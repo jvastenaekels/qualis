@@ -1,0 +1,113 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import SortableCard from './SortableCard';
+
+// Mock dnd-kit hook
+vi.mock('@dnd-kit/sortable', () => ({
+    useSortable: vi.fn().mockReturnValue({
+        attributes: {},
+        listeners: {},
+        setNodeRef: vi.fn(),
+        transform: null,
+        transition: null,
+        isDragging: false
+    })
+}));
+
+// Mock framer-motion to avoid animation issues in tests
+vi.mock('framer-motion', () => ({
+    motion: {
+        div: ({ children, className, onClick, onMouseEnter, onMouseLeave, ...props }: React.ComponentProps<'div'>) => (
+            <div 
+                className={className} 
+                onClick={onClick}
+                onMouseEnter={onMouseEnter}
+                onMouseLeave={onMouseLeave}
+                {...props}
+            >
+                {children}
+            </div>
+        )
+    }
+}));
+
+describe('SortableCard', () => {
+    const defaultProps = {
+        id: 123,
+        text: 'Test Card Content',
+    };
+
+    it('renders card text correctly', () => {
+        render(<SortableCard {...defaultProps} />);
+        expect(screen.getByText('Test Card Content')).toBeTruthy();
+    });
+
+    it('renders different variants with correct classes', () => {
+        const { rerender } = render(<SortableCard {...defaultProps} variant="grid" />);
+        // detailed check for grid variant classes or structure could be here
+        // For now checking text presence is a proxy that render succeeded
+        expect(screen.getByText('Test Card Content')).toBeTruthy();
+
+        rerender(<SortableCard {...defaultProps} variant="hand" />);
+        // Hand variant usually has smaller text or padding
+        // checking if it renders without crashing
+        expect(screen.getByText('Test Card Content')).toBeTruthy();
+
+        rerender(<SortableCard {...defaultProps} variant="compact" />);
+        expect(screen.getByText('Test Card Content')).toBeTruthy();
+    });
+
+    it('handles click events', () => {
+        const handleClick = vi.fn();
+        render(<SortableCard {...defaultProps} onClick={handleClick} />);
+        
+
+        // Based on implementation, the onClick is on the outer div which has .cursor-grab
+        // Let's find logic: The outer div has onClick
+        
+        // Simulating click on the text element which bubbles up
+        fireEvent.click(screen.getByText('Test Card Content'));
+        
+        expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows zoom overlay on hover', async () => {
+        render(<SortableCard {...defaultProps} />);
+        
+        const cardContainer = screen.getByText('Test Card Content').closest('.relative');
+        if(!cardContainer) throw new Error('Container not found');
+
+        // Trigger hover
+        fireEvent.mouseEnter(cardContainer);
+
+        // Zoom portal should appear
+        // Since it uses a Portal, it attaches to document.body
+        // We look for the zoomed text content
+        await waitFor(() => {
+             // Logic: The ZoomPortal renders the same text in a fixed overlay
+             // Since getAllByText would return 2 elements (card + zoom), we can check length
+             const textElements = screen.getAllByText('Test Card Content');
+             expect(textElements.length).toBe(2);
+        });
+
+        // Trigger leave
+        fireEvent.mouseLeave(cardContainer);
+        
+        await waitFor(() => {
+            const textElements = screen.getAllByText('Test Card Content');
+            expect(textElements.length).toBe(1);
+        });
+    });
+
+    it('styling changes when selected', () => {
+        render(<SortableCard {...defaultProps} isSelected={true} />);
+        
+        // We need to look for specific selected classes, e.g., border-blue-500
+        // The motion.div has the classes
+        // We can query by generic container
+        
+        // This relies on class structure which might be brittle, but verifies logic
+        const contentDiv = screen.getByText('Test Card Content').closest('.border-blue-500');
+        expect(contentDiv).toBeTruthy();
+    });
+});

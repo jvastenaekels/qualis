@@ -4,6 +4,7 @@ import SortableCard from './SortableCard';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { Check, ZoomIn, ZoomOut, RotateCcw, X, Frown, Meh, Smile } from 'lucide-react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useTranslation, Trans } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -108,7 +109,7 @@ const GridSort: React.FC<GridSortProps> = ({
   };
   
 
-  const transformRef = React.useRef<any>(null);
+  const transformRef = React.useRef<ReactZoomPanPinchRef>(null);
   const wrapperRef = React.useRef<HTMLDivElement>(null);
   const contentRef = React.useRef<HTMLDivElement>(null);
   const pyramidRef = React.useRef<HTMLDivElement>(null);
@@ -256,9 +257,8 @@ const GridSort: React.FC<GridSortProps> = ({
     setDimmingActive(true);
     
     // Safety delay to allow render and auto-fit to settle
-    const timer = setTimeout(() => {
-        const { zoomToElement } = transformRef.current;
-        
+    const timer = setTimeout(() => {    
+        if (!transformRef.current) return;
         let targetId = '';
         // Strategy: Focus on the "Center of the Zone" (Zonal Focus)
         if (activePile === 'disagree') {
@@ -275,7 +275,7 @@ const GridSort: React.FC<GridSortProps> = ({
         }
 
         const targetNode = document.getElementById(targetId);
-        if (targetNode && wrapperRef.current && pyramidRef.current && contentRef.current) {
+        if (targetNode && wrapperRef.current && pyramidRef.current && contentRef.current && transformRef.current) {
             const isMobile = window.innerWidth < 1024;
             const state = transformRef.current.instance.transformState;
             

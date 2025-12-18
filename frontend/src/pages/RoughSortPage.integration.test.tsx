@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import RoughSortPage from './RoughSortPage';
-import { LayoutProvider } from '../contexts/LayoutContext';
 import { useStudyStore } from '../store/useStudyStore';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import StudyLayout from '../layouts/StudyLayout';
@@ -39,7 +38,11 @@ describe('RoughSortPage Integration', () => {
             session: { hasConsented: true, currentStep: 3 },
             categorizeCard: vi.fn(),
             undoRoughSort: vi.fn(),
-            setStep: vi.fn()
+            setStep: vi.fn(),
+            setConfig: vi.fn(),
+            setConfigLoading: vi.fn(),
+            setConfigError: vi.fn(),
+            triggerConfigRefetch: vi.fn()
         });
 
         render(
@@ -71,7 +74,11 @@ describe('RoughSortPage Integration', () => {
              session: { hasConsented: true, currentStep: 3 },
              categorizeCard: vi.fn(),
              undoRoughSort: vi.fn(),
-             setStep: vi.fn()
+             setStep: vi.fn(),
+             setConfig: vi.fn(),
+             setConfigLoading: vi.fn(),
+             setConfigError: vi.fn(),
+             triggerConfigRefetch: vi.fn()
          });
  
          render(

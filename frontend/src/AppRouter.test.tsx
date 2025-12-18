@@ -24,7 +24,9 @@ describe('App Routing Protection', () => {
         // Mock session as NOT consented
         mockUseStudyStore.mockReturnValue({ 
             session: { hasConsented: false, currentStep: 1 },
-            config: { slug: 'demo' } 
+            config: { slug: 'demo' },
+            setConfigLoading: vi.fn(),
+            setConfigError: vi.fn()
         });
 
         render(
@@ -52,7 +54,11 @@ describe('App Routing Protection', () => {
 
     it('allows access if consented', () => {
         // Mock session AS consented
-        (useStudyStore as any).mockReturnValue({ session: { hasConsented: true, currentStep: 4 } });
+        mockUseStudyStore.mockReturnValue({ 
+            session: { hasConsented: true, currentStep: 4 },
+            setConfigLoading: vi.fn(),
+            setConfigError: vi.fn()
+        });
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>

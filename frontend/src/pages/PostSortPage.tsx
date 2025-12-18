@@ -51,7 +51,7 @@ const PostSortPage: React.FC = () => {
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [config, responses.qsort.length, navigate, slug, session.isCompleted]); 
+    }, [config, responses.qsort.length, navigate, slug, session.isCompleted, submit]); 
     
     if (!config) return null;
 

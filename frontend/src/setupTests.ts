@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 // Mock react-i18next globally
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ 
-        t: (key: any) => key,
+        t: (key: string) => key,
         i18n: {
              changeLanguage: () => new Promise(() => {}),
              language: 'en'
@@ -14,8 +14,8 @@ vi.mock('react-i18next', () => ({
         type: '3rdParty',
         init: () => {},
     },
-    Trans: ({ i18nKey, children }: any) => {
-        return children || i18nKey;
+    Trans: ({ children }: React.PropsWithChildren) => {
+        return children || null;
     }
 }));
 // Polyfill ResizeObserver

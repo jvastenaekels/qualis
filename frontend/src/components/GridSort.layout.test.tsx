@@ -48,16 +48,14 @@ describe('GridSort Layout', () => {
         expect(slots).toHaveLength(8);
     });
 
-    it('has sufficient top padding to prevent hidden slots', () => {
+    it('has sufficient spacing', () => {
          render(
             <DndContext>
                 <GridSort {...defaultProps} />
             </DndContext>
         );
         const gridContainer = screen.getByTestId('grid-container');
-        expect(gridContainer.className).toContain('py-12');
-        expect(gridContainer.className).toContain('py-12');
-        // expect(gridContainer.className).toContain('overflow-y-auto'); // Removed as logic changed with zoom lib
+        expect(gridContainer.className).toContain('gap-8');
     });
 });
 

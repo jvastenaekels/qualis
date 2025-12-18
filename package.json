@@ -1,0 +1,11 @@
+{
+  "name": "open-q-root",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build",
+    "postinstall": "echo 'Postinstall root skipping'"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
