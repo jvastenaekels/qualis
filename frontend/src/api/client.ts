@@ -8,7 +8,7 @@ export class ApiError extends Error {
     }
 }
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export async function post<T>(endpoint: string, data: any): Promise<T> {
     const response = await fetch(`${BASE_URL}${endpoint}`, {
