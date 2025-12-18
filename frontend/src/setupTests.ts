@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-// import '@testing-library/jest-dom'; 
+import '@testing-library/jest-dom'; 
 
 // Mock react-i18next globally
 vi.mock('react-i18next', () => ({
@@ -18,3 +18,9 @@ vi.mock('react-i18next', () => ({
         return children || i18nKey;
     }
 }));
+// Polyfill ResizeObserver
+global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};

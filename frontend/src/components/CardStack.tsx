@@ -103,9 +103,11 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         />
 
         {/* Content */}
-        <p className="text-xl sm:text-2xl font-medium text-gray-800 text-center relative z-10 pointer-events-none select-none">
-          {statement.text}
-        </p>
+        <div className="flex-1 w-full overflow-y-auto custom-scrollbar flex flex-col p-2">
+            <p className="text-xl sm:text-2xl font-medium text-gray-800 text-center select-none m-auto">
+              {statement.text}
+            </p>
+        </div>
       </motion.div>
     </div>
   );

@@ -21,10 +21,20 @@ const PostSortPage: React.FC = () => {
     const isSuccess = isSubmitSuccess || session.isCompleted;
     const finalConfirmationCode = session.confirmationCode || submitConfirmationCode;
 
+    // Local state for validation touched
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
+    const [validationError, setValidationError] = useState<string | null>(null);
+
     React.useEffect(() => {
         // If already completed, ensure we are technically on step 5 (though layout might lock others)
         setStep(5);
     }, [setStep]);
+
+    // Header Action (Submit)
+    React.useEffect(() => {
+        // Clear header action since we use body button
+        setHeaderAction(null);
+    }, [setHeaderAction]);
 
     // Completeness Guard
     React.useEffect(() => {
@@ -43,7 +53,7 @@ const PostSortPage: React.FC = () => {
         }
     }, [config, responses.qsort.length, navigate, slug, session.isCompleted]); 
     
-    if (!config) return <div className="p-8 text-center text-gray-500">{t('common.loading')}</div>;
+    if (!config) return null;
 
     // Default Grid (Same as FineSortPage)
     const DEFAULT_GRID = [
@@ -74,9 +84,6 @@ const PostSortPage: React.FC = () => {
     // Helpers to get text
     const getCardText = (id: number) => config?.statements.find(s => s.id === id)?.text || 'Unknown Card';
 
-    // Local state for validation touched
-    const [touched, setTouched] = useState<Record<string, boolean>>({});
-
     const handleCommentChange = (id: number, val: string) => {
         const current = { ...(responses.postsort?.card_comments || {}) };
         current[id] = val;
@@ -105,8 +112,6 @@ const PostSortPage: React.FC = () => {
         setTouched(newTouched);
     };
 
-    const [validationError, setValidationError] = useState<string | null>(null);
-
     const handleSubmit = async () => {
         if (!validateAll()) {
             markAllTouched();
@@ -117,12 +122,6 @@ const PostSortPage: React.FC = () => {
         setValidationError(null);
         await submit();
     };
-    
-    // Header Action (Submit)
-    React.useEffect(() => {
-        // Clear header action since we use body button
-        setHeaderAction(null);
-    }, [setHeaderAction]);
 
 
     // Success View

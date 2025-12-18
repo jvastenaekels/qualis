@@ -60,6 +60,10 @@ class StudyTranslation(Base):
     description: Mapped[str] = mapped_column(String)
     instructions: Mapped[str] = mapped_column(String) # HTML/MD
     ui_labels: Mapped[dict[str, str]] = mapped_column(JSON, default=dict) # Button adjustments
+    consent_title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    consent_description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    consent_accept: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    consent_decline: Mapped[Optional[str]] = mapped_column(String, nullable=True)
 
     study: Mapped["Study"] = relationship(back_populates="translations")
 

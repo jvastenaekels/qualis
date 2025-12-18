@@ -35,7 +35,7 @@ const SourceDeck: React.FC<SourceDeckProps> = ({ agree, disagree, neutral }) => 
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id as any)}
                         className={`
-                            flex-1 py-3 text-xs sm:text-sm font-bold uppercase tracking-wide
+                            flex-1 py-3 text-xs sm:text-sm font-bold tracking-wide
                             transition-colors relative
                             ${activeTab === tab.id ? tab.color : 'text-gray-400 hover:text-gray-600'}
                         `}

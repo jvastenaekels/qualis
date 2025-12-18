@@ -28,7 +28,10 @@ describe('useSubmitStudy', () => {
                 token: 'test-token',
                 hasConsented: true,
                 currentStep: 5,
-                language: 'en'
+                language: 'en',
+                maxReachedStep: 5,
+                isCompleted: false,
+                confirmationCode: null
             },
             responses: {
                 presort: { age: 30 },

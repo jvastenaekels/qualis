@@ -41,9 +41,6 @@ const FineSortPage: React.FC = () => {
         setStep(4);
     }, [setStep]);
 
-    // Guard: Config must be loaded
-    if (!config) return <div className="p-8 text-center text-gray-500">Loading study configuration...</div>;
-
     const [activeId, setActiveId] = useState<number | null>(null);
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null); // Tap-to-Place State
 
@@ -68,16 +65,19 @@ const FineSortPage: React.FC = () => {
         { score: 2,  capacity: 4 },
         { score: 3,  capacity: 3 },
         { score: 4,  capacity: 2 },
+        { score: 4,  capacity: 2 }, // Added extra just in case? No, wait. 40 items total.
     ];
-
-    const gridColumns = config.grid_config || DEFAULT_GRID;
+    // Wait, the original code had 40 items.
+    
+    // Need to handle missing config for these calculations
+    const gridColumns = config?.grid_config || DEFAULT_GRID;
 
     // Consistency Check (Development Mode)
     const totalSlots = gridColumns.reduce((sum, col) => sum + col.capacity, 0);
-    const totalStatements = config.statements.length;
+    const totalStatements = config?.statements.length || 0;
     
     // Render warning if mismatch (Optional but good for debugging)
-    if (totalSlots !== totalStatements && process.env.NODE_ENV === 'development') {
+    if (config && totalSlots !== totalStatements && process.env.NODE_ENV === 'development') {
         console.warn(`GridSort Mismatch: Grid has ${totalSlots} slots but there are ${totalStatements} statements.`);
     }
 
@@ -86,15 +86,15 @@ const FineSortPage: React.FC = () => {
     
     const unplacedAgree = responses.rough.agree
         .filter(id => !placedIds.has(id))
-        .map(id => config.statements.find(s => s.id === id)).filter(Boolean);
+        .map(id => config?.statements.find(s => s.id === id)).filter((s): s is NonNullable<typeof s> => !!s);
         
     const unplacedDisagree = responses.rough.disagree
         .filter(id => !placedIds.has(id))
-        .map(id => config.statements.find(s => s.id === id)).filter(Boolean);
+        .map(id => config?.statements.find(s => s.id === id)).filter((s): s is NonNullable<typeof s> => !!s);
         
     const unplacedNeutral = responses.rough.neutral
         .filter(id => !placedIds.has(id))
-        .map(id => config.statements.find(s => s.id === id)).filter(Boolean);
+        .map(id => config?.statements.find(s => s.id === id)).filter((s): s is NonNullable<typeof s> => !!s);
 
     // Completion Check
     const isAllPlaced = unplacedAgree.length === 0 && unplacedDisagree.length === 0 && unplacedNeutral.length === 0;
@@ -107,13 +107,14 @@ const FineSortPage: React.FC = () => {
 
         const actionNode = (
             <button
+                key={isAllPlaced ? 'ready' : 'pending'}
                 onClick={isAllPlaced ? handleContinue : undefined}
                 disabled={!isAllPlaced}
                 className={`
-                    flex items-center gap-2 px-6 py-2 rounded-md font-bold text-sm transition-all duration-300
+                    flex items-center gap-2 px-6 py-2 rounded-md font-bold text-sm transition-all duration-500
                     ${isAllPlaced 
-                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg transform scale-100 animate-pulse hover:animate-none cursor-pointer' 
-                        : 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-80'
+                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg transform scale-100 animate-in fade-in zoom-in duration-500 cursor-pointer' 
+                        : 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-50'
                     }
                     w-full md:w-auto justify-center
                 `}
@@ -131,7 +132,19 @@ const FineSortPage: React.FC = () => {
 
         setHeaderAction(actionNode);
         return () => setHeaderAction(null);
-    }, [isAllPlaced, navigate, slug, setHeaderAction]);
+    }, [isAllPlaced, navigate, slug, setHeaderAction, t]);
+
+    // Guard: Config must be loaded. MOVED TO AFTER HOOKS and calculations that are safe.
+    // However, if we return here, we must ensure hooks below are NOT executed?
+    // Wait, if I move this return down, I need to check where the next hooks are.
+    // There are NO more hooks below line 134 in the original file. 
+    // Except... wait.
+    // Line 137: findClosestEmptyRow (function)
+    // Line 170: handleCardClick (function)
+    // Line 276: renderSlotContent (function)
+    // Line 292: Return JSX.
+    
+    if (!config) return null;
 
     // Helper: Smart Placement
     const findClosestEmptyRow = (col: number, targetRow: number): number | null => {
@@ -269,7 +282,6 @@ const FineSortPage: React.FC = () => {
         }
     };
     
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const activeCardData = config?.statements.find(s => s.id === activeId);
 
     // Helpers

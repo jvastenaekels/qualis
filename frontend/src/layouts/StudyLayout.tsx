@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
-import { Outlet, useParams, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
 import { useStudyStore } from '../store/useStudyStore';
-import { Languages, ChevronDown } from 'lucide-react';
+import { Check, Globe, RefreshCw, X } from 'lucide-react';
 import { LayoutProvider, useLayoutAction } from '../contexts/LayoutContext';
+import { useStudyConfig } from '../hooks/useStudyConfig';
 
 const steps = [
   { id: 1, labelKey: 'layout.steps.welcome' },
@@ -17,12 +18,15 @@ const steps = [
 const StudyLayoutContent: React.FC = () => {
   const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
-  const { session } = useStudyStore();
+  const { session, config, configError, configLoading } = useStudyStore();
   const location = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate(); // Removed as stepper is read-only
   const { headerAction } = useLayoutAction();
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
+
+  // Trigger config fetch/re-fetch on slug or language change
+  const { retry } = useStudyConfig();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -37,12 +41,59 @@ const StudyLayoutContent: React.FC = () => {
     };
   }, []);
 
+  // Sync i18n with Store (Persistence Source of Truth) - Atomic update with config
+  useEffect(() => {
+    if (session.language && session.language !== i18n.language && !configLoading) {
+      i18n.changeLanguage(session.language);
+    }
+  }, [session.language, configLoading]);
+
   const changeLanguage = (lng: string) => {
-      i18n.changeLanguage(lng);
-      // Sync store
+      // Sync store (this will trigger config refetch)
       useStudyStore.getState().setLanguage(lng);
       setIsLangMenuOpen(false);
   };
+
+  // Full Page Error State (if we have no config at all)
+  if (configError && !config) {
+    return (
+        <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+            <div className="max-w-md w-full bg-white rounded-2xl border border-red-100 shadow-xl p-8 text-center space-y-6">
+                <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
+                    <X size={40} />
+                </div>
+                <div className="space-y-2">
+                    <h2 className="text-2xl font-bold text-slate-900">{t('common.error')}</h2>
+                    <p className="text-slate-600">{t(configError)}</p>
+                </div>
+                <button 
+                    onClick={retry}
+                    className="w-full py-3 px-6 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                >
+                    <RefreshCw size={18} /> {t('common.errors.retry')}
+                </button>
+            </div>
+        </div>
+    );
+  }
+
+  // Hard Loading State (Initial Fetch)
+  if (!config && configLoading) {
+     return (
+        <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
+            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className="space-y-2 text-center animate-pulse">
+                <p className="text-slate-500 font-bold text-xl">{t('common.loading')}</p>
+                <p className="text-slate-400 text-sm">Preparing your study session...</p>
+            </div>
+            {/* Minimal Skeleton */}
+            <div className="w-full max-w-md space-y-3 pt-8">
+                <div className="h-4 bg-slate-200 rounded w-3/4 mx-auto animate-pulse"></div>
+                <div className="h-4 bg-slate-200 rounded w-1/2 mx-auto animate-pulse"></div>
+            </div>
+        </div>
+     );
+  }
 
   // Basic Protection Check
   const isProtected = ['presort', 'sort', 'review'].some(path => location.pathname.includes(path));
@@ -63,152 +114,142 @@ const StudyLayoutContent: React.FC = () => {
   return (
     <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 flex-none relative">
-        <div className="w-full max-w-[1920px] mx-auto px-4 md:px-6 h-16 flex items-center justify-between gap-4 relative">
-          
-          {/* LEFT: Branding */}
-          <div className="font-bold text-gray-900 flex-shrink-0 z-10 bg-white pr-4">
-              Q-Method App
+      <header className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-50 flex items-center justify-between relative shadow-sm">
+        
+        {/* Subtle Loading Line (Background Re-validation) */}
+        {configLoading && (
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-600/20 overflow-hidden">
+                <div className="h-full bg-blue-600 w-1/3 animate-loading-line" />
+            </div>
+        )}
+
+        {/* Mobile Progress Bar (Top Edge) */}
+        <div className="md:hidden absolute top-0 left-0 w-full h-1 bg-slate-100">
+             <div 
+                className="h-full bg-blue-600 transition-all duration-300 ease-in-out" 
+                style={{ width: `${(session.currentStep / steps.length) * 100}%` }}
+             />
+        </div>
+
+        {/* LEFT: Branding / Context */}
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
+             {/* Use config title if available, else static default */}
+              {session.currentStep === 1 ? 'OpenQ' : (config?.title || 'Q-Method Study')}
           </div>
+          {/* Mobile Step Counter (Next to title) */}
+          <span className="md:hidden text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full whitespace-nowrap">
+            {t('layout.mobile_step')} {session.currentStep}/{steps.length}
+          </span>
+        </div>
 
-          {/* CENTER: Stepper (Desktop) - Absolute Centered */}
-          <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-            
-            {/* XL+ Screens: Full Stepper */}
-            <div className="hidden xl:flex items-center space-x-8">
-               {steps.map((step, index) => {
-                  const isActive = session.currentStep === step.id;
-                  const isCompleted = session.currentStep > step.id; // Visual completion of step
-                  
-                  // Disable navigation if global session is completed (except step 5 maybe, but redundant if redirect)
-                  // Or just disable everything if completed to prevent confusion
-                  const isDisabled = session.isCompleted || step.id > session.maxReachedStep;
-
-                  return (
+        {/* CENTER: Stepper (Desktop Only) */}
+        <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
+           <div className="flex items-center gap-1">
+              {steps.map((step, index) => {
+                 const status = session.currentStep === step.id
+                     ? 'current'
+                     : session.currentStep > step.id
+                     ? 'completed'
+                     : 'upcoming';
+                 
+                 return (
                     <div key={step.id} className="flex items-center">
-                        {/* Connecting Line (except first) */}
-                        {index > 0 && (
-                            <div className={`w-12 h-0.5 mx-2 ${isCompleted || isActive ? 'bg-blue-600' : 'bg-gray-200'}`} />
-                        )}
-                        
-                        <button
-                            onClick={() => {
-                                // Only allow navigation if step is reachable and not globally completed
-                                if (!isDisabled) {
-                                    useStudyStore.getState().setStep(step.id);
-                                    // Also navigate to the correct URL
-                                    // slug is available from hook logic above
-                                    // We need to map step ID to path segment manually or via a helper
-                                    const paths: Record<number, string> = {
-                                        1: 'welcome',
-                                        2: 'presort',
-                                        3: 'rough-sort',
-                                        4: 'sort', 
-                                        5: 'post-sort'
-                                    };
-                                    navigate(`/study/${slug}/${paths[step.id]}`);
-                                }
-                            }}
-                            disabled={isDisabled}
-                            className={`flex items-center gap-2 text-sm transition-colors ${
-                                !isDisabled ? 'cursor-pointer hover:text-blue-800' : 'cursor-not-allowed text-gray-400'
-                            } ${isActive ? 'text-blue-600 font-bold' : isCompleted ? 'text-gray-900' : ''}`}
-                        >
-                            <div className={`
-                                w-8 h-8 rounded-full flex items-center justify-center text-xs border transition-colors duration-300
-                                ${isActive ? 'border-blue-600 bg-blue-50 text-blue-600' : isCompleted ? 'bg-gray-900 text-white border-gray-900' : 'border-gray-200 text-gray-400'}
-                            `}>
-                                {step.id}
-                            </div>
-                            <span className="whitespace-nowrap">{t(step.labelKey)}</span>
-                        </button>
+                       {/* Connection Line */}
+                       {index > 0 && (
+                           <div className={`w-8 h-0.5 mx-2 transition-colors duration-300 ${status === 'upcoming' ? 'bg-slate-200' : 'bg-blue-600'}`} />
+                       )}
+                       
+                       {/* Step Node */}
+                       <div className={`
+                           w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                           ${status === 'current' ? 'border-blue-600 text-blue-600 bg-white shadow-sm ring-4 ring-blue-50' : 
+                             status === 'completed' ? 'bg-blue-600 border-blue-600 text-white' : 
+                             'border-slate-200 bg-slate-50 text-slate-300'}
+                       `}>
+                           {status === 'completed' ? (
+                               <Check size={16} strokeWidth={3} />
+                           ) : status === 'current' ? (
+                               <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />
+                           ) : (
+                               <div className="w-2 h-2 bg-slate-300 rounded-full" />
+                           )}
+                       </div>
+
+                       {/* Label (Current Only) */}
+                       {status === 'current' && (
+                           <span className="ml-3 font-bold text-slate-800 text-sm whitespace-nowrap animate-in fade-in slide-in-from-left-2">
+                               {t(step.labelKey)}
+                           </span>
+                       )}
                     </div>
-                  );
-               })}
-            </div>
+                 );
+              })}
+           </div>
+        </div>
 
-            {/* MD-XL Screens: Compact Stepper */}
-            <div className="flex xl:hidden flex-col items-center">
-                <span className="text-xs uppercase tracking-wider text-gray-500 font-bold">{t('layout.mobile_step')} {session.currentStep} / {steps.length}</span>
-                <span className="text-sm font-semibold text-gray-900">
-                    {t(steps.find(s => s.id === session.currentStep)?.labelKey || '')}
-                </span>
-            </div>
-          </div>
-
-
-          {/* RIGHT: Actions + Language */}
-          <div className="flex items-center gap-3 z-10 bg-white pl-4">
-             {/* Language Dropdown */}
-            <div className="relative" ref={langMenuRef}>
+        {/* RIGHT: Actions + Language */}
+        <div className="flex items-center gap-3">
+           {/* Language Selector (Globe Icon) */}
+           <div className="relative" ref={langMenuRef}>
                 <button 
                     onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                    className={`
-                        p-2 rounded-full flex items-center gap-2 transition-all duration-200 border
-                        ${isLangMenuOpen ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-white border-transparent hover:bg-gray-100 text-gray-600'}
-                    `}
-                    title="Select Language"
+                    className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
+                    title="Change language"
                 >
-                    <Languages size={20} />
-                    <span className="hidden 2xl:inline text-sm font-medium">
-                        {i18n.language.startsWith('fr') ? 'Français' : i18n.language.startsWith('fi') ? 'Suomi' : 'English'}
-                    </span>
-                    <ChevronDown size={14} className={`transition-transform duration-200 ${isLangMenuOpen ? 'rotate-180' : ''}`} />
+                    <Globe size={20} />
                 </button>
 
-                {/* Dropdown Menu */}
+                {/* Dropdown (Simplified) */}
                 {isLangMenuOpen && (
-                    <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-50 animate-in fade-in slide-in-from-top-2">
-                        <div className="px-3 py-2 border-b border-gray-50 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                            Select Language
-                        </div>
-                        <button 
-                            onClick={() => changeLanguage('en')}
-                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${i18n.language.startsWith('en') ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-700'}`}
-                        >
-                            <span>English</span>
-                            {i18n.language.startsWith('en') && <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>}
-                        </button>
-                        <button 
-                            onClick={() => changeLanguage('fr')}
-                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${i18n.language.startsWith('fr') ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-700'}`}
-                        >
-                            <span>Français</span>
-                            {i18n.language.startsWith('fr') && <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>}
-                        </button>
-                        <button 
-                            onClick={() => changeLanguage('fi')}
-                            className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors flex items-center justify-between ${i18n.language.startsWith('fi') ? 'text-blue-600 font-bold bg-blue-50/50' : 'text-gray-700'}`}
-                        >
-                            <span>Suomi</span>
-                            {i18n.language.startsWith('fi') && <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span>}
-                        </button>
+                    <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-50 animate-in fade-in zoom-in-95">
+                        {['en', 'fr', 'fi'].map((lang) => (
+                            <button 
+                                key={lang}
+                                onClick={() => changeLanguage(lang)}
+                                className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${i18n.language.startsWith(lang) ? 'text-blue-600 font-semibold' : 'text-slate-700'}`}
+                            >
+                                <span className="uppercase">{lang}</span>
+                                {i18n.language.startsWith(lang) && <Check size={14} />}
+                            </button>
+                        ))}
                     </div>
                 )}
-            </div>
+           </div>
 
-            {/* PRIMARY ACTION (Desktop) */}
-            <div className="hidden md:block">
-                {headerAction}
-            </div>
-          </div>
-        </div>
-        
-        {/* Stepper (Mobile) - Keep independent below */}
-        <div className="md:hidden border-t border-gray-100 bg-gray-50 px-4 py-2 text-xs font-medium text-gray-600 text-center flex items-center justify-center gap-2">
-            <span className="bg-gray-200 text-gray-700 px-1.5 rounded text-[10px]">{session.currentStep}/{steps.length}</span>
-            <span>{t(steps.find(s => s.id === session.currentStep)?.labelKey || '')}</span>
+           {/* Primary Action (Desktop) */}
+           <div className="hidden md:block">
+               {headerAction}
+           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 w-full mx-auto overflow-y-auto relative flex flex-col">
-        <Outlet />
+      <main className="flex-1 w-full mx-auto overflow-y-auto relative flex flex-col bg-slate-50">
+        {/* Error Banner (Stale-while-revalidating failure) */}
+        {configError && config && (
+            <div className="bg-red-600 text-white px-6 py-2 flex items-center justify-between animate-in slide-in-from-top duration-300">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                    <X size={16} />
+                    {t(configError)}
+                </div>
+                <button 
+                    onClick={retry}
+                    className="flex items-center gap-1.5 px-3 py-1 bg-white/20 hover:bg-white/30 rounded text-xs font-bold transition-colors"
+                >
+                    <RefreshCw size={14} /> {t('common.errors.retry')}
+                </button>
+            </div>
+        )}
+        {/* Transition Overlay / Dimming */}
+        <div className={`flex-1 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+            <Outlet />
+        </div>
       </main>
 
-      {/* Mobile Footer for Action (Validation Gate) */}
+      {/* Mobile Footer (Primary Action) */}
       {showMobileFooter && (
-          <div className="md:hidden flex-none bg-white border-t border-gray-200 p-4 sticky bottom-0 z-50 pb-safe">
+          <div className="md:hidden flex-none bg-white border-t border-slate-200 p-4 sticky bottom-0 z-50 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
               {headerAction}
           </div>
       )}

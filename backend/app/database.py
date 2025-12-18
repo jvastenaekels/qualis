@@ -1,8 +1,10 @@
+import os
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 
 # For local development with SQLite
-SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./q_method.db"
+# On Scalingo/Production, this will be provided via DATABASE_URL
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./q_method.db")
 
 engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,

@@ -1,16 +1,13 @@
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 
-interface DroppableSlotProps {
+interface DroppableSlotProps extends React.HTMLAttributes<HTMLDivElement> {
   id: string; // Format: "col-row"
   isOver?: boolean;
   children?: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-  style?: React.CSSProperties; 
 }
 
-const DroppableSlot: React.FC<DroppableSlotProps> = ({ id, children, className, onClick, style }) => {
+const DroppableSlot: React.FC<DroppableSlotProps> = ({ id, children, className, onClick, style, ...props }) => {
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
@@ -21,6 +18,7 @@ const DroppableSlot: React.FC<DroppableSlotProps> = ({ id, children, className, 
       onClick={onClick}
       data-testid={id}
       style={style} // Apply style
+      {...props}
       className={`
         rounded border-2 
         flex items-center justify-center 

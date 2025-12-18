@@ -1,19 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { StudyConfig } from '../schemas/study';
 
-// Basic Types for State (Expand as models grow)
-export interface StudyConfig {
-  slug: string;
-  title: string;
-  description: string;
-  instructions: string;
-  presort_config: Record<string, any>;
-  grid_config?: { score: number; capacity: number }[];
-  postsort_config?: {
-      extreme_columns?: number[];
-  };
-  statements: { id: number; text: string }[];
-}
+// Removed old StudyConfig interface in favor of Zod-inferred type
 
 interface SessionState {
   token: string | null;
@@ -26,7 +15,7 @@ interface SessionState {
 }
 
 interface ResponsesState {
-  presort: Record<string, any>;
+  presort: Record<string, string | number | boolean>;
   rough: {
     agree: number[];
     disagree: number[];
@@ -44,16 +33,22 @@ interface ResponsesState {
 interface StudyStore {
   // Data
   config: StudyConfig | null;
+  configLoading: boolean;
+  configError: string | null;
+  configRefetchTag: number;
   session: SessionState;
   responses: ResponsesState;
 
   // Actions
   setConfig: (config: StudyConfig) => void;
+  setConfigLoading: (loading: boolean) => void;
+  setConfigError: (error: string | null) => void;
+  triggerConfigRefetch: () => void;
   setConsent: (consented: boolean) => void;
   setToken: (token: string) => void;
   setStep: (step: number) => void;
-  setPresortResponse: (data: Record<string, any>) => void;
-  setPostSortResponse: (field: keyof ResponsesState['postsort'], value: any) => void;
+  setPresortResponse: (data: Record<string, string | number | boolean>) => void;
+  setPostSortResponse: (field: keyof ResponsesState['postsort'], value: string | Record<number, string>) => void;
   
   categorizeCard: (statementId: number, category: 'agree' | 'disagree' | 'neutral') => void;
   undoRoughSort: () => void;
@@ -74,6 +69,9 @@ export const useStudyStore = create<StudyStore>()(
   persist(
     (set) => ({
       config: null,
+      configLoading: false,
+      configError: null,
+      configRefetchTag: 0,
       session: {
         token: null,
         hasConsented: false,
@@ -90,7 +88,10 @@ export const useStudyStore = create<StudyStore>()(
         postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
       },
 
-      setConfig: (config) => set({ config }),
+      setConfig: (config) => set({ config, configLoading: false, configError: null }),
+      setConfigLoading: (configLoading) => set({ configLoading }),
+      setConfigError: (configError) => set({ configError, configLoading: false }),
+      triggerConfigRefetch: () => set((state) => ({ configRefetchTag: state.configRefetchTag + 1 })),
       setConsent: (hasConsented) =>
         set((state) => ({ session: { ...state.session, hasConsented } })),
       setToken: (token) =>
@@ -250,10 +251,12 @@ export const useStudyStore = create<StudyStore>()(
           }
       })),
       
-      resetSession: () => set({
+      resetSession: () => set((state) => ({
+        config: null,
+        configRefetchTag: state.configRefetchTag + 1,
         session: { token: null, hasConsented: false, currentStep: 1, maxReachedStep: 1, language: 'en', isCompleted: false, confirmationCode: null },
         responses: { presort: {}, rough: { agree: [], disagree: [], neutral: [], history: [] }, qsort: [], postsort: { card_comments: {}, missing_statement: '', general_comment: '' } }
-      }),
+      })),
 
       setLanguage: (lang) => set((state) => ({
           session: { ...state.session, language: lang }
@@ -261,24 +264,38 @@ export const useStudyStore = create<StudyStore>()(
     }),
     {
       name: 'q-method-storage',
-      version: 3, // Bump version
-      migrate: (persistedState: any, version: number) => {
+      version: 4,
+      migrate: (persistedState: unknown, version: number) => {
+        let state = persistedState as Record<string, unknown>;
+
+        // Schema Safety: When adding/changing shared State interfaces, 
+        // increment version and add migration logic here.
         if (version < 3) {
-           return {
-             ...persistedState,
+           const session = (state?.session as Record<string, unknown>) || {};
+           state = {
+             ...state,
              session: {
-                 ...persistedState.session,
+                 ...session,
                  isCompleted: false,
                  confirmationCode: null
              }
            };
         }
-        return persistedState;
+
+        if (version < 4) {
+          // Initialize configRefetchTag if missing (added in v4)
+          state = {
+            ...state,
+            configRefetchTag: state?.configRefetchTag ?? 0
+          };
+        }
+
+        return state;
       },
     }
   )
 );
 // Expose store for E2E testing
 if (import.meta.env.DEV) {
-  (window as any).useStudyStore = useStudyStore;
+  (window as Record<string, unknown>).useStudyStore = useStudyStore;
 }

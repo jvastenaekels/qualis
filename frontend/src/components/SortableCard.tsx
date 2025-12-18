@@ -36,8 +36,8 @@ const SortableCard: React.FC<SortableCardProps> = ({
 
   const ZoomPortal = () => createPortal(
     <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
-        <div className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-4 transform scale-110">
-            <p className="text-lg font-medium text-slate-800 text-center leading-relaxed">
+        <div className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-4 transform scale-110 max-h-[80vh] overflow-y-auto flex flex-col">
+            <p className="text-lg font-medium text-slate-800 text-center leading-relaxed my-auto">
                 {text}
             </p>
         </div>
@@ -61,7 +61,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
           containerPadding = 'px-2 py-2';
           break;
       case 'compact': 
-          textSizeClass = 'text-[10px] leading-tight line-clamp-4 text-slate-700'; // Smaller text for mobile deck
+          textSizeClass = 'text-xs leading-tight line-clamp-4 text-slate-700'; // Smaller text for mobile deck
           containerPadding = 'p-2';
           break;
       case 'grid': 

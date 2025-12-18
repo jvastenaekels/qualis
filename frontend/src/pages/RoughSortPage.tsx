@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useMotionValue, useTransform, motion } from 'framer-motion';
 import { useStudyStore } from '../store/useStudyStore';
 import CardStack, { type CardStackHandle } from '../components/CardStack';
-import { Check, X, ArrowDown, RotateCcw, ArrowRight } from 'lucide-react';
+import { Check, X, RotateCcw, ArrowRight, Frown, Smile, Meh } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 
@@ -108,7 +108,7 @@ const RoughSortPage: React.FC = () => {
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [currentCard, responses.rough.history.length, undoRoughSort]);
 
-    if (!config) return <div>Loading...</div>;
+    if (!config) return null;
 
     // Completed State
     if (!currentCard) {
@@ -180,10 +180,25 @@ const RoughSortPage: React.FC = () => {
             {/* 3. The Control Cluster (Centered Stage) */}
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-2 py-4 relative">
                 
-                {/* FLOATING TIP (Top Left of Control Cluster) - Closable */}
+                {/* FLOATING TIP (Top Left of Control Cluster) - Swipeable & Closable */}
                 {showTip && (
-                    <div className="absolute top-4 left-4 z-40 max-w-xs pointer-events-none select-none hidden md:block">
-                        <div className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-sm rounded-xl p-4 flex gap-3 animate-in fade-in slide-in-from-top-4 duration-700 pointer-events-auto relative pr-8">
+                    <div className="absolute top-4 left-4 z-40 max-w-xs hidden md:block select-none pointer-events-auto">
+                        <motion.div 
+                            drag="x"
+                            dragConstraints={{ left: 0, right: 0 }}
+                            dragElastic={0.2}
+                            onDragEnd={(_, info) => {
+                                if (Math.abs(info.offset.x) > 100 || Math.abs(info.velocity.x) > 500) {
+                                    setShowTip(false);
+                                }
+                            }}
+                            onPointerDownCapture={(e) => e.stopPropagation()}
+                            onPointerMoveCapture={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-sm rounded-xl p-4 flex gap-3 relative pr-8 cursor-grab active:cursor-grabbing"
+                        >
                             <span className="text-lg">💡</span>
                             <p className="text-sm text-slate-600 leading-relaxed font-medium">
                                 {t('rough.header.hint')}
@@ -194,7 +209,7 @@ const RoughSortPage: React.FC = () => {
                             >
                                 <X size={14} />
                             </button>
-                        </div>
+                        </motion.div>
                     </div>
                 )}
 
@@ -204,11 +219,14 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleDisagree, opacity: opacityDisagree }}
                         onClick={() => handleVote('disagree')}
-                        className="z-20 flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1"
+                        className="z-20 flex flex-col items-center justify-center w-[7.5rem] h-[7.5rem] sm:w-[9.1rem] sm:h-[9.1rem] rounded-full bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1"
                         aria-label={t('common.disagree')}
                     >
-                        <X size={28} strokeWidth={3} />
-                        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wide">{t('common.disagree')}</span>
+                        {/* Unified: Frown + Text for all screens */}
+                        <div className="flex flex-col items-center gap-1">
+                             <Frown size={24} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
+                             <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wide">{t('common.disagree')}</span>
+                        </div>
                     </motion.button>
 
                     {/* Card Zone */}
@@ -229,11 +247,14 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleAgree, opacity: opacityAgree }}
                         onClick={() => handleVote('agree')}
-                        className="z-20 flex flex-col items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1"
+                        className="z-20 flex flex-col items-center justify-center w-[7.5rem] h-[7.5rem] sm:w-[9.1rem] sm:h-[9.1rem] rounded-full bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1"
                         aria-label={t('common.agree')}
                     >
-                        <Check size={28} strokeWidth={3} />
-                        <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wide">{t('common.agree')}</span>
+                        {/* Unified: Smile + Text for all screens */}
+                        <div className="flex flex-col items-center gap-1">
+                            <Smile size={24} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
+                            <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wide">{t('common.agree')}</span>
+                        </div>
                     </motion.button>
                 </div>
 
@@ -241,11 +262,14 @@ const RoughSortPage: React.FC = () => {
                 <motion.button
                     style={{ scale: scaleNeutral, opacity: opacityNeutral }}
                     onClick={() => handleVote('neutral')}
-                    className="mt-6 w-48 h-14 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
+                    className="mt-6 w-[18.2rem] h-[5.6rem] rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
                     aria-label={t('common.neutral')}
                 >
-                    <ArrowDown size={20} />
-                    {t('common.neutral')}
+                     {/* Unified: Meh + Text for all screens */}
+                     <div className="flex items-center gap-2 text-gray-600">
+                         <Meh size={20} strokeWidth={2.5} className="opacity-80" />
+                         <span className="text-sm font-bold tracking-wide">{t('common.neutral')}</span>
+                    </div>
                 </motion.button>
                 
             </div>

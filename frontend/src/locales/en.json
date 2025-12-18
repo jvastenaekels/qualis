@@ -1,56 +1,68 @@
 {
   "common": {
-    "agree": "Agree",
-    "disagree": "Disagree",
-    "neutral": "Neutral",
+    "agree": "Like my view",
+    "disagree": "Unlike my view",
+    "neutral": "Neutral / Unsure",
     "undo": "Undo",
     "next": "Next step",
-    "submit": "Submit study",
+    "submit": "Save my perspective",
     "loading": "Loading...",
     "yes": "Yes",
     "no": "No",
     "ok": "OK",
     "cancel": "Cancel",
-    "attention": "Attention",
+    "attention": "Note",
     "error": "Error",
-    "submitting": "Submitting..."
+    "submitting": "Sending...",
+    "cards": "cards",
+    "close": "Close",
+    "errors": {
+      "network": "Network connection error. Please check your internet connection.",
+      "not_found": "Study not found.",
+      "validation": "System error: Data validation failed.",
+      "unknown": "An unexpected error occurred.",
+      "retry": "Retry"
+    }
   },
   "layout": {
-    "title": "Q-Method App",
+    "title": "OpenQ",
     "steps": {
       "welcome": "Welcome",
-      "presort": "Quick questions",
-      "rough": "Rough sort",
-      "fine": "Fine sort",
-      "review": "Review"
+      "presort": "Context",
+      "rough": "First impression",
+      "fine": "Distinctions",
+      "review": "Overview"
     },
     "mobile_step": "Step",
     "language": "English"
   },
   "welcome": {
-    "start": "Start study",
+    "title": "Welcome",
+    "description": "Please read the instructions carefully.",
+    "start": "Start Study",
     "consent": {
-      "label": "I consent to participate in this study",
-      "description": "I understand that my data will be processed anonymously and I can withdraw at any time.",
-      "error": "You must consent to participate."
-    }
+      "label": "I verify that I am at least 18 years old. I consent to the anonymous processing of my data in accordance with GDPR.",
+      "error": "You must accept the terms to continue."
+    },
+    "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
+    "restart": "Start a new session"
   },
   "presort": {
     "title": "About you",
-    "description": "Please answer a few questions before starting the sort.",
+    "description": "Please answer a few questions to help us contextualize your point of view.",
     "submit": "Continue to sorting",
     "select_placeholder": "Select...",
-    "error_required": "This field is required"
+    "error_required": "Please answer this question."
   },
   "rough": {
     "header": {
       "title": "Does this statement represent your point of view?",
-      "subtitle": "Swipe left to disagree, right to agree, or down for neutral.",
-      "hint": "Your choices here are not final. This step simply helps organize your thoughts before the precise sorting."
+      "subtitle": "Swipe left if it is unlike your view, right if it is like your view, or down if unsure.",
+      "hint": "Trust your first impression. This step helps organize your thoughts before the detailed sorting."
     },
     "complete": {
       "title": "Rough sort complete",
-      "subtitle": "You have categorized all statements. Now we will refine your choices."
+      "subtitle": "You have categorized all statements. Now, let's refine the nuance."
     },
     "instructions": {
         "swipe": "Swipe or tap to categorize"
@@ -58,44 +70,55 @@
   },
   "fine": {
     "deck": {
-        "title": "Statements to sort",
-        "all_placed": "All placed!",
+        "title": "Cards available",
+        "all_placed": "Deck empty",
         "reset": "Reset deck",
-        "confirm_reset": "Are you sure you want to reset the grid? All placed cards will return to their piles."
+        "confirm_reset": "Restart the grid placement? Your cards will return to the deck."
     },
-    "toolbar": {
-        "mobile": "Sort from <0>disagree</0> (left) to <1>agree</1> (right). Tap to place within the grid.",
-        "desktop": "Sort from <0>disagree</0> (left) to <1>agree</1> (right). Drag cards to the grid."
-    },
-    "tips": {
-        "extremes": "It's often easier to start by placing the cards you feel most strongly about in the extreme columns (-4 and +4).",
-        "vertical": "Note: Vertical position is irrelevant. Only the left-to-right order matters."
-    },
+  "toolbar": {
+      "mobile": "Tap a card to select it, then tap the grid to place it according to how well it matches your view.",
+      "desktop": "Drag cards onto the pyramid grid according to how well they match your view.",
+      "zoom_in": "Zoom In",
+      "zoom_out": "Zoom Out",
+      "fit_screen": "Fit to Screen",
+      "label": "Grid controls"
+  },
+  "grid": {
+      "label": "Sorting Grid",
+      "column": "Column",
+      "slot": "Slot",
+      "in_column": "in column"
+  },
+"tips": {
+    "extremes": "Quick tip: Start with the left and right edges. It's usually easier to place what is clearest to you first, and save the more nuanced choices for later.",
+    "vertical": "Note: Vertical position doesn't matter. Only the left-to-right order counts."
+},
     "legend": {
-        "disagree": "Disagree",
+        "disagree": "Unlike my view",
         "neutral": "Neutral",
-        "agree": "Agree"
+        "agree": "Like my view",
+        "label": "Spectrum legend"
     },
     "actions": {
-        "validate": "Validate",
+        "validate": "Confirm Grid",
         "finish": "Finish sorting",
-        "ready": "Ready to review",
-        "not_ready": "Place all cards to proceed"
+        "ready": "Review my perspective",
+        "not_ready": "Place all cards to continue"
     }
   },
   "post": {
     "title": "Final questions",
-    "description": "You're almost done! Please take a moment to explain your choices for the most significant statements.",
+    "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
     "extreme": {
-        "why": "Why did you place this here?",
-        "placeholder": "Please explain your thinking...",
-        "min_chars": "Please enter at least 10 characters.",
-        "label_agree": "Agree",
-        "label_disagree": "Disagree"
+        "why": "What in your personal experience led you to place this card here?",
+        "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
+        "min_chars": "A few words are enough to help us understand the context.",
+        "label_agree": "Most Like my view",
+        "label_disagree": "Most Unlike my view"
     },
     "missing": {
-        "label": "Is there any key statement missing to reflect your view?",
-        "description": "If so, please describe it briefly below.",
+        "label": "Is there any key statement missing to fully reflect your view?",
+        "description": "If you feel an important aspect was left out, please describe it here.",
         "placeholder": "Optional..."
     },
     "general": {
@@ -104,11 +127,11 @@
         "placeholder": "Optional..."
     },
     "submit": "Submit study",
-    "validation_error": "Please complete all required comments (min 10 characters).",
+    "validation_error": "Please ensure you've briefly explained your key choices above.",
     "success": {
-        "title": "Thank You!",
-        "message": "Your responses have been successfully submitted.",
-        "id_label": "Confirmation Code"
+        "title": "Perspective recorded",
+        "message": "Your contribution to the study has been saved.",
+        "id_label": "Confirmation code"
     }
   }
 }

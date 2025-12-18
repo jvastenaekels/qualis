@@ -1,3 +1,8 @@
+import sys
+import os
+# Add parent directory to path to allow importing app
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import asyncio
 from sqlalchemy import select
 from app.database import SessionLocal

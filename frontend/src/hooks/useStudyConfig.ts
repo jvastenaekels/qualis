@@ -1,37 +1,58 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useStudyStore } from '../store/useStudyStore';
-import { get } from '../api/client';
+import { get, ApiError } from '../api/client';
 import { useParams } from 'react-router-dom';
-
-// Since we haven't typed the backend response strictly in frontend, use 'any' or verify type
+import { StudyConfigSchema } from '../schemas/study';
+import { ZodError } from 'zod';
 
 export const useStudyConfig = () => {
     const { slug } = useParams();
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const { setConfig, session } = useStudyStore();
+    const { setConfig, setConfigLoading, setConfigError, triggerConfigRefetch, configRefetchTag, session, config } = useStudyStore();
 
     useEffect(() => {
         if (!slug) return;
         
         const fetchConfig = async () => {
-            setIsLoading(true);
+            // Only show full loading state if we don't have a config yet (stale-while-revalidating)
+            if (!config) {
+                setConfigLoading(true);
+            }
+            
+            // Clear previous error when starting a new fetch
+            setConfigError(null);
+
             try {
                 // Fetch study config from backend
-                const data = await get<any>(`/api/study/${slug}?lang=${session.language}`);
+                const data = await get<unknown>(`/api/study/${slug}?lang=${session.language}`);
                 
-                setConfig(data);
+                // VALIDATE WITH ZOD
+                const validatedData = StudyConfigSchema.parse(data);
                 
-            } catch (err: any) {
-                console.error("Failed to fetch study:", err);
-                setError(err.message);
-            } finally {
-                setIsLoading(false);
+                setConfig(validatedData);
+                
+            } catch (err: unknown) {
+                console.error("Failed to fetch or validate study:", err);
+                
+                let errorKey = 'common.errors.unknown';
+                if (err instanceof ApiError) {
+                    if (err.status === 404) {
+                        errorKey = 'common.errors.not_found';
+                    }
+                } else if (err instanceof ZodError) {
+                    errorKey = 'common.errors.validation';
+                } else if (err instanceof TypeError && err.message === 'Failed to fetch') {
+                    errorKey = 'common.errors.network';
+                }
+                
+                setConfigError(errorKey);
             }
         };
 
         fetchConfig();
-    }, [slug, session.language, setConfig]); 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [slug, session.language, configRefetchTag, setConfig, setConfigLoading, setConfigError]); 
 
-    return { isLoading, error };
+    return { 
+        retry: triggerConfigRefetch 
+    };
 };

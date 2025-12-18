@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Path, Query
 from datetime import datetime
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlalchemy import select
 from app.database import get_db
 from app.models import Study, Participant, QSortEntry, ParticipantStatus, Statement
@@ -9,19 +10,78 @@ from app.schemas import SubmissionInput
 router = APIRouter()
 
 @router.post("/submit")
-async def submit_study(data: SubmissionInput, request: Request, db: Session = Depends(get_db)):
+async def submit_study(data: SubmissionInput, request: Request, db: AsyncSession = Depends(get_db)):
     # Metadata
     ip_address = request.client.host if request.client else "unknown"
     # Confirmation code logic moved up (or re-generated if new, but session token is consistent)
     confirmation_code = str(data.session_token)[:8].upper()
 
     # 1. Find Study
-    study = await db.execute(select(Study).where(Study.slug == data.study_slug))
-    study = study.scalar_one_or_none()
+    study_stmt = select(Study).where(Study.slug == data.study_slug).options(selectinload(Study.statements))
+    study_result = await db.execute(study_stmt)
+    study = study_result.scalar_one_or_none()
     if not study:
         raise HTTPException(status_code=404, detail="Study not found")
 
-    # 2. Find or Create Participant
+    # 2. Validation: Statement Ownership
+    # Ensure all submitted statement IDs belong to this study
+    valid_statement_ids = {s.id for s in study.statements}
+    for entry in data.qsort:
+        if entry.statement_id not in valid_statement_ids:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Statement ID {entry.statement_id} does not belong to study '{data.study_slug}'"
+            )
+
+    # 3. Validation: Enforce Completeness
+    if data.status == ParticipantStatus.completed:
+        # Check if qsort entries match the total number of statements in the study
+        # We need to count statements.
+        stmt_count = len(study.statements)
+        if len(data.qsort) != stmt_count:
+             # Since duplicates are blocked in schema, len equality is enough.
+             raise HTTPException(status_code=400, detail=f"Submission incomplete. Expected {stmt_count} cards, got {len(data.qsort)}.")
+
+        # Check Column Capacities (Forced Distribution)
+        # Group entries by grid_score
+        from collections import Counter
+        submission_counts = Counter(entry.grid_score for entry in data.qsort)
+        
+        # Normalize grid_config to a dict for easier comparison
+        # study.grid_config can be a list of {"score": X, "capacity": Y} or dict {"score": capacity}
+        target_dist = {}
+        if isinstance(study.grid_config, list):
+            for item in study.grid_config:
+                if isinstance(item, dict) and "score" in item and "capacity" in item:
+                    target_dist[int(item["score"])] = item["capacity"]
+        elif isinstance(study.grid_config, dict):
+            for score_str, capacity in study.grid_config.items():
+                try:
+                    target_dist[int(score_str)] = capacity
+                except ValueError:
+                    continue
+        
+        # Check against target_dist
+        for score_val, capacity in target_dist.items():
+            count = submission_counts.get(score_val, 0)
+            
+            # Strict enforcement for completed studies: Count must match capacity exactly
+            if count != capacity:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Column {score_val} has incorrect number of cards. Expected {capacity}, got {count}."
+                )
+            
+            # Remove from counter to check for extra invalid scores later
+            if score_val in submission_counts:
+                del submission_counts[score_val]
+        
+        # If any entries remain in submission_counts, they are invalid scores (not in config)
+        if submission_counts:
+            invalid_scores = list(submission_counts.keys())
+            raise HTTPException(status_code=400, detail=f"Submission contains invalid grid scores: {invalid_scores}")
+
+    # 4. Find or Create Participant
     # We trust the session_token from the client for now, or ensure uniqueness
     participant = await db.execute(select(Participant).where(Participant.session_token == data.session_token))
     participant = participant.scalar_one_or_none()
@@ -34,42 +94,33 @@ async def submit_study(data: SubmissionInput, request: Request, db: Session = De
             language_used=data.language_used,
             presort_answers=data.presort_answers,
             postsort_answers=data.postsort_answers,
-            status=data.status, # Use provided status or default
+            status=data.status,
             confirmation_code=confirmation_code,
             ip_address=ip_address,
             submitted_at=datetime.now()
         )
         db.add(participant)
-        await db.commit()
-        await db.refresh(participant)
+        await db.flush() # Get ID, don't commit yet
     else:
         # Update existing participant
-        # Prevent re-submission if already completed and we are trying to set completed again?
-        # Actually logic:
-        # If DB is completed -> Return early (prevent overwrite)
-        # UNLESS we want to support editing? Requirement says "Verify and propose ways to handle this". 
-        # Current logic was: if completed, return code.
-        # User request today: "save as incomplete".
-        
         if participant.status == ParticipantStatus.completed:
-             # If already completed, do not allow switching back to started or editing.
-             # Return success with code.
+             # Already completed, idempotent return
             confirmation_code = str(participant.session_token)[:8].upper()
             return {"status": "success", "confirmation_code": confirmation_code}
 
-        # We must await refresh calls if we access lazy loaded attrs, but here we just set values.
         participant.language_used = data.language_used
         participant.presort_answers = data.presort_answers
         participant.postsort_answers = data.postsort_answers
-        participant.status = data.status # Update status (e.g. started -> completed)
+        participant.status = data.status 
         participant.confirmation_code = confirmation_code
         participant.ip_address = ip_address
         participant.submitted_at = datetime.now()
         
-        # Explicit flush to ensure updates are ready before managing children
         await db.flush()
         
         # Delete existing Q-Sorts to replace them
+        # We need to load them to delete, or use delete statement logic
+        # For simplicity and ORM safety:
         stmt = select(Participant).where(Participant.id == participant.id).options(selectinload(Participant.qsort_entries))
         p_with_entries = await db.execute(stmt)
         participant = p_with_entries.scalar_one()
@@ -77,11 +128,10 @@ async def submit_study(data: SubmissionInput, request: Request, db: Session = De
         if participant.qsort_entries:
             for entry in participant.qsort_entries:
                 await db.delete(entry)
-        await db.commit()
+        
+        await db.flush()
 
-    # 3. Save Q-Sort Entries
-    # Verify statement IDs belong to this study (optional but good for integrity)
-    # For speed, we just insert.
+    # 5. Save Q-Sort Entries
     new_entries = []
     for entry in data.qsort:
         new_entries.append(QSortEntry(
@@ -92,16 +142,18 @@ async def submit_study(data: SubmissionInput, request: Request, db: Session = De
         ))
     
     db.add_all(new_entries)
+    
+    # SINGLE ATOMIC COMMIT
     await db.commit()
-
-    # Generate a user-friendly confirmation code from the session token
-    # Taking the first 8 characters is usually sufficient for short-term uniqueness display
-    confirmation_code = str(participant.session_token)[:8].upper()
 
     return {"status": "success", "confirmation_code": confirmation_code}
 
 @router.get("/study/{slug}")
-async def get_study(slug: str, lang: str = "en", db: Session = Depends(get_db)):
+async def get_study(
+    slug: str = Path(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100),
+    lang: str = Query("en", pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5),
+    db: AsyncSession = Depends(get_db)
+):
     # Fetch study with all necessary relations
     # We need: grid_config, presort_config, postsort_config, statements
     # AND translations for the current language (handling this in backend or sending all?)
@@ -128,44 +180,53 @@ async def get_study(slug: str, lang: str = "en", db: Session = Depends(get_db)):
     # For now, let's return a structured object the frontend can use directly.
     # We default to English for the main fields if found, else first available.
     
+    # Priority: Requested Lang -> English -> First Available
     translation = next((t for t in study.translations if t.language_code == lang), None)
+    
+    if not translation:
+        # Fallback to English
+        translation = next((t for t in study.translations if t.language_code == "en"), None)
+    
     if not translation and study.translations:
-        # Fallback to First Available if requested lang not found
+        # Fallback to First Available
         translation = study.translations[0]
-        # logic could be improved to fallback to EN explicitly if available
         
-    title = translation.title if translation else study.slug
-    description = translation.description if translation else ""
-    instructions = translation.instructions if translation else ""
+    title = translation.title if (translation and hasattr(translation, 'title')) else study.slug
+    description = translation.description if (translation and hasattr(translation, 'description')) else ""
+    instructions = translation.instructions if (translation and hasattr(translation, 'instructions')) else ""
     
     statements_data = []
     for s in study.statements:
         s_trans = next((t for t in s.translations if t.language_code == lang), None)
+        
+        if not s_trans:
+             # Fallback to English
+             s_trans = next((t for t in s.translations if t.language_code == "en"), None)
+
         if not s_trans and s.translations:
-             # Fallback
+             # Fallback to First Available
              s_trans = s.translations[0]
              
         text = s_trans.text if s_trans else s.code
         statements_data.append({"id": s.id, "text": text})
 
 
-    # Transform grid_config from dict {"-4": 2} to list [{"score": -4, "capacity": 2}]
+    # Transform grid_config from dict {"-4": 2} or list [{"score": -4, "capacity": 2}] to list [{"score": -4, "capacity": 2}]
     grid_config_list = []
     if study.grid_config:
-        # Check if it's already a list (legacy/safety) or dict
         if isinstance(study.grid_config, list):
-            grid_config_list = study.grid_config
+            for item in study.grid_config:
+                if isinstance(item, dict) and "score" in item and "capacity" in item:
+                    grid_config_list.append({"score": int(item["score"]), "capacity": item["capacity"]})
         elif isinstance(study.grid_config, dict):
-             # Depending on seed structure. seed.py used simple dict keys "-4".
-             # We assume keys are scores (str) and values are capacity (int).
-             for score_str, capacity in study.grid_config.items():
-                 try:
-                     score = int(score_str)
-                     grid_config_list.append({"score": score, "capacity": capacity})
-                 except ValueError:
-                     pass # Ignore non-integer keys if any
-             # Sort by score
-             grid_config_list.sort(key=lambda x: x["score"])
+            for score_str, capacity in study.grid_config.items():
+                try:
+                    grid_config_list.append({"score": int(score_str), "capacity": capacity})
+                except ValueError:
+                    pass
+        
+        # Sort by score
+        grid_config_list.sort(key=lambda x: x["score"])
 
     return {
         "slug": study.slug,
@@ -174,6 +235,11 @@ async def get_study(slug: str, lang: str = "en", db: Session = Depends(get_db)):
         "instructions": instructions,
         "presort_config": study.presort_config,
         "grid_config": grid_config_list, 
-        "postsort_config": study.postsort_config,
-        "statements": statements_data
+        "statements": statements_data,
+        "consent": {
+            "title": getattr(translation, "consent_title", None),
+            "description": getattr(translation, "consent_description", None),
+            "accept": getattr(translation, "consent_accept", None),
+            "decline": getattr(translation, "consent_decline", None)
+        }
     }

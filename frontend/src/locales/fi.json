@@ -1,105 +1,137 @@
 {
   "common": {
-    "agree": "Samaa mieltä",
-    "disagree": "Eri mieltä",
-    "neutral": "Neutraali",
+    "agree": "Vastaa näkemystäni",
+    "disagree": "Ei vastaa näkemystäni",
+    "neutral": "Neutraali / Epävarma",
     "undo": "Kumoa",
     "next": "Seuraava vaihe",
-    "submit": "Lähetä vastaus",
+    "submit": "Tallenna näkemykseni",
     "loading": "Ladataan...",
     "yes": "Kyllä",
     "no": "Ei",
     "ok": "OK",
-    "cancel": "Peruuta"
+    "cancel": "Peruuta",
+    "attention": "Huomio",
+    "error": "Virhe",
+    "submitting": "Lähetetään...",
+    "cards": "korttia",
+    "close": "Sulje",
+    "errors": {
+      "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
+      "not_found": "Tutkimusta ei löytynyt.",
+      "validation": "Järjestelmävirhe: Tietojen validointi epäonnistui.",
+      "unknown": "Odottamaton virhe tapahtui.",
+      "retry": "Yritä uudelleen"
+    }
   },
   "layout": {
-    "title": "Q-metodi",
+    "title": "OpenQ",
     "steps": {
       "welcome": "Tervetuloa",
-      "presort": "Taustakysymykset",
-      "rough": "Alustava lajittelu",
-      "fine": "Tarkka lajittelu",
-      "review": "Tarkistus"
+      "presort": "Taustoitus",
+      "rough": "Ensivaikutelma",
+      "fine": "Vivahteet",
+      "review": "Kokonaiskuva"
     },
     "mobile_step": "Vaihe",
     "language": "Suomi"
   },
   "welcome": {
+    "title": "Tervetuloa",
+    "description": "Lue ohjeet huolellisesti.",
     "start": "Aloita tutkimus",
     "consent": {
-      "label": "Suostun osallistumaan tähän tutkimukseen",
-      "description": "Ymmärrän, että tietojani käsitellään nimettömästi ja voin keskeyttää milloin tahansa.",
-      "error": "Sinun on annettava suostumuksesi osallistuaksesi."
-    }
+      "label": "Vahvistan olevani vähintään 18-vuotias. Suostun tietojeni nimettömään käsittelyyn GDPR:n mukaisesti.",
+      "error": "Sinun on hyväksyttävä ehdot jatkaaksesi."
+    },
+    "reset_confirm": "Oletko varma, että haluat aloittaa uuden istunnon? Tämä poistaa nykyisen edistymisesi.",
+    "restart": "Aloita uusi istunto"
   },
   "presort": {
     "title": "Tietoja sinusta",
-    "description": "Vastaathan muutamaan kysymykseen ennen lajittelun aloittamista.",
+    "description": "Vastaathan muutamaan kysymykseen, jotka auttavat meitä taustoittamaan näkemystäsi.",
     "submit": "Jatka lajitteluun",
     "select_placeholder": "Valitse...",
-    "error_required": "Tämä kenttä on pakollinen"
+    "error_required": "Vastaathan tähän kysymykseen."
   },
   "rough": {
     "header": {
-      "title": "Edustaako tämä väittämä näkemystäsi?",
-      "subtitle": "Pyyhkäise vasemmalle (eri mieltä), oikealle (samaa mieltä) tai alas (neutraali).",
-      "hint": "Valintasi tässä vaiheessa eivät ole lopullisia. Tämä vaihe auttaa jäsentämään ajatuksiasi ennen tarkkaa lajittelua."
+      "title": "Vastaako tämä väite sinun näkemystäsi?",
+      "subtitle": "Pyyhkäise vasemmalle, jos se ei vastaa näkemystäsi, oikealle jos se vastaa, tai alas jos olet epävarma.",
+      "hint": "Luota ensivaikutelmaasi. Tämä vaihe auttaa jäsentämään ajatuksiasi ennen tarkempaa lajittelua."
     },
     "complete": {
       "title": "Alustava lajittelu valmis",
-      "subtitle": "Olet luokitellut kaikki väittämät. Nyt tarkennamme valintojasi."
+      "subtitle": "Olet ryhmitellyt kaikki väitteet. Nyt ryhdymme hiomaan vivahteita."
     },
     "instructions": {
-        "swipe": "Pyyhkäise tai napauta luokitellaksesi"
+        "swipe": "Pyyhkäise tai napauta lajitellaksesi"
     }
   },
   "fine": {
     "deck": {
-        "title": "Lajiteltavat väittämät",
-        "all_placed": "Kaikki sijoitettu!",
-        "reset": "Tyhjennä ruudukko",
-        "confirm_reset": "Oletko varma, että haluat tyhjentää ruudukon? Kaikki sijoitetut kortit palautuvat pinoihin."
+        "title": "Jäljellä olevat kortit",
+        "all_placed": "Pakka tyhjä",
+        "reset": "Palauta alkuun",
+        "confirm_reset": "Haluatko aloittaa sijoittelun alusta? Kaikki kortit palautuvat pakkaan."
     },
     "toolbar": {
-        "mobile": "Järjestä: <0>eri mieltä</0> (vasen) – <1>samaa mieltä</1> (oikea). Napauta asettaaksesi.",
-        "desktop": "Järjestä: <0>eri mieltä</0> (vasen) – <1>samaa mieltä</1> (oikea). Raahaa kortit ruudukkoon."
+        "mobile": "Valitse kortti napauttamalla ja sijoita se ruudukkoon sen mukaan, kuinka hyvin se vastaa näkemystäsi.",
+        "desktop": "Raahaa kortit pyramidiruudukkoon sen mukaan, kuinka hyvin ne vastaavat näkemystäsi.",
+        "zoom_in": "Lähennä",
+        "zoom_out": "Loitonna",
+        "fit_screen": "Sovita näyttöön",
+        "label": "Ruudukon hallinta"
+    },
+    "grid": {
+        "label": "Lajitteluruudukko",
+        "column": "Sarake",
+        "slot": "Paikka",
+        "in_column": "sarakkeessa"
     },
     "tips": {
-        "extremes": "Usein on helpointa aloittaa sijoittamalla ääripäihin (-4 ja +4) ne kortit, joista olet vahvimmin jotain mieltä.",
-        "vertical": "Huomio: Pystysuuntaisella sijainnilla ei ole merkitystä. Vain järjestys vasemmalta oikealle merkitsee."
+        "extremes": "Pieni vinkki: aloita reunoista. Usein on helpointa sijoittaa ensin itselle selkeimmät asiat ja jättää vivahteet loppuun.",
+        "vertical": "Muista: pystysuuntaisella sijainnilla ei ole merkitystä. Vain järjestys vasemmalta oikealle merkitsee."
     },
     "legend": {
-        "disagree": "Eri mieltä",
+        "disagree": "Ei vastaa näkemystäni",
         "neutral": "Neutraali",
-        "agree": "Samaa mieltä"
+        "agree": "Vastaa näkemystäni",
+        "label": "Spektrin selite"
     },
     "actions": {
-        "validate": "Vahvista",
-        "finish": "Valmis",
-        "ready": "Valmis tarkistettavaksi",
+        "validate": "Vahvista ruudukko",
+        "finish": "Viimeistele lajittelu",
+        "ready": "Tarkastele kokonaiskuvaa",
         "not_ready": "Sijoita kaikki kortit jatkaaksesi"
     }
   },
   "post": {
     "title": "Viimeiset kysymykset",
-    "description": "Olet melkein valmis! Kerrothan lyhyesti valinnoistasi merkittävimpien väittämien kohdalla.",
+    "description": "Olet melkein valmis! Perustelusi merkittävimmille valinnoille ovat arvokkaita analyysin kannalta.",
     "extreme": {
-        "why": "Miksi sijoitit tämän tähän?",
-        "placeholder": "Perustele ajatuksesi...",
-        "min_chars": "Kirjoita vähintään 10 merkkiä.",
-        "label_agree": "Samaa mieltä",
-        "label_disagree": "Eri mieltä"
+        "why": "Mikä henkilökohtaisessa kokemuksessasi sai sinut sijoittamaan tämän kortin tähän?",
+        "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
+        "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään asiayhteyden.",
+        "label_agree": "Vastaa minua parhaiten",
+        "label_disagree": "Ei vastaa minua lainkaan"
     },
     "missing": {
-        "label": "Puuttuuko jokin keskeinen väittämä, joka kuvaisi näkemystäsi?",
-        "description": "Jos kyllä, kuvaile se lyhyesti alla.",
-        "placeholder": "Vapaaehtoinen..."
+        "label": "Puuttuuko jokin olennainen väite, joka kuvaisi näkemystäsi?",
+        "description": "Jos koet, että jokin tärkeä näkökulma jäi puuttumaan, kuvaile se lyhyesti tässä.",
+        "placeholder": "Valinnainen..."
     },
     "general": {
         "label": "Yleiset kommentit",
         "description": "Palautetta tutkimuksesta tai muita ajatuksia?",
-        "placeholder": "Vapaaehtoinen..."
+        "placeholder": "Valinnainen..."
     },
-    "submit": "Lähetä vastaus"
+    "submit": "Tallenna näkemykseni",
+    "validation_error": "Varmistathan, että olet selittänyt lyhyesti tärkeimmät valintasi yllä.",
+    "success": {
+        "title": "Kiitos!",
+        "message": "Näkemyksesi on tallennettu onnistuneesti.",
+        "id_label": "Vahvistuskoodi"
+    }
   }
 }

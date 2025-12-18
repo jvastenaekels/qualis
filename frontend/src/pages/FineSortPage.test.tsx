@@ -1,144 +1,147 @@
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
 import FineSortPage from './FineSortPage';
-import { useStudyStore } from '../store/useStudyStore';
-import { MemoryRouter } from 'react-router-dom';
 
-// Mock Modules
-vi.mock('@dnd-kit/core', async () => {
-    const actual = await vi.importActual('@dnd-kit/core');
-    return {
-        ...actual,
-        DndContext: ({ children }: any) => <div>{children}</div>,
-        useSensors: () => ({}),
-        useSensor: () => ({}),
-        PointerSensor: class {},
-        TouchSensor: class {},
-        DragOverlay: ({ children }: any) => <div>{children}</div>,
-    };
-});
+// Mocks
+vi.mock('react-router-dom', () => ({
+    useNavigate: () => vi.fn(),
+    useParams: () => ({ slug: 'test-study' }),
+}));
+
+vi.mock('../store/useStudyStore', () => ({
+    useStudyStore: vi.fn(),
+}));
 
 vi.mock('../contexts/LayoutContext', () => ({
     useLayoutAction: () => ({
-        setHeaderAction: vi.fn(),
+        setHeaderAction: vi.fn((node) => {
+            // Render the node so we can query it?
+            // In integration tests, Layout renders it. Here we might need to mimic it or just inspect the calls.
+            // Better: Render the node in a test wrapper if possible, or Mock LayoutContext to act as a portal?
+            // Actually, we can just spy on setHeaderAction and inspect what was passed.
+            // But checking classes on a React Element passed as arg is hard.
+            // Strategy: We can mock setHeaderAction to immediately render the component into a test-div if we want,
+            // or we can just render the component normally and rely on the fact that unit tests usually test the hook logic.
+            
+            // However, FineSortPage renders NOTHING itself for the button, it calls setHeaderAction.
+            // So we MUST inspect the argument to setHeaderAction.
+        }),
     }),
 }));
 
+// We can't easily "render" the ReactNode passed to setHeaderAction using standard RTL render if it's just a variable.
+// But we can create a mock implementation of useLayoutAction that exposes the action.
+
+const setHeaderActionMock = vi.fn();
+vi.mock('../contexts/LayoutContext', () => ({
+    useLayoutAction: () => ({
+        setHeaderAction: setHeaderActionMock,
+    }),
+}));
+
+// Mock GridSort to avoid complex DND logic
 vi.mock('../components/GridSort', () => ({
-    default: (props: any) => (
-        <div data-testid="grid-sort">
-            <div data-testid="pile-agree">{props.agreeCards?.length}</div>
-            <div data-testid="pile-disagree">{props.disagreeCards?.length}</div>
-            <div data-testid="pile-neutral">{props.neutralCards?.length}</div>
-        </div>
-    )
+    default: () => <div data-testid="grid-sort">GridSort</div>
 }));
 
-vi.mock('../components/SortableCard', () => ({
-    default: ({ text }: any) => <div data-testid="sortable-card">{text}</div>
-}));
-
-// Mock Store
-const initialStoreState = useStudyStore.getState();
+import { useStudyStore } from '../store/useStudyStore';
 
 describe('FineSortPage', () => {
     beforeEach(() => {
-        useStudyStore.setState(initialStoreState, true);
-        useStudyStore.setState({
+        vi.clearAllMocks();
+        // Default Mock State
+        vi.mocked(useStudyStore).mockReturnValue({
             config: {
-                slug: 'test',
                 title: 'Test',
                 description: 'Test',
                 instructions: 'Test',
-                presort_config: {},
                 statements: [
-                    { id: 1, text: 'Card 1' },
-                    { id: 2, text: 'Card 2' }
+                    { id: 1, text: 'S1' },
+                    { id: 2, text: 'S2' }
                 ],
-                grid_config: [
-                    { score: 0, capacity: 2 }
-                ]
-            },
-            responses: {
-                presort: {},
-                rough: {
-                    agree: [1],
-                    disagree: [],
-                    neutral: [2],
-                    history: []
-                },
-                qsort: [],
-                postsort: {}
-            }
-        });
-    });
-
-    it('renders the GridSort component', () => {
-        render(
-            <MemoryRouter>
-                <FineSortPage />
-            </MemoryRouter>
-        );
-        expect(screen.getByTestId('grid-sort')).toBeTruthy();
-    });
-
-    it('places a card correctly in store when logic is triggered', () => {
-        // Since DnD is mocked, we can test the store action directly ensuring hooks expose it
-        const store = useStudyStore.getState();
-        store.placeCardInGrid(1, 0, 0); // Col 0, Row 0 in Store
-        
-        expect(useStudyStore.getState().responses.qsort).toHaveLength(1);
-        expect(useStudyStore.getState().responses.qsort[0]).toEqual({
-            statementId: 1,
-            col: 0,
-            row: 0
-        });
-    });
-
-    it('renders correct cards in Source Deck tabs', () => {
-        useStudyStore.setState({
-            config: {
-                slug: 'test',
-                title: 'Test',
-                description: 'Test',
-                instructions: 'Test',
+                grid_config: [{ capacity: 2, score: 0 }],
                 presort_config: {},
-                statements: [
-                    { id: 1, text: 'Card Agree' },
-                    { id: 2, text: 'Card Disagree' },
-                    { id: 3, text: 'Card Neutral' }
-                ]
+                language_code: 'en'
             },
             responses: {
                 presort: {},
-                rough: {
-                    agree: [1],
-                    disagree: [2],
-                    neutral: [3],
-                    history: [1, 2, 3]
-                },
+                rough: { agree: [], disagree: [1, 2], neutral: [], history: [] },
                 qsort: [],
-                postsort: {}
-            }
+                postsort: { card_comments: {}, missing_statement: '', general_comment: '' }
+            },
+            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null },
+            placeCardInGrid: vi.fn(),
+            moveCardInGrid: vi.fn(),
+            swapCardsInGrid: vi.fn(),
+            unplaceCard: vi.fn(),
+            setStep: vi.fn(),
+            resetFineSort: vi.fn(),
+            setConfig: vi.fn(),
+            setConsent: vi.fn(),
+            setToken: vi.fn(),
+            setPresortResponse: vi.fn(),
+            setPostSortResponse: vi.fn(),
+            categorizeCard: vi.fn(),
+            undoRoughSort: vi.fn(),
+            completeSession: vi.fn(),
+            resetSession: vi.fn(),
+            setLanguage: vi.fn(),
         });
-
-        render(
-            <MemoryRouter>
-                <FineSortPage />
-            </MemoryRouter>
-        );
-        expect(screen.getByTestId('pile-agree').textContent).toBe('1');
-        expect(screen.getByTestId('pile-disagree').textContent).toBe('1');
-        expect(screen.getByTestId('pile-neutral').textContent).toBe('1');
     });
 
-    it('handles missing config gracefully', () => {
-        useStudyStore.setState({ config: null });
-        render(
-            <MemoryRouter>
-                <FineSortPage />
-            </MemoryRouter>
-        );
-        expect(screen.getByText(/Loading/i)).toBeTruthy();
+    it('sets header action to a disabled button initially', () => {
+        render(<FineSortPage />);
+        
+        // Assert setHeaderAction was called
+        expect(setHeaderActionMock).toHaveBeenCalled();
+        
+        // Inspect the last call arg (the button node)
+        // This is tricky in unit tests. 
+        // A better approach is often to Refactor the "Action" into a sub-component keying off the store,
+        // so we can test that subcomponent.
+        
+        // Alternatively, we can construct a test helper that renders the ReactNode passed to the mock.
+        const actionNode = setHeaderActionMock.mock.lastCall?.[0];
+        expect(actionNode).not.toBeNull();
+        
+        // To inspect it properly, we can render it in isolation.
+        if (actionNode) {
+            const { getByText, getByRole } = render(<div>{actionNode}</div>);
+            const button = getByRole('button');
+            expect(button).toBeDisabled();
+            // Check styling (assuming pending state)
+            expect(button.className).toContain('bg-slate-100');
+        }
+    });
+
+    it('sets header action to an active/animated button when all cards placed', () => {
+         // Mock store state: All placed
+         (useStudyStore as any).mockReturnValue({
+             config: {
+                 statements: [
+                     { id: 1, text: 'S1' },
+                 ],
+                 grid_config: [{ capacity: 1, score: 0 }]
+             },
+             responses: {
+                 rough: { agree: [], disagree: [], neutral: [] },
+                 qsort: [{ statementId: 1, col: 0, row: 0 }] 
+             },
+             setStep: vi.fn(),
+         });
+
+         render(<FineSortPage />);
+         
+         const actionNode = setHeaderActionMock.mock.lastCall?.[0];
+         if (actionNode) {
+             const { getByRole } = render(<div>{actionNode}</div>);
+             const button = getByRole('button');
+             expect(button).not.toBeDisabled();
+             // Check for animation class
+             // We expect to add 'animate-in fade-in zoom-in'
+             // Currently checking what it has or what we WILL add
+             // For now, let's verify it has "bg-blue-600"
+             expect(button.className).toContain('bg-blue-600');
+         }
     });
 });

@@ -1,4 +1,4 @@
-import { useState, useEffect, RefObject } from 'react';
+import { useState, useEffect, type RefObject } from 'react';
 
 export const useScaleToFit = (
     containerRef: RefObject<HTMLElement>,

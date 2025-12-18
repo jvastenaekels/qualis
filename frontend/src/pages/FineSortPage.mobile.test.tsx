@@ -8,7 +8,6 @@ import { useStudyStore } from '../store/useStudyStore';
 
 // Mock Store
 vi.mock('../store/useStudyStore');
-const mockUseStudyStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
 
 // Mock ResizeObserver
 global.ResizeObserver = class {
@@ -37,19 +36,38 @@ describe('FineSortPage Mobile Interaction', () => {
         // 1. Setup State: Card 1 is in Neutral Pile (Deck). Grid is empty.
         const placeCardInGridSpy = vi.fn();
         
-        mockUseStudyStore.mockReturnValue({
-            config: mockConfig,
-            responses: {
-                rough: { agree: [], disagree: [1], neutral: [] }, 
-                qsort: []
+        vi.mocked(useStudyStore).mockReturnValue({
+            config: {
+                ...mockConfig,
+                title: 'Demo',
+                description: 'Demo',
+                instructions: 'Demo',
+                presort_config: {},
+                language_code: 'en'
             },
-            session: { hasConsented: true, currentStep: 4 },
+            responses: {
+                presort: {},
+                rough: { agree: [], disagree: [1], neutral: [], history: [] }, 
+                qsort: [],
+                postsort: { card_comments: {}, missing_statement: '', general_comment: '' }
+            },
+            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null },
             setStep: vi.fn(),
             placeCardInGrid: placeCardInGridSpy,
             moveCardInGrid: vi.fn(),
             swapCardsInGrid: vi.fn(),
             unplaceCard: vi.fn(),
-            resetFineSort: vi.fn()
+            resetFineSort: vi.fn(),
+            setConfig: vi.fn(),
+            setConsent: vi.fn(),
+            setToken: vi.fn(),
+            setPresortResponse: vi.fn(),
+            setPostSortResponse: vi.fn(),
+            categorizeCard: vi.fn(),
+            undoRoughSort: vi.fn(),
+            completeSession: vi.fn(),
+            resetSession: vi.fn(),
+            setLanguage: vi.fn(),
         });
 
         render(
@@ -91,21 +109,40 @@ describe('FineSortPage Mobile Interaction', () => {
         // 1. Setup State: Card 2 in Disagree Pile. Card 1 already in Grid at 0,0.
         const swapCardsInGridSpy = vi.fn();
 
-        mockUseStudyStore.mockReturnValue({
-            config: mockConfig,
+        vi.mocked(useStudyStore).mockReturnValue({
+            config: {
+                ...mockConfig,
+                title: 'Demo',
+                description: 'Demo',
+                instructions: 'Demo',
+                presort_config: {},
+                language_code: 'en'
+            },
             responses: {
-                rough: { agree: [], disagree: [2], neutral: [] }, 
+                presort: {},
+                rough: { agree: [], disagree: [2], neutral: [], history: [] }, 
                 qsort: [
                     { statementId: 1, col: 0, row: 0 }
-                ]
+                ],
+                postsort: { card_comments: {}, missing_statement: '', general_comment: '' }
             },
-            session: { hasConsented: true, currentStep: 4 },
+            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null },
             setStep: vi.fn(),
             placeCardInGrid: vi.fn(),
             moveCardInGrid: vi.fn(),
             swapCardsInGrid: swapCardsInGridSpy,
             unplaceCard: vi.fn(),
-            resetFineSort: vi.fn()
+            resetFineSort: vi.fn(),
+            setConfig: vi.fn(),
+            setConsent: vi.fn(),
+            setToken: vi.fn(),
+            setPresortResponse: vi.fn(),
+            setPostSortResponse: vi.fn(),
+            categorizeCard: vi.fn(),
+            undoRoughSort: vi.fn(),
+            completeSession: vi.fn(),
+            resetSession: vi.fn(),
+            setLanguage: vi.fn(),
         });
 
         render(

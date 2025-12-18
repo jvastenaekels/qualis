@@ -1,56 +1,68 @@
 {
   "common": {
-    "agree": "D'accord",
-    "disagree": "Pas d'accord",
-    "neutral": "Neutre",
+    "agree": "Correspond à mon point de vue",
+    "disagree": "Ne correspond pas à mon point de vue",
+    "neutral": "Neutre / Indécis",
     "undo": "Annuler",
     "next": "Étape suivante",
-    "submit": "Soumettre l'étude",
+    "submit": "Enregistrer",
     "loading": "Chargement...",
     "yes": "Oui",
     "no": "Non",
     "ok": "OK",
     "cancel": "Annuler",
-    "attention": "Attention",
+    "attention": "Note",
     "error": "Erreur",
-    "submitting": "Envoi en cours..."
+    "submitting": "Envoi...",
+    "cards": "cartes",
+    "close": "Fermer",
+    "errors": {
+      "network": "Erreur de connexion réseau. Veuillez vérifier votre connexion internet.",
+      "not_found": "Étude non trouvée.",
+      "validation": "Erreur système : Échec de la validation des données.",
+      "unknown": "Une erreur inattendue est survenue.",
+      "retry": "Réessayer"
+    }
   },
   "layout": {
-    "title": "Q-Method App",
+    "title": "OpenQ",
     "steps": {
       "welcome": "Bienvenue",
-      "presort": "Questions",
-      "rough": "Tri préliminaire",
-      "fine": "Tri détaillé",
-      "review": "Finalisation"
+      "presort": "Contexte",
+      "rough": "Première impression",
+      "fine": "Nuances",
+      "review": "Vue d'ensemble"
     },
     "mobile_step": "Étape",
     "language": "Français"
   },
   "welcome": {
+    "title": "Bienvenue",
+    "description": "Veuillez lire attentivement les instructions.",
     "start": "Commencer l'étude",
     "consent": {
-      "label": "Je consens à participer à cette étude",
-      "description": "Je comprends que mes données seront traitées de manière anonyme et que je peux me retirer à tout moment.",
-      "error": "Vous devez consentir pour participer."
-    }
+      "label": "Je certifie avoir au moins 18 ans. Je consens au traitement anonyme de mes données conformément au RGPD.",
+      "error": "Vous devez accepter les conditions pour continuer."
+    },
+    "reset_confirm": "Êtes-vous sûr de vouloir commencer une nouvelle session ? Cela effacera votre progression actuelle.",
+    "restart": "Commencer une nouvelle session"
   },
   "presort": {
     "title": "À propos de vous",
-    "description": "Veuillez répondre à quelques questions avant de commencer le tri.",
+    "description": "Veuillez répondre à ces quelques questions pour nous aider à situer votre point de vue.",
     "submit": "Continuer vers le tri",
     "select_placeholder": "Sélectionner...",
-    "error_required": "Ce champ est requis"
+    "error_required": "Merci de répondre à cette question."
   },
   "rough": {
     "header": {
-      "title": "Cette affirmation représente-t-elle votre point de vue ?",
-      "subtitle": "Faites glisser vers la gauche pour « Pas d'accord », vers la droite pour « D'accord », ou vers le bas pour « Neutre ».",
-      "hint": "Vos choix ici ne sont pas définitifs. Cette étape aide simplement à organiser vos pensées avant le tri précis."
+      "title": "Cette affirmation correspond-elle à votre point de vue ?",
+      "subtitle": "Glissez à gauche pour « Ne me correspond pas », à droite pour « Me correspond », ou en bas si vous êtes indécis.",
+      "hint": "Fiez-vous à votre première impression. Cette étape sert à organiser vos pensées avant le classement final."
     },
     "complete": {
       "title": "Premier tri terminé",
-      "subtitle": "Vous avez catégorisé toutes les affirmations. Nous allons maintenant affiner vos choix."
+      "subtitle": "Vous avez dégrossi le tri. Nous allons maintenant affiner les nuances."
     },
     "instructions": {
         "swipe": "Glissez ou appuyez pour catégoriser"
@@ -58,44 +70,55 @@
   },
   "fine": {
     "deck": {
-        "title": "Affirmations à trier",
-        "all_placed": "Tout est placé !",
+        "title": "Cartes disponibles",
+        "all_placed": "Pile vide",
         "reset": "Réinitialiser",
-        "confirm_reset": "Êtes-vous sûr de vouloir réinitialiser la grille ? Toutes les cartes placées retourneront dans leurs piles."
+        "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
     },
-    "toolbar": {
-        "mobile": "Classez de <0>pas d'accord</0> (gauche) à <1>d'accord</1> (droite). Sélectionnez l'affirmation et cliquez à nouveau où vous voulez la placer dans la grille.",
-        "desktop": "Classez de <0>pas d'accord</0> (gauche) à <1>d'accord</1> (droite). Faites glisser les cartes vers la grille."
-    },
-    "tips": {
-        "extremes": "Il est souvent plus facile de commencer par placer les cartes sur lesquelles vous avez l'opinion la plus forte dans les colonnes extrêmes (-4 et +4).",
-        "vertical": "Note : La position verticale n'a pas d'importance. Seul l'ordre de gauche à droite compte."
-    },
+"toolbar": {
+    "mobile": "Touchez une affirmation pour la sélectionner, puis la grille pour la placer selon son degré de correspondance avec votre point de vue.",
+    "desktop": "Glissez les cartes sur la grille pyramidale selon leur degré de correspondance avec votre point de vue.",
+    "zoom_in": "Zoom avant",
+    "zoom_out": "Zoom arrière",
+    "fit_screen": "Ajuster à l'écran",
+    "label": "Contrôles de la grille"
+},
+"grid": {
+    "label": "Grille de tri",
+    "column": "Colonne",
+    "slot": "Emplacement",
+    "in_column": "dans la colonne"
+},
+"tips": {
+    "extremes": "Un petit conseil : commencez par les bords gauche et droit. Il est généralement plus simple de placer d'abord ce qui est très clair pour vous, et de garder les nuances pour la fin.",
+    "vertical": "Notez que la hauteur n'a pas d'importance. Seul l'ordre de gauche à droite compte."
+},
     "legend": {
-        "disagree": "Pas d'accord",
+        "disagree": "Ne correspond pas à mon point de vue",
         "neutral": "Neutre",
-        "agree": "D'accord"
+        "agree": "Correspond à mon point de vue",
+        "label": "Légende du spectre"
     },
     "actions": {
-        "validate": "Valider",
+        "validate": "Confirmer la grille",
         "finish": "Terminer le tri",
-        "ready": "Prêt à réviser",
+        "ready": "Voir la vue d'ensemble",
         "not_ready": "Placez toutes les cartes pour continuer"
     }
   },
   "post": {
     "title": "Dernières questions",
-    "description": "Vous avez presque fini ! Veuillez prendre un moment pour expliquer vos choix pour les affirmations les plus significatives.",
+    "description": "Dernière étape ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
     "extreme": {
-        "why": "Pourquoi avez-vous placé ceci ici ?",
-        "placeholder": "Veuillez expliquer votre pensée...",
-        "min_chars": "Veuillez entrer au moins 10 caractères.",
-        "label_agree": "Plutôt d'accord",
-        "label_disagree": "Plutôt pas d'accord"
+        "why": "Qu'est-ce qui, dans votre expérience personnelle, vous a fait placer cette carte ici ?",
+        "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
+        "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
+        "label_agree": "Me correspond le plus",
+        "label_disagree": "Ne me correspond pas du tout"
     },
     "missing": {
-        "label": "Y a-t-il une affirmation clé manquante pour refléter votre point de vue ?",
-        "description": "Si oui, veuillez la décrire brièvement ci-dessous.",
+        "label": "Y a-t-il une affirmation importante qui manque pour refléter votre avis ?",
+        "description": "Si vous pensez qu'un aspect clé a été oublié, décrivez-le brièvement ici.",
         "placeholder": "Optionnel..."
     },
     "general": {
@@ -104,11 +127,11 @@
         "placeholder": "Optionnel..."
     },
     "submit": "Soumettre l'étude",
-    "validation_error": "Veuillez compléter tous les commentaires requis (min 10 caractères).",
+    "validation_error": "Merci d'ajouter une courte explication pour vos choix principaux ci-dessus.",
     "success": {
-        "title": "Merci !",
-        "message": "Vos réponses ont été soumises avec succès.",
-        "id_label": "Code de Confirmation"
+        "title": "C'est noté !",
+        "message": "Votre contribution à l'étude a bien été enregistrée.",
+        "id_label": "Code de confirmation"
     }
   }
 }
