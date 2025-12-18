@@ -10,7 +10,7 @@ export class ApiError extends Error {
 
 const BASE_URL = import.meta.env.VITE_API_URL || '';
 
-export async function post<T>(endpoint: string, data: any): Promise<T> {
+export async function post<T>(endpoint: string, data: unknown): Promise<T> {
     const response = await fetch(`${BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: {
