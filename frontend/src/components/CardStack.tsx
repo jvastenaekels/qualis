@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
 import { motion, useTransform, useAnimation, type PanInfo, type MotionValue } from 'framer-motion';
 import { createPortal } from 'react-dom';
 
@@ -16,6 +16,8 @@ export interface CardStackHandle {
 const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVote, x, y }, ref) => {
   const controls = useAnimation();
   const [showZoom, setShowZoom] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const textRef = useRef<HTMLParagraphElement>(null);
 
   // Dynamic Tints
   // Left (-x): Red, Right (+x): Green, Down (+y): Gray
@@ -34,13 +36,28 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
   const ZoomPortal = () => createPortal(
     <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
         <div className="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-4 transform scale-105 max-h-[80vh] overflow-y-auto flex flex-col">
-            <p className="text-xl font-medium text-slate-800 text-center leading-relaxed my-auto">
+            <p className="text-xl font-medium text-slate-800 text-center leading-relaxed my-auto font-sans">
                 {statement.text}
             </p>
         </div>
     </div>,
     document.body
   );
+
+  // Overflow Detection
+  useEffect(() => {
+    const checkOverflow = () => {
+        if (textRef.current) {
+            const hasOverflow = textRef.current.scrollHeight > textRef.current.clientHeight;
+            setIsOverflowing(hasOverflow);
+        }
+    };
+    
+    checkOverflow();
+    // Re-check on statement change or window resize (typography auto-scale might change things)
+    window.addEventListener('resize', checkOverflow);
+    return () => window.removeEventListener('resize', checkOverflow);
+  }, [statement.text, fontSizeClass]);
 
   useImperativeHandle(ref, () => ({
     swipe: async (direction) => {
@@ -97,7 +114,7 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         onDragEnd={handleDragEnd}
         animate={controls}
         style={{ x, y, rotate }}
-        onMouseEnter={() => setShowZoom(true)}
+        onMouseEnter={() => isOverflowing && setShowZoom(true)}
         onMouseLeave={() => setShowZoom(false)}
         className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-6 sm:p-8 cursor-grab active:cursor-grabbing touch-none overflow-hidden"
       >
@@ -124,14 +141,17 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         />
 
         {/* Content - No scroll to avoid drag conflict */}
-        <div className="flex-1 w-full flex flex-col p-2">
-            <p className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed`}>
+        <div className="flex-1 w-full flex flex-col p-2 overflow-hidden">
+            <p 
+                ref={textRef}
+                className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed line-clamp-6 sm:line-clamp-none`}
+            >
               {statement.text}
             </p>
         </div>
 
-        {/* Zoom Trigger Info */}
-        {textLength > 100 && (
+        {/* Zoom Trigger Info - ONLY if overflowing */}
+        {isOverflowing && (
             <div className="absolute bottom-4 right-6 opacity-40">
                 <span className="text-lg">🔍</span>
             </div>

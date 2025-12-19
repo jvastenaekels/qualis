@@ -159,9 +159,9 @@ const RoughSortPage: React.FC = () => {
                 {/* Desktop Spacer / Mobile Context */}
                 <div className="w-12 lg:w-20 hidden sm:block" />
 
-                {/* Pedagogical Header (Progressive) */}
+                {/* Pedagogical Header (Progressive) - Aligned with FineSort / GridSort */}
                 <div className="flex-1 px-2 flex flex-col items-center justify-center">
-                    <h3 className={`font-bold text-gray-900 leading-tight text-center transition-all duration-500 ${sortedCount >= 3 ? 'text-sm opacity-60' : 'text-lg sm:text-xl'}`}>
+                    <h3 className={`font-bold text-slate-700 leading-tight text-center transition-all duration-500 ${sortedCount >= 3 ? 'text-sm opacity-60 lg:text-lg lg:opacity-100' : 'text-lg sm:text-xl'}`}>
                         {t('rough.header.title')}
                     </h3>
                 </div>
@@ -173,9 +173,9 @@ const RoughSortPage: React.FC = () => {
             {/* 3. The Control Cluster (Centered Stage) */}
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-2 py-4 relative">
                 
-                {/* FLOATING TIP (Top Left of Control Cluster) - Swipeable & Closable */}
+                {/* FLOATING TIP (Top Left of Control Cluster) - Swipeable & Closable - MOBILE ONLY */}
                 {showTip && (
-                    <div className="absolute top-4 left-4 z-40 max-w-xs hidden md:block select-none pointer-events-auto">
+                    <div className="absolute top-4 left-4 z-40 max-w-xs block md:hidden select-none pointer-events-auto">
                         <motion.div 
                             drag="x"
                             dragConstraints={{ left: 0, right: 0 }}
