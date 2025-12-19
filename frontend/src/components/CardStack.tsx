@@ -7,6 +7,7 @@
 import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
 import { motion, useTransform, useAnimation, type PanInfo, type MotionValue } from 'framer-motion';
 import { createPortal } from 'react-dom';
+import ReactMarkdown from 'react-markdown';
 
 interface CardStackProps {
   statement: { id: number; text: string };
@@ -23,7 +24,7 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
   const controls = useAnimation();
   const [showZoom, setShowZoom] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
-  const textRef = useRef<HTMLParagraphElement>(null);
+  const textRef = useRef<HTMLDivElement>(null);
 
   // Dynamic Tints
   // Left (-x): Red, Right (+x): Green, Down (+y): Gray
@@ -42,9 +43,11 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
   const ZoomPortal = () => createPortal(
     <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
         <div className="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-4 transform scale-105 max-h-[80vh] overflow-y-auto flex flex-col">
-            <p className="text-xl font-medium text-slate-800 text-center leading-relaxed my-auto font-sans">
-                {statement.text}
-            </p>
+            <div className="text-xl font-medium text-slate-800 text-center leading-relaxed my-auto font-sans">
+                <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                    {statement.text}
+                </ReactMarkdown>
+            </div>
         </div>
     </div>,
     document.body
@@ -148,12 +151,14 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
 
         {/* Content - No scroll to avoid drag conflict */}
         <div className="flex-1 w-full flex flex-col p-2 overflow-hidden">
-            <p 
+            <div 
                 ref={textRef}
                 className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed line-clamp-6 sm:line-clamp-none`}
             >
-              {statement.text}
-            </p>
+                <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                    {statement.text}
+                </ReactMarkdown>
+            </div>
         </div>
 
         {/* Zoom Trigger Info - ONLY if overflowing */}

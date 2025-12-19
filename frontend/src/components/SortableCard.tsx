@@ -10,6 +10,8 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { createPortal } from 'react-dom';
 
+import ReactMarkdown from 'react-markdown';
+
 interface SortableCardProps {
   id: number;
   text: string;
@@ -49,9 +51,11 @@ const SortableCard: React.FC<SortableCardProps> = ({
   const ZoomPortal = () => createPortal(
     <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
         <div className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-4 transform scale-110 max-h-[80vh] overflow-y-auto flex flex-col">
-            <p className="text-lg font-medium text-slate-800 text-center leading-relaxed my-auto">
-                {text}
-            </p>
+            <div className="text-lg font-medium text-slate-800 text-center leading-relaxed my-auto">
+                <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                    {text}
+                </ReactMarkdown>
+            </div>
         </div>
     </div>,
     document.body
@@ -135,11 +139,13 @@ const SortableCard: React.FC<SortableCardProps> = ({
                 `}
             >
                 <div className="w-full h-full flex items-center justify-center overflow-hidden">
-                    <p 
+                    <div 
                         className={`text-center font-medium text-slate-800 ${textSizeClass}`}
                     >
-                        {text}
-                    </p>
+                        <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                            {text}
+                        </ReactMarkdown>
+                    </div>
                 </div>
                 
                 <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">

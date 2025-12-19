@@ -13,6 +13,7 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { useTranslation, Trans } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
 
 interface GridSortProps {
   agreeCards: { id: number; text: string }[];
@@ -631,9 +632,11 @@ const GridSort: React.FC<GridSortProps> = ({
                                 animate={{ opacity: 1, y: 0 }}
                                 className="w-full flex items-center justify-center gap-2 py-2"
                             >
-                                <span className="text-sm sm:text-lg font-bold text-indigo-700 text-center leading-tight">
-                                    {selectedCard.text}
-                                </span>
+                                <div className="text-sm sm:text-lg font-bold text-indigo-700 text-center leading-tight">
+                                    <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                                        {selectedCard.text}
+                                    </ReactMarkdown>
+                                </div>
                                 <button 
                                     onClick={() => onCardClick?.(selectedCard.id)} 
                                     className="flex-none p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100"

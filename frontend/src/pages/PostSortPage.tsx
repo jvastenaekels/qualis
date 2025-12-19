@@ -11,6 +11,7 @@ import { useStudyStore } from '../store/useStudyStore';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLayoutAction } from '../contexts/LayoutContext';
 import { AlertCircle, Check, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { useSubmitStudy } from '../hooks/useSubmitStudy';
 
 const PostSortPage: React.FC = () => {
@@ -220,7 +221,9 @@ const PostSortPage: React.FC = () => {
                                 </div>
                                 
                                 <blockquote className="text-lg font-medium text-slate-800 mb-4 pl-4 border-l-4 border-slate-300 italic">
-                                    "{getCardText(card.statementId)}"
+                                    <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                                        {getCardText(card.statementId)}
+                                    </ReactMarkdown>
                                 </blockquote>
 
                                 <div className="relative">
