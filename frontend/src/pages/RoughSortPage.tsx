@@ -241,7 +241,7 @@ const RoughSortPage: React.FC = () => {
                         {/* Unified: Frown + Text for all screens */}
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
                              <Frown size={20} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
-                             <span className="text-[10px] sm:text-sm font-extrabold uppercase tracking-wide">{t('common.disagree')}</span>
+                             <span className="text-sm font-bold uppercase tracking-wide">{t('common.disagree')}</span>
                         </div>
                     </motion.button>
 
@@ -269,7 +269,7 @@ const RoughSortPage: React.FC = () => {
                         {/* Unified: Smile + Text for all screens */}
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
                             <Smile size={20} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
-                            <span className="text-[10px] sm:text-sm font-extrabold uppercase tracking-wide">{t('common.agree')}</span>
+                            <span className="text-sm font-bold uppercase tracking-wide">{t('common.agree')}</span>
                         </div>
                     </motion.button>
                 </div>
