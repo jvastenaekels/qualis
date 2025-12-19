@@ -12,9 +12,18 @@ if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://")
 elif SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgresql://"):
      SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
+# asyncpg doesn't support the 'sslmode' query parameter. 
+# We strip it if present to avoid TypeError.
+if "sslmode=" in SQLALCHEMY_DATABASE_URL:
+    from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
+    u = urlparse(SQLALCHEMY_DATABASE_URL)
+    q = parse_qs(u.query)
+    q.pop("sslmode", None)
+    SQLALCHEMY_DATABASE_URL = urlunparse(u._replace(query=urlencode(q, doseq=True)))
+
 engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
-    echo=True, # Set to False in production
+    echo=False, # Set to False in production
 )
 
 SessionLocal = async_sessionmaker(
