@@ -22,13 +22,22 @@ export const useStudyConfig = () => {
             setConfigError(null);
 
             try {
+                // Detect Browser Language if session is not yet set
+                const langToRequest = session.language ?? window.navigator.language.substring(0, 2); // Fallback to raw navigator if i18n not ready
+                
                 // Fetch study config from backend
-                const data = await get<unknown>(`/api/study/${slug}?lang=${session.language}`);
+                const data = await get<unknown>(`/api/study/${slug}?lang=${langToRequest}`);
                 
                 // VALIDATE WITH ZOD
                 const validatedData = StudyConfigSchema.parse(data);
                 
                 setConfig(validatedData);
+
+                // If session language was not set, OR if the backend resolved to a DIFFERENT language
+                // we should update our session to match what is actually being displayed.
+                if (!session.language || (validatedData.language && session.language !== validatedData.language)) {
+                    useStudyStore.getState().setLanguage(validatedData.language || 'en');
+                }
                 
             } catch (err: unknown) {
                 console.error("Failed to fetch or validate study:", err);

@@ -25,10 +25,20 @@ const WelcomePage: React.FC = () => {
         setConsent, setToken, setStep 
     } = useStudyStore();
 
-    const { register, handleSubmit, formState: { errors, isValid } } = useForm<ConsentForm>({
+    const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm<ConsentForm>({
         resolver: zodResolver(consentSchema),
         defaultValues: { consent: session.hasConsented }
     });
+
+    // Auto-save consent to store
+    React.useEffect(() => {
+        const subscription = watch((value) => {
+            if (value.consent !== undefined) {
+                setConsent(value.consent);
+            }
+        });
+        return () => subscription.unsubscribe();
+    }, [watch, setConsent]);
 
     // Set Step 1 on mount
     React.useEffect(() => {

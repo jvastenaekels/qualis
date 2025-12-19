@@ -14,11 +14,12 @@ interface GridSortProps {
   neutralCards: { id: number; text: string }[];
   gridColumns: { score: number; capacity: number }[];
   responses: unknown;
-  renderSlotContent: (col: number, row: number) => React.ReactNode;
+  renderSlotContent: (col: number, row: number, dimensions: { width: number, height: number }) => React.ReactNode;
   onReset?: () => void;
   selectedCardId?: number | null;
   onCardClick?: (id: number) => void;
   onSlotClick?: (col: number, row: number) => void;
+  onDimensionsChange?: (dimensions: { width: number, height: number }) => void;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -32,7 +33,8 @@ const GridSort: React.FC<GridSortProps> = ({
   onReset,
   selectedCardId,
   onCardClick,
-  onSlotClick
+  onSlotClick,
+  onDimensionsChange
 }) => {
   const { t } = useTranslation();
   const [activePile, setActivePile] = useState<PileType>('disagree');
@@ -88,10 +90,10 @@ const GridSort: React.FC<GridSortProps> = ({
   
   // Legend Label Sizing Helper (Unified for all labels)
   const getLegendFontSize = (maxLen: number) => {
-    // Increased sizes for better mobile readability
-    if (maxLen < 12) return 'text-base sm:text-xl'; 
-    if (maxLen < 25) return 'text-sm sm:text-lg';
-    return 'text-xs sm:text-base';
+    // MAX mobile readability
+    if (maxLen < 12) return 'text-xl sm:text-2xl'; 
+    if (maxLen < 25) return 'text-lg sm:text-xl';
+    return 'text-base sm:text-lg';
   };
   
   // Zone Highlighting Helper
@@ -140,43 +142,38 @@ const GridSort: React.FC<GridSortProps> = ({
       const isMobile = window.innerWidth < 1024;
 
       if (isMobile) {
-          // Mobile: 110% of screen width
-          // The wrapper might have padding, but usually on mobile it's full width of the 'canvas' area.
-          const scale = (wrapperW * 1.10) / contentW;
+          // Mobile: Fit to Width primarily, but ensuring it fits Height (Contain)
+          const widthScale = (wrapperW * 0.95) / contentW; // Slightly smaller to be safe
+          const heightScale = (wrapperH * 0.82) / contentH; 
           
-          // Center Horizontally
-          // X = (ContainerWidth - ScaledContentWidth) / 2
+          const scale = Math.min(widthScale, heightScale);
+          
           const x = (wrapperW - (contentW * scale)) / 2;
           
-          // Align Bottom
-          // Y = ContainerHeight - ScaledContentHeight - Padding
-          // Use a small padding to sit "just above" the bottom edge
-          const y = wrapperH - (contentH * scale) - 20;
+          // Align to Bottom (as requested to show spectrum bar)
+          // We sit exactly on the bottom, with a small padding
+          const y = wrapperH - (contentH * scale) - 5;
 
           transformRef.current.setTransform(x, y, scale, 200);
       } else {
-          // Desktop: Refined Center Fit on the PYRAMID
-          const padding = 64; 
+          // Desktop: Centered fit
+          const padding = 100; // Increased padding for safety
           const availableW = wrapperW - padding;
           const availableH = wrapperH - padding;
     
           const scaleX = availableW / contentW;
           const scaleY = availableH / contentH;
           
-          const fitScale = Math.min(scaleX, scaleY, 1.2); 
+          const fitScale = Math.min(scaleX, scaleY, 1.1); // Slightly more conservative (1.1x max)
     
-          // 1. Calculate general center for content
+          // Center vertically and horizontally
           let x = (wrapperW - (contentW * fitScale)) / 2;
-          const y = (wrapperH - (contentH * fitScale)) / 3.0; // Slightly higher bias for the "Big Picture"
+          const y = (wrapperH - (contentH * fitScale)) / 2;
 
-          // 2. Adjust X to center specifically on the PYRAMID if possible
           if (pyramidRef.current) {
               const pyramid = pyramidRef.current;
               const pyramidW = pyramid.offsetWidth;
-              const pyramidOffsetLeft = pyramid.offsetLeft; // Offset relative to grid-container
-              
-              // We want the viewport center to align with the pyramid center
-              // Resulting X = (wrapperW / 2) - ((pyramidOffsetLeft + pyramidW / 2) * fitScale)
+              const pyramidOffsetLeft = pyramid.offsetLeft;
               x = (wrapperW / 2) - ((pyramidOffsetLeft + (pyramidW / 2)) * fitScale);
           }
 
@@ -221,19 +218,24 @@ const GridSort: React.FC<GridSortProps> = ({
       setCardDimensions(prev => {
           // Strict convergence check to prevent loops (1px delta)
           if (Math.abs(prev.width - newWidth) < 1.5 && Math.abs(prev.height - newHeight) < 1.5) return prev;
-          return { width: newWidth, height: newHeight };
+          const next = { width: newWidth, height: newHeight };
+          onDimensionsChange?.(next);
+          return next;
       });
-  }, [gridColumns]);
+  }, [gridColumns, onDimensionsChange]);
 
 
   
   // Recalculate size on mount/resize
   useEffect(() => {
-      // Auto-close tips on mobile when a card is selected
-      if (selectedCardId && window.innerWidth < 1024) {
-          setClosedTips({ extremes: true, vertical: true });
-      }
-  }, [selectedCardId]);
+    // Initial
+    calculateOptimalSize();
+    
+    // Auto-close tips on mobile when a card is selected
+    if (selectedCardId && window.innerWidth < 1024) {
+        setClosedTips({ extremes: true, vertical: true });
+    }
+  }, [selectedCardId, calculateOptimalSize]);
 
   useEffect(() => {
       // Logic for transient transition could go here if needed in the future
@@ -259,16 +261,29 @@ const GridSort: React.FC<GridSortProps> = ({
     // Safety delay to allow render and auto-fit to settle
     const timer = setTimeout(() => {    
         if (!transformRef.current) return;
+        
+        const isMobile = window.innerWidth < 1024;
         let targetId = '';
+
         // Strategy: Focus on the "Center of the Zone" (Zonal Focus)
+        const sortedScores = [...gridColumns].map(c => c.score).sort((a, b) => a - b);
+        const minScore = sortedScores[0];
+        const maxScore = sortedScores[sortedScores.length - 1];
+
         if (activePile === 'disagree') {
-            // Target the column closer to center of the disagree zone (-1) to avoid showing too much empty space
-            targetId = 'column--1';
+            // Mobile: Target extreme + 2 (closer to center), clamped to at least -1 to stay in zone
+            const targetScore = isMobile ? Math.min(minScore + 2, -1) : -1;
+            targetId = `column-${targetScore}`;
+            // Fallback chain
             if (!document.getElementById(targetId)) targetId = 'column--2';
+            if (!document.getElementById(targetId)) targetId = 'column--1';
         } else if (activePile === 'agree') {
-            // Target the column closer to center of the agree zone (+1) to avoid showing too much empty space
-            targetId = 'column-1';
+            // Mobile: Target extreme - 2 (closer to center), clamped to at least 1 to stay in zone
+            const targetScore = isMobile ? Math.max(maxScore - 2, 1) : 1;
+            targetId = `column-${targetScore}`;
+            // Fallback chain
             if (!document.getElementById(targetId)) targetId = 'column-2';
+            if (!document.getElementById(targetId)) targetId = 'column-1';
         } else {
             // Neutral -> Center Column
             targetId = 'column-0';
@@ -276,13 +291,12 @@ const GridSort: React.FC<GridSortProps> = ({
 
         const targetNode = document.getElementById(targetId);
         if (targetNode && wrapperRef.current && pyramidRef.current && contentRef.current && transformRef.current) {
-            const isMobile = window.innerWidth < 1024;
             const state = transformRef.current.instance.transformState;
             
             // 1. Calculate Target Scale
-            // On Mobile: Zoom in by 1.33x from overview
+            // On Mobile: Zoom in by 1.75x from overview
             // On Desktop: Subtle 1.05x zoom for slight emphasis
-            const targetScale = isMobile ? (state.scale * 1.33) : (state.scale * 1.05);
+            const targetScale = isMobile ? (state.scale * 1.75) : (state.scale * 1.05);
 
             // 2. Manual Coordinate Calculation for PERFECT Centering
             const wrapperW = wrapperRef.current.clientWidth;
@@ -318,12 +332,9 @@ const GridSort: React.FC<GridSortProps> = ({
         clearTimeout(fitTimer);
         clearTimeout(timer);
     };
-  }, [activePile, hasPerformedZonalFocus]);
+  }, [activePile, hasPerformedZonalFocus, gridColumns]);
 
   React.useEffect(() => {
-      // Initial
-      calculateOptimalSize();
-      
       const wrapper = wrapperRef.current;
       if (!wrapper) return;
 
@@ -344,10 +355,10 @@ const GridSort: React.FC<GridSortProps> = ({
       };
   }, [calculateOptimalSize]);
 
-  // Separate AutoFit effect
+  // Panning Trigger
   useEffect(() => {
      // Wait for DOM
-     const t = setTimeout(performAutoFit, 50);
+     const t = setTimeout(performAutoFit, 100);
      return () => clearTimeout(t);
   }, [cardDimensions]);
 
@@ -365,9 +376,10 @@ const GridSort: React.FC<GridSortProps> = ({
           bg-white lg:border-r border-t lg:border-t-0 border-gray-200 
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md 
           flex flex-col
-          h-auto lg:h-full 
+          h-[200px] lg:h-full 
           transition-all duration-300
-          pb-safe
+          overflow-hidden
+          pb-safe lg:pb-0
       ">
           
               {/* HEADER & TABS */}
@@ -501,46 +513,72 @@ const GridSort: React.FC<GridSortProps> = ({
 
           {/* THE SOURCE DECK CONTENT */}
           {/* Mobile: Horizontal Scroll (flex-row). Desktop: Vertical Grid (flex-col). */}
+          {/* Added min-h-0 to prevent flex child from overflowing parent height in nested flex columns */}
           <motion.div 
             key={activePile}
             initial={{ backgroundColor: activePile === 'disagree' ? '#fee2e2' : activePile === 'agree' ? '#dcfce7' : '#f1f5f9' }}
             animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} // fading to slate-50/50
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="flex-1 p-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto"
+            transition={{ duration: 0.8 }} // Doubled fading time (was ~0.4)
+            // flex-[1_1_0%] is key here to force it to shrink below content size if needed
+            className="flex-1 p-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-h-0 custom-scrollbar"
           >
               <SortableContext 
                   items={activeCards.map(c => c.id)} 
                   strategy={rectSortingStrategy}
                >
-                  <div className={`
+                  <motion.div 
+                    variants={{
+                        show: { transition: { staggerChildren: 0.05 } }
+                    }}
+                    initial="hidden"
+                    animate="show"
+                    className={`
                         ${activeCards.length === 0 
                             ? 'flex w-full h-full justify-center items-center' 
                             : 'flex flex-row lg:grid lg:grid-cols-1 2xl:lg:grid-cols-2 gap-2 lg:gap-3'}
                   `}>
-                      {activeCards.length > 0 ? activeCards.map(card => (
-                          <div key={card.id} className="flex-none w-[120px] sm:w-[140px] lg:w-full">
-                              <SortableCard 
-                                id={card.id} 
-                                text={card.text} 
-                                variant="compact" 
-                                isSelected={selectedCardId === card.id}
-                                onClick={() => onCardClick?.(card.id)}
-                            />
-                          </div>
-                      )) : (
-                          <div className="text-center text-slate-300 flex flex-col items-center gap-2">
-                              <Check size={24} className="text-green-400" />
-                              <span className="text-sm font-medium">{t('fine.deck.all_placed')}</span>
-                          </div>
-                      )}
-                  </div>
+                      <AnimatePresence mode="popLayout">
+                          {activeCards.length > 0 ? activeCards.map(card => (
+                              <motion.div 
+                                  key={card.id} 
+                                  layout
+                                  initial={{ x: 20, opacity: 0 }}
+                                  animate={{ x: 0, opacity: 1 }}
+                                  exit={{ x: -20, opacity: 0 }}
+                                  transition={{ duration: 0.4, ease: "easeOut" }}
+                                  className="flex-none w-[120px] sm:w-[140px] lg:w-full"
+                              >
+                                     <SortableCard 
+                                       key={card.id}
+                                       id={card.id}
+                                       text={card.text}
+                                       variant="compact"
+                                       isSelected={selectedCardId === card.id}
+                                       onClick={() => onCardClick?.(card.id)}
+                                       aspectRatio={cardDimensions.width / cardDimensions.height}
+                                       // Only disable hover zoom on mobile browsers to prevent obstructing the grid
+                                       disableHoverZoom={typeof window !== 'undefined' && window.innerWidth < 1024}
+                                   />
+                              </motion.div>
+                          )) : (
+                              <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-center text-slate-300 flex flex-col items-center gap-2"
+                              >
+                                  <Check size={24} className="text-green-400" />
+                                  <span className="text-sm font-medium">{t('fine.deck.all_placed')}</span>
+                              </motion.div>
+                          )}
+                      </AnimatePresence>
+                  </motion.div>
 
                </SortableContext>
           </motion.div>
           
-          {/* FOOTER ACTION (Reset) */}
+          {/* FOOTER ACTION (Reset) - Hidden on mobile to prevent accidental triggers */}
           {onReset && (
-              <div className="flex-none p-2 border-t border-gray-100 bg-slate-50/50 hidden lg:flex justify-center">
+              <div className="flex-none p-2 border-t border-gray-100 bg-slate-50/50 hidden lg:flex justify-center z-10">
                   <button 
                       onClick={onReset}
                       className="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors uppercase tracking-wider px-3 py-1.5 rounded hover:bg-red-50"
@@ -557,29 +595,61 @@ const GridSort: React.FC<GridSortProps> = ({
       --------------------------------------------------------------------------- */}
       <div className="flex-1 h-full bg-slate-50 relative flex flex-col overflow-hidden">
           
-           {/* Toolbar Info: Visible on ALL screens now */}
-           <div className="py-2 flex-none bg-white border-b border-gray-200 flex items-center justify-center px-4 shadow-sm z-20">
-                {/* Mobile Text */}
-                <span className="text-base sm:text-xl font-bold text-slate-700 text-center leading-tight lg:hidden">
-                   <Trans 
-                       i18nKey="fine.toolbar.mobile"
-                       components={[
-                           <strong className="text-red-600" key="0" />,
-                           <strong className="text-green-600" key="1" />
-                       ]}
-                   />
-                </span>
-                {/* Desktop Text */}
-                <span className="text-lg sm:text-xl font-bold text-slate-700 text-center leading-tight hidden lg:inline">
-                   <Trans 
-                       i18nKey="fine.toolbar.desktop"
-                       components={[
-                           <strong className="text-red-600" key="0" />,
-                           <strong className="text-green-600" key="1" />
-                       ]}
-                   />
-                </span>
-           </div>
+            {/* Toolbar Info / Sticky Statement Bar (Mobile Only) */}
+            <div className={`min-h-[70px] flex-none bg-white border-b border-gray-200 flex items-center justify-center px-4 shadow-sm z-20`}>
+                {(() => {
+                    const isMobileLocal = typeof window !== 'undefined' && window.innerWidth < 1024;
+                    // If a card is selected AND we are on mobile, show Sticky Bar UX
+                    const selectedCards = [...agreeCards, ...disagreeCards, ...neutralCards];
+                    const selectedCard = selectedCardId ? selectedCards.find(c => c.id === selectedCardId) : null;
+
+                    if (isMobileLocal && selectedCard) {
+                        return (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="w-full flex items-center justify-center gap-2 py-2"
+                            >
+                                <span className="text-sm sm:text-lg font-bold text-indigo-700 text-center leading-tight">
+                                    {selectedCard.text}
+                                </span>
+                                <button 
+                                    onClick={() => onCardClick?.(selectedCard.id)} 
+                                    className="flex-none p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </motion.div>
+                        );
+                    }
+
+                    // On Desktop OR if no card selected on mobile, show basic instructions
+                    return (
+                        <>
+                            {/* Mobile Text */}
+                            <span className="text-base sm:text-xl font-bold text-slate-700 text-center leading-tight lg:hidden">
+                               <Trans 
+                                   i18nKey="fine.toolbar.mobile"
+                                   components={[
+                                       <strong className="text-red-600" key="0" />,
+                                       <strong className="text-green-600" key="1" />
+                                   ]}
+                               />
+                            </span>
+                            {/* Desktop Text */}
+                            <span className="text-lg sm:text-xl font-bold text-slate-700 text-center leading-tight hidden lg:inline">
+                               <Trans 
+                                   i18nKey="fine.toolbar.desktop"
+                                   components={[
+                                       <strong className="text-red-600" key="0" />,
+                                       <strong className="text-green-600" key="1" />
+                                   ]}
+                               />
+                            </span>
+                        </>
+                    );
+                })()}
+            </div>
 
            <div className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing" ref={wrapperRef}>
                 
@@ -733,7 +803,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                                             role="gridcell"
                                                             aria-label={`${t('fine.grid.slot', 'Slot')} ${rowIndex + 1} ${t('fine.grid.column', 'in column')} ${score}`}
                                                         >
-                                                            {renderSlotContent(colIndex, rowIndex)}
+                                                            {renderSlotContent(colIndex, rowIndex, cardDimensions)}
                                                         </DroppableSlot>
                                                     ))}
                                                 </div>
@@ -778,7 +848,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                               })()}
                                           </div>
                                          {/* Gradient Bar */}
-                                         <div className="w-full h-3 bg-gradient-to-r from-red-500/30 via-slate-200 to-green-500/30 rounded-full relative backdrop-blur-sm" aria-hidden="true">
+                                         <div className="w-full h-5 bg-gradient-to-r from-red-500/30 via-slate-200 to-green-500/30 rounded-full relative backdrop-blur-sm" aria-hidden="true">
                                              {/* Center Tick */}
                                              <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-400/50 -translate-x-1/2"></div>
                                              {/* End Ticks */}

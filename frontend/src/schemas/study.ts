@@ -46,6 +46,7 @@ export const StudyConfigSchema = z.object({
   consent: ConsentSchema.optional(),
   ui_labels: z.record(z.string()).optional(),
   available_languages: z.array(z.string()).optional(),
+  language: z.string().optional(),
 });
 
 export type StudyConfig = z.infer<typeof StudyConfigSchema>;

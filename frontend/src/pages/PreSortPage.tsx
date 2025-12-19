@@ -11,7 +11,7 @@ import type { PreSortField } from '../schemas/study';
 const PreSortPage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
-    const { config, setPresortResponse, setStep } = useStudyStore();
+    const { config, setPresortResponse, setStep, responses } = useStudyStore();
     const { t, i18n } = useTranslation();
     
     // Generate Dynamic Zod Schema based on config
@@ -45,10 +45,19 @@ const PreSortPage: React.FC = () => {
         return z.object(shape);
     }, [config?.presort_config, t]);
 
-    const { register, handleSubmit, formState: { errors, isValid } } = useForm({
+    const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm({
         resolver: zodResolver(dynamicSchema),
-        mode: 'onChange'
+        mode: 'onChange',
+        defaultValues: responses.presort
     });
+
+    // Auto-save form data to store using subscription to avoid render loops
+    React.useEffect(() => {
+        const subscription = watch((value) => {
+            setPresortResponse(value as Record<string, string | number | boolean>);
+        });
+        return () => subscription.unsubscribe();
+    }, [watch, setPresortResponse]);
 
     // Set Step 2 on mount
     React.useEffect(() => {

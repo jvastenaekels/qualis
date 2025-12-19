@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import StudyLayout from './StudyLayout';
 import { useStudyStore } from '../store/useStudyStore';
 import i18n from '../i18n';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 // Mock dependencies
 // i18n is already being mocked globally in setupTests.ts for some things, but here we mock specifically.
@@ -29,6 +29,17 @@ describe('StudyLayout Language Sync', () => {
         vi.clearAllMocks();
         act(() => {
              useStudyStore.getState().resetSession();
+             // Seed with valid config to bypass loading/error states
+             useStudyStore.getState().setConfig({
+                 title: 'Test Study',
+                 slug: 'test',
+                 statements: [],
+                 grid_config: [],
+                 available_languages: ['en', 'fr']
+             } as any);
+             
+             // Consent is required for protected routes (sort/review)
+             useStudyStore.getState().setConsent(true);
         });
     });
 
@@ -75,5 +86,58 @@ describe('StudyLayout Language Sync', () => {
         
         // Verify i18n updated
         expect(i18n.changeLanguage).toHaveBeenCalledWith('fr');
+    });
+});
+
+describe('Layout Scroll Behavior', () => {
+    it('Applies overflow-hidden on sorting pages', () => {
+        const { container } = render(
+            <MemoryRouter initialEntries={['/study/slug/rough-sort']}>
+                <Routes>
+                    <Route path="/study/:slug/rough-sort" element={<StudyLayout />} />
+                </Routes>
+            </MemoryRouter>
+        );
+        const main = container.querySelector('main');
+        expect(main).toHaveClass('overflow-hidden');
+        expect(main).not.toHaveClass('overflow-y-auto');
+    });
+
+    it('Applies overflow-hidden on fine-sort page', () => {
+        const { container } = render(
+            <MemoryRouter initialEntries={['/study/slug/sort']}>
+                 <Routes>
+                    <Route path="/study/:slug/sort" element={<StudyLayout />} />
+                </Routes>
+            </MemoryRouter>
+        );
+        const main = container.querySelector('main');
+        expect(main).toHaveClass('overflow-hidden');
+    });
+
+    it('Applies overflow-y-auto on post-sort page (despite containing "sort")', () => {
+        const { container } = render(
+             <MemoryRouter initialEntries={['/study/slug/post-sort']}>
+                 <Routes>
+                    <Route path="/study/:slug/post-sort" element={<StudyLayout />} />
+                </Routes>
+            </MemoryRouter>
+        );
+        const main = container.querySelector('main');
+        expect(main).toHaveClass('overflow-y-auto');
+        expect(main).not.toHaveClass('overflow-hidden');
+    });
+
+    it('Applies overflow-y-auto on other pages (e.g. welcome)', () => {
+        const { container } = render(
+             <MemoryRouter initialEntries={['/study/slug/welcome']}>
+                 <Routes>
+                    <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+                </Routes>
+            </MemoryRouter>
+        );
+        const main = container.querySelector('main');
+        expect(main).toHaveClass('overflow-y-auto');
+        expect(main).not.toHaveClass('overflow-hidden');
     });
 });

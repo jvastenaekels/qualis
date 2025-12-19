@@ -180,31 +180,38 @@ async def get_study(
     # For now, let's return a structured object the frontend can use directly.
     # We default to English for the main fields if found, else first available.
     
-    # Priority: Requested Lang -> English -> First Available
+    # Priority: Requested Lang -> Default (Study) -> English -> First Available
+    # 1. Requested
     translation = next((t for t in study.translations if t.language_code == lang), None)
     
+    # 2. Default (Study)
+    if not translation and study.default_language:
+        translation = next((t for t in study.translations if t.language_code == study.default_language), None)
+
+    # 3. English
     if not translation:
-        # Fallback to English
         translation = next((t for t in study.translations if t.language_code == "en"), None)
     
+    # 4. First Available
     if not translation and study.translations:
-        # Fallback to First Available
         translation = study.translations[0]
         
+    resolved_lang = translation.language_code if translation else "en"
+
     title = translation.title if (translation and hasattr(translation, 'title')) else study.slug
     description = translation.description if (translation and hasattr(translation, 'description')) else ""
     instructions = translation.instructions if (translation and hasattr(translation, 'instructions')) else ""
     
     statements_data = []
     for s in study.statements:
-        s_trans = next((t for t in s.translations if t.language_code == lang), None)
+        # Same Logic for Statements
+        s_trans = next((t for t in s.translations if t.language_code == resolved_lang), None)
         
+        # If specific statement translation missing, allow fallback to English
         if not s_trans:
-             # Fallback to English
              s_trans = next((t for t in s.translations if t.language_code == "en"), None)
 
         if not s_trans and s.translations:
-             # Fallback to First Available
              s_trans = s.translations[0]
              
         text = s_trans.text if s_trans else s.code
@@ -242,5 +249,6 @@ async def get_study(
             "accept": getattr(translation, "consent_accept", None),
             "decline": getattr(translation, "consent_decline", None)
         },
-        "available_languages": [t.language_code for t in study.translations]
+        "available_languages": [t.language_code for t in study.translations],
+        "language": resolved_lang
     }

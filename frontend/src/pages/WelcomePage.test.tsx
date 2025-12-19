@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import WelcomePage from './WelcomePage';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
+import { useStudyStore } from '../store/useStudyStore';
+
 // Mocks
 const mockSetConsent = vi.fn();
 const mockSetToken = vi.fn();
@@ -15,7 +17,7 @@ const mockConfig = {
 };
 
 vi.mock('../store/useStudyStore', () => ({
-    useStudyStore: () => ({
+    useStudyStore: vi.fn(() => ({
         session: { hasConsented: false, token: null },
         setConsent: mockSetConsent,
         setToken: mockSetToken,
@@ -23,7 +25,7 @@ vi.mock('../store/useStudyStore', () => ({
         config: mockConfig,
         configLoading: false,
         configError: null
-    })
+    }))
 }));
 
 vi.mock('../hooks/useStudyConfig', () => ({
@@ -98,5 +100,36 @@ describe('WelcomePage', () => {
             expect(mockSetConsent).toHaveBeenCalledWith(true);
             expect(mockSetStep).toHaveBeenCalledWith(2);
         });
+    });
+
+    it('persists consent when re-navigating', async () => {
+        let externalConsent = false;
+        vi.mocked(useStudyStore).mockImplementation(() => ({
+            session: { hasConsented: externalConsent },
+            setConsent: (val: boolean) => { externalConsent = val; },
+            setStep: vi.fn(),
+            config: mockConfig
+        }) as any);
+
+        const { unmount } = render(
+            <MemoryRouter>
+                <WelcomePage />
+            </MemoryRouter>
+        );
+
+        const checkbox = screen.getByLabelText(/welcome\.consent\.label/i);
+        fireEvent.click(checkbox);
+        
+        await waitFor(() => expect(externalConsent).toBe(true));
+
+        unmount();
+
+        render(
+            <MemoryRouter>
+                <WelcomePage />
+            </MemoryRouter>
+        );
+
+        expect(screen.getByLabelText(/welcome\.consent\.label/i)).toBeChecked();
     });
 });

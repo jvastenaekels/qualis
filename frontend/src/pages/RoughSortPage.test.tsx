@@ -107,4 +107,32 @@ describe('RoughSortPage', () => {
         expect(screen.getByText('rough.complete.title')).toBeTruthy();
         expect(screen.getByText('common.next')).toBeTruthy();
     });
+
+    it('persists progress when re-navigating', () => {
+        // Categorize one card
+        useStudyStore.getState().categorizeCard(1, 'agree');
+
+        const { unmount } = render(
+            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
+                <Routes>
+                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        // Card 1 is gone, Card 2 is current
+        expect(screen.getByText('Card 2')).toBeTruthy();
+
+        unmount();
+
+        render(
+            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
+                <Routes>
+                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('Card 2')).toBeTruthy();
+    });
 });

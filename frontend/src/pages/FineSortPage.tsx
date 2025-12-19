@@ -43,6 +43,7 @@ const FineSortPage: React.FC = () => {
 
     const [activeId, setActiveId] = useState<number | null>(null);
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null); // Tap-to-Place State
+    const [cardDimensions, setCardDimensions] = useState<{ width: number, height: number } | null>(null);
 
     // Sensors
     const sensors = useSensors(
@@ -285,7 +286,7 @@ const FineSortPage: React.FC = () => {
     const activeCardData = config?.statements.find(s => s.id === activeId);
 
     // Helpers
-    const renderSlotContent = (col: number, row: number) => {
+    const renderSlotContent = (col: number, row: number, dimensions: { width: number, height: number }) => {
          const cardInSlot = responses.qsort.find(c => c.col === col && c.row === row);
          const statement = cardInSlot ? config?.statements.find(s => s.id === cardInSlot.statementId) : null;
          if (statement) {
@@ -295,6 +296,8 @@ const FineSortPage: React.FC = () => {
                     text={statement.text} 
                     isSelected={selectedCardId === statement.id}
                     onClick={() => handleCardClick(statement.id)}
+                    dimensions={dimensions}
+                    disableHoverZoom={typeof window !== 'undefined' && window.innerWidth < 1024}
                 />
             );
          }
@@ -322,6 +325,7 @@ const FineSortPage: React.FC = () => {
                     selectedCardId={selectedCardId}
                     onCardClick={handleCardClick}
                     onSlotClick={handleSlotClick}
+                    onDimensionsChange={setCardDimensions}
 
                     onReset={() => {
                         if (window.confirm(t('fine.deck.confirm_reset'))) {
@@ -336,7 +340,12 @@ const FineSortPage: React.FC = () => {
              {createPortal(
                 <DragOverlay>
                     {activeCardData ? (
-                        <SortableCard id={activeCardData.id} text={activeCardData.text} isOverlay />
+                        <SortableCard 
+                            id={activeCardData.id} 
+                            text={activeCardData.text} 
+                            isOverlay 
+                            aspectRatio={cardDimensions ? cardDimensions.width / cardDimensions.height : undefined}
+                        />
                     ) : null}
                 </DragOverlay>,
                 document.body

@@ -11,6 +11,9 @@ interface SortableCardProps {
   variant?: 'hand' | 'grid' | 'compact';
   isSelected?: boolean;
   onClick?: () => void;
+  dimensions?: { width: number; height: number };
+  aspectRatio?: number;
+  disableHoverZoom?: boolean;
 }
 
 const SortableCard: React.FC<SortableCardProps> = ({ 
@@ -19,7 +22,10 @@ const SortableCard: React.FC<SortableCardProps> = ({
     isOverlay, 
     variant = 'grid',
     isSelected,
-    onClick 
+    onClick,
+    dimensions,
+    aspectRatio,
+    disableHoverZoom = false
 }) => {
   const {
     attributes,
@@ -49,6 +55,8 @@ const SortableCard: React.FC<SortableCardProps> = ({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.3 : 1,
+    // Add dynamic dimensions if provided
+    ...(dimensions && { width: dimensions.width, height: dimensions.height })
   };
 
   // Typography Logic
@@ -71,14 +79,15 @@ const SortableCard: React.FC<SortableCardProps> = ({
           break;
   }
 
-  // Aspect Ratio Logic
-  const aspectClass = (variant === 'grid' || variant === 'compact') ? 'h-full' : 'aspect-[3/4]';
+  // Aspect Ratio Logic: Use prop if provided, otherwise default to 3/4
+  const aspectStyle = aspectRatio ? { aspectRatio: `${aspectRatio}` } : {};
+  const aspectClass = !aspectRatio && !dimensions ? 'aspect-[3/4]' : '';
 
   return (
     <>
         <div
             ref={setNodeRef}
-            style={style}
+            style={{ ...style, ...aspectStyle }}
             {...attributes}
             {...listeners}
             onClick={() => {
@@ -90,7 +99,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
             onMouseLeave={() => setShowZoom(false)}
             className={`
                 relative
-                w-full ${aspectClass}
+                ${!dimensions ? 'w-full' : ''} ${aspectClass}
                 flex items-center justify-center p-0
                 cursor-grab active:cursor-grabbing
                 touch-manipulation dnd-prevent-pan
@@ -132,7 +141,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
             </motion.div>
         </div>
 
-        {showZoom && !isDragging && <ZoomPortal />}
+        {showZoom && !isDragging && !disableHoverZoom && <ZoomPortal />}
     </>
   );
 };

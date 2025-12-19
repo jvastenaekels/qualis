@@ -9,7 +9,7 @@ interface SessionState {
   hasConsented: boolean;
   currentStep: number;
   maxReachedStep: number;
-  language: string;
+  language: string | null;
   isCompleted: boolean;
   confirmationCode: string | null;
 }
@@ -77,7 +77,7 @@ export const useStudyStore = create<StudyStore>()(
         hasConsented: false,
         currentStep: 1, // 1: Welcome
         maxReachedStep: 1,
-        language: 'en',
+        language: null, // Initialized to null to auto-detect
         isCompleted: false,
         confirmationCode: null
       },
@@ -105,7 +105,11 @@ export const useStudyStore = create<StudyStore>()(
              }
         })),
       setPresortResponse: (data) =>
-        set((state) => ({ responses: { ...state.responses, presort: data } })),
+        set((state) => {
+          // Simple JSON stringify comparison to avoid redundant updates
+          if (JSON.stringify(state.responses.presort) === JSON.stringify(data)) return state;
+          return { responses: { ...state.responses, presort: data } };
+        }),
 
       setPostSortResponse: (field, value) => 
         set((state) => ({
@@ -254,7 +258,7 @@ export const useStudyStore = create<StudyStore>()(
       resetSession: () => set((state) => ({
         config: null,
         configRefetchTag: state.configRefetchTag + 1,
-        session: { token: null, hasConsented: false, currentStep: 1, maxReachedStep: 1, language: 'en', isCompleted: false, confirmationCode: null },
+        session: { token: null, hasConsented: false, currentStep: 1, maxReachedStep: 1, language: null, isCompleted: false, confirmationCode: null },
         responses: { presort: {}, rough: { agree: [], disagree: [], neutral: [], history: [] }, qsort: [], postsort: { card_comments: {}, missing_statement: '', general_comment: '' } }
       })),
 

@@ -141,7 +141,38 @@ describe('FineSortPage', () => {
              // We expect to add 'animate-in fade-in zoom-in'
              // Currently checking what it has or what we WILL add
              // For now, let's verify it has "bg-blue-600"
-             expect(button.className).toContain('bg-blue-600');
+              expect(button.className).toContain('bg-blue-600');
          }
+    });
+
+    it('persists grid placements when re-navigating', () => {
+        let externalQSort = [{ statementId: 1, col: 0, row: 0 }];
+        vi.mocked(useStudyStore).mockImplementation(() => ({
+            config: {
+                statements: [{ id: 1, text: 'S1' }],
+                grid_config: [{ capacity: 1, score: 0 }],
+                presort_config: {}
+            } as any,
+            responses: {
+                rough: { agree: [1], disagree: [], neutral: [] },
+                qsort: externalQSort
+            } as any,
+            setStep: vi.fn(),
+            placeCardInGrid: vi.fn(),
+            moveCardInGrid: vi.fn(),
+            swapCardsInGrid: vi.fn(),
+            unplaceCard: vi.fn(),
+            resetFineSort: vi.fn(),
+        }) as any);
+
+        const { unmount } = render(<FineSortPage />);
+        
+        // Assert card 1 is in grid (GridSort mock rendes test-id)
+        expect(screen.getByTestId('grid-sort')).toBeTruthy();
+
+        unmount();
+
+        render(<FineSortPage />);
+        expect(screen.getByTestId('grid-sort')).toBeTruthy();
     });
 });

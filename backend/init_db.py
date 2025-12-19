@@ -1,24 +1,41 @@
 import asyncio
+import os
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from app.database import engine, Base, SessionLocal
 from app.models import User, Study, StudyTranslation, Statement, StatementTranslation, StudyState
 
-async def seed_db():
-    print("--- Seeding Database ---")
+async def init_db():
+    print("--- Initializing Database (Non-Destructive) ---")
     
-    # Reset DB to ensure clean state
+    # Create tables if they don't exist
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-    
+    print("1. Tables verified/created.")
+
     async with SessionLocal() as session:
-        # 1. Create Owner
-        owner = User(email="admin@example.com", hashed_password="hashed_secret", is_active=True)
+        # Check if we already have users
+        result = await session.execute(select(User))
+        existing_user = result.scalars().first()
+        
+        if existing_user:
+            print("2. Database already initialized (User found). Skipping seeding.")
+            return
+
+        print("2. No users found. Starting initial seed...")
+
+        # 1. Create Initial Admin User
+        # Note: In a real production app, you'd want to set a secure password via env var.
+        admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
+        admin_password = os.getenv("ADMIN_PASSWORD", "hashed_secret") # Replace with real hashing in production
+        
+        owner = User(email=admin_email, hashed_password=admin_password, is_active=True)
         session.add(owner)
         await session.commit()
-        print("1. User created.")
+        await session.refresh(owner)
+        print(f"3. Admin user created: {admin_email}")
 
-        # 2. Create Study
+        # 2. Create Example Study
         study = Study(
             slug="example-study",
             owner_id=owner.id,
@@ -76,7 +93,7 @@ async def seed_db():
         session.add(study)
         await session.commit()
         await session.refresh(study)
-        print(f"2. Study created (ID: {study.id}).")
+        print(f"4. Example study created (ID: {study.id}).")
 
         # 3. Add Translations (En, Fr, Fi)
         t_en = StudyTranslation(
@@ -89,7 +106,6 @@ async def seed_db():
             consent_description="Data will be used solely for scientific research and stored securely.",
             consent_accept="I agree",
             consent_decline="I do not agree",
-
         )
         t_fr = StudyTranslation(
             study_id=study.id, 
@@ -160,8 +176,8 @@ async def seed_db():
         session.add_all(stmt_translations)
         await session.commit()
         
-        print(f"3. {len(statements)} Statements and translations added.")
-        print("--- Seeding Complete ---")
+        print(f"5. {len(statements)} Statements and translations added.")
+        print("--- Initialization Complete ---")
 
 if __name__ == "__main__":
-    asyncio.run(seed_db())
+    asyncio.run(init_db())

@@ -112,7 +112,7 @@ const StudyLayoutContent: React.FC = () => {
   const showMobileFooter = !!headerAction;
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+    <div className="h-dvh bg-gray-50 flex flex-col overflow-hidden">
       {/* Header */}
       <header className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-50 flex items-center justify-between relative shadow-sm">
         
@@ -227,7 +227,7 @@ const StudyLayoutContent: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 w-full mx-auto overflow-y-auto relative flex flex-col bg-slate-50">
+      <main className={`flex-1 w-full mx-auto relative flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/sort'].some(path => location.pathname.endsWith(path)) ? 'overflow-hidden' : 'overflow-y-auto'}`}>
         {/* Error Banner (Stale-while-revalidating failure) */}
         {configError && config && (
             <div className="bg-red-600 text-white px-6 py-2 flex items-center justify-between animate-in slide-in-from-top duration-300">
@@ -244,7 +244,7 @@ const StudyLayoutContent: React.FC = () => {
             </div>
         )}
         {/* Transition Overlay / Dimming */}
-        <div className={`flex-1 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
+        <div className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}>
             <Outlet />
         </div>
       </main>

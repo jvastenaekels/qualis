@@ -62,7 +62,7 @@
     },
     "complete": {
       "title": "Premier tri terminé",
-      "subtitle": "Vous avez dégrossi le tri. Nous allons maintenant affiner les nuances."
+      "subtitle": "Nous allons maintenant affiner les nuances."
     },
     "instructions": {
         "swipe": "Glissez ou appuyez pour catégoriser"
@@ -77,7 +77,7 @@
     },
 "toolbar": {
     "mobile": "Touchez une affirmation pour la sélectionner, puis la grille pour la placer selon son degré de correspondance avec votre point de vue.",
-    "desktop": "Glissez les cartes sur la grille pyramidale selon leur degré de correspondance avec votre point de vue.",
+    "desktop": "Glissez les cartes sur la grille pyramidale en comparant leur degré de correspondance avec votre point de vue.",
     "zoom_in": "Zoom avant",
     "zoom_out": "Zoom arrière",
     "fit_screen": "Ajuster à l'écran",

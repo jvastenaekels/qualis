@@ -96,6 +96,10 @@ describe('GridSort Responsive Layout', () => {
         // And the text span to have 'hidden lg:block'
         const textSpan = screen.getByText('common.disagree');
         expect(textSpan.className).toContain('hidden lg:block');
+        
+        // Verify Sidebar classes for padding
+        const sidebar = screen.getByText('fine.deck.title').closest('div')?.parentElement;
+        expect(sidebar?.className).toContain('lg:pb-0');
     });
 
     it('renders desktop source deck correctly (text visible)', () => {
@@ -182,6 +186,27 @@ describe('GridSort Responsive Layout', () => {
         expect(screen.getByText('ℹ️')).toBeInTheDocument();
 
         vi.useRealTimers();
+    });
+
+    it('renders reset button correctly based on viewport', () => {
+        resizeWindow(1024); // Desktop
+        const onReset = vi.fn();
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} onReset={onReset} />
+            </DndContext>
+        );
+        
+        const resetBtn = screen.getByText('fine.deck.reset');
+        expect(resetBtn).toBeInTheDocument();
+        
+        // Check local parent container
+        const container = resetBtn.closest('div');
+        expect(container?.className).toContain('flex justify-center'); // Base structure
+        expect(container?.className).toContain('hidden lg:flex'); // Specifically hidden on mobile, shown on desktop
+
+        // Check if flex-none is applied (crucial for layout stability)
+        expect(container?.className).toContain('flex-none');
     });
 });
 

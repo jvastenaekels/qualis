@@ -57,16 +57,21 @@ describe('PostSortPage', () => {
         return { setPostSortResponseSpy, setStepSpy };
     };
 
-    it('renders loading state if config is missing', () => {
-        mockUseStudyStore.mockReturnValue({ config: null, setStep: vi.fn() });
-        render(
+    it('renders null if config is missing', () => {
+        mockUseStudyStore.mockReturnValue({ 
+            config: null, 
+            session: { isCompleted: false }, 
+            responses: { qsort: [], postsort: {} },
+            setStep: vi.fn() 
+        });
+        const { container } = render(
              <MemoryRouter>
                 <LayoutProvider>
                     <PostSortPage />
                 </LayoutProvider>
             </MemoryRouter>
         );
-        expect(screen.getByText('common.loading')).toBeTruthy();
+        expect(container.firstChild).toBeNull();
     });
 
     it('identifies and displays extreme cards only', () => {
@@ -151,5 +156,45 @@ describe('PostSortPage', () => {
          const generalInput = screen.getByLabelText('post.general.label');
          fireEvent.change(generalInput, { target: { value: 'Great study!' } });
          expect(setPostSortResponseSpy).toHaveBeenCalledWith('general_comment', 'Great study!');
+    });
+
+    it('persists comments when re-navigating', async () => {
+        let externalComments: Record<number, string> = {};
+        vi.mocked(useStudyStore).mockImplementation(() => ({
+            config: mockConfig as any,
+            responses: {
+                ...mockResponses,
+                postsort: { ...mockResponses.postsort, card_comments: externalComments }
+            } as any,
+            setPostSortResponse: (field: string, val: unknown) => {
+                if (field === 'card_comments') externalComments = val as Record<number, string>;
+            },
+            setStep: vi.fn(),
+            session: { hasConsented: true, isCompleted: false } as any,
+            triggerConfigRefetch: vi.fn()
+        }) as any);
+
+        const { unmount } = render(
+            <MemoryRouter>
+                <LayoutProvider>
+                    <PostSortPage />
+                </LayoutProvider>
+            </MemoryRouter>
+        );
+
+        const textAreas = screen.getAllByPlaceholderText('post.extreme.placeholder');
+        fireEvent.change(textAreas[0], { target: { value: 'Persisted comment for card 1' } });
+
+        unmount();
+
+        render(
+            <MemoryRouter>
+                <LayoutProvider>
+                    <PostSortPage />
+                </LayoutProvider>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByDisplayValue('Persisted comment for card 1')).toBeTruthy();
     });
 });

@@ -37,6 +37,7 @@ class Study(Base):
     slug: Mapped[str] = mapped_column(String, unique=True, index=True)
     owner_id: Mapped[int] = mapped_column(ForeignKey("users.id")) # Assuming ownership for now
     state: Mapped[StudyState] = mapped_column(SAEnum(StudyState), default=StudyState.draft)
+    default_language: Mapped[Optional[str]] = mapped_column(String(5), nullable=True) # e.g. "en"
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     # JSON Configs
