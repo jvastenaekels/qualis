@@ -748,6 +748,7 @@ const GridSort: React.FC<GridSortProps> = ({
                     limitToBounds={false}
                     wheel={{ step: 0.1 }}
                     panning={{ excluded: ['dnd-prevent-pan'] }}
+                    doubleClick={{ disabled: true }}
                 >
                     {() => (
                         <TransformComponent 

@@ -103,6 +103,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
                 flex items-center justify-center p-0
                 cursor-grab active:cursor-grabbing
                 touch-manipulation dnd-prevent-pan
+                [touch-action:manipulation]
                 ${isOverlay ? 'z-50 cursor-grabbing' : ''}
             `}
         >
