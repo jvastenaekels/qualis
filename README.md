@@ -1,6 +1,6 @@
 # Open-Q
 
-Open-Q is an open-source platform for conducting **Q-methodology** research. It provides a seamless, modern interface for participants to perform q-sorts and for researchers to collect and analyze qualitative data.
+Open-Q is an open-source platform for conducting **Q-methodology** research. It provides a seamless, modern interface for participants to perform q-sorts and for researchers to collect and analyze data on subjective views.
 
 ---
 
