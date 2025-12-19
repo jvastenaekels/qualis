@@ -235,7 +235,7 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleDisagree, opacity: opacityDisagree }}
                         onClick={() => handleVote('disagree')}
-                        className="z-20 flex flex-col items-center justify-center w-24 h-24 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1"
+                        className="z-20 flex-none flex flex-col items-center justify-center w-28 min-h-24 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-2"
                         aria-label={t('common.disagree')}
                     >
                         {/* Unified: Frown + Text for all screens */}
@@ -263,7 +263,7 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleAgree, opacity: opacityAgree }}
                         onClick={() => handleVote('agree')}
-                        className="z-20 flex flex-col items-center justify-center w-24 h-24 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1"
+                        className="z-20 flex-none flex flex-col items-center justify-center w-28 min-h-24 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-2"
                         aria-label={t('common.agree')}
                     >
                         {/* Unified: Smile + Text for all screens */}
