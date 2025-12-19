@@ -566,7 +566,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                   animate={{ x: 0, opacity: 1 }}
                                   exit={{ x: -20, opacity: 0 }}
                                   transition={{ duration: 0.4, ease: "easeOut" }}
-                                  className="flex-none w-[120px] sm:w-[140px] lg:w-full"
+                                  className="flex-none w-[120px] sm:w-[140px] lg:w-full lg:max-w-[220px] mx-auto"
                               >
                                      <SortableCard 
                                        key={card.id}
@@ -575,7 +575,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                        variant="compact"
                                        isSelected={selectedCardId === card.id}
                                        onClick={() => onCardClick?.(card.id)}
-                                       aspectRatio={cardDimensions.width / cardDimensions.height}
+                                       aspectRatio={1.5} // Fixed horizontal ratio for deck density
                                        // Only disable hover zoom on mobile browsers to prevent obstructing the grid
                                        disableHoverZoom={typeof window !== 'undefined' && window.innerWidth < 1024}
                                    />

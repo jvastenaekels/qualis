@@ -76,7 +76,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
           break;
       case 'compact': 
           textSizeClass = 'text-xs leading-tight line-clamp-4 text-slate-700'; // Smaller text for mobile deck
-          containerPadding = 'p-2';
+          containerPadding = 'p-1.5';
           break;
       case 'grid': 
       default:
