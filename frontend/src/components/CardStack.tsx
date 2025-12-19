@@ -43,7 +43,7 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
     }
   }));
 
-  const handleDragEnd = async (_: any, info: PanInfo) => {
+  const handleDragEnd = async (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const threshold = 100;
     const { x: offsetX, y: offsetY } = info.offset;
 
