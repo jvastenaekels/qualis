@@ -301,5 +301,5 @@ export const useStudyStore = create<StudyStore>()(
 );
 // Expose store for E2E testing
 if (import.meta.env.DEV) {
-  (window as any).useStudyStore = useStudyStore;
+  (window as unknown as Record<string, unknown>).useStudyStore = useStudyStore;
 }
