@@ -1,3 +1,9 @@
+/*
+ * Open-Q - Open-source platform for conducting Q-methodology research
+ * Copyright (C) 2025 Julien Vastenekels
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';

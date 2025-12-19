@@ -1,3 +1,7 @@
+# Open-Q - Open-source platform for conducting Q-methodology research
+# Copyright (C) 2025 Julien Vastenekels
+# Licensed under the GNU Affero General Public License v3.0 or later.
+
 from fastapi import APIRouter, Depends, HTTPException, Request, Path, Query
 from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession

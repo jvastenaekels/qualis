@@ -1,3 +1,9 @@
+/*
+ * Open-Q - Open-source platform for conducting Q-methodology research
+ * Copyright (C) 2025 Julien Vastenekels
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
 import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
 import { motion, useTransform, useAnimation, type PanInfo, type MotionValue } from 'framer-motion';
 import { createPortal } from 'react-dom';

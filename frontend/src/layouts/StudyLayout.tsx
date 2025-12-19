@@ -1,3 +1,9 @@
+/*
+ * Open-Q - Open-source platform for conducting Q-methodology research
+ * Copyright (C) 2025 Julien Vastenekels
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
@@ -135,7 +141,7 @@ const StudyLayoutContent: React.FC = () => {
         <div className="flex items-center gap-3 min-w-0">
           <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
              {/* Use config title if available, else static default */}
-              {session.currentStep === 1 ? 'OpenQ' : (config?.title || 'Q-Method Study')}
+              {session.currentStep === 1 ? 'Open-Q' : (config?.title || 'Q-Method Study')}
           </div>
           {/* Mobile Step Counter (Next to title) */}
           <span className="md:hidden text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full whitespace-nowrap">

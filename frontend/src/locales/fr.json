@@ -7,6 +7,7 @@
     "next": "Étape suivante",
     "submit": "Enregistrer",
     "loading": "Chargement...",
+    "lang_code": "fr",
     "yes": "Oui",
     "no": "Non",
     "ok": "OK",
@@ -25,7 +26,7 @@
     }
   },
   "layout": {
-    "title": "OpenQ",
+    "title": "Open-Q",
     "steps": {
       "welcome": "Bienvenue",
       "presort": "Contexte",

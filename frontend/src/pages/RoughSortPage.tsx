@@ -1,3 +1,9 @@
+/*
+ * Open-Q - Open-source platform for conducting Q-methodology research
+ * Copyright (C) 2025 Julien Vastenekels
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMotionValue, useTransform, motion } from 'framer-motion';
@@ -244,7 +250,12 @@ const RoughSortPage: React.FC = () => {
                     >
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
                              <Frown size={20} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
-                             <span className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight`}>{t('common.disagree')}</span>
+                             <span 
+                                 lang={t('common.lang_code', { defaultValue: 'en' })}
+                                 className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight break-words hyphens-auto`}
+                             >
+                                 {t('common.disagree')}
+                             </span>
                         </div>
                     </motion.button>
 
@@ -271,7 +282,12 @@ const RoughSortPage: React.FC = () => {
                     >
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
                             <Smile size={20} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
-                            <span className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight`}>{t('common.agree')}</span>
+                            <span 
+                                lang={t('common.lang_code', { defaultValue: 'en' })}
+                                className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight break-words hyphens-auto`}
+                            >
+                                {t('common.agree')}
+                            </span>
                         </div>
                     </motion.button>
                 </div>
@@ -286,7 +302,12 @@ const RoughSortPage: React.FC = () => {
                     >
                          <div className="flex items-center gap-2 text-gray-600">
                              <Meh size={20} strokeWidth={2.5} className="opacity-80" />
-                             <span className={`${sharedFontSize} font-bold tracking-wide`}>{t('common.neutral')}</span>
+                             <span 
+                                 lang={t('common.lang_code', { defaultValue: 'en' })}
+                                 className={`${sharedFontSize} font-bold tracking-wide break-words hyphens-auto`}
+                             >
+                                 {t('common.neutral')}
+                             </span>
                         </div>
                     </motion.button>
 
