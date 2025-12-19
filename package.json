@@ -2,7 +2,7 @@
   "name": "open-q-root",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm install && npm run build",
+    "build": "cd frontend && npm install --include=dev && npm run build",
     "postinstall": "echo 'Postinstall root skipping'"
   },
   "engines": {
