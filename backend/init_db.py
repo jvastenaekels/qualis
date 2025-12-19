@@ -148,9 +148,9 @@ async def init_db():
         
         stmt_translations = []
         for i, stmt in enumerate(statements):
-            # Vary text length based on index
+            # Vary text length based on index - all statements have at least LOREM_SHORT
             if i % 4 == 0:
-                extra = ""
+                extra = LOREM_SHORT
             elif i % 4 == 1:
                 extra = LOREM_SHORT
             elif i % 4 == 2:
