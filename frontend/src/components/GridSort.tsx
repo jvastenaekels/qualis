@@ -575,7 +575,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                        variant="compact"
                                        isSelected={selectedCardId === card.id}
                                        onClick={() => onCardClick?.(card.id)}
-                                       aspectRatio={1.5} // Fixed horizontal ratio for deck density
+                                       aspectRatio={cardDimensions.width / cardDimensions.height}
                                        // Only disable hover zoom on mobile browsers to prevent obstructing the grid
                                        disableHoverZoom={typeof window !== 'undefined' && window.innerWidth < 1024}
                                    />
