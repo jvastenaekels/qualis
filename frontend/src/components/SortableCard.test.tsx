@@ -116,4 +116,15 @@ describe('SortableCard', () => {
         const contentDiv = screen.getByText('Test Card Content').closest('.border-blue-500');
         expect(contentDiv).toBeTruthy();
     });
+
+    it('applies dimensions correctly in overlay mode', () => {
+        const dimensions = { width: 100, height: 150 };
+        render(<SortableCard {...defaultProps} isOverlay={true} dimensions={dimensions} />);
+        
+        // The outer div (the one with .relative) should have the provided dimensions
+        const outerDiv = screen.getByText('Test Card Content').closest('.relative') as HTMLElement;
+        expect(outerDiv).toBeTruthy();
+        expect(outerDiv.style.width).toBe('100px');
+        expect(outerDiv.style.height).toBe('150px');
+    });
 });

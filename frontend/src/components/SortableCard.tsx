@@ -131,7 +131,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
                     flex items-center justify-center ${containerPadding}
                     transition-colors
                     select-none group
-                    ${isOverlay ? 'scale-105 shadow-xl ring-2 ring-indigo-500' : ''}
+                    ${isOverlay ? 'shadow-xl ring-2 ring-indigo-500' : ''}
                 `}
             >
                 <div className="w-full h-full flex items-center justify-center overflow-hidden">

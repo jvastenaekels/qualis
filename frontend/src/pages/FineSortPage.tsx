@@ -350,6 +350,7 @@ const FineSortPage: React.FC = () => {
                             id={activeCardData.id} 
                             text={activeCardData.text} 
                             isOverlay 
+                            dimensions={cardDimensions || undefined}
                             aspectRatio={cardDimensions ? cardDimensions.width / cardDimensions.height : undefined}
                         />
                     ) : null}
