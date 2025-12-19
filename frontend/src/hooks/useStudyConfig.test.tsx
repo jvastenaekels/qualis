@@ -9,11 +9,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useStudyConfig } from './useStudyConfig';
 import { useStudyStore } from '../store/useStudyStore';
 import * as apiClient from '../api/client';
+import { applyStudyOverrides } from '../utils/i18nOverrides';
 
 // Mock specific parts 
 vi.mock('../api/client', () => ({
     get: vi.fn(),
     post: vi.fn()
+}));
+
+// Mock the i18n overrides utility
+vi.mock('../utils/i18nOverrides', () => ({
+    applyStudyOverrides: vi.fn(),
+    resetBaseLocales: vi.fn(),
 }));
 
 // Mock i18n instance methods for tracking
@@ -81,7 +88,6 @@ describe('Language Double Logic (UI + Content)', () => {
         // 4. Verify API Re-fetch with new language (Content Logic)
         await waitFor(() => {
             // Should be called again with lang=fr
-            console.log('Mock calls:', mockGet.mock.calls);
             expect(mockGet).toHaveBeenCalledWith('/api/study/test-study?lang=fr');
         });
 
@@ -93,5 +99,27 @@ describe('Language Double Logic (UI + Content)', () => {
         // HOWEVER, the user asked to verify the "Double Logic". 
         // Let's verify StudyLayout's side effect as well by rendering a simplified component with the same logic
         // OR we can rely on the fact that StudyLayout is the one responsible.
+    });
+
+    it('Applies UI Overrides when present in config', async () => {
+        const mockGet = vi.mocked(apiClient.get);
+        const uiLabels = { 'common.agree': 'Approve' };
+        
+        mockGet.mockResolvedValue({
+            slug: 'test-study',
+            title: 'Test Title',
+            description: 'Desc',
+            instructions: 'Instr',
+            presort_config: {},
+            statements: [],
+            ui_labels: uiLabels,
+            language: 'en'
+        });
+
+        renderHook(() => useStudyConfig());
+
+        await waitFor(() => {
+            expect(applyStudyOverrides).toHaveBeenCalledWith('en', uiLabels);
+        });
     });
 });

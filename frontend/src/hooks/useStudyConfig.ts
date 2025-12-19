@@ -10,6 +10,7 @@ import { get, ApiError } from '../api/client';
 import { useParams } from 'react-router-dom';
 import { StudyConfigSchema } from '../schemas/study';
 import { ZodError } from 'zod';
+import { applyStudyOverrides } from '../utils/i18nOverrides';
 
 export const useStudyConfig = () => {
     const { slug } = useParams();
@@ -44,6 +45,11 @@ export const useStudyConfig = () => {
                 const validatedData = StudyConfigSchema.parse(data);
                 
                 setConfig(validatedData);
+
+                // Apply UI Overrides if present
+                if (validatedData.ui_labels) {
+                    applyStudyOverrides(validatedData.language || 'en', validatedData.ui_labels);
+                }
 
                 // If session language was not set, OR if the backend resolved to a DIFFERENT language
                 // we should update our session to match what is actually being displayed.

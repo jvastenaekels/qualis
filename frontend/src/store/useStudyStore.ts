@@ -7,6 +7,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { StudyConfig } from '../schemas/study';
+import { resetBaseLocales } from '../utils/i18nOverrides';
 
 // Removed old StudyConfig interface in favor of Zod-inferred type
 
@@ -261,12 +262,15 @@ export const useStudyStore = create<StudyStore>()(
           }
       })),
       
-      resetSession: () => set((state) => ({
-        config: null,
-        configRefetchTag: state.configRefetchTag + 1,
-        session: { token: null, hasConsented: false, currentStep: 1, maxReachedStep: 1, language: null, isCompleted: false, confirmationCode: null },
-        responses: { presort: {}, rough: { agree: [], disagree: [], neutral: [], history: [] }, qsort: [], postsort: { card_comments: {}, missing_statement: '', general_comment: '' } }
-      })),
+      resetSession: () => set((state) => {
+        resetBaseLocales();
+        return {
+          config: null,
+          configRefetchTag: state.configRefetchTag + 1,
+          session: { token: null, hasConsented: false, currentStep: 1, maxReachedStep: 1, language: null, isCompleted: false, confirmationCode: null },
+          responses: { presort: {}, rough: { agree: [], disagree: [], neutral: [], history: [] }, qsort: [], postsort: { card_comments: {}, missing_statement: '', general_comment: '' } }
+        };
+      }),
 
       setLanguage: (lang) => set((state) => ({
           session: { ...state.session, language: lang }

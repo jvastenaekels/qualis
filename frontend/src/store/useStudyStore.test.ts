@@ -4,8 +4,15 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useStudyStore } from './useStudyStore';
+import * as i18nUtils from '../utils/i18nOverrides';
+
+// Mock the i18n overrides utility
+vi.mock('../utils/i18nOverrides', () => ({
+    resetBaseLocales: vi.fn(),
+    applyStudyOverrides: vi.fn(),
+}));
 
 describe('useStudyStore', () => {
     beforeEach(() => {
@@ -53,5 +60,12 @@ describe('useStudyStore', () => {
         store.setPresortResponse(response);
         
         expect(useStudyStore.getState().responses.presort).toEqual(response);
+    });
+
+    it('resets i18n locales on session reset', () => {
+        const store = useStudyStore.getState();
+        store.resetSession();
+        
+        expect(i18nUtils.resetBaseLocales).toHaveBeenCalled();
     });
 });
