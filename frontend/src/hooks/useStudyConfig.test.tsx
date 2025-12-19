@@ -3,7 +3,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useStudyConfig } from './useStudyConfig';
 import { useStudyStore } from '../store/useStudyStore';
 import * as apiClient from '../api/client';
-import i18n from '../i18n';
 
 // Mock specific parts 
 vi.mock('../api/client', () => ({

@@ -29,13 +29,13 @@ const RoughSortPage: React.FC = () => {
     const x = useMotionValue(0);
     const y = useMotionValue(0);
 
-    // Filter unsorted cards
     const unsortedCards = useMemo(() => {
         if (!config) return [];
         const sortedIds = new Set(responses.rough.history);
         return config.statements.filter(s => !sortedIds.has(s.id));
     }, [config, responses.rough.history]);
 
+    const sortedCount = responses.rough.history.length;
     const currentCard = unsortedCards[0];
     const progress = config ? ((config.statements.length - unsortedCards.length) / config.statements.length) * 100 : 0;
 
@@ -155,26 +155,19 @@ const RoughSortPage: React.FC = () => {
             </div>
 
             {/* 2. Instruction Bar (Visual Separation) */}
-            <div className="flex-none bg-slate-50 py-3 px-4 flex items-center justify-between border-b border-gray-100 z-20 shadow-sm relative">
-                {/* Undo Button */}
-                <button
-                    onClick={undoRoughSort}
-                    disabled={responses.rough.history.length === 0}
-                    className="flex items-center gap-1 text-xs font-bold text-gray-400 hover:text-gray-700 disabled:opacity-30 uppercase tracking-widest transition-colors w-20"
-                >
-                    <RotateCcw size={14} />
-                    {t('common.undo')}
-                </button>
+            <div className={`flex-none bg-slate-50 flex items-center justify-between border-b border-gray-100 z-20 shadow-sm relative transition-all duration-500 overflow-hidden ${sortedCount >= 3 ? 'py-1 max-h-12' : 'py-3 max-h-24'}`}>
+                {/* Desktop Spacer / Mobile Context */}
+                <div className="w-12 lg:w-20 hidden sm:block" />
 
-                {/* Pedagogical Header (Context Only - No Hint) */}
+                {/* Pedagogical Header (Progressive) */}
                 <div className="flex-1 px-2 flex flex-col items-center justify-center">
-                    <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight text-center">
+                    <h3 className={`font-bold text-gray-900 leading-tight text-center transition-all duration-500 ${sortedCount >= 3 ? 'text-sm opacity-60' : 'text-lg sm:text-xl'}`}>
                         {t('rough.header.title')}
                     </h3>
                 </div>
 
-                {/* Spacer */}
-                <div className="w-20" />
+                {/* Desktop Spacer */}
+                <div className="w-12 lg:w-20 hidden sm:block" />
             </div>
 
             {/* 3. The Control Cluster (Centered Stage) */}
@@ -214,23 +207,23 @@ const RoughSortPage: React.FC = () => {
                 )}
 
                 {/* Row A: Horizon (Disagree - Card - Agree) */}
-                <div className="flex flex-row items-center justify-center gap-4 sm:gap-8 md:gap-12 w-full">
+                <div className="flex flex-row items-center justify-center gap-2 sm:gap-8 md:gap-12 w-full">
                     {/* Left Button (Disagree) */}
                     <motion.button
                         style={{ scale: scaleDisagree, opacity: opacityDisagree }}
                         onClick={() => handleVote('disagree')}
-                        className="z-20 flex flex-col items-center justify-center w-[7.5rem] h-[7.5rem] sm:w-[9.1rem] sm:h-[9.1rem] rounded-full bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1"
+                        className="z-20 flex flex-col items-center justify-center w-24 h-24 sm:w-[9.1rem] sm:h-[9.1rem] rounded-full bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1"
                         aria-label={t('common.disagree')}
                     >
                         {/* Unified: Frown + Text for all screens */}
-                        <div className="flex flex-col items-center gap-1">
-                             <Frown size={24} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
-                             <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wide">{t('common.disagree')}</span>
+                        <div className="flex flex-col items-center gap-0.5 sm:gap-1">
+                             <Frown size={20} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
+                             <span className="text-[10px] sm:text-sm font-extrabold uppercase tracking-wide">{t('common.disagree')}</span>
                         </div>
                     </motion.button>
 
-                    {/* Card Zone */}
-                    <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md h-auto aspect-[4/3] flex justify-center items-center z-10 shrink">
+                    {/* Card Zone - Enlarged on mobile */}
+                    <div className="relative w-full max-w-[14rem] sm:max-w-sm md:max-w-md h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 shrink">
                         <div className="w-full h-full relative">
                             <CardStack 
                                 ref={cardStackRef}
@@ -247,30 +240,42 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleAgree, opacity: opacityAgree }}
                         onClick={() => handleVote('agree')}
-                        className="z-20 flex flex-col items-center justify-center w-[7.5rem] h-[7.5rem] sm:w-[9.1rem] sm:h-[9.1rem] rounded-full bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1"
+                        className="z-20 flex flex-col items-center justify-center w-24 h-24 sm:w-[9.1rem] sm:h-[9.1rem] rounded-full bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1"
                         aria-label={t('common.agree')}
                     >
                         {/* Unified: Smile + Text for all screens */}
-                        <div className="flex flex-col items-center gap-1">
-                            <Smile size={24} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
-                            <span className="text-xs sm:text-sm font-extrabold uppercase tracking-wide">{t('common.agree')}</span>
+                        <div className="flex flex-col items-center gap-0.5 sm:gap-1">
+                            <Smile size={20} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
+                            <span className="text-[10px] sm:text-sm font-extrabold uppercase tracking-wide">{t('common.agree')}</span>
                         </div>
                     </motion.button>
                 </div>
 
-                {/* Row B: Anchor (Neutral Pill) */}
-                <motion.button
-                    style={{ scale: scaleNeutral, opacity: opacityNeutral }}
-                    onClick={() => handleVote('neutral')}
-                    className="mt-6 w-[18.2rem] h-[5.6rem] rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
-                    aria-label={t('common.neutral')}
-                >
-                     {/* Unified: Meh + Text for all screens */}
-                     <div className="flex items-center gap-2 text-gray-600">
-                         <Meh size={20} strokeWidth={2.5} className="opacity-80" />
-                         <span className="text-sm font-bold tracking-wide">{t('common.neutral')}</span>
-                    </div>
-                </motion.button>
+                {/* Row B: Anchor (Neutral Pill + Undo) */}
+                <div className="mt-8 flex flex-col items-center gap-6">
+                    <motion.button
+                        style={{ scale: scaleNeutral, opacity: opacityNeutral }}
+                        onClick={() => handleVote('neutral')}
+                        className="w-[18.2rem] h-[5.6rem] rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
+                        aria-label={t('common.neutral')}
+                    >
+                         {/* Unified: Meh + Text for all screens */}
+                         <div className="flex items-center gap-2 text-gray-600">
+                             <Meh size={20} strokeWidth={2.5} className="opacity-80" />
+                             <span className="text-sm font-bold tracking-wide">{t('common.neutral')}</span>
+                        </div>
+                    </motion.button>
+
+                    {/* Ergonomic Undo Button (Bottom) */}
+                    <button
+                        onClick={undoRoughSort}
+                        disabled={responses.rough.history.length === 0}
+                        className="flex items-center gap-2 px-6 py-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-0 transition-all text-xs font-bold uppercase tracking-widest"
+                    >
+                        <RotateCcw size={14} />
+                        {t('common.undo')}
+                    </button>
+                </div>
                 
             </div>
 

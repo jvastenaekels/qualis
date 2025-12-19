@@ -65,73 +65,73 @@
       "subtitle": "Nous allons maintenant affiner les nuances."
     },
     "instructions": {
-        "swipe": "Glissez ou appuyez pour catégoriser"
+      "swipe": "Glissez ou appuyez pour catégoriser"
     }
   },
   "fine": {
     "deck": {
-        "title": "Cartes disponibles",
-        "all_placed": "Pile vide",
-        "reset": "Réinitialiser",
-        "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
+      "title": "Cartes disponibles",
+      "all_placed": "Pile vide",
+      "reset": "Réinitialiser",
+      "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
     },
-"toolbar": {
-    "mobile": "Touchez une affirmation pour la sélectionner, puis la grille pour la placer selon son degré de correspondance avec votre point de vue.",
-    "desktop": "Glissez les cartes sur la grille pyramidale en comparant leur degré de correspondance avec votre point de vue.",
-    "zoom_in": "Zoom avant",
-    "zoom_out": "Zoom arrière",
-    "fit_screen": "Ajuster à l'écran",
-    "label": "Contrôles de la grille"
-},
-"grid": {
-    "label": "Grille de tri",
-    "column": "Colonne",
-    "slot": "Emplacement",
-    "in_column": "dans la colonne"
-},
-"tips": {
-    "extremes": "Un petit conseil : commencez par les bords gauche et droit. Il est généralement plus simple de placer d'abord ce qui est très clair pour vous, et de garder les nuances pour la fin.",
-    "vertical": "Notez que la hauteur n'a pas d'importance. Seul l'ordre de gauche à droite compte."
-},
+    "toolbar": {
+      "mobile": "Touchez une affirmation pour la sélectionner, puis la grille pour la placer selon son degré de correspondance avec votre point de vue.",
+      "desktop": "Glissez les cartes sur la grille pyramidale en comparant leurs degrés de correspondance avec votre point de vue.",
+      "zoom_in": "Zoom avant",
+      "zoom_out": "Zoom arrière",
+      "fit_screen": "Ajuster à l'écran",
+      "label": "Contrôles de la grille"
+    },
+    "grid": {
+      "label": "Grille de tri",
+      "column": "Colonne",
+      "slot": "Emplacement",
+      "in_column": "dans la colonne"
+    },
+    "tips": {
+      "extremes": "Un petit conseil : commencez par les bords gauche et droit. Il est généralement plus simple de placer d'abord ce qui est très clair pour vous, et de garder les nuances pour la fin.",
+      "vertical": "Notez que la hauteur n'a pas d'importance. Seul l'ordre de gauche à droite compte."
+    },
     "legend": {
-        "disagree": "Ne correspond pas à mon point de vue",
-        "neutral": "Neutre",
-        "agree": "Correspond à mon point de vue",
-        "label": "Légende du spectre"
+      "disagree": "Ne correspond pas à mon point de vue",
+      "neutral": "Neutre",
+      "agree": "Correspond à mon point de vue",
+      "label": "Légende du spectre"
     },
     "actions": {
-        "validate": "Confirmer la grille",
-        "finish": "Terminer le tri",
-        "ready": "Voir la vue d'ensemble",
-        "not_ready": "Placez toutes les cartes pour continuer"
+      "validate": "Confirmer la grille",
+      "finish": "Terminer le tri",
+      "ready": "Voir la vue d'ensemble",
+      "not_ready": "Placez toutes les cartes pour continuer"
     }
   },
   "post": {
     "title": "Pour conclure",
     "description": "Nous y sommes presque ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
     "extreme": {
-        "why": "Qu'est-ce qui, dans votre expérience personnelle, vous a fait placer cette carte ici ?",
-        "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
-        "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
-        "label_agree": "Me correspond le plus",
-        "label_disagree": "Ne me correspond pas du tout"
+      "why": "Qu'est-ce qui, dans votre expérience personnelle, vous a fait placer cette carte ici ?",
+      "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
+      "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
+      "label_agree": "Me correspond le plus",
+      "label_disagree": "Ne me correspond pas du tout"
     },
     "missing": {
-        "label": "Y a-t-il une affirmation importante qui manque pour refléter votre avis ?",
-        "description": "Si vous pensez qu'un aspect clé a été oublié, décrivez-le brièvement ici.",
-        "placeholder": "Optionnel..."
+      "label": "Y a-t-il une affirmation importante qui manque pour refléter votre avis ?",
+      "description": "Si vous pensez qu'un aspect clé a été oublié, décrivez-le brièvement ici.",
+      "placeholder": "Optionnel..."
     },
     "general": {
-        "label": "Commentaires généraux",
-        "description": "Des retours sur l'étude ou des réflexions supplémentaires ?",
-        "placeholder": "Optionnel..."
+      "label": "Commentaires généraux",
+      "description": "Des retours sur l'étude ou des réflexions supplémentaires ?",
+      "placeholder": "Optionnel..."
     },
     "submit": "Soumettre l'étude",
     "validation_error": "Merci d'ajouter une courte explication pour vos choix principaux ci-dessus.",
     "success": {
-        "title": "C'est noté !",
-        "message": "Votre contribution à l'étude a bien été enregistrée.",
-        "id_label": "Code de confirmation"
+      "title": "C'est noté !",
+      "message": "Votre contribution à l'étude a bien été enregistrée.",
+      "id_label": "Code de confirmation"
     }
   }
 }

@@ -1,5 +1,6 @@
-import { forwardRef, useImperativeHandle } from 'react';
+import { forwardRef, useImperativeHandle, useState } from 'react';
 import { motion, useTransform, useAnimation, type PanInfo, type MotionValue } from 'framer-motion';
+import { createPortal } from 'react-dom';
 
 interface CardStackProps {
   statement: { id: number; text: string };
@@ -14,6 +15,7 @@ export interface CardStackHandle {
 
 const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVote, x, y }, ref) => {
   const controls = useAnimation();
+  const [showZoom, setShowZoom] = useState(false);
 
   // Dynamic Tints
   // Left (-x): Red, Right (+x): Green, Down (+y): Gray
@@ -22,6 +24,23 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
   const opacityAgree = useTransform(x, [10, 100], [0, 1]);
   const opacityDisagree = useTransform(x, [-10, -100], [0, 1]);
   const opacityNeutral = useTransform(y, [10, 100], [0, 1]);
+
+  // Dynamic Typography
+  const textLength = statement.text.length;
+  let fontSizeClass = 'text-xl sm:text-2xl';
+  if (textLength > 150) fontSizeClass = 'text-sm sm:text-base';
+  else if (textLength > 80) fontSizeClass = 'text-lg sm:text-xl';
+
+  const ZoomPortal = () => createPortal(
+    <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
+        <div className="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-4 transform scale-105 max-h-[80vh] overflow-y-auto flex flex-col">
+            <p className="text-xl font-medium text-slate-800 text-center leading-relaxed my-auto">
+                {statement.text}
+            </p>
+        </div>
+    </div>,
+    document.body
+  );
 
   useImperativeHandle(ref, () => ({
     swipe: async (direction) => {
@@ -78,7 +97,9 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         onDragEnd={handleDragEnd}
         animate={controls}
         style={{ x, y, rotate }}
-        className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-8 cursor-grab active:cursor-grabbing touch-none overflow-hidden"
+        onMouseEnter={() => setShowZoom(true)}
+        onMouseLeave={() => setShowZoom(false)}
+        className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-6 sm:p-8 cursor-grab active:cursor-grabbing touch-none overflow-hidden"
       >
         {/* Color Overlays */}
         <motion.div 
@@ -102,13 +123,22 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
             className="absolute inset-0 bg-gray-100/50 pointer-events-none border-4 border-gray-500 rounded-3xl" 
         />
 
-        {/* Content */}
-        <div className="flex-1 w-full overflow-y-auto custom-scrollbar flex flex-col p-2">
-            <p className="text-xl sm:text-2xl font-medium text-gray-800 text-center select-none m-auto">
+        {/* Content - No scroll to avoid drag conflict */}
+        <div className="flex-1 w-full flex flex-col p-2">
+            <p className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed`}>
               {statement.text}
             </p>
         </div>
+
+        {/* Zoom Trigger Info */}
+        {textLength > 100 && (
+            <div className="absolute bottom-4 right-6 opacity-40">
+                <span className="text-lg">🔍</span>
+            </div>
+        )}
       </motion.div>
+
+      {showZoom && <ZoomPortal />}
     </div>
   );
 });
