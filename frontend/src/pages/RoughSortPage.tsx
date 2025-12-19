@@ -97,7 +97,7 @@ const RoughSortPage: React.FC = () => {
     );
 
     const handleVote = (direction: 'agree' | 'disagree' | 'neutral') => {
-        // Auto-dismiss tip on button click (mobile)
+        // Auto-dismiss tip on button click (mobile only)
         if (showTip && typeof window !== 'undefined' && window.innerWidth < 1024) {
             setShowTip(false);
         }
@@ -197,9 +197,9 @@ const RoughSortPage: React.FC = () => {
             {/* 3. The Control Cluster (Centered Stage) */}
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-2 py-4 relative">
                 
-                {/* FLOATING TIP (Top Left of Control Cluster) - Swipeable & Closable - MOBILE ONLY */}
+                {/* FLOATING TIP (Top Left of Control Cluster) - Swipeable & Closable */}
                 {showTip && (
-                    <div className="absolute top-4 left-4 z-40 max-w-xs block md:hidden select-none pointer-events-auto">
+                    <div className="absolute top-4 left-4 z-40 max-w-xs block select-none pointer-events-auto">
                         <motion.div 
                             drag="x"
                             dragConstraints={{ left: 0, right: 0 }}
@@ -210,12 +210,10 @@ const RoughSortPage: React.FC = () => {
                                     setShowTip(false);
                                 }
                             }}
-                            onPointerDownCapture={(e) => e.stopPropagation()}
-                            onPointerMoveCapture={(e) => e.stopPropagation()}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ duration: 1.5, ease: "easeOut" }}
-                            className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-sm rounded-xl p-4 flex gap-3 relative pr-8 cursor-grab active:cursor-grabbing dnd-prevent-pan touch-none"
+                            className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-sm rounded-xl p-4 flex gap-3 relative pr-8 cursor-grab active:cursor-grabbing"
                         >
                             <span className="text-lg">💡</span>
                             <p className="text-sm text-slate-600 leading-relaxed font-medium">
