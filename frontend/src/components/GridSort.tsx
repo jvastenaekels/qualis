@@ -20,15 +20,13 @@ interface GridSortProps {
   disagreeCards: { id: number; text: string }[];
   neutralCards: { id: number; text: string }[];
   gridColumns: { score: number; capacity: number }[];
-  responses: { 
-    qsort: { statementId: number; col: number; row: number }[];
-  };
   renderSlotContent: (col: number, row: number, dimensions: { width: number, height: number }) => React.ReactNode;
   onReset?: () => void;
   selectedCardId?: number | null;
   onCardClick?: (id: number) => void;
   onSlotClick?: (col: number, row: number) => void;
   onDimensionsChange?: (dimensions: { width: number, height: number }) => void;
+  forcedTipsClosed?: boolean;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -38,13 +36,13 @@ const GridSort: React.FC<GridSortProps> = ({
   disagreeCards,
   neutralCards,
   gridColumns,
-  responses,
   renderSlotContent,
   onReset,
   selectedCardId,
   onCardClick,
   onSlotClick,
-  onDimensionsChange
+  onDimensionsChange,
+  forcedTipsClosed = false
 }) => {
   const { t } = useTranslation();
   const [activePile, setActivePile] = useState<PileType>('disagree');
@@ -53,13 +51,6 @@ const GridSort: React.FC<GridSortProps> = ({
   const [closedTips, setClosedTips] = useState({ extremes: false, vertical: false });
   const [hasPerformedZonalFocus, setHasPerformedZonalFocus] = useState(false);
   const [autoFitEnabled, setAutoFitEnabled] = useState(true); // Control auto-fit to prevent zoom during interactions
-
-  // Auto-hide tips once 3 cards are placed
-  useEffect(() => {
-      if (responses.qsort.length >= 3) {
-          setClosedTips({ extremes: true, vertical: true });
-      }
-  }, [responses.qsort.length]);
 
   // Initial Auto-Fit & Delayed Smart Focus
   useEffect(() => {
@@ -742,7 +733,7 @@ const GridSort: React.FC<GridSortProps> = ({
                     <div className="absolute top-4 left-4 z-40 max-w-[85vw] md:max-w-sm pointer-events-none select-none flex flex-col gap-2" role="status" aria-live="polite">
                         <AnimatePresence mode="popLayout">
                             {/* Tip 1: Extremes */}
-                            {!closedTips.extremes && (
+                            {!closedTips.extremes && !forcedTipsClosed && (
                                 <motion.div 
                                     key="tip-extremes"
                                     drag="x"
@@ -775,7 +766,7 @@ const GridSort: React.FC<GridSortProps> = ({
                             )}
                             
                             {/* Tip 2: Vertical Order */}
-                            {!closedTips.vertical && (
+                            {!closedTips.vertical && !forcedTipsClosed && (
                                 <motion.div 
                                     key="tip-vertical"
                                     drag="x"

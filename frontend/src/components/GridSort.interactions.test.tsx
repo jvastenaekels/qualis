@@ -49,7 +49,6 @@ describe('GridSort Interactions', () => {
             { score: 0, capacity: 1 },
             { score: 1, capacity: 1 },
         ],
-        responses: { qsort: [] },
         renderSlotContent: () => null,
     };
 

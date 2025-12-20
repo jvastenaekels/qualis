@@ -326,8 +326,8 @@ const FineSortPage: React.FC = () => {
                     disagreeCards={unplacedDisagree}
                     neutralCards={unplacedNeutral}
                     gridColumns={gridColumns}
-                    responses={responses}
                     renderSlotContent={renderSlotContent}
+                    forcedTipsClosed={responses.qsort.length >= 3}
                     
                     // Tap-to-Place Props
                     selectedCardId={selectedCardId}
