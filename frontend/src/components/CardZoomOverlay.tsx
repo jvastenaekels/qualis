@@ -23,23 +23,18 @@ const CardZoomOverlay: React.FC = () => {
                     className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center p-4"
                 >
                     {/* Backdrop (visual only since pointer-events-none on parent) */}
-                    <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px]" />
+                    <div className="absolute inset-0 bg-slate-900/5" />
 
                     <motion.div 
                         initial={{ scale: 0.9, y: 10, opacity: 0 }}
                         animate={{ scale: 1, y: 0, opacity: 1 }}
                         exit={{ scale: 0.9, y: 10, opacity: 0 }}
-                        className="relative bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-auto flex flex-col pointer-events-auto"
+                        className="relative bg-white p-8 rounded-2xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-auto flex flex-col pointer-events-auto"
                     >
                         <div className="text-xl font-medium text-slate-800 text-center leading-relaxed my-auto font-sans">
                             <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
                                 {zoomedCard.text}
                             </ReactMarkdown>
-                        </div>
-                        
-                        {/* Optional visual cue that it can be closed by moving away */}
-                        <div className="mt-4 text-center text-xs text-slate-400 font-medium uppercase tracking-wider">
-                           Card Preview
                         </div>
                     </motion.div>
                 </motion.div>
