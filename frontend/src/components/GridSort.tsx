@@ -20,7 +20,9 @@ interface GridSortProps {
   disagreeCards: { id: number; text: string }[];
   neutralCards: { id: number; text: string }[];
   gridColumns: { score: number; capacity: number }[];
-  responses: unknown;
+  responses: { 
+    qsort: { statementId: number; col: number; row: number }[];
+  };
   renderSlotContent: (col: number, row: number, dimensions: { width: number, height: number }) => React.ReactNode;
   onReset?: () => void;
   selectedCardId?: number | null;
@@ -36,6 +38,7 @@ const GridSort: React.FC<GridSortProps> = ({
   disagreeCards,
   neutralCards,
   gridColumns,
+  responses,
   renderSlotContent,
   onReset,
   selectedCardId,
@@ -50,6 +53,13 @@ const GridSort: React.FC<GridSortProps> = ({
   const [closedTips, setClosedTips] = useState({ extremes: false, vertical: false });
   const [hasPerformedZonalFocus, setHasPerformedZonalFocus] = useState(false);
   const [autoFitEnabled, setAutoFitEnabled] = useState(true); // Control auto-fit to prevent zoom during interactions
+
+  // Auto-hide tips once 3 cards are placed
+  useEffect(() => {
+      if (responses.qsort.length >= 3) {
+          setClosedTips({ extremes: true, vertical: true });
+      }
+  }, [responses.qsort.length]);
 
   // Initial Auto-Fit & Delayed Smart Focus
   useEffect(() => {
