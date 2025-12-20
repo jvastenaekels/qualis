@@ -9,11 +9,12 @@ import '@testing-library/jest-dom';
 
 // Mock react-i18next globally
 vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ 
+    useTranslation: () => ({
         t: (key: string) => key,
         i18n: {
              changeLanguage: () => new Promise(() => {}),
-             language: 'en'
+             language: 'en',
+             addResourceBundle: vi.fn(),
         }
     }),
     initReactI18next: {
@@ -24,6 +25,19 @@ vi.mock('react-i18next', () => ({
         return children || null;
     }
 }));
+
+// Mock local i18n module
+vi.mock('./i18n', () => ({
+    default: {
+        changeLanguage: vi.fn(),
+        language: 'en',
+        addResourceBundle: vi.fn(),
+        init: vi.fn().mockReturnValue(Promise.resolve()),
+        use: vi.fn().mockReturnThis(),
+    },
+    t: (key: string) => key
+}));
+
 // Polyfill ResizeObserver
 global.ResizeObserver = class ResizeObserver {
     observe() {}

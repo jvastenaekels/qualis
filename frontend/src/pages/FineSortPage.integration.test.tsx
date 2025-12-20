@@ -5,27 +5,45 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FineSortPage from './FineSortPage';
-import { LayoutProvider } from '../contexts/LayoutContext';
 import { useStudyStore } from '../store/useStudyStore';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import StudyLayout from '../layouts/StudyLayout';
 
 // Mock Store
-vi.mock('../store/useStudyStore');
+vi.mock('../store/useStudyStore', () => ({
+    useStudyStore: Object.assign(vi.fn(), {
+        getState: vi.fn(() => ({
+            session: { token: null, hasConsented: true, currentStep: 4, isSaving: false },
+            resetSession: vi.fn(),
+        })),
+        setState: vi.fn(),
+        subscribe: vi.fn(),
+    }),
+}));
 const mockUseStudyStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
+
+// Mock useStudyConfig
+vi.mock('../hooks/useStudyConfig', () => ({
+    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() }))
+}));
 
 // Mock translation
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
-    Trans: ({ i18nKey }: any) => i18nKey, // Simple mock returning key
+    Trans: ({ children, i18nKey }: any) => children || i18nKey,
     initReactI18next: { type: '3rdParty', init: () => {} }
 }));
 
 // Mock Drag and Drop (difficult to test full drag interaction in unit tests, so we mock basics)
 // Or we just test that the button renders if we mock the STATE as empty.
+
+// Mock GridSort to avoid complex DND logic in integration tests
+vi.mock('../components/GridSort', () => ({
+    default: () => <div data-testid="grid-sort">GridSort</div>
+}));
 
 // Mock ResizeObserver
 global.ResizeObserver = class {
@@ -60,7 +78,7 @@ describe('FineSortPage Integration', () => {
                     { statementId: 2, col: 0, row: 1 }
                 ]
             },
-            session: { hasConsented: true, currentStep: 4 },
+            session: { hasConsented: true, currentStep: 4, isSaving: false },
             setStep: vi.fn(),
             placeCardInGrid: vi.fn(),
             moveCardInGrid: vi.fn(),
@@ -99,7 +117,7 @@ describe('FineSortPage Integration', () => {
             },
             // Note: In FineSortPage:
             // const unplacedNeutral = responses.rough.neutral... map id to statement
-            session: { hasConsented: true, currentStep: 4 },
+            session: { hasConsented: true, currentStep: 4, isSaving: false },
             setStep: vi.fn(),
             resetFineSort: vi.fn()
         });

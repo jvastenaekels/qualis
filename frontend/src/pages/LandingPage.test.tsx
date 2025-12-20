@@ -7,7 +7,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import LandingPage from './LandingPage';
-import { MemoryRouter, useNavigate } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -25,7 +25,7 @@ describe('LandingPage', () => {
                 <LandingPage />
             </MemoryRouter>
         );
-        expect(screen.getByPlaceholderText(/e.g. complex-study/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/e.g. example-study/i)).toBeInTheDocument();
         expect(screen.getByRole('button')).toBeDisabled();
     });
 
@@ -35,18 +35,20 @@ describe('LandingPage', () => {
                 <LandingPage />
             </MemoryRouter>
         );
-        const input = screen.getByPlaceholderText(/e.g. complex-study/i);
+        const input = screen.getByPlaceholderText(/e.g. example-study/i);
         fireEvent.change(input, { target: { value: 'test-study' } });
-        expect(screen.getByRole('button')).not.toBeDisabled();
+        
+        expect(screen.getByRole('button', { name: /go to study/i })).not.toBeDisabled();
     });
 
     it('navigates to study on submit', () => {
-         render(
+        render(
             <MemoryRouter>
                 <LandingPage />
             </MemoryRouter>
         );
-        const input = screen.getByPlaceholderText(/e.g. complex-study/i);
+
+        const input = screen.getByPlaceholderText(/e.g. example-study/i);
         fireEvent.change(input, { target: { value: 'test-study' } });
         
         const button = screen.getByRole('button');

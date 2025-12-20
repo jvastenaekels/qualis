@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FineSortPage from './FineSortPage';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -14,6 +14,12 @@ import { useStudyStore } from '../store/useStudyStore';
 
 // Mock Store
 vi.mock('../store/useStudyStore');
+const mockUseStudyStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
+
+// Mock useStudyConfig
+vi.mock('../hooks/useStudyConfig', () => ({
+    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() }))
+}));
 
 // Mock ResizeObserver
 global.ResizeObserver = class {
@@ -57,7 +63,7 @@ describe('FineSortPage Mobile Interaction', () => {
                 qsort: [],
                 postsort: { card_comments: {}, missing_statement: '', general_comment: '' }
             },
-            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null },
+            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null, isSaving: false },
             setStep: vi.fn(),
             placeCardInGrid: placeCardInGridSpy,
             moveCardInGrid: vi.fn(),
@@ -132,7 +138,7 @@ describe('FineSortPage Mobile Interaction', () => {
                 ],
                 postsort: { card_comments: {}, missing_statement: '', general_comment: '' }
             },
-            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null },
+            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null, isSaving: false },
             setStep: vi.fn(),
             placeCardInGrid: vi.fn(),
             moveCardInGrid: vi.fn(),

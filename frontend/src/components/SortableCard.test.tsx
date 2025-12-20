@@ -4,9 +4,12 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SortableCard from './SortableCard';
+import CardZoomOverlay from './CardZoomOverlay';
+import { useStudyStore } from '../store/useStudyStore';
+import { act } from 'react';
 
 // Mock dnd-kit hook
 vi.mock('@dnd-kit/sortable', () => ({
@@ -34,10 +37,28 @@ vi.mock('framer-motion', () => ({
                 {children}
             </div>
         )
-    }
+    },
+    AnimatePresence: ({ children }: any) => children
 }));
 
 describe('SortableCard', () => {
+    beforeEach(() => {
+        // Reset store to initial state
+        useStudyStore.setState({ 
+            zoomedCard: null,
+            session: {
+                token: null,
+                hasConsented: false,
+                currentStep: 1,
+                maxReachedStep: 1,
+                language: null,
+                isCompleted: false,
+                confirmationCode: null,
+                isSaving: false
+            }
+        });
+    });
+
     const defaultProps = {
         id: 123,
         text: 'Test Card Content',
@@ -78,31 +99,39 @@ describe('SortableCard', () => {
     });
 
     it('shows zoom overlay on hover', async () => {
-        render(<SortableCard {...defaultProps} />);
+        // useStudyStore is REAL here, reset it
+        useStudyStore.setState({ zoomedCard: null });
+
+        render(
+            <>
+                <SortableCard {...defaultProps} />
+                <CardZoomOverlay />
+            </>
+        );
         
         const cardContainer = screen.getByText('Test Card Content').closest('.relative');
         if(!cardContainer) throw new Error('Container not found');
 
         // Trigger hover
-        fireEvent.mouseEnter(cardContainer);
-
-        // Zoom portal should appear
-        // Since it uses a Portal, it attaches to document.body
-        // We look for the zoomed text content
-        await waitFor(() => {
-             // Logic: The ZoomPortal renders the same text in a fixed overlay
-             // Since getAllByText would return 2 elements (card + zoom), we can check length
-             const textElements = screen.getAllByText('Test Card Content');
-             expect(textElements.length).toBe(2);
+        await act(async () => {
+             fireEvent.mouseEnter(cardContainer);
         });
 
+        // Zoom portal should appear
+        await waitFor(() => {
+             const textElements = screen.getAllByText('Test Card Content');
+             expect(textElements.length).toBe(2);
+        }, { timeout: 2000 });
+
         // Trigger leave
-        fireEvent.mouseLeave(cardContainer);
+        await act(async () => {
+            fireEvent.mouseLeave(cardContainer);
+        });
         
         await waitFor(() => {
             const textElements = screen.getAllByText('Test Card Content');
             expect(textElements.length).toBe(1);
-        });
+        }, { timeout: 2000 });
     });
 
     it('styling changes when selected', () => {

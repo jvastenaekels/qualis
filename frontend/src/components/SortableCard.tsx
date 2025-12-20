@@ -23,7 +23,7 @@ interface SortableCardProps {
   disableHoverZoom?: boolean;
 }
 
-const SortableCard: React.FC<SortableCardProps> = ({ 
+const SortableCard: React.FC<SortableCardProps> = React.memo(({ 
     id, 
     text, 
     isOverlay, 
@@ -44,7 +44,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
   } = useSortable({ id });
 
   const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
-  const zoomedCard = useStudyStore((state) => state.zoomedCard);
+  const isZoomed = useStudyStore((state) => state.zoomedCard?.id === id);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -54,6 +54,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
     ...(dimensions && { width: dimensions.width, height: dimensions.height })
   };
 
+  // ... (switch remains same) ...
   // Typography Logic
   let textSizeClass = '';
   let containerPadding = '';
@@ -91,7 +92,7 @@ const SortableCard: React.FC<SortableCardProps> = ({
                 }
             }}
             onMouseEnter={() => !isDragging && !isOverlay && !disableHoverZoom && setZoomedCard({ id, text })}
-            onMouseLeave={() => zoomedCard?.id === id && setZoomedCard(null)}
+            onMouseLeave={() => isZoomed && setZoomedCard(null)}
             className={`
                 relative
                 ${!dimensions ? 'w-full' : ''} ${aspectClass}
@@ -140,6 +141,6 @@ const SortableCard: React.FC<SortableCardProps> = ({
         </div>
     </>
   );
-};
+});
 
 export default SortableCard;

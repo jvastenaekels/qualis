@@ -57,7 +57,7 @@ describe('PostSortPage', () => {
             responses: mockResponses,
             setPostSortResponse: setPostSortResponseSpy,
             setStep: setStepSpy,
-            session: { hasConsented: true }
+            session: { hasConsented: true, isSaving: false }
         });
 
         return { setPostSortResponseSpy, setStepSpy };
@@ -66,7 +66,7 @@ describe('PostSortPage', () => {
     it('renders null if config is missing', () => {
         mockUseStudyStore.mockReturnValue({ 
             config: null, 
-            session: { isCompleted: false }, 
+            session: { isCompleted: false, isSaving: false }, 
             responses: { qsort: [], postsort: {} },
             setStep: vi.fn() 
         });
@@ -176,7 +176,7 @@ describe('PostSortPage', () => {
                 if (field === 'card_comments') externalComments = val as Record<number, string>;
             },
             setStep: vi.fn(),
-            session: { hasConsented: true, isCompleted: false } as any,
+            session: { hasConsented: true, isCompleted: false, isSaving: false } as any,
             triggerConfigRefetch: vi.fn()
         }) as any);
 

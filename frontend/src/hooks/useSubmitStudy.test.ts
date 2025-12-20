@@ -37,7 +37,8 @@ describe('useSubmitStudy', () => {
                 language: 'en',
                 maxReachedStep: 5,
                 isCompleted: false,
-                confirmationCode: null
+                confirmationCode: null,
+                isSaving: false
             },
             responses: {
                 presort: { age: 30 },
@@ -78,6 +79,8 @@ describe('useSubmitStudy', () => {
         expect(url).toBe('/api/submit');
         expect(payload).toEqual({
             session_token: 'test-token',
+            study_slug: 'test',
+            status: 'completed',
             language_used: 'en',
             presort_answers: { age: 30 },
             qsort: [
@@ -85,6 +88,7 @@ describe('useSubmitStudy', () => {
                 { statement_id: 2, grid_score: 4, card_comment: "Why 4" }
             ],
             postsort_answers: {
+                card_comments: { 1: "Why -4", 2: "Why 4" },
                 missing_statement: "Missed this",
                 general_comment: "Good study"
             }

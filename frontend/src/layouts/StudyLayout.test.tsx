@@ -17,12 +17,14 @@ vi.mock('../i18n', () => ({
     default: {
         changeLanguage: vi.fn(),
         language: 'en'
-    }
+    },
+    // Adding named export for useTranslation if needed, but it's mocked in layout
+    t: (key: string) => key
 }));
 
 // Mock useStudyConfig since it's used in StudyLayout
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ retry: vi.fn() }))
+    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() }))
 }));
 
 // We need to Mock LayoutContext properly or wrap it. StudyLayout uses it.
@@ -33,19 +35,34 @@ vi.mock('../hooks/useStudyConfig', () => ({
 describe('StudyLayout Language Sync', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        act(() => {
-             useStudyStore.getState().resetSession();
-             // Seed with valid config to bypass loading/error states
-             useStudyStore.getState().setConfig({
-                 title: 'Test Study',
-                 slug: 'test',
-                 statements: [],
-                 grid_config: [],
-                 available_languages: ['en', 'fr']
-             } as any);
-             
-             // Consent is required for protected routes (sort/review)
-             useStudyStore.getState().setConsent(true);
+        // Reset and seed store
+        useStudyStore.setState({
+            config: {
+                title: 'Test Study',
+                slug: 'test',
+                statements: [],
+                grid_config: [],
+                available_languages: ['en', 'fr']
+            } as any,
+            configLoading: false,
+            configError: null,
+            session: { 
+                token: null, 
+                hasConsented: true, 
+                currentStep: 1, 
+                maxReachedStep: 1, 
+                language: 'en', 
+                isCompleted: false, 
+                confirmationCode: null,
+                isSaving: false
+            },
+            responses: {
+                presort: {},
+                rough: { agree: [], disagree: [], neutral: [], history: [] },
+                qsort: [],
+                postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
+            },
+            zoomedCard: null
         });
     });
 

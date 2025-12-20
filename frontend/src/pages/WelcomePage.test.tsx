@@ -24,7 +24,7 @@ const mockConfig = {
 
 vi.mock('../store/useStudyStore', () => ({
     useStudyStore: vi.fn(() => ({
-        session: { hasConsented: false, token: null },
+        session: { hasConsented: false, token: null, isSaving: false },
         setConsent: mockSetConsent,
         setToken: mockSetToken,
         setStep: mockSetStep,
@@ -111,7 +111,7 @@ describe('WelcomePage', () => {
     it('persists consent when re-navigating', async () => {
         let externalConsent = false;
         vi.mocked(useStudyStore).mockImplementation(() => ({
-            session: { hasConsented: externalConsent },
+            session: { hasConsented: externalConsent, isSaving: false },
             setConsent: (val: boolean) => { externalConsent = val; },
             setStep: vi.fn(),
             config: mockConfig

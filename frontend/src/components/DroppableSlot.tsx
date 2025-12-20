@@ -13,7 +13,7 @@ interface DroppableSlotProps extends React.HTMLAttributes<HTMLDivElement> {
   children?: React.ReactNode;
 }
 
-const DroppableSlot: React.FC<DroppableSlotProps> = ({ id, children, className, onClick, style, ...props }) => {
+const DroppableSlot: React.FC<DroppableSlotProps> = React.memo(({ id, children, className, onClick, style, ...props }) => {
   const { setNodeRef, isOver } = useDroppable({
     id,
   });
@@ -42,6 +42,6 @@ const DroppableSlot: React.FC<DroppableSlotProps> = ({ id, children, className, 
       {children}
     </div>
   );
-};
+});
 
 export default DroppableSlot;

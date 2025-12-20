@@ -16,6 +16,11 @@ import StudyLayout from '../layouts/StudyLayout';
 vi.mock('../store/useStudyStore');
 const mockUseStudyStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
 
+// Mock useStudyConfig
+vi.mock('../hooks/useStudyConfig', () => ({
+    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() }))
+}));
+
 // Mock translation
 // Mock translation
 vi.mock('react-i18next', () => ({
@@ -41,7 +46,7 @@ describe('RoughSortPage Integration', () => {
             responses: {
                 rough: { history: [1] } // All cards sorted
             },
-            session: { hasConsented: true, currentStep: 3 },
+            session: { hasConsented: true, currentStep: 3, isSaving: false },
             categorizeCard: vi.fn(),
             undoRoughSort: vi.fn(),
             setStep: vi.fn(),
@@ -77,7 +82,7 @@ describe('RoughSortPage Integration', () => {
              responses: {
                  rough: { history: [] } 
              },
-             session: { hasConsented: true, currentStep: 3 },
+            session: { hasConsented: true, currentStep: 3, isSaving: false },
              categorizeCard: vi.fn(),
              undoRoughSort: vi.fn(),
              setStep: vi.fn(),

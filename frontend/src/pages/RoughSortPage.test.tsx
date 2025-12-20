@@ -38,6 +38,16 @@ describe('RoughSortPage', () => {
                     { id: 2, text: 'Card 2' },
                     { id: 3, text: 'Card 3' }
                 ]
+            },
+            session: { 
+                token: null, 
+                hasConsented: false, 
+                currentStep: 1, 
+                maxReachedStep: 1, 
+                language: null, 
+                isCompleted: false, 
+                confirmationCode: null,
+                isSaving: false 
             }
         });
     });

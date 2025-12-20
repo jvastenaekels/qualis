@@ -75,7 +75,7 @@ describe('FineSortPage', () => {
                 qsort: [],
                 postsort: { card_comments: {}, missing_statement: '', general_comment: '' }
             },
-            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null },
+            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null, isSaving: false },
             placeCardInGrid: vi.fn(),
             moveCardInGrid: vi.fn(),
             swapCardsInGrid: vi.fn(),

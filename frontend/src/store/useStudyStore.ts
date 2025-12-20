@@ -19,6 +19,7 @@ interface SessionState {
   language: string | null;
   isCompleted: boolean;
   confirmationCode: string | null;
+  isSaving: boolean; // Tracking persistence status
 }
 
 interface ResponsesState {
@@ -45,6 +46,7 @@ interface StudyStore {
   session: SessionState;
   responses: ResponsesState;
   zoomedCard: { id: number; text: string } | null;
+  configRefetchTag: number;
 
   // Actions
   setConfig: (config: StudyConfig) => void;
@@ -71,6 +73,7 @@ interface StudyStore {
   resetSession: () => void;
   setLanguage: (lang: string) => void;
   setZoomedCard: (card: { id: number; text: string } | null) => void;
+  setSaving: (saving: boolean) => void;
 }
 
 export const useStudyStore = create<StudyStore>()(
@@ -87,7 +90,8 @@ export const useStudyStore = create<StudyStore>()(
         maxReachedStep: 1,
         language: null, // Initialized to null to auto-detect
         isCompleted: false,
-        confirmationCode: null
+        confirmationCode: null,
+        isSaving: false
       },
       responses: {
         presort: {},
@@ -135,6 +139,10 @@ export const useStudyStore = create<StudyStore>()(
       categorizeCard: (statementId, category) =>
         set((state) => {
           const { rough } = state.responses;
+          
+          // Trigger saving indicator
+          setTimeout(() => set((s) => ({ session: { ...s.session, isSaving: false } })), 800);
+
           return {
             responses: {
               ...state.responses,
@@ -147,7 +155,8 @@ export const useStudyStore = create<StudyStore>()(
             },
             session: {
                 ...state.session,
-                maxReachedStep: Math.min(state.session.maxReachedStep, 3) // Downgrade to Rough Sort (3)
+                maxReachedStep: Math.min(state.session.maxReachedStep, 3), // Downgrade to Rough Sort (3)
+                isSaving: true
             }
           };
         }),
@@ -179,7 +188,6 @@ export const useStudyStore = create<StudyStore>()(
           };
         }),
 
-      // Fine Sort Actions
       placeCardInGrid: (statementId, col, row) => set((state) => {
           // Validation: Check Capacity
           const colConfig = state.config?.grid_config?.[col];
@@ -191,12 +199,19 @@ export const useStudyStore = create<StudyStore>()(
               return state; // Prevent overfilling
           }
 
+          // Trigger saving indicator
+          setTimeout(() => set((s) => ({ session: { ...s.session, isSaving: false } })), 800);
+
           // Remove if exists, then add
           const filtered = state.responses.qsort.filter(p => p.statementId !== statementId);
           return {
               responses: {
                   ...state.responses,
                   qsort: [...filtered, { statementId, col, row }]
+              },
+              session: {
+                  ...state.session,
+                  isSaving: true
               }
           };
       }),
@@ -269,7 +284,7 @@ export const useStudyStore = create<StudyStore>()(
         return {
           config: null,
           configRefetchTag: state.configRefetchTag + 1,
-          session: { token: null, hasConsented: false, currentStep: 1, maxReachedStep: 1, language: null, isCompleted: false, confirmationCode: null },
+          session: { token: null, hasConsented: false, currentStep: 1, maxReachedStep: 1, language: null, isCompleted: false, confirmationCode: null, isSaving: false },
           responses: { presort: {}, rough: { agree: [], disagree: [], neutral: [], history: [] }, qsort: [], postsort: { card_comments: {}, missing_statement: '', general_comment: '' } },
           zoomedCard: null
         };
@@ -280,6 +295,7 @@ export const useStudyStore = create<StudyStore>()(
       })),
 
       setZoomedCard: (zoomedCard) => set({ zoomedCard }),
+      setSaving: (isSaving) => set((state) => ({ session: { ...state.session, isSaving } })),
     }),
     {
       name: 'q-method-storage',
@@ -311,6 +327,27 @@ export const useStudyStore = create<StudyStore>()(
 
         return state;
       },
+      storage: {
+        getItem: (name) => {
+          const str = localStorage.getItem(name);
+          return str ? JSON.parse(str) : null;
+        },
+        setItem: (name, newValue) => {
+          try {
+            // Check size before setting (Optional: warning if > 2MB)
+            const str = JSON.stringify(newValue);
+            if (str.length > 2 * 1024 * 1024) {
+               console.warn(`[StudyStore] Persistence size warning: ${(str.length / 1024 / 1024).toFixed(2)} MB`);
+            }
+            localStorage.setItem(name, str);
+          } catch (error) {
+            if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+              console.error('[StudyStore] LocalStorage Quota Exceeded! Failed to persist state.');
+            }
+          }
+        },
+        removeItem: (name) => localStorage.removeItem(name),
+      }
     }
   )
 );
