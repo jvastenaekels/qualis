@@ -133,8 +133,8 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
                 ${!dimensions ? 'w-full' : ''} ${aspectClass}
                 flex items-center justify-center p-0
                 cursor-grab active:cursor-grabbing
-                touch-manipulation dnd-prevent-pan
-                [touch-action:manipulation]
+                touch-none dnd-prevent-pan
+                [touch-action:none]
                 ${isOverlay ? 'z-50 cursor-grabbing' : ''}
             `}
         >
