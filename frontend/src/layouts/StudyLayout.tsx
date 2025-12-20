@@ -144,11 +144,18 @@ const StudyLayoutContent: React.FC = () => {
                         {/* Use config title if available, else static default */}
                         {session.currentStep === 1 ? 'Open-Q' : (config?.title || 'Q-Method Study')}
                     </div>
-                    {/* Saving Indicator */}
-                    {session.isSaving && (
-                        <span className="flex items-center gap-1 text-[10px] font-bold text-blue-500 uppercase tracking-tighter animate-pulse bg-blue-50 px-1.5 py-0.5 rounded">
-                            <RefreshCw size={10} className="animate-spin" /> {t('common.saving', 'Saving...')}
-                        </span>
+                    {/* Passive Save Status Indicator - Hidden on Rough Sort */}
+                    {!location.pathname.includes('rough-sort') && (
+                        <div className="flex items-center gap-1.5">
+                            <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+                                session.isSaving 
+                                    ? 'bg-amber-400 animate-pulse' 
+                                    : 'bg-green-500'
+                            }`} />
+                            <span className="text-[9px] font-medium text-slate-400 uppercase tracking-wider hidden sm:inline">
+                                {session.isSaving ? t('common.saving', 'Saving') : t('common.saved', 'Saved')}
+                            </span>
+                        </div>
                     )}
                     {/* Mobile Step Counter (Next to title) */}
                     <span className="md:hidden text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full whitespace-nowrap">
