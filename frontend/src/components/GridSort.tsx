@@ -409,6 +409,37 @@ const GridSort: React.FC<GridSortProps> = ({
           
               {/* HEADER & TABS */}
               <div className="flex-none px-2 lg:px-3 pt-2 lg:pt-4 pb-2 border-b border-gray-100 bg-white z-20">
+                  {/* MOBILE STICKY STATEMENT BAR (Relocated to Thumb Zone) */}
+                  {(() => {
+                      const isMobileLocal = typeof window !== 'undefined' && window.innerWidth < 1024;
+                      const selectedCards = [...agreeCards, ...disagreeCards, ...neutralCards];
+                      const selectedCard = selectedCardId ? selectedCards.find(c => c.id === selectedCardId) : null;
+
+                      if (isMobileLocal && selectedCard) {
+                          return (
+                              <motion.div 
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: 'auto' }}
+                                  className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-indigo-50/50 rounded-xl mb-3 border border-indigo-100 shadow-inner"
+                              >
+                                  <div className="text-sm font-bold text-indigo-700 text-center leading-tight">
+                                      <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                                          {selectedCard.text}
+                                      </ReactMarkdown>
+                                  </div>
+                                  <button 
+                                      onClick={() => onCardClick?.(selectedCard.id)} 
+                                      className="flex-none p-1.5 text-indigo-400 hover:text-indigo-600 rounded-full hover:bg-indigo-100/50"
+                                      aria-label="Clear selection"
+                                  >
+                                      <X size={18} />
+                                  </button>
+                              </motion.div>
+                          );
+                      }
+                      return null;
+                  })()}
+
                   <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 hidden lg:block">
                       {t('fine.deck.title')}
                   </h3>
@@ -620,62 +651,26 @@ const GridSort: React.FC<GridSortProps> = ({
       --------------------------------------------------------------------------- */}
       <div className="flex-1 h-full bg-slate-50 relative flex flex-col overflow-hidden">
           
-            {/* Toolbar Info / Sticky Statement Bar (Mobile Only) */}
-            <div className={`min-h-[70px] flex-none bg-white border-b border-gray-200 flex items-center justify-center px-4 shadow-sm z-20`}>
-                {(() => {
-                    const isMobileLocal = typeof window !== 'undefined' && window.innerWidth < 1024;
-                    // If a card is selected AND we are on mobile, show Sticky Bar UX
-                    const selectedCards = [...agreeCards, ...disagreeCards, ...neutralCards];
-                    const selectedCard = selectedCardId ? selectedCards.find(c => c.id === selectedCardId) : null;
-
-                    if (isMobileLocal && selectedCard) {
-                        return (
-                            <motion.div 
-                                initial={{ opacity: 0, y: 5 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="w-full flex items-center justify-center gap-2 py-2"
-                            >
-                                <div className="text-sm sm:text-lg font-bold text-indigo-700 text-center leading-tight">
-                                    <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
-                                        {selectedCard.text}
-                                    </ReactMarkdown>
-                                </div>
-                                <button 
-                                    onClick={() => onCardClick?.(selectedCard.id)} 
-                                    className="flex-none p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100"
-                                >
-                                    <X size={20} />
-                                </button>
-                            </motion.div>
-                        );
-                    }
-
-                    // On Desktop OR if no card selected on mobile, show basic instructions
-                    return (
-                        <>
-                            {/* Mobile Text */}
-                            <span className="text-base sm:text-xl font-bold text-slate-700 text-center leading-tight lg:hidden">
-                               <Trans 
-                                   i18nKey="fine.toolbar.mobile"
-                                   components={[
-                                       <strong className="text-red-600" key="0" />,
-                                       <strong className="text-green-600" key="1" />
-                                   ]}
-                               />
-                            </span>
-                            {/* Desktop Text */}
-                            <span className="text-lg sm:text-xl font-bold text-slate-700 text-center leading-tight hidden lg:inline">
-                               <Trans 
-                                   i18nKey="fine.toolbar.desktop"
-                                   components={[
-                                       <strong className="text-red-600" key="0" />,
-                                       <strong className="text-green-600" key="1" />
-                                   ]}
-                               />
-                            </span>
-                        </>
-                    );
-                })()}
+            {/* Toolbar Info / Instructions Bar */}
+            <div className={`min-h-[60px] flex-none bg-white border-b border-gray-200 flex items-center justify-center px-4 shadow-sm z-20`}>
+                <span className="text-base sm:text-lg font-bold text-slate-700 text-center leading-tight lg:hidden">
+                    <Trans 
+                        i18nKey="fine.toolbar.mobile"
+                        components={[
+                            <strong className="text-red-600" key="0" />,
+                            <strong className="text-green-600" key="1" />
+                        ]}
+                    />
+                </span>
+                <span className="text-lg sm:text-xl font-bold text-slate-700 text-center leading-tight hidden lg:inline">
+                    <Trans 
+                        i18nKey="fine.toolbar.desktop"
+                        components={[
+                            <strong className="text-red-600" key="0" />,
+                            <strong className="text-green-600" key="1" />
+                        ]}
+                    />
+                </span>
             </div>
 
            <div className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing" ref={wrapperRef}>

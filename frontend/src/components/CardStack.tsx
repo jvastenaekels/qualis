@@ -189,9 +189,17 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
 
         {/* Zoom Trigger Info - ONLY if overflowing */}
         {isOverflowing && (
-            <div className="absolute bottom-4 right-6 opacity-40">
-                <span className="text-lg">🔍</span>
-            </div>
+            <motion.button 
+                whileTap={{ scale: 0.9 }}
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setZoomedCard({ id: statement.id, text: statement.text });
+                }}
+                className="absolute bottom-4 right-6 p-2 bg-slate-100/80 rounded-full text-lg shadow-sm lg:bg-transparent lg:shadow-none lg:p-0"
+                aria-label="Zoom statement"
+            >
+                <span className="text-xl">🔍</span>
+            </motion.button>
         )}
       </motion.div>
     </div>
