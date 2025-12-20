@@ -34,7 +34,8 @@ const FineSortPage: React.FC = () => {
         swapCardsInGrid, 
         unplaceCard,
         setStep,
-        resetFineSort
+        resetFineSort,
+        setZoomedCard
     } = useStudyStore();
 
     const navigate = useNavigate();
@@ -231,6 +232,7 @@ const FineSortPage: React.FC = () => {
 
     // Drag Handlers
     const handleDragStart = (event: DragStartEvent) => {
+        setZoomedCard(null); // Clear zoom on drag start
         setActiveId(event.active.id as number);
         setSelectedCardId(null); // Clear selection on drag start to avoid confusion
     };

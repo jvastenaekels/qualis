@@ -4,13 +4,12 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { createPortal } from 'react-dom';
-
 import ReactMarkdown from 'react-markdown';
+import { useStudyStore } from '../store/useStudyStore';
 
 interface SortableCardProps {
   id: number;
@@ -44,22 +43,8 @@ const SortableCard: React.FC<SortableCardProps> = ({
     isDragging
   } = useSortable({ id });
 
-  const [showZoom, setShowZoom] = useState(false);
-
-  // ... (ZoomPortal remains same) ...
-
-  const ZoomPortal = () => createPortal(
-    <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
-        <div className="bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-4 transform scale-110 max-h-[80vh] overflow-y-auto flex flex-col">
-            <div className="text-lg font-medium text-slate-800 text-center leading-relaxed my-auto">
-                <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
-                    {text}
-                </ReactMarkdown>
-            </div>
-        </div>
-    </div>,
-    document.body
-  );
+  const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
+  const zoomedCard = useStudyStore((state) => state.zoomedCard);
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -105,8 +90,8 @@ const SortableCard: React.FC<SortableCardProps> = ({
                     onClick();
                 }
             }}
-            onMouseEnter={() => !isDragging && !isOverlay && setShowZoom(true)}
-            onMouseLeave={() => setShowZoom(false)}
+            onMouseEnter={() => !isDragging && !isOverlay && !disableHoverZoom && setZoomedCard({ id, text })}
+            onMouseLeave={() => zoomedCard?.id === id && setZoomedCard(null)}
             className={`
                 relative
                 ${!dimensions ? 'w-full' : ''} ${aspectClass}
@@ -153,8 +138,6 @@ const SortableCard: React.FC<SortableCardProps> = ({
                 </div>
             </motion.div>
         </div>
-
-        {showZoom && !isDragging && !disableHoverZoom && <ZoomPortal />}
     </>
   );
 };

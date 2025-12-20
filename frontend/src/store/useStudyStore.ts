@@ -42,9 +42,9 @@ interface StudyStore {
   config: StudyConfig | null;
   configLoading: boolean;
   configError: string | null;
-  configRefetchTag: number;
   session: SessionState;
   responses: ResponsesState;
+  zoomedCard: { id: number; text: string } | null;
 
   // Actions
   setConfig: (config: StudyConfig) => void;
@@ -70,6 +70,7 @@ interface StudyStore {
   completeSession: (code: string) => void;
   resetSession: () => void;
   setLanguage: (lang: string) => void;
+  setZoomedCard: (card: { id: number; text: string } | null) => void;
 }
 
 export const useStudyStore = create<StudyStore>()(
@@ -94,6 +95,7 @@ export const useStudyStore = create<StudyStore>()(
         qsort: [],
         postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
       },
+      zoomedCard: null,
 
       setConfig: (config) => set({ config, configLoading: false, configError: null }),
       setConfigLoading: (configLoading) => set({ configLoading }),
@@ -268,13 +270,16 @@ export const useStudyStore = create<StudyStore>()(
           config: null,
           configRefetchTag: state.configRefetchTag + 1,
           session: { token: null, hasConsented: false, currentStep: 1, maxReachedStep: 1, language: null, isCompleted: false, confirmationCode: null },
-          responses: { presort: {}, rough: { agree: [], disagree: [], neutral: [], history: [] }, qsort: [], postsort: { card_comments: {}, missing_statement: '', general_comment: '' } }
+          responses: { presort: {}, rough: { agree: [], disagree: [], neutral: [], history: [] }, qsort: [], postsort: { card_comments: {}, missing_statement: '', general_comment: '' } },
+          zoomedCard: null
         };
       }),
 
       setLanguage: (lang) => set((state) => ({
           session: { ...state.session, language: lang }
       })),
+
+      setZoomedCard: (zoomedCard) => set({ zoomedCard }),
     }),
     {
       name: 'q-method-storage',

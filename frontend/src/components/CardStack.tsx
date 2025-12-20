@@ -6,8 +6,8 @@
 
 import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 'react';
 import { motion, useTransform, useAnimation, type PanInfo, type MotionValue } from 'framer-motion';
-import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
+import { useStudyStore } from '../store/useStudyStore';
 
 interface CardStackProps {
   statement: { id: number; text: string };
@@ -22,7 +22,8 @@ export interface CardStackHandle {
 
 const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVote, x, y }, ref) => {
   const controls = useAnimation();
-  const [showZoom, setShowZoom] = useState(false);
+  const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
+  const zoomedCard = useStudyStore((state) => state.zoomedCard);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
 
@@ -39,19 +40,6 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
   let fontSizeClass = 'text-xl sm:text-2xl';
   if (textLength > 150) fontSizeClass = 'text-sm sm:text-base';
   else if (textLength > 80) fontSizeClass = 'text-lg sm:text-xl';
-
-  const ZoomPortal = () => createPortal(
-    <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center">
-        <div className="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border-2 border-indigo-500 max-w-sm mx-4 transform scale-105 max-h-[80vh] overflow-y-auto flex flex-col">
-            <div className="text-xl font-medium text-slate-800 text-center leading-relaxed my-auto font-sans">
-                <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
-                    {statement.text}
-                </ReactMarkdown>
-            </div>
-        </div>
-    </div>,
-    document.body
-  );
 
   // Overflow Detection
   useEffect(() => {
@@ -120,11 +108,12 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         drag
         dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }} // Snap back origin
         dragElastic={0.7} // Resistance
+        onDragStart={() => setZoomedCard(null)}
         onDragEnd={handleDragEnd}
         animate={controls}
         style={{ x, y, rotate }}
-        onMouseEnter={() => isOverflowing && setShowZoom(true)}
-        onMouseLeave={() => setShowZoom(false)}
+        onMouseEnter={() => isOverflowing && setZoomedCard({ id: statement.id, text: statement.text })}
+        onMouseLeave={() => zoomedCard?.id === statement.id && setZoomedCard(null)}
         className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-6 sm:p-8 cursor-grab active:cursor-grabbing touch-none overflow-hidden"
       >
         {/* Color Overlays */}
@@ -168,8 +157,6 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
             </div>
         )}
       </motion.div>
-
-      {showZoom && <ZoomPortal />}
     </div>
   );
 });

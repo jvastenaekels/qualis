@@ -12,6 +12,7 @@ import { useStudyStore } from '../store/useStudyStore';
 import { Check, Globe, RefreshCw, X } from 'lucide-react';
 import { LayoutProvider, useLayoutAction } from '../contexts/LayoutContext';
 import { useStudyConfig } from '../hooks/useStudyConfig';
+import CardZoomOverlay from '../components/CardZoomOverlay';
 
 const steps = [
   { id: 1, labelKey: 'layout.steps.welcome' },
@@ -269,6 +270,7 @@ const StudyLayout: React.FC = () => {
     return (
         <LayoutProvider>
             <StudyLayoutContent />
+            <CardZoomOverlay />
         </LayoutProvider>
     );
 };
