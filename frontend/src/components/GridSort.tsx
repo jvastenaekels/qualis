@@ -181,7 +181,7 @@ const GridSort: React.FC<GridSortProps> = ({
 
   const renderDeckCards = () => {
     return activeCards.length > 0 ? activeCards.map(card => (
-        <motion.div key={card.id} layout initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="flex-none w-[120px] sm:w-[140px] lg:w-full mx-auto">
+        <motion.div key={card.id} layout initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="flex-none w-[100px] sm:w-[120px] lg:w-full">
                <SortableCard id={card.id} text={card.text} variant="compact" isSelected={selectedCardId === card.id} onClick={() => onCardClick?.(card.id)} aspectRatio={cardDimensions.width / cardDimensions.height} disableHoverZoom={disableHoverZoom || (typeof window !== 'undefined' && window.innerWidth < 1024)} />
         </motion.div>
     )) : (
@@ -373,7 +373,7 @@ const GridSort: React.FC<GridSortProps> = ({
 
               {!isDeckCollapsed && (
                 <motion.div key={activePile} initial={{ backgroundColor: activePile === 'disagree' ? '#fee2e2' : activePile === 'agree' ? '#dcfce7' : '#f1f5f9' }} animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} transition={{ duration: 0.8 }}
-                    className="flex-1 p-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-h-0 custom-scrollbar lg:grid lg:grid-cols-2 lg:content-start lg:gap-2"
+                    className="flex-1 p-2 flex flex-row gap-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-h-0 custom-scrollbar lg:grid lg:grid-cols-2 lg:content-start lg:gap-2"
                 >
 {renderDeckCards()}
               </motion.div>
