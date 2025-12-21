@@ -56,6 +56,23 @@ const GridSort: React.FC<GridSortProps> = ({
 
   const [cardDimensions, setCardDimensions] = useState({ width: 160, height: 96 });
 
+  // Calculate optimal deck height based on longest statement
+  const calculateDeckHeight = () => {
+    const allCards = [...agreeCards, ...disagreeCards, ...neutralCards];
+    if (allCards.length === 0) return 280; // Default minimum
+    
+    const maxLength = Math.max(...allCards.map(card => card.text.length));
+    
+    // Heuristic: ~50 chars per line, 20px per line, base 200px
+    // Min: 280px, Max: 400px
+    const estimatedLines = Math.ceil(maxLength / 50);
+    const calculatedHeight = 200 + (estimatedLines * 20);
+    
+    return Math.min(Math.max(calculatedHeight, 280), 400);
+  };
+
+  const deckHeight = calculateDeckHeight();
+
   const getActiveCards = () => {
       switch(activePile) {
           case 'agree': return agreeCards;
@@ -402,13 +419,16 @@ const GridSort: React.FC<GridSortProps> = ({
       </div>
 
        {/* PANEL: SOURCE INVENTORY (Deck) */}
-      <div className="
+      <div 
+        className="
           w-full lg:w-[320px] flex-none 
           bg-white lg:border-r border-t lg:border-t-0 border-gray-200 
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md 
-          flex flex-col h-[320px] lg:h-full transition-all duration-300
+          flex flex-col lg:h-full transition-all duration-300
           overflow-hidden pb-safe lg:pb-0
-      ">
+        "
+        style={{ height: `${deckHeight}px` }}
+      >
               <div className="flex-none px-2 lg:px-3 pt-2 lg:pt-4 pb-2 border-b border-gray-100 bg-white z-20">
                   {/* UNIFIED MOBILE INFO HUB (Thumb Zone) */}
                   <div className="lg:hidden mb-3">
