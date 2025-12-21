@@ -107,6 +107,10 @@
         "finish": "Viimeistele lajittelu",
         "ready": "Tarkastele kokonaiskuvaa",
         "not_ready": "Sijoita kaikki kortit jatkaaksesi"
+    },
+    "workbench": {
+      "active_card": "Aktiivinen kortti",
+      "place_on_grid": "Napauta ruudukkoa sijoittaaksesi"
     }
   },
   "post": {

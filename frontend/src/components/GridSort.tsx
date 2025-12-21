@@ -1,19 +1,26 @@
+
 /*
  * Open-Q - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
-import DroppableSlot from './DroppableSlot';
-import SortableCard from './SortableCard';
-import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import { Check, ZoomIn, ZoomOut, RotateCcw, X, Frown, Meh, Smile, Maximize2, XCircle } from 'lucide-react';
-import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+// Imports
+import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+    ZoomIn, ZoomOut, RotateCcw,
+    ChevronDown, ChevronUp, Check, X,
+    Smile, Meh, Frown
+} from 'lucide-react';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
+import { DndContext, useDraggable, useDroppable, DragOverlay, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { motion, AnimatePresence } from 'framer-motion';
-import ReactMarkdown from 'react-markdown';
+import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
+import { SortableCard } from './SortableCard';
+import { DroppableSlot } from './DroppableSlot';
 import { useGridZoom } from '../hooks/useGridZoom';
+import WorkbenchPanel from './WorkbenchPanel';
 import { useStudyStore } from '../store/useStudyStore';
 
 interface GridSortProps {
@@ -224,11 +231,26 @@ const GridSort: React.FC<GridSortProps> = ({
   const selectedCards = [...agreeCards, ...disagreeCards, ...neutralCards];
   const selectedCard = selectedCardId ? selectedCards.find(c => c.id === selectedCardId) : null;
 
+  const renderDeckCards = () => {
+    return activeCards.length > 0 ? activeCards.map(card => (
+        <motion.div key={card.id} layout initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="flex-none w-[120px] sm:w-[140px] lg:w-full mx-auto">
+               <SortableCard id={card.id} text={card.text} variant="compact" isSelected={selectedCardId === card.id} onClick={() => onCardClick?.(card.id)} aspectRatio={cardDimensions.width / cardDimensions.height} disableHoverZoom={disableHoverZoom || (typeof window !== 'undefined' && window.innerWidth < 1024)} />
+        </motion.div>
+    )) : (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-slate-300 flex flex-col items-center gap-2">
+            <Check size={24} className="text-green-400" />
+            <span className="text-sm font-medium">{t('fine.deck.all_placed')}</span>
+        </motion.div>
+    );
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">
       
        {/* PANEL: THE GRID (Canvas) */}
-      <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden">
+      <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300"
+           style={{ paddingBottom: isMobile && selectedCard ? '35vh' : '0' }} // Reserve space for Workbench fixed bottom
+      >
             {/* Desktop-only Instruction */}
             <div className="hidden lg:flex min-h-[60px] flex-none bg-white border-b border-gray-200 items-center justify-center px-4 shadow-sm z-20">
                 <span className="text-lg font-bold text-slate-700 text-center leading-tight">
@@ -338,15 +360,30 @@ const GridSort: React.FC<GridSortProps> = ({
             </div>
       </div>
 
+       {/* PANEL: WORKBENCH STAGE (Bottom Fixed) */}
+       <AnimatePresence>
+            {selectedCardId && (
+                <WorkbenchPanel 
+                    key="workbench"
+                    card={selectedCard}
+                    onClose={() => onCardClick?.(selectedCardId)} // Deselect
+                />
+            )}
+       </AnimatePresence>
+
        {/* PANEL: SOURCE INVENTORY (Deck) */}
+       {/* Only show Deck if Workbench is NOT active (OR show it hidden/collapsed) */}
+       {/* To preserve state, we keep it rendered but hidden or minimized? */}
+       {/* Actually, for simplicity/performance in this revamp, lets conditionally render or use display:none */}
       <div 
-        className="
+        className={`
           w-full lg:w-[320px] flex-none 
           bg-white lg:border-r border-t lg:border-t-0 border-gray-200 
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md 
           flex flex-col lg:h-full transition-all duration-300
           overflow-hidden pb-safe lg:pb-0
-        "
+          ${selectedCardId && isMobile ? 'hidden' : ''} 
+        `}
         style={{ 
             height: isMobile 
                 ? (isDeckCollapsed ? 'auto' : `${deckHeight}px`) 
@@ -354,62 +391,6 @@ const GridSort: React.FC<GridSortProps> = ({
         }}
       >
               <div className="flex-none px-2 lg:px-3 pt-2 lg:pt-4 pb-2 border-b border-gray-100 bg-white z-20">
-                  {/* UNIFIED MOBILE INFO HUB (Thumb Zone) */}
-                  <div className="lg:hidden mb-1">
-                      <AnimatePresence mode="wait">
-                          {selectedCard ? (
-                              <motion.div 
-                                  key="mob-st" 
-                                  initial={{ opacity: 0, y: 10 }} 
-                                  animate={{ opacity: 1, y: 0 }} 
-                                  exit={{ opacity: 0, y: -10 }}
-                                  className="w-full flex flex-col gap-1"
-                              >
-                                  {/* Instruction Helper */}
-                                  <div className="text-center animate-bounce">
-                                      <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100 shadow-sm">
-                                          ↓ {t('fine.toolbar.place_instruction')} 
-                                      </span>
-                                  </div>
-
-                                  {/* HUD Card Container */}
-                                  <div className="w-full flex items-stretch gap-0 bg-white rounded-lg border-2 border-indigo-500 shadow-md overflow-hidden">
-                                      {/* Content Area: Tap to Read/Zoom */}
-                                      <div 
-                                          className="flex-1 flex flex-col justify-center p-3 cursor-zoom-in active:bg-indigo-50 transition-colors border-r border-indigo-100 hover:bg-slate-50 touch-manipulation"
-                                          onClick={() => setZoomedCard(selectedCard)}
-                                      >
-                                          <div className="flex items-center gap-2 mb-1">
-                                               <Maximize2 size={12} className="text-indigo-400" />
-                                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">{t('fine.toolbar.read_full')}</span>
-                                          </div>
-                                          <div className="text-xs font-bold text-slate-800 line-clamp-2 leading-tight">
-                                              <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
-                                          </div>
-                                      </div>
-
-                                      {/* Action Area: Cancel */}
-                                      <div 
-                                          className="flex-none w-14 flex items-center justify-center bg-slate-50 cursor-pointer hover:bg-red-50 hover:text-red-500 active:bg-red-100 transition-colors border-l border-slate-100 touch-manipulation"
-                                          onClick={() => onCardClick?.(selectedCard.id)}
-                                          title={t('common.cancel')}
-                                      >
-                                          <XCircle size={24} className="text-slate-400 hover:text-red-500" />
-                                      </div>
-                                  </div>
-                              </motion.div>
-                          ) : (
-                               <motion.div key="mob-inst" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                   className="text-center py-1 flex items-center justify-center h-[52px]"
-                               >
-                                   <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider px-2">
-                                       {t('fine.toolbar.mobile_short', 'Sélectionnez → Placez')}
-                                   </span>
-                               </motion.div>
-                           )}
-                      </AnimatePresence>
-                  </div>
-
                   <h3 className={`text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 hidden lg:block`}>{t('fine.deck.title')}</h3>
 
                   {!isDeckCollapsed && (
@@ -446,22 +427,7 @@ const GridSort: React.FC<GridSortProps> = ({
                 <motion.div key={activePile} initial={{ backgroundColor: activePile === 'disagree' ? '#fee2e2' : activePile === 'agree' ? '#dcfce7' : '#f1f5f9' }} animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} transition={{ duration: 0.8 }}
                     className="flex-1 p-2 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto min-h-0 custom-scrollbar"
                 >
-                  <SortableContext items={activeCards.map(c => c.id)} strategy={rectSortingStrategy}>
-                      <motion.div initial="hidden" animate="show" className={`${activeCards.length === 0 ? 'flex w-full h-full justify-center items-center' : 'flex flex-row lg:grid lg:grid-cols-2 gap-2 lg:gap-3'}`}>
-                          <AnimatePresence mode="popLayout">
-                              {activeCards.length > 0 ? activeCards.map(card => (
-                                  <motion.div key={card.id} layout initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="flex-none w-[120px] sm:w-[140px] lg:w-full mx-auto">
-                                         <SortableCard id={card.id} text={card.text} variant="compact" isSelected={selectedCardId === card.id} onClick={() => onCardClick?.(card.id)} aspectRatio={cardDimensions.width / cardDimensions.height} disableHoverZoom={disableHoverZoom || (typeof window !== 'undefined' && window.innerWidth < 1024)} />
-                                  </motion.div>
-                              )) : (
-                                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center text-slate-300 flex flex-col items-center gap-2">
-                                      <Check size={24} className="text-green-400" />
-                                      <span className="text-sm font-medium">{t('fine.deck.all_placed')}</span>
-                                  </motion.div>
-                              )}
-                          </AnimatePresence>
-                      </motion.div>
-                   </SortableContext>
+{renderDeckCards()}
               </motion.div>
               )}
               {(onReset && !isDeckCollapsed) && (

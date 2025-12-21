@@ -107,6 +107,10 @@
       "finish": "Terminer le tri",
       "ready": "Voir la vue d'ensemble",
       "not_ready": "Placez toutes les cartes pour continuer"
+    },
+    "workbench": {
+      "active_card": "Carte active",
+      "place_on_grid": "Touchez la grille pour placer"
     }
   },
   "post": {
