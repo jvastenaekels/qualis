@@ -181,7 +181,7 @@ const GridSort: React.FC<GridSortProps> = ({
 
   const renderDeckCards = () => {
     return activeCards.length > 0 ? activeCards.map(card => (
-        <motion.div key={card.id} layout initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="flex-none w-[100px] sm:w-[120px] lg:w-full">
+        <motion.div key={card.id} layout initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="flex-none w-[130px] sm:w-[140px] lg:w-full">
                <SortableCard id={card.id} text={card.text} variant="compact" isSelected={selectedCardId === card.id} onClick={() => onCardClick?.(card.id)} aspectRatio={cardDimensions.width / cardDimensions.height} disableHoverZoom={disableHoverZoom || (typeof window !== 'undefined' && window.innerWidth < 1024)} />
         </motion.div>
     )) : (
