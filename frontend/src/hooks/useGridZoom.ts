@@ -11,11 +11,9 @@ interface UseGridZoomProps {
     setDimmingActive: (active: boolean) => void;
 }
 
-export const useGridZoom = ({
     wrapperRef,
     contentRef,
     pyramidRef,
-    gridColumns,
     activePile,
     hasPerformedZonalFocus,
     setDimmingActive,
@@ -83,7 +81,7 @@ export const useGridZoom = ({
         }
     }, []);
 
-    // Zonal Focus Logic
+    // Zonal Focus Logic (Anti-Bias: Sector Panning)
     useEffect(() => {
         if (!hasPerformedZonalFocus || !transformRef.current) return;
 
@@ -91,52 +89,51 @@ export const useGridZoom = ({
              if (!transformRef.current || !wrapperRef.current || !contentRef.current || !pyramidRef.current) return;
              
              const isMobile = window.innerWidth < 1024;
-             if (!isMobile) return; // Disable zonal focus on desktop as it annoys users usually, keeping it mobile or strictly optional
+             if (!isMobile) return; 
 
-             // Simplified Zonal Logic to avoid jumping if user already interacted?
-             // For now, we keep the original logic but guarded by mobile check/preference
+             // 1. Determine Sector Direction (Left vs Right)
+             // We do NOT target a specific column (Bias hazard).
+             // We simply ensure the relevant "Side" of the pyramid is visible.
+             let targetXFactor = 0.5; // Default center
              
-             let targetId = '';
-             const baseScores = gridColumns.map(c => c.score).sort((a,b) => a - b);
-             const minScore = baseScores[0];
-             const maxScore = baseScores[baseScores.length - 1];
-
              if (activePile === 'disagree') {
-                 targetId = `column-${Math.min(minScore + 1, -1)}`; 
+                 targetXFactor = 0.25; // Focus on the Left Quadrant
              } else if (activePile === 'agree') {
-                 targetId = `column-${Math.max(maxScore - 1, 1)}`;
+                 targetXFactor = 0.75; // Focus on the Right Quadrant
              } else {
-                 return; // No zonal focus for neutral
+                 return; // Neutral -> Stay put or center? (User controls)
              }
              
-             // Fallbacks
-             if (!document.getElementById(targetId)) targetId = 'column-0'; 
+             // 2. Calculate smooth Pan target
+             const state = transformRef.current.instance.transformState;
+             const contentW = contentRef.current.offsetWidth;
+             const wrapperW = wrapperRef.current.clientWidth;
+             const currentScale = state.scale;
 
-             const targetNode = document.getElementById(targetId);
-             if (targetNode) {
-                 const state = transformRef.current.instance.transformState;
-                 // Don't zoom if user has already zoomed in significantly?
-                 if (state.scale > 1.2) return;
+             // Clarity: Ensure we ZOOM IN to the zone
+             // If user is zoomed out (<1), jump to 1.2. 
+             // If already zoomed in, nudge it further (x1.2) up to a max of 2.5
+             let targetScale = Math.max(currentScale * 1.3, 1.2);
+             targetScale = Math.min(targetScale, 2.5);
 
-                 const targetScale = state.scale * 1.5;
-                 const wrapperW = wrapperRef.current.clientWidth;
-                 const wrapperH = wrapperRef.current.clientHeight;
-                 const pyramid = pyramidRef.current;
-                 const pyramidOffsetLeft = pyramid.offsetLeft;
-                 const targetColumnCenter = targetNode.offsetLeft + (targetNode.offsetWidth / 2);
-                 const targetX = (wrapperW / 2) - ((pyramidOffsetLeft + targetColumnCenter) * targetScale);
-                 const contentH = contentRef.current.offsetHeight;
-                 const targetY = wrapperH - (contentH * targetScale) - 20;
+             // Center on the target sector
+             // x = (WrapperCenter) - (SectorCenter * Scale)
+             const targetX = (wrapperW / 2) - ((contentW * targetXFactor) * targetScale);
+             
+             // Ensure Y keeps the pyramid visible (bottom align vs center?)
+             // Keeping Y stable or re-centering vertically.
+             const currentY = state.positionY; 
 
-                 transformRef.current.setTransform(targetX, targetY, targetScale, 400, 'easeOut');
-                 setDimmingActive(true);
-                 setTimeout(() => setDimmingActive(false), 2000);
-             }
+             transformRef.current.setTransform(targetX, currentY, targetScale, 600, 'easeOut');
+             
+             // Subtle visual cue that we moved
+             setDimmingActive(true);
+             setTimeout(() => setDimmingActive(false), 1500);
 
-        }, 500);
+        }, 300); // Reduced delay for responsiveness
 
         return () => clearTimeout(timer);
-    }, [activePile, hasPerformedZonalFocus, gridColumns, performAutoFit, setDimmingActive, wrapperRef, contentRef, pyramidRef]);
+    }, [activePile, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef]);
 
     return {
         transformRef,
