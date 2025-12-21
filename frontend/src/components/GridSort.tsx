@@ -18,6 +18,8 @@ import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import SortableCard from './SortableCard';
 import DroppableSlot from './DroppableSlot';
 import { useGridZoom } from '../hooks/useGridZoom';
+import { useGridCalculations } from '../hooks/useGridCalculations';
+import { useDeckManagement } from '../hooks/useDeckManagement';
 import WorkbenchPanel from './WorkbenchPanel';
 
 
@@ -55,14 +57,33 @@ const GridSort: React.FC<GridSortProps> = ({
   onZoomChange
 }) => {
   const { t } = useTranslation();
-  const [activePile, setActivePile] = useState<PileType>('disagree');
+  
+  // Deck Management Hook
+  const { 
+      activePile, 
+      setActivePile, 
+      activeCards, 
+      deckHeight, 
+      hasPerformedZonalFocus, 
+      setHasPerformedZonalFocus 
+  } = useDeckManagement({
+      agreeCards,
+      disagreeCards,
+      neutralCards
+  });
+
   const [smartFocusActive, setSmartFocusActive] = useState(false); 
   const [dimmingActive, setDimmingActive] = useState(false);       
   const [closedTips, setClosedTips] = useState({ extremes: false, vertical: false });
-  const [hasPerformedZonalFocus, setHasPerformedZonalFocus] = useState(false);
   const [autoFitEnabled, setAutoFitEnabled] = useState(true); 
 
-  const [cardDimensions, setCardDimensions] = useState({ width: 160, height: 96 });
+  // Grid Calculations Hook
+  const { wrapperRef, cardDimensions } = useGridCalculations({
+      gridColumns,
+      selectedCardId,
+      onDimensionsChange
+  });
+
   const [isMobile, setIsMobile] = useState(false);
 
 
@@ -76,8 +97,7 @@ const GridSort: React.FC<GridSortProps> = ({
 
   const isDeckCollapsed = isMobile && !!selectedCardId;
 
-  // Refs for Zoom Hook
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  // Refs for Zoom Hook (wrapperRef is now provided by useGridCalculations)
   const contentRef = useRef<HTMLDivElement>(null);
   const pyramidRef = useRef<HTMLDivElement>(null);
 
@@ -92,30 +112,6 @@ const GridSort: React.FC<GridSortProps> = ({
       setDimmingActive,
       onZoomChange
   });
-
-  // Calculate optimal deck height based on longest statement
-  const calculateDeckHeight = () => {
-    const allCards = [...agreeCards, ...disagreeCards, ...neutralCards];
-    if (allCards.length === 0) return 280; 
-    
-    // Safety check for empty text
-    const maxLength = Math.max(...allCards.map(card => card.text?.length || 0));
-    const estimatedLines = Math.ceil(maxLength / 50);
-    const calculatedHeight = 200 + (estimatedLines * 20);
-    return Math.min(Math.max(calculatedHeight, 280), 400);
-  };
-
-  const deckHeight = calculateDeckHeight();
-
-  const getActiveCards = () => {
-      switch(activePile) {
-          case 'agree': return agreeCards;
-          case 'disagree': return disagreeCards;
-          case 'neutral': return neutralCards;
-          default: return [];
-      }
-  };
-  const activeCards = getActiveCards();
 
   const getColumnTint = (score: number) => {
       if (score <= -3) return 'bg-red-50/50';
@@ -140,36 +136,7 @@ const GridSort: React.FC<GridSortProps> = ({
       return false;
   };
 
-  const calculateOptimalSize = React.useCallback(() => {
-      if (!wrapperRef.current) return;
-      // Grid Anchoring: Do not resize cards when in Mobile Focus Mode (Deck Collapsed)
-      // This prevents "Layout Thrashing" / Chaos.
-      if (selectedCardId && window.innerWidth < 1024) return;
 
-      const wrapper = wrapperRef.current;
-      const W = wrapper.clientWidth;
-      const H = wrapper.clientHeight;
-      if (W === 0 || H === 0) return;
-      const numCols = gridColumns.length;
-      if (numCols === 0) return;
-      const maxRows = Math.max(...gridColumns.map(c => c.capacity || 0));
-      if (maxRows === 0) return;
-      const screenRatio = W / H;
-      const gridStructureRatio = maxRows / numCols;
-      const rawGridRatio = screenRatio * gridStructureRatio;
-      const goldenRatio = 1.6;
-      let targetCardRatio = (rawGridRatio + goldenRatio) / 2;
-      targetCardRatio = Math.max(1.0, Math.min(targetCardRatio, 2.2)); 
-      const targetArea = 160 * 96; 
-      const newWidth = Math.sqrt(targetArea * targetCardRatio);
-      const newHeight = targetArea / newWidth;
-      setCardDimensions(prev => {
-          if (Math.abs(prev.width - newWidth) < 1.5 && Math.abs(prev.height - newHeight) < 1.5) return prev;
-          const next = { width: newWidth, height: newHeight };
-          onDimensionsChange?.(next);
-          return next;
-      });
-  }, [gridColumns, onDimensionsChange, selectedCardId]);
 
   useEffect(() => {
       // 1. Perform initial auto-fit
@@ -192,31 +159,15 @@ const GridSort: React.FC<GridSortProps> = ({
 
   // Responsive: Close tips and disable autofit on mobile selection
   useEffect(() => {
-    // Only calculate if NOT in focus mode (anchoring)
-    if (!selectedCardId || window.innerWidth >= 1024) {
-        calculateOptimalSize();
-    }
-    
     if (selectedCardId && window.innerWidth < 1024) {
         setClosedTips({ extremes: true, vertical: true });
         setAutoFitEnabled(false);
     }
-  }, [selectedCardId, calculateOptimalSize]);
+  }, [selectedCardId]);
 
   useEffect(() => { setAutoFitEnabled(true); }, [activePile]);
 
-  // Resize Observer
-  React.useEffect(() => {
-      const wrapper = wrapperRef.current;
-      if (!wrapper) return;
-      let rafId: number;
-      const observer = new ResizeObserver(() => {
-          cancelAnimationFrame(rafId);
-          rafId = requestAnimationFrame(() => { calculateOptimalSize(); });
-      });
-      observer.observe(wrapper);
-      return () => { observer.disconnect(); cancelAnimationFrame(rafId); };
-  }, [calculateOptimalSize]);
+
 
   useEffect(() => {
      if (!autoFitEnabled) return;
