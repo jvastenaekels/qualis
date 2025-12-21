@@ -109,32 +109,27 @@ const FineSortPage: React.FC = () => {
 
     // Hoist Action to Header/Footer
     React.useEffect(() => {
+        // Only show button when all cards are placed
+        if (!isAllPlaced) {
+            setHeaderAction(null);
+            return () => setHeaderAction(null);
+        }
+
         const handleContinue = () => {
              navigate(`/study/${slug}/post-sort`);
         };
 
         const actionNode = (
             <button
-                key={isAllPlaced ? 'ready' : 'pending'}
-                onClick={isAllPlaced ? handleContinue : undefined}
-                disabled={!isAllPlaced}
-                className={`
-                    flex items-center gap-2 px-6 py-2 rounded-md font-bold text-sm transition-all duration-500
-                    ${isAllPlaced 
-                        ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg transform scale-100 animate-in fade-in zoom-in duration-500 cursor-pointer' 
-                        : 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-50'
-                    }
+                onClick={handleContinue}
+                className="
+                    flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm
+                    bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl
+                    transform transition-all duration-300 animate-pulse
                     w-full md:w-auto justify-center
-                `}
-                title={isAllPlaced ? t('fine.actions.ready') : t('fine.actions.not_ready')}
+                "
             >
-                {isAllPlaced ? (
-                    <>
-                        {t('fine.actions.validate')} <Check size={16} strokeWidth={3} />
-                    </>
-                ) : (
-                    <span>{t('fine.actions.finish')}</span>
-                )}
+                {t('fine.actions.validate')} <Check size={18} strokeWidth={3} />
             </button>
         );
 

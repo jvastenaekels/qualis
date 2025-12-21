@@ -431,8 +431,8 @@ const GridSort: React.FC<GridSortProps> = ({
                               <motion.div key="mob-inst" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                                   className="text-center py-1 flex items-center justify-center h-[52px]"
                               >
-                                  <span className="text-xs sm:text-sm font-bold text-slate-400 uppercase tracking-wider px-2">
-                                      <Trans i18nKey="fine.toolbar.mobile" components={[<strong className="text-red-400" key="0" />, <strong className="text-green-400" key="1" />]} />
+                                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider px-2">
+                                      {t('fine.toolbar.mobile_short', 'Sélectionnez → Placez')}
                                   </span>
                               </motion.div>
                           )}
