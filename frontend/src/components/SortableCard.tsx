@@ -169,9 +169,11 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
                     </div>
                 </div>
                 
-                <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                     <span className="text-base text-indigo-400">🔍</span>
-                </div>
+                {!disableHoverZoom && (
+                    <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <span className="text-base text-indigo-400">🔍</span>
+                    </div>
+                )}
             </motion.div>
         </div>
     </>

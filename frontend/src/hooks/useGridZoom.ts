@@ -83,58 +83,58 @@ export const useGridZoom = ({
     }, []);
 
     // Zonal Focus Logic (Anti-Bias: Sector Panning)
+    // 2-step animation: First show entire pyramid, then zoom to zone
     useEffect(() => {
         if (!hasPerformedZonalFocus || !transformRef.current) return;
 
-        const timer = setTimeout(() => {
+        // Step 1: First show the entire pyramid (autoFit)
+        performAutoFit();
+        
+        // Step 2: After delay, zoom to the target zone
+        const zoomTimer = setTimeout(() => {
              if (!transformRef.current || !wrapperRef.current || !contentRef.current || !pyramidRef.current) return;
              
              const isMobile = window.innerWidth < 1024;
              if (!isMobile) return; 
 
-             // 1. Determine Sector Direction (Left vs Right)
-             // We do NOT target a specific column (Bias hazard).
-             // We simply ensure the relevant "Side" of the pyramid is visible.
-             let targetXFactor = 0.5; // Default center
+             // Determine Target Column based on Pile
+             // Disagree -> Column -2, Neutral -> Column 0, Agree -> Column +2
+             const targetColumnId = activePile === 'disagree' ? 'column--2' 
+                                  : activePile === 'agree' ? 'column-2' 
+                                  : 'column-0';
              
-             if (activePile === 'disagree') {
-                 targetXFactor = 0.25; // Focus on the Left Quadrant
-             } else if (activePile === 'agree') {
-                 targetXFactor = 0.75; // Focus on the Right Quadrant
-             } else {
-                 return; // Neutral -> Stay put or center? (User controls)
-             }
-             
-             // 2. Calculate smooth Pan target
-             const state = transformRef.current.instance.transformState;
-             const contentW = contentRef.current.offsetWidth;
+             const targetColumn = document.getElementById(targetColumnId);
+             if (!targetColumn) return;
+
+             // Fixed Scale for Zonal Zoom (subtle)
+             const targetScale = 1.2;
+
+             // Calculate Pan to center on target column
              const wrapperW = wrapperRef.current.clientWidth;
-             const currentScale = state.scale;
-
-             // Clarity: Ensure we ZOOM IN to the zone
-             // If user is zoomed out (<1), jump to 1.2. 
-             // If already zoomed in, nudge it further (x1.2) up to a max of 2.5
-             let targetScale = Math.max(currentScale * 1.3, 1.2);
-             targetScale = Math.min(targetScale, 2.5);
-
-             // Center on the target sector
-             // x = (WrapperCenter) - (SectorCenter * Scale)
-             const targetX = (wrapperW / 2) - ((contentW * targetXFactor) * targetScale);
+             const wrapperH = wrapperRef.current.clientHeight;
+             const contentH = contentRef.current.offsetHeight;
              
-             // Ensure Y keeps the pyramid visible (bottom align vs center?)
-             // Keeping Y stable or re-centering vertically.
-             const currentY = state.positionY; 
-
-             transformRef.current.setTransform(targetX, currentY, targetScale, 600, 'easeOut');
+             // Get column position relative to content
+             const columnRect = targetColumn.getBoundingClientRect();
+             const contentRect = contentRef.current.getBoundingClientRect();
+             const columnCenterInContent = (columnRect.left - contentRect.left) + (columnRect.width / 2);
              
-             // Subtle visual cue that we moved
+             // Center horizontally on column
+             const targetX = (wrapperW / 2) - (columnCenterInContent * targetScale);
+             
+             // Position vertically to keep spectrum bar visible (anchor to bottom)
+             const targetY = wrapperH - (contentH * targetScale) - 10;
+
+             transformRef.current.setTransform(targetX, targetY, targetScale, 800, 'easeOutQuad');
+             
+             // Subtle visual cue
              setDimmingActive(true);
              setTimeout(() => setDimmingActive(false), 1500);
 
-        }, 300); // Reduced delay for responsiveness
+        }, 800); // Delay after autoFit completes
 
-        return () => clearTimeout(timer);
-    }, [activePile, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef]);
+        return () => clearTimeout(zoomTimer);
+    }, [activePile, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef, performAutoFit]);
 
     return {
         transformRef,

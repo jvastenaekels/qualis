@@ -315,7 +315,6 @@ const GridSort: React.FC<GridSortProps> = ({
                     card={selectedCard || null}
                     onClose={() => onCardClick?.(selectedCardId)}
                     height={deckHeight}
-                    cardDimensions={cardDimensions}
                 />
             )}
        </AnimatePresence>

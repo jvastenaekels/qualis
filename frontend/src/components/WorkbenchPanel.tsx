@@ -15,16 +15,12 @@ interface WorkbenchPanelProps {
     onClose: () => void;
     className?: string;
     height?: number;
-    cardDimensions?: { width: number; height: number };
 }
 
-const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, className = '', height, cardDimensions }) => {
+const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, className = '', height }) => {
     const { t } = useTranslation();
 
     if (!card) return null;
-
-    // Calculate aspect ratio for proper card rendering
-    const aspectRatio = cardDimensions ? cardDimensions.width / cardDimensions.height : 1.6;
 
     return (
         <motion.div
@@ -45,7 +41,7 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
         >
             {/* Header with Slide Handle and Close */}
             <div className="flex-none flex items-center justify-between px-4 pt-2 pb-1">
-                <div className="w-8" /> {/* Spacer */}
+                <div className="w-8" />
                 <div className="flex flex-col items-center">
                     <div className="w-10 h-1 bg-slate-300 rounded-full" />
                 </div>
@@ -59,7 +55,7 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
             </div>
 
             {/* Instruction */}
-            <div className="flex-none px-4 pb-2 text-center">
+            <div className="flex-none px-4 pb-1 text-center">
                 <div className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
                     <ChevronUp size={12} className="animate-bounce" />
                     {t('fine.workbench.drag_or_tap', 'Drag to Grid or Tap Slot')}
@@ -67,15 +63,14 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
                 </div>
             </div>
 
-            {/* Draggable Card "The Magnifier" */}
-            <div className="flex-1 flex items-center justify-center px-4 pb-3">
-                <div className="w-full max-w-[200px]">
+            {/* Draggable Card - Full width */}
+            <div className="flex-1 flex items-center justify-center px-3 pb-2 min-h-0">
+                <div className="w-full h-full flex items-center justify-center">
                     <SortableCard 
                         id={card.id} 
                         text={card.text} 
-                        variant="grid"
+                        variant="hand"
                         isSelected={true}
-                        aspectRatio={aspectRatio}
                         disableHoverZoom={true}
                     />
                 </div>
