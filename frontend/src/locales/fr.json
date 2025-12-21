@@ -110,7 +110,8 @@
     },
     "workbench": {
       "active_card": "Carte active",
-      "place_on_grid": "Touchez la grille pour placer"
+      "place_on_grid": "Touchez la grille pour placer",
+      "drag_or_tap": "Glissez ou touchez une case"
     }
   },
   "post": {

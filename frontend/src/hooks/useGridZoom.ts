@@ -7,6 +7,7 @@ interface UseGridZoomProps {
     pyramidRef: React.RefObject<HTMLDivElement>;
     gridColumns: { score: number; capacity: number }[];
     activePile: 'agree' | 'disagree' | 'neutral';
+    activePileCount: number;
     hasPerformedZonalFocus: boolean;
     setDimmingActive: (active: boolean) => void;
 }
@@ -17,6 +18,7 @@ export const useGridZoom = ({
     pyramidRef,
     gridColumns,
     activePile,
+    activePileCount,
     hasPerformedZonalFocus,
     setDimmingActive,
     onZoomChange
@@ -126,6 +128,9 @@ export const useGridZoom = ({
              const isMobile = window.innerWidth < 1024;
              if (!isMobile) return; 
 
+             // Skip zonal zoom if pile is empty - just stay centered
+             if (activePileCount === 0) return;
+
              // Calculate dynamic target column based on grid limits
              // Disagree: minScore + 2, Neutral: 0, Agree: maxScore - 2
              const scores = gridColumns.map(c => c.score);
@@ -179,7 +184,7 @@ export const useGridZoom = ({
         }, 800); // Delay after autoFit completes
 
         return () => clearTimeout(zoomTimer);
-    }, [activePile, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef, performAutoFit, gridColumns]);
+    }, [activePile, activePileCount, hasPerformedZonalFocus, setDimmingActive, wrapperRef, contentRef, pyramidRef, performAutoFit, gridColumns]);
 
     return {
         transformRef,

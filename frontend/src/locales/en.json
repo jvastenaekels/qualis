@@ -110,7 +110,8 @@
     },
     "workbench": {
       "active_card": "Active Card",
-      "place_on_grid": "Tap Grid to Place"
+      "place_on_grid": "Tap Grid to Place",
+      "drag_or_tap": "Drag to grid or tap a slot"
     }
   },
   "post": {
