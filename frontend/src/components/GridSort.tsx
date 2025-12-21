@@ -197,7 +197,6 @@ const GridSort: React.FC<GridSortProps> = ({
       
        {/* PANEL: THE GRID (Canvas) */}
       <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300"
-           style={{ paddingBottom: isMobile && selectedCard ? '35vh' : '0' }} // Reserve space for Workbench fixed bottom
       >
             {/* Desktop-only Instruction */}
             <div className="hidden lg:flex min-h-[60px] flex-none bg-white border-b border-gray-200 items-center justify-center px-4 shadow-sm z-20">
