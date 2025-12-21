@@ -440,11 +440,6 @@ const GridSort: React.FC<GridSortProps> = ({
                   </div>
 
                   <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 hidden lg:block">{t('fine.deck.title')}</h3>
-                  <div className="hidden lg:block mb-4 text-center border-y border-slate-50 py-3">
-                       <span className="text-xs font-bold text-slate-500 leading-snug">
-                           <Trans i18nKey="fine.toolbar.desktop" components={[<strong className="text-red-600" key="0" />, <strong className="text-green-600" key="1" />]} />
-                       </span>
-                  </div>
 
                   <div className="flex gap-3 w-full mb-4 px-2 justify-center" role="tablist">
                        {['disagree', 'neutral', 'agree'].map((pile) => {

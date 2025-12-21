@@ -39,12 +39,12 @@ const CardZoomOverlay: React.FC = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    // Desktop: Bottom Left Bubble | Mobile: Full Width Bottom Sheet
+                    // Desktop: Bottom Right Bubble (near deck) | Mobile: Full Width Bottom Sheet
                     className={`
                         fixed z-[9999] flex 
                         ${isMobile 
                             ? 'inset-x-0 bottom-0 items-end justify-center pointer-events-auto' 
-                            : 'bottom-8 left-8 items-end justify-start max-w-sm pointer-events-none'
+                            : 'bottom-8 right-8 items-end justify-end max-w-sm pointer-events-none'
                         }
                     `}
                     onClick={() => isMobile && setZoomedCard(null)} // Dismiss on tap for mobile
@@ -52,7 +52,7 @@ const CardZoomOverlay: React.FC = () => {
                     <motion.div 
                         initial={isMobile 
                             ? { y: '100%', opacity: 0.5 } 
-                            : { scale: 0.9, x: -20, opacity: 0 }
+                            : { scale: 0.9, x: 20, opacity: 0 }
                         }
                         animate={isMobile 
                             ? { y: 0, opacity: 1 } 
@@ -60,7 +60,7 @@ const CardZoomOverlay: React.FC = () => {
                         }
                         exit={isMobile 
                             ? { y: '100%', opacity: 0 } 
-                            : { scale: 0.9, x: -20, opacity: 0 }
+                            : { scale: 0.9, x: 20, opacity: 0 }
                         }
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
                         onClick={(e) => e.stopPropagation()} // Prevent dismissal when clicking content
