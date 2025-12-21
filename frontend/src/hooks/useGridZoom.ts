@@ -134,57 +134,47 @@ export const useGridZoom = ({
              
              let targetScore: number;
              if (activePile === 'disagree') {
-                 targetScore = minScore + 2; // e.g., -4 -> -2
+                 targetScore = minScore + 2;
              } else if (activePile === 'agree') {
-                 targetScore = maxScore - 2; // e.g., +4 -> +2
+                 targetScore = maxScore - 2;
              } else {
-                 targetScore = 0; // neutral
+                 targetScore = 0;
              }
 
-             // Format column ID (handle negative scores like -2 -> "column--2")
+             // Format column ID
              const targetColumnId = `column-${targetScore}`;
-             
              const targetColumn = document.getElementById(targetColumnId);
              if (!targetColumn) return;
 
-             // Subtle scale for zonal focus (just pan, minimal zoom)
-             const targetScale = 1.05;
-
              // Get current transform state
              const currentState = transformRef.current.instance.transformState;
-             const currentScale = currentState.scale;
+             const currentX = currentState.positionX;
              
-             // Calculate column center relative to wrapper
+             // Target scale: 0.66 (zoom out for more context)
+             const targetScale = 0.66;
+             
+             // Get positions
              const wrapperW = wrapperRef.current.clientWidth;
              const wrapperH = wrapperRef.current.clientHeight;
              const contentH = contentRef.current.offsetHeight;
-             
-             // Get column position accounting for current transform
              const columnRect = targetColumn.getBoundingClientRect();
              const wrapperRect = wrapperRef.current.getBoundingClientRect();
              
-             // Column center in screen coords
+             // Calculate pan to center the target column
              const columnCenterScreen = columnRect.left + (columnRect.width / 2);
-             
-             // Where we want it (center of wrapper)
              const wrapperCenterScreen = wrapperRect.left + (wrapperW / 2);
-             
-             // Current X offset
-             const currentX = currentState.positionX;
-             
-             // Calculate new X to center column
              const deltaX = wrapperCenterScreen - columnCenterScreen;
-             const scaleRatio = targetScale / currentScale;
-             const targetX = (currentX + deltaX) * scaleRatio;
+             const targetX = currentX + deltaX;
              
              // Bottom anchor for Y
              const targetY = wrapperH - (contentH * targetScale) - 10;
 
-             transformRef.current.setTransform(targetX, targetY, targetScale, 800, 'easeOutQuad');
+             // Apply zoom and pan
+             transformRef.current.setTransform(targetX, targetY, targetScale, 600, 'easeOutQuad');
              
              // Subtle visual cue
              setDimmingActive(true);
-             setTimeout(() => setDimmingActive(false), 1500);
+             setTimeout(() => setDimmingActive(false), 1000);
 
         }, 800); // Delay after autoFit completes
 

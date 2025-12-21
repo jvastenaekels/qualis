@@ -15,6 +15,7 @@ interface WorkbenchPanelProps {
     onClose: () => void;
     className?: string;
     height?: number;
+    cardDimensions?: { width: number; height: number };
 }
 
 // Dynamic text sizing based on text length
@@ -25,12 +26,17 @@ const getTextSizeClass = (textLength: number): string => {
     return 'text-xs';
 };
 
-const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, className = '', height }) => {
+const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, className = '', height, cardDimensions }) => {
     const { t } = useTranslation();
 
     if (!card) return null;
 
     const textSizeClass = getTextSizeClass(card.text.length);
+    
+    // Calculate aspect ratio from card dimensions (default to 3/4 if not provided)
+    const aspectRatio = cardDimensions 
+        ? cardDimensions.width / cardDimensions.height 
+        : 0.75;
 
     return (
         <motion.div
@@ -64,24 +70,36 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
                 </button>
             </div>
 
-            {/* Instruction */}
-            <div className="flex-none px-4 pb-2 text-center">
-                <div className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-indigo-500 uppercase tracking-wider">
-                    <ChevronUp size={12} className="animate-bounce" />
-                    {t('fine.workbench.drag_or_tap', 'Drag to Grid or Tap Slot')}
-                    <ChevronUp size={12} className="animate-bounce" />
+            {/* Card + Instruction - Horizontal layout */}
+            <div className="flex-1 flex items-center justify-center gap-3 px-4 pb-3 min-h-0">
+                {/* Instruction - Left side, vertical text */}
+                <div className="flex-none flex items-center">
+                    <div className="flex flex-col items-center gap-1 text-[9px] font-bold text-indigo-500 uppercase tracking-wider">
+                        <ChevronUp size={12} className="animate-bounce" />
+                        <span className="writing-mode-vertical">{t('fine.workbench.drag_or_tap', 'Drag or Tap')}</span>
+                    </div>
                 </div>
-            </div>
 
-            {/* Card Content - Smart fit, no aspect ratio, centered text */}
-            <div className="flex-1 flex items-center justify-center px-6 pb-4 min-h-0">
+                {/* Card Content - Consistent aspect ratio with grid cards, scroll fallback */}
                 <div 
-                    className="w-full bg-white rounded-2xl border-2 border-indigo-200 shadow-md p-4 text-center"
+                    className="bg-white rounded-2xl border-2 border-indigo-200 shadow-md p-3 flex items-center justify-center overflow-y-auto flex-1"
+                    style={{ 
+                        aspectRatio: `${aspectRatio}`,
+                        maxHeight: '100%',
+                        maxWidth: '60%'
+                    }}
                 >
-                    <div className={`font-medium text-slate-800 ${textSizeClass} leading-relaxed`}>
+                    <div className={`font-medium text-slate-800 ${textSizeClass} leading-relaxed text-center`}>
                         <ReactMarkdown components={{ p: ({ children }) => <span className="block">{children}</span> }}>
                             {card.text}
                         </ReactMarkdown>
+                    </div>
+                </div>
+
+                {/* Instruction - Right side, vertical text */}
+                <div className="flex-none flex items-center">
+                    <div className="flex flex-col items-center gap-1 text-[9px] font-bold text-indigo-500 uppercase tracking-wider">
+                        <ChevronUp size={12} className="animate-bounce" />
                     </div>
                 </div>
             </div>
