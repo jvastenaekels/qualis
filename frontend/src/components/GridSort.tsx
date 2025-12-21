@@ -427,7 +427,7 @@ const GridSort: React.FC<GridSortProps> = ({
           flex flex-col lg:h-full transition-all duration-300
           overflow-hidden pb-safe lg:pb-0
         "
-        style={{ height: `${deckHeight}px` }}
+        style={{ height: window.innerWidth < 1024 ? `${deckHeight}px` : 'auto' }}
       >
               <div className="flex-none px-2 lg:px-3 pt-2 lg:pt-4 pb-2 border-b border-gray-100 bg-white z-20">
                   {/* UNIFIED MOBILE INFO HUB (Thumb Zone) */}
