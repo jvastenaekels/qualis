@@ -414,18 +414,22 @@ const GridSort: React.FC<GridSortProps> = ({
                   <div className="lg:hidden mb-3">
                       <AnimatePresence mode="wait">
                           {selectedCard ? (
-                              <motion.div key="mob-st" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                                  className="w-full flex items-center justify-center gap-2 py-1.5 px-3 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm"
+                              <motion.div 
+                                  key="mob-st" 
+                                  initial={{ opacity: 0, y: 10 }} 
+                                  animate={{ opacity: 1, y: 0 }} 
+                                  exit={{ opacity: 0, y: -10 }}
+                                  onClick={() => onCardClick?.(selectedCard.id)}
+                                  className="w-full flex items-center justify-center gap-2 py-1.5 px-3 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm cursor-pointer active:scale-95 transition-transform"
                               >
-                                  <div className="flex flex-col gap-0.5 text-center leading-tight">
+                                  <div className="flex flex-col gap-0.5 text-center leading-tight flex-1">
                                       <div className="text-xs font-bold text-indigo-700 line-clamp-2">
                                           <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
                                       </div>
-                                      <div className="text-[9px] uppercase tracking-wider text-indigo-400 font-bold animate-pulse">
-                                          {t('fine.toolbar.tap_hint', 'Tap a slot on grid to place')}
+                                      <div className="text-[9px] uppercase tracking-wider text-indigo-400 font-bold">
+                                          {t('fine.toolbar.tap_to_zoom', 'Tap to view full text')}
                                       </div>
                                   </div>
-                                  <button onClick={() => onCardClick?.(selectedCard.id)} className="flex-none p-1 text-indigo-400 hover:text-indigo-600 transition-colors"><X size={16} /></button>
                               </motion.div>
                           ) : (
                               <motion.div key="mob-inst" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
