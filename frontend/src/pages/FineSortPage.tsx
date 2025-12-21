@@ -14,6 +14,10 @@ import {
     PointerSensor, 
     TouchSensor, 
     closestCenter,
+    pointerWithin,
+    rectIntersection,
+    // getFirstCollision, 
+    type CollisionDetection
 } from '@dnd-kit/core';
 import { useNavigate, useParams } from 'react-router-dom';
 import { createPortal } from 'react-dom';
@@ -25,6 +29,32 @@ import SortableCard from '../components/SortableCard';
 import { useFineSortDrag } from '../hooks/useFineSortDrag';
 
 const FineSortPage: React.FC = () => {
+    // ... hooks ...
+
+    // Custom Collision Strategy:
+    // 1. Priority: Pointer within a slot (Intuitive "under my finger/mouse")
+    // 2. Fallback: Intersection with slot (Coverage)
+    // 3. Last Resort: Closest Center (Magnet behavior)
+    const collisionStrategy: CollisionDetection = (args) => {
+        // First, check if pointer is strictly inside a droppable
+        const pointerCollisions = pointerWithin(args);
+        if (pointerCollisions.length > 0) {
+            return pointerCollisions;
+        }
+
+        // If not, check if the card rect intersects with any droppable
+        const rectCollisions = rectIntersection(args);
+        if (rectCollisions.length > 0) {
+            return rectCollisions;
+        }
+
+        // Finally, fallback to searching for the closest center (magnet)
+        return closestCenter(args);
+    };
+
+    // ... function continues ...
+    // Update DndContext prop: collisionDetection={collisionStrategy}
+
     const { 
         config, 
         responses, 
@@ -53,9 +83,9 @@ const FineSortPage: React.FC = () => {
 
     // Sensors
     const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
         useSensor(TouchSensor, { 
-            activationConstraint: { delay: 250, tolerance: 5 } 
+            activationConstraint: { delay: 250, tolerance: 8 } 
         })
     );
     
@@ -195,7 +225,7 @@ const FineSortPage: React.FC = () => {
     return (
         <DndContext 
             sensors={sensors} 
-            collisionDetection={closestCenter}
+            collisionDetection={collisionStrategy}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
             autoScroll
