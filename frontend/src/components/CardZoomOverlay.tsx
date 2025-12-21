@@ -65,10 +65,10 @@ const CardZoomOverlay: React.FC = () => {
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
                         onClick={(e) => e.stopPropagation()} // Prevent dismissal when clicking content
                         className={`
-                            relative bg-white shadow-2xl pointer-events-auto
+                            relative bg-white shadow-2xl
                             ${isMobile 
-                                ? 'w-full rounded-t-[2.5rem] border-t-4 border-indigo-500 p-8 pb-12' 
-                                : 'p-6 rounded-2xl border-2 border-indigo-500 flex flex-col'
+                                ? 'w-full rounded-t-[2.5rem] border-t-4 border-indigo-500 p-8 pb-12 pointer-events-auto' 
+                                : 'p-6 rounded-2xl border-2 border-indigo-500 flex flex-col pointer-events-none'
                             }
                         `}
                     >
