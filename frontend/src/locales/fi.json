@@ -78,6 +78,8 @@
     },
     "toolbar": {
         "mobile": "Napauta tai raahaa kortteja sijoittaaksesi ne ruudukkoon.",
+        "place_instruction": "Napauta ruutua sijoittaaksesi",
+        "read_full": "Napauta lukeaksesi koko tekstin",
         "desktop": "Raahaa tai napauta kortteja sijoittaaksesi ne ruudukkoon sen mukaan, kuinka hyvin ne vastaavat näkemystäsi.",
         "zoom_in": "Lähennä",
         "zoom_out": "Loitonna",

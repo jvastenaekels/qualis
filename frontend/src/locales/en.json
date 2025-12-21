@@ -78,6 +78,8 @@
     },
   "toolbar": {
       "mobile": "Tap or drag cards to place them on the grid.",
+      "place_instruction": "Tap a slot to place",
+      "read_full": "Tap to read full text",
       "desktop": "Drag or tap cards to place them on the grid according to how well they match your view.",
       "zoom_in": "Zoom In",
       "zoom_out": "Zoom Out",

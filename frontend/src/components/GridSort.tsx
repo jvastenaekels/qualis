@@ -8,12 +8,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import DroppableSlot from './DroppableSlot';
 import SortableCard from './SortableCard';
 import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
-import { Check, ZoomIn, ZoomOut, RotateCcw, X, Frown, Meh, Smile } from 'lucide-react';
+import { Check, ZoomIn, ZoomOut, RotateCcw, X, Frown, Meh, Smile, Maximize2, XCircle } from 'lucide-react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { useGridZoom } from '../hooks/useGridZoom';
+import { useStudyStore } from '../store/useStudyStore';
 
 interface GridSortProps {
   agreeCards: { id: number; text: string }[];
@@ -58,6 +59,9 @@ const GridSort: React.FC<GridSortProps> = ({
 
   const [cardDimensions, setCardDimensions] = useState({ width: 160, height: 96 });
   const [isMobile, setIsMobile] = useState(false);
+
+  // Store access for manual zoom trigger
+  const setZoomedCard = useStudyStore((state) => state.setZoomedCard);
 
   useEffect(() => {
       const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -351,24 +355,50 @@ const GridSort: React.FC<GridSortProps> = ({
                                   initial={{ opacity: 0, y: 10 }} 
                                   animate={{ opacity: 1, y: 0 }} 
                                   exit={{ opacity: 0, y: -10 }}
-                                  className="w-full flex items-center justify-center gap-2 py-2 px-3 bg-indigo-50 rounded-lg border border-indigo-100 shadow-sm cursor-pointer active:scale-95 transition-transform"
-                                  onClick={() => onCardClick?.(selectedCard.id)}
+                                  className="w-full flex flex-col gap-1"
                               >
-                                  <div className="flex flex-col gap-0.5 text-center leading-tight flex-1">
-                                      <div className="text-xs font-bold text-indigo-700 line-clamp-4">
-                                          <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
+                                  {/* Instruction Helper */}
+                                  <div className="text-center animate-bounce">
+                                      <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100 shadow-sm">
+                                          ↓ {t('fine.toolbar.place_instruction')} 
+                                      </span>
+                                  </div>
+
+                                  {/* HUD Card Container */}
+                                  <div className="w-full flex items-stretch gap-0 bg-white rounded-lg border-2 border-indigo-500 shadow-md overflow-hidden">
+                                      {/* Content Area: Tap to Read/Zoom */}
+                                      <div 
+                                          className="flex-1 flex flex-col justify-center p-3 cursor-zoom-in active:bg-indigo-50 transition-colors border-r border-indigo-100 hover:bg-slate-50"
+                                          onClick={() => setZoomedCard(selectedCard)}
+                                      >
+                                          <div className="flex items-center gap-2 mb-1">
+                                               <Maximize2 size={12} className="text-indigo-400" />
+                                               <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">{t('fine.toolbar.read_full')}</span>
+                                          </div>
+                                          <div className="text-xs font-bold text-slate-800 line-clamp-2 leading-tight">
+                                              <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>{selectedCard.text}</ReactMarkdown>
+                                          </div>
+                                      </div>
+
+                                      {/* Action Area: Cancel */}
+                                      <div 
+                                          className="flex-none w-14 flex items-center justify-center bg-slate-50 cursor-pointer hover:bg-red-50 hover:text-red-500 active:bg-red-100 transition-colors border-l border-slate-100"
+                                          onClick={() => onCardClick?.(selectedCard.id)}
+                                          title={t('common.cancel')}
+                                      >
+                                          <XCircle size={24} className="text-slate-400 hover:text-red-500" />
                                       </div>
                                   </div>
                               </motion.div>
                           ) : (
-                              <motion.div key="mob-inst" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                  className="text-center py-1 flex items-center justify-center h-[52px]"
-                              >
-                                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider px-2">
-                                      {t('fine.toolbar.mobile_short', 'Sélectionnez → Placez')}
-                                  </span>
-                              </motion.div>
-                          )}
+                               <motion.div key="mob-inst" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                   className="text-center py-1 flex items-center justify-center h-[52px]"
+                               >
+                                   <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider px-2">
+                                       {t('fine.toolbar.mobile_short', 'Sélectionnez → Placez')}
+                                   </span>
+                               </motion.div>
+                           )}
                       </AnimatePresence>
                   </div>
 

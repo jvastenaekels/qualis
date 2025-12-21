@@ -78,6 +78,8 @@
     },
     "toolbar": {
       "mobile": "Appuyez ou glissez les cartes pour les placer sur la grille.",
+      "place_instruction": "Appuyez sur une case pour placer",
+      "read_full": "Appuyez pour lire le texte",
       "desktop": "Glissez ou appuyez sur les cartes pour les placer sur la grille selon leur degré de correspondance avec votre point de vue.",
       "zoom_in": "Zoom avant",
       "zoom_out": "Zoom arrière",
