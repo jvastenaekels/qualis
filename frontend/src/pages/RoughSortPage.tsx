@@ -193,11 +193,11 @@ const RoughSortPage: React.FC = () => {
             </div>
 
             {/* 2. Instruction Bar (Visual Separation) */}
-            <div className={`flex-none bg-slate-50 flex items-center justify-between border-b border-gray-100 z-20 shadow-sm relative transition-all duration-500 overflow-hidden ${sortedCount >= 3 ? 'py-1 max-h-12' : 'py-3 max-h-24'}`}>
+            <div className="flex-none bg-slate-50 flex items-center justify-between border-b border-gray-100 z-20 shadow-sm relative transition-all duration-500 py-3 max-h-24">
                 <div className="w-12 lg:w-20 hidden sm:block" />
 
                 <div className="flex-1 px-2 flex flex-col items-center justify-center">
-                    <h3 className={`font-bold text-slate-700 leading-tight text-center transition-all duration-500 ${sortedCount >= 3 ? 'text-sm opacity-60 lg:text-lg lg:opacity-100' : 'text-lg sm:text-xl'}`}>
+                    <h3 className="font-bold text-slate-700 leading-tight text-center transition-all duration-500 text-lg sm:text-xl">
                         {t('rough.header.title')}
                     </h3>
                 </div>

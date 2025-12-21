@@ -18,7 +18,7 @@ import { DndContext, useDraggable, useDroppable, DragOverlay, closestCenter, Poi
 import { motion, AnimatePresence } from 'framer-motion';
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 import { SortableCard } from './SortableCard';
-import { DroppableSlot } from './DroppableSlot';
+import DroppableSlot from './DroppableSlot';
 import { useGridZoom } from '../hooks/useGridZoom';
 import WorkbenchPanel from './WorkbenchPanel';
 import { useStudyStore } from '../store/useStudyStore';

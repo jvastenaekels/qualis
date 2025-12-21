@@ -11,6 +11,7 @@ interface UseGridZoomProps {
     setDimmingActive: (active: boolean) => void;
 }
 
+export const useGridZoom = ({
     wrapperRef,
     contentRef,
     pyramidRef,
