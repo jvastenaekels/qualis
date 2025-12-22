@@ -2,71 +2,246 @@
 
 This document describes the technical architecture, design choices, and data flow of the Open-Q platform.
 
-## 🏗️ High-Level Perspective
+---
 
-Open-Q follows a decoupled Client-Server architecture.
+## 🏗️ System Architecture
+
+Open-Q follows a decoupled **Client-Server** architecture with clear separation of concerns.
 
 ```mermaid
 graph LR
     subgraph "Frontend (React + Vite)"
         UI[User Interface]
-        ZS[Zustand Store]
+        Stores[Zustand Stores]
         I18N[i18next]
     end
 
     subgraph "Backend (FastAPI)"
-        API[FastAPI Endpoints]
-        SQL[SQLAlchemy ORM]
+        API[REST Endpoints]
+        ORM[SQLAlchemy]
     end
 
     subgraph "Storage"
-        DB[(SQLite / Postgres)]
+        DB[(PostgreSQL<br/>or SQLite)]
     end
 
-    UI <--> ZS
-    ZS --> API
-    API <--> SQL
-    SQL <--> DB
+    UI <--> Stores
+    Stores -->|REST| API
+    API <--> ORM
+    ORM <--> DB
 ```
-
-## 💻 Tech Stack Rationale
-
-### Frontend
-
-- **React + Vite**: Chosen for fast development cycle (HMR) and modern ecosystem.
-- **TypeScript**: Ensuring type safety across the application, especially for complex Q-sort logic.
-- **Zustand**: Selected for state management due to its simplicity and minimal boilerplate compared to Redux, while still providing robust global state.
-- **Tailwind CSS**: For rapid UI development with a consistent design system.
-- **dnd-kit**: A modern, accessible drag-and-drop library specifically designed for React.
-- **Framer Motion**: For smooth, high-performance animations and transitions.
-
-### Backend
-
-- **FastAPI**: High performance, easy-to-use asynchronous framework with native OpenAPI support.
-- **SQLAlchemy (Async)**: Industry-standard ORM for Python, utilizing async drivers for better concurrency.
-- **Pydantic**: For strict data validation and serialization.
 
 ---
 
-## 📊 Core Data Models
+## 💾 State Management
 
-| Model                | Purpose                                                        | Key Relationships                                |
-| :------------------- | :------------------------------------------------------------- | :----------------------------------------------- |
-| **Study**            | Defines the Q-methodology experiment parameters.               | Has many Translations, Statements, Participants. |
-| **StudyTranslation** | Localized content for a specific study.                        | Belongs to Study.                                |
-| **Statement**        | The individual items being sorted.                             | Belongs to Study.                                |
-| **Participant**      | A single session of a user taking the study.                   | Belongs to Study, Has many QSortEntries.         |
-| **QSortEntry**       | A specific statement's placement in the grid by a participant. | Belongs to Participant & Statement.              |
+The frontend uses **Zustand** with three atomic stores for clean separation of concerns:
+
+```mermaid
+flowchart TD
+    subgraph "Zustand Stores"
+        Config["useConfigStore<br/>📄 Study config, statements, grid"]
+        Session["useSessionStore<br/>🔐 Step, consent, language"]
+        Response["useResponseStore<br/>📝 Rough sort, Q-sort, post-sort"]
+        UI["useUIStore<br/>🖼️ Zoomed card, tips state"]
+    end
+
+    subgraph "Pages"
+        WP[WelcomePage]
+        PS[PreSortPage]
+        RS[RoughSortPage]
+        FS[FineSortPage]
+        Post[PostSortPage]
+    end
+
+    Config --> WP & PS & RS & FS & Post
+    Session --> WP & PS & RS & FS & Post
+    Response --> RS & FS & Post
+    UI --> FS
+
+    style Config fill:#dbeafe
+    style Session fill:#fef3c7
+    style Response fill:#dcfce7
+    style UI fill:#f3e8ff
+```
+
+| Store              | Purpose                                      | Persisted       |
+| ------------------ | -------------------------------------------- | --------------- |
+| `useConfigStore`   | Study configuration, statements, grid layout | ❌              |
+| `useSessionStore`  | Current step, consent status, language       | ✅ localStorage |
+| `useResponseStore` | Participant data (rough, qsort, postsort)    | ✅ localStorage |
+| `useUIStore`       | Transient UI state (zoomed card)             | ❌              |
+
+---
+
+## 💻 Technology Stack
+
+### Frontend
+
+| Technology              | Purpose                              |
+| ----------------------- | ------------------------------------ |
+| **React 18** + **Vite** | Fast development with HMR            |
+| **TypeScript**          | Type safety for Q-sort logic         |
+| **Zustand**             | Minimal boilerplate state management |
+| **Tailwind CSS**        | Utility-first styling                |
+| **dnd-kit**             | Accessible drag-and-drop             |
+| **Framer Motion**       | Smooth animations                    |
+| **react-i18next**       | Internationalization                 |
+
+### Backend
+
+| Technology              | Purpose                           |
+| ----------------------- | --------------------------------- |
+| **FastAPI**             | Async REST API with OpenAPI docs  |
+| **SQLAlchemy**          | ORM with async support            |
+| **Pydantic**            | Data validation and serialization |
+| **SQLite / PostgreSQL** | Flexible database options         |
+
+---
+
+## 📊 Database Schema
+
+```mermaid
+erDiagram
+    STUDY ||--o{ STUDY_TRANSLATION : has
+    STUDY ||--o{ STATEMENT : contains
+    STUDY ||--o{ PARTICIPANT : has
+    PARTICIPANT ||--o{ QSORT_ENTRY : makes
+    STATEMENT ||--o{ QSORT_ENTRY : placed_in
+
+    STUDY {
+        int id PK
+        string slug UK
+        json grid_config
+        json presort_config
+        json postsort_config
+    }
+
+    STUDY_TRANSLATION {
+        int id PK
+        int study_id FK
+        string language
+        string title
+        text description
+        text instructions
+    }
+
+    STATEMENT {
+        int id PK
+        int study_id FK
+        json text
+    }
+
+    PARTICIPANT {
+        int id PK
+        int study_id FK
+        string confirmation_code
+        string status
+        json presort_data
+        json rough_data
+        json postsort_data
+    }
+
+    QSORT_ENTRY {
+        int id PK
+        int participant_id FK
+        int statement_id FK
+        int column_score
+        int row_position
+    }
+```
 
 ---
 
 ## 🔄 Data Lifecycle
 
-1. **Initialization**: Frontend fetches Study configuration and translations from the Backend.
-2. **Session**: A `Participant` record is created. Progress is stored locally in Zustand and periodically synced (or synced at the end).
-3. **Execution**:
-   - **Pre-sort**: Metadata/Demographics.
-   - **Rough Sort**: Initial categorization.
-   - **Fine Sort**: Placement in the Q-grid.
-   - **Post-sort**: Qualitative follow-up.
-4. **Completion**: Final submission creates `QSortEntry` records and updates `Participant` status to `completed`.
+### 1. Study Initialization
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant Frontend
+    participant API
+    participant DB
+
+    Browser->>Frontend: Visit /study/:slug
+    Frontend->>API: GET /api/study/:slug
+    API->>DB: Query Study + Translations + Statements
+    DB-->>API: Study Data
+    API-->>Frontend: JSON Config
+    Frontend->>Frontend: Store in useConfigStore
+    Frontend-->>Browser: Render UI
+```
+
+### 2. Sort & Submission
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant API
+    participant DB
+
+    User->>Frontend: Complete Pre-Sort
+    Frontend->>Frontend: Store in useResponseStore
+
+    User->>Frontend: Complete Rough Sort
+    Frontend->>Frontend: Store rough data
+
+    User->>Frontend: Complete Fine Sort
+    Frontend->>Frontend: Store qsort data
+
+    User->>Frontend: Complete Post-Sort
+    Frontend->>Frontend: Store postsort data
+
+    User->>Frontend: Submit
+    Frontend->>API: POST /api/submit
+    API->>DB: Create Participant + QSortEntries
+    DB-->>API: Confirmation Code
+    API-->>Frontend: { success: true, code: "ABC123" }
+    Frontend-->>User: Show Confirmation
+```
+
+---
+
+## 📁 Project Structure
+
+```
+frontend/src/
+├── pages/              # Route components
+│   ├── WelcomePage.tsx
+│   ├── PreSortPage.tsx
+│   ├── RoughSortPage.tsx
+│   ├── FineSortPage.tsx
+│   └── PostSortPage.tsx
+├── components/         # Reusable UI
+│   ├── GridSort.tsx    # Q-grid with zoom/pan
+│   ├── CardStack.tsx   # Swipeable card deck
+│   ├── SortableCard.tsx
+│   └── DroppableSlot.tsx
+├── hooks/              # Custom React hooks
+│   ├── useGridZoom.ts  # Zoom/pan logic
+│   ├── useFineSortDrag.ts
+│   └── useStudyConfig.ts
+├── store/              # Zustand stores
+│   ├── useConfigStore.ts
+│   ├── useSessionStore.ts
+│   ├── useResponseStore.ts
+│   └── useUIStore.ts
+└── locales/            # i18n translations
+    ├── en.json
+    ├── fr.json
+    └── fi.json
+```
+
+---
+
+## 🔌 API Endpoints
+
+| Method | Endpoint           | Description                   |
+| ------ | ------------------ | ----------------------------- |
+| `GET`  | `/api/study/:slug` | Fetch study configuration     |
+| `POST` | `/api/submit`      | Submit participant data       |
+| `GET`  | `/docs`            | Interactive API documentation |
+
+For full API reference, visit `/docs` when the backend is running.

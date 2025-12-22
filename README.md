@@ -1,83 +1,170 @@
 # Open-Q
 
-Open-Q is an open-source platform for conducting **Q-methodology** research. It provides a seamless, modern interface for participants to perform q-sorts and for researchers to collect and analyze data on subjective views.
+**Open-Q** is an open-source platform for conducting **Q-methodology** research. It provides a seamless, modern interface for participants to perform Q-sorts and for researchers to collect and analyze subjective viewpoints.
+
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 ---
 
-## 🚀 Quick Links
+## 📚 Documentation
 
-- 📘 [Documentation Roadmap](docs/documentation_roadmap.md)
-- 🏗️ [Architecture Overview](docs/ARCHITECTURE.md)
-- 🧪 [Researcher Guide](docs/README_STRUCTURE.md#docsresearchersmd-how-to-use-open-q-for-research) (Coming Soon)
-- 👩‍💻 [Developer Guide](docs/README_STRUCTURE.md#docsdevelopersmd-local-setup--contribution-guide)
-
----
-
-## ✨ Key Features
-
-- **Modern Q-Sort Interface**: Drag-and-drop powered by `dnd-kit` with fluid animations via `Framer Motion`.
-- **Multi-language Support**: Fully internationalized (i18n) for global research.
-- **Responsive Design**: Works on Desktop and Mobile (Tablet recommended for sorting).
-- **FastAPI Backend**: High-performance asynchronous API.
-- **Flexible Configuration**: Define grid shapes, pre-sort fields, and post-sort questions via JSON.
+| Audience           | Guide                                                                                                                                           |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🔬 **Researchers** | [Q-Methodology Guide](docs/researchers/q-methodology.md) · [Study Configuration](docs/CONFIG_REFERENCE.md) · [Data Export](docs/DATA_EXPORT.md) |
+| 👩‍💻 **Developers**  | [Architecture](docs/ARCHITECTURE.md) · [API Reference](docs/developers/api-reference.md) · [Testing](docs/developers/testing.md)                |
+| 🚀 **Deployment**  | [Production Deployment](docs/getting-started/deployment.md)                                                                                     |
 
 ---
 
-## 🏗️ System Overview
+## ✨ Features
+
+- **Modern Q-Sort Interface** — Drag-and-drop with fluid animations
+- **Multi-language Support** — Fully internationalized (i18n) for global research
+- **Responsive Design** — Desktop, tablet, and mobile optimized
+- **Flexible Configuration** — Define grid shapes, pre-sort fields, and post-sort questions via JSON
+- **Real-time Progress** — Auto-saves participant progress
+
+---
+
+## 🏗️ Architecture
 
 ```mermaid
 graph TD
-    User([Researcher]) -->|Configures| Backend
-    Participant([Participant]) -->|Does Sort| Frontend
-    Frontend <-->|REST API| Backend
-    Backend <-->|SQL| Database[(SQLite/Postgres)]
+    subgraph "Frontend (React + Vite)"
+        UI[User Interface]
+        ZS[Zustand Stores]
+    end
+
+    subgraph "Backend (FastAPI)"
+        API[REST API]
+        ORM[SQLAlchemy]
+    end
+
+    subgraph Storage
+        DB[(PostgreSQL<br/>or SQLite)]
+    end
+
+    UI <--> ZS
+    ZS <-->|REST| API
+    API <--> ORM
+    ORM <--> DB
 ```
 
 ---
 
-## 🛠️ Getting Started
+## 🔄 Study Flow
+
+Participants progress through 5 stages in a Q-methodology study:
+
+```mermaid
+flowchart LR
+    A[🏠 Welcome] -->|Consent| B[📋 Pre-Sort]
+    B -->|Demographics| C[🎴 Rough Sort]
+    C -->|Categorize| D[📊 Fine Sort]
+    D -->|Q-Grid| E[💬 Post-Sort]
+    E -->|Comments| F[✅ Submit]
+
+    style A fill:#e0f2fe
+    style B fill:#fef3c7
+    style C fill:#fee2e2
+    style D fill:#dbeafe
+    style E fill:#f3e8ff
+    style F fill:#dcfce7
+```
+
+| Stage          | Purpose                                         |
+| -------------- | ----------------------------------------------- |
+| **Welcome**    | Study instructions, consent agreement           |
+| **Pre-Sort**   | Demographics and context questions              |
+| **Rough Sort** | Initial categorization (Agree/Neutral/Disagree) |
+| **Fine Sort**  | Precise placement in Q-grid pyramid             |
+| **Post-Sort**  | Qualitative explanations of extreme choices     |
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- **Node.js** (v18+)
-- **Python** (3.10+)
-- **Make** (Optional, for easy automation)
+- **Node.js** 18+
+- **Python** 3.10+
+- **Make** (optional)
 
-### Fast Local Setup
+### Local Development
 
-1. **Clone the repository**:
+```bash
+# Clone repository
+git clone https://github.com/jvastenaekels/open-q.git
+cd open-q
 
-   ```bash
-   git clone https://github.com/jvastenaekels/open-q.git
-   cd open-q
-   ```
+# Backend
+cd backend
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+python init_db.py && python seed.py
+uvicorn app.main:app --reload
 
-2. **Run Backend**:
+# Frontend (new terminal)
+cd frontend
+npm install
+npm run dev
+```
 
-   ```bash
-   cd backend
-   python -m venv venv
-   source venv/bin/activate # or venv\Scripts\activate on Windows
-   pip install -r requirements.txt
-   python init_db.py # Initialize database
-   python seed.py    # Seed with example data
-   uvicorn app.main:app --reload
-   ```
+**Or use Make:**
 
-3. **Run Frontend**:
-   ```bash
-   cd frontend
-   npm install
-   npm run dev
-   ```
+```bash
+make run-backend  # Terminal 1
+make run-frontend # Terminal 2
+```
 
-_Or use the provided `Makefile` in the root:_
+Visit: **http://localhost:5173/study/example-study/welcome**
 
-- `make run-backend`
-- `make run-frontend`
+---
+
+## 🧪 Testing
+
+```bash
+# Frontend unit tests
+cd frontend && npm test
+
+# Frontend E2E tests (Chromium, Firefox, WebKit)
+cd frontend && npm run e2e
+
+# Backend tests
+cd backend && pytest
+```
+
+---
+
+## 📁 Project Structure
+
+```
+open-q/
+├── frontend/           # React + Vite + TypeScript
+│   ├── src/
+│   │   ├── pages/      # Route components
+│   │   ├── components/ # Reusable UI (GridSort, CardStack)
+│   │   ├── hooks/      # Custom hooks (useGridZoom, useFineSortDrag)
+│   │   ├── store/      # Zustand stores
+│   │   └── locales/    # i18n translations
+│   └── e2e/            # Playwright E2E tests
+├── backend/            # FastAPI + SQLAlchemy
+│   ├── app/
+│   │   ├── main.py     # API entry point
+│   │   ├── models.py   # SQLAlchemy models
+│   │   └── routers/    # API endpoints
+│   └── studies/        # JSON study configurations
+└── docs/               # Documentation
+```
 
 ---
 
 ## 📄 License
 
-This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **GNU Affero General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our [Contributing Guidelines](docs/CONTRIBUTING.md) before submitting a PR.
