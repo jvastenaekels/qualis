@@ -125,9 +125,6 @@ export const useGridZoom = ({
         const zoomTimer = setTimeout(() => {
              if (!transformRef.current || !wrapperRef.current || !contentRef.current || !pyramidRef.current) return;
              
-             const isMobile = window.innerWidth < 1024;
-             if (!isMobile) return; 
-
              // Skip zonal zoom if pile is empty - just stay centered
              if (activePileCount === 0) return;
 
@@ -151,31 +148,40 @@ export const useGridZoom = ({
              const targetColumn = document.getElementById(targetColumnId);
              if (!targetColumn) return;
 
-             // Get current transform state
-             const currentState = transformRef.current.instance.transformState;
-             const currentX = currentState.positionX;
-             
-             // Target scale: 0.66 (zoom out for more context)
-             const targetScale = 0.66;
-             
-             // Get positions
+             // Get wrapper and content dimensions
              const wrapperW = wrapperRef.current.clientWidth;
              const wrapperH = wrapperRef.current.clientHeight;
+             const contentW = contentRef.current.offsetWidth;
              const contentH = contentRef.current.offsetHeight;
+             
+             // Target scale: fit content nicely (0.8 for desktop, 0.66 for mobile)
+             const isMobile = window.innerWidth < 1024;
+             const targetScale = isMobile ? 0.66 : 0.85;
+             
+             // Get the column's position relative to the content (not screen)
+             const contentRect = contentRef.current.getBoundingClientRect();
              const columnRect = targetColumn.getBoundingClientRect();
-             const wrapperRect = wrapperRef.current.getBoundingClientRect();
              
-             // Calculate pan to center the target column
-             const columnCenterScreen = columnRect.left + (columnRect.width / 2);
-             const wrapperCenterScreen = wrapperRect.left + (wrapperW / 2);
-             const deltaX = wrapperCenterScreen - columnCenterScreen;
-             const targetX = currentX + deltaX;
+             // Column center relative to content (at current scale)
+             const currentScale = transformRef.current.instance.transformState.scale;
+             const columnCenterInContent = (columnRect.left - contentRect.left + columnRect.width / 2) / currentScale;
              
-             // Bottom anchor for Y
+             // Where we want the column center to be (center of wrapper)
+             const targetColumnScreenX = wrapperW / 2;
+             
+             // Calculate X position: targetColumnScreenX = columnCenterInContent * targetScale + targetX
+             const targetX = targetColumnScreenX - (columnCenterInContent * targetScale);
+             
+             // Center content horizontally, ensure it doesn't overflow too much
+             const maxX = 0;
+             const minX = wrapperW - (contentW * targetScale);
+             const clampedX = Math.max(minX, Math.min(maxX, targetX));
+             
+             // Bottom anchor for Y (spectrum bar visible)
              const targetY = wrapperH - (contentH * targetScale) - 10;
 
              // Apply zoom and pan
-             transformRef.current.setTransform(targetX, targetY, targetScale, 600, 'easeOutQuad');
+             transformRef.current.setTransform(clampedX, targetY, targetScale, 600, 'easeOutQuad');
              
              // Subtle visual cue
              setDimmingActive(true);

@@ -362,11 +362,11 @@ const GridSort: React.FC<GridSortProps> = ({
                                    activeBar: 'bg-red-200'
                                },
                                neutral: {
-                                   icon: 'text-indigo-500',
-                                   activeBg: 'bg-indigo-50 border-indigo-300',
-                                   activeText: 'text-indigo-700',
-                                   activeBadge: 'bg-indigo-600 text-white border-white',
-                                   activeBar: 'bg-indigo-200'
+                                   icon: 'text-gray-500',
+                                   activeBg: 'bg-gray-100 border-gray-300',
+                                   activeText: 'text-gray-700',
+                                   activeBadge: 'bg-gray-600 text-white border-white',
+                                   activeBar: 'bg-gray-200'
                                },
                                agree: {
                                    icon: 'text-green-500',
