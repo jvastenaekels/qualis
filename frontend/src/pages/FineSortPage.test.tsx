@@ -7,36 +7,15 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FineSortPage from './FineSortPage';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 
 // Mocks
 vi.mock('react-router-dom', () => ({
     useNavigate: () => vi.fn(),
     useParams: () => ({ slug: 'test-study' }),
 }));
-
-vi.mock('../store/useStudyStore', () => ({
-    useStudyStore: vi.fn(),
-}));
-
-vi.mock('../contexts/LayoutContext', () => ({
-    useLayoutAction: () => ({
-        setHeaderAction: vi.fn((_node) => {
-            // Render the node so we can query it?
-            // In integration tests, Layout renders it. Here we might need to mimic it or just inspect the calls.
-            // Better: Render the node in a test wrapper if possible, or Mock LayoutContext to act as a portal?
-            // Actually, we can just spy on setHeaderAction and inspect what was passed.
-            // But checking classes on a React Element passed as arg is hard.
-            // Strategy: We can mock setHeaderAction to immediately render the component into a test-div if we want,
-            // or we can just render the component normally and rely on the fact that unit tests usually test the hook logic.
-            
-            // However, FineSortPage renders NOTHING itself for the button, it calls setHeaderAction.
-            // So we MUST inspect the argument to setHeaderAction.
-        }),
-    }),
-}));
-
-// We can't easily "render" the ReactNode passed to setHeaderAction using standard RTL render if it's just a variable.
-// But we can create a mock implementation of useLayoutAction that exposes the action.
 
 const setHeaderActionMock = vi.fn();
 vi.mock('../contexts/LayoutContext', () => ({
@@ -50,52 +29,35 @@ vi.mock('../components/GridSort', () => ({
     default: () => <div data-testid="grid-sort">GridSort</div>
 }));
 
-import { useStudyStore } from '../store/useStudyStore';
+const mockConfig = {
+    title: 'Test',
+    description: 'Test',
+    instructions: 'Test',
+    statements: [
+        { id: 1, text: 'S1' },
+        { id: 2, text: 'S2' }
+    ],
+    grid_config: [{ capacity: 2, score: 0 }],
+    presort_config: {},
+    language_code: 'en'
+};
 
 describe('FineSortPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        // Default Mock State
-        vi.mocked(useStudyStore).mockReturnValue({
-            config: {
-                title: 'Test',
-                description: 'Test',
-                instructions: 'Test',
-                statements: [
-                    { id: 1, text: 'S1' },
-                    { id: 2, text: 'S2' }
-                ],
-                grid_config: [{ capacity: 2, score: 0 }],
-                presort_config: {},
-                language_code: 'en'
-            },
-            responses: {
-                presort: {},
-                rough: { agree: [], disagree: [1, 2], neutral: [], history: [] },
-                qsort: [],
-                postsort: { card_comments: {}, missing_statement: '', general_comment: '' }
-            },
-            session: { token: null, hasConsented: true, currentStep: 4, maxReachedStep: 4, language: 'en', isCompleted: false, confirmationCode: null, isSaving: false },
-            placeCardInGrid: vi.fn(),
-            moveCardInGrid: vi.fn(),
-            swapCardsInGrid: vi.fn(),
-            unplaceCard: vi.fn(),
-            setStep: vi.fn(),
-            resetFineSort: vi.fn(),
-            setConfig: vi.fn(),
-            setConsent: vi.fn(),
-            setToken: vi.fn(),
-            setPresortResponse: vi.fn(),
-            setPostSortResponse: vi.fn(),
-            categorizeCard: vi.fn(),
-            undoRoughSort: vi.fn(),
-            completeSession: vi.fn(),
-            resetSession: vi.fn(),
-            setLanguage: vi.fn(),
-        });
+        // Reset stores to clean state
+        useConfigStore.getState().setConfig(mockConfig as any);
+        useSessionStore.getState().resetSession();
+        useSessionStore.getState().setConsent(true);
+        useSessionStore.getState().setStep(4);
+        useResponseStore.getState().resetResponses();
     });
 
     it('does not set header action initially (null) when not all cards are placed', () => {
+        // Setup: Cards in rough sort but not in grid
+        useResponseStore.getState().categorizeCard(1, 'disagree');
+        useResponseStore.getState().categorizeCard(2, 'disagree');
+        
         render(<FineSortPage />);
         
         // Assert setHeaderAction was called with null
@@ -105,61 +67,52 @@ describe('FineSortPage', () => {
     });
 
     it('sets header action to an active/animated button when all cards placed', () => {
-         // Mock store state: All placed
-         (useStudyStore as any).mockReturnValue({
-             config: {
-                 statements: [
-                     { id: 1, text: 'S1' },
-                 ],
-                 grid_config: [{ capacity: 1, score: 0 }]
-             },
-             responses: {
-                 rough: { agree: [], disagree: [], neutral: [] },
-                 qsort: [{ statementId: 1, col: 0, row: 0 }] 
-             },
-             setStep: vi.fn(),
-         });
+        // Setup: All cards placed in grid
+        useResponseStore.getState().categorizeCard(1, 'disagree');
+        useResponseStore.getState().placeCardInGrid(1, 0, 0);
+        
+        // Update config to match 1 card
+        useConfigStore.getState().setConfig({
+            ...mockConfig,
+            statements: [{ id: 1, text: 'S1' }],
+            grid_config: [{ capacity: 1, score: 0 }]
+        } as any);
 
-         render(<FineSortPage />);
+        render(<FineSortPage />);
          
-         const actionNode = setHeaderActionMock.mock.lastCall?.[0];
-         if (actionNode) {
-             const { getByRole } = render(<div>{actionNode}</div>);
-             const button = getByRole('button');
-             expect(button).not.toBeDisabled();
-             // Check for animation class
-             expect(button.className).toContain('bg-green-600');
-         }
+        const actionNode = setHeaderActionMock.mock.lastCall?.[0];
+        if (actionNode) {
+            const { getByRole } = render(<div>{actionNode}</div>);
+            const button = getByRole('button');
+            expect(button).not.toBeDisabled();
+            // Check for animation class
+            expect(button.className).toContain('bg-green-600');
+        }
     });
 
     it('persists grid placements when re-navigating', () => {
-        const externalQSort = [{ statementId: 1, col: 0, row: 0 }];
-        vi.mocked(useStudyStore).mockImplementation(() => ({
-            config: {
-                statements: [{ id: 1, text: 'S1' }],
-                grid_config: [{ capacity: 1, score: 0 }],
-                presort_config: {}
-            } as any,
-            responses: {
-                rough: { agree: [1], disagree: [], neutral: [] },
-                qsort: externalQSort
-            } as any,
-            setStep: vi.fn(),
-            placeCardInGrid: vi.fn(),
-            moveCardInGrid: vi.fn(),
-            swapCardsInGrid: vi.fn(),
-            unplaceCard: vi.fn(),
-            resetFineSort: vi.fn(),
-        }) as any);
+        // Setup: Card 1 placed in grid
+        useResponseStore.getState().categorizeCard(1, 'agree');
+        useResponseStore.getState().placeCardInGrid(1, 0, 0);
+        
+        useConfigStore.getState().setConfig({
+            ...mockConfig,
+            statements: [{ id: 1, text: 'S1' }],
+            grid_config: [{ capacity: 1, score: 0 }]
+        } as any);
 
         const { unmount } = render(<FineSortPage />);
         
-        // Assert card 1 is in grid (GridSort mock rendes test-id)
+        // Assert GridSort is rendered
         expect(screen.getByTestId('grid-sort')).toBeTruthy();
 
         unmount();
 
+        // Re-render - placement should still be there (in store)
         render(<FineSortPage />);
         expect(screen.getByTestId('grid-sort')).toBeTruthy();
+        
+        // Verify store still has the placement
+        expect(useResponseStore.getState().qsort.length).toBe(1);
     });
 });

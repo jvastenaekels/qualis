@@ -7,53 +7,47 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useSubmitStudy } from './useSubmitStudy';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 
 // Mock the API client
 const mockPost = vi.fn();
 vi.mock('../api/client', () => ({
-    post: (...args: any[]) => mockPost(...args)
+    post: (...args: unknown[]) => mockPost(...args)
 }));
+
+const mockConfig = {
+    slug: 'test',
+    title: 'Test',
+    description: '',
+    instructions: '',
+    presort_config: {},
+    grid_config: [{ score: -4, capacity: 1 }, { score: 4, capacity: 1 }],
+    statements: [{ id: 1, text: 'S1' }, { id: 2, text: 'S2' }]
+};
 
 describe('useSubmitStudy', () => {
     beforeEach(() => {
-        useStudyStore.getState().resetSession();
         mockPost.mockReset();
-        // Setup minimal store state
-        useStudyStore.setState({
-            config: {
-                slug: 'test',
-                title: 'Test',
-                description: '',
-                instructions: '',
-                presort_config: {},
-                grid_config: [{ score: -4, capacity: 1 }, { score: 4, capacity: 1 }],
-                statements: [{ id: 1, text: 'S1' }, { id: 2, text: 'S2' }]
-            },
-            session: {
-                token: 'test-token',
-                hasConsented: true,
-                currentStep: 5,
-                language: 'en',
-                maxReachedStep: 5,
-                isCompleted: false,
-                confirmationCode: null,
-                isSaving: false
-            },
-            responses: {
-                presort: { age: 30 },
-                rough: { agree: [], disagree: [], neutral: [], history: [] },
-                qsort: [
-                    { statementId: 1, col: 0, row: 0 }, // Score -4
-                    { statementId: 2, col: 1, row: 0 }  // Score 4
-                ],
-                postsort: {
-                    card_comments: { 1: "Why -4", 2: "Why 4" },
-                    missing_statement: "Missed this",
-                    general_comment: "Good study"
-                }
-            }
-        });
+        
+        // Setup stores
+        useConfigStore.getState().setConfig(mockConfig as any);
+        
+        useSessionStore.getState().resetSession();
+        useSessionStore.getState().setToken('test-token');
+        useSessionStore.getState().setConsent(true);
+        useSessionStore.getState().setLanguage('en');
+        useSessionStore.getState().setStep(5);
+        
+        useResponseStore.getState().resetResponses();
+        useResponseStore.getState().setPresortResponse({ age: 30 });
+        useResponseStore.getState().placeCardInGrid(1, 0, 0); // Score -4
+        useResponseStore.getState().placeCardInGrid(2, 1, 0); // Score 4
+        useResponseStore.getState().setPostSortResponse('card_comments', { 1: "Why -4", 2: "Why 4" });
+        useResponseStore.getState().setPostSortResponse('missing_statement', "Missed this");
+        useResponseStore.getState().setPostSortResponse('general_comment', "Good study");
+
     });
 
     afterEach(() => {

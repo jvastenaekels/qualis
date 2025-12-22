@@ -67,7 +67,7 @@ const GridSort: React.FC<GridSortProps> = ({
   onInteractionUtils
 }) => {
   const { t } = useTranslation();
-  
+
   // Deck Management Hook
   const { 
       activePile, 
@@ -83,7 +83,23 @@ const GridSort: React.FC<GridSortProps> = ({
   });
 
   const [closedTips, setClosedTips] = useState({ extremes: false, vertical: false });
+  const [showVerticalTip, setShowVerticalTip] = useState(false);
   const [autoFitEnabled, setAutoFitEnabled] = useState(true); 
+
+  // Staggered tips: Show vertical tip 1s after extremes tip closes, OR after 5s
+  useEffect(() => {
+      if (closedTips.extremes && !forcedTipsClosed) {
+          const timer = setTimeout(() => setShowVerticalTip(true), 1000);
+          return () => clearTimeout(timer);
+      }
+  }, [closedTips.extremes, forcedTipsClosed]);
+  
+  // Fallback: show vertical tip after 5s regardless
+  useEffect(() => {
+      const timer = setTimeout(() => setShowVerticalTip(true), 5000);
+      return () => clearTimeout(timer);
+  }, []);
+ 
 
   // Grid Calculations Hook
   const { wrapperRef, cardDimensions } = useGridCalculations({
@@ -234,22 +250,34 @@ const GridSort: React.FC<GridSortProps> = ({
                         <AnimatePresence mode="popLayout">
                             {!closedTips.extremes && !forcedTipsClosed && (
                                 <motion.div 
-                                    key="tip-extremes" drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.8}
-                                    onDragEnd={(_, info) => { if (Math.abs(info.offset.x) > 20 || Math.abs(info.velocity.x) > 50) setClosedTips(prev => ({ ...prev, extremes: true })); }}
-                                    initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 500, rotate: 10 }}
-                                    className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-sm rounded-xl p-3 flex gap-2 pr-8 relative pointer-events-auto cursor-grab active:cursor-grabbing dnd-prevent-pan touch-none"
+                                    key="tip-extremes" 
+                                    drag="x" 
+                                    dragConstraints={{ left: 0, right: 0 }} 
+                                    dragElastic={0.5}
+                                    onDragEnd={(_, info) => { if (Math.abs(info.offset.x) > 30 || Math.abs(info.velocity.x) > 100) setClosedTips(prev => ({ ...prev, extremes: true })); }}
+                                    initial={{ opacity: 0, x: -100, scale: 0.9 }} 
+                                    animate={{ opacity: 1, x: 0, scale: 1 }} 
+                                    exit={{ opacity: 0, x: 400, scale: 0.9, rotate: 8 }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 25, opacity: { duration: 0.3 } }}
+                                    className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-lg rounded-xl p-3 flex gap-2 pr-8 relative pointer-events-auto cursor-grab active:cursor-grabbing dnd-prevent-pan touch-none"
                                 >
                                     <span>💡</span>
                                     <p className="text-sm text-slate-600 leading-relaxed font-medium">{t('fine.tips.extremes')}</p>
                                     <button onClick={() => setClosedTips(prev => ({ ...prev, extremes: true }))} className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600"><X size={14} /></button>
                                 </motion.div>
                             )}
-                            {!closedTips.vertical && !forcedTipsClosed && (
+                            {showVerticalTip && !closedTips.vertical && !forcedTipsClosed && (
                                 <motion.div 
-                                    key="tip-vertical" drag="x" dragConstraints={{ left: 0, right: 0 }} dragElastic={0.8}
-                                    onDragEnd={(_, info) => { if (Math.abs(info.offset.x) > 20 || Math.abs(info.velocity.x) > 50) setClosedTips(prev => ({ ...prev, vertical: true })); }}
-                                    initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 500, rotate: -10 }}
-                                    className="bg-blue-50/90 backdrop-blur-sm border border-blue-100 shadow-sm rounded-xl p-3 flex gap-2 relative pr-8 pointer-events-auto cursor-grab active:cursor-grabbing dnd-prevent-pan touch-none"
+                                    key="tip-vertical" 
+                                    drag="x" 
+                                    dragConstraints={{ left: 0, right: 0 }} 
+                                    dragElastic={0.5}
+                                    onDragEnd={(_, info) => { if (Math.abs(info.offset.x) > 30 || Math.abs(info.velocity.x) > 100) setClosedTips(prev => ({ ...prev, vertical: true })); }}
+                                    initial={{ opacity: 0, x: -100, scale: 0.9 }} 
+                                    animate={{ opacity: 1, x: 0, scale: 1 }} 
+                                    exit={{ opacity: 0, x: 400, scale: 0.9, rotate: -8 }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 25, opacity: { duration: 0.3 } }}
+                                    className="bg-blue-50/90 backdrop-blur-sm border border-blue-100 shadow-lg rounded-xl p-3 flex gap-2 relative pr-8 pointer-events-auto cursor-grab active:cursor-grabbing dnd-prevent-pan touch-none"
                                 >
                                     <span>ℹ️</span>
                                     <p className="text-sm text-blue-800 leading-relaxed font-medium">{t('fine.tips.vertical')}</p>

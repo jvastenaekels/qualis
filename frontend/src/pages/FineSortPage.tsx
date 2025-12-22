@@ -141,9 +141,6 @@ const FineSortPage: React.FC = () => {
         { score: 2,  capacity: 4 }, { score: 3,  capacity: 3 }, { score: 4,  capacity: 2 },
     ];
 
-    if (process.env.NODE_ENV === 'test') {
-        console.warn(`[FineSortPage] Render - selectedCardId: ${selectedCardId}`);
-    }
 
     const placedIds = new Set(responses.qsort.map(c => c.statementId));
     const unplacedAgree = responses.rough.agree.filter(id => !placedIds.has(id)).map(id => config?.statements.find(s => s.id === id)).filter((s): s is NonNullable<typeof s> => !!s);
@@ -233,8 +230,10 @@ const FineSortPage: React.FC = () => {
             onDragEnd={handleDragEnd}
             autoScroll={false}
             measuring={{
-                droppable: { strategy: MeasuringStrategy.Always },
-                frequency: panVersion,
+                droppable: { 
+                    strategy: MeasuringStrategy.Always,
+                    frequency: panVersion
+                },
             }}
             modifiers={[snapCenterToCursor]}
         >
@@ -243,7 +242,7 @@ const FineSortPage: React.FC = () => {
                     agreeCards={unplacedAgree} disagreeCards={unplacedDisagree} neutralCards={unplacedNeutral}
                     gridColumns={gridColumns}
                     renderSlotContent={renderSlotContent}
-                    forcedTipsClosed={responses.qsort.length >= 3}
+                    forcedTipsClosed={responses.qsort.length >= 5}
                     disableHoverZoom={activeId !== null}
                     selectedCardId={selectedCardId}
                     onCardClick={handleCardClick}

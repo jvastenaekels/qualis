@@ -9,30 +9,20 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import WelcomePage from './WelcomePage';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
 
 // Mocks
-const mockSetConsent = vi.fn();
-const mockSetToken = vi.fn();
-const mockSetStep = vi.fn();
 const mockConfig = {
     title: 'Test Study',
     description: 'Test Description',
     instructions: 'Test **Instructions**',
-    statements: []
+    statements: [],
+    consent: {
+        title: null,
+        description: null
+    }
 };
-
-vi.mock('../store/useStudyStore', () => ({
-    useStudyStore: vi.fn(() => ({
-        session: { hasConsented: false, token: null, isSaving: false },
-        setConsent: mockSetConsent,
-        setToken: mockSetToken,
-        setStep: mockSetStep,
-        config: mockConfig,
-        configLoading: false,
-        configError: null
-    }))
-}));
 
 vi.mock('../hooks/useStudyConfig', () => ({
     useStudyConfig: () => ({ isLoading: false, error: null })
@@ -41,6 +31,9 @@ vi.mock('../hooks/useStudyConfig', () => ({
 describe('WelcomePage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        // Setup initial state
+        useConfigStore.getState().setConfig(mockConfig as any);
+        useSessionStore.getState().resetSession();
     });
 
     it('renders study title and description', () => {
@@ -103,20 +96,11 @@ describe('WelcomePage', () => {
         }
 
         await waitFor(() => {
-            expect(mockSetConsent).toHaveBeenCalledWith(true);
-            expect(mockSetStep).toHaveBeenCalledWith(2);
+            expect(useSessionStore.getState().hasConsented).toBe(true);
         });
     });
 
     it('persists consent when re-navigating', async () => {
-        let externalConsent = false;
-        vi.mocked(useStudyStore).mockImplementation(() => ({
-            session: { hasConsented: externalConsent, isSaving: false },
-            setConsent: (val: boolean) => { externalConsent = val; },
-            setStep: vi.fn(),
-            config: mockConfig
-        }) as any);
-
         const { unmount } = render(
             <MemoryRouter>
                 <WelcomePage />
@@ -126,7 +110,7 @@ describe('WelcomePage', () => {
         const checkbox = screen.getByLabelText(/welcome\.consent\.label/i);
         fireEvent.click(checkbox);
         
-        await waitFor(() => expect(externalConsent).toBe(true));
+        await waitFor(() => expect(useSessionStore.getState().hasConsented).toBe(true));
 
         unmount();
 

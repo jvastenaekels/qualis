@@ -8,28 +8,30 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import GridSort from './GridSort';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 
 // Mock translation
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-// Mock Store
-vi.mock('../store/useStudyStore', () => ({
-    useStudyStore: Object.assign(vi.fn(), {
-        getState: vi.fn(),
-        subscribe: vi.fn(),
-    }),
-}));
-
-const mockStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
-
 // Mock ResizeObserver
 global.ResizeObserver = class {
     observe() {}
     unobserve() {}
     disconnect() {}
+};
+
+const mockConfig = {
+    statements: [
+        { id: 1, text: 'Card One Text' },
+        { id: 2, text: 'Card Two Text' }
+    ],
+    title: 'Test',
+    description: 'Test',
+    instructions: 'Test'
 };
 
 describe('GridSort Workbench Interaction', () => {
@@ -53,35 +55,28 @@ describe('GridSort Workbench Interaction', () => {
              { id: 1, text: 'Card One Text' },
              { id: 2, text: 'Card Two Text' }
         ],
-        isMobile: true // Force Mobile mode for Workbench
+        isMobile: true, // Force Mobile mode for Workbench
+        forcedTipsClosed: true // Hide tips to avoid DOM interference
     };
+
 
     beforeEach(() => {
         vi.clearAllMocks();
-        mockStore.mockReturnValue({
-            session: { hasConsented: true },
-            setZoomedCard: vi.fn()
-        });
+        useConfigStore.getState().setConfig(mockConfig as any);
+        useSessionStore.getState().resetSession();
+        useSessionStore.getState().setConsent(true);
+        useResponseStore.getState().resetResponses();
     });
 
     it('opens WorkbenchPanel when a card is clicked', async () => {
         render(<GridSort {...defaultProps} />);
 
         // 1. Find a card in the deck and click it
-        // The card text might be truncated or rendered via markdown, so we look for "Card One Text"
         const card = screen.getByText('Card One Text');
         fireEvent.click(card);
 
         // 2. Expect WorkbenchPanel to appear
-        // It contains "Active Card" and the full text.
-        // Also "Fine.workbench.active_card" (mocked key)
         expect(screen.getByText('fine.workbench.active_card')).toBeInTheDocument();
-        
-        // 3. Expect Deck to be hidden or removed
-        // We look for the Deck title 'fine.deck.title' container or check generic hiding
-        // In our implementation, we added `hidden` class to the deck container if selected.
-        // Testing visibility via class is tricky with `toBeVisible` if css isn't processed perfectly in jsdom, 
-        // but checking the workbench presence is the key positive assertion.
     });
 
     it('closes WorkbenchPanel when Close button is clicked', async () => {

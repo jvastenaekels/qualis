@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import GridSort from './GridSort';
 import { DndContext } from '@dnd-kit/core';
@@ -32,7 +32,7 @@ const ResizeObserverMock = vi.fn(() => ({
 }));
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 
-describe('GridSort Tips Auto-hide', () => {
+describe('GridSort Tips', () => {
     const defaultProps = {
         agreeCards: [],
         disagreeCards: [],
@@ -49,24 +49,37 @@ describe('GridSort Tips Auto-hide', () => {
         vi.useRealTimers();
     });
 
-    it('shows tips after 2 seconds and hides them when forcedTipsClosed is true', async () => {
+    it('shows extremes tip immediately, vertical tip after 5s', async () => {
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} forcedTipsClosed={false} />
+            </DndContext>
+        );
+
+        // Extremes tip should be visible immediately
+        expect(screen.getByText('fine.tips.extremes')).toBeInTheDocument();
+        
+        // Vertical tip should NOT be visible yet (staggered)
+        expect(screen.queryByText('fine.tips.vertical')).toBeNull();
+
+        // Advance time by 5s (fallback timer for vertical tip)
+        await act(async () => {
+            vi.advanceTimersByTime(5000);
+        });
+
+        // Now vertical tip should also be visible
+        expect(screen.getByText('fine.tips.vertical')).toBeInTheDocument();
+    });
+
+    it('hides tips when forcedTipsClosed is true', async () => {
         const { rerender } = render(
             <DndContext>
                 <GridSort {...defaultProps} forcedTipsClosed={false} />
             </DndContext>
         );
 
-        // Initially tips are not visible (delay is 2s)
-        expect(screen.queryByText('fine.tips.extremes')).toBeNull();
-
-        // Advance time by 2s
-        await act(async () => {
-            vi.advanceTimersByTime(2000);
-        });
-
-        // Now tips should be visible
+        // Extremes tip visible
         expect(screen.getByText('fine.tips.extremes')).toBeInTheDocument();
-        expect(screen.getByText('fine.tips.vertical')).toBeInTheDocument();
 
         // Rerender with forcedTipsClosed=true
         await act(async () => {
@@ -77,13 +90,31 @@ describe('GridSort Tips Auto-hide', () => {
             );
         });
 
-        // Advance timers for exit animation
+        // Tips should be hidden
+        expect(screen.queryByText('fine.tips.extremes')).toBeNull();
+    });
+
+    it('shows vertical tip 1s after extremes tip is closed', async () => {
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} forcedTipsClosed={false} />
+            </DndContext>
+        );
+
+        // Extremes tip visible
+        expect(screen.getByText('fine.tips.extremes')).toBeInTheDocument();
+        expect(screen.queryByText('fine.tips.vertical')).toBeNull();
+
+        // Close extremes tip by clicking X button
+        const closeBtn = screen.getByText('fine.tips.extremes').closest('div')?.querySelector('button');
+        if (closeBtn) fireEvent.click(closeBtn);
+
+        // Wait 1s for vertical tip to appear
         await act(async () => {
-             vi.advanceTimersByTime(1000);
+            vi.advanceTimersByTime(1000);
         });
 
-        // Now tips should be hidden
-        expect(screen.queryByTestId('tip-extremes')).toBeNull();
-        expect(screen.queryByTestId('tip-vertical')).toBeNull();
+        // Vertical tip should now be visible
+        expect(screen.getByText('fine.tips.vertical')).toBeInTheDocument();
     });
 });

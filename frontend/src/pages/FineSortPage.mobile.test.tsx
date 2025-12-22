@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import FineSortPage from './FineSortPage';
@@ -77,15 +77,11 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         const slot = screen.getByTestId('slot_0_0');
         fireEvent.click(slot);
 
-        // 7. Verify Card moved to Grid
-        try {
-            const placedCard = await screen.findByTestId('card-1', {}, { timeout: 4000 });
-            expect(placedCard).toBeTruthy();
-        } catch (e) {
-            console.log('DOM state on Tap-to-Place failure:');
-            screen.debug(undefined, 20000);
-            throw e;
-        }
+        // 7. Verify Card moved to Grid (Careful with ambiguity vs Workbench)
+        await waitFor(() => {
+            const cardInSlot = within(slot).getByTestId('card-1');
+            expect(cardInSlot).toBeTruthy();
+        }, { timeout: 4000 });
 
         // 8. Verify Deck shows completion message
         expect(screen.getByText(/fine.deck.all_placed/i)).toBeTruthy();
@@ -120,15 +116,11 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         const slot = screen.getByTestId('slot_0_0');
         fireEvent.click(slot);
 
-        // 5. Verify Swap: Card 2 should now be in the grid
-        try {
-            const placedCard2 = await screen.findByTestId('card-2');
-            expect(placedCard2).toBeTruthy();
-        } catch (e) {
-            console.log('DOM state on Tap-to-Swap failure:');
-            screen.debug(undefined, 20000);
-            throw e;
-        }
+        // 5. Verify Swap: Card 2 should now be in the grid slot
+        await waitFor(() => {
+            const card2InSlot = within(slot).getByTestId('card-2');
+            expect(card2InSlot).toBeTruthy();
+        }, { timeout: 4000 });
 
         // 6. Card 1 should be back in the deck
         expect(await screen.findByText(/Statement 1/i)).toBeTruthy();

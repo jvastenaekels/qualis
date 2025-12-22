@@ -59,7 +59,7 @@
     "header": {
       "title": "Vastaako tämä väite sinun näkemystäsi?",
       "subtitle": "Pyyhkäise vasemmalle, jos se ei vastaa näkemystäsi, oikealle jos se vastaa, tai alas jos olet epävarma.",
-      "hint": "Luota ensivaikutelmaasi. Tämä alustava lajittelu jäsentää ajatuksesi ja tekee jatkosta helpompaa: voit tarkentaa jokaista sijaintia lopullisessa vaiheessa."
+      "hint": "Luota vaistoosi. Tämä ensimmäinen kierros jäsentää ajatuksesi—seuraavassa vaiheessa hienosäädät kaiken."
     },
     "complete": {
       "title": "Alustava lajittelu valmis",
@@ -93,8 +93,8 @@
         "in_column": "sarakkeessa"
     },
     "tips": {
-        "extremes": "Pieni vinkki: aloita reunoista. Usein on helpointa sijoittaa ensin itselle selkeimmät asiat ja jättää vivahteet loppuun.",
-        "vertical": "Muista: pystysuuntaisella sijainnilla ei ole merkitystä. Vain järjestys vasemmalta oikealle merkitsee."
+        "extremes": "Aloita ääripäistä. Sijoita vahvimmat näkemyksesi ensin, sitten etene kohti keskustaa.",
+        "vertical": "Pystysuuntaisella sijainnilla ei ole merkitystä—vain vasemmalta oikealle -järjestys merkitsee."
     },
     "legend": {
         "disagree": "Ei vastaa näkemystäni",

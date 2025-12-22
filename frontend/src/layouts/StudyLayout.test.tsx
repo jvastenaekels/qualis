@@ -106,7 +106,39 @@ describe('StudyLayout Language Sync', () => {
 });
 
 describe('Layout Scroll Behavior', () => {
+    beforeEach(() => {
+        // Setup stores - layout needs config and consent to render main
+        useConfigStore.setState({
+            config: {
+                title: 'Test Study',
+                slug: 'slug',
+                statements: [],
+                grid_config: [],
+                presort_config: {},
+                postsort_config: {},
+                available_languages: ['en'],
+                require_code: false,
+                require_consent: true,
+                consent_text: 'Consent'
+            } as any,
+            isLoading: false,
+            error: null
+        });
+        
+        useSessionStore.setState({
+            token: null, 
+            hasConsented: true, 
+            currentStep: 1, 
+            maxReachedStep: 1, 
+            language: 'en', 
+            isCompleted: false, 
+            confirmationCode: null,
+            isSaving: false
+        });
+    });
+
     it('Applies overflow-hidden on sorting pages', () => {
+
         const { container } = render(
             <MemoryRouter initialEntries={['/study/slug/rough-sort']}>
                 <Routes>

@@ -7,7 +7,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import RoughSortPage from './RoughSortPage';
-import { useStudyStore } from '../store/useStudyStore';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 // Mocks
@@ -22,34 +24,25 @@ global.ResizeObserver = class ResizeObserver {
     disconnect() {}
 };
 
+const mockConfig = {
+    slug: 'test-study',
+    title: 'Test Study',
+    description: 'Test Description',
+    instructions: 'Test Instructions',
+    presort_config: {},
+    statements: [
+        { id: 1, text: 'Card 1' },
+        { id: 2, text: 'Card 2' },
+        { id: 3, text: 'Card 3' }
+    ]
+};
+
 describe('RoughSortPage', () => {
     beforeEach(() => {
-        useStudyStore.getState().resetSession();
-        // Setup initial store state
-        useStudyStore.setState({
-            config: {
-                slug: 'test-study',
-                title: 'Test Study',
-                description: 'Test Description',
-                instructions: 'Test Instructions',
-                presort_config: {},
-                statements: [
-                    { id: 1, text: 'Card 1' },
-                    { id: 2, text: 'Card 2' },
-                    { id: 3, text: 'Card 3' }
-                ]
-            },
-            session: { 
-                token: null, 
-                hasConsented: false, 
-                currentStep: 1, 
-                maxReachedStep: 1, 
-                language: null, 
-                isCompleted: false, 
-                confirmationCode: null,
-                isSaving: false 
-            }
-        });
+        // Reset all stores
+        useConfigStore.getState().setConfig(mockConfig as any);
+        useSessionStore.getState().resetSession();
+        useResponseStore.getState().resetResponses();
     });
 
     it('sets the current step to 3 on mount', () => {
@@ -60,7 +53,7 @@ describe('RoughSortPage', () => {
                 </Routes>
             </MemoryRouter>
         );
-        expect(useStudyStore.getState().session.currentStep).toBe(3);
+        expect(useSessionStore.getState().currentStep).toBe(3);
     });
 
     it('renders the pedagogical hint', () => {
@@ -93,24 +86,10 @@ describe('RoughSortPage', () => {
     });
 
     it('completes the sort when all cards are categorized', () => {
-        // Mock empty unsorted cards by simulating full history
-         useStudyStore.setState({
-             responses: {
-                 rough: {
-                     agree: [1, 2, 3],
-                     disagree: [],
-                     neutral: [],
-                     history: [1, 2, 3]
-                 },
-                 presort: {},
-                 qsort: [],
-                 postsort: {
-                     card_comments: {},
-                     missing_statement: '',
-                     general_comment: ''
-                 }
-             }
-         });
+        // Setup: All cards already categorized
+        useResponseStore.getState().categorizeCard(1, 'agree');
+        useResponseStore.getState().categorizeCard(2, 'agree');
+        useResponseStore.getState().categorizeCard(3, 'agree');
 
          render(
             <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
@@ -126,7 +105,7 @@ describe('RoughSortPage', () => {
 
     it('persists progress when re-navigating', () => {
         // Categorize one card
-        useStudyStore.getState().categorizeCard(1, 'agree');
+        useResponseStore.getState().categorizeCard(1, 'agree');
 
         const { unmount } = render(
             <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>

@@ -59,7 +59,7 @@
     "header": {
       "title": "Cette affirmation correspond-elle à votre point de vue ?",
       "subtitle": "Glissez à gauche pour « Ne me correspond pas », à droite pour « Me correspond », ou en bas si vous êtes indécis.",
-      "hint": "Fiez-vous à votre première impression. Ce tri rapide organise vos idées et simplifie la suite : vous pourrez affiner chaque position lors de l'étape finale."
+      "hint": "Fiez-vous à votre instinct. Ce premier tri structure vos idées—vous affinerez tout à l'étape suivante."
     },
     "complete": {
       "title": "Premier tri terminé",
@@ -93,8 +93,8 @@
       "in_column": "dans la colonne"
     },
     "tips": {
-      "extremes": "Un petit conseil : commencez par les bords gauche et droit. Il est généralement plus simple de placer d'abord ce qui est très clair pour vous, et de garder les nuances pour la fin.",
-      "vertical": "Notez que la hauteur n'a pas d'importance. Seul l'ordre de gauche à droite compte."
+      "extremes": "Commencez par les extrêmes. Placez d'abord vos avis les plus forts, puis avancez vers le milieu.",
+      "vertical": "La position verticale n'a pas d'importance—seul l'ordre gauche-droite compte."
     },
     "legend": {
       "disagree": "Ne correspond pas à mon point de vue",

@@ -59,7 +59,7 @@
     "header": {
       "title": "Does this statement represent your point of view?",
       "subtitle": "Swipe left if it is unlike your view, right if it is like your view, or down if unsure.",
-      "hint": "Trust your first impression. This quick sort organizes your thoughts and simplifies the next steps: you will be able to refine every position during the final stage."
+      "hint": "Trust your gut. This first pass organizes your thinking—you'll fine-tune everything in the next step."
     },
     "complete": {
       "title": "Rough sort complete",
@@ -93,8 +93,8 @@
       "in_column": "in column"
   },
 "tips": {
-    "extremes": "Quick tip: Start with the left and right edges. It's usually easier to place what is clearest to you first, and save the more nuanced choices for later.",
-    "vertical": "Note: Vertical position doesn't matter. Only the left-to-right order counts."
+    "extremes": "Start with extremes. Place your strongest views first, then work toward the middle.",
+    "vertical": "Vertical position doesn't matter—only left-to-right order counts."
 },
     "legend": {
         "disagree": "Unlike my view",

@@ -283,16 +283,10 @@ export const useFineSortDrag = ({
     }, [responses.qsort, findClosestEmptyRow, actions, stopPan]);
 
     const handleCardClick = useCallback((id: number) => {
-        if (process.env.NODE_ENV === 'test') {
-            console.warn(`[useFineSortDrag] handleCardClick: id=${id}`);
-        }
         onSelectionChange?.(id === selectedId ? null : id);
     }, [onSelectionChange, selectedId]);
 
     const handleSlotClick = useCallback((col: number, row: number) => {
-        if (process.env.NODE_ENV === 'test') {
-            console.warn(`[useFineSortDrag] handleSlotClick: col=${col}, row=${row}, selectedId=${selectedId}`);
-        }
         if (selectedId === null || selectedId === undefined) return;
 
         const existingCard = responses.qsort.find(c => c.col === col && c.row === row);

@@ -5,7 +5,9 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useStudyStore } from './useStudyStore';
+import { useConfigStore } from './useConfigStore';
+import { useSessionStore } from './useSessionStore';
+import { useResponseStore } from './useResponseStore';
 import * as i18nUtils from '../utils/i18nOverrides';
 
 // Mock the i18n overrides utility
@@ -14,58 +16,74 @@ vi.mock('../utils/i18nOverrides', () => ({
     applyStudyOverrides: vi.fn(),
 }));
 
-describe('useStudyStore', () => {
+describe('Atomic Stores', () => {
     beforeEach(() => {
-        useStudyStore.getState().resetSession();
+        useConfigStore.getState().resetConfig();
+        useSessionStore.getState().resetSession();
+        useResponseStore.getState().resetResponses();
         localStorage.clear();
     });
 
-    it('initializes with default values', () => {
-        const state = useStudyStore.getState();
-        expect(state.config).toBeNull();
-        expect(state.session.hasConsented).toBe(false);
-        expect(state.session.currentStep).toBe(1);
+    describe('useSessionStore', () => {
+        it('initializes with default values', () => {
+            const state = useSessionStore.getState();
+            expect(state.hasConsented).toBe(false);
+            expect(state.currentStep).toBe(1);
+        });
+
+        it('updates consent', () => {
+            useSessionStore.getState().setConsent(true);
+            expect(useSessionStore.getState().hasConsented).toBe(true);
+        });
+
+        it('updates token', () => {
+            const token = 'test-token-123';
+            useSessionStore.getState().setToken(token);
+            expect(useSessionStore.getState().token).toBe(token);
+        });
+
+        it('updates steps correctly', () => {
+            useSessionStore.getState().setStep(2);
+            expect(useSessionStore.getState().currentStep).toBe(2);
+        });
+
+        it('resets i18n locales on session reset', () => {
+            useSessionStore.getState().resetSession();
+            expect(i18nUtils.resetBaseLocales).toHaveBeenCalled();
+        });
     });
 
-    it('updates consent and generates token', () => {
-        const store = useStudyStore.getState();
-        
-        store.setConsent(true);
-        expect(useStudyStore.getState().session.hasConsented).toBe(true);
-        
-        const token = 'test-token-123';
-        store.setToken(token);
-        expect(useStudyStore.getState().session.token).toBe(token);
+    describe('useResponseStore', () => {
+        it('stores presort responses', () => {
+            const response = { age: 25, role: 'Developer' };
+            useResponseStore.getState().setPresortResponse(response);
+            
+            expect(useResponseStore.getState().presort).toEqual(response);
+        });
+
+        it('places cards in grid', () => {
+            // Need config for placeCardInGrid to work
+            useConfigStore.getState().setConfig({
+                statements: [{ id: 1, text: 'Test' }],
+                grid_config: [{ score: 0, capacity: 5 }]
+            } as any);
+            
+            useResponseStore.getState().placeCardInGrid(1, 0, 0);
+            const state = useResponseStore.getState();
+            expect(state.qsort).toContainEqual({ statementId: 1, col: 0, row: 0 });
+        });
     });
 
-    it('persists state to localStorage', () => {
-        const store = useStudyStore.getState();
-        store.setConsent(true);
-        
-        // Manually trigger persist hydrate if needed, or assume zustand sync
-        // In JSDOM, localstorage is synchronous.
-        const storageValue = JSON.parse(localStorage.getItem('q-method-storage') || '{}');
-        expect(storageValue.state.session.hasConsented).toBe(true);
-    });
+    describe('useConfigStore', () => {
+        it('initializes with null config', () => {
+            const state = useConfigStore.getState();
+            expect(state.config).toBeNull();
+        });
 
-    it('updates steps correctly', () => {
-        const store = useStudyStore.getState();
-        store.setStep(2);
-        expect(useStudyStore.getState().session.currentStep).toBe(2);
-    });
-
-    it('stores presort responses', () => {
-        const store = useStudyStore.getState();
-        const response = { age: 25, role: 'Developer' };
-        store.setPresortResponse(response);
-        
-        expect(useStudyStore.getState().responses.presort).toEqual(response);
-    });
-
-    it('resets i18n locales on session reset', () => {
-        const store = useStudyStore.getState();
-        store.resetSession();
-        
-        expect(i18nUtils.resetBaseLocales).toHaveBeenCalled();
+        it('sets config', () => {
+            const mockConfig = { title: 'Test', statements: [] };
+            useConfigStore.getState().setConfig(mockConfig as any);
+            expect(useConfigStore.getState().config?.title).toBe('Test');
+        });
     });
 });

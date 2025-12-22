@@ -6,7 +6,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useMotionValue, useTransform, motion } from 'framer-motion';
+import { useMotionValue, useTransform, motion, AnimatePresence } from 'framer-motion';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -33,7 +33,14 @@ const RoughSortPage: React.FC = () => {
     const cardStackRef = useRef<CardStackHandle>(null);
     const { t } = useTranslation();
 
-    const [showTip, setShowTip] = useState(true);
+    const [showTip, setShowTip] = useState(false);
+
+    // Show tip after 1.5s delay for user orientation
+    useEffect(() => {
+        const timer = setTimeout(() => setShowTip(true), 1500);
+        return () => clearTimeout(timer);
+    }, []);
+
 
     // Motion Values lifted from CardStack
     const x = useMotionValue(0);
@@ -222,35 +229,47 @@ const RoughSortPage: React.FC = () => {
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-2 py-4 relative">
                 
                 {/* FLOATING TIP */}
-                {showTip && (
-                    <div className="absolute top-4 left-4 z-40 max-w-xs block select-none pointer-events-auto">
+                <AnimatePresence>
+                    {showTip && (
                         <motion.div 
-                            drag="x"
-                            dragConstraints={{ left: 0, right: 0 }}
-                            dragElastic={0.8}
-                            onDragEnd={(_, info) => {
-                                if (Math.abs(info.offset.x) > 20 || Math.abs(info.velocity.x) > 50) {
-                                    setShowTip(false);
-                                }
+                            key="rough-tip"
+                            className="absolute top-4 left-4 z-40 max-w-xs block select-none pointer-events-auto"
+                            initial={{ opacity: 0, x: -100, scale: 0.9 }}
+                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                            exit={{ opacity: 0, x: 300, scale: 0.9, rotate: 5 }}
+                            transition={{ 
+                                type: "spring", 
+                                stiffness: 300, 
+                                damping: 25,
+                                opacity: { duration: 0.3 }
                             }}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 1.5, ease: "easeOut" }}
-                            className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-sm rounded-xl p-4 flex gap-3 relative pr-8 cursor-grab active:cursor-grabbing"
                         >
-                            <span className="text-lg">💡</span>
-                            <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                                {t('rough.header.hint')}
-                            </p>
-                            <button 
-                                onClick={() => setShowTip(false)}
-                                className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
+                            <motion.div 
+                                drag="x"
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={0.5}
+                                onDragEnd={(_, info) => {
+                                    if (Math.abs(info.offset.x) > 30 || Math.abs(info.velocity.x) > 100) {
+                                        setShowTip(false);
+                                    }
+                                }}
+                                className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-lg rounded-xl p-4 flex gap-3 relative pr-8 cursor-grab active:cursor-grabbing"
                             >
-                                <X size={14} />
-                            </button>
+                                <span className="text-lg">💡</span>
+                                <p className="text-sm text-slate-600 leading-relaxed font-medium">
+                                    {t('rough.header.hint')}
+                                </p>
+                                <button 
+                                    onClick={() => setShowTip(false)}
+                                    className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </motion.div>
                         </motion.div>
-                    </div>
-                )}
+                    )}
+                </AnimatePresence>
+
 
                 {/* Row A: Horizon (Disagree - Card - Agree) */}
                 <div className="flex flex-row items-center justify-center gap-2 sm:gap-8 md:gap-12 w-full">

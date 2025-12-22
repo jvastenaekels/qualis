@@ -8,34 +8,30 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import StudyLayout from './layouts/StudyLayout';
-import { useStudyStore } from './store/useStudyStore';
-
-// Mock Modules
-vi.mock('./store/useStudyStore');
-const mockUseStudyStore = useStudyStore as unknown as ReturnType<typeof vi.fn>;
-
-describe('App Routing Protection', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
+import { useSessionStore } from './store/useSessionStore';
+import { useConfigStore } from './store/useConfigStore';
 
 // Mock Pages
 const MockFineSort = () => <div data-testid="page-fine">Fine Page</div>;
 const MockWelcome = () => <div data-testid="page-welcome">Welcome Page</div>;
 
-describe('App Routing Protection', () => {
-    
-    it('redirects to welcome if not consented on protected route', () => {
-        // Mock session as NOT consented
-        mockUseStudyStore.mockReturnValue({ 
-            session: { hasConsented: false, currentStep: 1 },
-            config: { slug: 'demo' },
-            setConfigLoading: vi.fn(),
-            setConfigError: vi.fn(),
-            setZoomedCard: vi.fn()
-        });
+const mockConfig = {
+    slug: 'demo',
+    title: 'Test',
+    description: 'Test',
+    instructions: 'Test',
+    statements: []
+};
 
+describe('App Routing Protection', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        useConfigStore.getState().setConfig(mockConfig as any);
+        useSessionStore.getState().resetSession();
+    });
+
+    it('redirects to welcome if not consented on protected route', () => {
+        // Session is NOT consented (default after reset)
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
                  <Routes>
@@ -52,21 +48,13 @@ describe('App Routing Protection', () => {
 
         // Should NOT show Fine Page
         expect(screen.queryByTestId('page-fine')).toBeNull();
-        // Should Redirect to Welcome (or at least render nothing / Navigate)
-        // Since we are inside MemoryRouter, Navigate replaces the entry. 
-        // We can check if Welcome Page is rendered IF the redirect target matches a route.
-        // The redirect wraps to `/study/:slug/welcome`.
+        // Should Redirect to Welcome
         expect(screen.getByTestId('page-welcome')).toBeTruthy();
     });
 
     it('allows access if consented', () => {
-        // Mock session AS consented
-        mockUseStudyStore.mockReturnValue({ 
-            session: { hasConsented: true, currentStep: 4 },
-            setConfigLoading: vi.fn(),
-            setConfigError: vi.fn(),
-            setZoomedCard: vi.fn()
-        });
+        // Set session as consented
+        useSessionStore.getState().setConsent(true);
 
         render(
             <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
@@ -80,5 +68,4 @@ describe('App Routing Protection', () => {
 
         expect(screen.getByTestId('page-fine')).toBeTruthy();
     });
-});
 });

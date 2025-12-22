@@ -6,9 +6,11 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { useState } from 'react';
 import PreSortPage from './PreSortPage';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { useConfigStore } from '../store/useConfigStore';
+import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 
 // Mocks
 const mockConfig = {
@@ -16,32 +18,21 @@ const mockConfig = {
         age: { type: 'number', label: 'Age', required: true, min: 18, max: 99 },
         gender: { type: 'select', label: 'Gender', required: true, options: ['Male', 'Female'] },
         job: { type: 'text', label: 'Job Title', required: false }
-    }
+    },
+    statements: [],
+    title: 'Test Study',
+    description: 'Test',
+    instructions: 'Test',
 };
-
-const mockSetStep = vi.fn();
-
-// Create a mock store hook that behaves more realistically
-const useMockStudyStore = () => {
-    const [responses, setResponses] = useState({ presort: {} });
-    return {
-        config: mockConfig,
-        responses,
-        setPresortResponse: (data: any) => setResponses({ presort: data }),
-        setStep: mockSetStep
-    };
-};
-
-vi.mock('../store/useStudyStore', () => ({
-    useStudyStore: vi.fn()
-}));
-
-import { useStudyStore } from '../store/useStudyStore';
 
 describe('PreSortPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        (useStudyStore as any).mockImplementation(useMockStudyStore);
+        // Setup stores
+        useConfigStore.getState().setConfig(mockConfig as any);
+        useSessionStore.getState().resetSession();
+        useSessionStore.getState().setConsent(true);
+        useResponseStore.getState().resetResponses();
     });
 
     it('renders form fields based on config', () => {
@@ -89,28 +80,11 @@ describe('PreSortPage', () => {
 
         fireEvent.click(button);
 
-        // waitFor because the setStep might be called after async validation/submit
-        await waitFor(() => expect(mockSetStep).toHaveBeenCalledWith(3));
+        // Verify step was set to 3
+        await waitFor(() => expect(useSessionStore.getState().currentStep).toBe(3));
     });
 
     it('persists data when re-navigating', async () => {
-        // To properly test persistence, we need the mockStore to be external to the component's mount cycle
-        let externalResponses = { presort: {} };
-        const useMockStudyStorePersistent = () => {
-            const [responses, setResponses] = useState(externalResponses);
-            const setPresortResponse = (data: any) => {
-                externalResponses = { presort: data };
-                setResponses(externalResponses);
-            };
-            return {
-                config: mockConfig,
-                responses,
-                setPresortResponse,
-                setStep: mockSetStep
-            };
-        };
-        (useStudyStore as any).mockImplementation(useMockStudyStorePersistent);
-
         const { unmount } = render(
             <MemoryRouter>
                 <PreSortPage />
@@ -119,9 +93,8 @@ describe('PreSortPage', () => {
 
         fireEvent.input(screen.getByLabelText(/Age/), { target: { value: '45' } });
         
-        // Wait for auto-save to trigger (it's in an effect)
-        // Note: watch() returns raw strings for number inputs before coersion
-        await waitFor(() => expect(externalResponses.presort).toEqual(expect.objectContaining({ age: '45' })));
+        // Wait for auto-save to trigger
+        await waitFor(() => expect(useResponseStore.getState().presort).toEqual(expect.objectContaining({ age: '45' })));
 
         unmount();
 
