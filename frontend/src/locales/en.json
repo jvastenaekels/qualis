@@ -29,7 +29,7 @@
     "title": "Open-Q",
     "steps": {
       "welcome": "Welcome",
-      "presort": "Context",
+      "presort": "Background",
       "rough": "First impression",
       "fine": "Distinctions",
       "review": "Reflections"
@@ -43,7 +43,7 @@
     "start": "Start Study",
     "consent": {
       "label": "I verify that I am at least 18 years old. I consent to the anonymous processing of my data in accordance with GDPR.",
-      "error": "You must accept the terms to continue."
+      "error": "Please accept the terms to continue."
     },
     "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
     "restart": "Start a new session"
@@ -53,7 +53,7 @@
     "description": "Please answer a few questions to help us contextualize your point of view.",
     "submit": "Continue to sorting",
     "select_placeholder": "Select...",
-    "error_required": "Please answer this question."
+    "error_required": "This question is required."
   },
   "rough": {
     "header": {
@@ -121,8 +121,8 @@
         "why": "What makes this statement so significant to how you see things?",
         "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
         "min_chars": "A few words are enough to help us understand the context.",
-        "label_agree": "Most Like my view",
-        "label_disagree": "Most Unlike my view"
+        "label_agree": "Most like my view",
+        "label_disagree": "Most unlike my view"
     },
     "missing": {
         "label": "Is there something important about your view that wasn't captured?",
@@ -134,8 +134,8 @@
         "description": "Any feedback on the study or additional thoughts?",
         "placeholder": "Optional..."
     },
-    "submit": "Submit study",
-    "validation_error": "Please ensure you've briefly explained your key choices above.",
+    "submit": "Share my perspective",
+    "validation_error": "Please briefly explain your key choices to continue.",
     "success": {
         "title": "Perspective recorded",
         "message": "Your contribution to the study has been saved.",

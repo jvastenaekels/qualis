@@ -11,12 +11,23 @@ from app.database import get_db
 from app.models import Study, Participant, QSortEntry, ParticipantStatus, Statement
 from app.schemas import SubmissionInput
 
+from app.limiter import limiter
+
 router = APIRouter()
 
 @router.post("/submit")
+@limiter.limit("5/minute")
 async def submit_study(data: SubmissionInput, request: Request, db: AsyncSession = Depends(get_db)):
     # Metadata
-    ip_address = request.client.host if request.client else "unknown"
+    raw_ip = request.client.host if request.client else "unknown"
+    
+    # Hash IP for Privacy/GDPR
+    # We use a fixed salt (ideally from env) to allow consistent hashing for fraud detection
+    # but preventing rainbow table attacks if DB leaks.
+    import hashlib
+    import os
+    salt = os.getenv("IP_HASH_SALT", "default-salt-allow-override")
+    ip_address = hashlib.sha256(f"{raw_ip}{salt}".encode()).hexdigest()[:64]
     # Confirmation code logic moved up (or re-generated if new, but session token is consistent)
     confirmation_code = str(data.session_token)[:8].upper()
 
@@ -153,7 +164,9 @@ async def submit_study(data: SubmissionInput, request: Request, db: AsyncSession
     return {"status": "success", "confirmation_code": confirmation_code}
 
 @router.get("/study/{slug}")
+@limiter.limit("60/minute")
 async def get_study(
+    request: Request,
     slug: str = Path(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100),
     lang: str = Query("en", pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5),
     db: AsyncSession = Depends(get_db)

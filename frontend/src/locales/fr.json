@@ -29,7 +29,7 @@
     "title": "Open-Q",
     "steps": {
       "welcome": "Bienvenue",
-      "presort": "Contexte",
+      "presort": "Profil",
       "rough": "Première impression",
       "fine": "Nuances",
       "review": "Réflexions"
@@ -134,7 +134,7 @@
       "description": "Des retours sur l'étude ou des réflexions supplémentaires ?",
       "placeholder": "Optionnel..."
     },
-    "submit": "Soumettre l'étude",
+    "submit": "Partager mon point de vue",
     "validation_error": "Merci d'ajouter une courte explication pour vos choix principaux ci-dessus.",
     "success": {
       "title": "C'est noté !",

@@ -57,6 +57,7 @@ describe('RoughSortPage', () => {
     });
 
     it('renders the pedagogical hint', () => {
+        vi.useFakeTimers();
         render(
             <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
                  <Routes>
@@ -65,10 +66,15 @@ describe('RoughSortPage', () => {
             </MemoryRouter>
         );
         
+        // Fast-forward time to trigger the hint (1500ms delay)
+        vi.advanceTimersByTime(2000);
+
         // Check for Hint (now at bottom)
         expect(screen.getByText('rough.header.hint')).toBeTruthy();
         // Check for Title
         expect(screen.getByText('rough.header.title')).toBeTruthy();
+        
+        vi.useRealTimers();
     });
 
     it('renders the Control Cluster buttons', () => {

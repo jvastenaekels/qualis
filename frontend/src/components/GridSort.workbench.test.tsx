@@ -62,6 +62,10 @@ describe('GridSort Workbench Interaction', () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
+        // Resize window to mobile - GridSort uses window.innerWidth
+        global.innerWidth = 500;
+        global.dispatchEvent(new Event('resize'));
+        
         useConfigStore.getState().setConfig(mockConfig as any);
         useSessionStore.getState().resetSession();
         useSessionStore.getState().setConsent(true);

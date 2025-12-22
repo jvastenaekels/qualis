@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { useConfigStore } from './useConfigStore';
 import { useSessionStore } from './useSessionStore';
 import { useResponseStore } from './useResponseStore';
-import * as i18nUtils from '../utils/i18nOverrides';
+import { resetBaseLocales } from '../utils/i18nOverrides';
 
 // Mock the i18n overrides utility
 vi.mock('../utils/i18nOverrides', () => ({
@@ -49,7 +49,7 @@ describe('Atomic Stores', () => {
 
         it('resets i18n locales on session reset', () => {
             useSessionStore.getState().resetSession();
-            expect(i18nUtils.resetBaseLocales).toHaveBeenCalled();
+            expect(resetBaseLocales).toHaveBeenCalled();
         });
     });
 
