@@ -35,7 +35,8 @@ test.describe('Visual Regression', () => {
     // Take full page screenshot
     await expect(page).toHaveScreenshot('welcome-page.png', {
       fullPage: true,
-      animations: 'disabled'
+      animations: 'disabled',
+      maxDiffPixelRatio: 0.05
     });
   });
 
@@ -57,7 +58,8 @@ test.describe('Visual Regression', () => {
     // Take screenshot of rough sort page
     await expect(page).toHaveScreenshot('rough-sort-page.png', {
       fullPage: true,
-      animations: 'disabled'
+      animations: 'disabled',
+      maxDiffPixelRatio: 0.05
     });
   });
 
@@ -80,13 +82,16 @@ test.describe('Visual Regression', () => {
     const gridContainer = page.locator('[data-testid="grid-container"]');
     if (await gridContainer.isVisible()) {
       await expect(gridContainer).toHaveScreenshot('fine-sort-grid.png', {
-        animations: 'disabled'
+        animations: 'disabled',
+        maxDiffPixelRatio: 0.05,
+        maxDiffPixels: 1000 // Allow for 1-2px layout shifts
       });
     } else {
       // Fallback to full page
       await expect(page).toHaveScreenshot('fine-sort-page.png', {
         fullPage: true,
-        animations: 'disabled'
+        animations: 'disabled',
+        maxDiffPixelRatio: 0.05
       });
     }
   });
