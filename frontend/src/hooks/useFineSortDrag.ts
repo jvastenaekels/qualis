@@ -1,5 +1,5 @@
-import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
-import { useState, useCallback } from 'react';
+import type { DragStartEvent, DragEndEvent, DragMoveEvent } from '@dnd-kit/core';
+import { useState, useCallback, useRef } from 'react';
 
 // Define minimal types needed for the hook to avoid circular deps or complex mocks
 interface DragCard {
@@ -20,6 +20,19 @@ interface Actions {
     setZoomedCard: (card: { id: number; text: string } | null) => void; 
 }
 
+interface InteractionUtils {
+    zoomIn: () => void;
+    zoomOut: () => void;
+    performAutoFit: () => void;
+    transformRef: React.RefObject<{ 
+        instance: { 
+            transformState: { positionX: number; positionY: number; scale: number; } 
+        }; 
+        setTransform: (x: number, y: number, scale: number, duration: number, animationType?: string) => void;
+    }>;
+    wrapperRef: React.RefObject<HTMLDivElement>;
+}
+
 interface UseFineSortDragProps {
     responses: {
         qsort: DragCard[];
@@ -28,6 +41,7 @@ interface UseFineSortDragProps {
     actions: Actions;
     onSelectionChange?: (id: number | null) => void;
     selectedId?: number | null;
+    interactionUtils?: InteractionUtils | null;
 }
 
 export const useFineSortDrag = ({
@@ -35,15 +49,91 @@ export const useFineSortDrag = ({
     gridColumns,
     actions,
     onSelectionChange,
-    selectedId
+    selectedId,
+    interactionUtils
 }: UseFineSortDragProps) => {
     const [activeId, setActiveId] = useState<number | null>(null);
+    
+    // Advanced Drag Interaction Refs
+    const lastPos = useRef({ x: 0, y: 0 });
+    const dwellTimer = useRef<NodeJS.Timeout | null>(null);
+    const panInterval = useRef<NodeJS.Timeout | null>(null);
 
     const handleDragStart = useCallback((event: DragStartEvent) => {
         actions.setZoomedCard(null);
         setActiveId(event.active.id as number);
         onSelectionChange?.(null);
+        
+        // Initialize position for dwell
+        if (event.activatorEvent instanceof MouseEvent || event.activatorEvent instanceof PointerEvent) {
+            lastPos.current = { x: event.activatorEvent.clientX, y: event.activatorEvent.clientY };
+        }
     }, [actions, onSelectionChange]);
+
+    const stopPan = useCallback(() => {
+        if (panInterval.current) {
+            clearInterval(panInterval.current);
+            panInterval.current = null;
+        }
+    }, []);
+
+    const handleDragMove = useCallback((event: DragMoveEvent) => {
+        if (!interactionUtils || !interactionUtils.transformRef.current) return;
+
+        // Use activatorEvent coords + delta as a fallback for pointerCoordinates
+        const activator = event.activatorEvent as MouseEvent | PointerEvent;
+        const x = activator.clientX + event.delta.x;
+        const y = activator.clientY + event.delta.y;
+
+        const threshold = 10; // pixels for dwell movement
+        const dist = Math.sqrt(Math.pow(x - lastPos.current.x, 2) + Math.pow(y - lastPos.current.y, 2));
+
+        // 1. Dwell Zoom
+        if (dist > threshold) {
+            // Reset dwell timer if moved
+            if (dwellTimer.current) clearTimeout(dwellTimer.current);
+            dwellTimer.current = setTimeout(() => {
+                interactionUtils.zoomIn();
+            }, 750);
+            lastPos.current = { x, y };
+        }
+
+        // 2. Edge Panning
+        const wrapper = interactionUtils.wrapperRef.current;
+        if (!wrapper) return;
+
+        const rect = wrapper.getBoundingClientRect();
+        const edgeThreshold = 80; // Distance from edge to trigger pan
+        const panSpeed = 10; // Pixels per interval
+
+        let dx = 0;
+        let dy = 0;
+
+        if (x < rect.left + edgeThreshold) dx = panSpeed;
+        else if (x > rect.right - edgeThreshold) dx = -panSpeed;
+
+        if (y < rect.top + edgeThreshold) dy = panSpeed;
+        else if (y > rect.bottom - edgeThreshold) dy = -panSpeed;
+
+        if (dx !== 0 || dy !== 0) {
+            if (!panInterval.current) {
+                panInterval.current = setInterval(() => {
+                    const transform = interactionUtils.transformRef.current;
+                    if (transform) {
+                        const state = transform.instance.transformState;
+                        transform.setTransform(
+                            state.positionX + dx,
+                            state.positionY + dy,
+                            state.scale,
+                            0 // No animation for continuous pan
+                        );
+                    }
+                }, 16); // ~60fps
+            }
+        } else {
+            stopPan();
+        }
+    }, [interactionUtils, stopPan]);
 
     const findClosestEmptyRow = useCallback((col: number, targetRow: number): number | null => {
         const capacity = gridColumns[col]?.capacity || 0;
@@ -76,6 +166,10 @@ export const useFineSortDrag = ({
     const handleDragEnd = useCallback((event: DragEndEvent) => {
         const { active, over } = event;
         setActiveId(null);
+        
+        // Cleanup timers
+        if (dwellTimer.current) clearTimeout(dwellTimer.current);
+        stopPan();
 
         if (!over) return;
 
@@ -170,6 +264,7 @@ export const useFineSortDrag = ({
     return {
         activeId,
         handleDragStart,
+        handleDragMove,
         handleDragEnd,
         findClosestEmptyRow,
         handleCardClick,

@@ -85,6 +85,7 @@ const WorkbenchPanel: React.FC<WorkbenchPanelProps> = ({ card, onClose, classNam
                         variant="grid"
                         isSelected={true}
                         disableHoverZoom={true}
+                        allowScroll={true}
                     />
                 </div>
 

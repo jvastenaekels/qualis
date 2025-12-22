@@ -174,10 +174,12 @@ const FineSortPage: React.FC = () => {
     
     // --- Refactored Drag Logic via Hook ---
     const [zoomLevel, setZoomLevel] = useState(1);
+    const [interactionUtils, setInteractionUtils] = useState<any>(null);
 
     const { 
         activeId, 
         handleDragStart, 
+        handleDragMove,
         handleDragEnd, 
         handleCardClick, 
         handleSlotClick 
@@ -192,7 +194,8 @@ const FineSortPage: React.FC = () => {
              setZoomedCard
         },
         onSelectionChange: setSelectedCardId,
-        selectedId: selectedCardId
+        selectedId: selectedCardId,
+        interactionUtils
     });
     
     if (!config) return null;
@@ -248,6 +251,7 @@ const FineSortPage: React.FC = () => {
             sensors={sensors} 
             collisionDetection={collisionStrategy}
             onDragStart={handleDragStart}
+            onDragMove={handleDragMove}
             onDragEnd={handleDragEnd}
             autoScroll
             modifiers={[snapCenterToCursor]}
@@ -274,7 +278,7 @@ const FineSortPage: React.FC = () => {
                         }
                     }}
                     onZoomChange={setZoomLevel}
-
+                    onInteractionUtils={setInteractionUtils}
                 />
              </div>
 

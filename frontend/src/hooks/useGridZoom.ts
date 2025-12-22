@@ -47,7 +47,18 @@ export const useGridZoom = ({
             const widthScale = (wrapperW * 0.98) / contentW;
             const heightScale = (wrapperH * 0.92) / contentH;
             scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.75));
-            x = (wrapperW - (contentW * scale)) / 2;
+            
+            // Precise pyramid centering
+            if (pyramidRef.current) {
+                const pyramid = pyramidRef.current;
+                const pyramidOffsetLeft = pyramid.offsetLeft;
+                const pyramidW = pyramid.offsetWidth;
+                x = (wrapperW / 2) - ((pyramidOffsetLeft + (pyramidW / 2)) * scale);
+            } else {
+                x = (wrapperW - (contentW * scale)) / 2;
+            }
+            
+            // Anchor to bottom to leave room for HUD/Workbench
             y = wrapperH - (contentH * scale) - 2;
         } else {
             const padding = 100;
@@ -57,17 +68,17 @@ export const useGridZoom = ({
             const scaleY = availableH / contentH;
             scale = Math.min(scaleX, scaleY, 1.1);
             
-            x = (wrapperW - (contentW * scale)) / 2;
-            y = (wrapperH - (contentH * scale)) / 2;
-
+            // Precise pyramid centering
             if (pyramidRef.current) {
                 const pyramid = pyramidRef.current;
                 const pyramidOffsetLeft = pyramid.offsetLeft;
-                // Center the pyramid specifically if possible/needed, but general centering usually works better
-                // Using the original logic's refinement:
-                 const pyramidW = pyramid.offsetWidth;
-                 x = (wrapperW / 2) - ((pyramidOffsetLeft + (pyramidW / 2)) * scale);
+                const pyramidW = pyramid.offsetWidth;
+                x = (wrapperW / 2) - ((pyramidOffsetLeft + (pyramidW / 2)) * scale);
+            } else {
+                x = (wrapperW - (contentW * scale)) / 2;
             }
+            
+            y = (wrapperH - (contentH * scale)) / 2;
         }
         
         transformRef.current.setTransform(x, y, scale, 200);
@@ -129,18 +140,31 @@ export const useGridZoom = ({
              if (activePileCount === 0) return;
 
              // Calculate dynamic target column based on grid limits
-             // Disagree: minScore + 2, Neutral: 0, Agree: maxScore - 2
+             // Desktop: -1 (Disagree), 0 (Neutral), +1 (Agree)
+             // Mobile: minScore + 2, Neutral: 0, Agree: maxScore - 2
              const scores = gridColumns.map(c => c.score);
              const minScore = Math.min(...scores);
              const maxScore = Math.max(...scores);
              
+             const isMobile = window.innerWidth < 1024;
              let targetScore: number;
-             if (activePile === 'disagree') {
-                 targetScore = minScore + 2;
-             } else if (activePile === 'agree') {
-                 targetScore = maxScore - 2;
+             
+             if (isMobile) {
+                 if (activePile === 'disagree') {
+                     targetScore = minScore + 2;
+                 } else if (activePile === 'agree') {
+                     targetScore = maxScore - 2;
+                 } else {
+                     targetScore = 0;
+                 }
              } else {
-                 targetScore = 0;
+                 if (activePile === 'disagree') {
+                     targetScore = -1;
+                 } else if (activePile === 'agree') {
+                     targetScore = 1;
+                 } else {
+                     targetScore = 0;
+                 }
              }
 
              // Format column ID
@@ -154,9 +178,8 @@ export const useGridZoom = ({
              const contentW = contentRef.current.offsetWidth;
              const contentH = contentRef.current.offsetHeight;
              
-             // Target scale: fit content nicely (0.8 for desktop, 0.66 for mobile)
-             const isMobile = window.innerWidth < 1024;
-             const targetScale = isMobile ? 0.66 : 0.85;
+             // Target scale: fit content nicely (1.0 for desktop, 0.66 for mobile)
+             const targetScale = isMobile ? 0.66 : 1.0;
              
              // Get the column's position relative to the content (not screen)
              const contentRect = contentRef.current.getBoundingClientRect();

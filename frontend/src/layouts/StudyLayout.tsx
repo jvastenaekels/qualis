@@ -148,8 +148,10 @@ const StudyLayoutContent: React.FC = () => {
                 {/* LEFT: Branding / Context */}
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
-                        {/* Use config title if available, else static default */}
-                        {session.currentStep === 1 ? 'Open-Q' : (config?.title || 'Q-Method Study')}
+                        {/* Use logo if on step 1, else config title */}
+                        {session.currentStep === 1 ? (
+                            <img src="/images/logo.png" alt="Open-Q" className="h-8 w-auto object-contain" />
+                        ) : (config?.title || 'Q-Method Study')}
                     </div>
 
                     {/* Mobile Step Counter (Next to title) */}

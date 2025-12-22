@@ -37,6 +37,18 @@ interface GridSortProps {
   forcedTipsClosed?: boolean;
   disableHoverZoom?: boolean;
   onZoomChange?: (scale: number) => void;
+  onInteractionUtils?: (utils: { 
+    zoomIn: () => void; 
+    zoomOut: () => void; 
+    performAutoFit: () => void;
+    transformRef: React.RefObject<{ 
+      instance: { 
+        transformState: { positionX: number; positionY: number; scale: number; } 
+      }; 
+      setTransform: (x: number, y: number, scale: number, duration: number, animationType?: string) => void;
+    }>;
+    wrapperRef: React.RefObject<HTMLDivElement>;
+  }) => void;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -54,7 +66,8 @@ const GridSort: React.FC<GridSortProps> = ({
   onDimensionsChange,
   forcedTipsClosed = false,
   disableHoverZoom = false,
-  onZoomChange
+  onZoomChange,
+  onInteractionUtils
 }) => {
   const { t } = useTranslation();
   
@@ -113,6 +126,19 @@ const GridSort: React.FC<GridSortProps> = ({
       setDimmingActive,
       onZoomChange
   });
+
+  // Pass interaction utils up to parent
+  useEffect(() => {
+    if (onInteractionUtils) {
+        onInteractionUtils({
+            zoomIn,
+            zoomOut,
+            performAutoFit,
+            transformRef,
+            wrapperRef
+        });
+    }
+  }, [onInteractionUtils, zoomIn, zoomOut, performAutoFit, transformRef, wrapperRef]);
 
   const getColumnTint = (score: number) => {
       if (score <= -3) return 'bg-red-50/50';

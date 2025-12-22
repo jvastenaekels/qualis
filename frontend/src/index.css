@@ -35,10 +35,12 @@
     background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
+    background: #cbd5e1;
     border-radius: 10px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #cbd5e1;
+    background: #94a3b8;
   }
+  /* Hide scrollbar by default, show on hover/scrolling if possible, 
+     but standard utilities are usually enough for modern browsers */
 }
