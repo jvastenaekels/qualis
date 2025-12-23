@@ -36,7 +36,7 @@ const ROW_H = 26; // 24h + 2g for correct stacking
 // Source piles are in a div below with pt-2 (8px).
 // So distance from Source Top to Grid Bottom is roughly 8px gap + source border?
 // Let's use a calibrated value.
-const GRID_BASE_Y = -48; // Calibrated for smooth landing
+const GRID_BASE_Y = 14; // Center of Bottom Row Slots (Y coord relative to Container Center)
 
 const FINE_STEPS = [
     { id: 'L2_0', x: -2 * COL_OFFSET, y: 0, source: 0 },
@@ -133,7 +133,7 @@ const SortingAnimation: React.FC = () => {
     // We use absolute positioning from the CENTER of the container.
     // Grid is centered (offset 0).
     const DESKTOP_GRID_OFFSET_X = 0; 
-    const DESKTOP_DECK_OFFSET_X = 60;  // Shift Deck Center Right relative to main center
+    const DESKTOP_DECK_OFFSET_X = 66;  // Shift Deck Center Right relative to main center
 
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
@@ -235,11 +235,17 @@ const SortingAnimation: React.FC = () => {
 
                 {/* Wrapper regarding Desktop Offsets -> Actually we need to visually move the children */}
                 {/* Left Side (Desktop): Grid + Bottom Thumbs */}
-                {/* Always Centered using flex-col items-center */}
-                <div className="flex flex-col items-center z-10">
+                {/* Mobile: Flex. Desktop: Absolute Grid */}
+                <div 
+                    className={`
+                        z-10 transition-transform duration-500
+                        ${isDesktop ? 'absolute top-1/2 left-1/2' : 'flex flex-col items-center'}
+                    `}
+                    style={isDesktop ? { transform: 'translate(-50%, -64%)' } : {}}
+                >
                     
                     {/* Grid Container with Side Thumbs (Mobile Only) */}
-                    <div className="flex items-end gap-2 mb-2 md:mb-4">
+                    <div className="flex items-end gap-2 mb-2 md:mb-0">
                         {/* Left Thumb (Mobile) */}
                         <div className="flex items-center pb-1 opacity-40 md:hidden">
                             <ThumbsDown size={16} className="text-slate-500" />
@@ -259,19 +265,21 @@ const SortingAnimation: React.FC = () => {
                             <ThumbsUp size={16} className="text-slate-500" />
                         </div>
                     </div>
+                </div>
 
-                    {/* Bottom Thumbs (Desktop Only) */}
-                    {/* Bottom Thumbs (Desktop Only) - Aligned with Grid Columns */}
-                    <div className="hidden md:flex items-center gap-[2px] mt-1 opacity-60">
-                         {/* Under L2 (Disagree) */}
-                         <div className="w-[18px] flex justify-center"><ThumbsDown size={14} className="text-slate-500" /></div>
-                         {/* Spacers for L1, C0, R1 */}
-                         <div className="w-[18px]" />
-                         <div className="w-[18px]" />
-                         <div className="w-[18px]" />
-                         {/* Under R2 (Agree) */}
-                         <div className="w-[18px] flex justify-center"><ThumbsUp size={14} className="text-slate-500" /></div>
-                    </div>
+                {/* Bottom Thumbs (Desktop Only) - Absolute Positioned below Grid */}
+                <div 
+                    className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 items-center gap-[2px] opacity-60 z-10"
+                    style={{ marginTop: '30px' }} 
+                >
+                        {/* Under L2 (Disagree) */}
+                        <div className="w-[18px] flex justify-center"><ThumbsDown size={14} className="text-slate-500" /></div>
+                        {/* Spacers for L1, C0, R1 */}
+                        <div className="w-[18px]" />
+                        <div className="w-[18px]" />
+                        <div className="w-[18px]" />
+                        {/* Under R2 (Agree) */}
+                        <div className="w-[18px] flex justify-center"><ThumbsUp size={14} className="text-slate-500" /></div>
                 </div>
 
                 {/* Right Side (Desktop): Source Piles - Vertical Stack */}
@@ -283,8 +291,8 @@ const SortingAnimation: React.FC = () => {
                         md:absolute md:top-1/2 md:left-1/2 md:-translate-y-1/2
                     `}
                     // On Desktop, we position the LEFT edge.
-                    // Center is at +60. Width is 18. Left is 60 - 9 = 51.
-                    style={isDesktop ? { marginLeft: '51px' } : {}}
+                    // Center is at +66. Width is 18. Left is 66 - 9 = 57.
+                    style={isDesktop ? { marginLeft: '57px' } : {}}
                 >
                      {/* Render only in FINE phase to accept the layoutId transition */}
                     {phase === 'FINE' && (
