@@ -36,7 +36,8 @@ test.describe('Visual Regression', () => {
     await expect(page).toHaveScreenshot('welcome-page.png', {
       fullPage: true,
       animations: 'disabled',
-      maxDiffPixelRatio: 0.05
+      maxDiffPixelRatio: 0.10,
+      maxDiffPixels: 20000 // Allow for mobile font rendering differences
     });
   });
 
