@@ -129,11 +129,11 @@ const SortingAnimation: React.FC = () => {
     const fineTargetY = activeFineStep ? (GRID_BASE_Y + activeFineStep.y) : 0;
 
     return (
-        <div className="relative w-full h-56 flex justify-center items-center py-6 select-none pointer-events-none" aria-hidden="true">
+        <div className="w-full h-auto flex flex-col justify-center items-center py-6 select-none pointer-events-none gap-8" aria-hidden="true">
 
             {/* --- ROUGH SORT (Compact) --- */}
             {/* --- ROUGH SORT (Centered Starburst) --- */}
-            <div className={`absolute top-0 left-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-in-out ${phase === 'ROUGH' ? 'opacity-100 scale-100 z-20' : 'opacity-0 scale-90 z-10'}`}>
+            <div className={`relative w-full h-48 flex items-center justify-center transition-all duration-700 ease-in-out ${phase === 'ROUGH' ? 'opacity-100 filter-none' : 'opacity-40 grayscale-[0.8]'}`}>
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">1</div>
 
@@ -174,7 +174,7 @@ const SortingAnimation: React.FC = () => {
             </div>
 
             {/* --- FINE SORT (Compact) --- */}
-            <div className={`absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out ${phase === 'FINE' ? 'opacity-100 scale-100 z-20' : 'opacity-0 scale-90 z-10'}`}>
+            <div className={`relative w-full h-48 flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out ${phase === 'FINE' ? 'opacity-100 filter-none' : 'opacity-40 grayscale-[0.8]'}`}>
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">2</div>
 
