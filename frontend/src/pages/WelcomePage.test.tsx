@@ -42,7 +42,7 @@ describe('WelcomePage', () => {
                 <WelcomePage />
             </MemoryRouter>
         );
-        expect(screen.getByText('Test Study')).toBeInTheDocument();
+        expect(screen.getByAltText('Test Study')).toBeInTheDocument();
         expect(screen.getByText('Test Description')).toBeInTheDocument();
     });
 

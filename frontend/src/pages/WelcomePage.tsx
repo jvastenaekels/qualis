@@ -14,6 +14,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import SortingAnimation from '../components/SortingAnimation';
 
 const consentSchema = z.object({
     consent: z.boolean().refine(val => val === true, { 
@@ -80,6 +81,19 @@ const WelcomePage: React.FC = () => {
                 
                 <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 my-8">
                     <Markdown>{study.instructions}</Markdown>
+                </div>
+
+                {/* Animated Sorting Example */}
+                <div className="mb-8 border-t border-gray-100 pt-8">
+                    <h3 className="text-center text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+                         {t('welcome.goal_title', 'Your Goal')}
+                    </h3>
+                    <div className="bg-slate-50/50 p-4 rounded-xl border border-gray-100 shadow-inner overflow-hidden">
+                            <SortingAnimation />
+                            <p className="text-xs text-center text-slate-400 mt-2 italic">
+                                {t('welcome.visual_example_caption', 'Sort statements from text to the grid.')}
+                            </p>
+                    </div>
                 </div>
             </div>
 
