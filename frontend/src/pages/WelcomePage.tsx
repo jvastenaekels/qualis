@@ -21,6 +21,9 @@ const WelcomePage: React.FC = () => {
     const config = useConfigStore((state) => state.config);
     const setStep = useSessionStore((state) => state.setStep);
 
+    const hasConsented = useSessionStore((state) => state.hasConsented);
+    const maxReachedStep = useSessionStore((state) => state.maxReachedStep);
+    
     // Set Step 1 on mount
     React.useEffect(() => {
         setStep(1);
@@ -107,20 +110,22 @@ const WelcomePage: React.FC = () => {
                 </button>
             </div>
             
-            {/* Reset Session Link */}
-            <div className="mt-6 flex justify-center">
-                 <button 
-                    onClick={() => {
-                        if (window.confirm(t('welcome.reset_confirm'))) {
-                            useSessionStore.getState().resetSession();
-                            window.location.reload();
-                        }
-                    }}
-                    className="text-sm text-slate-400 hover:text-slate-600 underline decoration-slate-300 underline-offset-4 transition-colors"
-                >
-                    {t('welcome.restart', 'Start a new session')}
-                </button>
-            </div>
+            {/* Reset Session Link - Only if session in progress */}
+            {(hasConsented || maxReachedStep > 1) && (
+                <div className="mt-6 flex justify-center">
+                     <button 
+                        onClick={() => {
+                            if (window.confirm(t('welcome.reset_confirm'))) {
+                                useSessionStore.getState().resetSession();
+                                window.location.reload();
+                            }
+                        }}
+                        className="text-sm text-slate-400 hover:text-slate-600 underline decoration-slate-300 underline-offset-4 transition-colors"
+                    >
+                        {t('welcome.restart', 'Start a new session')}
+                    </button>
+                </div>
+            )}
     </div>
 );
 };

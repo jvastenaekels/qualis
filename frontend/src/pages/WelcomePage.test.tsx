@@ -92,4 +92,61 @@ describe('WelcomePage', () => {
              expect(screen.getByText('Consent Page')).toBeInTheDocument();
          });
     });
+    
+    it('conditionally renders "Start a new session" link based on session state', async () => {
+        const { unmount } = render(
+            <MemoryRouter>
+                <WelcomePage />
+            </MemoryRouter>
+        );
+
+        // Initially (reset session), the link should NOT be there
+        expect(screen.queryByText('Start a new session')).not.toBeInTheDocument();
+        
+        unmount();
+
+        // Case 1: user has consented
+        useSessionStore.getState().setConsent(true);
+        render(
+            <MemoryRouter>
+                <WelcomePage />
+            </MemoryRouter>
+        );
+        expect(screen.getByText('Start a new session')).toBeInTheDocument();
+        
+        // Use cleanup for re-render
+        // Instead of unmount/remount significantly, we can just update store and trigger re-render if we were using a real app,
+        // but for unit tests, re-rendering with new store state is cleaner.
+    });
+
+    it('resets session when link is clicked and confirmed', async () => {
+         // Setup active session
+         useSessionStore.getState().setConsent(true);
+         
+         // Mock window.confirm
+         const confirmSpy = vi.spyOn(window, 'confirm');
+         confirmSpy.mockImplementation(() => true);
+         
+         // Mock window.location.reload (optional, but good practice since we call it)
+         Object.defineProperty(window, 'location', {
+            configurable: true,
+            value: { reload: vi.fn() },
+          });
+
+         render(
+            <MemoryRouter>
+                <WelcomePage />
+            </MemoryRouter>
+        );
+
+        const link = screen.getByText('Start a new session');
+        fireEvent.click(link);
+
+        expect(confirmSpy).toHaveBeenCalled();
+        expect(window.location.reload).toHaveBeenCalled();
+        
+        // Verify store was reset (hasConsented should be false)
+        // Note: useSessionStore.getState() might reflect the change immediately
+        expect(useSessionStore.getState().hasConsented).toBe(false);
+    });
 });
