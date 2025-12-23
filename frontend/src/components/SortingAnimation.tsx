@@ -8,12 +8,14 @@ import { Smile, Frown, Meh, ThumbsUp, ThumbsDown } from 'lucide-react';
 // Targets relative from common center? No, let's keep relative to Deck.
 // Deck is at (0,0).
 // Targets (Up):
+// Layout: Disagree (Left/Up), Agree (Right/Up), Neutral (Center/Down)
+// Calibrated to match the visual "Inverted Triangle"
 const ROUGH_TARGETS = [
-    { x: -36, y: -60, pileId: 'disagree' },
-    { x: 36, y: -60, pileId: 'agree' },
-    { x: 0, y: -60, pileId: 'neutral' },
-    { x: -36, y: -60, pileId: 'disagree' },
-    { x: 0, y: -60, pileId: 'neutral' }
+    { x: -50, y: -90, pileId: 'disagree' },
+    { x: 50, y: -90, pileId: 'agree' },
+    { x: 0, y: -45, pileId: 'neutral' },
+    { x: -50, y: -90, pileId: 'disagree' },
+    { x: 0, y: -45, pileId: 'neutral' }
 ];
 
 // FINE SORT
@@ -132,12 +134,20 @@ const SortingAnimation: React.FC = () => {
 
                 {/* Piles */}
                 {/* Render only in ROUGH phase so they can 'move' to FINE phase via layoutId */}
-                <div className="flex gap-3 h-11 z-10 min-w-[120px] justify-center"> 
+                {/* Piles (Triangle Layout) */}
+                {/* Render only in ROUGH phase so they can 'move' to FINE phase via layoutId */}
+                <div className="relative z-10 mb-8 flex flex-col items-center gap-2"> 
                     {phase === 'ROUGH' && (
                         <>
-                            <DynamicStack count={roughPileCounts.disagree} icon={Frown} type="pile" layoutId="pile-disagree" />
-                            <DynamicStack count={roughPileCounts.neutral} icon={Meh} type="pile" layoutId="pile-neutral" />
-                            <DynamicStack count={roughPileCounts.agree} icon={Smile} type="pile" layoutId="pile-agree" />
+                            {/* Top Row: Opposites */}
+                            <div className="flex gap-16">
+                                <DynamicStack count={roughPileCounts.disagree} icon={Frown} type="pile" layoutId="pile-disagree" />
+                                <DynamicStack count={roughPileCounts.agree} icon={Smile} type="pile" layoutId="pile-agree" />
+                            </div>
+                            {/* Bottom Row: Neutral */}
+                            <div>
+                                <DynamicStack count={roughPileCounts.neutral} icon={Meh} type="pile" layoutId="pile-neutral" />
+                            </div>
                         </>
                     )}
                 </div>
