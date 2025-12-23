@@ -133,7 +133,7 @@ const SortingAnimation: React.FC = () => {
     // We use absolute positioning from the CENTER of the container.
     // Grid is centered (offset 0).
     const DESKTOP_GRID_OFFSET_X = 0; 
-    const DESKTOP_DECK_OFFSET_X = 52;  // Shift Deck Center Right relative to main center
+    const DESKTOP_DECK_OFFSET_X = 60;  // Shift Deck Center Right relative to main center
 
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
@@ -226,7 +226,7 @@ const SortingAnimation: React.FC = () => {
 
             {/* --- FINE SORT (Compact) --- */}
             <div className={`
-                absolute top-0 left-0 w-full h-full flex flex-col md:flex-row items-center justify-center gap-2 md:gap-0 transition-all duration-700 ease-in-out
+                absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out
                 md:relative md:w-full md:h-40
                 ${phase === 'FINE' ? 'opacity-100 scale-100 z-20 md:filter-none' : 'opacity-0 scale-90 z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
             `}>
@@ -283,8 +283,8 @@ const SortingAnimation: React.FC = () => {
                         md:absolute md:top-1/2 md:left-1/2 md:-translate-y-1/2
                     `}
                     // On Desktop, we position the LEFT edge.
-                    // Center is at +52. Width is 18. Left is 52 - 9 = 43.
-                    style={isDesktop ? { marginLeft: '43px' } : {}}
+                    // Center is at +60. Width is 18. Left is 60 - 9 = 51.
+                    style={isDesktop ? { marginLeft: '51px' } : {}}
                 >
                      {/* Render only in FINE phase to accept the layoutId transition */}
                     {phase === 'FINE' && (
