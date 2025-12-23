@@ -35,8 +35,6 @@ const ROW_H = 26; // 24h + 2g for correct stacking
 // The grid container is h-32 (128px). Items are flex-end.
 // Source piles are in a div below with pt-2 (8px).
 // So distance from Source Top to Grid Bottom is roughly 8px gap + source border?
-// Let's use a calibrated value.
-const GRID_BASE_Y = 14; // Center of Bottom Row Slots (Y coord relative to Container Center)
 
 const FINE_STEPS = [
     { id: 'L2_0', x: -2 * COL_OFFSET, y: 0, source: 0 },
@@ -129,57 +127,74 @@ const SortingAnimation: React.FC = () => {
         return () => window.removeEventListener('resize', checkDesktop);
     }, []);
 
-    // Configuration for Desktop Layout
-    // We use absolute positioning from the CENTER of the container.
-    // Grid is centered (offset 0).
-    const DESKTOP_GRID_OFFSET_X = 0; 
-    const DESKTOP_DECK_OFFSET_X = 66;  // Shift Deck Center Right relative to main center
+    // --- SHARED GEOMETRY CONSTANTS ---
+    // These drive BOTH the CSS Positioning AND the Animation Coordinates.
+    // Origin (0,0) is the CENTER of the container.
+    //
+    // MOBILE:
+    // Grid Row 0 (Bottom Row) Center Y: -12px (Slightly up from center)
+    // Source Piles Center Y: +40px (Below grid)
+    //
+    // DESKTOP:
+    // Grid Row 0 (Bottom Row) Center Y: +28px (Grid is strictly centered vertically in left area? No, we center the whole visual block)
+    // Let's align Desktop Grid vertical center ~0.
+    // Grid Height ~80px. Top -40, Bottom +40. Row 0 is at bottom (+28 is correct for center of card 12px from bottom).
+    // Deck Center Y: 0 (Middle pile). Top -32, Bot +32.
+    // Deck Offset X: 66px.
+    
+    // MOBILE
+    const MOBILE_GRID_ROW0_Y = -12;
+    const MOBILE_SOURCE_CENTER_Y = 40;
+
+    // DESKTOP
+    const DESKTOP_GRID_ROW0_Y = 28;
+    const DESKTOP_DECK_OFFSET_X = 66;
 
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
     const activeFineStep = phase === 'FINE' && step < FINE_STEPS.length ? FINE_STEPS[step] : null;
 
-    // Fine card flying positions
-    // Mobile: Source is centered (0,0 relative to source container). Target is relative to Grid.
-    // Desktop: We need a common coordinate space since we are moving containers apart.
-    // Let's assume the "Flying Card" is positioned relative to the Center of the Phase 2 container.
+    // --- FINE CARD ANIMATION COORDINATES ---
+    // Calculated based on Layout Mode using constants.
     
-    // Source X (Deck Position)
-    // Mobile: 0 (Center), -36, +36 relative to center
-    // Desktop: Fixed X offset relative to center.
-    const fineSourceBaseX = isDesktop ? DESKTOP_DECK_OFFSET_X : 0;
-    const fineSourceOffset = isDesktop ? 0 : (activeFineStep ? (activeFineStep.source === 0 ? -36 : activeFineStep.source === 2 ? 36 : 0) : 0);
-    const fineSourceX = fineSourceBaseX + fineSourceOffset;
+    // Grid Base Y (Row 0)
+    const currentGridBaseY = isDesktop ? DESKTOP_GRID_ROW0_Y : MOBILE_GRID_ROW0_Y;
 
-    // Source Y (Deck Position)
-    // Mobile: Constant 8 (row)
-    // Desktop: Vertical Stack. 
-    // Stack is 3 items of h=24px with gap-2 (8px). Total height = 24*3 + 8*2 = 72+16 = 88px.
-    // Center of stack is at Y=0 relative to container center? 
-    // Let's assume the stack is centered vertically in the parent.
-    // Pile 0 (Top): -32px
-    // Pile 1 (Mid): 0px
-    // Pile 2 (Bot): +32px
-    // Note: Our "activeFineStep.source" is 0=Disagree(Top?), 1=Middle, 2=Agree(Bottom?)
-    // Let's verify rendering order below... yes: Disagree, Neutral, Agree.
-    const fineSourceBaseY = isDesktop ? 0 : 8; // Mobile stays at 8
-    const fineSourceOffsetY = isDesktop 
-        ? (activeFineStep ? (activeFineStep.source === 0 ? -32 : activeFineStep.source === 2 ? 32 : 0) : 0)
-        : 0;
-    const fineSourceY = fineSourceBaseY + fineSourceOffsetY;
+    // Source Deck Base Y (Center of middle pile / Center of row)
+    const currentSourceBaseY = isDesktop ? 0 : MOBILE_SOURCE_CENTER_Y;
 
-    // Target X (Grid Slot) 
-    // Mobile: Just the slot x
-    // Desktop: Grid is shifted left.
-    const fineTargetBaseX = isDesktop ? DESKTOP_GRID_OFFSET_X : 0;
-    const fineTargetX = fineTargetBaseX + (activeFineStep ? activeFineStep.x : 0);
-    const fineTargetY = activeFineStep ? (GRID_BASE_Y + activeFineStep.y) : 0;
+    // Source Base X (Center of deck group)
+    const currentSourceBaseX = isDesktop ? DESKTOP_DECK_OFFSET_X : 0; // Mobile is 0
+
+    // Source Coordinates (Flying Card Start)
+    // X: Base + Offset (Mobile side piles)
+    // Y: Base + Offset (Desktop vertical piles)
+    
+    const fineSourceX = useMemo(() => {
+        if (!activeFineStep) return 0;
+        const offset = isDesktop 
+            ? 0 
+            : (activeFineStep.source === 0 ? -36 : activeFineStep.source === 2 ? 36 : 0);
+        return currentSourceBaseX + offset;
+    }, [isDesktop, activeFineStep, currentSourceBaseX]);
+
+    const fineSourceY = useMemo(() => {
+        if (!activeFineStep) return 0;
+        const offset = isDesktop
+            ? (activeFineStep.source === 0 ? -32 : activeFineStep.source === 2 ? 32 : 0)
+            : 0;
+        return currentSourceBaseY + offset;
+    }, [isDesktop, activeFineStep, currentSourceBaseY]);
+
+    // Target Coordinates (Flying Card End)
+    const fineTargetX = (activeFineStep ? activeFineStep.x : 0) + (isDesktop ? 0 : 0); // Mobile grid x is 0 offset
+    const fineTargetY = currentGridBaseY + (activeFineStep ? activeFineStep.y : 0);
+
 
     return (
         <div className="relative w-full h-56 md:h-auto md:flex md:flex-col md:justify-center md:items-center py-6 select-none pointer-events-none md:gap-4" aria-hidden="true">
 
             {/* --- ROUGH SORT (Compact) --- */}
-            {/* --- ROUGH SORT (Centered Starburst) --- */}
             <div className={`
                 absolute top-0 left-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-in-out
                 md:relative md:w-full md:h-40
@@ -224,7 +239,7 @@ const SortingAnimation: React.FC = () => {
                 )}
             </div>
 
-            {/* --- FINE SORT (Compact) --- */}
+            {/* --- FINE SORT (Layout via Geometry Constants) --- */}
             <div className={`
                 absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out
                 md:relative md:w-full md:h-40
@@ -233,25 +248,41 @@ const SortingAnimation: React.FC = () => {
                 {/* Background Number */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[140px] font-bold text-slate-200 z-0 leading-none">2</div>
 
-                {/* Wrapper regarding Desktop Offsets -> Actually we need to visually move the children */}
-                {/* Left Side (Desktop): Grid + Bottom Thumbs */}
-                {/* Mobile: Flex. Desktop: Absolute Grid */}
+                {/* 
+                   GRID CONTAINER 
+                   Positioned so that the Center of the Bottom Row is at `currentGridBaseY` relative to container center.
+                   Grid Slots align `items-end`. 
+                   Center of Bottom Card is 12px from Grid Bottom.
+                   So Grid Bottom Edge should be at `currentGridBaseY + 12px`.
+                   We position the container using bottom/transform.
+                   If we use `top: 50%`, then we margin-top based on the offset.
+                   Actually simpler: Position the `div` center at `currentGridBaseY` but offset by half grid height?
+                   Better: Use calculate style.
+                   
+                   Grid Bottom aligned to: `50% + (currentGridBaseY + 12)px`.
+                */}
                 <div 
-                    className={`
-                        z-10 transition-transform duration-500
-                        ${isDesktop ? 'absolute top-1/2 left-1/2' : 'flex flex-col items-center'}
-                    `}
-                    style={isDesktop ? { transform: 'translate(-50%, -64%)' } : {}}
+                    className="absolute z-10 flex items-end justify-center left-1/2 -translate-x-1/2"
+                    style={{
+                        // 26px = 12px (half card) + safety. 
+                        // The `bottom` edge of this div aligns with the bottom of the slots.
+                        // We want `bottom` edge to be at CenterY + GridBaseY + 12px.
+                        top: `calc(50% + ${currentGridBaseY + 12}px - 100%)` 
+                        // The div's bottom edge is at Top position + Height (100%).
+                        // If Top is `50% + Y - 100%`, then Bottom is `50% + Y`.
+                        // Y = GridBaseY + 12.
+                        // So Bottom is at Center + GridBaseY + 12. Correct.
+                    }}
                 >
-                    
-                    {/* Grid Container with Side Thumbs (Mobile Only) */}
-                    <div className="flex items-end gap-2 mb-2 md:mb-0">
+                     {/* Pyramid Grid (Flex Row) */}
+                     {/* Mobile Side Thumbs included here to keep relative position simple */}
+                     <div className="flex items-end gap-2">
                         {/* Left Thumb (Mobile) */}
-                        <div className="flex items-center pb-1 opacity-40 md:hidden">
+                        <div className={`flex items-center pb-1 opacity-40 md:hidden`}>
                             <ThumbsDown size={16} className="text-slate-500" />
                         </div>
 
-                        {/* Pyramid Grid */}
+                        {/* Slots */}
                         <div className="flex items-end gap-[2px]">
                             <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('L2_0')} /></div>
                             <div className="flex flex-col gap-[2px]"><MiniSlot filled={fineFilledIds.has('L1_1')} /><MiniSlot filled={fineFilledIds.has('L1_0')} /></div>
@@ -261,38 +292,43 @@ const SortingAnimation: React.FC = () => {
                         </div>
 
                         {/* Right Thumb (Mobile) */}
-                        <div className="flex items-center pb-1 opacity-40 md:hidden">
+                        <div className={`flex items-center pb-1 opacity-40 md:hidden`}>
                             <ThumbsUp size={16} className="text-slate-500" />
                         </div>
                     </div>
                 </div>
 
-                {/* Bottom Thumbs (Desktop Only) - Absolute Positioned below Grid */}
+                {/* DESKTOP BOTTOM THUMBS */}
+                {/* Positioned relative to Grid Bottom. Grid Bottom is at GridBaseY+12. */}
+                {/* We want these slightly below. Say +4px gap. */}
+                {/* Center Y = GridBaseY + 12 + 4 + 7 (half thumb height 14) = GridBaseY + 23. */}
                 <div 
-                    className="hidden md:flex absolute top-1/2 left-1/2 -translate-x-1/2 items-center gap-[2px] opacity-60 z-10"
-                    style={{ marginTop: '30px' }} 
+                    className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-[2px] opacity-60 z-10"
+                    style={{ top: `calc(50% + ${currentGridBaseY + 23}px - 7px)` }} // Top = Center - HalfHeight
                 >
-                        {/* Under L2 (Disagree) */}
                         <div className="w-[18px] flex justify-center"><ThumbsDown size={14} className="text-slate-500" /></div>
-                        {/* Spacers for L1, C0, R1 */}
                         <div className="w-[18px]" />
                         <div className="w-[18px]" />
                         <div className="w-[18px]" />
-                        {/* Under R2 (Agree) */}
                         <div className="w-[18px] flex justify-center"><ThumbsUp size={14} className="text-slate-500" /></div>
                 </div>
 
-                {/* Right Side (Desktop): Source Piles - Vertical Stack */}
-                {/* On Mobile: It's just below in the flex-col. z-index ensure it's above background but below flying cards */}
-                {/* On Desktop: It's ABSOLUTE positioned to the right of the center. */}
+                {/* SOURCE PILES */}
+                {/* 
+                    Mobile: Row of 3. Center at `MOBILE_SOURCE_CENTER_Y`.
+                    Desktop: Col of 3. Center at 0. Offset X `DESKTOP_DECK_OFFSET_X`.
+                    We position the CENTER of this container at (BaseX, BaseY).
+                */}
                 <div 
                     className={`
-                        relative flex gap-6 md:gap-2 md:flex-col pt-2 md:pt-0 h-[24px] md:h-auto z-10 transition-transform duration-500
-                        md:absolute md:top-1/2 md:left-1/2 md:-translate-y-1/2
+                        absolute z-10 flex gap-6 md:gap-2 items-center justify-center
+                        ${isDesktop ? 'flex-col' : 'flex-row'}
                     `}
-                    // On Desktop, we position the LEFT edge.
-                    // Center is at +66. Width is 18. Left is 66 - 9 = 57.
-                    style={isDesktop ? { marginLeft: '57px' } : {}}
+                    style={{
+                        top: `calc(50% + ${currentSourceBaseY}px)`, // Top becomes Center Y
+                        left: `calc(50% + ${currentSourceBaseX}px)`, // Left becomes Center X
+                        transform: 'translate(-50%, -50%)' // Center the div itself
+                    }}
                 >
                      {/* Render only in FINE phase to accept the layoutId transition */}
                     {phase === 'FINE' && (
@@ -304,18 +340,20 @@ const SortingAnimation: React.FC = () => {
                     )}
                 </div>
 
-                {/* Flying Card Overlay - Positioned Absolute Relative to Phase Container center */}
-                {/* We lift this OUT of the source piles container so it can fly freely between the two potentially separated areas */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-0 h-0 z-50">
+                {/* Flying Card Overlay */}
+                <div className="absolute top-1/2 left-1/2 w-0 h-0 z-50">
                     <AnimatePresence>
                         {activeFineStep && (
                             <motion.div
                                 key={`fine-fly-${step}`}
-                                initial={{ x: fineSourceX, y: fineSourceY, opacity: 1 }}
-                                animate={{ x: fineTargetX, y: fineTargetY }}
+                                // Source/Target are calculated relative to Center (0,0).
+                                // This div is at Center.
+                                // We offset by -9, -12 to center the 18x24 card on the point.
+                                initial={{ x: fineSourceX - 9, y: fineSourceY - 12, opacity: 1 }}
+                                animate={{ x: fineTargetX - 9, y: fineTargetY - 12 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: FINE_DURATION, ease: "easeInOut" }}
-                                className="absolute top-0 left-[-9px] w-[18px] h-[24px] bg-blue-50 border-2 border-blue-600 rounded-[2px] shadow-xl pointer-events-none"
+                                className="absolute top-0 left-0 w-[18px] h-[24px] bg-blue-50 border-2 border-blue-600 rounded-[2px] shadow-xl pointer-events-none"
                             />
                         )}
                     </AnimatePresence>
