@@ -130,8 +130,10 @@ const SortingAnimation: React.FC = () => {
     }, []);
 
     // Configuration for Desktop Layout
-    const DESKTOP_GRID_OFFSET_X = 0; // Shift Grid Left
-    const DESKTOP_DECK_OFFSET_X = 42;  // Shift Deck Right relative to center
+    // We use absolute positioning from the CENTER of the container.
+    // Grid is centered (offset 0).
+    const DESKTOP_GRID_OFFSET_X = 0; 
+    const DESKTOP_DECK_OFFSET_X = 52;  // Shift Deck Center Right relative to main center
 
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
@@ -144,13 +146,8 @@ const SortingAnimation: React.FC = () => {
     
     // Source X (Deck Position)
     // Mobile: 0 (Center), -36, +36 relative to center
-    // Desktop: +60 (Center), -36, +36 relative to THAT center? No, source piles in desktop are vertical or horizontal? 
-    // User said "decks are positioned to the right" AND "one above the other".
-    // So on Desktop: Fixed X, Varying Y.
+    // Desktop: Fixed X offset relative to center.
     const fineSourceBaseX = isDesktop ? DESKTOP_DECK_OFFSET_X : 0;
-    
-    // Desktop: center (0), -36? No, vertical stack means X is constant (0 relative to stack center).
-    // Mobile: horizontal row means X varies (-36, 0, 36).
     const fineSourceOffset = isDesktop ? 0 : (activeFineStep ? (activeFineStep.source === 0 ? -36 : activeFineStep.source === 2 ? 36 : 0) : 0);
     const fineSourceX = fineSourceBaseX + fineSourceOffset;
 
@@ -238,7 +235,8 @@ const SortingAnimation: React.FC = () => {
 
                 {/* Wrapper regarding Desktop Offsets -> Actually we need to visually move the children */}
                 {/* Left Side (Desktop): Grid + Bottom Thumbs */}
-                <div className={`flex flex-col items-center z-10 transition-transform duration-500 ${isDesktop ? 'translate-x-[0px]' : ''}`}>
+                {/* Always Centered using flex-col items-center */}
+                <div className="flex flex-col items-center z-10">
                     
                     {/* Grid Container with Side Thumbs (Mobile Only) */}
                     <div className="flex items-end gap-2 mb-2 md:mb-4">
@@ -277,7 +275,17 @@ const SortingAnimation: React.FC = () => {
                 </div>
 
                 {/* Right Side (Desktop): Source Piles - Vertical Stack */}
-                <div className={`relative flex gap-6 md:gap-2 md:flex-col pt-2 md:pt-0 h-[24px] md:h-auto z-10 transition-transform duration-500 ${isDesktop ? 'translate-x-[42px] translate-y-[-10px]' : ''}`}>
+                {/* On Mobile: It's just below in the flex-col. z-index ensure it's above background but below flying cards */}
+                {/* On Desktop: It's ABSOLUTE positioned to the right of the center. */}
+                <div 
+                    className={`
+                        relative flex gap-6 md:gap-2 md:flex-col pt-2 md:pt-0 h-[24px] md:h-auto z-10 transition-transform duration-500
+                        md:absolute md:top-1/2 md:left-1/2 md:-translate-y-1/2
+                    `}
+                    // On Desktop, we position the LEFT edge.
+                    // Center is at +52. Width is 18. Left is 52 - 9 = 43.
+                    style={isDesktop ? { marginLeft: '43px' } : {}}
+                >
                      {/* Render only in FINE phase to accept the layoutId transition */}
                     {phase === 'FINE' && (
                         <>
