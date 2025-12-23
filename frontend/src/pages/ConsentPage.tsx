@@ -7,6 +7,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import Markdown from 'react-markdown';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useConfigStore } from '../store/useConfigStore';
@@ -78,9 +79,9 @@ const ConsentPage: React.FC = () => {
                 {/* Consent Description/Legal Text */}
                 <div className="prose prose-sm max-w-none text-gray-600">
                      {config.consent?.description ? (
-                         <p>{config.consent.description}</p>
+                         <Markdown>{config.consent.description}</Markdown>
                      ) : (
-                         <p>{t('consent.default_text', 'By checking the box below, you agree to participate in this study. Your participation is voluntary and you may withdraw at any time.')}</p>
+                         <Markdown>{t('consent.default_text')}</Markdown>
                      )}
                 </div>
 

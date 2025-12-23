@@ -72,7 +72,7 @@
   "consent": {
     "title": "Suostumus osallistumiseen",
     "subtitle": "Lue seuraavat tiedot huolellisesti.",
-    "default_text": "Rastittamalla alla olevan ruudun suostut osallistumaan tähän tutkimukseen. Osallistumisesi on vapaaehtoista ja voit keskeyttää sen milloin tahansa."
+    "default_text": "Ennen aloittamista, lue seuraavat tiedot huolellisesti:\n\nTämä akateeminen tutkimus käyttää Q-metodologiaa inhimillisen subjektiivisuuden analysointiin. Tässä ei ole oikeita tai vääriä vastauksia. Tehtäväsi on yksinkertaisesti ilmaista oma näkökulmasi.\n\n**Luottamuksellisuus ja anonymiteetti:**\nVastauksesi käsitellään täysin luottamuksellisesti, nimettöminä ja GDPR:n mukaisesti. Tulokset yhdistetään yleisten suuntausten (näkökulmatekijöiden) tunnistamiseksi, eikä sinua voida tunnistaa yksilöllisesti.\n\n**Tietojen käyttö:**\nKerättyjä tietoja käytetään yksinomaan tieteelliseen tutkimukseen.\n\n**Vapaaehtoinen osallistuminen:**\nOsallistumisesi on täysin vapaaehtoista. Olet vapaa kieltäytymään osallistumisesta tai keskeyttämään tutkimuksen milloin tahansa ilman perusteluja."
   },
   "presort": {
     "title": "About you",

@@ -72,7 +72,7 @@
   "consent": {
     "title": "Consentement à la participation",
     "subtitle": "Veuillez lire attentivement les informations suivantes.",
-    "default_text": "En cochant la case ci-dessous, vous acceptez de participer à cette étude. Votre participation est volontaire et vous pouvez vous retirer à tout moment."
+    "default_text": "Avant de commencer, merci de prendre connaissance des informations suivantes :\n\nCette étude académique utilise la méthodologie Q pour analyser la subjectivité humaine. Il n'y a ici aucune bonne ou mauvaise réponse. Votre rôle consiste simplement à exprimer votre propre point de vue.\n\n**Confidentialité et anonymat :**\nVos réponses seront traitées de manière strictement confidentielle, anonymisée et en conformité avec le RGPD. Les résultats seront agrégés pour dégager des tendances générales (facteurs de points de vue) et ne permettront jamais de vous identifier individuellement.\n\n**Utilisation des données :**\nLes données collectées serviront exclusivement à des fins de recherche scientifique.\n\n**Liberté de participation :**\nVotre participation est entièrement volontaire. Vous êtes libre de refuser de participer ou d'interrompre l'étude à tout moment sans avoir à vous justifier."
   },
   "presort": {
     "title": "À propos de vous",
