@@ -73,7 +73,9 @@ const WelcomePage: React.FC = () => {
     return (
         <div className="max-w-3xl mx-auto py-12 space-y-8 animate-in fade-in duration-500 px-4">
             <div className="prose prose-blue max-w-none">
-                <h1 className="text-3xl font-bold text-gray-900">{study.title}</h1>
+                <div className="flex justify-center mb-8">
+                    <img src="/images/open-q-logo.svg" alt={study.title} className="h-16 md:h-20 w-auto object-contain" />
+                </div>
                 <p className="lead text-xl text-gray-600">{study.description}</p>
                 
                 <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 my-8">
