@@ -15,17 +15,20 @@
     "ok": "OK",
     "cancel": "Annuler",
     "check": "Vérifier",
-    "attention": "Note",
+    "attention": "Attention",
     "error": "Erreur",
-    "submitting": "Envoi...",
+    "submitting": "Envoi en cours...",
     "cards": "cartes",
     "close": "Fermer",
+    "statement": "Affirmation",
     "errors": {
       "network": "Erreur de connexion réseau. Veuillez vérifier votre connexion internet.",
       "not_found": "Étude non trouvée.",
       "validation": "Erreur système : Échec de la validation des données.",
       "unknown": "Une erreur inattendue est survenue.",
       "retry": "Réessayer",
+      "min": "La valeur doit être au moins {{min}}",
+      "max": "La valeur doit être au plus {{max}}",
       "404": {
           "title": "Page introuvable",
           "message": "La page ou l'étude que vous cherchez n'existe pas."

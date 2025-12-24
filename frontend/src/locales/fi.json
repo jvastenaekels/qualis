@@ -3,43 +3,46 @@
     "agree": "Jokseenkin samaa mieltä",
     "disagree": "Jokseenkin eri mieltä",
     "neutral": "Ei vahvaa mielipidettä",
-    "undo": "Undo",
-    "next": "Next step",
-    "submit": "Share my perspective",
+    "undo": "Kumoa",
+    "next": "Seuraava",
+    "submit": "Lähetä vastaukset",
     "continue": "Jatka",
-    "loading": "Loading...",
-    "lang_code": "en",
+    "loading": "Ladataan...",
+    "lang_code": "fi",
     "yes": "Kyllä",
     "no": "Ei",
     "ok": "OK",
     "cancel": "Peruuta",
-    "attention": "Note",
-    "error": "Error",
-    "submitting": "Sending...",
-    "cards": "cards",
-    "close": "Close",
+    "attention": "Huomio",
+    "error": "Virhe",
+    "submitting": "Lähetetään...",
+    "cards": "korttia",
+    "close": "Sulje",
+    "statement": "Väite",
     "errors": {
-      "network": "Network connection error. Please check your internet connection.",
-      "not_found": "Study not found.",
-      "validation": "System error: Data validation failed.",
-      "unknown": "An unexpected error occurred.",
-      "retry": "Retry",
+      "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
+      "not_found": "Tutkimusta ei löytynyt.",
+      "validation": "Järjestelmävirhe: Tietojen vahvistus epäonnistui.",
+      "unknown": "Tapahtui odottamaton virhe.",
+      "retry": "Yritä uudelleen",
+      "min": "Arvon on oltava vähintään {{min}}",
+      "max": "Arvon on oltava enintään {{max}}",
       "404": {
-          "title": "Page Not Found",
-          "message": "The page or study you are looking for does not exist."
+          "title": "Sivua ei löytynyt",
+          "message": "Etsimääsi sivua tai tutkimusta ei ole olemassa."
       },
       "429": {
-          "title": "Too Many Requests",
-          "message": "You are doing that too fast. Please wait a moment."
+          "title": "Liikaa pyyntöjä",
+          "message": "Toimit liian nopeasti. Odota hetki."
       },
       "500": {
-          "title": "Server Error",
-          "message": "Our servers encountered an issue. Please try again later."
+          "title": "Palvelinvirhe",
+          "message": "Palvelimellamme ilmeni ongelma. Yritä myöhemmin uudelleen."
       },
-      "network_title": "Connection Lost",
-      "home": "Go to Home",
-      "reset": "Reset Session",
-      "default_title": "Oops! Something went wrong."
+      "network_title": "Yhteys katkesi",
+      "home": "Siirry etusivulle",
+      "reset": "Nollaa istunto",
+      "default_title": "Hups! Jotain meni pieleen."
     }
   },
   "layout": {
@@ -51,8 +54,8 @@
       "fine": "Tarkka lajittelu",
       "review": "Pohdinta"
     },
-    "mobile_step": "Step",
-    "language": "English"
+    "mobile_step": "Vaihe",
+    "language": "Suomi"
   },
   "welcome": {
     "title": "Welcome",

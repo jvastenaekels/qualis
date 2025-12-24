@@ -24,7 +24,6 @@ export interface CardStackHandle {
 const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVote, x, y }, ref) => {
   const controls = useAnimation();
   const setHoveredCard = useUIStore((state) => state.setHoveredCard);
-  const hoveredCard = useUIStore((state) => state.hoveredCard);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
 
@@ -98,36 +97,7 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
     // In our case, key={currentCard.id} remounts it, so explicit reset in swipe might be redundant but safe.
   };
 
-  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Cleanup timer on unmount
-  useEffect(() => {
-    return () => {
-        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    };
-  }, []);
-
-  const handleMouseEnter = () => {
-    if (!isOverflowing) return;
-    
-    // Clear any existing timer
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-    
-    // Set intent delay (300ms) for Reading Zone
-    hoverTimerRef.current = setTimeout(() => {
-        setHoveredCard({ id: statement.id, text: statement.text });
-    }, 300);
-  };
-
-  const handleMouseLeave = () => {
-    if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current);
-        hoverTimerRef.current = null;
-    }
-    if (hoveredCard?.id === statement.id) {
-        setHoveredCard(null);
-    }
-  };
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">
@@ -141,20 +111,12 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }} // Snap back origin
         dragElastic={0.7} // Resistance
             onDragStart={() => {
-                if (hoverTimerRef.current) {
-                    clearTimeout(hoverTimerRef.current);
-                    hoverTimerRef.current = null;
-                }
                 setHoveredCard(null);
             }}
         onDragEnd={handleDragEnd}
         animate={controls}
         style={{ x, y, rotate }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onTap={() => {
-             setHoveredCard({ id: statement.id, text: statement.text });
-        }}
+
         className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-6 sm:p-8 cursor-pointer active:cursor-grabbing touch-none overflow-hidden"
       >
         {/* Color Overlays */}

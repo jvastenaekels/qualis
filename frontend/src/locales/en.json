@@ -15,17 +15,20 @@
     "cancel": "Cancel",
     "check": "Check",
     "select_card": "Select a card",
-    "attention": "Note",
+    "attention": "Attention",
     "error": "Error",
-    "submitting": "Sending...",
+    "submitting": "Submitting...",
     "cards": "cards",
     "close": "Close",
+    "statement": "Statement",
     "errors": {
       "network": "Network connection error. Please check your internet connection.",
       "not_found": "Study not found.",
       "validation": "System error: Data validation failed.",
       "unknown": "An unexpected error occurred.",
       "retry": "Retry",
+      "min": "Value must be at least {{min}}",
+      "max": "Value must be at most {{max}}",
       "404": {
           "title": "Page Not Found",
           "message": "The page or study you are looking for does not exist."
