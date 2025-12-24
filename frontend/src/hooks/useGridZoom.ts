@@ -95,16 +95,48 @@ export const useGridZoom = ({
     }, [wrapperRef, contentRef, pyramidRef]);
 
     const zoomIn = useCallback(() => {
-        if (transformRef.current) {
-            transformRef.current.zoomIn(0.2);
-        }
-    }, []);
+        if (!transformRef.current || !wrapperRef.current) return;
+
+        const { scale, positionX, positionY } = transformRef.current.instance.transformState;
+        const wrapper = wrapperRef.current;
+        
+        // Center of the viewport
+        const cx = wrapper.clientWidth / 2;
+        const cy = wrapper.clientHeight / 2;
+
+        const newScale = Math.min(scale + 0.2, 3.0); // Max scale from TransformWrapper props
+        if (newScale === scale) return;
+
+        const ratio = newScale / scale;
+
+        // Calculate new position to keep (cx, cy) fixed relative to the viewport
+        const newX = cx - (cx - positionX) * ratio;
+        const newY = cy - (cy - positionY) * ratio;
+
+        transformRef.current.setTransform(newX, newY, newScale, 200, 'easeOutQuad');
+    }, [wrapperRef]);
 
     const zoomOut = useCallback(() => {
-        if (transformRef.current) {
-            transformRef.current.zoomOut(0.2);
-        }
-    }, []);
+        if (!transformRef.current || !wrapperRef.current) return;
+
+        const { scale, positionX, positionY } = transformRef.current.instance.transformState;
+        const wrapper = wrapperRef.current;
+        
+        // Center of the viewport
+        const cx = wrapper.clientWidth / 2;
+        const cy = wrapper.clientHeight / 2;
+
+        const newScale = Math.max(scale - 0.2, 0.1); // Min scale from TransformWrapper props
+        if (newScale === scale) return;
+
+        const ratio = newScale / scale;
+
+        // Calculate new position to keep (cx, cy) fixed relative to the viewport
+        const newX = cx - (cx - positionX) * ratio;
+        const newY = cy - (cy - positionY) * ratio;
+
+        transformRef.current.setTransform(newX, newY, newScale, 200, 'easeOutQuad');
+    }, [wrapperRef]);
 
     // Auto-fit on significant window resize (debounced)
     useEffect(() => {
