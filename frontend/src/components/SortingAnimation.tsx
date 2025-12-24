@@ -334,11 +334,11 @@ const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId, type 
                 layoutId={layoutId} 
                 animate={isBumping ? { scale: 1.15 } : { scale: 1 }}
                 transition={{ duration: 0.2, type: "spring", stiffness: 300 }}
-                className={`relative w-[18px] h-[24px] flex-shrink-0 transition-opacity duration-300 ${count === 0 ? 'opacity-40' : 'opacity-100'}`}
+                className={`relative w-[18px] h-[24px] flex-shrink-0 transition-opacity duration-300 ${(count === 0 && type !== 'source') ? 'opacity-40' : 'opacity-100'}`}
             >
                 {/* Empty State */}
                 {count === 0 && (
-                    <div className="absolute inset-0 border-2 border-dashed border-slate-200 rounded-[2px]" />
+                    <div className="absolute inset-0 bg-slate-50 border-2 border-dashed border-slate-300 rounded-[2px]" />
                 )}
 
                 {/* Under Layers */}
