@@ -69,7 +69,7 @@
     "description": "Please read the instructions carefully.",
     "start": "Start Study",
     "consent": {
-      "label": "I certify that I am at least 18 years old, have read and understood the information above, and freely agree to participate in this study.",
+      "label": "I confirm I am at least 18 years old. I understand my participation is voluntary and revocable, and I consent to the anonymous processing of my data for research purposes.",
       "error": "Please accept the terms to continue."
     },
     "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
@@ -77,7 +77,7 @@
     "preview_title": "Sorting Preview",
     "objective_label": "Study Objective",
     "instructions_label": "Process",
-    "default_instructions": "**How to participate:**\n\n1. Read each statement.\n2. Sort it based on your feeling.\n3. Refine your sort on the grid."
+    "default_instructions": "**How to participate:**\n\n1. Read each statement.\n2. Categorize it based on your viewpoint.\n3. Refine your arrangement on the grid."
   },
   "consent": {
     "title": "Consent to Participate",
@@ -94,8 +94,8 @@
   "rough": {
     "header": {
       "title": "What is your position regarding this statement?",
-      "subtitle": "Swipe left if you tend to disagree, right if you tend to agree, or down if you have no strong feelings.",
-      "hint": "Trust your gut. This first pass organizes your thinking—you'll fine-tune everything in the next step."
+      "subtitle": "Swipe **Left** to Disagree, **Right** to Agree, or **Down** for Neutral/Uncertain.",
+      "hint": "Trust your **first impression**. This is a rough sort—you will refine your choices in the next step."
     },
     "complete": {
       "title": "Rough sort complete",
@@ -108,12 +108,12 @@
   },
   "fine": {
     "header": {
-      "title": "Sort the statements on the grid according to your point of view",
+      "title": "Place the statements on the grid to reflect your perspective.",
       "mobile_title": "Sort statements based on your point of view"
     },
     "deck": {
         "title": "Cards available",
-        "all_placed": "All statements placed",
+        "all_placed": "All statements from this stack are placed",
         "reset": "Reset deck",
         "confirm_reset": "Restart the grid placement? Your cards will return to the deck."
     },
@@ -157,7 +157,7 @@
         "extremes_title": "Poles & Extremes",
         "vertical": "Vertical position doesn't matter. Cards in the same column have the exact same score.",
         "vertical_title": "Sorting Axis",
-        "constraint": "Forced Choice: You must place every card to finish. Sometimes you'll have to make tough choices!",
+        "constraint": "Forced Choice: You must place every card to finish. You will sometimes have to separate statements you feel similarly about.",
         "constraint_title": "Challenge",
         "footer_note": "Each card must be placed to validate the final sort.",
         "close": "Got it!"
@@ -168,7 +168,7 @@
     "title": "To conclude",
     "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
     "extreme": {
-        "why": "What makes this statement so significant to how you see things?",
+        "why": "Why is this statement particularly significant to your perspective?",
         "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
         "min_chars": "A few words are enough to help us understand the context.",
         "label_agree": "Most like my view",
@@ -187,7 +187,7 @@
     "submit": "Share my perspective",
     "validation_error": "Please briefly explain your key choices to continue.",
     "success": {
-        "title": "Perspective recorded",
+        "title": "Submission Received",
         "message": "Your contribution to the study has been saved.",
         "id_label": "Confirmation code"
     }

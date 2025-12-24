@@ -156,10 +156,10 @@
     },
     "translations": {
         "en": {
-            "title": "Study Example",
-            "subtitle": "An interactive demonstration",
-            "objective": "This study aims to demonstrate the flexibility and usability of the Open-Q platform for social science research. By participating, you help us validate three key aspects:\n\n- **Intuitive UX**: A card sorting experience optimized for both mobile and desktop.\n- **Multilingual Support**: Robust handling of internationalized content.\n- **Modern Architecture**: Reliable and secure data collection.",
-            "instructions": "**Welcome!** This study uses Q-methodology to map different viewpoints on a subject.\n\nYour participation involves 4 smooth steps:\n\n1. **Context**: Answer a few background questions to help us understand your profile.\n2. **Preliminary Sort**: Sort statements into three piles (Tend to agree, No strong feelings, Tend to disagree).\n3. **Detailed Sort**: Arrange the cards on the grid to capture the nuance of your perspective.\n4. **Reflections**: Comment on your most significant choices to conclude the study.\n\nThere are no right or wrong answers, only your unique perspective matters.",
+            "title": "Open-Q Discovery",
+            "subtitle": "Experience Q-Methodology in Action",
+            "objective": "This interactive demo showcases Open-Q's capabilities. You will explore a set of statements to reveal your unique perspective, helping us validate the platform's intuitive design and flexible architecture.",
+            "instructions": "1. **Profile**: Answer a few questions to help us understand your background.\n2. **Rough Sort**: Sort the cards into three piles (Agree, Neutral, Disagree) based on your first impression.\n3. **Fine Sort**: Refine your perspective by placing all cards on the grid.\n4. **Analysis**: Explain the reasons behind your most significant choices.",
             "consent_title": "I confirm that I am at least 18 years old. I understand that my participation is voluntary and that I can stop at any time. I consent to the anonymous processing of my data for research purposes in accordance with GDPR.",
             "consent_description": "Data will be used solely for scientific research and stored securely.",
             "consent_accept": "I agree",
@@ -169,22 +169,22 @@
             }
         },
         "fr": {
-            "title": "Exemple d\u2019\u00e9tude",
-            "subtitle": "Une démonstration interactive",
-            "objective": "Cette étude vise à démontrer la flexibilité et la convivialité de la plateforme Open-Q. En participant, vous nous aidez à valider trois aspects clés :\n\n- **Expérience utilisateur** : un tri de cartes fluide et intuitif, sur mobile comme sur ordinateur.\n- **Multilinguisme** : une gestion robuste des contenus internationaux.\n- **Architecture moderne** : une collecte de données fiable et sécurisée.",
-            "instructions": "Cette étude utilise la méthode Q pour mettre en lumière la diversité des perspective.\n\nVotre participation suivra 4 étapes clés :\n\n1. **Profil** : quelques questions rapides pour mieux comprendre votre contexte.\n2. **Tri préliminaire** : classez spontanément les affirmations en trois piles (D'accord, Neutre, Pas d'accord).\n3. **Tri détaillé** : affinez votre position en organisant les cartes sur la grille selon l'importance qu'elles ont pour vous.\n4. **Réflexions** : expliquez les raisons de vos choix les plus significatifs pour conclure.\n\nNotez qu'il n'y a ni bonne ni mauvaise réponse : seule votre perspective personnelle compte.",
-            "consent_title": "Je certifie avoir au moins 18 ans, avoir lu et compris les informations ci-dessus, et accepte de participer librement à cette étude.",
+            "title": "Découverte Open-Q",
+            "subtitle": "Expérimentez la méthode Q en action",
+            "objective": "Cette démo interactive illustre les capacités d'Open-Q. Vous explorerez une série d'affirmations pour révéler votre perspective unique, nous aidant à valider le design intuitif et l'architecture flexible de la plateforme.",
+            "instructions": "1. **Profil** : Répondez à quelques questions pour nous aider à comprendre votre contexte.\n2. **Tri préliminaire** : Classez les cartes en trois piles (D'accord, Neutre, Pas d'accord) selon votre première impression.\n3. **Tri détaillé** : Affinez votre position en plaçant toutes les cartes sur la grille.\n4. **Analyse** : Expliquez les raisons de vos choix les plus marqués.",
+            "consent_title": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
             "ui_labels": {
-                "start_button": "Commencer l\u2019\u00e9tude"
+                "start_button": "Commencer l'étude"
             }
         },
         "fi": {
             "title": "Tutkimusesimerkki",
             "subtitle": "Interaktiivinen esittely",
             "objective": "Tämän tutkimuksen tavoitteena on osoittaa Open-Q-alustan joustavuus. Osallistumalla autat meitä validoimaan kolme keskeistä näkökohtaa:\n\n- **Käyttökokemus**: Intuitiivinen korttien lajittelu mobiililla ja työpöydällä.\n- **Monikielisyys**: Vahva tuki kansainväliselle sisällölle.\n- **Moderni Arkkitehtuuri**: Luotettava ja turvallinen tiedonkeruu.",
-            "instructions": "**Tervetuloa!** T\u00e4ss\u00e4 tutkimuksessa k\u00e4ytet\u00e4n Q-metodologiaa erilaisten n\u00e4k\u00f6kulmien kartoittamiseen.\n\nOsallistumisesi etenee sujuvasti 4 vaiheessa:\n\n1. **Taustoitus**: Vastaa muutamaan taustakysymykseen.\n2. **Alustava lajittelu**: Lajittele v\u00e4itt\u00e4m\u00e4t kolmeen pinoon (Jokseenkin samaa mieltä, Ei vahvaa mielipidettä, Jokseenkin eri mieltä).\n3. **Tarkka lajittelu**: J\u00e4rjest\u00e4 kortit ruudukkoon tarkentaaksesi n\u00e4k\u00f6kulmaasi.\n4. **Pohdinta**: Kommentoi merkitt\u00e4vimpi\u00e4 valintojasi.\n\nOikeita tai v\u00e4\u00e4ri\u00e4 vastauksia ei ole \u2013 vain sinun ainutlaatuinen n\u00e4k\u00f6kulmasi merkitsee.",
-            "consent_title": "Vahvistan olevani v\u00e4hint\u00e4\u00e4n 18-vuotias. Ymm\u00e4rr\u00e4n, ett\u00e4 osallistumiseni on vapaaehtoista ja voin keskeytt\u00e4\u00e4 sen milloin tahansa. Suostun tietojeni nimett\u00f6m\u00e4\u00e4n k\u00e4sittelyyn tutkimustarkoituksiin GDPR:n mukaisesti.",
-            "consent_description": "Tietoja k\u00e4ytet\u00e4\u00e4n ainoastaan tieteelliseen tutkimukseen ja niit\u00e4 s\u00e4ilytet\u00e4\u00e4n turvallisesti.",
+            "instructions": "**Tervetuloa!** Tässä tutkimuksessa käytetään Q-metodologiaa erilaisten näkökulmien kartoittamiseen.\n\nOsallistumisesi etenee sujuvasti 4 vaiheessa:\n\n1. **Taustoitus**: Vastaa muutamaan taustakysymykseen.\n2. **Alustava lajittelu**: Lajittele väittämät kolmeen pinoon (Jokseenkin samaa mieltä, Ei vahvaa mielipidettä, Jokseenkin eri mieltä).\n3. **Tarkka lajittelu**: Järjestä kortit ruudukkoon tarkentaaksesi näkökulmaasi.\n4. **Pohdinta**: Kommentoi merkittävimpiä valintojasi.\n\nOikeita tai vääriä vastauksia ei ole – vain sinun ainutlaatuinen näkökulmasi merkitsee.",
+            "consent_title": "Vahvistan olevani vähintään 18-vuotias. Ymmärrän, että osallistumiseni on vapaaehtoista ja voin keskeyttää sen milloin tahansa. Suostun tietojeni nimettömään käsittelyyn tutkimustarkoituksiin GDPR:n mukaisesti.",
+            "consent_description": "Tietoja käytetään ainoastaan tieteelliseen tutkimukseen ja niitä säilytetään turvallisesti.",
             "ui_labels": {
                 "start_button": "Aloita tutkimus"
             }

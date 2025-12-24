@@ -87,6 +87,8 @@ async def update_study():
                 title=t_data["title"],
                 description=t_data.get("description", ""),
                 instructions=t_data["instructions"],
+                subtitle=t_data.get("subtitle"),
+                objective=t_data.get("objective"),
                 consent_title=t_data.get("consent_title"),
                 consent_description=t_data.get("consent_description", ""),
                 consent_accept=t_data.get("consent_accept", "I agree"),

@@ -76,10 +76,32 @@ const WelcomePage: React.FC = () => {
                         <div className="uppercase tracking-wider text-xs font-bold text-blue-700 mb-4 bg-blue-100 w-fit px-3 py-1.5 rounded-md border border-blue-200">
                             {t('welcome.instructions_label', 'Instructions')}
                         </div>
-                        <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium">
-                            <Markdown>{study.instructions || t('welcome.default_instructions')}</Markdown>
+                        <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium rec-steps">
+                            <Markdown
+                                components={{
+                                    ol: ({node: _node, ...props}) => <ol className="space-y-5" {...props} />,
+                                    li: ({node: _node, ...props}) => (
+                                        <li className="flex gap-4 items-start group">
+                                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm border border-blue-200 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm mt-0.5 step-badge">
+                                                {/* Number injected via CSS */}
+                                            </span>
+                                            <div className="pt-1 text-slate-600 group-hover:text-slate-900 transition-colors leading-relaxed">
+                                                {props.children}
+                                            </div>
+                                        </li>
+                                    ),
+                                    strong: ({node: _node, ...props}) => <strong className="text-slate-900 font-bold" {...props} />
+                                }}
+                            >
+                                {study.instructions || t('welcome.default_instructions')}
+                            </Markdown>
+                            <style>{`
+                                .rec-steps ol { counter-reset: step-counter; list-style: none; padding: 0; margin: 0; }
+                                .rec-steps li { counter-increment: step-counter; padding: 0; margin: 0; }
+                                .rec-steps .step-badge::before { content: counter(step-counter); }
+                            `}</style>
                         </div>
-                    </div>
+                        </div>
 
                     {/* Visual Column */}
                     <div className="p-8 md:p-10 bg-slate-100 flex flex-col items-start min-h-[550px] relative overflow-hidden">

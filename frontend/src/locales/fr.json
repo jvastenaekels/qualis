@@ -77,7 +77,7 @@
     "preview_title": "Aperçu du tri",
     "objective_label": "Objectif de l'étude",
     "instructions_label": "Déroulement",
-    "default_instructions": "**Comment participer :**\n\n1. Lisez chaque affirmation.\n2. Triez-la selon votre ressenti.\n3. Affinez ensuite votre tri dans la grille."
+    "default_instructions": "**Comment participer :**\n\n1. Lisez chaque affirmation.\n2. Catégorisez-la selon votre **point de vue**.\n3. Affinez ensuite votre arrangement sur la grille."
   },
   "consent": {
     "title": "Consentement à la participation",
@@ -94,8 +94,8 @@
   "rough": {
     "header": {
       "title": "Quelle est votre position face à cette affirmation ?",
-      "subtitle": "Glissez à gauche pour « Plutôt pas d'accord », à droite pour « Plutôt d'accord », ou en bas si vous n'avez pas d'avis tranché.",
-      "hint": "Fiez-vous à votre instinct. Ce premier tri structure vos idées. Vous affinerez tout à l'étape suivante."
+      "subtitle": "Glissez à **Gauche** pour « Pas d'accord », à **Droite** pour « D'accord », ou en **Bas** pour « Neutre / Indécis ».",
+      "hint": "Fiez-vous à votre **première impression**. C'est un tri grossier — vous affinerez vos choix à l'étape suivante."
     },
     "complete": {
       "title": "Premier tri terminé",
@@ -108,12 +108,12 @@
   },
   "fine": {
     "header": {
-      "title": "Répartissez les affirmations sur la grille selon votre point de vue",
+      "title": "Disposez les affirmations sur la grille pour refléter votre **perspective**.",
       "mobile_title": "Triez les affirmations selon votre point de vue"
     },
     "deck": {
       "title": "Cartes disponibles",
-      "all_placed": "Toutes les affirmations de cette pile sont placées",
+      "all_placed": "Toutes les cartes de cette pile sont placées",
       "reset": "Réinitialiser",
       "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
     },
@@ -157,7 +157,7 @@
         "extremes_title": "Pôles et Extrémités",
         "vertical": "La position verticale n'importe pas. Les cartes d'une même colonne ont toutes le même score.",
         "vertical_title": "Axe de Tri",
-        "constraint": "Choix forcé : Vous devez placer toutes les cartes. Il faut parfois faire des choix difficiles !",
+        "constraint": "Choix forcé : Vous devez placer toutes les cartes. Vous devrez parfois départager des affirmations pour lesquelles vous avez un avis similaire.",
         "constraint_title": "Challenge",
         "footer_note": "Chaque carte doit être placée pour pouvoir valider le tri final.",
         "close": "Compris !"
@@ -168,7 +168,7 @@
     "title": "Pour conclure",
     "description": "Nous y sommes presque ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
     "extreme": {
-      "why": "Qu'est-ce qui rend cette affirmation si significative pour vous ?",
+      "why": "En quoi cette affirmation est-elle particulièrement significative pour votre point de vue ?",
       "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
       "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
       "label_agree": "Me correspond le plus",
@@ -187,7 +187,7 @@
     "submit": "Partager mon point de vue",
     "validation_error": "Merci d'ajouter une courte explication pour vos choix principaux ci-dessus.",
     "success": {
-      "title": "C'est noté !",
+      "title": "Contribution bien reçue",
       "message": "Votre contribution à l'étude a bien été enregistrée.",
       "id_label": "Code de confirmation"
     }
