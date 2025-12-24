@@ -103,7 +103,8 @@
   },
   "fine": {
     "header": {
-      "title": "Sort the statements on the grid according to your point of view"
+      "title": "Sort the statements on the grid according to your point of view",
+      "mobile_title": "Sort statements based on your point of view"
     },
     "deck": {
         "title": "Cards available",

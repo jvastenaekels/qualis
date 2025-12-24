@@ -103,11 +103,12 @@
   },
   "fine": {
     "header": {
-      "title": "Répartissez les affirmations sur la grille selon votre point de vue"
+      "title": "Répartissez les affirmations sur la grille selon votre point de vue",
+      "mobile_title": "Triez les affirmations selon votre point de vue"
     },
     "deck": {
       "title": "Cartes disponibles",
-      "all_placed": "Toutes les affirmations de cette pile placées",
+      "all_placed": "Toutes les affirmations de cette pile sont placées",
       "reset": "Réinitialiser",
       "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
     },

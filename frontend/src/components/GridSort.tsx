@@ -213,7 +213,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
             <div className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
                 <Target size={14} className="text-indigo-400 opacity-60 flex-none" />
                 <p className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2">
-                    {t('fine.header.title')}
+                    {isMobile ? t('fine.header.mobile_title') : t('fine.header.title')}
                 </p>
             </div>
 
