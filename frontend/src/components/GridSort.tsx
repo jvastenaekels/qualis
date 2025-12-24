@@ -227,22 +227,12 @@ const GridSort: React.FC<GridSortProps> = ({
       <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300"
       >
             {/* Reading Zone - Responsive Placement */}
-            {!isMobile ? (
-                /* Desktop: Legacy Instruction bar (optional, we could also put the reading zone here?) 
-                   The user approved the sidebar, so we keep this minimal or replace it with a horizontal reading zone if preferred.
-                   For now, let's keep the sidebar version as the primary one for desktop to respect the 'oui'.
-                */
-                <div className="hidden lg:flex min-h-[60px] flex-none bg-white border-b border-gray-200 items-center justify-center px-4 shadow-sm z-20">
-                    <span className="text-lg font-bold text-slate-700 text-center leading-tight">
-                        {t('fine.toolbar.desktop')}
-                    </span>
-                </div>
-            ) : (
+            {isMobile && (
                 /* Mobile: Sticky Reading Zone at the top */
-                <div className="sticky top-0 z-30 flex-none bg-white border-b border-indigo-100 shadow-sm transition-all duration-300">
-                    <div className={`p-3 transition-all duration-300 ${hoveredCard || selectedCard ? 'min-h-[100px] h-[100px]' : 'h-[50px]'} overflow-y-auto custom-scrollbar`}>
+                <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm transition-all duration-300">
+                    <div className={`p-3 transition-all duration-300 ${hoveredCard || selectedCard ? 'h-32' : 'h-11'} overflow-y-auto custom-scrollbar`}>
                         {hoveredCard || selectedCard ? (
-                            <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+                            <div className="animate-in fade-in slide-in-from-top-1 duration-300">
                                 <div className="text-[10px] font-bold text-indigo-400 mb-0.5 uppercase tracking-wider flex items-center gap-1">
                                     <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
                                     {hoveredCard ? 'Aperçu' : 'Sélection'}
@@ -254,7 +244,7 @@ const GridSort: React.FC<GridSortProps> = ({
                         ) : (
                             <div className="h-full flex items-center justify-center gap-2 text-slate-400 opacity-60">
                                 <span className="text-xl">👁️</span>
-                                <span className="text-xs font-semibold uppercase tracking-widest">{t('fine.toolbar.read_full') || "Toucher pour lire"}</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{t('fine.toolbar.read_full') || "Toucher pour lire"}</span>
                             </div>
                         )}
                     </div>
