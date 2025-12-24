@@ -46,41 +46,49 @@ export const useGridZoom = ({
         let scale: number, x: number, y: number;
 
         if (isMobile) {
+            // Mobile: Fit Width primarily
             const widthScale = (wrapperW * 0.98) / contentW;
-            const heightScale = (wrapperH * 0.92) / contentH;
-            scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.75));
+            const heightScale = (wrapperH * 0.90) / contentH;
             
-            // Precise pyramid centering
-            if (pyramidRef.current) {
-                const pyramid = pyramidRef.current;
-                const pyramidOffsetLeft = pyramid.offsetLeft;
-                const pyramidW = pyramid.offsetWidth;
-                x = (wrapperW / 2) - ((pyramidOffsetLeft + (pyramidW / 2)) * scale);
-            } else {
-                x = (wrapperW - (contentW * scale)) / 2;
-            }
+            // Allow slightly more zoom on mobile
+            scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.70));
             
-            // Anchor to bottom to leave room for HUD/Workbench
-            y = wrapperH - (contentH * scale) - 2;
+            // Center Horizontally (Content is flex-centered, so this centers the pyramid)
+            x = (wrapperW - (contentW * scale)) / 2;
+            
+            // Anchor Bottom to leave top space for numbers/text
+            // But ensure we don't push it *too* far down if it's small
+            y = wrapperH - (contentH * scale) - 10;
         } else {
-            const padding = 100;
+            // Desktop: Fit both, with padding
+            const padding = 60; // Reduced padding
             const availableW = wrapperW - padding;
             const availableH = wrapperH - padding;
             const scaleX = availableW / contentW;
             const scaleY = availableH / contentH;
+            
             scale = Math.min(scaleX, scaleY, 1.1);
             
-            // Precise pyramid centering
-            if (pyramidRef.current) {
-                const pyramid = pyramidRef.current;
-                const pyramidOffsetLeft = pyramid.offsetLeft;
-                const pyramidW = pyramid.offsetWidth;
-                x = (wrapperW / 2) - ((pyramidOffsetLeft + (pyramidW / 2)) * scale);
-            } else {
-                x = (wrapperW - (contentW * scale)) / 2;
-            }
+            // Center Horizontally
+            x = (wrapperW - (contentW * scale)) / 2;
             
-            y = (wrapperH - (contentH * scale)) / 2;
+            // Center Vertically based on PYRAMID, not full content
+            // (Content includes the Spectrum Bar at bottom, which drags visual center down)
+            if (pyramidRef.current) {
+                const pyramidH = pyramidRef.current.offsetHeight;
+                // We want the center of the pyramid to match the center of the wrapper
+                // Pyramid is at top of content, so PyramidCenterY relative to content is (pyramidH / 2)
+                const pyramidCenterY = (pyramidH / 2);
+                
+                // Target Y position for top of content:
+                // WrapperCenterY - (PyramidCenterY * scale)
+                y = (wrapperH / 2) - (pyramidCenterY * scale);
+                
+                // Correction: If this pushes the bottom bar off-screen, clamp it?
+                // Visual preference: Start with Pyramid centered.
+            } else {
+                y = (wrapperH - (contentH * scale)) / 2;
+            }
         }
         
         transformRef.current.setTransform(x, y, scale, 400, 'easeOutQuad');
