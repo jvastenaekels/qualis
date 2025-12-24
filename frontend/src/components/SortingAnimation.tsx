@@ -148,8 +148,8 @@ const SortingAnimation: React.FC = () => {
 
     // DESKTOP (Grid Left, Deck Right)
     const DESKTOP_GRID_ROW0_Y = 0; // Center vertically
-    const DESKTOP_GRID_OFFSET_X = -50; // Grid visual center relative to container center
-    const DESKTOP_DECK_OFFSET_X = 90; // Deck visual center relative to container center
+    const DESKTOP_GRID_OFFSET_X = -40; // Grid visual center relative to container center
+    const DESKTOP_DECK_OFFSET_X = 60; // Deck visual center relative to container center
 
     // Active Targets
     const activeRoughTarget = phase === 'ROUGH' && step < ROUGH_TARGETS.length ? ROUGH_TARGETS[step] : null;
@@ -200,7 +200,7 @@ const SortingAnimation: React.FC = () => {
             {/* --- ROUGH SORT (Compact) --- */}
             <div className={`
                 absolute top-0 left-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-in-out
-                ${phase === 'ROUGH' ? 'opacity-100 scale-[1.3] md:scale-[2.0] md:-translate-y-12 z-20' : 'opacity-0 scale-[1.2] md:scale-[1.8] md:-translate-y-12 z-10'}
+                ${phase === 'ROUGH' ? 'opacity-100 scale-[1.6] -translate-y-4 md:scale-[2.0] md:-translate-y-12 z-20' : 'opacity-0 scale-[1.4] -translate-y-4 md:scale-[1.8] md:-translate-y-12 z-10'}
             `}>
 
                 {/* Deck (Center) */}
@@ -242,7 +242,7 @@ const SortingAnimation: React.FC = () => {
             {/* --- FINE SORT (Layout via Geometry Constants) --- */}
             <div className={`
                 absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out
-                ${phase === 'FINE' ? 'opacity-100 scale-[1.3] md:scale-[2.0] md:-translate-y-12 z-20' : 'opacity-0 scale-[1.2] md:scale-[1.8] md:-translate-y-12 z-10'}
+                ${phase === 'FINE' ? 'opacity-100 scale-[1.6] -translate-y-4 md:scale-[2.0] md:-translate-y-12 z-20' : 'opacity-0 scale-[1.4] -translate-y-4 md:scale-[1.8] md:-translate-y-12 z-10'}
             `}>
 
                 {/* 
@@ -365,7 +365,7 @@ const SortingAnimation: React.FC = () => {
 
             {/* Progress Indicator (Bottom) */}
             {/* Progress Indicator (Bottom) */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none pb-12">
+            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none">
                 <div className={`transition-all duration-500 rounded-full flex items-center justify-center font-bold text-[10px] w-6 h-6 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 text-white shadow-md scale-110' : 'bg-slate-100 border-slate-300 text-slate-400'}`}>
                     1
                 </div>
@@ -407,7 +407,7 @@ const DynamicStack: React.FC<StackProps> = ({ count, icon: Icon, layoutId }) => 
         <motion.div 
             layoutId={layoutId} 
             transition={{ duration: 0.8, ease: "easeInOut" }}
-            className={`relative ${width} ${height} flex-shrink-0 transition-opacity duration-300 ${count === 0 ? 'opacity-30' : 'opacity-100'}`}
+            className={`relative ${width} ${height} flex-shrink-0 transition-opacity duration-300 ${count === 0 ? 'opacity-80' : 'opacity-100'}`}
         >
             {/* Placeholder / Empty Slot border */}
             <div className={`absolute inset-0 border-2 border-dashed border-slate-300 rounded-[2px] ${count === 0 ? 'block' : 'hidden'}`} />
