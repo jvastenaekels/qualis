@@ -80,7 +80,8 @@ const SortingAnimation: React.FC = () => {
 
     // Piles: Count how many of each type have been *completed*
     const roughPileCounts = useMemo(() => {
-        const counts = { disagree: 0, neutral: 0, agree: 0 };
+        // Start with some cards already sorted as per user request
+        const counts = { disagree: 3, neutral: 3, agree: 3 };
         // If FINE phase, Rough is complete (full piles)
         const effectiveStep = phase === 'ROUGH' ? step : ROUGH_TARGETS.length;
 
