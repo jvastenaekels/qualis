@@ -200,6 +200,11 @@ const SortingAnimation: React.FC = () => {
                 md:relative md:w-full md:h-40
                 ${phase === 'ROUGH' ? 'opacity-100 scale-[1.5] md:scale-100 z-20 md:filter-none' : 'opacity-0 scale-[1.35] z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
             `}>
+                {/* Step Badge (Mobile only) */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-semibold rounded-full z-50 md:hidden">
+                    1 / 2
+                </div>
+
                 {/* Deck (Center) */}
                 <div className="relative z-20">
                     <DynamicStack count={roughDeckCount} type="deck" />
@@ -242,6 +247,10 @@ const SortingAnimation: React.FC = () => {
                 md:relative md:w-full md:h-40
                 ${phase === 'FINE' ? 'opacity-100 scale-[1.5] md:scale-100 z-20 md:filter-none' : 'opacity-0 scale-[1.35] z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
             `}>
+                {/* Step Badge (Mobile only) */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] font-semibold rounded-full z-50 md:hidden">
+                    2 / 2
+                </div>
 
                 {/* 
                    GRID CONTAINER 
