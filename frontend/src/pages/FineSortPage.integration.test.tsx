@@ -80,7 +80,7 @@ describe('FineSortPage Integration', () => {
                 { statementId: 2, col: 0, row: 1 }
             ]
         };
-        const uiState = { zoomedCard: null, setZoomedCard: vi.fn() };
+        const uiState = { hoveredCard: null, setHoveredCard: vi.fn() };
 
         mockUseConfigStore.mockImplementation((selector: any) => selector ? selector(configState) : configState);
         mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);
@@ -120,7 +120,7 @@ describe('FineSortPage Integration', () => {
             rough: { agree: [], disagree: [], neutral: [1, 2] },
             qsort: []
         };
-        const uiState = { zoomedCard: null, setZoomedCard: vi.fn() };
+        const uiState = { hoveredCard: null, setHoveredCard: vi.fn() };
 
         mockUseConfigStore.mockImplementation((selector: any) => selector ? selector(configState) : configState);
         mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);

@@ -33,7 +33,7 @@ export interface InteractionUtils {
         instance: { 
             transformState: { positionX: number; positionY: number; scale: number; } 
         }; 
-        setTransform: (x: number, y: number, scale: number, duration: number, animationType?: string) => void;
+        setTransform: (x: number, y: number, scale: number, duration: number, animationType?: any) => void;
     }>;
     wrapperRef: React.RefObject<HTMLDivElement>;
     contentRef: React.RefObject<HTMLDivElement>;
@@ -65,6 +65,7 @@ export const useFineSortDrag = ({
     // Advanced Drag Interaction Refs
     const lastPos = useRef({ x: 0, y: 0 });
     const dwellTimer = useRef<NodeJS.Timeout | null>(null);
+    const panActivationTimer = useRef<NodeJS.Timeout | null>(null);
     const panInterval = useRef<NodeJS.Timeout | null>(null);
     const panSpeed = useRef({ dx: 0, dy: 0 });
 
@@ -76,14 +77,68 @@ export const useFineSortDrag = ({
         if (event.activatorEvent instanceof MouseEvent || event.activatorEvent instanceof PointerEvent) {
             lastPos.current = { x: event.activatorEvent.clientX, y: event.activatorEvent.clientY };
         }
-    }, [actions, onSelectionChange]);
+    }, [onSelectionChange]);
 
     const stopPan = useCallback(() => {
+        if (panActivationTimer.current) {
+            clearTimeout(panActivationTimer.current);
+            panActivationTimer.current = null;
+        }
         if (panInterval.current) {
             clearInterval(panInterval.current);
             panInterval.current = null;
         }
     }, []);
+
+    const startPanInterval = useCallback(() => {
+        if (panInterval.current) return;
+
+        panInterval.current = setInterval(() => {
+            const transform = interactionUtils?.transformRef.current;
+            const content = interactionUtils?.contentRef.current;
+            const wrapper = interactionUtils?.wrapperRef.current;
+            
+            if (transform && content && wrapper) {
+                const state = transform.instance.transformState;
+                const scale = state.scale;
+                const { dx: currentDx, dy: currentDy } = panSpeed.current;
+                
+                // 3. Dynamic speed factor if outside grid (Check inside interval)
+                let speedFactor = 1.0;
+                const gridEl = document.querySelector('[data-testid="grid-container"]');
+                if (gridEl) {
+                    const gridRect = gridEl.getBoundingClientRect();
+                    const { x: curX, y: curY } = lastPos.current; // Use latest pointer pos
+                    if (curX < gridRect.left || curX > gridRect.right || curY < gridRect.top || curY > gridRect.bottom) {
+                        speedFactor = 0.3; // Reduce speed outside grid
+                    }
+                }
+
+                const effectiveDx = currentDx * speedFactor;
+                const effectiveDy = currentDy * speedFactor;
+
+                const contentW = content.offsetWidth * scale;
+                const contentH = content.offsetHeight * scale;
+                const wrapperW = wrapper.clientWidth;
+                const wrapperH = wrapper.clientHeight;
+                
+                const minX = wrapperW - contentW - (wrapperW * 0.2);
+                const maxX = wrapperW * 0.2;
+                const minY = wrapperH - contentH - (wrapperH * 0.2);
+                const maxY = wrapperH * 0.2;
+                
+                const newX = Math.max(minX, Math.min(maxX, state.positionX + effectiveDx));
+                const newY = Math.max(minY, Math.min(maxY, state.positionY + effectiveDy));
+
+                if (newX !== state.positionX || newY !== state.positionY) {
+                    transform.setTransform(newX, newY, scale, 0);
+                    onPan?.();
+                } else {
+                    stopPan();
+                }
+            }
+        }, 16);
+    }, [interactionUtils, onPan, stopPan]);
 
     const handleDragMove = useCallback((event: DragMoveEvent) => {
         if (!interactionUtils || !interactionUtils.transformRef.current) return;
@@ -132,58 +187,19 @@ export const useFineSortDrag = ({
         panSpeed.current = { dx, dy };
 
         if (dx !== 0 || dy !== 0) {
-            if (!panInterval.current) {
-                panInterval.current = setInterval(() => {
-                    const transform = interactionUtils.transformRef.current;
-                    const content = interactionUtils.contentRef.current;
-                    const wrapper = interactionUtils.wrapperRef.current;
-                    
-                    if (transform && content && wrapper) {
-                        const state = transform.instance.transformState;
-                        const scale = state.scale;
-                        const { dx: currentDx, dy: currentDy } = panSpeed.current;
-                        
-                        // 3. Dynamic speed factor if outside grid (Check inside interval)
-                        let speedFactor = 1.0;
-                        const gridEl = document.querySelector('[data-testid="grid-container"]');
-                        if (gridEl) {
-                            const gridRect = gridEl.getBoundingClientRect();
-                            const { x: curX, y: curY } = lastPos.current; // Use latest pointer pos
-                            if (curX < gridRect.left || curX > gridRect.right || curY < gridRect.top || curY > gridRect.bottom) {
-                                speedFactor = 0.3; // Reduce speed outside grid
-                            }
-                        }
-
-                        const effectiveDx = currentDx * speedFactor;
-                        const effectiveDy = currentDy * speedFactor;
-
-                        const contentW = content.offsetWidth * scale;
-                        const contentH = content.offsetHeight * scale;
-                        const wrapperW = wrapper.clientWidth;
-                        const wrapperH = wrapper.clientHeight;
-                        
-                        const minX = wrapperW - contentW - (wrapperW * 0.2);
-                        const maxX = wrapperW * 0.2;
-                        const minY = wrapperH - contentH - (wrapperH * 0.2);
-                        const maxY = wrapperH * 0.2;
-                        
-                        const newX = Math.max(minX, Math.min(maxX, state.positionX + effectiveDx));
-                        const newY = Math.max(minY, Math.min(maxY, state.positionY + effectiveDy));
-
-                        if (newX !== state.positionX || newY !== state.positionY) {
-                            transform.setTransform(newX, newY, scale, 0);
-                            onPan?.();
-                        } else {
-                            stopPan();
-                        }
+            // Only start pan if we've been at the edge for a while (500ms activation delay)
+            if (!panInterval.current && !panActivationTimer.current) {
+                panActivationTimer.current = setTimeout(() => {
+                    panActivationTimer.current = null;
+                    if (panSpeed.current.dx !== 0 || panSpeed.current.dy !== 0) {
+                        startPanInterval();
                     }
-                }, 16); 
+                }, 500);
             }
-        }
- else {
+        } else {
             stopPan();
         }
-    }, [interactionUtils, stopPan, onPan]);
+    }, [interactionUtils, stopPan, startPanInterval]);
 
     const findClosestEmptyRow = useCallback((col: number, targetRow: number): number | null => {
         const capacity = gridColumns[col]?.capacity || 0;

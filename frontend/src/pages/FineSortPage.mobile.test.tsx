@@ -71,7 +71,7 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         fireEvent.click(card);
 
         // 5. Verify Workbench appears
-        expect(await screen.findByText(/fine.workbench.drag_or_tap/i)).toBeTruthy();
+        expect(await screen.findByText(/fine.workbench.place_on_grid/i)).toBeTruthy();
 
         // 6. User Taps Empty Slot (Place)
         const slot = screen.getByTestId('slot_0_0');
@@ -83,8 +83,30 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
             expect(cardInSlot).toBeTruthy();
         }, { timeout: 4000 });
 
-        // 8. Verify Deck shows completion message
+        // 8. Verify Deck shows completion message (Updated with precision)
         expect(screen.getByText(/fine.deck.all_placed/i)).toBeTruthy();
+    });
+
+    it('displays the precise "empty pile" message when a category is fully placed', async () => {
+        useResponseStore.getState().categorizeCard(1, 'disagree');
+        useResponseStore.getState().placeCardInGrid(1, 0, 0);
+        
+        render(
+            <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
+                <Routes>
+                    <Route path="/study/:slug" element={<StudyLayout />}>
+                        <Route path="sort/fine" element={<FineSortPage />} />
+                    </Route>
+                </Routes>
+            </MemoryRouter>
+        );
+
+        // Ensure we are on 'disagree'
+        const disagreeTab = await screen.findByRole('tab', { name: /common.disagree/i });
+        fireEvent.click(disagreeTab);
+
+        // Check for precise "all placed" label
+        expect(screen.getByText('fine.deck.all_placed')).toBeInTheDocument();
     });
 
     it('allows "Tap-to-Swap" interaction: Select Card -> Tap Occupied Slot -> Swap', async () => {

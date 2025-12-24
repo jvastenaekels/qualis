@@ -9,7 +9,6 @@ describe('useFineSortDrag', () => {
         moveCardInGrid: vi.fn(),
         swapCardsInGrid: vi.fn(),
         unplaceCard: vi.fn(),
-        setZoomedCard: vi.fn(),
     };
 
     const mockGridColumns = [

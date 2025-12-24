@@ -118,10 +118,6 @@
       "slot": "Slot",
       "in_column": "in column"
   },
-"tips": {
-    "extremes": "Start with extremes. Place your strongest views first, then work toward the middle.",
-    "vertical": "Vertical position doesn't matter—only left-to-right order counts."
-},
     "legend": {
         "disagree": "Most Disagree",
         "neutral": "Neutral",

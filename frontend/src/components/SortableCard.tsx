@@ -10,6 +10,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import ReactMarkdown from 'react-markdown';
 import { useUIStore } from '../store/useUIStore';
+import { Eye } from 'lucide-react';
 
 interface SortableCardProps {
   id: number;
@@ -101,6 +102,13 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
   const aspectStyle = aspectRatio ? { aspectRatio: `${aspectRatio}` } : {};
   const aspectClass = !aspectRatio && !dimensions ? 'aspect-[3/4]' : '';
 
+  const handlePointerDown = (e: React.PointerEvent) => {
+    // On touch devices, we want immediate feedback in the Reading Zone
+    if (e.pointerType === 'touch') {
+        handleMouseEnter();
+    }
+  };
+
   return (
     <>
         <div
@@ -109,7 +117,11 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
             {...attributes}
             {...listeners}
             data-testid={`card-${id}`}
+            onPointerDown={handlePointerDown}
             onClick={() => {
+                // Prevent event from bubbling if it's a drag activation
+                if (isDragging) return;
+                
                 if (hoverTimerRef.current) {
                     clearTimeout(hoverTimerRef.current);
                     hoverTimerRef.current = null;
@@ -126,7 +138,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
                 flex items-center justify-center p-0
                 cursor-grab active:cursor-grabbing
                 touch-none dnd-prevent-pan
-                [touch-action:none]
+                ${isDragging ? '[touch-action:none]' : '[touch-action:manipulation]'}
                 ${isOverlay ? 'z-50 cursor-grabbing' : ''}
             `}
         >
@@ -162,8 +174,10 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
                 </div>
                 
                 {!disableHoverZoom && (
-                    <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                         <span className="text-base text-indigo-400">🔍</span>
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-70 transition-opacity">
+                         <div className="bg-indigo-50/50 p-1 rounded-full text-indigo-400">
+                             <Eye size={14} strokeWidth={2.5} />
+                         </div>
                     </div>
                 )}
             </motion.div>

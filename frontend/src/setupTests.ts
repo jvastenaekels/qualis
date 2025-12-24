@@ -58,6 +58,6 @@ afterEach(() => {
     useConfigStore.getState().resetConfig();
     useResponseStore.getState().resetResponses();
     useSessionStore.getState().resetSession();
-    useUIStore.getState().setZoomedCard(null);
+    useUIStore.getState().setHoveredCard(null);
 });
 afterAll(() => server.close());

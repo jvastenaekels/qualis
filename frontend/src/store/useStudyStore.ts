@@ -45,7 +45,6 @@ interface StudyStore {
   configError: string | null;
   session: SessionState;
   responses: ResponsesState;
-  zoomedCard: { id: number; text: string } | null;
   configRefetchTag: number;
 
   // Actions
@@ -72,7 +71,6 @@ interface StudyStore {
   completeSession: (code: string) => void;
   resetSession: () => void;
   setLanguage: (lang: string) => void;
-  setZoomedCard: (card: { id: number; text: string } | null) => void;
   setSaving: (saving: boolean) => void;
 }
 
@@ -99,7 +97,6 @@ export const useStudyStore = create<StudyStore>()(
         qsort: [],
         postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
       },
-      zoomedCard: null,
 
       setConfig: (config) => set({ config, configLoading: false, configError: null }),
       setConfigLoading: (configLoading) => set({ configLoading }),
@@ -286,7 +283,6 @@ export const useStudyStore = create<StudyStore>()(
           configRefetchTag: state.configRefetchTag + 1,
           session: { token: null, hasConsented: false, currentStep: 1, maxReachedStep: 1, language: null, isCompleted: false, confirmationCode: null, isSaving: false },
           responses: { presort: {}, rough: { agree: [], disagree: [], neutral: [], history: [] }, qsort: [], postsort: { card_comments: {}, missing_statement: '', general_comment: '' } },
-          zoomedCard: null
         };
       }),
 
@@ -294,7 +290,6 @@ export const useStudyStore = create<StudyStore>()(
           session: { ...state.session, language: lang }
       })),
 
-      setZoomedCard: (zoomedCard) => set({ zoomedCard }),
       setSaving: (isSaving) => set((state) => ({ session: { ...state.session, isSaving } })),
     }),
     {

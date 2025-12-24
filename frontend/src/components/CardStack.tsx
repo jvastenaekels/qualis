@@ -8,6 +8,7 @@ import { forwardRef, useImperativeHandle, useState, useRef, useEffect } from 're
 import { motion, useTransform, useAnimation, type PanInfo, type MotionValue } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { useUIStore } from '../store/useUIStore';
+import { Eye } from 'lucide-react';
 
 interface CardStackProps {
   statement: { id: number; text: string };
@@ -22,8 +23,8 @@ export interface CardStackHandle {
 
 const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVote, x, y }, ref) => {
   const controls = useAnimation();
-  const setZoomedCard = useUIStore((state) => state.setZoomedCard);
-  const zoomedCard = useUIStore((state) => state.zoomedCard);
+  const setHoveredCard = useUIStore((state) => state.setHoveredCard);
+  const hoveredCard = useUIStore((state) => state.hoveredCard);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
 
@@ -112,9 +113,9 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
     // Clear any existing timer
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
     
-    // Set 300ms intent delay
+    // Set intent delay (300ms) for Reading Zone
     hoverTimerRef.current = setTimeout(() => {
-        setZoomedCard({ id: statement.id, text: statement.text });
+        setHoveredCard({ id: statement.id, text: statement.text });
     }, 300);
   };
 
@@ -123,8 +124,8 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         clearTimeout(hoverTimerRef.current);
         hoverTimerRef.current = null;
     }
-    if (zoomedCard?.id === statement.id) {
-        setZoomedCard(null);
+    if (hoveredCard?.id === statement.id) {
+        setHoveredCard(null);
     }
   };
 
@@ -139,13 +140,13 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         drag
         dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }} // Snap back origin
         dragElastic={0.7} // Resistance
-        onDragStart={() => {
-            if (hoverTimerRef.current) {
-                clearTimeout(hoverTimerRef.current);
-                hoverTimerRef.current = null;
-            }
-            setZoomedCard(null);
-        }}
+            onDragStart={() => {
+                if (hoverTimerRef.current) {
+                    clearTimeout(hoverTimerRef.current);
+                    hoverTimerRef.current = null;
+                }
+                setHoveredCard(null);
+            }}
         onDragEnd={handleDragEnd}
         animate={controls}
         style={{ x, y, rotate }}
@@ -193,12 +194,12 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
                 whileTap={{ scale: 0.9 }}
                 onClick={(e) => {
                     e.stopPropagation();
-                    setZoomedCard({ id: statement.id, text: statement.text });
+                    setHoveredCard({ id: statement.id, text: statement.text });
                 }}
-                className="absolute bottom-4 right-6 p-2 bg-slate-100/80 rounded-full text-lg shadow-sm lg:bg-transparent lg:shadow-none lg:p-0"
-                aria-label="Zoom statement"
+                className="absolute bottom-4 right-6 p-2 bg-indigo-50/80 rounded-full text-indigo-500 shadow-sm lg:p-1.5 transition-colors hover:bg-indigo-100"
+                aria-label="Read statement"
             >
-                <span className="text-xl">🔍</span>
+                <Eye size={20} strokeWidth={2.5} />
             </motion.button>
         )}
       </motion.div>

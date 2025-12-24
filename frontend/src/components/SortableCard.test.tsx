@@ -4,12 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import SortableCard from './SortableCard';
 import { useUIStore } from '../store/useUIStore';
-import { act } from 'react';
 
 // Mock dnd-kit hook
 vi.mock('@dnd-kit/sortable', () => ({
@@ -26,13 +25,14 @@ vi.mock('@dnd-kit/sortable', () => ({
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
     motion: {
-        div: ({ children, className, onClick, onMouseEnter, onMouseLeave, ...props }: React.ComponentProps<'div'>) => (
+        div: ({ children, className, onClick, onMouseEnter, onMouseLeave, style, ...props }: any) => (
             <div 
                 className={className} 
                 onClick={onClick}
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
-                {...props}
+                style={style}
+                data-testid={props['data-testid']}
             >
                 {children}
             </div>
@@ -47,6 +47,10 @@ describe('SortableCard', () => {
         useUIStore.setState({ hoveredCard: null });
     });
 
+    afterEach(() => {
+        cleanup();
+    });
+
     const defaultProps = {
         id: 123,
         text: 'Test Card Content',
@@ -54,21 +58,11 @@ describe('SortableCard', () => {
 
     it('renders card text correctly', () => {
         render(
-      <MemoryRouter>
-        <SortableCard {...defaultProps} />
-      </MemoryRouter>
-    );
-        expect(screen.getByText('Test Card Content')).toBeTruthy();
-    });
-
-    it('renders different variants with correct classes', () => {
-        const { rerender } = render(<SortableCard {...defaultProps} variant="grid" />);
-        expect(screen.getByText('Test Card Content')).toBeTruthy();
-
-        rerender(<SortableCard {...defaultProps} variant="hand" />);
-        expect(screen.getByText('Test Card Content')).toBeTruthy();
-
-        rerender(<SortableCard {...defaultProps} variant="compact" />);
+            <MemoryRouter>
+                <SortableCard {...defaultProps} />
+            </MemoryRouter>
+        );
+        expect(screen.getByTestId('card-123')).toBeTruthy();
         expect(screen.getByText('Test Card Content')).toBeTruthy();
     });
 
@@ -76,7 +70,7 @@ describe('SortableCard', () => {
         const handleClick = vi.fn();
         render(<SortableCard {...defaultProps} onClick={handleClick} />);
         
-        fireEvent.click(screen.getByText('Test Card Content'));
+        fireEvent.click(screen.getByTestId('card-123'));
         
         expect(handleClick).toHaveBeenCalledTimes(1);
     });
@@ -88,12 +82,11 @@ describe('SortableCard', () => {
             </MemoryRouter>
         );
         
-        const cardContainer = screen.getByText('Test Card Content').closest('.relative');
-        if(!cardContainer) throw new Error('Container not found');
+        const card = screen.getByTestId('card-123');
 
         // Trigger hover
         await act(async () => {
-             fireEvent.mouseEnter(cardContainer);
+             fireEvent.mouseEnter(card);
         });
 
         // Store should be updated immediately
@@ -101,7 +94,7 @@ describe('SortableCard', () => {
 
         // Trigger leave
         await act(async () => {
-            fireEvent.mouseLeave(cardContainer);
+            fireEvent.mouseLeave(card);
         });
         
         expect(useUIStore.getState().hoveredCard).toBe(null);
@@ -110,17 +103,17 @@ describe('SortableCard', () => {
     it('styling changes when selected', () => {
         render(<SortableCard {...defaultProps} isSelected={true} />);
         
-        const contentDiv = screen.getByText('Test Card Content').closest('.border-blue-500');
-        expect(contentDiv).toBeTruthy();
+        const card = screen.getByTestId('card-123');
+        const inner = card.querySelector('.border-blue-500');
+        expect(inner).toBeTruthy();
     });
 
-    it('applies dimensions correctly in overlay mode', () => {
+    it('applies dimensions correctly', () => {
         const dimensions = { width: 100, height: 150 };
-        render(<SortableCard {...defaultProps} isOverlay={true} dimensions={dimensions} />);
+        render(<SortableCard {...defaultProps} dimensions={dimensions} />);
         
-        const outerDiv = screen.getByText('Test Card Content').closest('.relative') as HTMLElement;
-        expect(outerDiv).toBeTruthy();
-        expect(outerDiv.style.width).toBe('100px');
-        expect(outerDiv.style.height).toBe('150px');
+        const card = screen.getByTestId('card-123');
+        expect(card.style.width).toBe('100px');
+        expect(card.style.height).toBe('150px');
     });
 });

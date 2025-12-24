@@ -5,12 +5,13 @@
  */
 
 // Imports
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     ZoomIn, ZoomOut, RotateCcw,
     Check, X, Eye,
-    Smile, Meh, Frown
+    Smile, Meh, Frown, HelpCircle,
+    Lightbulb, Sparkles, Target
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
@@ -20,6 +21,8 @@ import { useGridZoom } from '../hooks/useGridZoom';
 import { useGridCalculations } from '../hooks/useGridCalculations';
 import { useDeckManagement } from '../hooks/useDeckManagement';
 import { useUIStore } from '../store/useUIStore';
+import { useResponseStore } from '../store/useResponseStore';
+import type { InteractionUtils } from '../hooks/useFineSortDrag';
 
 
 interface GridSortProps {
@@ -30,21 +33,17 @@ interface GridSortProps {
   renderSlotContent: (col: number, row: number, dimensions: { width: number, height: number }) => React.ReactNode;
   onReset?: () => void;
   selectedCardId?: number | null;
+  selectedCard?: { id: number, text: string } | null;
+  activeCard?: { id: number; text: string } | null;
   onCardClick?: (id: number) => void;
   onSlotClick?: (col: number, row: number) => void;
   onDimensionsChange?: (dimensions: { width: number, height: number }) => void;
-  forcedTipsClosed?: boolean;
   disableHoverZoom?: boolean;
-  onZoomChange?: (scale: number) => void;
+  onZoomChange?: (zoom: number) => void;
   onTransformChange?: () => void;
-  onInteractionUtils?: (utils: { 
-    zoomIn: () => void; 
-    zoomOut: () => void; 
-    performAutoFit: () => void;
-    transformRef: React.RefObject<any>;
-    wrapperRef: React.RefObject<HTMLDivElement>;
-    contentRef: React.RefObject<HTMLDivElement>;
-  }) => void;
+  onInteractionUtils?: (utils: InteractionUtils) => void;
+  isAllPlaced?: boolean;
+  onValidate?: () => void;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -57,14 +56,17 @@ const GridSort: React.FC<GridSortProps> = ({
   renderSlotContent,
   onReset,
   selectedCardId,
+  selectedCard: selectedCardProp,
   onCardClick,
   onSlotClick,
   onDimensionsChange,
-  forcedTipsClosed = false,
   disableHoverZoom = false,
   onZoomChange,
   onTransformChange,
-  onInteractionUtils
+  onInteractionUtils,
+  isAllPlaced = false,
+  onValidate,
+  activeCard
 }) => {
   const { t } = useTranslation();
 
@@ -81,27 +83,29 @@ const GridSort: React.FC<GridSortProps> = ({
       disagreeCards,
       neutralCards
   });
+  
+  const qsortResponses = useResponseStore((state) => state.qsort);
+  const selectedCard = selectedCardProp;
 
   const hoveredCard = useUIStore((state) => state.hoveredCard);
-
-  const [closedTips, setClosedTips] = useState({ extremes: false, vertical: false });
-  const [showVerticalTip, setShowVerticalTip] = useState(false);
   const [autoFitEnabled, setAutoFitEnabled] = useState(true); 
-
-  // Staggered tips: Show vertical tip 1s after extremes tip closes, OR after 5s
-  useEffect(() => {
-      if (closedTips.extremes && !forcedTipsClosed) {
-          const timer = setTimeout(() => setShowVerticalTip(true), 1000);
-          return () => clearTimeout(timer);
-      }
-  }, [closedTips.extremes, forcedTipsClosed]);
-  
-  // Fallback: show vertical tip after 5s regardless
-  useEffect(() => {
-      const timer = setTimeout(() => setShowVerticalTip(true), 5000);
-      return () => clearTimeout(timer);
-  }, []);
  
+
+  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [methodologyStep, setMethodologyStep] = useState(0);
+  const methodologyTips = [
+      t('fine.workbench.methodology.extremes'),
+      t('fine.workbench.methodology.vertical'),
+      t('fine.workbench.methodology.interaction')
+  ];
+
+  useEffect(() => {
+      if (activeCard || hoveredCard || selectedCard) return;
+      const interval = setInterval(() => {
+          setMethodologyStep(prev => (prev + 1) % methodologyTips.length);
+      }, 6000);
+      return () => clearInterval(interval);
+  }, [activeCard, hoveredCard, selectedCard, methodologyTips.length]);
 
   // Grid Calculations Hook
   const { wrapperRef, cardDimensions } = useGridCalculations({
@@ -119,7 +123,7 @@ const GridSort: React.FC<GridSortProps> = ({
       return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const isDeckCollapsed = isMobile && !!selectedCardId;
+  const isDeckCollapsed = false; // Never collapse deck anymore as per user request
 
   // Refs for Zoom Hook (wrapperRef is now provided by useGridCalculations)
   const contentRef = useRef<HTMLDivElement>(null);
@@ -151,27 +155,27 @@ const GridSort: React.FC<GridSortProps> = ({
             zoomIn,
             zoomOut,
             performAutoFit,
-            transformRef,
+            transformRef: transformRef as any,
             wrapperRef,
             contentRef
         });
     }
   }, [onInteractionUtils, zoomIn, zoomOut, performAutoFit, transformRef, wrapperRef, contentRef]);
 
-  const getColumnTint = (score: number) => {
+  const getColumnTint = useCallback((score: number) => {
       if (score <= -3) return 'bg-red-50/50';
       if (score < 0) return 'bg-orange-50/30';
       if (score === 0) return 'bg-slate-50/50';
       if (score < 3) return 'bg-green-50/30';
       if (score <= 4) return 'bg-green-50/50';
       return 'bg-transparent';
-  };
+  }, []);
   
-  const getLegendFontSize = (maxLen: number) => {
+  const getLegendFontSize = useCallback((maxLen: number) => {
     if (maxLen < 12) return 'text-xl sm:text-2xl'; 
     if (maxLen < 25) return 'text-lg sm:text-xl';
     return 'text-base sm:text-lg';
-  };
+  }, []);
   
 
   useEffect(() => {
@@ -180,10 +184,9 @@ const GridSort: React.FC<GridSortProps> = ({
       return () => clearTimeout(tFit);
   }, [performAutoFit]); 
 
-  // Responsive: Close tips and disable autofit on mobile selection
+  // Responsive: Disable autofit on mobile selection
   useEffect(() => {
     if (selectedCardId && window.innerWidth < 1024) {
-        setClosedTips({ extremes: true, vertical: true });
         setAutoFitEnabled(false);
     }
   }, [selectedCardId]);
@@ -197,13 +200,20 @@ const GridSort: React.FC<GridSortProps> = ({
   }, [cardDimensions, autoFitEnabled, performAutoFit]);
 
   // Derived: active statement for the hub
-  const selectedCards = [...agreeCards, ...disagreeCards, ...neutralCards];
-  const selectedCard = selectedCardId ? selectedCards.find(c => c.id === selectedCardId) : null;
+  // const selectedCard = selectedCardProp; (already moved up)
 
-  const renderDeckCards = () => {
+  const renderDeckCards = useCallback(() => {
     return activeCards.length > 0 ? activeCards.map(card => (
         <motion.div key={card.id} layout initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -20, opacity: 0 }} className="flex-none w-[130px] sm:w-[140px] lg:w-full lg:flex-none">
-               <SortableCard id={card.id} text={card.text} variant="compact" isSelected={selectedCardId === card.id} onClick={() => onCardClick?.(card.id)} aspectRatio={cardDimensions.width / cardDimensions.height} disableHoverZoom={disableHoverZoom || (typeof window !== 'undefined' && window.innerWidth < 1024)} />
+               <SortableCard 
+                id={card.id} 
+                text={card.text} 
+                variant="compact" 
+                isSelected={selectedCardId === card.id} 
+                onClick={() => onCardClick?.(card.id)} 
+                aspectRatio={isMobile ? 1.5 : cardDimensions.width / cardDimensions.height} 
+                disableHoverZoom={disableHoverZoom || isMobile} 
+               />
         </motion.div>
     )) : (
         <motion.div 
@@ -217,7 +227,7 @@ const GridSort: React.FC<GridSortProps> = ({
             </div>
         </motion.div>
     );
-  };
+  }, [activeCards, selectedCardId, onCardClick, isMobile, cardDimensions, disableHoverZoom, t]);
 
   return (
     <div className="flex flex-col lg:flex-row h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">
@@ -225,25 +235,57 @@ const GridSort: React.FC<GridSortProps> = ({
        {/* PANEL: THE GRID (Canvas) */}
       <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300"
       >
+            {/* Condition of Instruction - Persistent Research Question */}
+            <div className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
+                <Target size={14} className="text-indigo-400 opacity-60 flex-none" />
+                <p className="text-[11px] sm:text-[13px] font-medium text-slate-600 text-center leading-relaxed max-w-2xl px-2">
+                    {t('fine.header.title')}
+                </p>
+            </div>
+
             {/* Reading Zone - Responsive Placement */}
             {isMobile && (
-                /* Mobile: Sticky Reading Zone at the top */
-                <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm transition-all duration-300">
-                    <div className={`p-3 transition-all duration-300 ${hoveredCard || selectedCard ? 'h-32' : 'h-11'} overflow-y-auto custom-scrollbar`}>
-                        {hoveredCard || selectedCard ? (
+                /* Mobile: Sticky Reading Zone at the top (Fixed height to prevent layout shifts) */
+                <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm">
+                    <div className="p-3 h-20 overflow-y-auto custom-scrollbar">
+                        {activeCard || hoveredCard || selectedCard ? (
                             <div className="animate-in fade-in slide-in-from-top-1 duration-300">
-                                <div className="text-[10px] font-bold text-indigo-400 mb-0.5 uppercase tracking-wider flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
-                                    {hoveredCard ? 'Aperçu' : 'Sélection'}
+                                <div className="text-[10px] font-bold text-indigo-400 mb-0.5 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Eye size={12} strokeWidth={2.5} />
+                                    {activeCard ? t('fine.workbench.active_card') : hoveredCard ? t('fine.toolbar.preview') : t('fine.workbench.active_card')}
                                 </div>
-                                <p className="text-slate-800 text-sm font-medium leading-relaxed">
-                                    {hoveredCard?.text || selectedCard?.text}
-                                </p>
+                                <div className="flex flex-col gap-0.5">
+                                    <p className="text-slate-800 text-sm font-medium leading-relaxed line-clamp-2">
+                                        {activeCard?.text || hoveredCard?.text || selectedCard?.text}
+                                    </p>
+                                    {selectedCard && !activeCard && (!hoveredCard || hoveredCard.id === selectedCard.id) && (
+                                        <p className="text-[10px] text-indigo-500 font-semibold italic animate-pulse">
+                                            {t('fine.workbench.place_on_grid')}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         ) : (
-                            <div className="h-full flex items-center justify-center gap-2 text-indigo-400 opacity-60">
-                                <Eye size={18} strokeWidth={2.5} />
-                                <span className="text-[10px] font-bold uppercase tracking-widest">{t('fine.toolbar.read_full') || "Toucher pour lire"}</span>
+                            <div className="h-full flex flex-col items-center justify-center gap-1.5 text-indigo-400">
+                                <AnimatePresence mode="wait">
+                                    <motion.div 
+                                        key={methodologyStep}
+                                        initial={{ opacity: 0, y: 5 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -5 }}
+                                        className="text-center flex flex-col items-center"
+                                    >
+                                        <div className="flex items-center gap-1.5 opacity-60 mb-0.5">
+                                            <Lightbulb size={10} className="text-amber-400 fill-amber-400/20" />
+                                            <p className="text-[10px] font-bold uppercase tracking-widest">
+                                                {t('fine.workbench.help')}
+                                            </p>
+                                        </div>
+                                        <p className="text-xs font-semibold leading-relaxed px-4 italic text-indigo-600/80">
+                                            {methodologyTips[methodologyStep]}
+                                        </p>
+                                    </motion.div>
+                                </AnimatePresence>
                             </div>
                         )}
                     </div>
@@ -263,50 +305,6 @@ const GridSort: React.FC<GridSortProps> = ({
                             <RotateCcw size={20} />
                         </button>
                 </div>
-
-                {/* Always show tips if not forced closed */}
-                {!forcedTipsClosed && (
-                    <div className="absolute top-4 left-4 z-40 max-w-[85vw] md:max-w-sm pointer-events-none select-none flex flex-col gap-2">
-                        <AnimatePresence mode="popLayout">
-                            {!closedTips.extremes && !forcedTipsClosed && (
-                                <motion.div 
-                                    key="tip-extremes" 
-                                    drag="x" 
-                                    dragConstraints={{ left: 0, right: 0 }} 
-                                    dragElastic={0.5}
-                                    onDragEnd={(_, info) => { if (Math.abs(info.offset.x) > 30 || Math.abs(info.velocity.x) > 100) setClosedTips(prev => ({ ...prev, extremes: true })); }}
-                                    initial={{ opacity: 0, x: -100, scale: 0.9 }} 
-                                    animate={{ opacity: 1, x: 0, scale: 1 }} 
-                                    exit={{ opacity: 0, x: 400, scale: 0.9, rotate: 8 }}
-                                    transition={{ type: "spring", stiffness: 300, damping: 25, opacity: { duration: 0.3 } }}
-                                    className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-lg rounded-xl p-3 flex gap-2 pr-8 relative pointer-events-auto cursor-grab active:cursor-grabbing dnd-prevent-pan touch-none"
-                                >
-                                    <span>💡</span>
-                                    <p className="text-sm text-slate-600 leading-relaxed font-medium">{t('fine.tips.extremes')}</p>
-                                    <button onClick={() => setClosedTips(prev => ({ ...prev, extremes: true }))} className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600"><X size={14} /></button>
-                                </motion.div>
-                            )}
-                            {showVerticalTip && !closedTips.vertical && !forcedTipsClosed && (
-                                <motion.div 
-                                    key="tip-vertical" 
-                                    drag="x" 
-                                    dragConstraints={{ left: 0, right: 0 }} 
-                                    dragElastic={0.5}
-                                    onDragEnd={(_, info) => { if (Math.abs(info.offset.x) > 30 || Math.abs(info.velocity.x) > 100) setClosedTips(prev => ({ ...prev, vertical: true })); }}
-                                    initial={{ opacity: 0, x: -100, scale: 0.9 }} 
-                                    animate={{ opacity: 1, x: 0, scale: 1 }} 
-                                    exit={{ opacity: 0, x: 400, scale: 0.9, rotate: -8 }}
-                                    transition={{ type: "spring", stiffness: 300, damping: 25, opacity: { duration: 0.3 } }}
-                                    className="bg-blue-50/90 backdrop-blur-sm border border-blue-100 shadow-lg rounded-xl p-3 flex gap-2 relative pr-8 pointer-events-auto cursor-grab active:cursor-grabbing dnd-prevent-pan touch-none"
-                                >
-                                    <span>ℹ️</span>
-                                    <p className="text-sm text-blue-800 leading-relaxed font-medium">{t('fine.tips.vertical')}</p>
-                                    <button onClick={() => setClosedTips(prev => ({ ...prev, vertical: true }))} className="absolute top-2 right-2 p-1 text-blue-300 hover:text-blue-500"><X size={14} /></button>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                )}
 
                 <TransformWrapper
                     ref={transformRef} initialScale={0.8} minScale={0.1} maxScale={3.0}
@@ -382,24 +380,42 @@ const GridSort: React.FC<GridSortProps> = ({
               {/* Reading Zone (L'Oeil du Tri) - Desktop Sidebar version */}
               {!isMobile && (
               <div className="flex-none p-4 pb-0">
-                  <div className="w-full bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 h-40 overflow-y-auto relative transition-all duration-300 custom-scrollbar">
-                      {hoveredCard || selectedCard ? (
-                         <div className="animate-in fade-in zoom-in-95 duration-200">
-                             <div className="text-xs font-bold text-indigo-400 mb-1 uppercase tracking-wider">
-                                 {hoveredCard ? 'Aperçu' : 'Sélection'}
-                             </div>
-                             <p className="text-slate-800 text-base sm:text-lg font-medium leading-relaxed">
-                                 {hoveredCard?.text || selectedCard?.text}
-                             </p>
-                         </div>
-                      ) : (
-                         <div className="flex flex-col items-center justify-center h-full text-center text-indigo-400/50 py-2">
-                             <div className="mb-2 transition-transform duration-500 group-hover:scale-110">
-                                <Eye size={32} strokeWidth={1.5} />
-                             </div>
-                             <p className="text-xs font-bold uppercase tracking-widest">
-                                 {t('fine.toolbar.read_full') || "Survoler ou toucher pour lire"}
-                             </p>
+                  <div className="w-full bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 h-40 overflow-y-auto relative transition-all duration-300 custom-scrollbar group">
+                       {activeCard || hoveredCard || selectedCard ? (
+                          <div className="animate-in fade-in zoom-in-95 duration-200">
+                              <div className="text-xs font-bold text-indigo-400 mb-1.5 uppercase tracking-wider flex items-center gap-2">
+                                  <Eye size={14} strokeWidth={2.5} />
+                                  {activeCard ? t('fine.workbench.active_card') : hoveredCard ? t('fine.toolbar.preview') : t('fine.workbench.active_card')}
+                              </div>
+                              <p className="text-slate-800 text-base sm:text-lg font-medium leading-relaxed">
+                                  {activeCard?.text || hoveredCard?.text || selectedCard?.text}
+                              </p>
+                          </div>
+                       ) : (
+                         <div className="flex flex-col items-center justify-center h-full text-center text-indigo-400 py-2">
+                             <AnimatePresence mode="wait">
+                                 <motion.div 
+                                    key={methodologyStep}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="flex flex-col items-center gap-3 px-6"
+                                 >
+                                     <div className="p-2 bg-amber-50 rounded-full text-amber-500 relative">
+                                        <Lightbulb size={24} strokeWidth={1.5} className="fill-amber-500/10" />
+                                        <motion.div 
+                                            animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.2, 1] }}
+                                            transition={{ duration: 2, repeat: Infinity }}
+                                            className="absolute -top-1 -right-1 text-amber-400"
+                                        >
+                                            <Sparkles size={12} />
+                                        </motion.div>
+                                     </div>
+                                     <p className="text-sm font-medium leading-relaxed italic text-indigo-600/70">
+                                         {methodologyTips[methodologyStep]}
+                                     </p>
+                                 </motion.div>
+                             </AnimatePresence>
                          </div>
                       )}
                   </div>
@@ -451,7 +467,7 @@ const GridSort: React.FC<GridSortProps> = ({
                                     role="tab"
                                     aria-selected={isActive}
                                     aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
-                                    className={`relative group flex-1 min-w-[80px] h-14 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
+                                    className={`relative group flex-1 min-w-[70px] h-12 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
                                       ${isActive ? `${style.activeBg} shadow-md scale-105 z-10` : 'bg-white border-slate-200 opacity-80'}
                                     `}
                                  >
@@ -476,9 +492,9 @@ const GridSort: React.FC<GridSortProps> = ({
                     animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }} 
                     transition={{ duration: 0.8 }}
                     className={`
-                        flex-1 p-2 flex flex-row gap-2 overflow-x-auto min-h-0 custom-scrollbar 
-                        ${activeCards.length === 0 ? 'items-center justify-center' : ''}
-                        lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-y-auto lg:overflow-x-hidden 
+                        flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-center justify-start custom-scrollbar 
+                        ${activeCards.length === 0 ? 'justify-center' : ''}
+                        lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-y-auto lg:overflow-x-hidden lg:p-2
                         ${activeCards.length === 0 ? 'lg:place-content-center' : 'lg:content-start'}
                     `}
                     data-testid="deck-cards-container"
@@ -486,12 +502,135 @@ const GridSort: React.FC<GridSortProps> = ({
                     {renderDeckCards()}
               </motion.div>
               )}
-              {(onReset && !isDeckCollapsed) && (
-                  <div className="flex-none p-2 border-t border-gray-100 bg-slate-50/50 hidden lg:flex justify-center z-10">
-                      <button onClick={onReset} className="text-xs font-bold text-slate-400 hover:text-red-500 px-3 py-1.5 rounded hover:bg-red-50">{t('fine.deck.reset')}</button>
-                  </div>
-              )}
+              {/* PANEL FOOTER: Guidance or Validation */}
+              <div className="flex-none p-4 border-t border-indigo-100 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+                  {isAllPlaced && !selectedCardId ? (
+                      <button 
+                        onClick={onValidate}
+                        className="w-full flex items-center justify-center gap-2 py-3 bg-green-600 text-white rounded-xl font-bold text-sm shadow-md hover:bg-green-700 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500"
+                      >
+                          {t('fine.actions.validate')} <Check size={18} strokeWidth={3} />
+                      </button>
+                  ) : (
+                      <div className="flex items-center justify-center min-h-[48px] bg-slate-50 border border-slate-100 rounded-xl px-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                           <div className="flex items-center gap-3 text-slate-500">
+                               {selectedCardId ? (
+                                   <>
+                                       <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-indigo-500 text-[10px] text-white font-black">2</span>
+                                       <span className="text-xs font-bold uppercase tracking-wide animate-pulse">
+                                           {t('fine.workbench.place_on_grid')}
+                                       </span>
+                                   </>
+                               ) : (
+                                   <>
+                                       <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500 font-black">1</span>
+                                       <span className="text-xs font-bold uppercase tracking-wide">
+                                           {qsortResponses.length === 0 
+                                              ? t('fine.workbench.initial_instruction') 
+                                              : t('common.select_card')}
+                                       </span>
+                                   </>
+                               )}
+                           </div>
+                           <button 
+                                onClick={() => setShowHelpModal(true)}
+                                className="p-1.5 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 rounded-full transition-colors flex-none ml-2"
+                                title={t('fine.workbench.help')}
+                           >
+                               <HelpCircle size={18} />
+                           </button>
+                      </div>
+                  )}
+
+                  {/* Desktop-only Reset link */}
+                  {onReset && (
+                    <div className="mt-3 hidden lg:flex justify-center">
+                        <button onClick={onReset} className="text-[10px] font-bold text-slate-400 hover:text-red-500 px-2 py-1 rounded transition-colors">{t('fine.deck.reset')}</button>
+                    </div>
+                  )}
+              </div>
       </div>
+
+      {/* Help Modal */}
+      <AnimatePresence>
+          {showHelpModal && (
+              <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                  <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      onClick={() => setShowHelpModal(false)}
+                      className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+                  />
+                  <motion.div 
+                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                      className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden"
+                  >
+                      <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-indigo-50/30">
+                          <div className="flex items-center gap-3">
+                              <div className="p-2 bg-indigo-500 text-white rounded-xl">
+                                  <HelpCircle size={24} />
+                              </div>
+                              <h2 className="text-xl font-extrabold text-slate-800">{t('fine.workbench.help')}</h2>
+                          </div>
+                          <button 
+                              onClick={() => setShowHelpModal(false)}
+                              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all"
+                          >
+                              <X size={24} />
+                          </button>
+                      </div>
+                      
+                      <div className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                          <section className="space-y-3">
+                              <h3 className="text-sm font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
+                                  <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                                  {t('fine.workbench.methodology.extremes_title')}
+                              </h3>
+                              <p className="text-slate-600 leading-relaxed font-medium">
+                                  {t('fine.workbench.methodology.extremes')}
+                              </p>
+                          </section>
+
+                          <section className="space-y-3">
+                              <h3 className="text-sm font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
+                                  <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                                  {t('fine.workbench.methodology.vertical_title')}
+                              </h3>
+                              <p className="text-slate-600 leading-relaxed font-medium">
+                                  {t('fine.workbench.methodology.vertical')}
+                              </p>
+                          </section>
+
+                          <section className="space-y-3">
+                              <h3 className="text-sm font-bold uppercase tracking-widest text-indigo-500 flex items-center gap-2">
+                                  <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                                  {t('fine.workbench.methodology.interaction_title')}
+                              </h3>
+                              <p className="text-slate-600 leading-relaxed font-medium">
+                                  {t('fine.workbench.methodology.interaction')}
+                              </p>
+                          </section>
+
+                          <div className="pt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 italic text-sm text-slate-500 text-center">
+                              {t('fine.workbench.methodology.footer_note')}
+                          </div>
+                      </div>
+
+                      <div className="p-6 bg-slate-50 border-t border-slate-100 flex justify-center">
+                          <button 
+                              onClick={() => setShowHelpModal(false)}
+                              className="px-10 py-3 bg-indigo-600 text-white rounded-xl font-bold shadow-md hover:bg-indigo-700 transition-all active:scale-95"
+                          >
+                              {t('fine.workbench.methodology.close')}
+                          </button>
+                      </div>
+                  </motion.div>
+              </div>
+          )}
+      </AnimatePresence>
     </div>
   );
 };

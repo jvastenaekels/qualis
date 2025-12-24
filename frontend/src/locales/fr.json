@@ -1,8 +1,9 @@
 {
   "common": {
-    "agree": "Plutôt d'accord",
+    "agree": "D'accord",
     "disagree": "Plutôt pas d'accord",
     "neutral": "Pas d'avis tranché",
+    "select_card": "Sélectionnez une carte",
     "undo": "Annuler",
     "next": "Étape suivante",
     "submit": "Partager mon point de vue",
@@ -96,16 +97,20 @@
     }
   },
   "fine": {
+    "header": {
+      "title": "Répartissez les affirmations sur la grille selon votre point de vue"
+    },
     "deck": {
       "title": "Cartes disponibles",
-      "all_placed": "Toutes les affirmations placées",
+      "all_placed": "Toutes les affirmations de cette pile placées",
       "reset": "Réinitialiser",
       "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les cartes retourneront dans la pile."
     },
     "toolbar": {
       "mobile": "Appuyez ou glissez les cartes pour les placer sur la grille.",
+      "preview": "Aperçu de la carte",
       "place_instruction": "Appuyez sur une case pour placer",
-      "read_full": "Appuyez pour lire le texte",
+      "read_full": "Appuyez sur une carte pour lire le texte",
       "desktop": "Glissez ou appuyez sur les cartes pour les placer sur la grille selon leur degré de correspondance avec votre point de vue.",
       "zoom_in": "Zoom avant",
       "zoom_out": "Zoom arrière",
@@ -117,10 +122,6 @@
       "column": "Colonne",
       "slot": "Emplacement",
       "in_column": "dans la colonne"
-    },
-    "tips": {
-      "extremes": "Commencez par les extrêmes. Placez d'abord vos avis les plus forts, puis avancez vers le milieu.",
-      "vertical": "La position verticale n'a pas d'importance—seul l'ordre gauche-droite compte."
     },
     "legend": {
       "disagree": "Le plus en désaccord",
@@ -136,8 +137,20 @@
     },
     "workbench": {
       "active_card": "Carte active",
-      "place_on_grid": "Touchez la grille pour placer",
-      "drag_or_tap": "Glissez ou touchez une case"
+      "place_on_grid": "Touchez un emplacement sur la grille pour placer la carte.",
+      "drag_or_tap": "Glissez ou touchez une case",
+      "initial_instruction": "Sélectionnez vos avis les plus forts pour les placer aux extrémités.",
+      "help": "Aide et règles",
+      "methodology": {
+        "extremes": "Conseil : Commencez par placer vos avis les plus forts aux extrémités.",
+        "extremes_title": "Pôles et Extrémités",
+        "vertical": "Verticalité : L'ordre haut-bas n'importe pas, seul l'axe horizontal compte.",
+        "vertical_title": "Axe de Tri",
+        "interaction": "Manipulation : Vous pouvez glisser les cartes ou simplement les toucher.",
+        "interaction_title": "Commandes Tactiles",
+        "footer_note": "Chaque carte doit être placée pour pouvoir valider le tri final.",
+        "close": "Compris !"
+      }
     }
   },
   "post": {

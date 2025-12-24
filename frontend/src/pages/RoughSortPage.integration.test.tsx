@@ -62,7 +62,7 @@ describe('RoughSortPage Integration', () => {
         const sessionState = { hasConsented: true, currentStep: 3, isSaving: false, setStep: vi.fn(), setLanguage: vi.fn() };
         mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);
         
-        const uiState = { zoomedCard: null, setZoomedCard: vi.fn() };
+        const uiState = { hoveredCard: null, setHoveredCard: vi.fn() };
         mockUseUIStore.mockImplementation((selector: any) => selector ? selector(uiState) : uiState);
 
         render(
@@ -96,7 +96,7 @@ describe('RoughSortPage Integration', () => {
          const sessionState = { hasConsented: true, currentStep: 3, isSaving: false, setStep: vi.fn(), setLanguage: vi.fn() };
          mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);
          
-         const uiState = { zoomedCard: null, setZoomedCard: vi.fn() };
+         const uiState = { hoveredCard: null, setHoveredCard: vi.fn() };
          mockUseUIStore.mockImplementation((selector: any) => selector ? selector(uiState) : uiState);
  
          render(

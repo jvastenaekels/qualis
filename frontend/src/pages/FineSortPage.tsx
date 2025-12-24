@@ -4,14 +4,14 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
     DndContext, 
     DragOverlay, 
     useSensors, 
     useSensor, 
-    PointerSensor, 
+    MouseSensor, 
     TouchSensor, 
     closestCenter,
     MeasuringStrategy,
@@ -60,9 +60,9 @@ const FineSortPage: React.FC = () => {
 
     // 3. Sensors (Always stable)
     const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+        useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
         useSensor(TouchSensor, { 
-            activationConstraint: { delay: 150, tolerance: 10 } 
+            activationConstraint: { delay: 250, tolerance: 5 } 
         })
     );
 
@@ -160,7 +160,14 @@ const FineSortPage: React.FC = () => {
         return () => setHeaderAction(null);
     }, [isAllPlaced, navigate, slug, setHeaderAction, t]);
 
-    // 7. Drag Hook
+    // 7. Memoized callbacks for performance
+    const actions = useMemo(() => ({
+        placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard
+    }), [placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard]);
+
+    const handlePan = useCallback(() => setPanVersion(v => v + 1), []);
+
+    // 8. Drag Hook
     const { 
         activeId, 
         handleDragStart, 
@@ -171,19 +178,16 @@ const FineSortPage: React.FC = () => {
     } = useFineSortDrag({
         responses,
         gridColumns,
-        actions: { placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard },
+        actions,
         onSelectionChange: setSelectedCardId,
         selectedId: selectedCardId,
         interactionUtils,
-        onPan: () => setPanVersion(v => v + 1)
+        onPan: handlePan
     });
 
-    // 8. Condition Check (After all hooks)
-    if (!config) return null;
-
-    const activeCardData = config.statements.find(s => s.id === activeId);
-
-    const renderSlotContent = (col: number, row: number, dimensions: { width: number, height: number }) => {
+    // 9. Memoized render function for slot content
+    const renderSlotContent = useCallback((col: number, row: number, dimensions: { width: number, height: number }) => {
+         if (!config) return null;
          const cardInSlot = responses.qsort.find(c => c.col === col && c.row === row);
          const statement = cardInSlot ? config.statements.find(s => s.id === cardInSlot.statementId) : null;
          if (statement) {
@@ -199,7 +203,13 @@ const FineSortPage: React.FC = () => {
             );
          }
          return null;
-    };
+    }, [config, responses.qsort, selectedCardId, handleCardClick, activeId]);
+
+    // 10. Condition Check (After all hooks)
+    if (!config) return null;
+
+    const activeCardData = config.statements.find(s => s.id === activeId);
+
 
     const snapCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
         if (draggingNodeRect && activatorEvent) {
@@ -240,9 +250,9 @@ const FineSortPage: React.FC = () => {
                     agreeCards={unplacedAgree} disagreeCards={unplacedDisagree} neutralCards={unplacedNeutral}
                     gridColumns={gridColumns}
                     renderSlotContent={renderSlotContent}
-                    forcedTipsClosed={responses.qsort.length >= 5}
                     disableHoverZoom={activeId !== null}
                     selectedCardId={selectedCardId}
+                    selectedCard={selectedCardId ? config.statements.find(s => s.id === selectedCardId) : null}
                     onCardClick={handleCardClick}
                     onSlotClick={handleSlotClick}
                     onDimensionsChange={setCardDimensions}
@@ -250,6 +260,9 @@ const FineSortPage: React.FC = () => {
                     onZoomChange={setZoomLevel}
                     onTransformChange={() => setPanVersion(v => v + 1)}
                     onInteractionUtils={setInteractionUtils}
+                    isAllPlaced={isAllPlaced}
+                    onValidate={() => navigate(`/study/${slug}/post-sort`)}
+                    activeCard={activeCardData}
                 />
              </div>
              {createPortal(

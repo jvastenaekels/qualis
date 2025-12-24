@@ -11,8 +11,9 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import CardStack, { type CardStackHandle } from '../components/CardStack';
-import { Check, X, RotateCcw, ArrowRight, Frown, Smile, Meh } from 'lucide-react';
+import { Check, X, RotateCcw, ArrowRight, Frown, Smile, Meh, Eye } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useUIStore } from '../store/useUIStore';
 
 
 const RoughSortPage: React.FC = () => {
@@ -213,17 +214,19 @@ const RoughSortPage: React.FC = () => {
             </div>
 
             {/* 2. Instruction Bar (Visual Separation) */}
-            <div className="flex-none bg-slate-50 flex items-center justify-between border-b border-gray-100 z-20 shadow-sm relative transition-all duration-500 py-3 max-h-24">
+            <div className="flex-none bg-slate-50 flex items-center justify-between border-b border-gray-100 z-20 shadow-sm relative transition-all duration-500 py-2">
                 <div className="w-12 lg:w-20 hidden sm:block" />
 
                 <div className="flex-1 px-2 flex flex-col items-center justify-center">
-                    <h3 className="font-bold text-slate-700 leading-tight text-center transition-all duration-500 text-lg sm:text-xl">
+                    <h3 className="font-bold text-slate-700 leading-tight text-center transition-all duration-500 text-base sm:text-lg">
                         {t('rough.header.title')}
                     </h3>
                 </div>
 
                 <div className="w-12 lg:w-20 hidden sm:block" />
             </div>
+
+
 
             {/* 3. The Control Cluster (Centered Stage) */}
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-2 py-4 relative">
@@ -294,6 +297,25 @@ const RoughSortPage: React.FC = () => {
                     {/* Card Zone */}
                     <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-sm md:max-w-md">
                         <div className="w-full h-full relative">
+                            {/* Tips Overlay */}
+                            <AnimatePresence>
+                                {showTip && (
+                                    <motion.div 
+                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                                        className="absolute -top-12 left-1/2 -translate-x-1/2 z-50 w-full max-w-[240px] pointer-events-none"
+                                    >
+                                        <div className="bg-indigo-600 text-white text-[10px] font-bold uppercase tracking-widest py-2 px-4 rounded-full shadow-lg flex items-center justify-center gap-2 border border-indigo-400/30 whitespace-nowrap">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                                            {window.innerWidth < 1024 
+                                                ? t('fine.workbench.drag_or_tap') 
+                                                : "Glissez ou cliquez pour trier"}
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
                             <CardStack 
                                 ref={cardStackRef}
                                 key={currentCard.id} 
