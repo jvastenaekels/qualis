@@ -2,7 +2,7 @@
   "common": {
     "agree": "Tend to agree",
     "disagree": "Tend to disagree",
-    "neutral": "No strong feelings",
+    "neutral": "Neutral",
     "undo": "Undo",
     "next": "Next step",
     "submit": "Share my perspective",
@@ -85,7 +85,7 @@
   },
   "rough": {
     "header": {
-      "title": "How does this resonate with you?",
+      "title": "What is your position regarding this statement?",
       "subtitle": "Swipe left if you tend to disagree, right if you tend to agree, or down if you have no strong feelings.",
       "hint": "Trust your gut. This first pass organizes your thinking—you'll fine-tune everything in the next step."
     },
@@ -95,7 +95,7 @@
     },
     "instructions": {
         "swipe": "Swipe or tap to categorize",
-        "desktop_tip": "Drag or click to sort"
+        "desktop_tip": "Swipe, tap, or use keyboard ( ← ↓ → ) to sort"
     }
   },
   "fine": {

@@ -83,16 +83,17 @@
   },
   "rough": {
     "header": {
-      "title": "How does this resonate with you?",
+      "title": "Mikä on kantasi tähän väittämään?",
       "subtitle": "Pyyhkäise vasemmalle, jos olet jokseenkin eri mieltä, oikealle, jos olet jokseenkin samaa mieltä, tai alas, jos sinulla ei ole vahvaa mielipidettä.",
-      "hint": "Trust your gut. This first pass organizes your thinking—you'll fine-tune everything in the next step."
+      "hint": "Luota vaistoosi. Tämä ensimmäinen kierros jäsentää ajatuksesi – tarkennat kaikkea seuraavassa vaiheessa."
     },
     "complete": {
-      "title": "Rough sort complete",
-      "subtitle": "Now, let's refine the nuance."
+      "title": "Alustava lajittelu valmis",
+      "subtitle": "Nyt tarkennetaan nyansseja."
     },
     "instructions": {
-        "swipe": "Swipe or tap to categorize"
+        "swipe": "Pyyhkäise tai napauta luokitellaksesi",
+        "desktop_tip": "Vedä, klikkaa tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"
     }
   },
   "fine": {

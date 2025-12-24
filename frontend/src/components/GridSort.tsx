@@ -84,7 +84,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
       neutralCards
   });
   
-  const qsortResponses = useResponseStore((state) => state.qsort);
+
   const selectedCard = selectedCardProp;
 
   const hoveredCard = useUIStore((state) => state.hoveredCard);
@@ -255,14 +255,10 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
                                     {activeCard ? t('fine.workbench.active_card') : hoveredCard ? t('fine.toolbar.preview') : t('fine.workbench.active_card')}
                                 </div>
                                 <div className="flex flex-col gap-0.5">
-                                    <p className="text-slate-800 text-sm font-medium leading-relaxed line-clamp-2">
+                                    <p className="text-slate-800 text-sm font-medium leading-relaxed">
                                         {activeCard?.text || hoveredCard?.text || selectedCard?.text}
                                     </p>
-                                    {selectedCard && !activeCard && (!hoveredCard || hoveredCard.id === selectedCard.id) && (
-                                        <p className="text-[10px] text-indigo-500 font-semibold italic animate-pulse">
-                                            {t('fine.workbench.place_on_grid')}
-                                        </p>
-                                    )}
+
                                 </div>
                             </div>
                         ) : (
@@ -522,23 +518,14 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
                                        </span>
                                    </>
                                ) : (
-                                   <>
-                                       <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500 font-black">1</span>
-                                       <span className="text-xs font-bold uppercase tracking-wide">
-                                           {qsortResponses.length === 0 
-                                              ? t('fine.workbench.initial_instruction') 
-                                              : t('common.select_card')}
-                                       </span>
-                                   </>
-                               )}
+                                    <>
+                                        <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500 font-black">1</span>
+                                        <span className="text-xs font-bold uppercase tracking-wide">
+                                            {t('common.select_card')}
+                                        </span>
+                                    </>
+                                )}
                            </div>
-                           <button 
-                                onClick={() => setShowHelpModal(true)}
-                                className="p-1.5 text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 rounded-full transition-colors flex-none ml-2"
-                                title={t('fine.workbench.help')}
-                           >
-                               <HelpCircle size={18} />
-                           </button>
                       </div>
                   )}
 

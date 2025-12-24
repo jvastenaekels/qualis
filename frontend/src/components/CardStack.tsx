@@ -152,7 +152,10 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         style={{ x, y, rotate }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-6 sm:p-8 cursor-grab active:cursor-grabbing touch-none overflow-hidden"
+        onTap={() => {
+             setHoveredCard({ id: statement.id, text: statement.text });
+        }}
+        className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-6 sm:p-8 cursor-pointer active:cursor-grabbing touch-none overflow-hidden"
       >
         {/* Color Overlays */}
         <motion.div 
@@ -177,10 +180,10 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
         />
 
         {/* Content - No scroll to avoid drag conflict */}
-        <div className="flex-1 w-full flex flex-col p-2 overflow-hidden">
+        <div className="flex-1 w-full flex flex-col p-2 overflow-hidden pointer-events-none">
             <div 
                 ref={textRef}
-                className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed line-clamp-6 sm:line-clamp-none`}
+                className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed line-clamp-[10] sm:line-clamp-none`}
             >
                 <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
                     {statement.text}
@@ -196,10 +199,10 @@ const CardStack = forwardRef<CardStackHandle, CardStackProps>(({ statement, onVo
                     e.stopPropagation();
                     setHoveredCard({ id: statement.id, text: statement.text });
                 }}
-                className="absolute bottom-4 right-6 p-2 bg-indigo-50/80 rounded-full text-indigo-500 shadow-sm lg:p-1.5 transition-colors hover:bg-indigo-100"
+                className="absolute bottom-4 right-6 p-3 bg-indigo-50/90 rounded-full text-indigo-600 shadow-md lg:p-2 transition-colors hover:bg-indigo-100"
                 aria-label="Read statement"
             >
-                <Eye size={20} strokeWidth={2.5} />
+                <Eye size={32} strokeWidth={2.5} />
             </motion.button>
         )}
       </motion.div>

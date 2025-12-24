@@ -85,7 +85,7 @@
   },
   "rough": {
     "header": {
-      "title": "Comment cette affirmation résonne-t-elle avec votre propre perspective ?",
+      "title": "Quelle est votre position face à cette affirmation ?",
       "subtitle": "Glissez à gauche pour « Plutôt pas d'accord », à droite pour « Plutôt d'accord », ou en bas si vous n'avez pas d'avis tranché.",
       "hint": "Fiez-vous à votre instinct. Ce premier tri structure vos idées. Vous affinerez tout à l'étape suivante."
     },
@@ -95,7 +95,7 @@
     },
     "instructions": {
       "swipe": "Glissez ou appuyez pour catégoriser",
-      "desktop_tip": "Glissez ou cliquez pour trier"
+      "desktop_tip": "Glissez, cliquez ou utilisez le clavier ( ← ↓ → ) pour trier"
     }
   },
   "fine": {

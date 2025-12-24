@@ -10,6 +10,8 @@ import { useMotionValue, useTransform, motion, AnimatePresence } from 'framer-mo
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { useUIStore } from '../store/useUIStore';
+import ReactMarkdown from 'react-markdown';
 import CardStack, { type CardStackHandle } from '../components/CardStack';
 import { Check, X, RotateCcw, ArrowRight, Frown, Smile, Meh } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -73,6 +75,13 @@ const RoughSortPage: React.FC = () => {
             unsubscribeY();
         };
     }, [showTip, x, y]);
+
+    // Auto-dismiss tip after 5 cards sorted (all devices)
+    useEffect(() => {
+        if (showTip && responses.rough.history.length >= 5) {
+            setShowTip(false);
+        }
+    }, [responses.rough.history.length, showTip]);
 
     const unsortedCards = useMemo(() => {
         if (!config) return [];
@@ -168,6 +177,10 @@ const RoughSortPage: React.FC = () => {
         return 'text-sm';
     }, [t]);
 
+    // --- Zoom Overlay State ---
+    const hoveredCard = useUIStore((state) => state.hoveredCard);
+    const setHoveredCard = useUIStore((state) => state.setHoveredCard);
+
     if (!config) return null;
 
     // Completed State
@@ -224,6 +237,32 @@ const RoughSortPage: React.FC = () => {
                             {config && `(${config.statements.length - unsortedCards.length + 1}/${config.statements.length})`}
                         </span>
                     </h3>
+                    
+                    {/* INLINE TIP (Attached to Title) */}
+                    <AnimatePresence>
+                        {showTip && (
+                            <motion.div 
+                                key="rough-tip-inline"
+                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                                animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
+                                exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                className="w-full max-w-sm overflow-hidden"
+                            >
+                                <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2.5 flex items-center justify-center gap-2.5 relative mx-auto text-center shadow-sm">
+                                    <span className="text-lg">💡</span>
+                                    <p className="text-xs text-yellow-800 font-medium leading-tight text-left">
+                                        {t('rough.header.hint')}
+                                    </p>
+                                    <button 
+                                        onClick={() => setShowTip(false)}
+                                        className="p-1 text-yellow-600 hover:text-yellow-800 rounded-full hover:bg-yellow-100 transition-colors flex-none"
+                                    >
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
 
                 <div className="w-12 lg:w-20 hidden sm:block" />
@@ -232,50 +271,9 @@ const RoughSortPage: React.FC = () => {
 
 
             {/* 3. The Control Cluster (Centered Stage) */}
-            <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-2 py-4 relative">
+            <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-2 py-4 relative gap-2 sm:gap-8 md:gap-12">
                 
-                {/* FLOATING TIP */}
-                <AnimatePresence>
-                    {showTip && (
-                        <motion.div 
-                            key="rough-tip"
-                            className="absolute top-4 left-4 z-40 max-w-xs block select-none pointer-events-auto"
-                            initial={{ opacity: 0, x: -100, scale: 0.9 }}
-                            animate={{ opacity: 1, x: 0, scale: 1 }}
-                            exit={{ opacity: 0, x: 300, scale: 0.9, rotate: 5 }}
-                            transition={{ 
-                                type: "spring", 
-                                stiffness: 300, 
-                                damping: 25,
-                                opacity: { duration: 0.3 }
-                            }}
-                        >
-                            <motion.div 
-                                drag="x"
-                                dragConstraints={{ left: 0, right: 0 }}
-                                dragElastic={0.5}
-                                onDragEnd={(_, info) => {
-                                    if (Math.abs(info.offset.x) > 30 || Math.abs(info.velocity.x) > 100) {
-                                        setShowTip(false);
-                                    }
-                                }}
-                                className="bg-white/90 backdrop-blur-sm border border-blue-100 shadow-lg rounded-xl p-4 flex gap-3 relative pr-8 cursor-grab active:cursor-grabbing"
-                            >
-                                <span className="text-lg">💡</span>
-                                <p className="text-sm text-slate-600 leading-relaxed font-medium">
-                                    {t('rough.header.hint')}
-                                </p>
-                                <button 
-                                    onClick={() => setShowTip(false)}
-                                    className="absolute top-2 right-2 p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
-                                >
-                                    <X size={14} />
-                                </button>
-                            </motion.div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
+                {/* FLOATING TIP REMOVED (Moved to Header) */}
 
                 {/* Row A: Horizon (Disagree - Card - Agree) */}
                 <div className="flex flex-row items-center justify-center gap-2 sm:gap-8 md:gap-12 w-full">
@@ -283,7 +281,7 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleDisagree, opacity: opacityDisagree }}
                         onClick={() => handleVote('disagree')}
-                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-24 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-1"
+                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-1"
                         aria-label={t('common.disagree')}
                     >
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
@@ -300,9 +298,9 @@ const RoughSortPage: React.FC = () => {
                     {/* Card Zone */}
                     <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-sm md:max-w-md">
                         <div className="w-full h-full relative">
-                            {/* Tips Overlay */}
+                            {/* Desktop/Tablet Hover Tip (Keep absolute for large screens, hidden on mobile) */}
                             <AnimatePresence>
-                                {showTip && (
+                                {showTip && window.innerWidth >= 1024 && (
                                     <motion.div 
                                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
                                         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -310,9 +308,7 @@ const RoughSortPage: React.FC = () => {
                                         className="absolute -top-12 left-1/2 -translate-x-1/2 z-50 w-full max-w-[240px] pointer-events-none"
                                     >
                                         <div className="text-slate-400 text-xs font-semibold uppercase tracking-widest py-2 px-4 flex items-center justify-center gap-2 whitespace-nowrap opacity-70">
-                                            {window.innerWidth < 1024 
-                                                ? t('fine.workbench.drag_or_tap') 
-                                                : t('rough.instructions.desktop_tip')}
+                                            {t('rough.instructions.desktop_tip')}
                                         </div>
                                     </motion.div>
                                 )}
@@ -333,7 +329,7 @@ const RoughSortPage: React.FC = () => {
                     <motion.button
                         style={{ scale: scaleAgree, opacity: opacityAgree }}
                         onClick={() => handleVote('agree')}
-                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-24 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-1"
+                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-1"
                         aria-label={t('common.agree')}
                     >
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
@@ -349,11 +345,11 @@ const RoughSortPage: React.FC = () => {
                 </div>
 
                 {/* Row B: Anchor (Neutral Pill + Undo) */}
-                <div className="mt-8 flex flex-col items-center gap-6">
+                <div className="flex flex-col items-center gap-4 w-full px-2">
                     <motion.button
                         style={{ scale: scaleNeutral, opacity: opacityNeutral }}
                         onClick={() => handleVote('neutral')}
-                        className="w-[18.2rem] h-[5.6rem] rounded-2xl bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
+                        className="w-auto min-w-[160px] max-w-[240px] px-8 sm:max-w-none sm:w-[18.2rem] h-16 sm:h-[5.6rem] rounded-2xl bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
                         aria-label={t('common.neutral')}
                     >
                          <div className="flex items-center gap-2 text-gray-600">
@@ -377,6 +373,45 @@ const RoughSortPage: React.FC = () => {
                     </button>
                 </div>
             </div>
+            
+            <AnimatePresence>
+                {hoveredCard && (
+                    <motion.div
+                         initial={{ opacity: 0 }}
+                         animate={{ opacity: 1 }}
+                         exit={{ opacity: 0 }}
+                         className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8"
+                         onClick={() => setHoveredCard(null)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                            animate={{ scale: 1, opacity: 1, y: 0 }}
+                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                            onClick={(e) => e.stopPropagation()} // Prevent closing on content click
+                            className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+                        >
+                            <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
+                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">
+                                     {t('common.statement')} {hoveredCard.id}
+                                </h3>
+                                <div className="text-xl sm:text-2xl font-medium text-gray-800 leading-relaxed">
+                                     <ReactMarkdown components={{ p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p> }}>
+                                         {hoveredCard.text}
+                                     </ReactMarkdown>
+                                </div>
+                            </div>
+                            <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+                                <button
+                                    onClick={() => setHoveredCard(null)}
+                                    className="px-6 py-2 bg-slate-900 text-white rounded-full font-bold text-sm tracking-wide hover:bg-slate-800 transition-colors"
+                                >
+                                    {t('common.close')}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
