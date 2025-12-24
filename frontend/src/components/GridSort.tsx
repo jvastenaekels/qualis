@@ -460,7 +460,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
                                 <button key={pile} onClick={() => { 
                                     setActivePile(pile as PileType); 
                                     // Only trigger zonal focus/zoom on mobile
-                                    if (window.innerWidth < 1024) {
+                                    if (isMobile) {
                                         setHasPerformedZonalFocus(true); 
                                     }
                                 }}
