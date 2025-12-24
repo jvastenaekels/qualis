@@ -257,7 +257,13 @@ const SortingAnimation: React.FC = () => {
 };
 
 const MiniSlot = ({ filled }: { filled: boolean }) => (
-    <div className={`w-[18px] h-[24px] rounded-[2px] border ${filled ? 'bg-slate-200 border-slate-300' : 'bg-white border-slate-200'} transition-colors duration-300 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]`} />
+    <div className={`
+        w-[18px] h-[24px] rounded-[2px] transition-all duration-300
+        ${filled 
+            ? 'bg-blue-600 border border-blue-700 shadow-sm scale-105 z-10' // Filled: High contrast (Blue card)
+            : 'bg-slate-50 border-2 border-dashed border-slate-300' // Empty: Dashed placeholder
+        }
+    `} />
 );
 
 // --- IMPROVED DYNAMIC STACK --- //
