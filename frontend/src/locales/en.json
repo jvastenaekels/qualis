@@ -104,6 +104,7 @@
     },
   "toolbar": {
       "mobile": "Tap or drag cards to place them on the grid.",
+      "preview": "Card preview",
       "place_instruction": "Tap a slot to place",
       "read_full": "Tap to read full text",
       "desktop": "Drag or tap cards to place them on the grid according to how well they match your view.",
@@ -133,7 +134,19 @@
     "workbench": {
       "active_card": "Active Card",
       "place_on_grid": "Tap Grid to Place",
-      "drag_or_tap": "Drag to grid or tap a slot"
+      "drag_or_tap": "Drag to grid or tap a slot",
+      "initial_instruction": "Select your strongest opinions to place at the extremes.",
+      "help": "Help & rules",
+      "methodology": {
+        "extremes": "Tip: Start by placing your strongest opinions at the extremes.",
+        "extremes_title": "Poles & Extremes",
+        "vertical": "Verticality: The top-bottom order doesn't matter, only the horizontal axis counts.",
+        "vertical_title": "Sorting Axis",
+        "interaction": "Handling: You can drag cards or simply tap them.",
+        "interaction_title": "Touch Controls",
+        "footer_note": "Each card must be placed to validate the final sort.",
+        "close": "Got it!"
+      }
     }
   },
   "post": {

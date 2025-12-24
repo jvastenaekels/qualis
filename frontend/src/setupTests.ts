@@ -50,6 +50,21 @@ global.ResizeObserver = class ResizeObserver {
     disconnect() {}
 };
 
+// Polyfill matchMedia
+Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+    }),
+});
+
 // MSW Server Setup
 beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
 afterEach(() => {

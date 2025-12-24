@@ -104,6 +104,7 @@
     },
   "toolbar": {
       "mobile": "Tap or drag cards to place them on the grid.",
+      "preview": "Kortin esikatselu",
       "place_instruction": "Tap a slot to place",
       "read_full": "Tap to read full text",
       "desktop": "Drag or tap cards to place them on the grid according to how well they match your view.",
@@ -133,7 +134,19 @@
     "workbench": {
       "active_card": "Active Card",
       "place_on_grid": "Tap Grid to Place",
-      "drag_or_tap": "Drag to grid or tap a slot"
+      "drag_or_tap": "Drag to grid or tap a slot",
+      "initial_instruction": "Valitse vahvimmat mielipiteesi ääripäihin.",
+      "help": "Ohjeet ja säännöt",
+      "methodology": {
+        "extremes": "Vinkki: Aloita asettamalla vahvimmat mielipiteesi ääripäihin.",
+        "extremes_title": "Navat ja ääripäät",
+        "vertical": "Pystysuuntaus: Ylhäältä alas -järjestyksellä ei ole merkitystä, vain vaaka-akseli ratkaisee.",
+        "vertical_title": "Lajitteluakseli",
+        "interaction": "Käsittely: Voit vetää kortteja tai vain napauttaa niitä.",
+        "interaction_title": "Kosketuskomennot",
+        "footer_note": "Jokainen kortti on asetettava lopullisen lajittelun vahvistamiseksi.",
+        "close": "Selvä!"
+      }
     }
   },
   "post": {
