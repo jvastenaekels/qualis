@@ -25,7 +25,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useLayoutAction } from '../contexts/LayoutContext';
-import { Check } from 'lucide-react';
+import { } from 'lucide-react';
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';
 import { useFineSortDrag, type InteractionUtils } from '../hooks/useFineSortDrag';
@@ -164,18 +164,9 @@ const FineSortPage: React.FC = () => {
     }, [responses.qsort, responses.rough, config?.statements]);
 
     useEffect(() => {
-        if (!isAllPlaced) { setHeaderAction(null); return; }
-        const actionNode = (
-            <button
-                onClick={() => navigate(`/study/${slug}/post-sort`)}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg font-bold text-sm bg-green-600 text-white hover:bg-green-700 shadow-lg hover:shadow-xl transform transition-all duration-300 animate-pulse w-full md:w-auto justify-center"
-            >
-                {t('fine.actions.validate')} <Check size={18} strokeWidth={3} />
-            </button>
-        );
-        setHeaderAction(actionNode);
+        setHeaderAction(null);
         return () => setHeaderAction(null);
-    }, [isAllPlaced, navigate, slug, setHeaderAction, t]);
+    }, [setHeaderAction]);
 
     // 7. Memoized callbacks for performance
     const actions = useMemo(() => ({
