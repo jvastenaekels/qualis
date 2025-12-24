@@ -13,6 +13,8 @@
     "no": "No",
     "ok": "OK",
     "cancel": "Cancel",
+    "check": "Check",
+    "select_card": "Select a card",
     "attention": "Note",
     "error": "Error",
     "submitting": "Sending...",
@@ -92,10 +94,14 @@
       "subtitle": "Now, let's refine the nuance."
     },
     "instructions": {
-        "swipe": "Swipe or tap to categorize"
+        "swipe": "Swipe or tap to categorize",
+        "desktop_tip": "Drag or click to sort"
     }
   },
   "fine": {
+    "header": {
+      "title": "Sort the statements on the grid according to your point of view"
+    },
     "deck": {
         "title": "Cards available",
         "all_placed": "All statements placed",
