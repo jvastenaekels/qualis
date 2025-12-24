@@ -132,19 +132,36 @@ const FineSortPage: React.FC = () => {
             .filter((c): c is NonNullable<typeof c> => c !== null);
     }, [responses.qsort]);
 
-    // 6. Action Handling Logic
-    const gridColumns = config?.grid_config || [
+    // 6. Memoized derived data
+    const gridColumns = useMemo(() => config?.grid_config || [
         { score: -4, capacity: 2 }, { score: -3, capacity: 3 }, { score: -2, capacity: 4 },
         { score: -1, capacity: 6 }, { score: 0,  capacity: 10 }, { score: 1,  capacity: 6 },
         { score: 2,  capacity: 4 }, { score: 3,  capacity: 3 }, { score: 4,  capacity: 2 },
-    ];
+    ], [config?.grid_config]);
 
-
-    const placedIds = new Set(responses.qsort.map(c => c.statementId));
-    const unplacedAgree = responses.rough.agree.filter(id => !placedIds.has(id)).map(id => config?.statements.find(s => s.id === id)).filter((s): s is NonNullable<typeof s> => !!s);
-    const unplacedDisagree = responses.rough.disagree.filter(id => !placedIds.has(id)).map(id => config?.statements.find(s => s.id === id)).filter((s): s is NonNullable<typeof s> => !!s);
-    const unplacedNeutral = responses.rough.neutral.filter(id => !placedIds.has(id)).map(id => config?.statements.find(s => s.id === id)).filter((s): s is NonNullable<typeof s> => !!s);
-    const isAllPlaced = unplacedAgree.length === 0 && unplacedDisagree.length === 0 && unplacedNeutral.length === 0;
+    const { unplacedAgree, unplacedDisagree, unplacedNeutral, isAllPlaced } = useMemo(() => {
+        const placedIds = new Set(responses.qsort.map(c => c.statementId));
+        const statements = config?.statements || [];
+        
+        const unplacedAgree = responses.rough.agree
+            .filter(id => !placedIds.has(id))
+            .map(id => statements.find(s => s.id === id))
+            .filter((s): s is NonNullable<typeof s> => !!s);
+        
+        const unplacedDisagree = responses.rough.disagree
+            .filter(id => !placedIds.has(id))
+            .map(id => statements.find(s => s.id === id))
+            .filter((s): s is NonNullable<typeof s> => !!s);
+        
+        const unplacedNeutral = responses.rough.neutral
+            .filter(id => !placedIds.has(id))
+            .map(id => statements.find(s => s.id === id))
+            .filter((s): s is NonNullable<typeof s> => !!s);
+        
+        const isAllPlaced = unplacedAgree.length === 0 && unplacedDisagree.length === 0 && unplacedNeutral.length === 0;
+        
+        return { unplacedAgree, unplacedDisagree, unplacedNeutral, isAllPlaced };
+    }, [responses.qsort, responses.rough, config?.statements]);
 
     useEffect(() => {
         if (!isAllPlaced) { setHeaderAction(null); return; }
@@ -208,8 +225,9 @@ const FineSortPage: React.FC = () => {
     // 10. Condition Check (After all hooks)
     if (!config) return null;
 
-    const activeCardData = config.statements.find(s => s.id === activeId);
-
+    // 11. Memoized card data - these need to be after config null check
+    const activeCardData = activeId !== null ? config.statements.find(s => s.id === activeId) : undefined;
+    const selectedCard = selectedCardId !== null ? config.statements.find(s => s.id === selectedCardId) ?? null : null;
 
     const snapCenterToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
         if (draggingNodeRect && activatorEvent) {
@@ -252,7 +270,7 @@ const FineSortPage: React.FC = () => {
                     renderSlotContent={renderSlotContent}
                     disableHoverZoom={activeId !== null}
                     selectedCardId={selectedCardId}
-                    selectedCard={selectedCardId ? config.statements.find(s => s.id === selectedCardId) : null}
+                    selectedCard={selectedCard}
                     onCardClick={handleCardClick}
                     onSlotClick={handleSlotClick}
                     onDimensionsChange={setCardDimensions}
