@@ -4,15 +4,21 @@
 
 import asyncio
 import os
+import sys
 from sqlalchemy import select
 from app.database import engine, Base, SessionLocal
 from app.models import User
 
-async def init_db():
+async def init_db(reset: bool = False):
     print("--- Initializing Database Infrastructure ---")
     
-    # Create tables if they don't exist
     async with engine.begin() as conn:
+        if reset:
+            print("0. Dropping all existing tables (--reset flag)...")
+            await conn.run_sync(Base.metadata.drop_all)
+            print("   Tables dropped.")
+        
+        # Create tables if they don't exist
         await conn.run_sync(Base.metadata.create_all)
     print("1. Tables verified/created.")
 
@@ -39,4 +45,7 @@ async def init_db():
         print("--- Initialization Complete ---")
 
 if __name__ == "__main__":
-    asyncio.run(init_db())
+    reset_flag = "--reset" in sys.argv
+    if reset_flag:
+        print("⚠️  WARNING: This will drop all existing data!")
+    asyncio.run(init_db(reset=reset_flag))
