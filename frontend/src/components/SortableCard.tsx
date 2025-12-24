@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import ReactMarkdown from 'react-markdown';
-
+import { useUIStore } from '../store/useUIStore';
 
 interface SortableCardProps {
   id: number;
@@ -45,7 +45,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
     isDragging
   } = useSortable({ id });
 
-
+  const setHoveredCard = useUIStore((state) => state.setHoveredCard);
   const hoverTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Cleanup timer on unmount
@@ -58,16 +58,12 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(({
   }, []);
 
   const handleMouseEnter = () => {
-    // Dwell zoom disabled by user request
-    return;
+     // Immediate hover feedback for Reading Zone
+     setHoveredCard({ id, text });
   };
 
   const handleMouseLeave = () => {
-    if (hoverTimerRef.current) {
-        clearTimeout(hoverTimerRef.current);
-        hoverTimerRef.current = null;
-    }
-    // We strictly avoid clearing global zoomed card here to avoid flickering if it's controlled elsewhere
+     setHoveredCard(null);
   };
 
   const style = {

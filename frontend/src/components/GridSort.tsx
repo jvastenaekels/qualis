@@ -20,6 +20,7 @@ import { useGridZoom } from '../hooks/useGridZoom';
 import { useGridCalculations } from '../hooks/useGridCalculations';
 import { useDeckManagement } from '../hooks/useDeckManagement';
 import WorkbenchPanel from './WorkbenchPanel';
+import { useUIStore } from '../store/useUIStore';
 
 
 interface GridSortProps {
@@ -81,6 +82,8 @@ const GridSort: React.FC<GridSortProps> = ({
       disagreeCards,
       neutralCards
   });
+
+  const hoveredCard = useUIStore((state) => state.hoveredCard);
 
   const [closedTips, setClosedTips] = useState({ extremes: false, vertical: false });
   const [showVerticalTip, setShowVerticalTip] = useState(false);
@@ -373,8 +376,31 @@ const GridSort: React.FC<GridSortProps> = ({
                 : '100%' 
         }}
       >
-              {/* Category selector (Piles) */}
-              <div className="flex-none p-4 pb-2">
+              {/* Reading Zone (L'Oeil du Tri) */}
+              <div className="flex-none p-4 pb-0">
+                  <div className="w-full bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 min-h-[140px] flex flex-col justify-center relative transition-all duration-300">
+                      {hoveredCard || selectedCard ? (
+                         <div className="animate-in fade-in zoom-in-95 duration-200">
+                             <div className="text-xs font-bold text-indigo-400 mb-1 uppercase tracking-wider">
+                                 {hoveredCard ? 'Aperçu' : 'Sélection'}
+                             </div>
+                             <p className="text-slate-800 text-base sm:text-lg font-medium leading-relaxed">
+                                 {hoveredCard?.text || selectedCard?.text}
+                             </p>
+                         </div>
+                      ) : (
+                         <div className="text-center text-slate-400 py-2">
+                             <div className="mb-2 text-2xl opacity-50">👁️</div>
+                             <p className="text-sm font-medium">
+                                 {t('fine.toolbar.read_full') || "Survolez ou touchez une carte pour lire"}
+                             </p>
+                         </div>
+                      )}
+                  </div>
+              </div>
+
+               {/* Category selector (Piles) */}
+               <div className="flex-none p-4 pb-2">
                   {!isDeckCollapsed && (
                   <div className="flex lg:grid lg:grid-cols-3 gap-2" role="tablist">
                       {(['disagree', 'neutral', 'agree'] as const).map((pile) => {
