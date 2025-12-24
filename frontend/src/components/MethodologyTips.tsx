@@ -20,7 +20,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     const tips = [
         t('fine.workbench.methodology.extremes'),
         t('fine.workbench.methodology.vertical'),
-        t('fine.workbench.methodology.interaction')
+        t('fine.workbench.methodology.constraint')
     ];
 
     useEffect(() => {

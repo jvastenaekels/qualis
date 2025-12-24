@@ -152,8 +152,8 @@
         "extremes_title": "Poles & Extremes",
         "vertical": "Verticality: The top-bottom order doesn't matter, only the horizontal axis counts.",
         "vertical_title": "Sorting Axis",
-        "interaction": "Handling: You can drag cards or simply tap them.",
-        "interaction_title": "Touch Controls",
+        "constraint": "Forced Choice: You must place every card to finish. Sometimes you'll have to make tough choices!",
+        "constraint_title": "Challenge",
         "footer_note": "Each card must be placed to validate the final sort.",
         "close": "Got it!"
       }

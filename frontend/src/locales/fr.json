@@ -152,8 +152,8 @@
         "extremes_title": "Pôles et Extrémités",
         "vertical": "Verticalité : L'ordre haut-bas n'importe pas, seul l'axe horizontal compte.",
         "vertical_title": "Axe de Tri",
-        "interaction": "Manipulation : Vous pouvez glisser les cartes ou simplement les toucher.",
-        "interaction_title": "Commandes Tactiles",
+        "constraint": "Choix forcé : Vous devez placer toutes les cartes. Il faut parfois faire des choix difficiles !",
+        "constraint_title": "Challenge",
         "footer_note": "Chaque carte doit être placée pour pouvoir valider le tri final.",
         "close": "Compris !"
       }
