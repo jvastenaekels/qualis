@@ -9,6 +9,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Markdown from 'react-markdown';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SortingAnimation from '../components/SortingAnimation';
@@ -117,6 +118,7 @@ const WelcomePage: React.FC = () => {
                         onClick={() => {
                             if (window.confirm(t('welcome.reset_confirm'))) {
                                 useSessionStore.getState().resetSession();
+                                useResponseStore.getState().resetResponses();
                                 window.location.reload();
                             }
                         }}

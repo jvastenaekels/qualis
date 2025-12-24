@@ -12,6 +12,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import type { StudyConfig } from '../schemas/study';
 import { useSessionStore } from '../store/useSessionStore';
+import { useResponseStore } from '../store/useResponseStore';
 
 // Mocks
 const mockConfig = {
@@ -123,6 +124,7 @@ describe('WelcomePage', () => {
     it('resets session when link is clicked and confirmed', async () => {
          // Setup active session
          useSessionStore.getState().setConsent(true);
+         useResponseStore.getState().setPresortResponse({ test: 'data' });
          
          // Mock window.confirm
          const confirmSpy = vi.spyOn(window, 'confirm');
@@ -149,5 +151,8 @@ describe('WelcomePage', () => {
         // Verify store was reset (hasConsented should be false)
         // Note: useSessionStore.getState() might reflect the change immediately
         expect(useSessionStore.getState().hasConsented).toBe(false);
+
+        // Verify response store was reset
+        expect(useResponseStore.getState().presort).toEqual({});
     });
 });
