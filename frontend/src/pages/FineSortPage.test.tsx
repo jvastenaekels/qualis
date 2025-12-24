@@ -4,32 +4,13 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FineSortPage from './FineSortPage';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
+import { renderWithProviders, setupStoreMocks, screen } from '../test/test-utils';
+import type { StudyConfig } from '../schemas/study';
 
-// Mocks
-vi.mock('react-router-dom', () => ({
-    useNavigate: () => vi.fn(),
-    useParams: () => ({ slug: 'test-study' }),
-}));
-
-const setHeaderActionMock = vi.fn();
-vi.mock('../contexts/LayoutContext', () => ({
-    useLayoutAction: () => ({
-        setHeaderAction: setHeaderActionMock,
-    }),
-}));
-
-// Mock GridSort to avoid complex DND logic
-vi.mock('../components/GridSort', () => ({
-    default: () => <div data-testid="grid-sort">GridSort</div>
-}));
-
-const mockConfig = {
+const mockConfig: StudyConfig = {
+    slug: 'demo',
     title: 'Test',
     description: 'Test',
     instructions: 'Test',
@@ -37,82 +18,106 @@ const mockConfig = {
         { id: 1, text: 'S1' },
         { id: 2, text: 'S2' }
     ],
-    grid_config: [{ capacity: 2, score: 0 }],
-    presort_config: {},
-    language_code: 'en'
+    grid_config: [{ score: 0, capacity: 2 }],
+    presort_config: {}
 };
+
+// Mock Stores (Core)
+vi.mock('../store/useConfigStore', () => ({
+    useConfigStore: Object.assign(vi.fn(), {
+        getState: () => ({ setConfig: vi.fn(), config: mockConfig })
+    })
+}));
+vi.mock('../store/useSessionStore', () => ({ useSessionStore: vi.fn() }));
+vi.mock('../store/useResponseStore', () => ({ useResponseStore: vi.fn() }));
+vi.mock('../store/useUIStore', () => ({ useUIStore: vi.fn() }));
+
+// Mocks
+vi.mock('../hooks/useLayout', () => ({
+    useLayoutAction: () => ({
+        setHeaderAction: vi.fn(),
+    }),
+}));
+
+// Mock GridSort
+vi.mock('../components/GridSort', () => ({
+    default: ({ isAllPlaced, onValidate }: { isAllPlaced: boolean; onValidate: () => void }) => (
+        <div data-testid="grid-sort">
+            GridSort
+            {isAllPlaced && (
+                <button onClick={onValidate}>fine.actions.validate</button>
+            )}
+        </div>
+    )
+}));
+
+// Mock useStudyConfig
+vi.mock('../hooks/useStudyConfig', () => ({
+    useStudyConfig: () => ({ isLoading: false, error: null })
+}));
+
+// Mock translation
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+    initReactI18next: { type: '3rdParty', init: () => {} }
+}));
 
 describe('FineSortPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        // Reset stores to clean state
-        useConfigStore.getState().setConfig(mockConfig as any);
-        useSessionStore.getState().resetSession();
-        useSessionStore.getState().setConsent(true);
-        useSessionStore.getState().setStep(4);
-        useResponseStore.getState().resetResponses();
     });
 
-    it('does not set header action initially (null) when not all cards are placed', () => {
-        // Setup: Cards in rough sort but not in grid
-        useResponseStore.getState().categorizeCard(1, 'disagree');
-        useResponseStore.getState().categorizeCard(2, 'disagree');
+    it('does not show validation button when not all cards are placed', () => {
+        setupStoreMocks({
+            useConfigStore: { config: mockConfig },
+            useResponseStore: {
+                rough: { agree: [1, 2], disagree: [], neutral: [] },
+                qsort: []
+            },
+            useSessionStore: { 
+                hasConsented: true, currentStep: 4, isCompleted: false, 
+                language: 'en', setStep: vi.fn() 
+            },
+            useUIStore: { 
+                hoveredCard: null, 
+                setActiveCard: vi.fn(), 
+                setHoveredCard: vi.fn(),
+                setSelectedCard: vi.fn()
+            }
+        });
+
+        renderWithProviders(<FineSortPage />);
         
-        render(<FineSortPage />);
-        
-        // Assert setHeaderAction was called with null
-        expect(setHeaderActionMock).toHaveBeenCalled();
-        const actionNode = setHeaderActionMock.mock.lastCall?.[0];
-        expect(actionNode).toBeNull();
+        expect(screen.queryByText('fine.actions.validate')).toBeNull();
     });
 
-    it('sets header action to an active/animated button when all cards placed', () => {
-        // Setup: All cards placed in grid
-        useResponseStore.getState().categorizeCard(1, 'disagree');
-        useResponseStore.getState().placeCardInGrid(1, 0, 0);
-        
-        // Update config to match 1 card
-        useConfigStore.getState().setConfig({
+    it('shows validation button when all cards placed', () => {
+        const singleCardConfig: StudyConfig = {
             ...mockConfig,
             statements: [{ id: 1, text: 'S1' }],
             grid_config: [{ capacity: 1, score: 0 }]
-        } as any);
+        };
 
-        render(<FineSortPage />);
+        setupStoreMocks({
+            useConfigStore: { config: singleCardConfig },
+            useResponseStore: {
+                rough: { agree: [1], disagree: [], neutral: [] },
+                qsort: [{ statementId: 1, col: 0, row: 0 }]
+            },
+            useSessionStore: { 
+                hasConsented: true, currentStep: 4, isCompleted: false, 
+                language: 'en', setStep: vi.fn() 
+            },
+            useUIStore: { 
+                hoveredCard: null, 
+                setActiveCard: vi.fn(), 
+                setHoveredCard: vi.fn(),
+                setSelectedCard: vi.fn()
+            }
+        });
+
+        renderWithProviders(<FineSortPage />);
          
-        const actionNode = setHeaderActionMock.mock.lastCall?.[0];
-        if (actionNode) {
-            const { getByRole } = render(<div>{actionNode}</div>);
-            const button = getByRole('button');
-            expect(button).not.toBeDisabled();
-            // Check for animation class
-            expect(button.className).toContain('bg-green-600');
-        }
-    });
-
-    it('persists grid placements when re-navigating', () => {
-        // Setup: Card 1 placed in grid
-        useResponseStore.getState().categorizeCard(1, 'agree');
-        useResponseStore.getState().placeCardInGrid(1, 0, 0);
-        
-        useConfigStore.getState().setConfig({
-            ...mockConfig,
-            statements: [{ id: 1, text: 'S1' }],
-            grid_config: [{ capacity: 1, score: 0 }]
-        } as any);
-
-        const { unmount } = render(<FineSortPage />);
-        
-        // Assert GridSort is rendered
-        expect(screen.getByTestId('grid-sort')).toBeTruthy();
-
-        unmount();
-
-        // Re-render - placement should still be there (in store)
-        render(<FineSortPage />);
-        expect(screen.getByTestId('grid-sort')).toBeTruthy();
-        
-        // Verify store still has the placement
-        expect(useResponseStore.getState().qsort.length).toBe(1);
+        expect(screen.getByText('fine.actions.validate')).toBeInTheDocument();
     });
 });

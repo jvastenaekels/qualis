@@ -4,16 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import React from 'react';
-import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import FineSortPage from './FineSortPage';
-import { useConfigStore } from '../store/useConfigStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useResponseStore } from '../store/useResponseStore';
-import { useUIStore } from '../store/useUIStore';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import StudyLayout from '../layouts/StudyLayout';
+import { renderWithProviders, setupStoreMocks, screen } from '../test/test-utils';
 import type { StudyConfig } from '../schemas/study';
 
 const mockConfig: StudyConfig = {
@@ -29,20 +22,15 @@ const mockConfig: StudyConfig = {
     presort_config: {}
 };
 
-// Mock Stores
+// Mock Stores (Core)
 vi.mock('../store/useConfigStore', () => ({
-    useConfigStore: Object.assign((fn: (s: any) => any) => fn({ config: mockConfig }), {
+    useConfigStore: Object.assign(vi.fn(), {
         getState: () => ({ setConfig: vi.fn(), config: mockConfig })
     })
 }));
-vi.mock('../store/useSessionStore');
-vi.mock('../store/useResponseStore');
-vi.mock('../store/useUIStore');
-
-const mockUseConfigStore = useConfigStore as unknown as ReturnType<typeof vi.fn>;
-const mockUseSessionStore = useSessionStore as unknown as ReturnType<typeof vi.fn>;
-const mockUseResponseStore = useResponseStore as unknown as ReturnType<typeof vi.fn>;
-const mockUseUIStore = useUIStore as unknown as ReturnType<typeof vi.fn>;
+vi.mock('../store/useSessionStore', () => ({ useSessionStore: vi.fn() }));
+vi.mock('../store/useResponseStore', () => ({ useResponseStore: vi.fn() }));
+vi.mock('../store/useUIStore', () => ({ useUIStore: vi.fn() }));
 
 // Mock useStudyConfig
 vi.mock('../hooks/useStudyConfig', () => ({
@@ -52,11 +40,11 @@ vi.mock('../hooks/useStudyConfig', () => ({
 // Mock translation
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
-    Trans: ({ children, i18nKey }: any) => children || i18nKey,
+    Trans: ({ children, i18nKey }: { children: React.ReactNode, i18nKey?: string }) => children || i18nKey,
     initReactI18next: { type: '3rdParty', init: () => {} }
 }));
 
-// Mock GridSort to avoid complex DND logic in integration tests
+// Mock GridSort
 vi.mock('../components/GridSort', () => ({
     default: ({ isAllPlaced, onValidate }: { isAllPlaced: boolean; onValidate: () => void }) => (
         <div data-testid="grid-sort">
@@ -68,7 +56,6 @@ vi.mock('../components/GridSort', () => ({
     )
 }));
 
-// Mock ResizeObserver
 global.ResizeObserver = class {
     observe() {}
     unobserve() {}
@@ -81,85 +68,59 @@ describe('FineSortPage Integration', () => {
     });
 
     it('renders "Finish Sorting" button in Header when grid is full', () => {
-        // Mock State: All cards placed
-        const configState = { config: mockConfig, isLoading: false };
-        const sessionState = { 
-            hasConsented: true, 
-            currentStep: 4, 
-            isCompleted: false, 
-            language: 'en',
-            setStep: vi.fn(), 
-        };
-        const responseState = {
-            rough: { agree: [], disagree: [], neutral: [] },
-            qsort: [
-                { statementId: 1, col: 0, row: 0 },
-                { statementId: 2, col: 0, row: 1 }
-            ]
-        };
-        const uiState = { hoveredCard: null, setHoveredCard: vi.fn() };
+        setupStoreMocks({
+            useConfigStore: { config: mockConfig, isLoading: false },
+            useSessionStore: { 
+                hasConsented: true, currentStep: 4, isCompleted: false, 
+                language: 'en', setStep: vi.fn() 
+            },
+            useResponseStore: {
+                rough: { agree: [], disagree: [], neutral: [] },
+                qsort: [
+                    { statementId: 1, col: 0, row: 0 },
+                    { statementId: 2, col: 0, row: 1 }
+                ]
+            },
+            useUIStore: { 
+                hoveredCard: null, 
+                setHoveredCard: vi.fn(), 
+                setSelectedCard: vi.fn(),
+                setActiveCard: vi.fn()
+            }
+        });
 
-        mockUseConfigStore.mockImplementation((selector: (s: any) => any) => selector ? selector(configState) : configState);
-        mockUseSessionStore.mockImplementation((selector: (s: any) => any) => selector ? selector(sessionState) : sessionState);
-        mockUseResponseStore.mockImplementation((selector: (s: any) => any) => selector ? selector(responseState) : responseState);
-        mockUseUIStore.mockImplementation((selector: (s: any) => any) => selector ? selector(uiState) : uiState);
+        renderWithProviders(<FineSortPage />, { 
+            initialEntries: ['/study/demo/sort/fine'] 
+        });
 
-        render(
-            <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                <Routes>
-                    <Route path="/study/:slug" element={<StudyLayout />}>
-                        <Route path="sort/fine" element={<FineSortPage />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>
-        );
-
-        // Check for Header Action (Desktop/Mobile)
-        // Logic says: if isAllPlaced -> "Validate"
         expect(screen.getAllByText(/fine.actions.validate/i).length).toBeGreaterThan(0);
-        
-        // It should be enabled
         const btns = screen.getAllByRole('button', { name: /fine.actions.validate/i });
         btns.forEach(btn => expect((btn as HTMLButtonElement).disabled).toBe(false));
     });
 
-    it('renders disabled "Finish Sorting" button when grid is NOT full', () => {
-        // Mock State: Cards remaining in Neutral pile
-        const configState = { config: mockConfig, isLoading: false };
-        const sessionState = { 
-            currentStep: 4, 
-            hasConsented: true, 
-            isSaving: false,
-            language: 'en',
-            setStep: vi.fn(), 
-        };
-        const responseState = {
-            rough: { agree: [], disagree: [], neutral: [1, 2] },
-            qsort: []
-        };
-        const uiState = { hoveredCard: null, setHoveredCard: vi.fn() };
+    it('hides "Finish Sorting" button when grid is NOT full', () => {
+        setupStoreMocks({
+            useConfigStore: { config: mockConfig, isLoading: false },
+            useSessionStore: { 
+                currentStep: 4, hasConsented: true, isSaving: false,
+                language: 'en', setStep: vi.fn() 
+            },
+            useResponseStore: {
+                rough: { agree: [], disagree: [], neutral: [1, 2] },
+                qsort: []
+            },
+            useUIStore: { 
+                hoveredCard: null, 
+                setHoveredCard: vi.fn(), 
+                setSelectedCard: vi.fn(),
+                setActiveCard: vi.fn()
+            }
+        });
 
-        mockUseConfigStore.mockImplementation((selector: any) => selector ? selector(configState) : configState);
-        mockUseSessionStore.mockImplementation((selector: any) => selector ? selector(sessionState) : sessionState);
-        mockUseResponseStore.mockImplementation((selector: any) => selector ? selector(responseState) : responseState);
-        mockUseUIStore.mockImplementation((selector: any) => selector ? selector(uiState) : uiState);
+        renderWithProviders(<FineSortPage />, { 
+            initialEntries: ['/study/demo/sort/fine'] 
+        });
 
-        render(
-            <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                <Routes>
-                    <Route path="/study/:slug" element={<StudyLayout />}>
-                        <Route path="sort/fine" element={<FineSortPage />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>
-        );
-
-        // Logic says: if !isAllPlaced -> Button should NOT be visible
-        // We check for both potential keys just in case, or ensure the query returns nothing
-        const finishBtns = screen.queryAllByRole('button', { name: /fine.actions.finish/i });
-        const validateBtns = screen.queryAllByRole('button', { name: /fine.actions.validate/i });
-        
-        expect(finishBtns.length).toBe(0);
-        expect(validateBtns.length).toBe(0);
+        expect(screen.queryAllByRole('button', { name: /fine.actions.validate/i }).length).toBe(0);
     });
 });

@@ -21,7 +21,8 @@ describe('useFineSortDrag', () => {
         const { result } = renderHook(() => useFineSortDrag({ 
             responses, 
             gridColumns: mockGridColumns, 
-            actions: mockActions 
+            actions: mockActions,
+            statements: []
         }));
 
         act(() => {
@@ -39,15 +40,16 @@ describe('useFineSortDrag', () => {
         const { result } = renderHook(() => useFineSortDrag({ 
             responses, 
             gridColumns: mockGridColumns, 
-            actions: mockActions 
+            actions: mockActions,
+            statements: []
         }));
 
         act(() => {
             // Drag to 0_0 (Occupied) -> Should go to 0_1 (Empty)
             result.current.handleDragEnd({
-                active: { id: 101 } as any,
-                over: { id: 'slot_0_0' } as any,
-            } as any);
+                active: { id: 101 } as unknown,
+                over: { id: 'slot_0_0' } as unknown,
+            } as unknown as DragEndEvent);
         });
 
         expect(mockActions.placeCardInGrid).toHaveBeenCalledWith(101, 0, 1);
@@ -66,14 +68,15 @@ describe('useFineSortDrag', () => {
         const { result } = renderHook(() => useFineSortDrag({ 
             responses, 
             gridColumns: mockGridColumns, 
-            actions: mockActions 
+            actions: mockActions,
+            statements: []
         }));
 
         act(() => {
             result.current.handleDragEnd({
-                active: { id: 300 } as any,
-                over: { id: 'slot_1_0' } as any,
-            } as any);
+                active: { id: 300 } as unknown,
+                over: { id: 'slot_1_0' } as unknown,
+            } as unknown as DragEndEvent);
         });
 
         expect(mockActions.swapCardsInGrid).toHaveBeenCalledWith(300, 200);
@@ -91,7 +94,8 @@ describe('useFineSortDrag', () => {
         const { result } = renderHook(() => useFineSortDrag({ 
             responses, 
             gridColumns: mockGridColumns, 
-            actions: mockActions 
+            actions: mockActions,
+            statements: []
         }));
 
         act(() => {
