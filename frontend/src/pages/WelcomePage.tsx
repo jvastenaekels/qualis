@@ -90,6 +90,12 @@ const WelcomePage: React.FC = () => {
                             {/* Anchor Shape */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-200/50 rounded-full blur-2xl opacity-60 pointer-events-none" />
                             
+                            {/* Step Numbers (Left) */}
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex flex-col gap-3 text-sm font-bold text-slate-400 z-20">
+                                <span>1</span>
+                                <span>2</span>
+                            </div>
+                            
                             {/* Scaled Animation */}
                             <div className="scale-150 transform origin-center grayscale-[0.2] contrast-125 z-10">
                                 <SortingAnimation />

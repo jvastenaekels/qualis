@@ -200,9 +200,6 @@ const SortingAnimation: React.FC = () => {
                 md:relative md:w-full md:h-40
                 ${phase === 'ROUGH' ? 'opacity-100 scale-[1.5] md:scale-100 z-20 md:filter-none' : 'opacity-0 scale-[1.35] z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
             `}>
-                {/* Step Number (Left) */}
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 text-2xl font-bold text-slate-300 z-0">1</div>
-
                 {/* Deck (Center) */}
                 <div className="relative z-20">
                     <DynamicStack count={roughDeckCount} type="deck" />
@@ -245,8 +242,6 @@ const SortingAnimation: React.FC = () => {
                 md:relative md:w-full md:h-40
                 ${phase === 'FINE' ? 'opacity-100 scale-[1.5] md:scale-100 z-20 md:filter-none' : 'opacity-0 scale-[1.35] z-10 md:opacity-40 md:grayscale-[0.8] md:scale-100'}
             `}>
-                {/* Step Number (Left) */}
-                <div className="absolute left-2 top-1/2 -translate-y-1/2 text-2xl font-bold text-slate-300 z-0">2</div>
 
                 {/* 
                    GRID CONTAINER 
