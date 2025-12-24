@@ -199,10 +199,6 @@ const SortingAnimation: React.FC = () => {
                 absolute top-0 left-0 w-full h-full flex items-center justify-center transition-all duration-700 ease-in-out
                 ${phase === 'ROUGH' ? 'opacity-100 scale-[1.5] md:scale-[2.0] z-20' : 'opacity-0 scale-[1.35] md:scale-[1.8] z-10'}
             `}>
-                {/* Step Badge */}
-                <div className="absolute top-0 md:-top-4 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] md:text-xs font-semibold rounded-full z-50 shadow-sm border border-slate-300">
-                    1 / 2
-                </div>
 
                 {/* Deck (Center) */}
                 <div className="relative z-20">
@@ -245,10 +241,6 @@ const SortingAnimation: React.FC = () => {
                 absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center gap-2 transition-all duration-700 ease-in-out
                 ${phase === 'FINE' ? 'opacity-100 scale-[1.5] md:scale-[2.0] z-20' : 'opacity-0 scale-[1.35] md:scale-[1.8] z-10'}
             `}>
-                {/* Step Badge */}
-                <div className="absolute top-0 md:-top-4 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-slate-200 text-slate-600 text-[10px] md:text-xs font-semibold rounded-full z-50 shadow-sm border border-slate-300">
-                    2 / 2
-                </div>
 
                 {/* 
                    GRID CONTAINER 
@@ -356,6 +348,19 @@ const SortingAnimation: React.FC = () => {
                             />
                         )}
                     </AnimatePresence>
+                </div>
+            </div>
+
+            {/* Progress Indicator (Bottom) */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none">
+                <div className={`transition-all duration-500 rounded-full flex items-center justify-center font-bold text-[10px] ${phase === 'ROUGH' ? 'w-6 h-6 bg-blue-600 text-white scale-110 shadow-md ring-2 ring-blue-100' : 'w-5 h-5 bg-slate-200 text-slate-400'}`}>
+                    1
+                </div>
+                <div className="w-8 h-0.5 bg-slate-200 overflow-hidden rounded-full">
+                    <div className={`h-full bg-blue-600 transition-all duration-500 ease-in-out ${phase === 'FINE' ? 'w-full' : 'w-0'}`} />
+                </div>
+                <div className={`transition-all duration-500 rounded-full flex items-center justify-center font-bold text-[10px] ${phase === 'FINE' ? 'w-6 h-6 bg-blue-600 text-white scale-110 shadow-md ring-2 ring-blue-100' : 'w-5 h-5 bg-slate-200 text-slate-400'}`}>
+                    2
                 </div>
             </div>
 
