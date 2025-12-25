@@ -176,7 +176,7 @@
         "fi": {
             "title": "Tutkimusesimerkki",
             "subtitle": "Interaktiivinen esittely",
-            "objective": "Tämän tutkimuksen tavoitteena on osoittaa Open-Q-alustan joustavuus. Osallistumalla autat meitä validoimaan kolme keskeistä näkökohtaa:\n\n- **Käyttökokemus**: Intuitiivinen korttien lajittelu mobiililla ja työpöydällä.\n- **Monikielisyys**: Vahva tuki kansainväliselle sisällölle.\n- **Moderni Arkkitehtuuri**: Luotettava ja turvallinen tiedonkeruu.",
+            "objective": "Tämä esittely havainnollistaa **Open-Q**-alustan käyttöä, joka on omistettu **Q-metodologialle**. **William Stephensonin** vuonna 1935 esittelemä menetelmä mahdollistaa **ihmisen subjektiivisuuden** tieteellisen tutkimisen ja yhdistää nykyään kansainvälisen tutkijayhteisön.\n\nLajittelemalla väittämiä oman näkökulmasi mukaan autat paljastamaan erillisiä **ajatusmalleja**. Tämä sovellus modernisoi tätä prosessia tarjoamalla **sujuvan ja osallistavan** tiedonkeruukokemuksen.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Aloita tutkimus"
