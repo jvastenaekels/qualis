@@ -103,7 +103,7 @@
     },
     "instructions": {
         "swipe": "Swipe or tap to categorize",
-        "desktop_tip": "Swipe, press, or use keyboard ( ← ↓ → ) to sort"
+        "desktop_tip": "Swipe, tap, or use keyboard ( ← ↓ → ) to sort"
     }
   },
   "fine": {
