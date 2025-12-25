@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
-import { get, reportBug, ApiError } from './client';
+import { get, post, reportBug, ApiError } from './client';
 import { server } from '../tests/server';
 
 // Mock global fetch
@@ -63,6 +63,25 @@ describe('API Client', () => {
 
             expect(fetchMock).not.toHaveBeenCalled();
         });
+
+        it('should gracefully handle reporting failures', async () => {
+            fetchMock.mockRejectedValueOnce(new Error('Network Error'));
+            const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+            
+            await reportBug('some error');
+            
+            expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Failed to report bug'), expect.any(Error));
+            consoleSpy.mockRestore();
+        });
+    });
+
+    describe('ApiError', () => {
+        it('should correctly capture status and message', () => {
+            const error = new ApiError(404, 'Not Found');
+            expect(error.status).toBe(404);
+            expect(error.message).toBe('Not Found');
+            expect(error.name).toBe('ApiError');
+        });
     });
 
     describe('get/post', () => {
@@ -113,6 +132,46 @@ describe('API Client', () => {
             
             // Should NOT trigger log reporting for client errors
             expect(fetchMock).toHaveBeenCalledTimes(1); 
+        });
+
+        it('should successfully handle GET requests', async () => {
+            const mockData = { id: 1 };
+            fetchMock.mockResolvedValueOnce(createMockResponse({
+                json: async () => mockData
+            }));
+
+            const result = await get('/data');
+            expect(result).toEqual(mockData);
+        });
+
+        it('should throw ApiError and report on 500 during POST', async () => {
+            fetchMock.mockResolvedValueOnce(createMockResponse({
+                ok: false,
+                status: 500,
+                text: async () => 'Server Crash',
+            }));
+
+            await expect(post('/submit', {})).rejects.toThrow('Server Crash');
+            
+            await vi.waitFor(() => {
+                const calls = fetchMock.mock.calls;
+                const logCall = calls.find((call) => typeof call[0] === 'string' && call[0].includes('/api/logs'));
+                expect(logCall).toBeDefined();
+            });
+        });
+
+        it('should successfully handle POST requests', async () => {
+            const mockData = { result: 'ok' };
+            fetchMock.mockResolvedValueOnce(createMockResponse({
+                json: async () => mockData
+            }));
+
+            const result = await post('/submit', { foo: 'bar' });
+            expect(result).toEqual(mockData);
+            expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/submit'), expect.objectContaining({
+                method: 'POST',
+                body: JSON.stringify({ foo: 'bar' })
+            }));
         });
     });
 });

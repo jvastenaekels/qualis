@@ -1,6 +1,7 @@
 import pytest
-from sqlalchemy import delete
-from app.models import StudyTranslation
+from sqlalchemy import delete, select
+from sqlalchemy.orm import selectinload
+from app.models import Study, StudyTranslation, User, StudyState, Statement, StatementTranslation
 
 # 1. Get Study Config
 @pytest.mark.asyncio
@@ -26,8 +27,6 @@ async def test_language_resolution_cascade(client, db):
     """
     Priority: Requested Lang -> Default (Study) -> English -> First Available
     """
-    from app.models import Study, StudyTranslation, User, StudyState
-    
     # Setup: Study with multiple languages
     owner = User(email="lang@test.com", hashed_password="pw")
     db.add(owner)
@@ -55,21 +54,19 @@ async def test_language_resolution_cascade(client, db):
     response = await client.get(f"/api/study/{slug}?lang=fi")
     assert response.json()["title"] == "Title FI"
     
-    # Case 2: No request lang, should use Study Default (FR)
-    # NOTE: Router currently defaults to 'en' in Query, so if EN exists, it picks EN.
+    # Case 2: No request lang. Router defaults to 'en' in Query.
     response = await client.get(f"/api/study/{slug}") 
     assert response.json()["title"] == "Title EN"
     
     # Case 3: Study Default (FR) - If we remove EN translation
     await db.execute(delete(StudyTranslation).where(StudyTranslation.language_code == "en"))
     await db.commit()
-    db.expire_all() # Ensure the next request doesn't see stale translations
+    db.expire_all()
     
     response = await client.get(f"/api/study/{slug}")
-    # Now lang="en" finds nothing, so it should fall back to study.default_language="fr"
     assert response.json()["title"] == "Title FR"
     
-    # Case 4: English Fallback (if no default and no requested)
+    # Case 4: English Fallback
     study.default_language = None
     trans_en = StudyTranslation(study_id=study.id, language_code="en", title="Title EN", description="", instructions="")
     db.add(trans_en)
@@ -79,20 +76,64 @@ async def test_language_resolution_cascade(client, db):
     response = await client.get(f"/api/study/{slug}")
     assert response.json()["title"] == "Title EN"
     
-    # Case 5: First Available (if no en, no default, no requested)
+    # Case 5: First Available
     await db.execute(delete(StudyTranslation).where(StudyTranslation.language_code == "en"))
-    # Re-fetch or ensure study attributes are available
     study.default_language = None
     await db.commit()
     db.expire_all()
     
     response = await client.get(f"/api/study/{slug}")
-    # Should be FR or FI (one of the remaining ones)
     assert response.json()["title"] in ["Title FR", "Title FI"]
 
 @pytest.mark.asyncio
+async def test_get_study_optional_fields_and_statement_fallbacks(client, db):
+    owner = User(email="opts@test.com", hashed_password="pw")
+    db.add(owner)
+    await db.flush()
+    
+    study = Study(
+        slug="opts-study", 
+        owner_id=owner.id, 
+        state=StudyState.active,
+        grid_config=[], presort_config={}, postsort_config={}
+    )
+    db.add(study)
+    await db.flush()
+    
+    trans_fi = StudyTranslation(
+        study_id=study.id, 
+        language_code="fi", 
+        title="Title FI", 
+        subtitle="Subtitle FI",
+        objective="Objective FI",
+        description="Desc FI",
+        instructions="Instr FI"
+    )
+    db.add(trans_fi)
+    
+    s1 = Statement(study_id=study.id, code="S1")
+    db.add(s1)
+    await db.flush()
+    
+    # S1 has translation in EN only
+    st1_en = StatementTranslation(statement_id=s1.id, language_code="en", text="Text EN")
+    db.add(st1_en)
+    
+    await db.commit()
+    
+    # Request FI
+    response = await client.get(f"/api/study/{study.slug}?lang=fi")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["subtitle"] == "Subtitle FI"
+    assert data["objective"] == "Objective FI"
+    assert data["instructions"] == "Instr FI"
+    
+    # Statement fallback to EN
+    assert data["statements"][0]["text"] == "Text EN"
+
+@pytest.mark.asyncio
 async def test_get_study_show_statement_codes(client, db):
-    from app.models import Study, User, StudyState
     owner = User(email="codes@test.com", hashed_password="pw")
     db.add(owner)
     await db.flush()
@@ -109,4 +150,3 @@ async def test_get_study_show_statement_codes(client, db):
     
     response = await client.get(f"/api/study/{study.slug}")
     assert response.json()["show_statement_codes"] is True
-
