@@ -21,16 +21,21 @@ def run_task(script_path, description):
 
 def main():
     print("--- Open-Q Post-Deployment Sequence ---")
-    current_dir = os.getcwd()
-    print(f"Working Directory: {current_dir}")
+    
+    # Determine base directory (backend/) relative to this script
+    script_dir = os.path.dirname(os.path.abspath(__file__)) # .../backend/scripts
+    backend_dir = os.path.dirname(script_dir) # .../backend
+    
+    print(f"Working Directory: {os.getcwd()}")
+    print(f"Backend Directory: {backend_dir}")
+    
+    # Change to backend directory so scripts find their modules
+    os.chdir(backend_dir)
     
     # 1. Ensure Database Schema (Migrations)
-    # Location: scripts/ensure_schema.py (relative to backend/)
     run_task("scripts/ensure_schema.py", "Schema Verification")
     
     # 2. Update Study Configuration (Data)
-    # Location: update_study.py (relative to backend/)
-    # Only run if example-study.json exists (it should)
     if os.path.exists("data/example-study.json"):
         run_task("update_study.py", "Study Data Update")
     else:

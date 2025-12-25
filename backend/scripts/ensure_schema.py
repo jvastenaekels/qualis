@@ -3,8 +3,11 @@ import asyncio
 import os
 import sys
 
-# Add project root to path
-sys.path.append(os.getcwd())
+# Add backend directory to path so 'from app' works regardless of CWD
+script_dir = os.path.dirname(os.path.abspath(__file__))
+backend_dir = os.path.dirname(script_dir)
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
 
 from app.database import engine
 from sqlalchemy import text, inspect
