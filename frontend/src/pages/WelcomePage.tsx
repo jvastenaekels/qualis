@@ -10,7 +10,7 @@ import Markdown from 'react-markdown';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Target } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import SortingAnimation from '../components/SortingAnimation';
 
@@ -57,7 +57,7 @@ const WelcomePage: React.FC = () => {
                     <div className="bg-white border border-slate-200 rounded-xl p-6 max-w-2xl mx-auto mt-8 text-left shadow-md relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
                         <h4 className="text-xs uppercase font-bold text-slate-500 mb-4 tracking-wider flex items-center gap-2">
-                             <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                             <Target size={16} className="text-blue-500" />
                             {t('welcome.objective_label', 'Objective of the study')}
                         </h4>
                         <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
@@ -68,7 +68,7 @@ const WelcomePage: React.FC = () => {
             </div>
 
             {/* 2. Process Section (The "How") */}
-            <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden mb-12">
+            <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden mb-8">
                 <div className="grid md:grid-cols-12 divide-y md:divide-y-0 md:divide-x divide-slate-200">
                     
                     {/* Instructions Column */}
@@ -104,7 +104,7 @@ const WelcomePage: React.FC = () => {
                         </div>
 
                     {/* Visual Column */}
-                    <div className="md:col-span-5 p-8 md:px-10 md:pt-10 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[500px] relative overflow-hidden">
+                    <div className="md:col-span-5 p-8 md:px-10 md:pt-10 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[350px] md:min-h-[500px] relative overflow-hidden">
                          <div className="relative z-10 uppercase tracking-wider text-xs font-bold text-slate-600 mb-4 bg-slate-200 w-fit px-3 py-1.5 rounded-md border border-slate-300">
                             {t('welcome.preview_title', "It's child's play!")}
                         </div>
