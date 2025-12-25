@@ -70,7 +70,7 @@
     "preview_title": "Esikatselu",
     "objective_label": "Tutkimuksen tavoite",
     "instructions_label": "Kulku",
-    "default_instructions": "1. **Profiilisi:** Muutama kysymys ainutlaatuisen näkökulmasi taustoittamiseksi.\n2. **Ensivaikutelma:** Tutustu väittämiin ja lajittele ne spontaanisti (Samaa mieltä, Neutraali, Eri mieltä).\n3. **Oma näkökulmasi:** Tarkenna ajatteluasi järjestämällä kokonaisuus tarkasti ruudukkoon.\n4. **Perustelut:** Anna valinnoillesi merkitys selittämällä vahvimmat kannanottosi."
+    "default_instructions": "1. **Tutustutaanpa hieman:** muutamia nopeita kysymyksiä, jotta ymmärrämme paremmin taustaasi.\n2. **Ensimmäiset mielikuvat:** tutustu väitteisiin ja kerro välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).\n3. **Oma näkemyksesi:** tarkenna ajatuksiasi asettamalla kukin väite ruudukkoon niin, että se heijastaa juuri sinun näkökulmaasi.\n4. **Perustelut:** muutama sana tärkeimpien valintojesi selittämiseksi."
   },
   "consent": {
     "title": "Suostumus osallistumiseen",
