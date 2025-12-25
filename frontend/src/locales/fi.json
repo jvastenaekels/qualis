@@ -70,7 +70,7 @@
     "preview_title": "Esikatselu",
     "objective_label": "Tutkimuksen tavoite",
     "instructions_label": "Kulku",
-    "default_instructions": "**Kuinka osallistua:**\n\n1. Lue jokainen väite.\n2. Lajittele se **näkemyksesi** mukaan.\n3. Tarkenna lajittelua ruudukossa."
+    "default_instructions": "**Näin osallistut:**\n\n1. Lue jokainen väite.\n2. Lajittele se **oman näkemyksesi** mukaan.\n3. Tarkenna lajittelua ruudukossa."
   },
   "consent": {
     "title": "Suostumus osallistumiseen",
@@ -139,7 +139,7 @@
       "active_card": "Active Card",
       "place_on_grid": "Tap Grid to Place",
       "drag_or_tap": "Drag to grid or tap a slot",
-      "initial_instruction": "Valitse vahvimmat mielipiteesi ääripäihin.",
+      "initial_instruction": "Sijoita vahvimmat mielipiteet ääripäihin.",
       "help": "Ohjeet ja säännöt",
       "methodology": {
         "extremes": "Vinkki: Aloita asettamalla vahvimmat mielipiteesi ääripäihin.",
@@ -148,7 +148,7 @@
         "vertical_title": "Lajitteluakseli",
         "interaction": "Käsittely: Voit vetää kortteja tai vain napauttaa niitä.",
         "interaction_title": "Kosketuskomennot",
-        "footer_note": "Jokainen kortti on asetettava lopullisen lajittelun vahvistamiseksi.",
+        "footer_note": "Jokainen kortti on sijoitettava ennen lopullista vahvistusta.",
         "close": "Selvä!"
       }
     }
