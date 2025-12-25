@@ -14,7 +14,7 @@
     "ok": "OK",
     "cancel": "Cancel",
     "check": "Check",
-    "select_card": "Select a card",
+    "select_card": "Pick a card",
     "attention": "Attention",
     "error": "Error",
     "submitting": "Submitting...",
@@ -98,7 +98,7 @@
       "hint": "Trust your **first impression**. This is a **spontaneous sort**—you will refine your choices in the next step."
     },
     "complete": {
-      "title": "First step completed",
+      "title": "First step complete",
       "subtitle": "Now, let's refine the nuance."
     },
     "instructions": {
@@ -143,14 +143,14 @@
     "actions": {
         "validate": "Confirm Sort",
         "finish": "Finish sorting",
-        "ready": "Review my perspective",
+        "ready": "Review overview",
         "not_ready": "Place all cards to continue"
     },
     "workbench": {
       "active_card": "Active Card",
       "place_on_grid": "Tap Grid to Place",
       "drag_or_tap": "Drag to grid or tap a slot",
-      "initial_instruction": "Select a card",
+      "initial_instruction": "Start by placing your strongest opinions at the extremes.",
       "help": "Help & rules",
       "methodology": {
         "extremes": "Tip: Start by placing your strongest opinions at the extremes.",
@@ -159,7 +159,7 @@
         "vertical_title": "Sorting Axis",
         "constraint": "Forced Choice: You must place every card to finish. You will sometimes have to separate statements you feel similarly about.",
         "constraint_title": "Challenge",
-        "footer_note": "Each card must be placed to validate the final sort.",
+        "footer_note": "All cards must be placed to finish.",
         "close": "Got it!"
       }
     }
