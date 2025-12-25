@@ -77,7 +77,8 @@ const ConsentPage: React.FC = () => {
             <form id="consent-form" onSubmit={handleSubmit(onSubmit)} className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm space-y-8">
                 
                 {/* Consent Description/Legal Text */}
-                <div className="prose prose-lg max-w-none text-gray-600">
+                {/* Consent Description/Legal Text */}
+                <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
                      {config.consent?.description ? (
                          <Markdown>{config.consent.description}</Markdown>
                      ) : (
@@ -95,8 +96,8 @@ const ConsentPage: React.FC = () => {
                                 className="h-6 w-6 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer"
                             />
                         </div>
-                        <div className="text-base sm:text-lg">
-                            <label htmlFor="consent" className="font-medium text-gray-900 cursor-pointer block">
+                        <div className="text-base">
+                            <label htmlFor="consent" className="font-medium text-slate-900 cursor-pointer block">
                                 {config.consent?.title || t('welcome.consent.label', 'I have read and understood the information provided and agree to participate.')}
                             </label>
                             {errors.consent && <p className="text-red-600 mt-2 text-sm">{t('welcome.consent.error', 'Consent is required to proceed.')}</p>}
