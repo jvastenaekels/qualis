@@ -131,7 +131,7 @@
         "en": {
             "title": "Discover Open-Q",
             "subtitle": "Experience Q-Methodology Simple and Easy",
-            "objective": "Welcome! The idea is simple: we want to understand how you see things, going beyond just 'yes' or 'no'. By placing various statements based on what rings truest to you, you help us map out your unique perspective. This approach captures the richness of human opinions, and this app just makes the process simple and easy to follow.",
+            "objective": "Welcome!\n\nThe idea is simple: we want to understand how you see things, going beyond just 'yes' or 'no'.\n\nBy **placing various statements** based on what rings truest to you, you help us map out your unique perspective. This approach captures the **richness of human opinions**, and this app just makes the process simple and easy to follow.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Start Study"
@@ -139,8 +139,8 @@
         },
         "fr": {
             "title": "Découverte d'Open-Q",
-            "subtitle": "La méthodologie Q en action",
-            "objective": "Bienvenue dans cette démonstration ! L'idée est simple : nous cherchons à comprendre comment vous percevez les choses, au-delà d'un simple 'oui' ou 'non'. En classant une série d'affirmations selon ce qui vous ressemble le plus, vous nous aidez à dessiner votre propre vision du monde. C'est une approche qui permet de capturer la richesse des opinions humaines, et cette application la rend simplement plus facile et agréable à utiliser.",
+            "subtitle": "La méthodologie Q en toute simplicité",
+            "objective": "Bienvenue dans cette démonstration !\n\nL'idée est simple : nous cherchons à comprendre comment vous percevez les choses, au-delà d'un simple 'oui' ou 'non'.\n\nEn **classant une série d'affirmations** selon ce qui vous ressemble le plus, vous nous aidez à dessiner votre propre vision du monde. C'est une approche qui permet de capturer la **richesse des opinions humaines**, et cette application la rend simplement plus facile et agréable à utiliser.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Commencer l'étude"
@@ -148,8 +148,8 @@
         },
         "fi": {
             "title": "Tutustu Open-Q-alustaan",
-            "subtitle": "Koe Q-metodologia käytännössä",
-            "objective": "Tervetuloa kokeilemaan! Idea on yksinkertainen: haluamme ymmärtää näkemyksiäsi syvällisemmin kuin vain 'kyllä' tai 'ei' -tasolla. Järjestämällä väitteitä sen mukaan, mikä tuntuu sinusta oikeimmalta, autat meitä hahmottamaan oman ainutlaatuisen näkökulmasi. Tämä menetelmä tavoittaa mielipiteiden rikkauden, ja tämä sovellus tekee osallistumisesta helppoa ja vaivatonta.",
+            "subtitle": "Q-metodologia helposti ja sujuvasti",
+            "objective": "Tervetuloa kokeilemaan!\n\nIdea on yksinkertainen: haluamme ymmärtää näkemyksiäsi syvällisemmin kuin vain 'kyllä' tai 'ei' -tasolla.\n\n**Järjestämällä väitteitä** sen mukaan, mikä tuntuu sinusta oikeimmalta, autat meitä hahmottamaan oman ainutlaatuisen näkökulmasi. Tämä menetelmä tavoittaa **mielipiteiden rikkauden**, ja tämä sovellus tekee osallistumisesta helppoa ja vaivatonta.",
             "instructions": "",
             "ui_labels": {
                 "start_button": "Aloita tutkimus"
