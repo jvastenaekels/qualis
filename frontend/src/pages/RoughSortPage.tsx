@@ -24,6 +24,7 @@ const RoughSortPage: React.FC = () => {
     
     // Config Store
     const config = useConfigStore((state) => state.config);
+    const showCodes = config?.show_statement_codes ?? false;
     
     // Response Store
     const responses = useResponseStore((state) => ({ rough: state.rough }));
@@ -319,7 +320,7 @@ const RoughSortPage: React.FC = () => {
                             <CardStack 
                                 ref={cardStackRef}
                                 key={currentCard.id} 
-                                statement={currentCard} 
+                                statement={{ ...currentCard, code: showCodes ? currentCard.code : undefined }} 
                                 onVote={onVoteComplete}
                                 x={x}
                                 y={y}

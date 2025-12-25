@@ -60,6 +60,7 @@ class StudyBase(BaseModel):
     grid_config: List[GridColumn]
     presort_config: Dict[str, Any]
     postsort_config: Dict[str, Any]
+    show_statement_codes: bool = False
 
 class StudyCreate(StudyBase):
     owner_id: int # Explicitly passed for now or inferred

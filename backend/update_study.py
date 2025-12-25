@@ -41,7 +41,8 @@ async def update_study():
                 default_language=data.get("default_language", "en"),
                 grid_config=data["grid_config"],
                 presort_config=data["presort_config"],
-                postsort_config=data["postsort_config"]
+                postsort_config=data["postsort_config"],
+                show_statement_codes=data.get("show_statement_codes", False)
             )
         )
         await session.execute(stmt)

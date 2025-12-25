@@ -259,5 +259,6 @@ async def get_study(
         },
         "available_languages": [t.language_code for t in study.translations],
         "language": resolved_lang,
+        "show_statement_codes": study.show_statement_codes,
         "ui_labels": getattr(translation, "ui_labels", {})
     }

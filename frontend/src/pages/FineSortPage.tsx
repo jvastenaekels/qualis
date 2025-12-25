@@ -195,6 +195,8 @@ const FineSortPage: React.FC = () => {
     });
 
     // 9. Memoized render function for slot content
+    const showCodes = config?.show_statement_codes ?? false;
+
     const renderSlotContent = useCallback((col: number, row: number, dimensions: { width: number, height: number }) => {
          if (!config) return null;
          const cardInSlot = responses.qsort.find(c => c.col === col && c.row === row);
@@ -204,7 +206,7 @@ const FineSortPage: React.FC = () => {
                 <SortableCard 
                     id={statement.id} 
                     text={statement.text} 
-                    code={statement.code}
+                    code={showCodes ? statement.code : undefined}
                     isSelected={selectedCardId === statement.id}
                     onClick={() => handleCardClick(statement.id)}
                     dimensions={dimensions}
@@ -213,7 +215,7 @@ const FineSortPage: React.FC = () => {
             );
          }
          return null;
-    }, [config, responses.qsort, selectedCardId, handleCardClick, activeId]);
+    }, [config, responses.qsort, selectedCardId, handleCardClick, activeId, showCodes]);
 
     // 10. Condition Check (After all hooks)
     const snapCenterToCursor: Modifier = useCallback(({ activatorEvent, draggingNodeRect, transform }) => {
@@ -275,6 +277,7 @@ const FineSortPage: React.FC = () => {
                     onInteractionUtils={setInteractionUtils}
                     isAllPlaced={isAllPlaced}
                     onValidate={handleValidate}
+                    showCodes={showCodes}
                 />
              </div>
              {createPortal(

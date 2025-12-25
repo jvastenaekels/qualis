@@ -41,9 +41,10 @@ vi.mock('../hooks/useLayout', () => ({
 
 // Mock GridSort
 vi.mock('../components/GridSort', () => ({
-    default: ({ isAllPlaced, onValidate }: { isAllPlaced: boolean; onValidate: () => void }) => (
+    default: ({ isAllPlaced, onValidate, showCodes }: any) => (
         <div data-testid="grid-sort">
             GridSort
+            <span data-testid="show-codes">{String(showCodes)}</span>
             {isAllPlaced && (
                 <button onClick={onValidate}>fine.actions.validate</button>
             )}
@@ -119,5 +120,34 @@ describe('FineSortPage', () => {
         renderWithProviders(<FineSortPage />);
          
         expect(screen.getByText('fine.actions.validate')).toBeInTheDocument();
+        });
+    
+    it('passes show_statement_codes config to GridSort', () => {
+        const configWithCodes: StudyConfig = {
+            ...mockConfig,
+            show_statement_codes: true
+        };
+
+        setupStoreMocks({
+            useConfigStore: { config: configWithCodes },
+            useResponseStore: {
+                rough: { agree: [], disagree: [], neutral: [] },
+                qsort: []
+            },
+            useSessionStore: { 
+                hasConsented: true, currentStep: 4, isCompleted: false, 
+                language: 'en', setStep: vi.fn() 
+            },
+            useUIStore: { 
+                    hoveredCard: null, 
+                    setActiveCard: vi.fn(), 
+                    setHoveredCard: vi.fn(),
+                    setSelectedCard: vi.fn()
+            }
+        });
+
+        renderWithProviders(<FineSortPage />);
+        expect(screen.getByTestId('show-codes')).toHaveTextContent('true');
     });
 });
+

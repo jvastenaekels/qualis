@@ -42,6 +42,7 @@ interface GridSortProps {
   onInteractionUtils?: (utils: InteractionUtils) => void;
   isAllPlaced?: boolean;
   onValidate?: () => void;
+  showCodes?: boolean;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -62,7 +63,8 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
   onTransformChange,
   onInteractionUtils,
   isAllPlaced = false,
-  onValidate
+  onValidate,
+  showCodes
 }) => {
   const { t } = useTranslation();
 
@@ -183,7 +185,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
                <SortableCard 
                 id={card.id} 
                 text={card.text} 
-                code={card.code}
+                code={showCodes ? card.code : undefined}
                 variant="compact" 
                 isSelected={selectedCardId === card.id} 
                 onClick={() => onCardClick?.(card.id)} 
@@ -203,7 +205,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(({
             </div>
         </motion.div>
     );
-  }, [activeCards, selectedCardId, onCardClick, isMobile, cardDimensions, disableHoverZoom, t]);
+  }, [activeCards, selectedCardId, onCardClick, isMobile, cardDimensions, disableHoverZoom, t, showCodes]);
 
   return (
     <div className="flex flex-col lg:flex-row h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">

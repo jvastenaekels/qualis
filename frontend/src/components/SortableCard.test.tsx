@@ -129,4 +129,16 @@ describe('SortableCard', () => {
          });
          expect(useUIStore.getState().hoveredCard?.code).toBe('S1');
     });
+
+    it('does not render code when undefined', async () => {
+        render(<SortableCard {...defaultProps} code={undefined} />);
+        const card = screen.getByTestId('card-123');
+        // Assuming "S1" or any code pattern isn't present by default
+        // We can't query by text easily if text isn't there.
+        // But we can check store update.
+        await act(async () => {
+            fireEvent.mouseEnter(card);
+        });
+        expect(useUIStore.getState().hoveredCard?.code).toBeUndefined();
+   });
 });
