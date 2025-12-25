@@ -77,7 +77,7 @@
     "preview_title": "Preview",
     "objective_label": "Study Objective",
     "instructions_label": "Process",
-    "default_instructions": "**How to participate:**\n\n1. Read each statement.\n2. Categorize it based on your **perspective**.\n3. Refine your arrangement on the grid."
+    "default_instructions": "1. **Your Profile:** A few questions to contextualize your unique point of view.\n2. **First Impression:** Discover the statements and sort them spontaneously (Agree, Neutral, Disagree).\n3. **Your Nuance:** Refine your thinking by organizing the items precisely on the grid.\n4. **Your Reasons:** Give meaning to your choices by explaining your strongest positions."
   },
   "consent": {
     "title": "Consent to Participate",

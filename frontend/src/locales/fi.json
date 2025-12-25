@@ -70,7 +70,7 @@
     "preview_title": "Esikatselu",
     "objective_label": "Tutkimuksen tavoite",
     "instructions_label": "Kulku",
-    "default_instructions": "**Näin osallistut:**\n\n1. Lue jokainen väite.\n2. Lajittele se **oman näkemyksesi** mukaan.\n3. Tarkenna lajittelua ruudukossa."
+    "default_instructions": "1. **Profiilisi:** Muutama kysymys ainutlaatuisen näkökulmasi taustoittamiseksi.\n2. **Ensivaikutelma:** Tutustu väittämiin ja lajittele ne spontaanisti (Samaa mieltä, Neutraali, Eri mieltä).\n3. **Oma nyanssisi:** Tarkenna ajatteluasi järjestämällä kokonaisuus tarkasti ruudukkoon.\n4. **Perustelut:** Anna valinnoillesi merkitys selittämällä vahvimmat kannanottosi."
   },
   "consent": {
     "title": "Suostumus osallistumiseen",
