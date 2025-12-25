@@ -167,12 +167,66 @@ backend/
 
 ## CI/CD Integration
 
-E2E tests run automatically on every push via GitHub Actions:
+Open-Q uses **GitHub Actions** to ensure code quality through automated testing.
 
-```yaml
-# .github/workflows/e2e.yml
-- name: Run E2E tests
-  run: cd frontend && npm run e2e
+### E2E Workflow (`.github/workflows/e2e.yml`)
+
+To optimize resource usage, Playwright E2E tests are configured with the following rules:
+
+- **Triggers**:
+  - Automatically runs on **Pull Requests** targeting `main` or `develop`.
+  - Only triggers if files in the `frontend/` directory or the workflow itself are modified.
+  - Can be triggered **manually** via the "Actions" tab in GitHub.
+- **Concurrency**:
+  - If a new commit is pushed to an active Pull Request, any previous pending or running test for that PR is **automatically cancelled** to save CI minutes.
+
+### Deployment Integration
+
+Upon successful deployment to **Scalingo**, a `postdeploy` hook automatically:
+
+1.  Verifies and updates the database schema (`ensure_schema.py`).
+2.  Synchronizes study data from JSON configurations (`update_study.py`).
+
+Verification of these steps can be found in the Scalingo deployment logs.
+
+---
+
+## Best Practices
+
+1.  **Avoid `any`**: Use proper types for mocks. If necessary, use `unknown as any` for store implementation details inside utilities, but keep test files type-safe.
+2.  **Isolate State Interaction**: Components should subscribe to specific store slices to minimize re-renders and make testing store interactions easier.
+3.  **Verify DOM Existence over Class Names**: Assert that elements are in the document and have correct content rather than checking specific CSS classes whenever possible.
+4.  **Mock Heavily-Animated Elements**: Use the provided `framer-motion` mock in utilities to avoid timing issues with `AnimatePresence`.
+5.  **Use `vi.useFakeTimers()`**: For time-dependent logic (e.g., auto-rotating tips or fading backgrounds).
+
+---
+
+## Integration Patterns
+
+Always use the provided utilities in `frontend/src/test/test-utils.tsx` to ensure consistency:
+
+```tsx
+import {
+  renderWithProviders,
+  setupStoreMocks,
+  screen,
+} from "../test/test-utils";
+
+it("demonstrates the pattern", () => {
+  // 1. Define the state for the specific test scenario
+  setupStoreMocks({
+    useConfigStore: { config: mockConfig },
+    useResponseStore: { rough: { history: [1] } },
+  });
+
+  // 2. Wrap the component with necessary providers (Router, Store, etc.)
+  renderWithProviders(<MyComponent />);
+
+  // 3. Perform assertions
+  expect(screen.getByText("Expected Text")).toBeInTheDocument();
+});
 ```
 
-View test reports in the Actions artifacts after each run.
+### Error Scenarios
+
+Mock the store to return error states (e.g., `configError: 'common.errors.not_found'`) and assert that the correct Error Component (e.g., `<StudyNotFound />`) is rendered.

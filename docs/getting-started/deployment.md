@@ -15,149 +15,102 @@ This guide covers deploying Open-Q to production environments.
 
 ---
 
-## Scalingo Deployment
+## Scalingo Deployment (Unified)
 
-Open-Q is deployed on Scalingo with the following architecture:
+Open-Q is deployed as a single application where the FastAPI backend serves the pre-built React frontend.
 
 ```mermaid
 graph LR
     subgraph Scalingo
-        FE[Frontend<br/>Node.js]
-        BE[Backend<br/>Python]
+        App[Open-Q App]
         DB[(PostgreSQL)]
     end
 
-    User([Users]) --> FE
-    FE --> BE
-    BE --> DB
+    User([Users]) --> App
+    App --> DB
 ```
 
 ### Prerequisites
 
-- Scalingo account
-- Scalingo CLI installed
+- Scalingo account and [Scalingo CLI](https://doc.scalingo.com/cli)
+- Application repository pushed to GitHub/GitLab
 
 ### Steps
 
-1. **Create Apps**
+1. **Create the App**
 
    ```bash
-   scalingo create open-q-frontend
-   scalingo create open-q-backend
+   scalingo create open-q
    ```
 
-2. **Add PostgreSQL to Backend**
+2. **Add PostgreSQL Resource**
 
    ```bash
-   scalingo -a open-q-backend addons-add postgresql postgresql-starter-512
+   scalingo --app open-q addons-add postgresql postgresql-starter-512
    ```
 
 3. **Set Environment Variables**
 
    ```bash
-   # Backend
-   scalingo -a open-q-backend env-set DATABASE_URL=$SCALINGO_POSTGRESQL_URL
-
-   # Frontend
-   scalingo -a open-q-frontend env-set VITE_API_URL=https://open-q-backend.osc-fr1.scalingo.io
+   scalingo --app open-q env-set DATABASE_URL=$SCALINGO_POSTGRESQL_URL
+   scalingo --app open-q env-set SECRET_KEY=$(openssl rand -hex 32)
+   scalingo --app open-q env-set ALLOWED_ORIGINS=https://open-q.osc-fr1.scalingo.io
    ```
 
 4. **Deploy**
-
+   Push your code to the Scalingo remote. The buildpack will automatically detect the Python environment.
    ```bash
-   # From backend directory
-   git subtree push --prefix backend scalingo-backend main
-
-   # From frontend directory (or use buildpack)
+   git push scalingo main
    ```
+
+### 🛰️ Post-Deployment Automation
+
+Open-Q uses a `scalingo.json` configuration to automate critical tasks after every successful build:
+
+- **Schema Verification**: Automatically adds missing columns (like `show_statement_codes`) to your production database without data loss.
+- **Study Sync**: Updates your study configuration and statements based on `backend/data/example-study.json`.
+
+You can monitor these tasks in the deployment logs:
+
+```bash
+scalingo --app open-q logs --n 100 --source build
+```
 
 ---
 
 ## Environment Variables
 
-### Backend
-
-| Variable       | Description                       | Required |
-| -------------- | --------------------------------- | -------- |
-| `DATABASE_URL` | PostgreSQL connection string      | ✅       |
-| `SECRET_KEY`   | Application secret (for sessions) | ✅       |
-| `CORS_ORIGINS` | Allowed CORS origins              | ✅       |
-
-### Frontend
-
-| Variable       | Description     | Required |
-| -------------- | --------------- | -------- |
-| `VITE_API_URL` | Backend API URL | ✅       |
+| Variable          | Description                                  | Required |
+| ----------------- | -------------------------------------------- | -------- |
+| `DATABASE_URL`    | Connection string (PostgreSQL or SQLite)     | ✅       |
+| `SECRET_KEY`      | Application secret for session security      | ✅       |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins | ✅       |
 
 ---
 
-## Docker Deployment
+## Manual Database Maintenance
 
-### docker-compose.yml
-
-```yaml
-version: "3.8"
-services:
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    environment:
-      - VITE_API_URL=http://backend:8000
-    depends_on:
-      - backend
-
-  backend:
-    build: ./backend
-    ports:
-      - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://user:pass@db:5432/openq
-    depends_on:
-      - db
-
-  db:
-    image: postgres:15
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=pass
-      - POSTGRES_DB=openq
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-volumes:
-  pgdata:
-```
-
-### Build & Run
+If you need to trigger tasks manually without a full redeploy:
 
 ```bash
-docker-compose up --build
-```
+# Force a schema check
+scalingo --app open-q run python backend/scripts/ensure_schema.py
 
----
-
-## Database Migrations
-
-```bash
-# Initialize database
-python init_db.py
-
-# Seed with example study
-python seed.py studies/example-study.json
+# Force a study configuration update
+scalingo --app open-q run python backend/update_study.py
 ```
 
 ---
 
 ## Health Checks
 
-| Endpoint          | Purpose         |
-| ----------------- | --------------- |
-| `GET /`           | Frontend health |
-| `GET /api/health` | Backend health  |
+| Endpoint      | Purpose                                |
+| ------------- | -------------------------------------- |
+| `GET /`       | Verifies Frontend is correctly served  |
+| `GET /health` | Backend API health and DB connectivity |
 
 ---
 
 ## SSL/HTTPS
 
-Scalingo and Render provide automatic SSL. For custom deployments, use Let's Encrypt with Certbot.
+Scalingo provides automatic SSL certificates for all applications. No manual configuration is required.

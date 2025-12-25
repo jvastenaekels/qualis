@@ -72,6 +72,25 @@ Controls the behavior of the final phase of the study.
 
 ---
 
+## 🎨 Miscellaneous Options
+
+### `show_statement_codes`
+
+A boolean flag to control the display of statement identifiers (e.g., "S1", "S2") on the cards.
+
+```json
+{
+  "slug": "my-study",
+  "show_statement_codes": true,
+  ...
+}
+```
+
+- **true**: Displays a subtle light-gray identifier in the top-left corner of each card and in the zoom overlays. Useful for research analysis and cross-referencing.
+- **false (Default)**: Statement codes are hidden for a cleaner participant experience.
+
+---
+
 ## 🌍 `StudyTranslation`
 
 Content that varies by language is stored in the `study_translations` table:
