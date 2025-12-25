@@ -160,10 +160,6 @@
             "subtitle": "Experience Q-Methodology in Action",
             "objective": "This interactive demo showcases Open-Q's capabilities. You will explore a set of statements to reveal your unique perspective, helping us validate the platform's intuitive design and flexible architecture.",
             "instructions": "",
-            "consent_title": "I confirm that I am at least 18 years old. I understand that my participation is voluntary and that I can stop at any time. I consent to the anonymous processing of my data for research purposes in accordance with GDPR.",
-            "consent_description": "Data will be used solely for scientific research and stored securely.",
-            "consent_accept": "I agree",
-            "consent_decline": "I do not agree",
             "ui_labels": {
                 "start_button": "Start Study"
             }
@@ -173,7 +169,6 @@
             "subtitle": "Expérimentez la méthode Q en action",
             "objective": "Cette démo illustre l'usage d'**Open-Q**, une plateforme dédiée à la **méthodologie Q**. Introduite en 1935 par **William Stephenson**, cette méthode permet d'étudier scientifiquement la **subjectivité humaine** et fédère aujourd'hui une communauté internationale de chercheurs.\n\nEn triant les affirmations selon votre point de vue, vous aidez à faire émerger des **structures de pensée** distinctes. Cette application modernise ce processus en offrant une expérience de collecte de données **fluide et engageante**.",
             "instructions": "",
-            "consent_title": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
             "ui_labels": {
                 "start_button": "Commencer l'étude"
             }
@@ -183,8 +178,6 @@
             "subtitle": "Interaktiivinen esittely",
             "objective": "Tämän tutkimuksen tavoitteena on osoittaa Open-Q-alustan joustavuus. Osallistumalla autat meitä validoimaan kolme keskeistä näkökohtaa:\n\n- **Käyttökokemus**: Intuitiivinen korttien lajittelu mobiililla ja työpöydällä.\n- **Monikielisyys**: Vahva tuki kansainväliselle sisällölle.\n- **Moderni Arkkitehtuuri**: Luotettava ja turvallinen tiedonkeruu.",
             "instructions": "",
-            "consent_title": "Vahvistan olevani vähintään 18-vuotias. Ymmärrän, että osallistumiseni on vapaaehtoista ja voin keskeyttää sen milloin tahansa. Suostun tietojeni nimettömään käsittelyyn tutkimustarkoituksiin GDPR:n mukaisesti.",
-            "consent_description": "Tietoja käytetään ainoastaan tieteelliseen tutkimukseen ja niitä säilytetään turvallisesti.",
             "ui_labels": {
                 "start_button": "Aloita tutkimus"
             }

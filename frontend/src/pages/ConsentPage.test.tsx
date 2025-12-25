@@ -134,4 +134,21 @@ describe('ConsentPage', () => {
         const newCheckbox = screen.getByRole('checkbox');
         expect(newCheckbox).toBeChecked();
     });
+
+    it('falls back to UI defaults when config consent is missing', () => {
+        // Clear config consent
+        const configWithoutConsent = { ...mockConfig, consent: null };
+        useConfigStore.getState().setConfig(configWithoutConsent as any);
+
+        render(
+            <MemoryRouter>
+                <ConsentPage />
+            </MemoryRouter>
+        );
+
+        // Should use defaults from i18n
+        // Note: our mock i18n returns the default value if provided, or the key
+        expect(screen.getByText('I have read and understood the information provided and agree to participate.')).toBeInTheDocument();
+        expect(screen.getByText('consent.default_text')).toBeInTheDocument(); // Key fallback from mock
+    });
 });
