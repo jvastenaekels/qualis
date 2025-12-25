@@ -4,16 +4,18 @@ import json
 import os
 import sys
 
-# Add project root to path for imports
-sys.path.append(os.getcwd())
+# Add backend directory to path so 'from app' works regardless of CWD
+script_dir = os.path.dirname(os.path.abspath(__file__)) # .../backend/
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
 
 from app.database import SessionLocal, engine
 from sqlalchemy import select, delete, update
 from app.models import Study, StudyTranslation, Statement, StatementTranslation
 
 async def update_study():
-    # Relative path from where we run it (backend dir)
-    json_path = 'data/example-study.json'
+    # Detect path relative to this script
+    json_path = os.path.join(script_dir, 'data', 'example-study.json')
     if not os.path.exists(json_path):
         print(f"Error: {json_path} not found.")
         return
