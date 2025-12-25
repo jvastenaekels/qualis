@@ -59,7 +59,7 @@ class StudyTranslation(Base):
     __tablename__ = "study_translations"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    study_id: Mapped[int] = mapped_column(ForeignKey("studies.id", ondelete="CASCADE"))
+    study_id: Mapped[int] = mapped_column(ForeignKey("studies.id", ondelete="CASCADE"), index=True)
     language_code: Mapped[str] = mapped_column(String(5)) # e.g. "en", "fr-FR"
     
     title: Mapped[str] = mapped_column(String)
@@ -84,7 +84,7 @@ class Statement(Base):
     __tablename__ = "statements"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    study_id: Mapped[int] = mapped_column(ForeignKey("studies.id", ondelete="CASCADE"))
+    study_id: Mapped[int] = mapped_column(ForeignKey("studies.id", ondelete="CASCADE"), index=True)
     code: Mapped[str] = mapped_column(String) # "S1", "S2"...
 
     study: Mapped["Study"] = relationship(back_populates="statements")
@@ -94,7 +94,7 @@ class StatementTranslation(Base):
     __tablename__ = "statement_translations"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    statement_id: Mapped[int] = mapped_column(ForeignKey("statements.id", ondelete="CASCADE"))
+    statement_id: Mapped[int] = mapped_column(ForeignKey("statements.id", ondelete="CASCADE"), index=True)
     language_code: Mapped[str] = mapped_column(String(5))
     text: Mapped[str] = mapped_column(String)
 
@@ -109,7 +109,7 @@ class Participant(Base):
     __tablename__ = "participants"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    study_id: Mapped[int] = mapped_column(ForeignKey("studies.id", ondelete="CASCADE"))
+    study_id: Mapped[int] = mapped_column(ForeignKey("studies.id", ondelete="CASCADE"), index=True)
     session_token: Mapped[UUID] = mapped_column(unique=True, index=True, default=uuid4)
     language_used: Mapped[str] = mapped_column(String(5))
     status: Mapped[ParticipantStatus] = mapped_column(SAEnum(ParticipantStatus), default=ParticipantStatus.started)
@@ -130,8 +130,8 @@ class QSortEntry(Base):
     __tablename__ = "qsort_entries"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    participant_id: Mapped[int] = mapped_column(ForeignKey("participants.id", ondelete="CASCADE"))
-    statement_id: Mapped[int] = mapped_column(ForeignKey("statements.id", ondelete="CASCADE"))
+    participant_id: Mapped[int] = mapped_column(ForeignKey("participants.id", ondelete="CASCADE"), index=True)
+    statement_id: Mapped[int] = mapped_column(ForeignKey("statements.id", ondelete="CASCADE"), index=True)
     
     grid_score: Mapped[int] = mapped_column(Integer) # -4, 0, 4
     card_comment: Mapped[Optional[str]] = mapped_column(String, nullable=True)

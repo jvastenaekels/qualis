@@ -1,5 +1,6 @@
 import os
 import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import submissions, logs
@@ -17,7 +18,21 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Open-Q API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Production Readiness Checks
+    if os.getenv("DATABASE_URL", "").startswith("postgre"):
+        salt = os.getenv("IP_HASH_SALT")
+        if not salt or salt == "default-salt-allow-override-in-prod":
+            logger.warning("CRITICAL SECURITY WARNING: IP_HASH_SALT is missing or using default value in production!")
+        
+        logger.info("Production environment detected. Security checks completed.")
+    else:
+        logger.info("Development environment detected.")
+    
+    yield
+
+app = FastAPI(title="Open-Q API", lifespan=lifespan)
 
 # Rate Limiter
 app.state.limiter = limiter
@@ -59,18 +74,20 @@ ROOT_DIR = os.path.dirname(BASE_DIR) # root/
 FRONTEND_DIST = os.path.join(ROOT_DIR, "frontend", "dist")
 
 if os.path.exists(FRONTEND_DIST):
-    # Mount assets (JS/CSS)
+    # Mount assets (JS/CSS) - These are immutable and can be served efficiently
     app.mount("/assets", StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")), name="assets")
     
-    # Catch-all for SPA
+    # Catch-all for SPA: Try static files first, then fallback to index.html
     @app.get("/{full_path:path}")
     async def serve_spa(full_path: str):
-        # Check if a specific file is requested (e.g., favicon.ico, manifest.json)
+        # 1. Check if it's a specific static file (e.g. favicon.ico, manifest.json) in the root
         file_path = os.path.join(FRONTEND_DIST, full_path)
-        if os.path.isfile(file_path):
+        if full_path and os.path.isfile(file_path):
              return FileResponse(file_path)
-        # Otherwise serve index.html
-        return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
+        
+        # 2. Otherwise serve index.html for CSR navigation
+        index_path = os.path.join(FRONTEND_DIST, "index.html")
+        return FileResponse(index_path)
 else:
     @app.get("/")
     def read_root():

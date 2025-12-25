@@ -26,8 +26,10 @@ class SecurityHeadersMiddleware:
                     (b"Strict-Transport-Security", b"max-age=63072000; includeSubDomains; preload"),
                     (b"X-Content-Type-Options", b"nosniff"),
                     (b"X-Frame-Options", b"DENY"),
-                    (b"Content-Security-Policy", b"default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https: https://fonts.gstatic.com; connect-src 'self' https:;"),
+                    (b"X-XSS-Protection", b"1; mode=block"),
+                    (b"Content-Security-Policy", b"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https: https://fonts.gstatic.com; connect-src 'self' https:; frame-ancestors 'none'; upgrade-insecure-requests;"),
                     (b"Referrer-Policy", b"strict-origin-when-cross-origin"),
+                    (b"Permissions-Policy", b"camera=(), microphone=(), geolocation=(), interest-cohort=()"),
                 ]
                 
                 for name, value in security_headers:
