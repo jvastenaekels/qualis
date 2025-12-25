@@ -50,8 +50,8 @@
     "steps": {
       "welcome": "Welcome",
       "presort": "Taustatiedot",
-      "rough": "Alustava lajittelu",
-      "fine": "Tarkka lajittelu",
+      "rough": "Ensivaikutelma",
+      "fine": "Ruudukkolajittelu",
       "review": "Pohdinta"
     },
     "mobile_step": "Vaihe",
@@ -67,10 +67,10 @@
     },
     "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
     "restart": "Start a new session",
-    "preview_title": "Lajittelun esikatselu",
+    "preview_title": "Esikatselu",
     "objective_label": "Tutkimuksen tavoite",
     "instructions_label": "Kulku",
-    "default_instructions": "**Kuinka osallistua:**\n\n1. Lue jokainen väite.\n2. Lajittele se näkemyksesi mukaan.\n3. Tarkenna lajittelua ruudukossa."
+    "default_instructions": "**Kuinka osallistua:**\n\n1. Lue jokainen väite.\n2. Lajittele se **näkemyksesi** mukaan.\n3. Tarkenna lajittelua ruudukossa."
   },
   "consent": {
     "title": "Suostumus osallistumiseen",
@@ -87,11 +87,11 @@
   "rough": {
     "header": {
       "title": "Mikä on kantasi tähän väittämään?",
-      "subtitle": "Pyyhkäise vasemmalle, jos olet jokseenkin eri mieltä, oikealle, jos olet jokseenkin samaa mieltä, tai alas, jos sinulla ei ole vahvaa mielipidettä.",
-      "hint": "Luota vaistoosi. Tämä ensimmäinen kierros jäsentää ajatuksesi – tarkennat kaikkea seuraavassa vaiheessa."
+      "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Ei vahvaa mielipidettä).",
+      "hint": "Luota **ensivaikutelmaan**. Tämä on **spontaani lajittelu** – tarkennat valintojasi seuraavassa vaiheessa."
     },
     "complete": {
-      "title": "Alustava lajittelu valmis",
+      "title": "Ensimmäinen vaihe valmis",
       "subtitle": "Nyt tarkennetaan nyansseja."
     },
     "instructions": {
