@@ -57,8 +57,8 @@
     "steps": {
       "welcome": "Bienvenue",
       "presort": "Profil",
-      "rough": "Tri préliminaire",
-      "fine": "Tri détaillé",
+      "rough": "Tri spontané",
+      "fine": "Tri sur la grille",
       "review": "Réflexions"
     },
     "mobile_step": "Étape",
@@ -98,7 +98,7 @@
       "hint": "Fiez-vous à votre **première impression**. C'est un tri grossier — vous affinerez vos choix à l'étape suivante."
     },
     "complete": {
-      "title": "Premier tri terminé",
+      "title": "Première étape validée",
       "subtitle": "Nous allons maintenant affiner les nuances."
     },
     "instructions": {
