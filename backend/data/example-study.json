@@ -159,7 +159,7 @@
             "title": "Open-Q Discovery",
             "subtitle": "Experience Q-Methodology in Action",
             "objective": "This interactive demo showcases Open-Q's capabilities. You will explore a set of statements to reveal your unique perspective, helping us validate the platform's intuitive design and flexible architecture.",
-            "instructions": "1. **Your Profile:** A few questions to contextualize your unique point of view.\n2. **First Impression:** Discover the statements and sort them spontaneously (Agree, Neutral, Disagree).\n3. **Your Perspective:** Refine your thinking by organizing the items precisely on the grid.\n4. **Your Reasons:** Give meaning to your choices by explaining your strongest positions.",
+            "instructions": "",
             "consent_title": "I confirm that I am at least 18 years old. I understand that my participation is voluntary and that I can stop at any time. I consent to the anonymous processing of my data for research purposes in accordance with GDPR.",
             "consent_description": "Data will be used solely for scientific research and stored securely.",
             "consent_accept": "I agree",
@@ -172,7 +172,7 @@
             "title": "Découverte Open-Q",
             "subtitle": "Expérimentez la méthode Q en action",
             "objective": "Cette démo illustre l'usage d'**Open-Q**, une plateforme dédiée à la **méthodologie Q**. Introduite en 1935 par **William Stephenson**, cette méthode permet d'étudier scientifiquement la **subjectivité humaine** et fédère aujourd'hui une communauté internationale de chercheurs.\n\nEn triant les affirmations selon votre point de vue, vous aidez à faire émerger des **structures de pensée** distinctes. Cette application modernise ce processus en offrant une expérience de collecte de données **fluide et engageante**.",
-            "instructions": "1. **Votre profil** : Quelques questions pour situer votre point de vue unique.\n2. **Première impression** : Découvrez les propositions et répartissez-les spontanément (D'accord, Neutre, Pas d'accord).\n3. **Votre perspective** : Affinez votre pensée en organisant précisément l'ensemble sur la grille.\n4. **Vos raisons** : Donnez du sens à vos choix en expliquant vos positions les plus marquées.",
+            "instructions": "",
             "consent_title": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
             "ui_labels": {
                 "start_button": "Commencer l'étude"
@@ -182,7 +182,7 @@
             "title": "Tutkimusesimerkki",
             "subtitle": "Interaktiivinen esittely",
             "objective": "Tämän tutkimuksen tavoitteena on osoittaa Open-Q-alustan joustavuus. Osallistumalla autat meitä validoimaan kolme keskeistä näkökohtaa:\n\n- **Käyttökokemus**: Intuitiivinen korttien lajittelu mobiililla ja työpöydällä.\n- **Monikielisyys**: Vahva tuki kansainväliselle sisällölle.\n- **Moderni Arkkitehtuuri**: Luotettava ja turvallinen tiedonkeruu.",
-            "instructions": "1. **Profiilisi:** Muutama kysymys ainutlaatuisen näkökulmasi taustoittamiseksi.\n2. **Ensivaikutelma:** Tutustu väittämiin ja lajittele ne spontaanisti (Samaa mieltä, Neutraali, Eri mieltä).\n3. **Oma näkökulmasi:** Tarkenna ajatteluasi järjestämällä kokonaisuus tarkasti ruudukkoon.\n4. **Perustelut:** Anna valinnoillesi merkitys selittämällä vahvimmat kannanottosi.",
+            "instructions": "",
             "consent_title": "Vahvistan olevani vähintään 18-vuotias. Ymmärrän, että osallistumiseni on vapaaehtoista ja voin keskeyttää sen milloin tahansa. Suostun tietojeni nimettömään käsittelyyn tutkimustarkoituksiin GDPR:n mukaisesti.",
             "consent_description": "Tietoja käytetään ainoastaan tieteelliseen tutkimukseen ja niitä säilytetään turvallisesti.",
             "ui_labels": {
