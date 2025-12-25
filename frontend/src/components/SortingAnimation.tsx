@@ -8,12 +8,12 @@ import { Smile, Frown, Meh, ThumbsUp, ThumbsDown } from 'lucide-react';
 // 6 Cards sorted in a "random-looking" sequence
 // Disagree (Left), Agree (Right), Neutral (Down)
 const ROUGH_TARGETS = [
-    { x: -32, y: -24, pileId: 'disagree' }, // 1. Disagree
-    { x: 32, y: -24, pileId: 'agree' },     // 2. Agree
-    { x: 0, y: 32, pileId: 'neutral' },     // 3. Neutral
-    { x: 32, y: -24, pileId: 'agree' },     // 4. Agree
-    { x: -32, y: -24, pileId: 'disagree' }, // 5. Disagree
-    { x: 0, y: 32, pileId: 'neutral' }      // 6. Neutral
+    { x: 32, y: -24, pileId: 'agree' },     // 1. Agree (Right) - Immediate decisive action
+    { x: 0, y: 32, pileId: 'neutral' },     // 2. Neutral (Down) - Hesitation looking
+    { x: -32, y: -24, pileId: 'disagree' }, // 3. Disagree (Left)
+    { x: 32, y: -24, pileId: 'agree' },     // 4. Agree (Right)
+    { x: -32, y: -24, pileId: 'disagree' }, // 5. Disagree (Left)
+    { x: 0, y: 32, pileId: 'neutral' }      // 6. Neutral (Down)
 ];
 
 // FINE SORT
