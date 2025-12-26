@@ -6,7 +6,7 @@ from typing import List, Optional, Any, Dict
 from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .models import StudyState, ParticipantStatus
+from .models import StudyState, ParticipantStatus, StudyRole
 
 # Translation Schemas
 class StudyTranslationBase(BaseModel):
@@ -53,6 +53,14 @@ class GridColumn(BaseModel):
     score: int
     capacity: int
 
+# Collaborator Schemas
+class StudyCollaboratorRead(BaseModel):
+    user_id: int
+    role: StudyRole
+    added_at: Any
+    
+    model_config = ConfigDict(from_attributes=True)
+
 # Study Schemas
 class StudyBase(BaseModel):
     slug: str = Field(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100)
@@ -76,6 +84,7 @@ class StudyRead(StudyBase):
     created_at: Any
     translations: List[StudyTranslationRead] = []
     statements: List[StatementRead] = []
+    collaborators: List[StudyCollaboratorRead] = []
     
     # This field could be populated dynamically if needed, 
     # but for now we expose the full translations list.

@@ -24,6 +24,11 @@ class ParticipantStatus(str, Enum):
     started = "started"
     completed = "completed"
 
+class StudyRole(str, Enum):
+    owner = "owner"
+    editor = "editor"
+    viewer = "viewer"
+
 # User Model
 class User(Base):
     __tablename__ = "users"
@@ -33,13 +38,16 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # Relationships
+    collaborations: Mapped[List["StudyCollaborator"]] = relationship(back_populates="user", cascade="all, delete-orphan", foreign_keys="StudyCollaborator.user_id")
+
 # Study Models
 class Study(Base):
     __tablename__ = "studies"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     slug: Mapped[str] = mapped_column(String, unique=True, index=True)
-    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id")) # Assuming ownership for now
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id")) # Original creator
     state: Mapped[StudyState] = mapped_column(SAEnum(StudyState), default=StudyState.draft)
     default_language: Mapped[Optional[str]] = mapped_column(String(5), nullable=True) # e.g. "en"
     show_statement_codes: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -54,6 +62,21 @@ class Study(Base):
     translations: Mapped[List["StudyTranslation"]] = relationship(back_populates="study", cascade="all, delete-orphan")
     statements: Mapped[List["Statement"]] = relationship(back_populates="study", cascade="all, delete-orphan")
     participants: Mapped[List["Participant"]] = relationship(back_populates="study", cascade="all, delete-orphan")
+    collaborators: Mapped[List["StudyCollaborator"]] = relationship(back_populates="study", cascade="all, delete-orphan")
+
+class StudyCollaborator(Base):
+    __tablename__ = "study_collaborators"
+
+    study_id: Mapped[int] = mapped_column(ForeignKey("studies.id", ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    role: Mapped[StudyRole] = mapped_column(SAEnum(StudyRole), default=StudyRole.viewer)
+    
+    added_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    added_by_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+
+    study: Mapped["Study"] = relationship(back_populates="collaborators")
+    user: Mapped["User"] = relationship(back_populates="collaborations", foreign_keys=[user_id])
+    added_by: Mapped["User"] = relationship(foreign_keys=[added_by_id])
 
 class StudyTranslation(Base):
     __tablename__ = "study_translations"
