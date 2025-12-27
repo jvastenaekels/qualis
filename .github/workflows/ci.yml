@@ -42,20 +42,20 @@ jobs:
 
       - name: Lint & Format (Ruff)
         run: |
-          ruff check backend/app
-          ruff format --check backend/app
+          python -m ruff check backend/app
+          python -m ruff format --check backend/app
 
       - name: Type Check (Mypy)
-        run: mypy backend/app
+        run: python -m mypy backend/app
 
       - name: Security SAST (Bandit)
-        run: bandit -r backend/app -ll
+        run: python -m bandit -r backend/app -ll
 
       - name: Security SCA (Pip Audit)
-        run: pip-audit
+        run: python -m pip_audit
 
       - name: Complexity (Radon)
-        run: radon cc backend/app -a -nb --min B
+        run: python -m radon cc backend/app -a -nb --min B
 
       - name: Architecture (Import Linter)
         run: lint-imports
@@ -66,7 +66,7 @@ jobs:
         run: deptry backend/app
 
       - name: Dead Code (Vulture)
-        run: vulture backend/app backend/vulture_whitelist.py --min-confidence 60
+        run: python -m vulture backend/app backend/vulture_whitelist.py --min-confidence 60
 
       - name: Unit Tests (Pytest)
         run: python -m pytest backend/tests
