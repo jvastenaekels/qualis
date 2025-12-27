@@ -19,7 +19,7 @@
         "i18n-check": "python3 scripts/check_i18n.py",
         "lint:duplication": "jscpd --config ../.jscpd.json",
         "lint:deadcode": "knip",
-        "lint:architecture": "depcruise src --include-only \"^src\" --config .dependency-cruiser.js",
+        "lint:architecture": "depcruise src --include-only \"^src\" --config .dependency-cruiser.cjs",
         "visualize:deps": "madge --image graph.svg src"
     },
     "dependencies": {

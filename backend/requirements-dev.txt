@@ -11,3 +11,4 @@ radon==6.0.1
 vulture==2.11
 import-linter==1.12.0
 deptry==0.12.0
+ruff==0.1.0
