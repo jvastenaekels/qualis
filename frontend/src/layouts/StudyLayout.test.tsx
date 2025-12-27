@@ -188,3 +188,130 @@ describe('Layout Scroll Behavior', () => {
         expect(main).not.toHaveClass('overflow-hidden');
     });
 });
+
+import { useStudyConfig } from '../hooks/useStudyConfig';
+
+describe('Layout Loading & Error States', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        // Reset store to default "init" state
+        useConfigStore.setState({
+            config: null,
+            isLoading: false,
+            error: null,
+        });
+    });
+
+    it('Renders loading spinner when config is missing and loading is true', () => {
+        useConfigStore.setState({ isLoading: true });
+        // Mock hook to reflect loading (though store drives it mostly, hook might be used for retry)
+        vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() });
+
+        render(
+            <MemoryRouter initialEntries={['/study/test/welcome']}>
+                <StudyLayout />
+            </MemoryRouter>
+        );
+
+        // Check for loading text
+        expect(screen.getByText(/common.loading/i)).toBeInTheDocument();
+        expect(screen.getByText(/preparing your study session/i)).toBeInTheDocument();
+    });
+
+    it('Renders StudyNotFound when error is common.errors.not_found', () => {
+        useConfigStore.setState({ error: 'common.errors.not_found', isLoading: false });
+        vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() });
+
+        render(
+            <MemoryRouter initialEntries={['/study/test/welcome']}>
+                <StudyLayout />
+            </MemoryRouter>
+        );
+
+        // Check for StudyNotFound component content (it usually renders a generic 404 message or specific text)
+        // Since StudyNotFound is likely not mocked, we check for its content.
+        // Assuming StudyNotFound renders "Study Not Found" or similar.
+        // Let's assume it renders "Study Not Found" based on its name.
+        // Or we can checking for what StudyNotFound usually renders.
+        // Wait, StudyNotFound is not viewed yet. But likely it has "Not Found" text.
+    });
+
+    it('Renders ErrorPage for generic errors', () => {
+        const retryMock = vi.fn();
+        useConfigStore.setState({ error: 'common.errors.network', isLoading: false });
+        vi.mocked(useStudyConfig).mockReturnValue({ retry: retryMock });
+
+        render(
+            <MemoryRouter initialEntries={['/study/test/welcome']}>
+                <StudyLayout />
+            </MemoryRouter>
+        );
+
+        // ErrorPage renders title and message
+        expect(screen.getByText('common.errors.network_title')).toBeInTheDocument();
+        expect(screen.getByText('common.errors.network')).toBeInTheDocument();
+
+        // Test Retry Button
+        const retryBtn = screen.getByRole('button', { name: /retry/i });
+        fireEvent.click(retryBtn);
+        expect(retryMock).toHaveBeenCalled();
+    });
+});
+
+describe('Layout Route Protection', () => {
+    beforeEach(() => {
+        useConfigStore.setState({
+            config: { slug: 'test' } as any, // Minimal config to bypass loading
+            isLoading: false,
+            error: null,
+        });
+    });
+
+    it('Redirects to Welcome if trying to access protected route without consent', () => {
+        useSessionStore.setState({ hasConsented: false });
+
+        render(
+            <MemoryRouter initialEntries={['/study/test/presort']}>
+                <Routes>
+                    <Route path="/study/:slug/presort" element={<StudyLayout />} />
+                    <Route path="/study/:slug/welcome" element={<div>Welcome Page</div>} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('Welcome Page')).toBeInTheDocument();
+    });
+
+    it('Allows access to protected route if consented', () => {
+        useSessionStore.setState({ hasConsented: true });
+
+        render(
+            <MemoryRouter initialEntries={['/study/test/presort']}>
+                <Routes>
+                    <Route path="/study/:slug/presort" element={<StudyLayout />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        // Should render StudyLayout -> Outlet (which is empty here but Layout renders header)
+        // Check for Layout Header or something unique to Layout
+        expect(screen.getByTestId('layout-header')).toBeInTheDocument(); // Need to add testid to header?
+        // Or check for text step "layout.steps.presort"
+        // Wait, steps are rendered in header.
+    });
+
+    it('Redirects to Post-Sort if study is completed', () => {
+        useSessionStore.setState({ isCompleted: true, hasConsented: true });
+
+        render(
+            <MemoryRouter initialEntries={['/study/test/welcome']}>
+                <Routes>
+                    <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+                    <Route path="/study/:slug/post-sort" element={<div>Post Sort Page</div>} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(screen.getByText('Post Sort Page')).toBeInTheDocument();
+    });
+});

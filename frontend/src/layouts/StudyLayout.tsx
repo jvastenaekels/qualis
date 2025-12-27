@@ -143,7 +143,10 @@ const StudyLayoutContent: React.FC = () => {
     return (
         <div className="h-dvh bg-gray-50 flex flex-col overflow-hidden">
             {/* Header */}
-            <header className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-50 flex items-center justify-between relative shadow-sm">
+            <header
+                data-testid="layout-header"
+                className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-50 flex items-center justify-between relative shadow-sm"
+            >
                 {/* Subtle Loading Line (Background Re-validation) */}
                 {configLoading && (
                     <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-600/20 overflow-hidden">

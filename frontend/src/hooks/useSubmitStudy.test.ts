@@ -97,7 +97,7 @@ describe('useSubmitStudy', () => {
         });
     });
 
-    it('handles API errors', async () => {
+    it('handles generic API errors', async () => {
         mockPost.mockRejectedValueOnce(new Error('API Failure'));
 
         const { result } = renderHook(() => useSubmitStudy());
@@ -109,5 +109,33 @@ describe('useSubmitStudy', () => {
         expect(result.current.isLoading).toBe(false);
         expect(result.current.isSuccess).toBe(false);
         expect(result.current.error).toBe('API Failure');
+    });
+
+    it('handles ApiError 400 (Bad Request)', async () => {
+        const apiError = new Error('Bad Request');
+        (apiError as any).status = 400;
+        mockPost.mockRejectedValueOnce(apiError);
+
+        const { result } = renderHook(() => useSubmitStudy());
+
+        await act(async () => {
+            await result.current.submit();
+        });
+
+        expect(result.current.error).toBe('Bad Request');
+    });
+
+    it('handles ApiError 429 (Rate Limit)', async () => {
+        const apiError = new Error('Too many requests');
+        (apiError as any).status = 429;
+        mockPost.mockRejectedValueOnce(apiError);
+
+        const { result } = renderHook(() => useSubmitStudy());
+
+        await act(async () => {
+            await result.current.submit();
+        });
+
+        expect(result.current.error).toBe('Too many requests');
     });
 });
