@@ -2,6 +2,7 @@
 # Target Python version
 target-version = "py310"
 line-length = 88
+extend-exclude = ["backend/vulture_whitelist.py"]
 
 [tool.ruff.lint]
 # E = pycodestyle (PEP 8 - Errors)
@@ -28,3 +29,15 @@ convention = "google"
 "backend/scripts/*" = ["E402"]
 "update_study.py" = ["E402"]
 "backend/update_study.py" = ["E402"]
+"backend/vulture_whitelist.py" = ["F821", "D100"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = ["vulture_whitelist\\.py"]
+
+[tool.radon]
+exclude = "tests/*,venv/*"
+cc_min = "B"

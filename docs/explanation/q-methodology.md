@@ -112,7 +112,7 @@ Participants explain why they placed their most extreme statements (e.g., +5 and
 
 ## Configuring Your Study
 
-Open-Q uses JSON configuration to define studies. See the [Configuration Reference](../CONFIG_REFERENCE.md) for details.
+Open-Q uses JSON configuration to define studies. See the [Configuration Reference](../reference/configuration.md) for details.
 
 ### Example Grid Configuration
 
@@ -142,6 +142,6 @@ Open-Q uses JSON configuration to define studies. See the [Configuration Referen
 
 ## Next Steps
 
-- [Creating Studies](./creating-studies.md)
-- [Study Configuration](../CONFIG_REFERENCE.md)
-- [Exporting Data](../DATA_EXPORT.md)
+- [Creating Studies](../guides/conducting-studies.md)
+- [Study Configuration](../reference/configuration.md)
+- [Exporting Data](../guides/data-export.md)

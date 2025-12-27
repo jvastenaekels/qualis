@@ -16,7 +16,11 @@
         "e2e:headed": "playwright test --headed",
         "e2e:debug": "playwright test --debug",
         "e2e:report": "playwright show-report",
-        "i18n-check": "python3 scripts/check_i18n.py"
+        "i18n-check": "python3 scripts/check_i18n.py",
+        "lint:duplication": "jscpd --config ../.jscpd.json",
+        "lint:deadcode": "knip",
+        "lint:architecture": "depcruise src --include-only \"^src\" --config .dependency-cruiser.js",
+        "visualize:deps": "madge --image graph.svg src"
     },
     "dependencies": {
         "@dnd-kit/core": "^6.3.1",
@@ -54,6 +58,7 @@
         "@vitejs/plugin-react": "^4.3.0",
         "@vitest/coverage-v8": "^1.6.1",
         "autoprefixer": "^10.4.17",
+        "dependency-cruiser": "^17.3.5",
         "eslint": "^9.0.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-plugin-prettier": "^5.5.4",
@@ -62,7 +67,10 @@
         "eslint-plugin-security": "^3.0.1",
         "globals": "^15.0.0",
         "happy-dom": "^20.0.11",
+        "jscpd": "^4.0.5",
         "jsdom": "^22.1.0",
+        "knip": "^5.77.4",
+        "madge": "^8.0.0",
         "msw": "^2.12.4",
         "postcss": "^8.4.35",
         "prettier": "^3.7.4",

@@ -1,0 +1,25 @@
+{
+    "entry": ["src/main.tsx", "src/i18n.ts"],
+    "project": ["src/**/*.{ts,tsx}"],
+    "ignore": [
+        "src/**/*.test.{ts,tsx}",
+        "src/test/**",
+        "src/hooks/useFineSortDrag.ts",
+        "src/contexts/LayoutContext.context.ts",
+        "src/schemas/study.ts"
+    ],
+    "ignoreBinaries": ["jscpd", "python3"],
+    "ignoreDependencies": [
+        "@fontsource/google-sans-flex",
+        "autoprefixer",
+        "postcss",
+        "tailwindcss",
+        "@dnd-kit/modifiers",
+        "clsx",
+        "tailwind-merge",
+        "@testing-library/dom",
+        "@vitest/coverage-v8",
+        "eslint-config-prettier",
+        "eslint-plugin-prettier"
+    ]
+}

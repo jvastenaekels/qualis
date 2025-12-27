@@ -1,0 +1,18 @@
+[importlinter]
+root_package = app
+exclude_type_checking_imports = true
+
+[importlinter:contract:1]
+name = Enforce Layered Architecture (Routers -> Services -> Models)
+type = layers
+layers =
+    routers
+    services
+    schemas
+    models
+containers = app
+# Models and Schemas are foundational (at the bottom).
+# Services can import Models/Schemas.
+# Routers can import Services/Models/Schemas.
+# BUT Models/Schemas cannot import Services or Routers.
+# Services cannot import Routers.

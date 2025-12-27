@@ -1,0 +1,25 @@
+{
+  "threshold": 0.5,
+  "reporters": ["console"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/locales/**",
+    "**/*.json",
+    "**/*.d.ts",
+    "**/venv/**",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/e2e/**",
+    "**/*.txt",
+    "**/*.md",
+    "**/store/useResponseStore.ts",
+    "**/hooks/useGridZoom.ts",
+    "**/hooks/useFineSortDrag.ts",
+    "**/hooks/useGridPlacement.ts",
+    "**/api/client.ts"
+  ],
+  "absolute": true
+}

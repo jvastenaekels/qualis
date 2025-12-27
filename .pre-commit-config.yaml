@@ -20,7 +20,19 @@ repos:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
         files: ^backend/
+        exclude: backend/vulture_whitelist.py
       - id: ruff-format
+        files: ^backend/
+        exclude: backend/vulture_whitelist.py
+
+  # Radon : Cyclomatic Complexity
+  - repo: local
+    hooks:
+      - id: radon-cc
+        name: Radon (Complexity)
+        entry: backend/venv/bin/radon cc
+        language: system
+        args: ["-a", "-nb", "--min", "B"]
         files: ^backend/
 
   # Mypy : Static Type Checking
@@ -32,6 +44,7 @@ repos:
         args:
           ["--ignore-missing-imports", "--config-file=backend/pyproject.toml"]
         additional_dependencies: [types-requests]
+        exclude: backend/vulture_whitelist.py
 
   # -------------------------
   # FRONTEND (React/TypeScript)
