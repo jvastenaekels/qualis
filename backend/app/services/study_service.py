@@ -131,6 +131,13 @@ class StudyService:
         if not study:
             raise HTTPException(status_code=404, detail="Study not found")
 
+        # 2.5 Validation: Study State
+        if study.state != "active":
+            raise HTTPException(
+                status_code=400,
+                detail=f"Study is not active (state: {study.state}). Submissions invalid.",
+            )
+
         # 3. Validation: Statement Ownership
         valid_statement_ids = {s.id for s in study.statements}
         for entry in data.qsort:
