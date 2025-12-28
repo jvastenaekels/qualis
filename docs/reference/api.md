@@ -103,35 +103,80 @@ Submit participant data after completing the study.
 
 ---
 
+## Authentication
+
+Administrative endpoints require a **JSON Web Token (JWT)**.
+
+### 1. Obtain a Token
+
+#### `POST /api/token`
+
+Authenticate with email and password to receive an access token.
+
+**Request:** `application/x-www-form-urlencoded`
+
+- `username`: User email
+- `password`: User password
+
+**Response:**
+
+```json
+{
+  "access_token": "eyJhbG...",
+  "token_type": "bearer"
+}
+```
+
+### 2. Use the Token
+
+Include the token in the `Authorization` header for all requests to `/api/admin/*`:
+`Authorization: Bearer <your_token>`
+
+---
+
+## Administrative API
+
+The Administrative API allows researchers to manage studies, users, and data.
+
+### Study Management
+
+- `GET /api/admin/studies/`: List studies accessible to the current user.
+- `POST /api/admin/studies/`: Create a new study (Draft state).
+- `GET /api/admin/studies/{slug}`: Fetch full configuration (including internal IDs).
+- `PATCH /api/admin/studies/{slug}`: Update configuration (structural changes allowed in Draft only).
+- `POST /api/admin/studies/{slug}/state`: Publish or Close a study.
+- `DELETE /api/admin/studies/{slug}`: Completely remove a study (Owner only).
+
+### Collaborator Management
+
+- `GET /api/admin/studies/{slug}/collaborators`: List researchers on a study.
+- `POST /api/admin/studies/{slug}/collaborators`: Invite or update a collaborator's role.
+- `DELETE /api/admin/studies/{slug}/collaborators/{email}`: Remove a collaborator.
+
+### User Management (Superuser Only)
+
+- `GET /api/admin/users/`: List all system users.
+- `POST /api/admin/users/`: Create a new user account.
+- `DELETE /api/admin/users/{id}`: Remove a user (prevents self-deletion).
+
+---
+
+## Data Exports
+
+#### `GET /api/admin/studies/{slug}/export/csv`
+
+Download results as a wide-format CSV file.
+
+#### `GET /api/admin/studies/{slug}/export/pqmethod`
+
+Download a ZIP file containing `.dat` and `.sta` files for PQMethod.
+
 ## Rate Limiting
 
 To ensure fair usage and system stability, the API implements rate limiting via `slowapi`.
 
-| Endpoint                | Limit                |
-| ----------------------- | -------------------- |
-| `GET /api/study/{slug}` | 60 requests / minute |
-| `POST /api/submit`      | 5 requests / minute  |
-
-**Response Headers:**
-When a request is made, the following headers are included to inform the client about their current status:
-
-- `X-RateLimit-Limit`: The number of requests allowed within the time window.
-- `X-RateLimit-Remaining`: The number of requests remaining in the current window.
-- `X-RateLimit-Reset`: The time at which the current window resets (in UTC epoch seconds).
-
----
-
-## Error Responses
-
-| Status | Description                             |
-| ------ | --------------------------------------- |
-| `404`  | Study not found                         |
-| `422`  | Validation error (invalid data)         |
-| `429`  | Too Many Requests (Rate limit exceeded) |
-| `500`  | Internal server error                   |
-
----
-
-## Authentication
-
-Currently, Open-Q does not require authentication for public studies. Researcher authentication for data export is planned for future releases.
+| Endpoint                | Limit                | Requirement |
+| ----------------------- | -------------------- | ----------- |
+| `GET /api/study/{slug}` | 60 requests / minute | Public      |
+| `POST /api/submit`      | 5 requests / minute  | Public      |
+| `/api/admin/*`          | 30 requests / minute | Authorized  |

@@ -14,6 +14,7 @@ The documentation is organized using the **Diátaxis** framework:
 - **[Tutorials](docs/tutorials/)**: Learning-oriented lessons.
   - [Production Deployment](docs/guides/deployment.md) (Scalingo, Docker)
 - **[Guides](docs/guides/)**: Task-oriented how-to guides.
+  - [Admin & Team Management](docs/guides/admin-management.md)
   - [Conducting Studies](docs/guides/conducting-studies.md)
   - [Exporting Data](docs/guides/data-export.md)
   - [Contributing & Development](docs/guides/contributing/development.md)
@@ -30,10 +31,11 @@ The documentation is organized using the **Diátaxis** framework:
 ## ✨ Features
 
 - **Modern Q-Sort Interface** — Drag-and-drop with fluid animations (Framer Motion).
+- **Advanced RBAC** — Multi-user collaboration with Owner, Editor, and Viewer roles.
+- **Administrative API** — Management of users, studies, and data exports.
 - **Multi-language Support** — Fully internationalized (i18n).
 - **Responsive Design** — "Focus Flow" UX optimized for mobile devices.
 - **Flexible Configuration** — Define grid shapes and logic via JSON.
-- **Robust Architecture** — FastAPI Backend + React Frontend + Architectural Governance.
 
 ---
 
