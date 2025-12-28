@@ -83,7 +83,7 @@ app.include_router(
     admin_studies.router, prefix="/api/admin/studies", tags=["admin-studies"]
 )
 app.include_router(submissions.router, prefix="/api", tags=["submissions"])
-app.include_router(logs.router, prefix="/api/logs", tags=["logs"])
+app.include_router(logs.router, prefix="/api", tags=["logs"])
 
 
 @app.get("/health")
