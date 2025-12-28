@@ -100,16 +100,16 @@ class Study(Base):
 
     # Relationships
     translations: Mapped[list["StudyTranslation"]] = relationship(
-        back_populates="study", cascade="all, delete-orphan"
+        back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
     statements: Mapped[list["Statement"]] = relationship(
-        back_populates="study", cascade="all, delete-orphan"
+        back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
     participants: Mapped[list["Participant"]] = relationship(
         back_populates="study", cascade="all, delete-orphan"
     )
     collaborators: Mapped[list["StudyCollaborator"]] = relationship(
-        back_populates="study", cascade="all, delete-orphan"
+        back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
 
 
@@ -185,7 +185,7 @@ class Statement(Base):
 
     study: Mapped["Study"] = relationship(back_populates="statements")
     translations: Mapped[list["StatementTranslation"]] = relationship(
-        back_populates="statement", cascade="all, delete-orphan"
+        back_populates="statement", cascade="all, delete-orphan", lazy="selectin"
     )
 
 

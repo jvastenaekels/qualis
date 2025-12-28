@@ -13,6 +13,7 @@ from app.limiter import limiter
 from app.middleware.errors import global_exception_handler
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import auth, logs, submissions
+from app.routers.admin import studies as admin_studies
 
 # Configure Logging
 logging.basicConfig(
@@ -78,8 +79,11 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/api", tags=["auth"])
+app.include_router(
+    admin_studies.router, prefix="/api/admin/studies", tags=["admin-studies"]
+)
 app.include_router(submissions.router, prefix="/api", tags=["submissions"])
-app.include_router(logs.router, prefix="/api", tags=["logs"])
+app.include_router(logs.router, prefix="/api/logs", tags=["logs"])
 
 
 @app.get("/health")

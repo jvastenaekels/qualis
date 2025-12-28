@@ -128,9 +128,22 @@ class StudyBase(BaseModel):
 class StudyCreate(StudyBase):
     """Schema for creating a study."""
 
-    owner_id: int  # Explicitly passed for now or inferred
     translations: list[StudyTranslationCreate]
     statements: list[StatementCreate] = []
+
+
+class StudyUpdate(BaseModel):
+    """Schema for updating a study."""
+
+    slug: str | None = Field(None, pattern="^[a-z0-9-]+$", min_length=3, max_length=100)
+    grid_config: list[GridColumn] | None = None
+    presort_config: dict[str, Any] | None = None
+    postsort_config: dict[str, Any] | None = None
+    default_language: str | None = Field(None, max_length=5)
+    show_statement_codes: bool | None = None
+
+    # Nested updates might be complex (translations, statements).
+    # For now, we assume simple field updates. Complex updates usually need dedicated endpoints or full replace strategies.
 
 
 class StudyRead(StudyBase):

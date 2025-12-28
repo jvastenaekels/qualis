@@ -20,10 +20,17 @@ from app.models import (
     Statement,
     StatementTranslation,
     Study,
+    StudyCollaborator,
+    StudyRole,
     StudyState,
     StudyTranslation,
     User,
 )
+from app.utils.security import get_password_hash
+
+# Test Data
+TEST_EMAIL = "test@example.com"
+TEST_PASSWORD = "testpassword"
 
 # Use in-memory SQLite for testing
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -75,12 +82,21 @@ async def client(db):
 
 
 @pytest_asyncio.fixture
-async def seed_study(db):
+async def test_user(db: AsyncSession):
+    """Create a test user for auth tests."""
+    hashed = get_password_hash(TEST_PASSWORD)
+    user = User(email=TEST_EMAIL, hashed_password=hashed)
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user
+
+
+@pytest_asyncio.fixture
+async def seed_study(db, test_user):
     """Seeds a complete study with statements and configs."""
-    # 1. Owner
-    owner = User(email="test@example.com", hashed_password="pw", is_active=True)
-    db.add(owner)
-    await db.flush()
+    # 1. Owner (use test_user)
+    owner = test_user
 
     # 2. Study
     grid_config = [
@@ -112,6 +128,12 @@ async def seed_study(db):
     )
     db.add(study)
     await db.flush()
+
+    # Add owner as collaborator
+    collab = StudyCollaborator(
+        study_id=study.id, user_id=owner.id, role=StudyRole.owner
+    )
+    db.add(collab)
 
     # 3. Translation
     trans = StudyTranslation(

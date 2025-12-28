@@ -1,3 +1,5 @@
+# type: ignore
+# ruff: noqa: F821, D100
 check_study_permission  # unused function (backend/app/dependencies.py:38)
 health_check  # unused function (backend/app/main.py:73)
 serve_spa  # unused function (backend/app/main.py:101)
