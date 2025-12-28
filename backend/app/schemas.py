@@ -26,6 +26,28 @@ class TokenData(BaseModel):
     email: str | None = None
 
 
+# User Schemas
+class UserBase(BaseModel):
+    """Base schema for users."""
+
+    email: str
+    is_active: bool = True
+    is_superuser: bool = False
+
+
+class UserCreate(UserBase):
+    """Schema for creating a new user with password."""
+
+    password: str = Field(..., min_length=8)
+
+
+class UserRead(UserBase):
+    """Schema for reading user information."""
+
+    id: int
+    model_config = ConfigDict(from_attributes=True)
+
+
 # Translation Schemas
 class StudyTranslationBase(BaseModel):
     """Base schema for study translations."""
