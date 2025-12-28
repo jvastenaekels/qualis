@@ -47,13 +47,21 @@ WHERE p.status = 'completed';
 
 ---
 
-## 🚀 Exporting Data (Future Roadmap)
+## 📈 Exporting Results
 
-Currently, data can be exported by querying the database directly. Future updates will include:
+A researcher can export results via the Administrative API (requires authentication).
 
-- **CSV Export**: A direct "download results" button in the Admin UI.
-- **PQMethod Export**: Pre-formatted files ready for factor analysis.
-- **JSON Batch Export**: For custom analysis scripts (Python/R).
+### Available Formats
+
+1. **CSV Export** (`GET /api/admin/studies/{slug}/export/csv`)
+   - Returns a wide-format file ready for spreadsheet software (Excel, Numbers).
+   - Includes metadata, participant answers, and Q-sort scores.
+
+2. **PQMethod Export** (`GET /api/admin/studies/{slug}/export/pqmethod`)
+   - Returns a ZIP containing `.dat` and `.sta` files.
+   - Specifically formatted for **PQMethod** and **Ken-Q Analysis** software.
+
+---
 
 ## 🔒 Data Privacy
 

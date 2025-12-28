@@ -103,18 +103,37 @@ flowchart TD
 
 ```mermaid
 erDiagram
+    USER ||--o{ STUDY_COLLABORATOR : member_of
+    STUDY ||--o{ STUDY_COLLABORATOR : has
     STUDY ||--o{ STUDY_TRANSLATION : has
     STUDY ||--o{ STATEMENT : contains
     STUDY ||--o{ PARTICIPANT : has
     PARTICIPANT ||--o{ QSORT_ENTRY : makes
     STATEMENT ||--o{ QSORT_ENTRY : placed_in
 
+    USER {
+        int id PK
+        string email UK
+        string hashed_password
+        boolean is_superuser
+    }
+
     STUDY {
         int id PK
         string slug UK
+        string state
+        int owner_id FK
         json grid_config
         json presort_config
         json postsort_config
+    }
+
+    STUDY_COLLABORATOR {
+        int id PK
+        int study_id FK
+        int user_id FK
+        string role
+        datetime added_at
     }
 
     STUDY_TRANSLATION {
@@ -129,7 +148,7 @@ erDiagram
     STATEMENT {
         int id PK
         int study_id FK
-        json text
+        string code
     }
 
     PARTICIPANT {
@@ -138,7 +157,6 @@ erDiagram
         string confirmation_code
         string status
         json presort_data
-        json rough_data
         json postsort_data
     }
 
@@ -146,10 +164,30 @@ erDiagram
         int id PK
         int participant_id FK
         int statement_id FK
-        int column_score
-        int row_position
+        int grid_score
     }
 ```
+
+---
+
+## 🔐 Permission Model (RBAC)
+
+Open-Q uses a two-tier RBAC system to balance global maintenance and fine-grained study collaboration.
+
+### 1. Global Hierachy
+
+- **Superuser**: Can manage all users in the system and perform global maintenance. Designated by `is_superuser: true` on the `User` model. Can only be created via CLI or another Superuser.
+- **Researcher**: Standard user. Can create studies and be invited to existing ones.
+
+### 2. Study-Level Roles
+
+Permissions are scoped per-study via the `StudyCollaborator` relationship:
+
+| Role       | Ability                                                                                        |
+| :--------- | :--------------------------------------------------------------------------------------------- |
+| **Owner**  | Full control: delete study, manage collaborators, update config during Draft, export results.  |
+| **Editor** | Can update configuration during Draft, change study state (Publish/Close), and export results. |
+| **Viewer** | Read-only access to study configuration and results export.                                    |
 
 ---
 
