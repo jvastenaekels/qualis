@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint';
 import security from 'eslint-plugin-security';
 
 export default tseslint.config(
-    { ignores: ['dist'] },
+    { ignores: ['dist', 'coverage', 'test-results', 'playwright-report', '*.config.js', '*.config.ts'] },
     {
         extends: [js.configs.recommended, ...tseslint.configs.recommended],
         files: ['**/*.{ts,tsx}'],
