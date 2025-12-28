@@ -218,7 +218,7 @@ class SubmissionInput(BaseModel):
     @field_validator("qsort")
     @classmethod
     def validate_qsort_structure(
-        cls, v: list[QSortEntryInput]
+        _cls, v: list[QSortEntryInput]
     ) -> list[QSortEntryInput]:
         """Validate that the Q-sort contains unique statements."""
         # Basic validation: check for duplicates
@@ -235,14 +235,14 @@ class SubmissionInput(BaseModel):
 
     @field_validator("session_token")
     @classmethod
-    def validate_token(cls, v: UUID) -> UUID:
+    def validate_token(_cls, v: UUID) -> UUID:
         """Validate the session token UUID."""
         # Check if UUID is version 4? Usually automatic.
         return v
 
     @field_validator("presort_answers", "postsort_answers")
     @classmethod
-    def validate_answers_dict(cls, v: dict[str, Any]) -> dict[str, Any]:
+    def validate_answers_dict(_cls, v: dict[str, Any]) -> dict[str, Any]:
         """Validate that the answers dictionary is not too large."""
         # Prevent massive JSON blobs
         import json
