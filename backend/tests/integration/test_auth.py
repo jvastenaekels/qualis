@@ -1,27 +1,13 @@
 """Integration tests for authentication."""
 
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import User
-from app.utils.security import get_password_hash
 
 # Test Data
 TEST_EMAIL = "test@example.com"
 TEST_PASSWORD = "testpassword"
-
-
-@pytest_asyncio.fixture
-async def test_user(db: AsyncSession):
-    """Create a test user for auth tests."""
-    hashed = get_password_hash(TEST_PASSWORD)
-    user = User(email=TEST_EMAIL, hashed_password=hashed)
-    db.add(user)
-    await db.commit()
-    await db.refresh(user)
-    return user
 
 
 @pytest.mark.asyncio
