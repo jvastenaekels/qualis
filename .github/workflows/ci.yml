@@ -139,13 +139,13 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+          key: ${{ runner.os }}-playwright-all-${{ env.PLAYWRIGHT_VERSION }}
 
       - name: Install Playwright browsers
-        run: cd frontend && npx playwright install --with-deps chromium
+        run: cd frontend && npx playwright install --with-deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
       - name: Install Playwright OS dependencies
-        run: cd frontend && npx playwright install-deps chromium
+        run: cd frontend && npx playwright install-deps
         if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Run E2E tests
