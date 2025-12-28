@@ -85,5 +85,8 @@ DEP002 = [
     "vulture",
     "import-linter",
     "deptry",
-    "ruff"
+    "ruff",
+    "bcrypt",
+    "types-python-jose",
+    "types-passlib"
 ]
