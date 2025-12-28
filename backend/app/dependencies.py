@@ -1,33 +1,50 @@
 """Dependency injection definitions."""
 
 from collections.abc import Callable
+from typing import cast
 
 from fastapi import Depends, HTTPException, Path, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.database import get_db
 from app.models import Study, StudyCollaborator, StudyRole, User
+from app.schemas import TokenData
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
 
 
-# --- Security Stubs (Replace with actual auth later) ---
-async def get_current_user(db: AsyncSession = Depends(get_db)) -> User:
-    """STUB: Returns a fake user for now.
-
-    In real impl, this would validate JWT and fetch user.
-    """
-    # For dev purposes, we might want to return a user based on a header or just the first user
-    # Returning None or raising 401 if no user found is standard
-    # Here we'll just try to find a user or raise 401
-
-    # Check for a specific mock user for testing if needed, strictly for verified scripts
-    # But usually we want to simulate a logged in user.
-    # Let's assume there is at least one user in DB or valid token logic.
-    # For the stub, we will raise NOT IMPLEMENTED unless used in a test context where we can override it using app.dependency_overrides
-    raise HTTPException(
+async def get_current_user(
+    token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_db)
+) -> User:
+    """Validate JWT token and retrieve the current user."""
+    credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Authentication not implemented",
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
     )
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+        token_data = TokenData(email=email)
+    except JWTError:
+        raise credentials_exception
+
+    query = select(User).where(User.email == token_data.email)
+    result = await db.execute(query)
+    user = cast(User | None, result.scalar_one_or_none())
+
+    if user is None:
+        raise credentials_exception
+
+    return user
 
 
 # --- RBAC Logic ---
@@ -71,7 +88,7 @@ def check_study_permission(required_role: StudyRole) -> Callable:
         )
 
         result = await db.execute(query)
-        collaborator = result.scalar_one_or_none()
+        collaborator = cast(StudyCollaborator | None, result.scalar_one_or_none())
 
         if not collaborator:
             # Maybe the user IS the owner stored in study.owner_id?

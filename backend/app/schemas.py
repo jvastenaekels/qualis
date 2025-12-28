@@ -12,6 +12,20 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from .models import ParticipantStatus, StudyRole, StudyState
 
 
+# Auth Schemas
+class Token(BaseModel):
+    """Schema for JWT access token."""
+
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    """Schema for token payload data."""
+
+    email: str | None = None
+
+
 # Translation Schemas
 class StudyTranslationBase(BaseModel):
     """Base schema for study translations."""
