@@ -54,7 +54,7 @@ async def test_seed_script_integration(
         "statements": [{"code": "S1", "translations": {"en": "Statement 1"}}],
     }
 
-    tmp_path = "backend/tests/tmp_study.json"
+    tmp_path = os.path.join(os.path.dirname(__file__), "tmp_study.json")
     with open(tmp_path, "w") as f:
         json.dump(study_data, f)
 
@@ -107,7 +107,7 @@ async def test_update_study_script_integration(
         "statements": [{"code": "S1", "translations": {"en": "Updated Statement 1"}}],
     }
 
-    tmp_path = "backend/tests/tmp_update_study.json"
+    tmp_path = os.path.join(os.path.dirname(__file__), "tmp_update_study.json")
     with open(tmp_path, "w") as f:
         json.dump(study_data, f)
 

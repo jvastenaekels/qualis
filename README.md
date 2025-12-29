@@ -36,8 +36,26 @@ The documentation is organized using the **Diátaxis** framework:
 - **Multi-language Support** — Fully internationalized (i18n).
 - **Responsive Design** — "Focus Flow" UX optimized for mobile devices.
 - **Flexible Configuration** — Define grid shapes and logic via JSON.
+- **Gunicorn**: Robust WSGI server for production concurrency.
+- **Local CI Wrapper**: A unified `make ci` command to verify code quality before pushing.
 
 ---
+
+## 🚀 Quick Start
+
+```bash
+# Install everything
+make install
+
+# Run backend (FastAPI)
+make run-backend
+
+# Run frontend (React/Vite)
+make run-frontend
+
+# Run full CI check (Lint + Type + Security + Tests)
+make ci
+```
 
 ## 🚀 Quick Start (Development)
 
