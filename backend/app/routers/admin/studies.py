@@ -61,10 +61,33 @@ async def create_study(
     db.add(owner_collab)
 
     # TODO: Handle translations and statements creation here if included in StudyCreate
+    from ...models import Statement, StatementTranslation, StudyTranslation
+
+    for t_in in study.translations:
+        db.add(StudyTranslation(study_id=db_study.id, **t_in.model_dump()))
+
+    # 2. Add Statements and their translations
+    for s_in in study.statements:
+        stmt = Statement(study_id=db_study.id, code=s_in.code)
+        db.add(stmt)
+        await db.flush()  # get stmt ID
+        for st_in in s_in.translations:
+            db.add(
+                StatementTranslation(
+                    statement_id=stmt.id,
+                    language_code=st_in.language_code,
+                    text=st_in.text,
+                )
+            )
 
     await db.commit()
-    await db.refresh(db_study)
-    return db_study
+    # Re-fetch with relationships for Response Serialization
+    from ...services.study_service import StudyService
+
+    updated_study = await StudyService.get_study_by_slug(db, db_study.slug)
+    if updated_study is None:
+        raise HTTPException(status_code=404, detail="Study not found after creation")
+    return updated_study
 
 
 @router.get("/", response_model=list[StudyRead])

@@ -5,15 +5,19 @@
 """Script to update statement texts with filler data."""
 
 import asyncio
+import os
+import sys
 
-from sqlalchemy import select
+# Add backend directory to path so 'from app' works regardless of CWD
+script_dir = os.path.dirname(os.path.abspath(__file__))  # .../backend/
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)  # noqa: E402
 
-from app.database import SessionLocal
-from app.models import Statement, StatementTranslation
+from app.utils.script_utils import APIClient  # noqa: E402
 
 
 async def update_statements():
-    """Update statement texts with filler data."""
+    """Update statement texts with filler data via Admin API."""
     print("--- Updating Statement Texts ---")
 
     # Define Lorem ipsum variations
@@ -21,47 +25,75 @@ async def update_statements():
     LOREM_MEDIUM = " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     LOREM_LONG = " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
 
-    async with SessionLocal() as session:
-        # Get all statements
-        result = await session.execute(select(Statement).order_by(Statement.id))
-        statements = result.scalars().all()
+    api = APIClient()
+    try:
+        await api.login()
 
-        if not statements:
-            print("No statements found.")
+        # 1. Fetch all studies to find statements (API listing)
+        response = await api.client.get("/api/admin/studies/")
+        if response.status_code != 200:
+            print("Failed to fetch studies.")
             return
 
-        print(f"Found {len(statements)} statements. Updating translations...")
+        studies = response.json()
+        if not studies:
+            print("No studies found.")
+            return
 
-        for i, stmt in enumerate(statements):
-            # Vary text length based on index - all statements have at least LOREM_SHORT
-            if i % 4 == 0:
-                extra = LOREM_SHORT
-            elif i % 4 == 1:
-                extra = LOREM_SHORT
-            elif i % 4 == 2:
-                extra = LOREM_MEDIUM
-            else:
-                extra = LOREM_LONG
+        for study_data in studies:
+            slug = study_data["slug"]
+            print(f"Processing study: {slug}")
 
-            # Update translations for each language
-            result = await session.execute(
-                select(StatementTranslation).where(
-                    StatementTranslation.statement_id == stmt.id
-                )
+            # Fetch full study to get statements
+            resp_full = await api.client.get(f"/api/admin/studies/{slug}")
+            study = resp_full.json()
+            statements = study.get("statements", [])
+
+            if not statements:
+                continue
+
+            updates = []
+            for i, stmt in enumerate(statements):
+                # Vary text length based on index
+                if i % 4 == 0 or i % 4 == 1:
+                    extra = LOREM_SHORT
+                elif i % 4 == 2:
+                    extra = LOREM_MEDIUM
+                else:
+                    extra = LOREM_LONG
+
+                # Prepare statement update
+                s_update = {
+                    "code": stmt["code"],
+                    "translations": [
+                        {
+                            "language_code": "en",
+                            "text": f"Statement {stmt['code']}:{extra}",
+                        },
+                        {
+                            "language_code": "fr",
+                            "text": f"Énoncé {stmt['code']}:{extra}",
+                        },
+                        {
+                            "language_code": "fi",
+                            "text": f"Väittämä {stmt['code']}:{extra}",
+                        },
+                    ],
+                }
+                updates.append(s_update)
+
+            # Send Patch
+            patch_resp = await api.client.patch(
+                f"/api/admin/studies/{slug}", json={"statements": updates}
             )
-            translations = result.scalars().all()
+            if patch_resp.status_code == 200:
+                print(f"✓ Updated {len(updates)} statements for {slug}.")
+            else:
+                print(f"Failed to update {slug}: {patch_resp.text}")
 
-            for trans in translations:
-                if trans.language_code == "en":
-                    trans.text = f"Statement {stmt.code}:{extra}"
-                elif trans.language_code == "fr":
-                    trans.text = f"Énoncé {stmt.code}:{extra}"
-                elif trans.language_code == "fi":
-                    trans.text = f"Väittämä {stmt.code}:{extra}"
-
-        await session.commit()
-        print(f"✓ Updated {len(statements)} statements with new Lorem ipsum text.")
-        print("--- Update Complete ---")
+    finally:
+        await api.close()
+    print("--- Update Complete ---")
 
 
 if __name__ == "__main__":

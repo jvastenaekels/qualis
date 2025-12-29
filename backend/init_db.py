@@ -42,10 +42,17 @@ async def init_db(reset: bool = False):
         print("2. No users found. Initializing admin account...")
 
         # 1. Create Initial Admin User
-        admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
-        admin_password = os.getenv("ADMIN_PASSWORD", "hashed_secret")
+        from app.utils.security import get_password_hash
 
-        owner = User(email=admin_email, hashed_password=admin_password, is_active=True)
+        admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
+        admin_password = os.getenv("ADMIN_PASSWORD", "admin123")
+
+        owner = User(
+            email=admin_email,
+            hashed_password=get_password_hash(admin_password),
+            is_active=True,
+            is_superuser=True,
+        )
         session.add(owner)
         await session.commit()
         print(f"3. Admin user created: {admin_email}")

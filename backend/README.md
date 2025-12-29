@@ -34,7 +34,7 @@ backend/
    ```
 
 3. **Seeding**:
-   Populate the database with studies defined in JSON files located in `data/`.
+   Populate the database with studies defined in JSON files. **Requires the API server to be running** (use default admin credentials or set `ADMIN_EMAIL`/`ADMIN_PASSWORD`).
 
    ```bash
    python seed.py data/example-study.json

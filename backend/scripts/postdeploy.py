@@ -5,18 +5,24 @@ import subprocess
 import sys
 
 
-def run_task(script_path, description):
+def run_task(script_path, description, args=None):
     """Execute a task script."""
     print(f"\n[PostDeploy] Starting: {description} ({script_path})")
     if not os.path.exists(script_path):
         print(f"[PostDeploy] Error: Script not found at {script_path}")
-        # We don't exit, we try next? Or strict?
-        # Strict is better for consistency.
         sys.exit(1)
 
     try:
-        # Pass current environment variables
-        subprocess.run([sys.executable, script_path], check=True, env=os.environ)
+        # Pass current environment variables + point to internal API
+        # this allows scripts to run correctly during Scalingo release phase
+        env = os.environ.copy()
+        env["API_BASE_URL"] = "http://internal"
+
+        cmd = [sys.executable, script_path]
+        if args:
+            cmd.extend(args)
+
+        subprocess.run(cmd, check=True, env=env)
         print(f"[PostDeploy] Success: {description}")
     except subprocess.CalledProcessError as e:
         print(f"[PostDeploy] Failed: {description}")
@@ -31,20 +37,22 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))  # .../backend/scripts
     backend_dir = os.path.dirname(script_dir)  # .../backend
 
-    print(f"Working Directory: {os.getcwd()}")
-    print(f"Backend Directory: {backend_dir}")
-
     # Change to backend directory so scripts find their modules
     os.chdir(backend_dir)
 
-    # 1. Ensure Database Schema (Migrations)
+    # 1. Initialize Database (Idempotent: Creates tables and initial admin if missing)
+    run_task("init_db.py", "Infrastructure Initialization")
+
+    # 2. Ensure Database Schema (Legacy/Manual Migrations)
     run_task("scripts/ensure_schema.py", "Schema Verification")
 
-    # 2. Update Study Configuration (Data)
+    # 3. Seed/Sync Study Configuration
+    # We run both seed and update to ensure the study exists AND is up to date
     if os.path.exists("data/example-study.json"):
-        run_task("update_study.py", "Study Data Update")
+        run_task("seed.py", "Study Seeding", ["data/example-study.json"])
+        run_task("update_study.py", "Study Configuration Sync")
     else:
-        print("[PostDeploy] Skipping Update: data/example-study.json not found.")
+        print("[PostDeploy] Skipping Study Tasks: data/example-study.json not found.")
 
     print("\n--- All Tasks Completed Successfully ---")
 

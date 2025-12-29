@@ -9,21 +9,16 @@ import json
 import os
 import sys
 
-from sqlalchemy import select
+# Add backend directory to path so 'from app' works regardless of CWD
+script_dir = os.path.dirname(os.path.abspath(__file__))  # .../backend/
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)  # noqa: E402
 
-from app.database import SessionLocal
-from app.models import (
-    Statement,
-    StatementTranslation,
-    Study,
-    StudyState,
-    StudyTranslation,
-    User,
-)
+from app.utils.script_utils import APIClient  # noqa: E402
 
 
 async def seed_study(json_path: str):
-    """Seed the database with study data from a JSON file."""
+    """Seed the database with study data from a JSON file via Admin API."""
     if not os.path.exists(json_path):
         print(f"Error: File {json_path} not found.")
         return
@@ -31,76 +26,32 @@ async def seed_study(json_path: str):
     with open(json_path, encoding="utf-8") as f:
         data = json.load(f)
 
-    async with SessionLocal() as session:
-        # 1. Ensure owner exists
-        result = await session.execute(
-            select(User).filter(User.email == "admin@example.com")
-        )
-        owner = result.scalars().first()
-        if not owner:
-            owner = User(
-                email="admin@example.com",
-                hashed_password="hashed_secret",
-                is_active=True,
-            )
-            session.add(owner)
-            await session.commit()
-            await session.refresh(owner)
-            print(f"Created owner: {owner.email}")
+    api = APIClient()
+    try:
+        await api.login()
+
+        # 1. Transform data
+        data = api.transform_study_data(data)
+        slug = data["slug"]
 
         # 2. Check if study already exists
-        slug = data["slug"]
-        result = await session.execute(select(Study).filter(Study.slug == slug))
-        existing_study = result.scalars().first()
-        if existing_study:
+        response = await api.client.get(f"/api/admin/studies/{slug}")
+        if response.status_code == 200:
             print(f"Study '{slug}' already exists. Skipping.")
             return
 
         # 3. Create Study
-        study = Study(
-            slug=slug,
-            owner_id=owner.id,
-            state=StudyState.active,
-            default_language=data.get("default_language", "en"),
-            grid_config=data["grid_config"],
-            presort_config=data["presort_config"],
-            postsort_config=data["postsort_config"],
-        )
-        session.add(study)
-        await session.flush()  # Get study ID
+        print(f"Creating study '{slug}'...")
+        response = await api.client.post("/api/admin/studies/", json=data)
 
-        # 4. Add Translations
-        for lang, t_data in data["translations"].items():
-            translation = StudyTranslation(
-                study_id=study.id,
-                language_code=lang,
-                title=t_data["title"],
-                subtitle=t_data.get("subtitle"),
-                description=t_data.get("description", ""),
-                objective=t_data.get("objective"),
-                instructions=t_data["instructions"],
-                consent_title=t_data["consent_title"],
-                consent_description=t_data.get("consent_description", ""),
-                consent_accept=t_data.get("consent_accept", "I agree"),
-                consent_decline=t_data.get("consent_decline", "I do not agree"),
-                ui_labels=t_data.get("ui_labels", {}),
-            )
-            session.add(translation)
+        if response.status_code == 201:
+            print(f"Successfully seeded study: {slug}")
+        else:
+            print(f"Failed to seed study: {response.text}")
+            sys.exit(1)
 
-        # 5. Add Statements and their translations
-        for s_data in data["statements"]:
-            stmt = Statement(study_id=study.id, code=s_data["code"])
-            session.add(stmt)
-            await session.flush()  # Get statement ID
-
-            for lang, text in s_data["translations"].items():
-                s_trans = StatementTranslation(
-                    statement_id=stmt.id, language_code=lang, text=text
-                )
-                session.add(s_trans)
-
-        await session.commit()
-        print(f"Successfully seeded study: {slug}")
+    finally:
+        await api.close()
 
 
 if __name__ == "__main__":
