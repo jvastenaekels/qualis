@@ -40,7 +40,23 @@ backend/
    python seed.py data/example-study.json
    ```
 
-4. **Running Locally**:
+   ```bash
+   python seed.py data/example-study.json
+   ```
+
+4. **Updating Study Configuration**:
+   To update an existing study (translations, statements, etc.) from a JSON file:
+
+   ```bash
+   python update_study.py data/example-study.json
+   ```
+
+5. **Utility Scripts**:
+   Additional management scripts are located in `scripts/`:
+   - `scripts/create_user.py`: Create admin users interactively.
+   - `scripts/ensure_schema.py`: Verify database schema consistency.
+
+6. **Running Locally**:
    ```bash
    uvicorn app.main:app --reload
    ```
