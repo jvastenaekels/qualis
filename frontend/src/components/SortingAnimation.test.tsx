@@ -71,11 +71,11 @@ describe('SortingAnimation', () => {
         render(<SortingAnimation />);
 
         // Rough sort duration calculation roughly:
-        // 5 cards * (0.6s + 0.2s gap) + 1.2s pause = ~5.2s
-        // Let's advance time enough to cover Rough Sort
+        // With initial delay of 1.5s, total time is ~7s.
+        // Let's advance time enough to cover Rough Sort (12s to be safe)
 
         // Advance time in steps to allow effect cycles (re-renders) to run and schedule new timers
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 12; i++) {
             act(() => {
                 vi.advanceTimersByTime(1000);
             });
