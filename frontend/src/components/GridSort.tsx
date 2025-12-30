@@ -52,7 +52,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         neutralCards,
         gridColumns,
         renderSlotContent,
-        onReset,
         selectedCardId,
         onCardClick,
         onSlotClick,
@@ -550,18 +549,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                         </>
                                     )}
                                 </div>
-                            </div>
-                        )}
-
-                        {/* Desktop-only Reset link */}
-                        {onReset && (
-                            <div className="mt-3 hidden lg:flex justify-center">
-                                <button
-                                    onClick={onReset}
-                                    className="text-[10px] font-bold text-slate-400 hover:text-red-500 px-2 py-1 rounded transition-colors"
-                                >
-                                    {t('fine.deck.reset')}
-                                </button>
                             </div>
                         )}
                     </div>

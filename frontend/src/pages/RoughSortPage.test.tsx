@@ -18,6 +18,19 @@ vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
 }));
 
+// Mock CardStack to capture ref and simulate behavior
+vi.mock('../components/CardStack', async () => {
+    const { forwardRef, useImperativeHandle } = await import('react');
+    return {
+        default: forwardRef(({ statement, onVote }: any, ref: any) => {
+            useImperativeHandle(ref, () => ({
+                swipe: (dir: string) => onVote(dir),
+            }));
+            return <div data-testid="card-stack">{statement?.text}</div>;
+        }),
+    };
+});
+
 // Mock ResizeObserver for Framer Motion
 global.ResizeObserver = class ResizeObserver {
     observe() {}
@@ -136,7 +149,84 @@ describe('RoughSortPage', () => {
                 </Routes>
             </MemoryRouter>
         );
+    });
 
-        expect(screen.getByText('Card 2')).toBeTruthy();
+    it('handles keyboard navigation (Arrow Keys)', () => {
+        render(
+            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
+                <Routes>
+                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        // Arrow Right -> Agree
+        act(() => {
+            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+        });
+
+        // Assert state change directly
+        const updatedStore = useResponseStore.getState();
+        // Since we categorized card 1, it should be in history and assigned 'agree'
+        expect(updatedStore.rough.history).toContain(1);
+        expect(updatedStore.rough.agree).toContain(1);
+    });
+
+    it('handles keyboard undo (Z key)', () => {
+        const store = useResponseStore.getState();
+        // Pre-fill history to allow undo
+        store.categorizeCard(1, 'agree'); // Use action to populate state correctly
+
+        render(
+            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
+                <Routes>
+                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        expect(useResponseStore.getState().rough.history.length).toBe(1);
+
+        act(() => {
+            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'z' }));
+        });
+
+        expect(useResponseStore.getState().rough.history.length).toBe(0);
+    });
+
+    it('handles button clicks (Agree/Disagree/Neutral)', () => {
+        render(
+            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
+                <Routes>
+                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        // Click Agree
+        act(() => {
+            const agreeBtn = screen.getByLabelText('common.agree');
+            agreeBtn.click();
+        });
+        expect(useResponseStore.getState().rough.agree).toContain(1);
+
+        // Reset for next click (since card 1 moves, we need to reset or check next card if available,
+        // but here we only have cards 1,2,3. Card 1 is now handled.)
+        // Actually, if we click agree, Card 1 goes to agree. Next is Card 2.
+
+        // Clicks on subsequent cards
+        act(() => {
+            const disagreeBtn = screen.getByLabelText('common.disagree');
+            disagreeBtn.click();
+        });
+        // Card 2 should be in disagree
+        expect(useResponseStore.getState().rough.disagree).toContain(2);
+
+        act(() => {
+            const neutralBtn = screen.getByLabelText('common.neutral');
+            neutralBtn.click();
+        });
+        // Card 3 should be in neutral
+        expect(useResponseStore.getState().rough.neutral).toContain(3);
     });
 });

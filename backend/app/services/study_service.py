@@ -43,6 +43,50 @@ class StudyService:
         return cast(Study | None, result.scalar_one_or_none())
 
     @staticmethod
+    async def record_consent(
+        db: AsyncSession,
+        study_slug: str,
+        session_token: Any,
+        language_code: str,
+        consent_hash: str | None = None,
+        ip_address: str | None = None,
+    ):
+        """Records the exact time and version (hash) of consent."""
+        # 1. Get Study
+        study = await StudyService.get_study_by_slug(db, study_slug)
+        if not study:
+            raise HTTPException(status_code=404, detail="Study not found")
+
+        hashed_ip = hash_ip(ip_address or "unknown")
+
+        # 2. Check if participant exists
+        stmt = select(Participant).where(Participant.session_token == session_token)
+        result = await db.execute(stmt)
+        participant = result.scalar_one_or_none()
+
+        if not participant:
+            # Create new participant record immediately upon consent
+            participant = Participant(
+                study_id=study.id,
+                session_token=session_token,
+                language_used=language_code,
+                consented_at=datetime.now(),
+                consent_hash=consent_hash,
+                ip_address=hashed_ip,
+                status=ParticipantStatus.started,
+            )
+            db.add(participant)
+        else:
+            # Update existing (if somehow re-consenting or resuming)
+            participant.consented_at = datetime.now()
+            participant.consent_hash = consent_hash
+            participant.language_used = language_code
+            participant.ip_address = hashed_ip
+
+        await db.commit()
+        return {"status": "recorded"}
+
+    @staticmethod
     def resolve_translation(
         study: Study, requested_lang: str
     ) -> tuple[str, StudyTranslation | None]:

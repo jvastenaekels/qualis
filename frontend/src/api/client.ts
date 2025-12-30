@@ -112,3 +112,17 @@ export async function get<T>(endpoint: string): Promise<T> {
 
     return response.json();
 }
+
+export async function recordConsent(
+    slug: string,
+    token: string,
+    languageCode: string,
+    consentHash?: string
+) {
+    return post(`/api/study/${slug}/consent`, {
+        study_slug: slug,
+        session_token: token,
+        language_code: languageCode,
+        consent_hash: consentHash,
+    });
+}

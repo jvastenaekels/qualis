@@ -83,8 +83,8 @@
     },
     "welcome": {
         "title": "Welcome",
-        "description": "By sorting these statements according to how well they match your view, you help us understand your perspective. This approach captures the diversity of viewpoints in a simple and engaging way through this application.",
-        "start": "Start Study",
+        "description": "By sorting these sentences, you help us understand your point of view. It's simple, interactive, and there are no wrong answers!",
+        "start": "Let's go!",
         "consent": {
             "label": "I confirm I am at least 18 years old. I understand my participation is voluntary and revocable, and I consent to the anonymous processing of my data for research purposes.",
             "error": "Please accept the terms to continue."
@@ -112,7 +112,7 @@
         "header": {
             "title": "What is your position regarding this statement?",
             "subtitle": "Swipe **Left** to Disagree, **Right** to Agree, or **Down** for Neutral/Undecided.",
-            "hint": "Trust your **first impression**. This is a **spontaneous sort**—you will refine your choices in the next step."
+            "hint": "Trust your **gut**. This is spontaneous — you can change your mind right after."
         },
         "complete": {
             "title": "First step complete",
@@ -125,8 +125,8 @@
     },
     "fine": {
         "header": {
-            "title": "Arrange the statements on the grid to reflect your **perspective**.",
-            "mobile_title": "Arrange statements to reflect your point of view"
+            "title": "Organize the grid according to your feelings",
+            "mobile_title": "Fill the grid with your feelings"
         },
         "deck": {
             "title": "Statements available",
@@ -139,7 +139,7 @@
             "preview": "Statement preview",
             "place_instruction": "Tap a slot to place",
             "read_full": "Tap to read full text",
-            "desktop": "Drag or tap statements to place them on the grid according to how well they match your view.",
+            "desktop": "Drag or tap statements to place them on the grid.",
             "zoom_in": "Zoom In",
             "zoom_out": "Zoom Out",
             "fit_screen": "Fit to Screen",
@@ -168,16 +168,16 @@
             "place_on_grid": "Tap Grid to Place",
             "drag_or_tap": "Drag to grid or tap a slot",
             "initial_instruction": "Drag or tap a statement",
-            "help": "Help & rules",
+            "help": "How to play?",
             "methodology": {
-                "extremes": "Tip: Start by placing the statements you most strongly agree or disagree with at the extremes.",
-                "extremes_title": "Sorting strategy",
-                "vertical": "Statements in the same column have the same score. Only the ranking from left to right matters.",
-                "vertical_title": "Sorting axis",
-                "constraint": "You must place every statement. Some choices might be difficult, but that's part of the methodology.",
-                "constraint_title": "Forced choices",
-                "footer_note": "All statements must be placed to finish.",
-                "close": "Got it!"
+                "extremes": "Tip: Start with what's most obvious to you (at the extremes).",
+                "extremes_title": "Where to start?",
+                "vertical": "In the same column, the order from top to bottom doesn't matter. Only the column counts.",
+                "vertical_title": "Good to know",
+                "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
+                "constraint_title": "The challenge",
+                "footer_note": "Place all cards to finish.",
+                "close": "Let's go!"
             }
         }
     },
@@ -188,8 +188,8 @@
             "why": "Why is this statement particularly significant to your perspective?",
             "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
             "min_chars": "A few words are enough to help us understand the context.",
-            "label_agree": "Most like my view",
-            "label_disagree": "Most unlike my view"
+            "label_agree": "Strongest Agreement",
+            "label_disagree": "Strongest Disagreement"
         },
         "missing": {
             "label": "Is there something important about your view that wasn't captured?",

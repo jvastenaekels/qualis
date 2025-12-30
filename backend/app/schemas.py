@@ -221,6 +221,15 @@ class QSortEntryInput(BaseModel):
     card_comment: str | None = None
 
 
+class ConsentInput(BaseModel):
+    """Schema for recording participant consent."""
+
+    study_slug: str
+    session_token: UUID
+    consent_hash: str | None = None
+    language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
+
+
 class SubmissionInput(BaseModel):
     """Schema for the full study submission/completion."""
 

@@ -83,8 +83,8 @@
     },
     "welcome": {
         "title": "Bienvenue",
-        "description": "En classant ces affirmations selon ce qui vous correspond le mieux, vous nous aidez à cerner votre vision du monde. Cette approche permet de saisir la diversité des points de vue, de manière simple et agréable grâce à cette application.",
-        "start": "Commencer l'étude",
+        "description": "En triant ces phrases, vous nous aidez à comprendre votre vision des choses. C'est simple, interactif et il n'y a pas de mauvaise réponse !",
+        "start": "C'est parti !",
         "consent": {
             "label": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
             "error": "Vous devez accepter les conditions pour continuer."
@@ -112,7 +112,7 @@
         "header": {
             "title": "Quelle est votre position face à cette affirmation ?",
             "subtitle": "Glissez à **Gauche** pour « Pas d'accord », à **Droite** pour « D'accord », ou en **Bas** pour « Neutre / Indécis ».",
-            "hint": "Fiez-vous à votre **première impression**. C'est un **classement spontané** — vous affinerez vos choix à l'étape suivante."
+            "hint": "Fiez-vous à votre **instinct**. C'est du spontané — vous pourrez changer d'avis juste après."
         },
         "complete": {
             "title": "Première étape validée",
@@ -125,8 +125,8 @@
     },
     "fine": {
         "header": {
-            "title": "Classez les affirmations sur la grille pour refléter votre perspective",
-            "mobile_title": "Disposez les affirmations sur la grille"
+            "title": "Organisez la grille selon votre ressenti",
+            "mobile_title": "Remplissez la grille avec votre ressenti"
         },
         "deck": {
             "title": "Affirmations disponibles",
@@ -167,17 +167,17 @@
             "active_card": "Affirmation active",
             "place_on_grid": "Touchez un emplacement sur la grille pour placer l'affirmation",
             "drag_or_tap": "Glissez ou touchez une case",
-            "initial_instruction": "Glissez ou appuyez sur une affirmation",
-            "help": "Aide et règles",
+            "initial_instruction": "Glissez ou touchez une affirmation",
+            "help": "Comment faire ?",
             "methodology": {
-                "extremes": "Conseil : Commencez par placer les affirmations suscitant le plus fort accord ou désaccord aux extrémités.",
-                "extremes_title": "Stratégie de classement",
-                "vertical": "Les affirmations d'une même colonne ont toutes le même score. Seul le classement de gauche à droite compte.",
-                "vertical_title": "Axe de classement",
-                "constraint": "Vous devez placer toutes les affirmations. Certains choix seront peut-être difficiles mais cela fait partie de la méthodologie.",
-                "constraint_title": "Choix forcés",
-                "footer_note": "Chaque affirmation doit être placée pour pouvoir valider le classement final.",
-                "close": "Compris !"
+                "extremes": "Astuce : Commencez par placer ce qui est le plus évident pour vous (aux extrémités).",
+                "extremes_title": "Par où commencer ?",
+                "vertical": "Dans une même colonne, l'ordre de haut en bas n'a pas d'importance. C'est juste la colonne qui compte.",
+                "vertical_title": "Bon à savoir",
+                "constraint": "Il faut tout caser ! C'est parfois un casse-tête, mais c'est le jeu pour nous forcer à prioriser.",
+                "constraint_title": "Contrainte du jeu",
+                "footer_note": "Placez toutes les cartes pour terminer.",
+                "close": "C'est parti !"
             }
         }
     },
@@ -188,7 +188,7 @@
             "why": "En quoi cette affirmation est-elle particulièrement significative pour votre point de vue ?",
             "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
             "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
-            "label_agree": "Me correspond le plus",
+            "label_agree": "Le plus en accord",
             "label_disagree": "Le plus en désaccord"
         },
         "missing": {

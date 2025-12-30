@@ -81,8 +81,8 @@
     },
     "welcome": {
         "title": "Welcome",
-        "description": "Please read the instructions carefully.",
-        "start": "Start Study",
+        "description": "Lajittelemalla nämä lauseet autat meitä ymmärtämään näkökulmaasi. Se on yksinkertaista, eikä vääriä vastauksia ole!",
+        "start": "Aloitetaan!",
         "consent": {
             "label": "Vahvistan olevani vähintään 18-vuotias, lukeneeni ja ymmärtäneeni yllä olevat tiedot, ja suostun osallistumaan tähän tutkimukseen vapaaehtoisesti.",
             "error": "Hyväksy ehdot jatkaaksesi."
@@ -110,7 +110,7 @@
         "header": {
             "title": "Mikä on kantasi tähän väitteeseen?",
             "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Neutraali).",
-            "hint": "Luota **ensivaikutelmaan**. Tämä on **spontaani lajittelu** – tarkennat valintojasi seuraavassa vaiheessa."
+            "hint": "Luota **vaistoosi**. Tämä on spontaania – voit muuttaa mieltäsi heti seuraavassa vaiheessa."
         },
         "complete": {
             "title": "Ensimmäinen vaihe valmis",
@@ -123,8 +123,8 @@
     },
     "fine": {
         "header": {
-            "title": "Järjestä väitteet ruudukkoon näkemyksesi mukaisesti.",
-            "mobile_title": "Järjestä väitteet näkökulmasi mukaan"
+            "title": "Järjestä ruudukko tuntemuksesi mukaan",
+            "mobile_title": "Täytä ruudukko tuntemustesi mukaan"
         },
         "deck": {
             "title": "Vapaat väitteet",
@@ -133,11 +133,11 @@
             "confirm_reset": "Haluatko aloittaa ruudukon sijoittelun alusta? Väitteet palautuvat pinoon."
         },
         "toolbar": {
-            "mobile": "Napauta tai vedä väitteitä sijoittaaksesi ne ruudukkoon.",
+            "mobile": "Napauta tai vedä väitteitä täyttääksesi ruudukon.",
             "preview": "Väitteen esikatselu",
             "place_instruction": "Napauta paikkaa sijoittaaksesi",
             "read_full": "Napauta lukeaksesi koko tekstin",
-            "desktop": "Vedä tai napauta väitteitä sijoittaaksesi ne ruudukkoon sen mukaan, kuinka hyvin ne vastaavat näkemystäsi.",
+            "desktop": "Vedä tai napauta väitteitä sijoittaaksesi ne ruudukkoon.",
             "zoom_in": "Lähennä",
             "zoom_out": "Loitonna",
             "fit_screen": "Sovita näyttöön",
@@ -166,15 +166,15 @@
             "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
             "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
             "initial_instruction": "Vedä tai napauta väitettä",
-            "help": "Ohjeet ja säännöt",
+            "help": "Miten tämä toimii?",
             "methodology": {
-                "extremes": "Vinkki: Aloita sijoittamalla ääripäihin väitteet, joista olet vahvimmin samaa tai eri mieltä.",
-                "extremes_title": "Lajittelustrategia",
-                "vertical": "Samassa sarakkeessa olevilla väitteillä on sama pistearvo. Vain järjestyksellä vasemmalta oikealle on merkitystä.",
-                "vertical_title": "Lajitteluakseli",
-                "constraint": "Kaikki väitteet on sijoitettava. Jotkut valinnat voivat olla vaikeita, mutta se kuuluu menetelmään.",
-                "constraint_title": "Pakotetut valinnat",
-                "footer_note": "Jokainen väite on sijoitettava ennen lopullista vahvistusta.",
+                "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
+                "extremes_title": "Mistä aloittaa?",
+                "vertical": "Samassa sarakkeessa järjestyksellä ei ole väliä. Vain sarake ratkaisee.",
+                "vertical_title": "Hyvä tietää",
+                "constraint": "Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida.",
+                "constraint_title": "Haaste",
+                "footer_note": "Sijoita kaikki kortit lopettaaksesi.",
                 "close": "Selvä!"
             }
         }
@@ -186,8 +186,8 @@
             "why": "Mikä tekee tästä väitteestä erityisen merkittävän näkökulmasi kannalta?",
             "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
             "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",
-            "label_agree": "Vastaa parhaiten näkemystäni",
-            "label_disagree": "Eniten eri mieltä"
+            "label_agree": "Vahvimmin samaa mieltä",
+            "label_disagree": "Vahvimmin eri mieltä"
         },
         "missing": {
             "label": "Onko jotain tärkeää näkökulmassasi, jota ei tavoitettu?",

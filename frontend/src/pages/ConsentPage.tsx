@@ -14,6 +14,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { recordConsent, reportBug } from '../api/client';
 
 const consentSchema = z.object({
     consent: z.boolean().refine((val) => val === true, {
@@ -23,10 +24,19 @@ const consentSchema = z.object({
 
 type ConsentForm = z.infer<typeof consentSchema>;
 
+// Simple SHA-256 hash function for consent text
+async function hashConsent(text: string): Promise<string> {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 const ConsentPage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const config = useConfigStore((state) => state.config);
     const session = useSessionStore();
@@ -57,12 +67,26 @@ const ConsentPage: React.FC = () => {
     // If no config, redirect home or show loading
     if (!config) return null;
 
-    const onSubmit = (data: ConsentForm) => {
+    const onSubmit = async (data: ConsentForm) => {
         if (data.consent) {
             setConsent(true);
+            const token = session.token || crypto.randomUUID();
             if (!session.token) {
-                setToken(crypto.randomUUID());
+                setToken(token);
             }
+
+            // Record proof of consent in DB
+            try {
+                const consentText = config.consent?.description || t('consent.default_text');
+                const consentHash = await hashConsent(consentText);
+
+                await recordConsent(slug || '', token, i18n.language, consentHash);
+            } catch (err) {
+                // Non-blocking: we still allow user to proceed but log the error
+                console.error('Failed to record consent proof:', err);
+                reportBug(err as Error, { context: 'ConsentPage' });
+            }
+
             setStep(2); // Move to Pre-Sort
             navigate(`/study/${slug}/presort`);
         }

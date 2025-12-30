@@ -236,6 +236,10 @@ class Participant(Base):
     submitted_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    consented_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    consent_hash: Mapped[str | None] = mapped_column(String, nullable=True)
 
     # Answers
     presort_answers: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
