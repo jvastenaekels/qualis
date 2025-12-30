@@ -75,27 +75,12 @@ export const useGridZoom = ({
             // Center Horizontally
             x = (wrapperW - contentW * scale) / 2;
 
-            // Center Vertically based on PYRAMID, not full content
-            // (Content includes the Spectrum Bar at bottom, which drags visual center down)
-            if (pyramidRef.current) {
-                const pyramidH = pyramidRef.current.offsetHeight;
-                // We want the center of the pyramid to match the center of the wrapper
-                // Pyramid is at top of content, so PyramidCenterY relative to content is (pyramidH / 2)
-                const pyramidCenterY = pyramidH / 2;
-
-                // Target Y position for top of content:
-                // WrapperCenterY - (PyramidCenterY * scale)
-                y = wrapperH / 2 - pyramidCenterY * scale;
-
-                // Correction: If this pushes the bottom bar off-screen, clamp it?
-                // Visual preference: Start with Pyramid centered.
-            } else {
-                y = (wrapperH - contentH * scale) / 2;
-            }
+            // Center Vertically based on FULL CONTENT to ensure spectrum bar is visible
+            y = (wrapperH - contentH * scale) / 2;
         }
 
         transformRef.current.setTransform(x, y, scale, 400, 'easeOutQuad');
-    }, [wrapperRef, contentRef, pyramidRef]);
+    }, [wrapperRef, contentRef]);
 
     const zoomIn = useCallback(() => {
         if (!transformRef.current || !wrapperRef.current) return;

@@ -94,7 +94,7 @@
         "preview_title": "Aperçu",
         "objective_label": "Objectif de l'étude",
         "instructions_label": "Déroulement",
-        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les affirmations et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre point de vue :** affinez votre perspective en plaçant chaque affirmation sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
+        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les affirmations et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre point de vue :** affinez votre perspective en classant chaque affirmation sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
     },
     "consent": {
         "title": "Consentement à la participation",
@@ -125,7 +125,7 @@
     },
     "fine": {
         "header": {
-            "title": "Disposez les affirmations sur la grille pour refléter votre perspective.",
+            "title": "Classez les affirmations sur la grille pour refléter votre perspective",
             "mobile_title": "Disposez les affirmations sur la grille"
         },
         "deck": {
