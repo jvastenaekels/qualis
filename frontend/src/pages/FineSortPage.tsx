@@ -354,7 +354,7 @@ const FineSortPage: React.FC = () => {
                             <SortableCard
                                 id={activeCardData.id}
                                 text={activeCardData.text}
-                                code={activeCardData.code}
+                                code={showCodes ? activeCardData.code : undefined}
                                 isOverlay
                                 dimensions={cardDimensions || undefined}
                                 aspectRatio={
