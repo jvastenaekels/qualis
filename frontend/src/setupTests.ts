@@ -6,7 +6,7 @@
 
 import { vi } from 'vitest';
 import '@testing-library/jest-dom';
-import { server } from './tests/server';
+import { server } from './test/server';
 import { useConfigStore } from './store/useConfigStore';
 import { useResponseStore } from './store/useResponseStore';
 import { useSessionStore } from './store/useSessionStore';

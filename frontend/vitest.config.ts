@@ -15,7 +15,7 @@ export default defineConfig({
                 '**/node_modules/**',
                 '**/dist/**',
                 '**/e2e/**',
-                '**/tests/**',
+                '**/test/**',
                 '**/*.config.*',
                 '**/*.d.ts',
                 'src/main.tsx',

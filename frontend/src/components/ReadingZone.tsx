@@ -43,7 +43,23 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     }, [displayCard]);
 
     const ScrollIndicator = () => (
-        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white/90 via-white/50 to-transparent pointer-events-none rounded-b-lg z-10" />
+        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white/90 via-white/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-lg z-10">
+            <div className="animate-bounce opacity-50">
+                <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-indigo-900"
+                >
+                    <path d="m6 9 6 6 6-6" />
+                </svg>
+            </div>
+        </div>
     );
 
     if (variant === 'mobile') {

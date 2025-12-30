@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import { get, post, reportBug, ApiError } from './client';
-import { server } from '../tests/server';
+import { server } from '../test/server';
 
 // Mock global fetch
 const fetchMock = vi.fn();
