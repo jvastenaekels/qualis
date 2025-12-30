@@ -8,8 +8,9 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import app.utils.script_utils as script_utils_module
 from app.models import Study, User
-from app.utils.script_utils import APIClient  # noqa: E402
+from app.utils.script_utils import APIClient, sync_study_from_file
 
 
 @pytest.mark.asyncio
@@ -23,15 +24,13 @@ async def test_api_client_login(client: AsyncClient, test_user: User):
     await api.login(email=TEST_EMAIL, password=TEST_PASSWORD)
     assert api.token is not None
     assert "Authorization" in api.client.headers
-    # We do NOT close the client fixture as it's managed by pytest
 
 
 @pytest.mark.asyncio
-async def test_seed_script_integration(
+async def test_sync_study_create(
     client: AsyncClient, db: AsyncSession, test_user: User
 ):
-    """Test seed.py refactored logic indirectly."""
-    import seed
+    """Test sync_study_from_file logic (create mode)."""
     from tests.conftest import TEST_EMAIL, TEST_PASSWORD
 
     # Set env vars for seeds
@@ -58,17 +57,17 @@ async def test_seed_script_integration(
     with open(tmp_path, "w") as f:
         json.dump(study_data, f)
 
-    # Monkeypatch APIClient in the seed module
-    orig_api_client = seed.APIClient
+    # Monkeypatch APIClient in the script_utils module
+    orig_api_cls = script_utils_module.APIClient
 
-    def mock_api_client(*args, **kwargs):
-        kwargs["client"] = client  # Use the fixture
-        return orig_api_client(*args, **kwargs)
+    def mock_api_factory(*args, **kwargs):
+        # Always return an instance using our test client
+        return orig_api_cls(client=client)
 
-    seed.APIClient = mock_api_client  # type: ignore
+    script_utils_module.APIClient = mock_api_factory  # type: ignore
 
     try:
-        await seed.seed_study(tmp_path)
+        await sync_study_from_file(tmp_path)
 
         # Verify in DB
         result = await db.execute(select(Study).where(Study.slug == "seed-via-api"))
@@ -76,17 +75,16 @@ async def test_seed_script_integration(
         assert study is not None
         assert study.slug == "seed-via-api"
     finally:
-        seed.APIClient = orig_api_client  # type: ignore
+        script_utils_module.APIClient = orig_api_cls  # type: ignore
         if os.path.exists(tmp_path):
             os.remove(tmp_path)
 
 
 @pytest.mark.asyncio
-async def test_update_study_script_integration(
+async def test_sync_study_update(
     client: AsyncClient, db: AsyncSession, seed_study: Study
 ):
-    """Test update_study.py refactored logic."""
-    import update_study
+    """Test sync_study_from_file logic (update mode)."""
     from tests.conftest import TEST_EMAIL, TEST_PASSWORD
 
     os.environ["ADMIN_EMAIL"] = TEST_EMAIL
@@ -98,6 +96,7 @@ async def test_update_study_script_integration(
         "presort_config": {},
         "postsort_config": {},
         "translations": {
+            # Note: transform_study_data will handle list vs dict conversion
             "en": {
                 "title": "Updated Title",
                 "instructions": "test",
@@ -111,21 +110,20 @@ async def test_update_study_script_integration(
     with open(tmp_path, "w") as f:
         json.dump(study_data, f)
 
-    # Monkeypatch in update_study module
-    orig_api_client = update_study.APIClient
+    # Monkeypatch
+    orig_api_cls = script_utils_module.APIClient
 
-    def mock_api_client(*args, **kwargs):
-        kwargs["client"] = client
-        return orig_api_client(*args, **kwargs)
+    def mock_api_factory(*args, **kwargs):
+        return orig_api_cls(client=client)
 
-    update_study.APIClient = mock_api_client  # type: ignore
+    script_utils_module.APIClient = mock_api_factory  # type: ignore
 
     try:
-        await update_study.update_study(tmp_path)
+        await sync_study_from_file(tmp_path)
 
         await db.refresh(seed_study)
         assert seed_study.default_language == "fr"
     finally:
-        update_study.APIClient = orig_api_client  # type: ignore
+        script_utils_module.APIClient = orig_api_cls  # type: ignore
         if os.path.exists(tmp_path):
             os.remove(tmp_path)

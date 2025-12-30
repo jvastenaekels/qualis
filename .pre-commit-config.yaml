@@ -40,7 +40,7 @@ repos:
       # Radon : Complexity
       - id: radon-cc
         name: Radon (Complexity)
-        entry: radon cc
+        entry: backend/venv/bin/radon cc
         language: system
         args: ["-a", "-nb", "--min", "B"]
         files: ^backend/
@@ -49,7 +49,7 @@ repos:
       # Deptry : Dependency Hygiene
       - id: deptry
         name: Deptry (Check Dependencies)
-        entry: bash -c 'cd backend && deptry app'
+        entry: bash -c 'cd backend && ./venv/bin/deptry app'
         language: system
         files: ^backend/pyproject.toml|backend/.*\.py$
         pass_filenames: false
@@ -57,7 +57,7 @@ repos:
       # Bandit : Security SAST
       - id: bandit
         name: Bandit (Security)
-        entry: bandit
+        entry: backend/venv/bin/bandit
         language: system
         args: ["-r", "backend/app", "-ll"]
         files: ^backend/

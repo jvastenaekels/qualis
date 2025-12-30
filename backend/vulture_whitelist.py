@@ -54,3 +54,4 @@ APIClient  # unused class (backend/app/utils/script_utils.py:9)
 _.login  # unused method (backend/app/utils/script_utils.py:35)
 _.close  # unused method (backend/app/utils/script_utils.py:52)
 _.transform_study_data  # unused method (backend/app/utils/script_utils.py:56)
+sync_study_from_file
