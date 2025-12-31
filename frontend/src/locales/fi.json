@@ -82,7 +82,7 @@
     "welcome": {
         "title": "Welcome",
         "description": "Lajittelemalla nämä lauseet autat meitä ymmärtämään näkökulmaasi. Se on yksinkertaista, eikä vääriä vastauksia ole!",
-        "start": "Aloitetaan!",
+        "start": "Aloita",
         "consent": {
             "label": "Vahvistan olevani vähintään 18-vuotias, lukeneeni ja ymmärtäneeni yllä olevat tiedot, ja suostun osallistumaan tähän tutkimukseen vapaaehtoisesti.",
             "error": "Hyväksy ehdot jatkaaksesi."
@@ -175,7 +175,7 @@
                 "constraint": "Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida.",
                 "constraint_title": "Haaste",
                 "footer_note": "Sijoita kaikki kortit lopettaaksesi.",
-                "close": "Selvä!"
+                "close": "Aloita"
             }
         }
     },

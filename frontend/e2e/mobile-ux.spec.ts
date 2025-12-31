@@ -24,7 +24,7 @@ test.describe('Mobile UX (Focus Flow)', () => {
         await page.getByRole('button', { name: /continue|continuer/i }).click();
 
         await page.getByLabel(/consent/i).check();
-        await page.getByRole('button', { name: /let's go|c'est parti/i }).click();
+        await page.getByRole('button', { name: /get started|commencer/i }).click();
         await page.getByRole('button', { name: /continue|continuer|submit|soumettre/i }).click(); // Presort
 
         // Rough sort - just click Neutral for all

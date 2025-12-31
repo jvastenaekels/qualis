@@ -84,7 +84,7 @@
     "welcome": {
         "title": "Welcome",
         "description": "By sorting these sentences, you help us understand your point of view. It's simple, interactive, and there are no wrong answers!",
-        "start": "Let's go!",
+        "start": "Get Started",
         "consent": {
             "label": "I confirm I am at least 18 years old. I understand my participation is voluntary and revocable, and I consent to the anonymous processing of my data for research purposes.",
             "error": "Please accept the terms to continue."
@@ -177,7 +177,7 @@
                 "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
                 "constraint_title": "The challenge",
                 "footer_note": "Place all cards to finish.",
-                "close": "Let's go!"
+                "close": "Get Started"
             }
         }
     },

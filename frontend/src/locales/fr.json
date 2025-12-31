@@ -84,7 +84,7 @@
     "welcome": {
         "title": "Bienvenue",
         "description": "En triant ces phrases, vous nous aidez à comprendre votre vision des choses. C'est simple, interactif et il n'y a pas de mauvaise réponse !",
-        "start": "C'est parti !",
+        "start": "Commencer",
         "consent": {
             "label": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
             "error": "Vous devez accepter les conditions pour continuer."
@@ -177,7 +177,7 @@
                 "constraint": "Il faut tout caser ! C'est parfois un casse-tête, mais c'est le jeu pour nous forcer à prioriser.",
                 "constraint_title": "Contrainte du jeu",
                 "footer_note": "Placez toutes les cartes pour terminer.",
-                "close": "C'est parti !"
+                "close": "Commencer"
             }
         }
     },
