@@ -1,6 +1,6 @@
 # Open-Q Backend
 
-The Open-Q backend is a robust ASGI application built with **FastAPI**, **SQLAlchemy (Async)**, and **Pydantic**.
+The Open-Q backend is a robust ASGI application built with **FastAPI**, **SQLAlchemy (Async)**, and **Pydantic**. It uses **bcrypt** for password hashing and **PyJWT** for secure token handling.
 
 ## 📁 Directory Structure
 
@@ -63,7 +63,7 @@ backend/
 
 ## 🧪 Testing
 
-We use `pytest` for backend testing. Detailed instructions can be found in [README_TESTING.md](README_TESTING.md).
+We use `pytest` for backend testing. Detailed instructions can be found in [../docs/guides/contributing/development.md](../docs/guides/contributing/development.md).
 
 ```bash
 pytest
