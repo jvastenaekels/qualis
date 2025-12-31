@@ -111,6 +111,9 @@ jobs:
       - name: Unit Tests (Vitest)
         run: npm run test -- --run --coverage --minWorkers=1 --maxWorkers=1
 
+      - name: Localization Check (i18n)
+        run: npm run i18n-check
+
   e2e-tests:
     name: E2E Tests (Playwright)
     needs: [backend-quality-tests, frontend-quality-tests]

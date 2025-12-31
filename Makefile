@@ -26,6 +26,7 @@ check:
 	cd backend && ./venv/bin/deptry app/
 	cd backend && ./venv/bin/vulture app/ vulture_whitelist.py --min-confidence 60
 	cd frontend && npm run type-check
+	cd frontend && npm run i18n-check
 
 test:
 	cd backend && ./venv/bin/pytest tests/

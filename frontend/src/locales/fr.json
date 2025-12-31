@@ -3,18 +3,12 @@
         "agree": "Plutôt d'accord",
         "disagree": "Plutôt pas d'accord",
         "neutral": "Neutre",
-        "select_card": "Sélectionnez une affirmation",
         "undo": "Annuler",
         "next": "Étape suivante",
         "submit": "Partager mon point de vue",
         "continue": "Continuer",
         "loading": "Chargement...",
         "lang_code": "fr",
-        "yes": "Oui",
-        "no": "Non",
-        "ok": "OK",
-        "cancel": "Annuler",
-        "check": "Vérifier",
         "attention": "Attention",
         "error": "Erreur",
         "submitting": "Envoi en cours...",
@@ -82,8 +76,6 @@
         "language": "Français"
     },
     "welcome": {
-        "title": "Bienvenue",
-        "description": "En triant ces phrases, vous nous aidez à comprendre votre vision des choses. C'est simple, interactif et il n'y a pas de mauvaise réponse !",
         "start": "Commencer",
         "consent": {
             "label": "Je confirme avoir au moins 18 ans. Je comprends que ma participation est volontaire et que je peux l'arrêter à tout moment. Je consens au traitement anonyme de mes données à des fins de recherche, conformément au RGPD.",
@@ -119,7 +111,6 @@
             "subtitle": "Nous allons maintenant affiner les nuances."
         },
         "instructions": {
-            "swipe": "Glissez ou appuyez pour catégoriser",
             "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour classer"
         }
     },
@@ -135,11 +126,7 @@
             "confirm_reset": "Voulez-vous recommencer le placement sur la grille ? Les affirmations retourneront dans la pile."
         },
         "toolbar": {
-            "mobile": "Appuyez ou glissez les affirmations pour les placer sur la grille",
             "preview": "Aperçu de l'affirmation",
-            "place_instruction": "Appuyez sur une case pour placer",
-            "read_full": "Appuyez sur une affirmation pour lire le texte",
-            "desktop": "Glissez ou appuyez sur les affirmations pour les placer sur la grille selon leur degré de correspondance avec votre point de vue.",
             "zoom_in": "Zoom avant",
             "zoom_out": "Zoom arrière",
             "fit_screen": "Ajuster à l'écran",
@@ -171,13 +158,8 @@
             "help": "Comment faire ?",
             "methodology": {
                 "extremes": "Astuce : Commencez par placer ce qui est le plus évident pour vous (aux extrémités).",
-                "extremes_title": "Par où commencer ?",
                 "vertical": "Dans une même colonne, l'ordre de haut en bas n'a pas d'importance. C'est juste la colonne qui compte.",
-                "vertical_title": "Bon à savoir",
-                "constraint": "Il faut tout caser ! C'est parfois un casse-tête, mais c'est le jeu pour nous forcer à prioriser.",
-                "constraint_title": "Contrainte du jeu",
-                "footer_note": "Placez toutes les cartes pour terminer.",
-                "close": "Commencer"
+                "constraint": "Il faut tout caser ! C'est parfois un casse-tête, mais c'est le jeu pour nous forcer à prioriser."
             }
         }
     },

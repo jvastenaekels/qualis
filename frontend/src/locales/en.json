@@ -9,12 +9,6 @@
         "continue": "Continue",
         "loading": "Loading...",
         "lang_code": "en",
-        "yes": "Yes",
-        "no": "No",
-        "ok": "OK",
-        "cancel": "Cancel",
-        "check": "Check",
-        "select_card": "Pick a statement",
         "attention": "Attention",
         "error": "Error",
         "submitting": "Submitting...",
@@ -82,8 +76,6 @@
         "language": "English"
     },
     "welcome": {
-        "title": "Welcome",
-        "description": "By sorting these sentences, you help us understand your point of view. It's simple, interactive, and there are no wrong answers!",
         "start": "Get Started",
         "consent": {
             "label": "I confirm I am at least 18 years old. I understand my participation is voluntary and revocable, and I consent to the anonymous processing of my data for research purposes.",
@@ -94,33 +86,32 @@
         "preview_title": "Preview",
         "objective_label": "Study Objective",
         "instructions_label": "Process",
-        "default_instructions": "1. **Getting to know you:** a few quick questions to better understand your background.\n2. **Your first impressions:** discover the statements and give your spontaneous reaction (agree, neutral, or disagree).\n3. **Your tailored vision:** refine your perspective by placing each statement on the grid to precisely reflect your thoughts.\n4. **The \"why\":** a few words to explain your most significant choices."
+        "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Your perspective:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Why:** a few words to explain your most significant choices."
     },
     "consent": {
-        "title": "Consent to Participate",
-        "subtitle": "Please review the following information carefully.",
-        "default_text": "**Confidentiality and Anonymity:**\nYour responses will be treated as strictly confidential, anonymized, and in compliance with GDPR. Results will be aggregated to identify general trends (viewpoint factors) and will never allow for your individual identification.\n\n**Data Usage:**\nCollected data will be used exclusively for scientific research purposes.\n\n**Voluntary Participation:**\nYour participation is entirely voluntary. You are free to refuse to participate or to stop the study at any time without having to justify your decision."
+        "title": "Participation Consent",
+        "subtitle": "Please read the following information carefully.",
+        "default_text": "**Confidentiality and Anonymity:**\nYour responses will be treated with strict confidentiality, anonymized, and in compliance with GDPR. Results will be aggregated to identify general trends (viewpoint factors) and will never allow for your individual identification.\n\n**Data Usage:**\nThe data collected will be used exclusively for scientific research purposes.\n\n**Voluntary Participation:**\nYour participation is entirely voluntary. You are free to decline to participate or to withdraw from the study at any time without providing a justification."
     },
     "presort": {
-        "title": "About you",
-        "description": "Please answer a few questions to help us contextualize your point of view.",
-        "submit": "Continue to sorting",
+        "title": "About You",
+        "description": "Please answer a few questions to help us situate your viewpoint.",
+        "submit": "Continue to Sorting",
         "select_placeholder": "Select...",
-        "error_required": "This question is required."
+        "error_required": "Please answer this question."
     },
     "rough": {
         "header": {
-            "title": "What is your position regarding this statement?",
-            "subtitle": "Swipe **Left** to Disagree, **Right** to Agree, or **Down** for Neutral/Undecided.",
-            "hint": "Trust your **gut**. This is spontaneous — you can change your mind right after."
+            "title": "What is your stance on this statement?",
+            "subtitle": "Swipe **Left** to Disagree, **Right** to Agree, or **Down** to be Neutral.",
+            "hint": "Trust your **instinct**. This is spontaneous — you can change your mind right after."
         },
         "complete": {
-            "title": "First step complete",
-            "subtitle": "Now, let's refine the nuance."
+            "title": "First Step Complete",
+            "subtitle": "We will now refine the nuances."
         },
         "instructions": {
-            "swipe": "Swipe or tap to categorize",
-            "desktop_tip": "Swipe, tap, or use keyboard ( ← ↓ → ) to sort"
+            "desktop_tip": "Drag, press, or use keyboard ( ← ↓ → ) to sort"
         }
     },
     "fine": {
@@ -129,17 +120,13 @@
             "mobile_title": "Fill the grid with your feelings"
         },
         "deck": {
-            "title": "Statements available",
-            "all_placed": "All statements from this stack are placed",
-            "reset": "Reset deck",
-            "confirm_reset": "Restart the grid placement? Your statements will return to the deck."
+            "title": "Available Statements",
+            "all_placed": "All statements in this pile are placed",
+            "reset": "Reset",
+            "confirm_reset": "Do you want to restart placement on the grid? Statements will return to the pile."
         },
         "toolbar": {
-            "mobile": "Tap or drag statements to place them on the grid.",
-            "preview": "Statement preview",
-            "place_instruction": "Tap a slot to place",
-            "read_full": "Tap to read full text",
-            "desktop": "Drag or tap statements to place them on the grid.",
+            "preview": "Statement Preview",
             "zoom_in": "Zoom In",
             "zoom_out": "Zoom Out",
             "fit_screen": "Fit to Screen",
@@ -166,18 +153,13 @@
         "workbench": {
             "active_card": "Active Statement",
             "place_on_grid": "Tap Grid to Place",
-            "drag_or_tap": "Drag to grid or tap a slot",
-            "initial_instruction": "Drag or tap a statement",
-            "help": "How to play?",
+            "drag_or_tap": "Drag to grid or tap slot",
+            "initial_instruction": "Drag or Tap Statement",
+            "help": "How does it work?",
             "methodology": {
-                "extremes": "Tip: Start with what's most obvious to you (at the extremes).",
-                "extremes_title": "Where to start?",
+                "extremes": "Tip: Start with what is most obvious to you (the extremes).",
                 "vertical": "In the same column, the order from top to bottom doesn't matter. Only the column counts.",
-                "vertical_title": "Good to know",
-                "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
-                "constraint_title": "The challenge",
-                "footer_note": "Place all cards to finish.",
-                "close": "Get Started"
+                "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices."
             }
         }
     },

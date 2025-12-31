@@ -9,10 +9,6 @@
         "continue": "Jatka",
         "loading": "Ladataan...",
         "lang_code": "fi",
-        "yes": "Kyllä",
-        "no": "Ei",
-        "ok": "OK",
-        "cancel": "Peruuta",
         "attention": "Huomio",
         "error": "Virhe",
         "submitting": "Lähetetään...",
@@ -47,23 +43,23 @@
                 "title": "Tutkimusta ei löytynyt",
                 "message": "Emme löytäneet tutkimusta tällä nimellä. Tarkista osoite tai ota yhteyttä tutkijaan.",
                 "action": "Siirry etusivulle"
+            }
+        },
+        "status": {
+            "draft": {
+                "title": "Tutkimus valmisteilla",
+                "message": "Tämä tutkimus ei ole vielä osallistuttavissa. Ole hyvä ja palaa myöhemmin.",
+                "action": "Siirry etusivulle"
             },
-            "status": {
-                "draft": {
-                    "title": "Tutkimus valmisteilla",
-                    "message": "Tämä tutkimus ei ole vielä osallistuttavissa. Ole hyvä ja palaa myöhemmin.",
-                    "action": "Siirry etusivulle"
-                },
-                "paused": {
-                    "title": "Huoltotauko",
-                    "message": "Tiedonkeruu on tilapäisesti keskeytetty huollon ajaksi. Palaamme pian.",
-                    "action": "Yritä uudelleen"
-                },
-                "closed": {
-                    "title": "Tiedonkeruu päättynyt",
-                    "message": "Tämä tutkimus on suljettu. Osallistuminen ei ole enää mahdollista.",
-                    "action": "Siirry etusivulle"
-                }
+            "paused": {
+                "title": "Huoltotauko",
+                "message": "Tiedonkeruu on tilapäisesti keskeytetty huollon ajaksi. Palaamme pian.",
+                "action": "Yritä uudelleen"
+            },
+            "closed": {
+                "title": "Tiedonkeruu päättynyt",
+                "message": "Tämä tutkimus on suljettu. Osallistuminen ei ole enää mahdollista.",
+                "action": "Siirry etusivulle"
             }
         }
     },
@@ -80,8 +76,6 @@
         "language": "Suomi"
     },
     "welcome": {
-        "title": "Welcome",
-        "description": "Lajittelemalla nämä lauseet autat meitä ymmärtämään näkökulmaasi. Se on yksinkertaista, eikä vääriä vastauksia ole!",
         "start": "Aloita",
         "consent": {
             "label": "Vahvistan olevani vähintään 18-vuotias, lukeneeni ja ymmärtäneeni yllä olevat tiedot, ja suostun osallistumaan tähän tutkimukseen vapaaehtoisesti.",
@@ -117,7 +111,6 @@
             "subtitle": "Nyt tarkennetaan nyansseja."
         },
         "instructions": {
-            "swipe": "Pyyhkäise tai napauta luokitellaksesi",
             "desktop_tip": "Vedä, paina tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"
         }
     },
@@ -133,11 +126,7 @@
             "confirm_reset": "Haluatko aloittaa ruudukon sijoittelun alusta? Väitteet palautuvat pinoon."
         },
         "toolbar": {
-            "mobile": "Napauta tai vedä väitteitä täyttääksesi ruudukon.",
             "preview": "Väitteen esikatselu",
-            "place_instruction": "Napauta paikkaa sijoittaaksesi",
-            "read_full": "Napauta lukeaksesi koko tekstin",
-            "desktop": "Vedä tai napauta väitteitä sijoittaaksesi ne ruudukkoon.",
             "zoom_in": "Lähennä",
             "zoom_out": "Loitonna",
             "fit_screen": "Sovita näyttöön",
@@ -169,13 +158,8 @@
             "help": "Miten tämä toimii?",
             "methodology": {
                 "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
-                "extremes_title": "Mistä aloittaa?",
                 "vertical": "Samassa sarakkeessa järjestyksellä ei ole väliä. Vain sarake ratkaisee.",
-                "vertical_title": "Hyvä tietää",
-                "constraint": "Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida.",
-                "constraint_title": "Haaste",
-                "footer_note": "Sijoita kaikki kortit lopettaaksesi.",
-                "close": "Aloita"
+                "constraint": "Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida."
             }
         }
     },
