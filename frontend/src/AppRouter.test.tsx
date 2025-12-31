@@ -5,8 +5,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { screen } from '@testing-library/react';
+import { renderWithProviders } from './test/test-utils';
+import { Routes, Route } from 'react-router-dom';
 import StudyLayout from './layouts/StudyLayout';
 import { useSessionStore } from './store/useSessionStore';
 import { useConfigStore } from './store/useConfigStore';
@@ -43,18 +44,17 @@ describe('App Routing Protection', () => {
 
     it('redirects to welcome if not consented on protected route', () => {
         // Session is NOT consented (default after reset)
-        render(
-            <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                <Routes>
-                    <Route path="/study/:slug" element={<StudyLayout />}>
-                        <Route path="welcome" element={<MockWelcome />} />
-                        <Route path="sort">
-                            <Route path="fine" element={<MockFineSort />} />
-                        </Route>
-                        <Route path="*" element={<div data-testid="page-error">Error</div>} />
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="welcome" element={<MockWelcome />} />
+                    <Route path="sort">
+                        <Route path="fine" element={<MockFineSort />} />
                     </Route>
-                </Routes>
-            </MemoryRouter>
+                    <Route path="*" element={<div data-testid="page-error">Error</div>} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/sort/fine'] }
         );
 
         // Should NOT show Fine Page
@@ -67,14 +67,13 @@ describe('App Routing Protection', () => {
         // Set session as consented
         useSessionStore.getState().setConsent(true);
 
-        render(
-            <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                <Routes>
-                    <Route path="/study/:slug" element={<StudyLayout />}>
-                        <Route path="sort/fine" element={<MockFineSort />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="sort/fine" element={<MockFineSort />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/sort/fine'] }
         );
 
         expect(screen.getByTestId('page-fine')).toBeTruthy();

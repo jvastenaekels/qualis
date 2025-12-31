@@ -1,7 +1,8 @@
-import { render, screen, act } from '@testing-library/react';
+import { screen, act } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ResetPage from './ResetPage';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { useSessionStore } from '../store/useSessionStore';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -30,13 +31,12 @@ describe('ResetPage', () => {
     });
 
     it('Resets all stores and redirects after delay', async () => {
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/reset']}>
-                <Routes>
-                    <Route path="/study/:slug/reset" element={<ResetPage />} />
-                    <Route path="/study/:slug/welcome" element={<div>Welcome Page</div>} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/reset" element={<ResetPage />} />
+                <Route path="/study/:slug/welcome" element={<div>Welcome Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/reset'] }
         );
 
         // Expect loading spinner

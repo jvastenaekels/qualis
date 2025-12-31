@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { screen } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
+import { Routes, Route } from 'react-router-dom';
 import FineSortPage from './FineSortPage';
 import StudyLayout from '../layouts/StudyLayout';
 import { useSessionStore } from '../store/useSessionStore';
@@ -29,14 +30,13 @@ describe('FineSortPage Desktop Layout (Integration)', () => {
         useResponseStore.getState().categorizeCard(3, 'disagree');
         useSessionStore.getState().setConsent(true);
 
-        render(
-            <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                <Routes>
-                    <Route path="/study/:slug" element={<StudyLayout />}>
-                        <Route path="sort/fine" element={<FineSortPage />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="sort/fine" element={<FineSortPage />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/sort/fine'] }
         );
 
         // 2. Wait for cards to appear

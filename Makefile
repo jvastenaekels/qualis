@@ -29,7 +29,7 @@ check:
 	cd frontend && npm run i18n-check
 
 test:
-	cd backend && ./venv/bin/pytest tests/
+	cd backend && ./venv/bin/pytest -n auto tests/
 	cd frontend && npm run test -- --run
 
 ci: lint check test

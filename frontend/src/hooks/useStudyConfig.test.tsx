@@ -90,4 +90,29 @@ describe('useStudyConfig', () => {
             expect(applyStudyOverrides).toHaveBeenCalledWith('en', uiLabels);
         });
     });
+    it('handles API errors (e.g. 404/500) gracefully', async () => {
+        const error = new Error('Not Found');
+        vi.mocked(useGetStudyConfig).mockReturnValue({
+            data: undefined,
+            isLoading: false,
+            error: error,
+            refetch: vi.fn(),
+        } as any);
+
+        renderHook(() => useStudyConfig());
+
+        await waitFor(() => {
+            // Check if error state is updated in the store
+            // Note: useStudyConfig primarily sets the config.
+            // If useGetStudyConfig returns an error, it's typically handled by the component usage
+            // (checking `error` returned by the hook or store).
+            // Let's verify standard behavior: if error, config remains null/empty or error is logged?
+            // Actually, looking at useStudyConfig implementation:
+            // It relies on useGetStudyConfig.
+            // If the store is not updated, that's expected.
+            // But we should verify it DOES NOT update with invalid data.
+            const cfg = useConfigStore.getState().config;
+            expect(cfg).toBeNull();
+        });
+    });
 });

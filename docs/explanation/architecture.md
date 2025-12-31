@@ -12,7 +12,8 @@ Open-Q follows a decoupled **Client-Server** architecture with clear separation 
 graph LR
     subgraph "Frontend (React + Vite)"
         UI[User Interface]
-        Stores[Zustand Stores]
+        State[Zustand Stores<br/>(Client State)]
+        Query[TanStack Query<br/>(Server State)]
         I18N[i18next]
     end
 
@@ -25,8 +26,9 @@ graph LR
         DB[(PostgreSQL<br/>or SQLite)]
     end
 
-    UI <--> Stores
-    Stores -->|REST| API
+    UI <--> State
+    UI <--> Query
+    Query -->|REST| API
     API <--> ORM
     ORM <--> DB
 ```
@@ -35,7 +37,12 @@ graph LR
 
 ## 💾 State Management
 
-The frontend uses **Zustand** with three atomic stores for clean separation of concerns:
+The frontend uses a hybrid approach:
+
+- **TanStack Query (via Orval)**: Manages async server state (caching, fetching, synchronizing).
+- **Zustand**: Manages client-only state (drag-and-drop, UI, session progress).
+
+Three atomic stores are used for clean separation of concerns:
 
 ```mermaid
 flowchart TD
@@ -80,8 +87,10 @@ flowchart TD
 
 | Technology              | Purpose                              |
 | ----------------------- | ------------------------------------ |
-| **React 18** + **Vite** | Fast development with HMR            |
+| **React 19** + **Vite** | Fast development with HMR            |
 | **TypeScript**          | Type safety for Q-sort logic         |
+| **TanStack Query**      | Server state management & caching    |
+| **Orval**               | Contract-first API client generation |
 | **Zustand**             | Minimal boilerplate state management |
 | **Tailwind CSS**        | Utility-first styling                |
 | **dnd-kit**             | Accessible drag-and-drop             |
@@ -103,13 +112,28 @@ flowchart TD
 
 ```mermaid
 erDiagram
-    USER ||--o{ STUDY_COLLABORATOR : member_of
-    STUDY ||--o{ STUDY_COLLABORATOR : has
+    WORKSPACE ||--o{ WORKSPACE_MEMBER : has
+    USER ||--o{ WORKSPACE_MEMBER : member_of
+    WORKSPACE ||--o{ STUDY : contains
     STUDY ||--o{ STUDY_TRANSLATION : has
     STUDY ||--o{ STATEMENT : contains
     STUDY ||--o{ PARTICIPANT : has
     PARTICIPANT ||--o{ QSORT_ENTRY : makes
     STATEMENT ||--o{ QSORT_ENTRY : placed_in
+
+    WORKSPACE {
+        int id PK
+        string title
+        string slug UK
+        datetime created_at
+    }
+
+    WORKSPACE_MEMBER {
+        int workspace_id FK
+        int user_id FK
+        enum role
+        datetime joined_at
+    }
 
     USER {
         int id PK
@@ -122,18 +146,10 @@ erDiagram
         int id PK
         string slug UK
         string state
-        int owner_id FK
+        int workspace_id FK
         json grid_config
         json presort_config
         json postsort_config
-    }
-
-    STUDY_COLLABORATOR {
-        int id PK
-        int study_id FK
-        int user_id FK
-        string role
-        datetime added_at
     }
 
     STUDY_TRANSLATION {
@@ -174,20 +190,20 @@ erDiagram
 
 Open-Q uses a two-tier RBAC system to balance global maintenance and fine-grained study collaboration.
 
-### 1. Global Hierachy
+### 1. Global Hierarchy
 
-- **Superuser**: Can manage all users in the system and perform global maintenance. Designated by `is_superuser: true` on the `User` model. Can only be created via CLI or another Superuser.
-- **Researcher**: Standard user. Can create studies and be invited to existing ones.
+- **Superuser**: Can manage all users in the system and perform global maintenance. Designated by `is_superuser: true` on the `User` model.
+- **User**: Standard account. Can be a member of one or more workspaces.
 
-### 2. Study-Level Roles
+### 2. Workspace-Level Roles
 
-Permissions are scoped per-study via the `StudyCollaborator` relationship:
+Permissions are scoped per-workspace via the `WorkspaceMember` relationship:
 
-| Role       | Ability                                                                                        |
-| :--------- | :--------------------------------------------------------------------------------------------- |
-| **Owner**  | Full control: delete study, manage collaborators, update config during Draft, export results.  |
-| **Editor** | Can update configuration during Draft, change study state (Publish/Close), and export results. |
-| **Viewer** | Read-only access to study configuration and results export.                                    |
+| Role           | Ability                                                                 |
+| :------------- | :---------------------------------------------------------------------- |
+| **Admin**      | Full control over workspace: manage members, create/delete studies.     |
+| **Researcher** | Can create/edit studies, export results. Cannot manage workspace users. |
+| **Viewer**     | Read-only access to study configuration and results export.             |
 
 ---
 
@@ -246,6 +262,13 @@ sequenceDiagram
 
 ```
 frontend/src/
+├── api/                # API Client (Orval)
+│   ├── generated.ts    # Generated hooks & types
+│   ├── model/          # Generated schemas
+│   └── mutator.ts      # Custom fetch wrapper
+├── test/               # Test utilities & mocks
+│   ├── test-utils.tsx  # Custom render & providers
+│   └── server.ts       # MSW server setup
 ├── pages/              # Route components
 │   ├── WelcomePage.tsx
 │   ├── PreSortPage.tsx
@@ -258,6 +281,7 @@ frontend/src/
 │   ├── SortableCard.tsx
 │   └── DroppableSlot.tsx
 ├── hooks/              # Custom React hooks
+│   ├── useGetStudyConfig.ts # Generated hook wrapper
 │   ├── useGridZoom.ts  # Zoom/pan logic
 │   ├── useFineSortDrag.ts
 │   └── useStudyConfig.ts

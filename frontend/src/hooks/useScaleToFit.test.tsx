@@ -17,10 +17,16 @@ describe('useScaleToFit', () => {
         content = document.createElement('div');
 
         // Mock ResizeObserver
-        global.ResizeObserver = vi.fn().mockImplementation((_callback) => ({
-            observe: vi.fn(),
-            disconnect: vi.fn(),
-        }));
+        vi.stubGlobal(
+            'ResizeObserver',
+            vi.fn().mockImplementation(function (_callback) {
+                return {
+                    observe: vi.fn(),
+                    disconnect: vi.fn(),
+                    unobserve: vi.fn(),
+                };
+            })
+        );
     });
 
     afterEach(() => {

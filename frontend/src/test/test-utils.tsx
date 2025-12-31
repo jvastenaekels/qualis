@@ -22,11 +22,28 @@ interface AllTheProvidersProps {
     initialEntries?: string[];
 }
 
-const AllTheProviders: React.FC<AllTheProvidersProps> = ({ children, initialEntries = ['/'] }) => {
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const createTestQueryClient = () =>
+    new QueryClient({
+        defaultOptions: {
+            queries: {
+                retry: false,
+            },
+        },
+    });
+
+export const AllTheProviders: React.FC<AllTheProvidersProps> = ({
+    children,
+    initialEntries = ['/'],
+}) => {
+    const queryClient = createTestQueryClient();
     return (
-        <MemoryRouter initialEntries={initialEntries}>
-            <LayoutProvider>{children}</LayoutProvider>
-        </MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+            <MemoryRouter initialEntries={initialEntries}>
+                <LayoutProvider>{children}</LayoutProvider>
+            </MemoryRouter>
+        </QueryClientProvider>
     );
 };
 

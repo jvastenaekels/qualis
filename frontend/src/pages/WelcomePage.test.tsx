@@ -4,10 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import WelcomePage from './WelcomePage';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 import { useConfigStore } from '../store/useConfigStore';
 import type { StudyConfig } from '../schemas/study';
@@ -46,11 +47,7 @@ describe('WelcomePage', () => {
     });
 
     it('renders study details (title, subtitle, description, objective)', () => {
-        render(
-            <MemoryRouter>
-                <WelcomePage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<WelcomePage />);
         expect(screen.getByText('Test Study')).toBeInTheDocument();
         expect(screen.getByText('Test Subtitle')).toBeInTheDocument();
         expect(screen.getByText('Test Description')).toBeInTheDocument();
@@ -58,11 +55,7 @@ describe('WelcomePage', () => {
     });
 
     it('renders instructions markdown', () => {
-        render(
-            <MemoryRouter>
-                <WelcomePage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<WelcomePage />);
         // Label
         expect(screen.getByText('Instructions')).toBeInTheDocument();
 
@@ -76,13 +69,12 @@ describe('WelcomePage', () => {
     });
 
     it('renders continue button and navigates to consent', async () => {
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/welcome']}>
-                <Routes>
-                    <Route path="/study/:slug/welcome" element={<WelcomePage />} />
-                    <Route path="/study/:slug/consent" element={<div>Consent Page</div>} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<WelcomePage />} />
+                <Route path="/study/:slug/consent" element={<div>Consent Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/welcome'] }
         );
 
         const button = screen.getByRole('button', { name: /Continue/i });
@@ -96,11 +88,7 @@ describe('WelcomePage', () => {
     });
 
     it('conditionally renders "Start a new session" link based on session state', async () => {
-        const { unmount } = render(
-            <MemoryRouter>
-                <WelcomePage />
-            </MemoryRouter>
-        );
+        const { unmount } = renderWithProviders(<WelcomePage />);
 
         // Initially (reset session), the link should NOT be there
         expect(screen.queryByText('Start a new session')).not.toBeInTheDocument();
@@ -112,11 +100,7 @@ describe('WelcomePage', () => {
             useSessionStore.getState().setConsent(true);
         });
 
-        render(
-            <MemoryRouter>
-                <WelcomePage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<WelcomePage />);
         expect(screen.getByText('Start a new session')).toBeInTheDocument();
 
         // Use cleanup for re-render
@@ -139,11 +123,7 @@ describe('WelcomePage', () => {
             value: { reload: vi.fn() },
         });
 
-        render(
-            <MemoryRouter>
-                <WelcomePage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<WelcomePage />);
 
         const link = screen.getByText('Start a new session');
         fireEvent.click(link);

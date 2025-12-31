@@ -5,9 +5,10 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import FineSortPage from './FineSortPage';
 import StudyLayout from '../layouts/StudyLayout';
 import { useSessionStore } from '../store/useSessionStore';
@@ -55,14 +56,13 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         useResponseStore.getState().categorizeCard(1, 'disagree');
         useSessionStore.getState().setConsent(true);
 
-        render(
-            <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                <Routes>
-                    <Route path="/study/:slug" element={<StudyLayout />}>
-                        <Route path="sort/fine" element={<FineSortPage />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="sort/fine" element={<FineSortPage />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/sort/fine'] }
         );
 
         // 2. Ensure we are on the 'disagree' pile
@@ -100,14 +100,13 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         useResponseStore.getState().categorizeCard(1, 'disagree');
         useResponseStore.getState().placeCardInGrid(1, 0, 0);
 
-        render(
-            <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                <Routes>
-                    <Route path="/study/:slug" element={<StudyLayout />}>
-                        <Route path="sort/fine" element={<FineSortPage />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="sort/fine" element={<FineSortPage />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/sort/fine'] }
         );
 
         // Ensure we are on 'disagree'
@@ -125,14 +124,13 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         useResponseStore.getState().placeCardInGrid(1, 0, 0);
         useSessionStore.getState().setConsent(true);
 
-        render(
-            <MemoryRouter initialEntries={['/study/demo/sort/fine']}>
-                <Routes>
-                    <Route path="/study/:slug" element={<StudyLayout />}>
-                        <Route path="sort/fine" element={<FineSortPage />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="sort/fine" element={<FineSortPage />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/sort/fine'] }
         );
 
         // 2. Ensure we are on the 'disagree' pile

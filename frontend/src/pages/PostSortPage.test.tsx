@@ -5,14 +5,13 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import PostSortPage from './PostSortPage';
-import { MemoryRouter } from 'react-router-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
-import { LayoutProvider } from '../contexts/LayoutContext';
 
 // Mock translation
 vi.mock('react-i18next', () => ({
@@ -61,24 +60,12 @@ describe('PostSortPage', () => {
     it('renders null if config is missing', () => {
         useConfigStore.getState().resetConfig();
 
-        const { container } = render(
-            <MemoryRouter>
-                <LayoutProvider>
-                    <PostSortPage />
-                </LayoutProvider>
-            </MemoryRouter>
-        );
+        const { container } = renderWithProviders(<PostSortPage />);
         expect(container.firstChild).toBeNull();
     });
 
     it('identifies and displays extreme cards only', () => {
-        render(
-            <MemoryRouter>
-                <LayoutProvider>
-                    <PostSortPage />
-                </LayoutProvider>
-            </MemoryRouter>
-        );
+        renderWithProviders(<PostSortPage />);
 
         // Extreme Cards
         expect(screen.getByText(/Card 1 \(Extreme -4\)/)).toBeTruthy();
@@ -90,13 +77,7 @@ describe('PostSortPage', () => {
     });
 
     it('shows validation error for short comments on submit', async () => {
-        render(
-            <MemoryRouter>
-                <LayoutProvider>
-                    <PostSortPage />
-                </LayoutProvider>
-            </MemoryRouter>
-        );
+        renderWithProviders(<PostSortPage />);
 
         const submitBtn = screen.getByText('post.submit');
         fireEvent.click(submitBtn);
@@ -107,13 +88,7 @@ describe('PostSortPage', () => {
     });
 
     it('updates store when typing comments', () => {
-        render(
-            <MemoryRouter>
-                <LayoutProvider>
-                    <PostSortPage />
-                </LayoutProvider>
-            </MemoryRouter>
-        );
+        renderWithProviders(<PostSortPage />);
 
         const textAreas = screen.getAllByPlaceholderText('post.extreme.placeholder');
         fireEvent.change(textAreas[0], {
@@ -126,13 +101,7 @@ describe('PostSortPage', () => {
     });
 
     it('tracks missing statement and general comments', () => {
-        render(
-            <MemoryRouter>
-                <LayoutProvider>
-                    <PostSortPage />
-                </LayoutProvider>
-            </MemoryRouter>
-        );
+        renderWithProviders(<PostSortPage />);
 
         // Missing statement
         const missingInput = screen.getByLabelText('post.missing.label');
@@ -148,26 +117,14 @@ describe('PostSortPage', () => {
     });
 
     it('persists comments when re-navigating', async () => {
-        const { unmount } = render(
-            <MemoryRouter>
-                <LayoutProvider>
-                    <PostSortPage />
-                </LayoutProvider>
-            </MemoryRouter>
-        );
+        const { unmount } = renderWithProviders(<PostSortPage />);
 
         const textAreas = screen.getAllByPlaceholderText('post.extreme.placeholder');
         fireEvent.change(textAreas[0], { target: { value: 'Persisted comment for card 1' } });
 
         unmount();
 
-        render(
-            <MemoryRouter>
-                <LayoutProvider>
-                    <PostSortPage />
-                </LayoutProvider>
-            </MemoryRouter>
-        );
+        renderWithProviders(<PostSortPage />);
 
         expect(screen.getByDisplayValue('Persisted comment for card 1')).toBeTruthy();
     });
@@ -185,13 +142,7 @@ describe('PostSortPage', () => {
         };
         useConfigStore.getState().setConfig(customConfig as any);
 
-        render(
-            <MemoryRouter>
-                <LayoutProvider>
-                    <PostSortPage />
-                </LayoutProvider>
-            </MemoryRouter>
-        );
+        renderWithProviders(<PostSortPage />);
 
         // Check for custom prompts (using queryAllByText for "Custom Why?" since it appears for multiple cards)
         expect(screen.getAllByText('Custom Why?').length).toBeGreaterThan(0);

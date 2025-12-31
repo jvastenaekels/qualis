@@ -5,12 +5,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { screen, act } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
 import RoughSortPage from './RoughSortPage';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import type { StudyConfig } from '../schemas/study';
 
 // Mocks
@@ -32,11 +33,6 @@ vi.mock('../components/CardStack', async () => {
 });
 
 // Mock ResizeObserver for Framer Motion
-global.ResizeObserver = class ResizeObserver {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-};
 
 const mockConfig = {
     slug: 'test-study',
@@ -60,24 +56,22 @@ describe('RoughSortPage', () => {
     });
 
     it('sets the current step to 3 on mount', () => {
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                <Routes>
-                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
         );
         expect(useSessionStore.getState().currentStep).toBe(3);
     });
 
     it('renders the pedagogical hint', () => {
         vi.useFakeTimers();
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                <Routes>
-                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
         // Fast-forward time to trigger the hint (1500ms delay)
@@ -94,12 +88,11 @@ describe('RoughSortPage', () => {
     });
 
     it('renders the Control Cluster buttons', () => {
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                <Routes>
-                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
         expect(screen.getByLabelText('common.disagree')).toBeTruthy();
@@ -113,12 +106,11 @@ describe('RoughSortPage', () => {
         useResponseStore.getState().categorizeCard(2, 'agree');
         useResponseStore.getState().categorizeCard(3, 'agree');
 
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                <Routes>
-                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
         expect(screen.getByText('rough.complete.title')).toBeTruthy();
@@ -129,12 +121,11 @@ describe('RoughSortPage', () => {
         // Categorize one card
         useResponseStore.getState().categorizeCard(1, 'agree');
 
-        const { unmount } = render(
-            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                <Routes>
-                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        const { unmount } = renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
         // Card 1 is gone, Card 2 is current
@@ -142,22 +133,20 @@ describe('RoughSortPage', () => {
 
         unmount();
 
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                <Routes>
-                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
         );
     });
 
     it('handles keyboard navigation (Arrow Keys)', () => {
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                <Routes>
-                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
         // Arrow Right -> Agree
@@ -177,12 +166,11 @@ describe('RoughSortPage', () => {
         // Pre-fill history to allow undo
         store.categorizeCard(1, 'agree'); // Use action to populate state correctly
 
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                <Routes>
-                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
         expect(useResponseStore.getState().rough.history.length).toBe(1);
@@ -195,12 +183,11 @@ describe('RoughSortPage', () => {
     });
 
     it('handles button clicks (Agree/Disagree/Neutral)', () => {
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/sort/rough']}>
-                <Routes>
-                    <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
         // Click Agree

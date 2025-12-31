@@ -4,13 +4,14 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { screen, fireEvent, act } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import StudyLayout from './StudyLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import i18n from '../i18n';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 
 // Mock dependencies
 // i18n is already being mocked globally in setupTests.ts for some things, but here we mock specifically.
@@ -66,11 +67,8 @@ describe('StudyLayout Language Sync', () => {
         const changeLanguageSpy = i18n.changeLanguage;
 
         // Render Layout
-        render(
-            <MemoryRouter initialEntries={['/study/test/welcome']}>
-                <StudyLayout />
-            </MemoryRouter>
-        );
+        // Render Layout
+        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
 
         // Change Store Language DIRECTLY (Simulating State Change)
         act(() => {
@@ -82,11 +80,7 @@ describe('StudyLayout Language Sync', () => {
     });
 
     it('Updates Store when UI Language Button is clicked', () => {
-        render(
-            <MemoryRouter initialEntries={['/study/test/welcome']}>
-                <StudyLayout />
-            </MemoryRouter>
-        );
+        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
 
         // Open Language Menu (Button with Globe)
         const globeBtn = screen.getByTitle('Change language'); // Based on title attribute I saw in code
@@ -138,12 +132,11 @@ describe('Layout Scroll Behavior', () => {
     });
 
     it('Applies overflow-hidden on sorting pages', () => {
-        const { container } = render(
-            <MemoryRouter initialEntries={['/study/slug/rough-sort']}>
-                <Routes>
-                    <Route path="/study/:slug/rough-sort" element={<StudyLayout />} />
-                </Routes>
-            </MemoryRouter>
+        const { container } = renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/rough-sort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/rough-sort'] }
         );
         const main = container.querySelector('main');
         expect(main).toHaveClass('overflow-hidden');
@@ -151,24 +144,22 @@ describe('Layout Scroll Behavior', () => {
     });
 
     it('Applies overflow-hidden on fine-sort page', () => {
-        const { container } = render(
-            <MemoryRouter initialEntries={['/study/slug/sort']}>
-                <Routes>
-                    <Route path="/study/:slug/sort" element={<StudyLayout />} />
-                </Routes>
-            </MemoryRouter>
+        const { container } = renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/sort'] }
         );
         const main = container.querySelector('main');
         expect(main).toHaveClass('overflow-hidden');
     });
 
     it('Applies overflow-y-auto on post-sort page (despite containing "sort")', () => {
-        const { container } = render(
-            <MemoryRouter initialEntries={['/study/slug/post-sort']}>
-                <Routes>
-                    <Route path="/study/:slug/post-sort" element={<StudyLayout />} />
-                </Routes>
-            </MemoryRouter>
+        const { container } = renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/post-sort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/post-sort'] }
         );
         const main = container.querySelector('main');
         expect(main).toHaveClass('overflow-y-auto');
@@ -176,12 +167,11 @@ describe('Layout Scroll Behavior', () => {
     });
 
     it('Applies overflow-y-auto on other pages (e.g. welcome)', () => {
-        const { container } = render(
-            <MemoryRouter initialEntries={['/study/slug/welcome']}>
-                <Routes>
-                    <Route path="/study/:slug/welcome" element={<StudyLayout />} />
-                </Routes>
-            </MemoryRouter>
+        const { container } = renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/slug/welcome'] }
         );
         const main = container.querySelector('main');
         expect(main).toHaveClass('overflow-y-auto');
@@ -207,11 +197,7 @@ describe('Layout Loading & Error States', () => {
         // Mock hook to reflect loading (though store drives it mostly, hook might be used for retry)
         vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() });
 
-        render(
-            <MemoryRouter initialEntries={['/study/test/welcome']}>
-                <StudyLayout />
-            </MemoryRouter>
-        );
+        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
 
         // Check for loading text
         expect(screen.getByText(/common.loading/i)).toBeInTheDocument();
@@ -222,11 +208,7 @@ describe('Layout Loading & Error States', () => {
         useConfigStore.setState({ error: 'common.errors.not_found', isLoading: false });
         vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() });
 
-        render(
-            <MemoryRouter initialEntries={['/study/test/welcome']}>
-                <StudyLayout />
-            </MemoryRouter>
-        );
+        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
 
         // Check for StudyNotFound component content (it usually renders a generic 404 message or specific text)
         // Since StudyNotFound is likely not mocked, we check for its content.
@@ -241,11 +223,7 @@ describe('Layout Loading & Error States', () => {
         useConfigStore.setState({ error: 'common.errors.network', isLoading: false });
         vi.mocked(useStudyConfig).mockReturnValue({ retry: retryMock });
 
-        render(
-            <MemoryRouter initialEntries={['/study/test/welcome']}>
-                <StudyLayout />
-            </MemoryRouter>
-        );
+        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
 
         // ErrorPage renders title and message
         expect(screen.getByText('common.errors.network_title')).toBeInTheDocument();
@@ -270,13 +248,12 @@ describe('Layout Route Protection', () => {
     it('Redirects to Welcome if trying to access protected route without consent', () => {
         useSessionStore.setState({ hasConsented: false });
 
-        render(
-            <MemoryRouter initialEntries={['/study/test/presort']}>
-                <Routes>
-                    <Route path="/study/:slug/presort" element={<StudyLayout />} />
-                    <Route path="/study/:slug/welcome" element={<div>Welcome Page</div>} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/presort" element={<StudyLayout />} />
+                <Route path="/study/:slug/welcome" element={<div>Welcome Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test/presort'] }
         );
 
         expect(screen.getByText('Welcome Page')).toBeInTheDocument();
@@ -285,12 +262,11 @@ describe('Layout Route Protection', () => {
     it('Allows access to protected route if consented', () => {
         useSessionStore.setState({ hasConsented: true });
 
-        render(
-            <MemoryRouter initialEntries={['/study/test/presort']}>
-                <Routes>
-                    <Route path="/study/:slug/presort" element={<StudyLayout />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/presort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/presort'] }
         );
 
         // Should render StudyLayout -> Outlet (which is empty here but Layout renders header)
@@ -303,13 +279,12 @@ describe('Layout Route Protection', () => {
     it('Redirects to Post-Sort if study is completed', () => {
         useSessionStore.setState({ isCompleted: true, hasConsented: true });
 
-        render(
-            <MemoryRouter initialEntries={['/study/test/welcome']}>
-                <Routes>
-                    <Route path="/study/:slug/welcome" element={<StudyLayout />} />
-                    <Route path="/study/:slug/post-sort" element={<div>Post Sort Page</div>} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+                <Route path="/study/:slug/post-sort" element={<div>Post Sort Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test/welcome'] }
         );
 
         expect(screen.getByText('Post Sort Page')).toBeInTheDocument();

@@ -4,10 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import PreSortPage from './PreSortPage';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -36,11 +37,7 @@ describe('PreSortPage', () => {
     });
 
     it('renders form fields based on config', () => {
-        render(
-            <MemoryRouter>
-                <PreSortPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<PreSortPage />);
 
         expect(screen.getByLabelText(/Age/)).toBeInTheDocument();
         expect(screen.getByLabelText(/Gender/)).toBeInTheDocument();
@@ -48,11 +45,7 @@ describe('PreSortPage', () => {
     });
 
     it('validates required fields', async () => {
-        render(
-            <MemoryRouter>
-                <PreSortPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<PreSortPage />);
 
         const button = screen.getByRole('button');
         expect(button).toBeDisabled();
@@ -64,12 +57,11 @@ describe('PreSortPage', () => {
     });
 
     it('submits valid form data', async () => {
-        render(
-            <MemoryRouter initialEntries={['/study/test/presort']}>
-                <Routes>
-                    <Route path="/study/:slug/presort" element={<PreSortPage />} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/presort" element={<PreSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test/presort'] }
         );
 
         fireEvent.input(screen.getByLabelText(/Age/), { target: { value: '30' } });
@@ -85,11 +77,7 @@ describe('PreSortPage', () => {
     });
 
     it('persists data when re-navigating', async () => {
-        const { unmount } = render(
-            <MemoryRouter>
-                <PreSortPage />
-            </MemoryRouter>
-        );
+        const { unmount } = renderWithProviders(<PreSortPage />);
 
         fireEvent.input(screen.getByLabelText(/Age/), { target: { value: '45' } });
 
@@ -102,11 +90,7 @@ describe('PreSortPage', () => {
 
         unmount();
 
-        render(
-            <MemoryRouter>
-                <PreSortPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<PreSortPage />);
 
         expect(screen.getByLabelText(/Age/)).toHaveValue(45);
     });

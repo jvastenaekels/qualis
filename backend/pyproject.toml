@@ -89,6 +89,7 @@ DEP002 = [
     "deptry",
     "ruff",
     "bcrypt",
-    "pyjwt"
+    "pyjwt",
+    "pytest-xdist"
 ]
 DEP003 = ["httpx"]

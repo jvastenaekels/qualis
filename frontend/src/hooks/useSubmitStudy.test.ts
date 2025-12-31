@@ -6,16 +6,17 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
+import { AllTheProviders } from '../test/test-utils';
 import { useSubmitStudy } from './useSubmitStudy';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useResponseStore } from '../store/useResponseStore';
 import type { StudyConfig } from '../schemas/study';
 
-// Mock the API client
-const mockPost = vi.fn();
-vi.mock('../api/client', () => ({
-    post: (...args: unknown[]) => mockPost(...args),
+// Mock the mutator
+const mockCustomInstance = vi.fn();
+vi.mock('../api/mutator', () => ({
+    customInstance: (...args: unknown[]) => mockCustomInstance(...args),
 }));
 
 const mockConfig = {
@@ -39,7 +40,7 @@ describe('useSubmitStudy', () => {
     const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     beforeEach(() => {
-        mockPost.mockReset();
+        mockCustomInstance.mockReset();
         consoleErrorSpy.mockClear();
 
         // Setup stores
@@ -67,9 +68,9 @@ describe('useSubmitStudy', () => {
     });
 
     it('submits correctly transformed payload on success', async () => {
-        mockPost.mockResolvedValueOnce({ success: true, confirmation_code: 'CONF123' });
+        mockCustomInstance.mockResolvedValueOnce({ success: true, confirmation_code: 'CONF123' });
 
-        const { result } = renderHook(() => useSubmitStudy());
+        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
 
         await act(async () => {
             await result.current.submit();
@@ -80,11 +81,12 @@ describe('useSubmitStudy', () => {
         expect(result.current.error).toBeNull();
         expect(result.current.confirmationCode).toBe('CONF123');
 
-        expect(mockPost).toHaveBeenCalledTimes(1);
-        const [url, payload] = mockPost.mock.calls[0];
+        expect(mockCustomInstance).toHaveBeenCalledTimes(1);
+        const callArgs = mockCustomInstance.mock.calls[0][0];
 
-        expect(url).toBe('/api/submit');
-        expect(payload).toEqual({
+        expect(callArgs.url).toBe('/api/submit');
+        expect(callArgs.method).toBe('POST');
+        expect(callArgs.data).toEqual({
             session_token: 'test-token',
             study_slug: 'test',
             status: 'completed',
@@ -103,9 +105,9 @@ describe('useSubmitStudy', () => {
     });
 
     it('handles generic API errors', async () => {
-        mockPost.mockRejectedValueOnce(new Error('API Failure'));
+        mockCustomInstance.mockRejectedValueOnce(new Error('API Failure'));
 
-        const { result } = renderHook(() => useSubmitStudy());
+        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
 
         await act(async () => {
             await result.current.submit();
@@ -120,9 +122,9 @@ describe('useSubmitStudy', () => {
     it('handles ApiError 400 (Bad Request)', async () => {
         const apiError = new Error('Bad Request');
         (apiError as any).status = 400;
-        mockPost.mockRejectedValueOnce(apiError);
+        mockCustomInstance.mockRejectedValueOnce(apiError);
 
-        const { result } = renderHook(() => useSubmitStudy());
+        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
 
         await act(async () => {
             await result.current.submit();
@@ -134,7 +136,7 @@ describe('useSubmitStudy', () => {
     it('handles missing config error', async () => {
         useConfigStore.getState().setConfig(null as any);
 
-        const { result } = renderHook(() => useSubmitStudy());
+        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
 
         await act(async () => {
             await result.current.submit();
@@ -149,7 +151,7 @@ describe('useSubmitStudy', () => {
     it('handles missing session token error', async () => {
         useSessionStore.getState().setToken(null as any);
 
-        const { result } = renderHook(() => useSubmitStudy());
+        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
 
         await act(async () => {
             await result.current.submit();
@@ -160,9 +162,12 @@ describe('useSubmitStudy', () => {
     });
 
     it('respects silent option (no loading state)', async () => {
-        mockPost.mockResolvedValueOnce({ success: true, confirmation_code: 'SilentCode' });
+        mockCustomInstance.mockResolvedValueOnce({
+            success: true,
+            confirmation_code: 'SilentCode',
+        });
 
-        const { result } = renderHook(() => useSubmitStudy());
+        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
 
         await act(async () => {
             // We pass silent: true. The hook should NOT set isLoading to true.

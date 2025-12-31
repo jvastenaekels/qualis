@@ -4,10 +4,10 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import LandingPage from './LandingPage';
-import { MemoryRouter } from 'react-router-dom';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
@@ -20,21 +20,13 @@ vi.mock('react-router-dom', async () => {
 
 describe('LandingPage', () => {
     it('renders landing page inputs', () => {
-        render(
-            <MemoryRouter>
-                <LandingPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<LandingPage />);
         expect(screen.getByPlaceholderText(/e.g. example-study/i)).toBeInTheDocument();
         expect(screen.getByRole('button')).toBeDisabled();
     });
 
     it('enables button when input is filled', () => {
-        render(
-            <MemoryRouter>
-                <LandingPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<LandingPage />);
         const input = screen.getByPlaceholderText(/e.g. example-study/i);
         fireEvent.change(input, { target: { value: 'test-study' } });
 
@@ -42,11 +34,7 @@ describe('LandingPage', () => {
     });
 
     it('navigates to study on submit', () => {
-        render(
-            <MemoryRouter>
-                <LandingPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<LandingPage />);
 
         const input = screen.getByPlaceholderText(/e.g. example-study/i);
         fireEvent.change(input, { target: { value: 'test-study' } });

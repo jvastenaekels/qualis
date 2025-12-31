@@ -55,7 +55,7 @@ vi.mock('../components/GridSort', () => ({
     ),
 }));
 
-global.ResizeObserver = class {
+(global as any).ResizeObserver = class {
     observe() {}
     unobserve() {}
     disconnect() {}

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
-import { MemoryRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { screen, act } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import StudyLayout from '../layouts/StudyLayout';
 import { useSessionStore } from '../store/useSessionStore';
 import { useConfigStore } from '../store/useConfigStore';
@@ -89,16 +90,15 @@ describe('Navigation Integration', () => {
     });
 
     it('navigates forward and backward correctly', () => {
-        render(
-            <MemoryRouter initialEntries={['/study/demo/welcome']}>
-                <Routes>
-                    <Route path="/study/:slug" element={<StudyLayout />}>
-                        <Route path="welcome" element={<MockWelcome />} />
-                        <Route path="presort" element={<MockPreSort />} />
-                        <Route path="sort/rough" element={<MockRoughSort />} />
-                    </Route>
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="welcome" element={<MockWelcome />} />
+                    <Route path="presort" element={<MockPreSort />} />
+                    <Route path="sort/rough" element={<MockRoughSort />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/welcome'] }
         );
 
         // Initial State

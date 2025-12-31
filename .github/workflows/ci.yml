@@ -22,101 +22,113 @@ jobs:
           args: --verbose --no-progress './docs/**/*.md' './README.md'
           fail: true
 
-  backend-quality-tests:
-    name: Backend Quality & Tests
+  backend-lint:
+    name: Backend Lint & Quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip"
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
           pip install -r backend/requirements-dev.txt
-
       - name: Lint & Format (Ruff)
         run: |
           python -m ruff check backend/app
           python -m ruff format --check backend/app
-
       - name: Type Check (Mypy)
         run: python -m mypy backend/app
-
       - name: Security SAST (Bandit)
         run: python -m bandit -r backend/app -ll
-
       - name: Security SCA (Pip Audit)
         run: python -m pip_audit --ignore-vuln GHSA-wj6h-64fc-37mp
-
       - name: Complexity (Radon)
         run: python -m radon cc backend/app -a -nb --min B
-
       - name: Architecture (Import Linter)
         run: lint-imports
         env:
           PYTHONPATH: ./backend
-
       - name: Dependency Hygiene (Deptry)
         run: cd backend && deptry app
-
       - name: Dead Code (Vulture)
         run: python -m vulture backend/app backend/vulture_whitelist.py --min-confidence 60
 
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install -r backend/requirements-dev.txt
       - name: Unit Tests (Pytest)
-        run: python -m pytest backend/tests
+        run: python -m pytest -n auto backend/tests
 
-  frontend-quality-tests:
-    name: Frontend Quality & Tests
+  frontend-lint:
+    name: Frontend Lint & Quality
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: frontend
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
-
       - name: Install dependencies
         run: npm ci
-
       - name: Lint (ESLint)
         run: npm run lint
-
       - name: Architecture (Dependency Cruiser)
         run: npm run lint:architecture
-
       - name: Type Check (TSC)
         run: npm run type-check
-
       - name: Duplication (JSCPD)
         run: npm install -g jscpd && npm run lint:duplication
-
       - name: Dead Code (Knip)
         run: npm run lint:deadcode
-
       - name: Security SCA (NPM Audit)
         run: npm audit --audit-level=high
-
-      - name: Unit Tests (Vitest)
-        run: npm run test -- --run --coverage --minWorkers=1 --maxWorkers=1
-
       - name: Localization Check (i18n)
         run: npm run i18n-check
 
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Unit Tests (Vitest)
+        run: npm run test -- --run --coverage
+
   e2e-tests:
     name: E2E Tests (Playwright)
-    needs: [backend-quality-tests, frontend-quality-tests]
+    needs: [backend-tests, frontend-tests]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

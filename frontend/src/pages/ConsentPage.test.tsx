@@ -4,10 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { renderWithProviders } from '../test/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ConsentPage from './ConsentPage';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 
@@ -46,22 +47,14 @@ describe('ConsentPage', () => {
     });
 
     it('renders consent title and description from config', () => {
-        render(
-            <MemoryRouter>
-                <ConsentPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<ConsentPage />);
         expect(screen.getByText('Consent to Participate')).toBeInTheDocument();
         expect(screen.getByText('Consent Description')).toBeInTheDocument();
         expect(screen.getByText('Consent Title')).toBeInTheDocument();
     });
 
     it('validates consent checkbox', async () => {
-        render(
-            <MemoryRouter>
-                <ConsentPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<ConsentPage />);
 
         const button = screen.getByRole('button', { name: /Start Study/i });
 
@@ -87,13 +80,12 @@ describe('ConsentPage', () => {
         // We can't easily mock useNavigate inside MemoryRouter without a wrapper or library approach,
         // but we can check if the route changed by rendering the target route.
 
-        render(
-            <MemoryRouter initialEntries={['/study/test-study/consent']}>
-                <Routes>
-                    <Route path="/study/:slug/consent" element={<ConsentPage />} />
-                    <Route path="/study/:slug/presort" element={<div>Presort Page</div>} />
-                </Routes>
-            </MemoryRouter>
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/consent" element={<ConsentPage />} />
+                <Route path="/study/:slug/presort" element={<div>Presort Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/consent'] }
         );
 
         const checkbox = screen.getByRole('checkbox');
@@ -112,11 +104,7 @@ describe('ConsentPage', () => {
     });
 
     it('persists consent state', async () => {
-        const { unmount } = render(
-            <MemoryRouter>
-                <ConsentPage />
-            </MemoryRouter>
-        );
+        const { unmount } = renderWithProviders(<ConsentPage />);
 
         const checkbox = screen.getByRole('checkbox');
         fireEvent.click(checkbox);
@@ -125,11 +113,7 @@ describe('ConsentPage', () => {
 
         unmount();
 
-        render(
-            <MemoryRouter>
-                <ConsentPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<ConsentPage />);
 
         const newCheckbox = screen.getByRole('checkbox');
         expect(newCheckbox).toBeChecked();
@@ -142,11 +126,7 @@ describe('ConsentPage', () => {
             useConfigStore.getState().setConfig(configWithoutConsent as any);
         });
 
-        render(
-            <MemoryRouter>
-                <ConsentPage />
-            </MemoryRouter>
-        );
+        renderWithProviders(<ConsentPage />);
 
         // Should use defaults from i18n
         // Note: our mock i18n returns the default value if provided, or the key
