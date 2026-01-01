@@ -107,71 +107,7 @@ const FineSortPage: React.FC = () => {
         setStep(4);
     }, [setStep]);
 
-    // Handle Escape to deselect
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape' && selectedCardId !== null) {
-                setSelectedCardId(null);
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedCardId]);
-
-    // 5. Collision Strategy (Stable)
-    const collisionStrategy: CollisionDetection = useCallback(
-        (args) => {
-            const { pointerCoordinates } = args;
-            if (!pointerCoordinates) return [];
-
-            // 1. Element at point (Viewport accurate)
-            const elAtPoint = document.elementFromPoint(pointerCoordinates.x, pointerCoordinates.y);
-            let resolvedPointId: string | null = null;
-
-            if (elAtPoint) {
-                let curr = elAtPoint as HTMLElement;
-                while (curr && curr !== document.body) {
-                    const id = curr.getAttribute('id') || curr.dataset.testid;
-                    if (id?.startsWith('slot_')) {
-                        resolvedPointId = id;
-                        break;
-                    }
-                    curr = curr.parentElement as HTMLElement;
-                }
-            }
-
-            const resolveToSlot = (id: string | number) => {
-                const idString = String(id);
-                if (idString.startsWith('slot_')) return idString;
-
-                // Handle card-ID format (from data-testid)
-                const cardIdMatch = idString.match(/^card-(\d+)$/);
-                const cardId = cardIdMatch ? parseInt(cardIdMatch[1], 10) : parseInt(idString, 10);
-
-                if (!Number.isNaN(cardId)) {
-                    const placed = responses.qsort.find((p) => p.statementId === cardId);
-                    return placed ? `slot_${placed.col}_${placed.row}` : null;
-                }
-                return null;
-            };
-
-            if (resolvedPointId) return [{ id: resolvedPointId }];
-
-            // 2. Fallbacks
-            const pointerCollisions = pointerWithin(args);
-            const collisions =
-                pointerCollisions.length > 0 ? pointerCollisions : closestCenter(args);
-            return collisions
-                .map((c) => {
-                    const slotId = resolveToSlot(c.id);
-                    return slotId ? { ...c, id: slotId } : null;
-                })
-                .filter((c): c is NonNullable<typeof c> => c !== null);
-        },
-        [responses.qsort]
-    );
-
-    // 6. Memoized derived data
+    // 5. Memoized derived data
     const gridColumns = useMemo(
         () =>
             config?.grid_config || [
@@ -220,7 +156,7 @@ const FineSortPage: React.FC = () => {
         return () => setHeaderAction(null);
     }, [setHeaderAction]);
 
-    // 7. Memoized callbacks for performance
+    // 6. Memoized callbacks for performance
     const actions = useMemo(
         () => ({
             placeCardInGrid,
@@ -234,7 +170,7 @@ const FineSortPage: React.FC = () => {
 
     const handlePan = useCallback(() => setPanVersion((v) => v + 1), []);
 
-    // 8. Drag Hook
+    // DnD Hooks
     const {
         activeId,
         handleDragStart,
@@ -245,13 +181,106 @@ const FineSortPage: React.FC = () => {
     } = useFineSortDrag({
         responses,
         gridColumns,
-        actions,
         onSelectionChange: setSelectedCardId,
         selectedId: selectedCardId,
         interactionUtils,
         onPan: handlePan,
         statements: config?.statements || [],
+        actions,
     });
+
+    const handleDragCancel = useCallback(() => {
+        // No-op for now as hook doesn't expose cancel handler
+        // Ideally we should reset activeId in hook
+    }, []);
+
+    // RECONCILIATION: Recover missing cards into Neutral deck
+    useEffect(() => {
+        if (!config || !responses.qsort || !responses.rough) return;
+
+        const allStatementIds = config.statements.map((s) => s.id);
+        const placedIds = responses.qsort.map((p) => p.statementId);
+        const roughIds = [
+            ...responses.rough.agree,
+            ...responses.rough.neutral,
+            ...responses.rough.disagree,
+        ];
+
+        const missingIds = allStatementIds.filter(
+            (id) => !placedIds.includes(id) && !roughIds.includes(id)
+        );
+
+        if (missingIds.length > 0) {
+            console.warn('Reconciling missing cards:', missingIds);
+            // Add missing cards to Neutral by default
+            missingIds.forEach((id) => {
+                actions.categorizeCard(id, 'neutral');
+            });
+        }
+    }, [config, responses.qsort, responses.rough, actions]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && selectedCardId !== null) {
+                setSelectedCardId(null);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedCardId]);
+
+    // 7. Collision Strategy (Stable)
+    const collisionStrategy: CollisionDetection = useCallback(
+        (args) => {
+            const { pointerCoordinates } = args;
+            if (!pointerCoordinates) return [];
+
+            // 1. Element at point (Viewport accurate)
+            const elAtPoint = document.elementFromPoint(pointerCoordinates.x, pointerCoordinates.y);
+            let resolvedPointId: string | null = null;
+
+            if (elAtPoint) {
+                let curr = elAtPoint as HTMLElement;
+                while (curr && curr !== document.body) {
+                    const id = curr.getAttribute('id') || curr.dataset.testid;
+                    if (id?.startsWith('slot_') || id?.startsWith('deck-')) {
+                        resolvedPointId = id;
+                        break;
+                    }
+                    curr = curr.parentElement as HTMLElement;
+                }
+            }
+
+            const resolveToSlot = (id: string | number) => {
+                const idString = String(id);
+                if (idString.startsWith('slot_') || idString.startsWith('deck-')) return idString;
+
+                // Handle card-ID format (from data-testid)
+                const cardIdMatch = idString.match(/^card-(\d+)$/);
+                const cardId = cardIdMatch ? parseInt(cardIdMatch[1], 10) : parseInt(idString, 10);
+
+                if (!Number.isNaN(cardId)) {
+                    const placed = responses.qsort.find((p) => p.statementId === cardId);
+                    return placed ? `slot_${placed.col}_${placed.row}` : null;
+                }
+                return null;
+            };
+
+            if (resolvedPointId) return [{ id: resolvedPointId }];
+
+            // 2. Fallbacks
+            const pointerCollisions = pointerWithin(args);
+            const collisions =
+                pointerCollisions.length > 0 ? pointerCollisions : closestCenter(args);
+            return collisions
+                .map((c) => {
+                    const slotId = resolveToSlot(c.id);
+                    return slotId ? { ...c, id: slotId } : null;
+                })
+                .filter((c): c is NonNullable<typeof c> => c !== null);
+        },
+        [responses.qsort]
+    );
 
     // 9. Memoized render function for slot content
     const showCodes = config?.show_statement_codes ?? false;
@@ -339,6 +368,7 @@ const FineSortPage: React.FC = () => {
             onDragStart={handleDragStart}
             onDragMove={handleDragMove}
             onDragEnd={handleDragEnd}
+            onDragCancel={handleDragCancel}
             autoScroll={false}
             measuring={{
                 droppable: {

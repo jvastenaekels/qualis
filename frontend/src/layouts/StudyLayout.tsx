@@ -302,11 +302,11 @@ const StudyLayoutContent: React.FC = () => {
                                status === 'current'
                                    ? 'border-blue-600 text-blue-600 bg-white shadow-sm ring-4 ring-blue-50'
                                    : status === 'completed'
-                                     ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:scale-110 cursor-pointer'
-                                     : isReachable
-                                       ? 'border-blue-200 text-blue-600 bg-blue-50 hover:bg-white hover:border-blue-400 cursor-pointer'
-                                       : 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
-                           }
+                                           ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:scale-110 cursor-pointer shadow-sm'
+                                           : isReachable
+                                             ? 'border-blue-400 text-blue-600 bg-white hover:bg-blue-50 hover:border-blue-600 cursor-pointer shadow-sm ring-2 ring-blue-50'
+                                             : 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
+                               }
                        `}
                                     >
                                         {status === 'completed' ? (
@@ -314,9 +314,9 @@ const StudyLayoutContent: React.FC = () => {
                                         ) : status === 'current' ? (
                                             <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />
                                         ) : isReachable ? (
-                                            <div className="w-2 h-2 bg-blue-400 rounded-full opacity-60" />
+                                            <div className="w-2 h-2 bg-blue-400 rounded-full" />
                                         ) : (
-                                            <div className="w-2 h-2 bg-slate-300 rounded-full" />
+                                            <div className="w-2 h-2 bg-slate-200 rounded-full" />
                                         )}
                                     </button>
 
