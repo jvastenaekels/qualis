@@ -21,20 +21,15 @@ import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
 
 // Sub-component: Droppable Pile
-const DroppablePile: React.FC<{
-    id: string;
-    children: React.ReactNode;
-    className: string;
-    onClick: () => void;
-    active?: boolean;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
-    id,
-    children,
-    className,
-    onClick,
-    active,
-    ...props
-}) => {
+const DroppablePile: React.FC<
+    {
+        id: string;
+        children: React.ReactNode;
+        className: string;
+        onClick: () => void;
+        active?: boolean;
+    } & React.ButtonHTMLAttributes<HTMLButtonElement>
+> = ({ id, children, className, onClick, active, ...props }) => {
     const { setNodeRef, isOver } = useDroppable({ id });
 
     return (
