@@ -93,8 +93,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         rough: {
                             ...newRough,
                             [category]: [...newRough[category], statementId],
-                        },
-                        qsort: [], // Reset Fine Sort logic
+                        }
                     };
                 });
 
@@ -120,8 +119,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                             disagree: rough.disagree.filter((id) => id !== lastCardId),
                             neutral: rough.neutral.filter((id) => id !== lastCardId),
                             history: newHistory,
-                        },
-                        qsort: [],
+                        }
                     };
                 });
                 triggerAutoSave();

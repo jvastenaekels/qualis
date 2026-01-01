@@ -12,15 +12,15 @@
  * Manages the top navigation bar, step progress, and locale switching.
  */
 
-import { Check, Globe } from 'lucide-react';
+import { Check, ChevronDown, Globe } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Outlet, useLocation, useParams } from 'react-router-dom';
+import { Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ApiError } from '../api/client';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { LayoutProvider } from '../contexts/LayoutContext';
-import { useLayoutState } from '../hooks/useLayout';
+import { useLayoutAction, useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
 import i18n from '../i18n';
 import ErrorPage from '../pages/ErrorPage';
@@ -39,6 +39,7 @@ const steps = [
 
 const StudyLayoutContent: React.FC = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const { slug } = useParams<{ slug: string }>();
 
     const config = useConfigStore((state) => state.config);
@@ -49,7 +50,26 @@ const StudyLayoutContent: React.FC = () => {
     const location = useLocation();
     const { headerAction } = useLayoutState();
     const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+    const [isStepMenuOpen, setIsStepMenuOpen] = useState(false);
     const langMenuRef = useRef<HTMLDivElement>(null);
+    const stepMenuRef = useRef<HTMLDivElement>(null);
+
+    const handleStepClick = (stepId: number) => {
+        if (stepId > session.maxReachedStep) return;
+
+        const routes: Record<number, string> = {
+            1: 'welcome',
+            2: 'presort',
+            3: 'rough-sort',
+            4: 'fine-sort',
+            5: 'post-sort',
+        };
+
+        const route = routes[stepId];
+        if (route) {
+            navigate(`/study/${slug}/${route}`);
+        }
+    };
 
     // Trigger config fetch/re-fetch on slug or language change
     const { retry } = useStudyConfig();
@@ -59,6 +79,9 @@ const StudyLayoutContent: React.FC = () => {
         const handleClickOutside = (event: MouseEvent) => {
             if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
                 setIsLangMenuOpen(false);
+            }
+            if (stepMenuRef.current && !stepMenuRef.current.contains(event.target as Node)) {
+                setIsStepMenuOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -183,10 +206,65 @@ const StudyLayoutContent: React.FC = () => {
                         )}
                     </div>
 
-                    {/* Mobile Step Counter (Next to title) */}
-                    <span className="md:hidden text-xs font-medium text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full whitespace-nowrap">
-                        {t('layout.mobile_step')} {session.currentStep}/{steps.length}
-                    </span>
+                    {/* Mobile Step Counter & Menu */}
+                    <div className="md:hidden relative" ref={stepMenuRef}>
+                        <button
+                            type="button"
+                            onClick={() => setIsStepMenuOpen(!isStepMenuOpen)}
+                            className={`
+                                text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5
+                                ${isStepMenuOpen ? 'bg-blue-600 text-white shadow-md scale-105' : 'text-slate-500 bg-slate-100 hover:bg-slate-200'}
+                            `}
+                        >
+                            {t('layout.mobile_step')} {session.currentStep}/{steps.length}
+                            <ChevronDown
+                                size={12}
+                                className={`transition-transform duration-200 ${isStepMenuOpen ? 'rotate-180' : ''}`}
+                            />
+                        </button>
+
+                        {/* Mobile Step Selection Menu */}
+                        {isStepMenuOpen && (
+                            <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-[60] py-2 animate-in fade-in zoom-in-95 duration-200 origin-top-left">
+                                <div className="px-3 py-1 mb-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                    {t('layout.navigation')}
+                                </div>
+                                {steps.map((step) => {
+                                    const isReached = step.id <= session.maxReachedStep;
+                                    const isCurrent = step.id === session.currentStep;
+
+                                    return (
+                                        <button
+                                            key={step.id}
+                                            type="button"
+                                            disabled={!isReached}
+                                            onClick={() => {
+                                                handleStepClick(step.id);
+                                                setIsStepMenuOpen(false);
+                                            }}
+                                            className={`
+                                                w-full px-3 py-2.5 flex items-center justify-between text-left transition-colors
+                                                ${
+                                                    isCurrent
+                                                        ? 'bg-blue-50 text-blue-700 font-semibold'
+                                                        : isReached
+                                                          ? 'text-slate-700 hover:bg-slate-50 active:bg-slate-100'
+                                                          : 'text-slate-300 cursor-not-allowed opacity-50'
+                                                }
+                                            `}
+                                        >
+                                            <span className="text-sm">
+                                                {step.id}. {t(step.labelKey)}
+                                            </span>
+                                            {isReached && !isCurrent && session.currentStep > step.id && (
+                                                <Check size={14} className="text-blue-500" />
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* CENTER: Stepper (Desktop Only) */}
@@ -210,15 +288,18 @@ const StudyLayoutContent: React.FC = () => {
                                     )}
 
                                     {/* Step Node */}
-                                    <div
+                                    <button
+                                        type="button"
+                                        onClick={() => handleStepClick(step.id)}
+                                        disabled={status === 'upcoming'}
                                         className={`
                            w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
                            ${
                                status === 'current'
                                    ? 'border-blue-600 text-blue-600 bg-white shadow-sm ring-4 ring-blue-50'
                                    : status === 'completed'
-                                     ? 'bg-blue-600 border-blue-600 text-white'
-                                     : 'border-slate-200 bg-slate-50 text-slate-300'
+                                     ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:scale-110 cursor-pointer'
+                                     : 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed'
                            }
                        `}
                                     >
@@ -229,7 +310,7 @@ const StudyLayoutContent: React.FC = () => {
                                         ) : (
                                             <div className="w-2 h-2 bg-slate-300 rounded-full" />
                                         )}
-                                    </div>
+                                    </button>
 
                                     {/* Label (Current Only) */}
                                     {status === 'current' && (

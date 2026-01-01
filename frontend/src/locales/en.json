@@ -145,7 +145,8 @@
             "validate": "Confirm Sort",
             "finish": "Finish sorting",
             "ready": "Review overview",
-            "not_ready": "Place all statements to continue"
+            "not_ready": "Place all statements to continue",
+            "review": "Review my summary"
         },
         "workbench": {
             "active_card": "Active Statement",

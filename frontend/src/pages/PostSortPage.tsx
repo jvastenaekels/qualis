@@ -168,7 +168,7 @@ const PostSortPage: React.FC = () => {
             return;
         }
         setValidationError(null);
-        await submit();
+        navigate(`/study/${slug}/summary`);
     };
 
     // Success View
@@ -339,10 +339,10 @@ const PostSortPage: React.FC = () => {
                         )}
                     </p>
 
-                    {/* Dropdown to add */}
-                    <div className="flex gap-2">
+                    {/* Dropdown to add - Ensure it's fully responsive */}
+                    <div className="w-full overflow-hidden">
                         <select
-                            className="flex-1 min-w-0 max-w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white truncate pr-8"
+                            className="w-full min-w-0 p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white truncate pr-10"
                             onChange={(e) => {
                                 if (e.target.value) {
                                     const id = parseInt(e.target.value, 10);
@@ -353,7 +353,6 @@ const PostSortPage: React.FC = () => {
                                         }
                                         // Reset select
                                         e.target.value = '';
-                                        // Scroll to new card logic could go here
                                     }
                                 }
                             }}
@@ -362,16 +361,14 @@ const PostSortPage: React.FC = () => {
                             <option value="" disabled>
                                 {t(
                                     'post.optional.select_placeholder',
-                                    'Select a statement to comment...'
+                                    'Select a statement...'
                                 )}
                             </option>
                             {responses.qsort
                                 .filter((s) => {
-                                    // Exclude extremes (they are handled above)
                                     const isExtreme = extremeCards.some(
                                         (e) => e.statementId === s.statementId
                                     );
-                                    // Exclude already commented/added (check if key exists in card_comments)
                                     const isAdded =
                                         responses.postsort.card_comments &&
                                         Object.hasOwn(
@@ -383,7 +380,7 @@ const PostSortPage: React.FC = () => {
                                 .sort((a, b) => a.statementId - b.statementId)
                                 .map((s) => (
                                     <option key={s.statementId} value={s.statementId}>
-                                        {`S${s.statementId}: ${getCardText(s.statementId).substring(0, 50)}...`}
+                                        {`S${s.statementId}: ${getCardText(s.statementId).substring(0, 35)}${getCardText(s.statementId).length > 35 ? '...' : ''}`}
                                     </option>
                                 ))}
                         </select>
@@ -505,20 +502,25 @@ const PostSortPage: React.FC = () => {
                     />
                 </div>
 
-                {/* SUBMIT BUTTON */}
                 <div className="flex justify-center pt-8">
                     <button
                         type="button"
-                        onClick={handleSubmit}
+                        onClick={() => submit()}
                         disabled={isLoading}
                         className="
-                            bg-blue-600 text-white px-8 py-3 rounded-full font-bold text-lg shadow-lg
-                            hover:bg-blue-700 hover:shadow-xl hover:scale-105 transition-all duration-300
+                            bg-indigo-600 text-white px-8 py-4 rounded-2xl font-black text-lg shadow-lg
+                            hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 transition-all duration-300
                             flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed
                         "
                     >
-                        <span>{isLoading ? t('common.submitting') : t('post.submit')}</span>
-                        {!isLoading && <Check size={20} strokeWidth={3} />}
+                        {isLoading ? (
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                        ) : (
+                            <>
+                                <span>{t('post.submit')}</span>
+                                <Check size={20} strokeWidth={3} />
+                            </>
+                        )}
                     </button>
                 </div>
             </div>
