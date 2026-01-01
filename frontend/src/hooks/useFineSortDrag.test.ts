@@ -29,6 +29,7 @@ describe('useFineSortDrag', () => {
             moveCardInGrid: vi.fn(),
             swapCardsInGrid: vi.fn(),
             unplaceCard: vi.fn(),
+            categorizeCard: vi.fn(),
         },
         statements: [{ id: 1, text: 'Card 1' }],
     };
@@ -80,5 +81,33 @@ describe('useFineSortDrag', () => {
 
         expect(defaultProps.actions.placeCardInGrid).toHaveBeenCalledWith(1, 0, 0);
         expect(onSelectionChange).toHaveBeenCalledWith(null);
+    });
+
+    it('handles Return to Pile (Deck Drop) correctly', () => {
+        const { result } = renderHook(() => useFineSortDrag(defaultProps as any));
+
+        const event = {
+            active: { id: 1 },
+            over: { id: 'deck-agree' },
+        };
+
+        result.current.handleDragEnd(event as any);
+
+        expect(defaultProps.actions.unplaceCard).toHaveBeenCalledWith(1);
+        expect(defaultProps.actions.categorizeCard).toHaveBeenCalledWith(1, 'agree');
+    });
+
+    it('handles Return to Pile (Deck Disagree) correctly', () => {
+        const { result } = renderHook(() => useFineSortDrag(defaultProps as any));
+
+        const event = {
+            active: { id: 2 },
+            over: { id: 'deck-disagree' },
+        };
+
+        result.current.handleDragEnd(event as any);
+
+        expect(defaultProps.actions.unplaceCard).toHaveBeenCalledWith(2);
+        expect(defaultProps.actions.categorizeCard).toHaveBeenCalledWith(2, 'disagree');
     });
 });

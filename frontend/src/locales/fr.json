@@ -156,7 +156,7 @@
             "help": "Comment faire ?",
             "methodology": {
                 "extremes": "Astuce : Commencez par placer ce qui est le plus évident pour vous (aux extrémités).",
-                "vertical": "Dans une même colonne, l'ordre de haut en bas n'a pas d'importance. C'est juste la colonne qui compte.",
+                "vertical": "Dans une même colonne, l'ordre de haut en bas n'a pas d'importance. Seul l'ordre de gauche à droite compte.",
                 "constraint": "Il faut tout caser ! C'est parfois un casse-tête, mais c'est le jeu pour nous forcer à prioriser."
             }
         }
