@@ -103,7 +103,7 @@
     "rough": {
         "header": {
             "title": "What is your stance on this statement?",
-            "subtitle": "Swipe **Left** to Disagree, **Right** to Agree, or **Down** to be Neutral.",
+            "subtitle": "Swipe **left** to Disagree, **right** to Agree, or **down** to be Neutral.",
             "hint": "Trust your **instinct**. This is spontaneous — you can change your mind right after."
         },
         "complete": {
@@ -116,14 +116,12 @@
     },
     "fine": {
         "header": {
-            "title": "Organize the grid according to your feelings",
-            "mobile_title": "Fill the grid with your feelings"
+            "title": "Sort the statements on the grid according to your feelings",
+            "mobile_title": "Sort the statements on the grid according to your feelings"
         },
         "deck": {
             "title": "Available Statements",
-            "all_placed": "All statements in this pile are placed",
-            "reset": "Reset",
-            "confirm_reset": "Do you want to restart placement on the grid? Statements will return to the pile."
+            "all_placed": "All statements in this pile are sorted"
         },
         "toolbar": {
             "preview": "Statement Preview",
@@ -174,7 +172,7 @@
             "label_disagree": "Strongest Disagreement"
         },
         "optional": {
-            "title": "Additional Comments (Optional)",
+            "title": "Additional Comments (optional)",
             "description": "Feel free to add comments to any other statement if you wish to elaborate on your choices.",
             "select_placeholder": "Select a statement to comment...",
             "placeholder": "Your comment here..."

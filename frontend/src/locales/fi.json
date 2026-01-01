@@ -117,13 +117,11 @@
     "fine": {
         "header": {
             "title": "Järjestä ruudukko tuntemuksesi mukaan",
-            "mobile_title": "Täytä ruudukko tuntemustesi mukaan"
+            "mobile_title": "Järjestä ruudukko tuntemuksesi mukaan"
         },
         "deck": {
             "title": "Vapaat väitteet",
-            "all_placed": "Kaikki väitteet on sijoitettu",
-            "reset": "Nollaa pino",
-            "confirm_reset": "Haluatko aloittaa ruudukon sijoittelun alusta? Väitteet palautuvat pinoon."
+            "all_placed": "Kaikki väitteet on lajiteltu"
         },
         "toolbar": {
             "preview": "Väitteen esikatselu",
@@ -172,6 +170,12 @@
             "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",
             "label_agree": "Vahvimmin samaa mieltä",
             "label_disagree": "Vahvimmin eri mieltä"
+        },
+        "optional": {
+            "title": "Lisäkommentit (valinnainen)",
+            "description": "Voit vapaasti kommentoida muita väitteitä tarkentaaksesi valintojasi.",
+            "select_placeholder": "Valitse kommentoitava väite...",
+            "placeholder": "Kommenttisi tähän..."
         },
         "missing": {
             "label": "Onko jotain tärkeää näkökulmassasi, jota ei tavoitettu?",
