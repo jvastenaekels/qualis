@@ -116,8 +116,7 @@
     },
     "fine": {
         "header": {
-            "title": "Sort the statements on the grid according to your feelings",
-            "mobile_title": "Sort the statements on the grid according to your feelings"
+            "title": "Sort the statements on the grid according to your unique and personal experience"
         },
         "deck": {
             "title": "Available Statements",
@@ -165,7 +164,7 @@
         "title": "To conclude",
         "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
         "extreme": {
-            "why": "Why is this statement particularly significant to your perspective?",
+            "why": "Why did you choose to place this statement here? How is it significant to you?",
             "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
             "min_chars": "A few words are enough to help us understand the context.",
             "label_agree": "Strongest Agreement",

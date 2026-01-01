@@ -116,8 +116,7 @@
     },
     "fine": {
         "header": {
-            "title": "Järjestä ruudukko tuntemuksesi mukaan",
-            "mobile_title": "Järjestä ruudukko tuntemuksesi mukaan"
+            "title": "Järjestä väittämät ruudukkoon ainutlaatuisen ja henkilökohtaisen kokemuksesi mukaan"
         },
         "deck": {
             "title": "Vapaat väitteet",
@@ -165,7 +164,7 @@
         "title": "Lopuksi",
         "description": "Olet melkein valmis! Kommenttisi merkittävimmistä väitteistä ovat erittäin tärkeitä analyysillemme.",
         "extreme": {
-            "why": "Mikä tekee tästä väitteestä erityisen merkittävän näkökulmasi kannalta?",
+            "why": "Miksi valitsit tämän väittämän juuri tähän? Miten se on merkityksellinen sinulle?",
             "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
             "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",
             "label_agree": "Vahvimmin samaa mieltä",

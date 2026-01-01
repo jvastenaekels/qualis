@@ -289,7 +289,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             <ReactMarkdown
                                 components={{ p: ({ children }) => <span>{children}</span> }}
                             >
-                                {isMobile ? t('fine.header.mobile_title') : t('fine.header.title')}
+                                {t('fine.header.title')}
                             </ReactMarkdown>
                         </div>
                     </div>
