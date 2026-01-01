@@ -4,6 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+import { useDroppable } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
 import { Check, Frown, Meh, RotateCcw, Smile, Target, ZoomIn, ZoomOut } from 'lucide-react';
 // Imports
@@ -18,6 +19,36 @@ import type { InteractionUtils } from '../types/grid';
 import DroppableSlot from './DroppableSlot';
 import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
+
+// Sub-component: Droppable Pile
+const DroppablePile: React.FC<{
+    id: string;
+    children: React.ReactNode;
+    className: string;
+    onClick: () => void;
+    active?: boolean;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>> = ({
+    id,
+    children,
+    className,
+    onClick,
+    active,
+    ...props
+}) => {
+    const { setNodeRef, isOver } = useDroppable({ id });
+
+    return (
+        <button
+            ref={setNodeRef}
+            type="button"
+            onClick={onClick}
+            className={`${className} ${isOver && !active ? 'ring-2 ring-blue-400 bg-blue-50/80 scale-105' : ''}`}
+            {...props}
+        >
+            {children}
+        </button>
+    );
+};
 
 interface GridSortProps {
     agreeCards: { id: number; text: string; code?: string }[];
@@ -519,22 +550,22 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 const style = pileStyles[pile];
 
                                 return (
-                                    <button
+                                    <DroppablePile
                                         key={pile}
-                                        type="button"
+                                        id={`deck-${pile}`}
+                                        className={`relative group flex-1 min-w-[70px] h-12 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
+                                      ${isActive ? `${style.activeBg} shadow-md scale-105 z-10` : 'bg-white border-slate-200 opacity-80'}
+                                    `}
                                         onClick={() => {
                                             setActivePile(pile as PileType);
-                                            // Only trigger zonal focus/zoom on mobile
                                             if (isMobile) {
                                                 setHasPerformedZonalFocus(true);
                                             }
                                         }}
+                                        active={isActive}
                                         role="tab"
                                         aria-selected={isActive}
                                         aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
-                                        className={`relative group flex-1 min-w-[70px] h-12 lg:h-auto lg:aspect-[4/5] rounded-lg border-2 shadow-sm transition-all duration-200 flex flex-col items-center justify-center p-1
-                                      ${isActive ? `${style.activeBg} shadow-md scale-105 z-10` : 'bg-white border-slate-200 opacity-80'}
-                                    `}
                                     >
                                         <Icon size={24} className={`lg:hidden ${style.icon}`} />
                                         <span
@@ -554,7 +585,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                         >
                                             {cards.length}
                                         </motion.span>
-                                    </button>
+                                    </DroppablePile>
                                 );
                             })}
                         </div>
@@ -584,7 +615,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     </motion.div>
                     {/* PANEL FOOTER: Guidance or Validation */}
                     <div className="flex-none p-4 border-t border-indigo-100 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
-                        {isAllPlaced && !selectedCardId ? (
+                        {isAllPlaced ? (
                             <button
                                 type="button"
                                 onClick={onValidate}
@@ -610,7 +641,9 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                 1
                                             </span>
                                             <span className="text-xs font-bold uppercase tracking-wide">
-                                                {t('fine.workbench.initial_instruction')}
+                                                {isAllPlaced // Fallback if selectedId prevents button
+                                                    ? t('fine.actions.finish')
+                                                    : t('fine.workbench.initial_instruction')}
                                             </span>
                                         </>
                                     )}

@@ -53,8 +53,14 @@ const FineSortPage: React.FC = () => {
         rough: state.rough,
         qsort: state.qsort,
     }));
-    const { placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard, resetFineSort } =
-        useResponseStore();
+    const {
+        placeCardInGrid,
+        moveCardInGrid,
+        swapCardsInGrid,
+        unplaceCard,
+        resetFineSort,
+        categorizeCard,
+    } = useResponseStore();
 
     const setStep = useSessionStore((state) => state.setStep);
     const navigate = useNavigate();
@@ -221,8 +227,9 @@ const FineSortPage: React.FC = () => {
             moveCardInGrid,
             swapCardsInGrid,
             unplaceCard,
+            categorizeCard,
         }),
-        [placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard]
+        [placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard, categorizeCard]
     );
 
     const handlePan = useCallback(() => setPanVersion((v) => v + 1), []);

@@ -27,6 +27,7 @@ interface Actions {
     moveCardInGrid: (id: number, col: number, row: number) => void;
     swapCardsInGrid: (id1: number, id2: number) => void;
     unplaceCard: (id: number) => void;
+    categorizeCard: (id: number, category: 'agree' | 'disagree' | 'neutral') => void;
 }
 
 interface UseFineSortDragProps {
@@ -142,7 +143,18 @@ export const useFineSortDrag = ({
             const cardId = active.id as number;
             let overIdString = String(over.id);
 
-            // If dropped on another card, resolve to its slot
+            // 1. Check for Deck Drop (Return to Pile)
+            if (overIdString.startsWith('deck-')) {
+                const category = overIdString.replace('deck-', '') as
+                    | 'agree'
+                    | 'neutral'
+                    | 'disagree';
+                actions.unplaceCard(cardId);
+                actions.categorizeCard(cardId, category);
+                return;
+            }
+
+            // 2. If dropped on another card, resolve to its slot
             if (!overIdString.startsWith('slot_')) {
                 const cardIdAtOver = over.id as number;
                 const placedCard = responses.qsort.find((c) => c.statementId === cardIdAtOver);
@@ -151,6 +163,7 @@ export const useFineSortDrag = ({
                 }
             }
 
+            // 3. Slot Placement
             if (overIdString.startsWith('slot_')) {
                 const parts = overIdString.split('_');
                 if (parts.length === 3) {
@@ -160,7 +173,7 @@ export const useFineSortDrag = ({
                 }
             }
         },
-        [responses.qsort, handlePlacement, cleanupInteraction]
+        [responses.qsort, handlePlacement, cleanupInteraction, actions]
     );
 
     const handleCardClick = useCallback(
