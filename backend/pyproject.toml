@@ -53,3 +53,15 @@ known_first_party = ["app"]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiosqlite", "aiofiles", "gunicorn", "uvicorn", "python-multipart"]
+
+[tool.importlinter]
+root_package = "app"
+
+[[tool.importlinter.contracts]]
+name = "Three tier architecture"
+type = "layers"
+layers = [
+    "app.routers",
+    "app.services",
+    "app.models"
+]
