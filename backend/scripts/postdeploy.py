@@ -44,7 +44,8 @@ def main():
     run_task("init_db.py", "Infrastructure Initialization")
 
     # 2. Ensure Database Schema (Legacy/Manual Migrations)
-    run_task("scripts/ensure_schema.py", "Schema Verification")
+    run_task("scripts/ensure_schema.py", "Schema Verification (Legacy)")
+    run_task("scripts/migrate_001_add_ui_labels.py", "Migration 001: UI Labels")
 
     # 3. Sync Study Configuration (Idempotent: Create or Update)
     if os.path.exists("data/example-study.json"):

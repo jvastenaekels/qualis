@@ -194,6 +194,7 @@ const RoughSortPage: React.FC = () => {
 
                 <div className="flex flex-col gap-4 mt-4 items-center">
                     <button
+                        type="button"
                         onClick={() => navigate(`/study/${slug}/fine-sort`)}
                         className="px-8 py-3 bg-blue-600 text-white rounded-md font-bold text-base hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 animate-pulse hover:animate-none transition-all w-full sm:w-auto"
                     >
@@ -201,6 +202,7 @@ const RoughSortPage: React.FC = () => {
                     </button>
 
                     <button
+                        type="button"
                         onClick={undoRoughSort}
                         className="px-6 py-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm font-medium"
                     >
@@ -257,7 +259,9 @@ const RoughSortPage: React.FC = () => {
                                         </ReactMarkdown>
                                     </div>
                                     <button
+                                        type="button"
                                         onClick={() => setShowTip(false)}
+                                        aria-label="Close tip"
                                         className="p-1 text-yellow-600 hover:text-yellow-800 rounded-full hover:bg-yellow-100 transition-colors flex-none"
                                     >
                                         <X size={14} />
@@ -283,6 +287,7 @@ const RoughSortPage: React.FC = () => {
                         onClick={() => handleVote('disagree')}
                         className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-1"
                         aria-label={t('common.disagree')}
+                        aria-keyshortcuts="ArrowLeft"
                     >
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
                             <Frown
@@ -342,6 +347,7 @@ const RoughSortPage: React.FC = () => {
                         onClick={() => handleVote('agree')}
                         className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-1"
                         aria-label={t('common.agree')}
+                        aria-keyshortcuts="ArrowRight"
                     >
                         <div className="flex flex-col items-center gap-0.5 sm:gap-1">
                             <Smile
@@ -366,6 +372,7 @@ const RoughSortPage: React.FC = () => {
                         onClick={() => handleVote('neutral')}
                         className="w-auto min-w-[160px] max-w-[240px] px-8 sm:max-w-none sm:w-[18.2rem] h-16 sm:h-[5.6rem] rounded-2xl bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
                         aria-label={t('common.neutral')}
+                        aria-keyshortcuts="ArrowDown"
                     >
                         <div className="flex items-center gap-2 text-gray-600">
                             <Meh size={20} strokeWidth={2.5} className="opacity-80" />
@@ -379,9 +386,11 @@ const RoughSortPage: React.FC = () => {
                     </motion.button>
 
                     <button
+                        type="button"
                         onClick={undoRoughSort}
                         disabled={responses.rough.history.length === 0}
                         className="flex items-center gap-2 px-6 py-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-0 transition-all text-xs font-bold uppercase tracking-widest"
+                        aria-keyshortcuts="z"
                     >
                         <RotateCcw size={14} />
                         {t('common.undo')}
@@ -424,6 +433,7 @@ const RoughSortPage: React.FC = () => {
                             </div>
                             <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
                                 <button
+                                    type="button"
                                     onClick={() => setHoveredCard(null)}
                                     className="px-6 py-2 bg-slate-900 text-white rounded-full font-bold text-sm tracking-wide hover:bg-slate-800 transition-colors"
                                 >

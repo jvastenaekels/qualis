@@ -1,0 +1,123 @@
+
+> open-q@0.0.0 test
+> vitest --run --coverage
+
+
+[1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/home/julien/open-q/frontend[39m
+      [2mCoverage enabled with [22m[33mv8[39m
+
+ [32m✓[39m src/pages/PreSortPage.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 855[2mms[22m[39m
+     [33m[2m✓[22m[39m submits valid form data [33m 301[2mms[22m[39m
+ [32m✓[39m src/components/SortingAnimation.test.tsx [2m([22m[2m5 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[33m 540[2mms[22m[39m
+ [32m✓[39m src/pages/ConsentPage.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 792[2mms[22m[39m
+     [33m[2m✓[22m[39m submits consent and navigates to presort [33m 388[2mms[22m[39m
+ [32m✓[39m src/layouts/StudyLayout.test.tsx [2m([22m[2m12 tests[22m[2m)[22m[33m 1149[2mms[22m[39m
+     [33m[2m✓[22m[39m Updates Store when UI Language Button is clicked [33m 308[2mms[22m[39m
+ [32m✓[39m src/components/GridSort.layout.test.tsx [2m([22m[2m7 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m[33m 826[2mms[22m[39m
+     [33m[2m✓[22m[39m renders the correct number of slots based on capacity [33m 318[2mms[22m[39m
+ [32m✓[39m src/components/GridSort.pedagogy.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[33m 686[2mms[22m[39m
+     [33m[2m✓[22m[39m renders the Objective Bar with Target icon and title [33m 405[2mms[22m[39m
+ [32m✓[39m src/pages/PostSortPage.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[33m 1680[2mms[22m[39m
+     [33m[2m✓[22m[39m shows validation error for short comments on submit [33m 343[2mms[22m[39m
+     [33m[2m✓[22m[39m persists comments when re-navigating [33m 354[2mms[22m[39m
+ [32m✓[39m src/pages/WelcomePage.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 1177[2mms[22m[39m
+     [33m[2m✓[22m[39m renders study details (title, subtitle, description, objective) [33m 338[2mms[22m[39m
+ [32m✓[39m src/components/GridSort.interactions.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1668[2mms[22m[39m
+     [33m[2m✓[22m[39m defaults to disagree pile and switches piles correctly [33m 969[2mms[22m[39m
+ [32m✓[39m src/pages/FineSortPage.desktop.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 1141[2mms[22m[39m
+     [33m[2m✓[22m[39m organizes deck cards in two columns on desktop [33m 1118[2mms[22m[39m
+ [32m✓[39m src/pages/FineSortPage.mobile.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[33m 2119[2mms[22m[39m
+     [33m[2m✓[22m[39m displays the precise "empty pile" message when a category is fully placed [33m 1531[2mms[22m[39m
+     [33m[2m✓[22m[39m allows "Tap-to-Swap" interaction: Select Card -> Tap Occupied Slot -> Swap [33m 564[2mms[22m[39m
+ [32m✓[39m src/tests/Navigation.integration.test.tsx [2m([22m[2m1 test[22m[2m)[22m[33m 507[2mms[22m[39m
+     [33m[2m✓[22m[39m navigates forward and backward correctly [33m 488[2mms[22m[39m
+ [32m✓[39m src/components/MethodologyTips.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 228[2mms[22m[39m
+ [32m✓[39m src/components/ReadingZone.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 176[2mms[22m[39m
+ [32m✓[39m src/components/SourceDeck.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 151[2mms[22m[39m
+ [32m✓[39m src/pages/LandingPage.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 392[2mms[22m[39m
+ [32m✓[39m src/AppRouter.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 300[2mms[22m[39m
+ [32m✓[39m src/hooks/useStudyConfig.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 118[2mms[22m[39m
+ [32m✓[39m src/pages/RoughSortPage.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 577[2mms[22m[39m
+ [32m✓[39m src/pages/FineSortPage.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 413[2mms[22m[39m
+     [33m[2m✓[22m[39m does not show validation button when not all cards are placed [33m 344[2mms[22m[39m
+ [32m✓[39m src/components/SortableCard.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 459[2mms[22m[39m
+ [32m✓[39m src/pages/FineSortPage.integration.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 190[2mms[22m[39m
+ [32m✓[39m src/pages/StudyStatusPage.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 193[2mms[22m[39m
+ [32m✓[39m src/hooks/useSubmitStudy.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 117[2mms[22m[39m
+ [32m✓[39m src/api/mutator.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m src/hooks/useScaleToFit.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 125[2mms[22m[39m
+ [32m✓[39m src/components/CardPile.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 210[2mms[22m[39m
+ [32m✓[39m src/pages/RoughSortPage.integration.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 290[2mms[22m[39m
+ [32m✓[39m src/pages/ErrorPage.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 393[2mms[22m[39m
+ [32m✓[39m src/pages/ResetPage.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 117[2mms[22m[39m
+ [32m✓[39m src/components/DroppableSlot.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 124[2mms[22m[39m
+ [32m✓[39m src/store/useResponseStore.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 83[2mms[22m[39m
+ [32m✓[39m src/components/CardStack.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 252[2mms[22m[39m
+ [32m✓[39m src/api/client.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 95[2mms[22m[39m
+ [32m✓[39m src/hooks/useFineSortDrag.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 105[2mms[22m[39m
+ [32m✓[39m src/utils/i18nOverrides.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m src/store/roughSort.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m src/store/atomicStores.test.ts [2m([22m[2m9 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/store/useSessionStore.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [2m[90m↓[39m[22m src/components/GridSort.mobile-layout.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[33m3 skipped[39m[2m)[22m
+
+[2m Test Files [22m [1m[32m39 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (40)[39m
+[2m      Tests [22m [1m[32m168 passed[39m[22m[2m | [22m[33m9 skipped[39m[90m (177)[39m
+[2m   Start at [22m 10:33:33
+[2m   Duration [22m 16.61s[2m (transform 6.35s, setup 30.98s, import 42.41s, tests 18.38s, environment 42.03s)[22m
+
+[34m % [39m[2mCoverage report from [22m[33mv8[39m
+-------------------|---------|----------|---------|---------|-------------------
+File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+-------------------|---------|----------|---------|---------|-------------------
+All files          |   71.88 |     59.1 |   80.28 |   73.67 |
+ api               |   96.42 |    93.75 |     100 |     100 |
+  client.ts        |    92.3 |    93.33 |     100 |     100 | 40
+  mutator.ts       |     100 |    94.11 |     100 |     100 | 50
+ components        |   76.24 |    64.63 |    80.8 |   76.71 |
+  CardPile.tsx     |     100 |      100 |     100 |     100 |
+  CardStack.tsx    |    53.7 |    31.57 |   63.63 |   48.97 | ...98,117,174-175
+  ...pableSlot.tsx |     100 |      100 |     100 |     100 |
+  ...rBoundary.tsx |   17.64 |       10 |      50 |   17.64 | 28-57,64
+  GridSort.tsx     |    92.1 |    90.24 |     100 |   95.23 | 139-140,146
+  ...ologyTips.tsx |     100 |      100 |     100 |     100 |
+  ReadingZone.tsx  |   96.15 |       72 |    87.5 |   95.45 | 46
+  SortableCard.tsx |   74.46 |    66.07 |   77.77 |   76.19 | ...14,131-132,207
+  ...Animation.tsx |   74.41 |    49.13 |   65.51 |   77.47 | ...62,174,449-455
+  SourceDeck.tsx   |     100 |     87.5 |     100 |     100 | 47
+ contexts          |     100 |      100 |     100 |     100 |
+  ...xt.context.ts |     100 |      100 |     100 |     100 |
+  ...utContext.tsx |     100 |      100 |     100 |     100 |
+ hooks             |   53.62 |    42.36 |   71.05 |   54.31 |
+  ...Management.ts |   94.73 |       75 |     100 |   94.11 | 34
+  ...nteraction.ts |   17.97 |     5.45 |   33.33 |   19.04 | ...-84,92-141,153
+  ...neSortDrag.ts |   66.66 |    45.83 |      60 |   72.09 | ...,91-94,112-115
+  ...tudyConfig.ts |     100 |      100 |     100 |     100 |
+  ...lculations.ts |   45.09 |     42.3 |   55.55 |      50 | 40-63,82-84
+  ...dPlacement.ts |   85.71 |    81.81 |    87.5 |   85.71 | 51-54,89
+  useGridZoom.ts   |   25.19 |    19.29 |   46.15 |   25.43 | ...36-145,167-244
+  useLayout.ts     |      80 |       50 |     100 |      80 | 13,21
+  useScaleToFit.ts |      96 |    81.81 |     100 |     100 | 18,49
+  ...tudyConfig.ts |   83.33 |    73.52 |     100 |   84.61 | 34-35,68-69,71,73
+  ...ubmitStudy.ts |     100 |    71.42 |     100 |     100 | 37,49-85
+ layouts           |   93.22 |    86.07 |   94.11 |   92.85 |
+  StudyLayout.tsx  |   93.22 |    86.07 |   94.11 |   92.85 | 60-61,94,128
+ pages             |   77.54 |    56.55 |   78.85 |   80.61 |
+  ConsentPage.tsx  |   97.82 |    65.38 |     100 |     100 | ...,77-89,153,168
+  ErrorPage.tsx    |   88.46 |    73.17 |      60 |   88.46 | 53,144-164
+  FineSortPage.tsx |   63.28 |    38.37 |   69.76 |   66.03 | ...64-282,295,298
+  LandingPage.tsx  |     100 |       50 |     100 |     100 | 20
+  PostSortPage.tsx |   76.64 |    58.82 |    77.5 |   78.81 | ...00-404,411-453
+  PreSortPage.tsx  |   91.93 |    58.53 |     100 |   96.22 | 104-105
+  ResetPage.tsx    |     100 |      100 |     100 |     100 |
+  ...hSortPage.tsx |   69.29 |    56.16 |    72.5 |   73.26 | ...97,260,399-427
+  ...tatusPage.tsx |     100 |       80 |     100 |     100 | 78
+  WelcomePage.tsx  |   88.88 |    76.92 |   81.81 |    90.9 | 95-98
+ store             |    87.5 |    65.38 |   90.19 |    95.6 |
+  ...onfigStore.ts |      75 |      100 |   71.42 |   83.33 | 26
+  ...ponseStore.ts |   86.36 |    65.38 |   90.32 |   95.77 | 121,196-197
+  ...ssionStore.ts |     100 |      100 |     100 |     100 |
+  useUIStore.ts    |     100 |      100 |     100 |     100 |
+ utils             |     100 |      100 |     100 |     100 |
+  i18nOverrides.ts |     100 |      100 |     100 |     100 |
+-------------------|---------|----------|---------|---------|-------------------

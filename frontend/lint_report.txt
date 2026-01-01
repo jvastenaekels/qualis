@@ -1,0 +1,9 @@
+
+> open-q@0.0.0 lint
+> biome check src
+
+The number of diagnostics exceeds the limit allowed. Use --max-diagnostics to increase it.
+Diagnostics not shown: 64.
+Checked 169 files in 111ms. No fixes applied.
+Found 46 errors.
+Found 38 warnings.

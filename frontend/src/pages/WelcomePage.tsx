@@ -141,6 +141,7 @@ const WelcomePage: React.FC = () => {
             {/* Continue Button */}
             <div className="flex justify-center">
                 <button
+                    type="button"
                     onClick={handleContinue}
                     className="group w-full sm:w-auto px-10 py-4 bg-blue-600 text-white rounded-full font-bold text-lg hover:bg-blue-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3"
                 >
@@ -156,6 +157,7 @@ const WelcomePage: React.FC = () => {
             {(hasConsented || maxReachedStep > 1) && (
                 <div className="mt-6 flex justify-center">
                     <button
+                        type="button"
                         onClick={() => {
                             if (window.confirm(t('welcome.reset_confirm'))) {
                                 useSessionStore.getState().resetSession();

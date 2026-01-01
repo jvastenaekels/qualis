@@ -191,3 +191,101 @@ async def seed_study(db, test_user, test_workspace):
     study = result.scalar_one()
 
     return study
+
+
+@pytest_asyncio.fixture
+async def user_factory(db: AsyncSession):
+    """Factory to create dynamic test users."""
+
+    async def _create_user(email: str = None, password: str = TEST_PASSWORD) -> User:
+        import uuid
+
+        email = email or f"user_{uuid.uuid4()}@example.com"
+        hashed = get_password_hash(password)
+        user = User(email=email, hashed_password=hashed)
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        return user
+
+    return _create_user
+
+
+@pytest_asyncio.fixture
+async def workspace_factory(db: AsyncSession):
+    """Factory to create workspaces with specific owners."""
+
+    async def _create_workspace(owner: User, title: str = None) -> Workspace:
+        import uuid
+
+        title = title or f"Workspace {uuid.uuid4()}"
+        ws = Workspace(title=title, slug=f"ws-{uuid.uuid4()}")
+        db.add(ws)
+        await db.flush()
+
+        member = WorkspaceMember(
+            workspace_id=ws.id, user_id=owner.id, role=WorkspaceRole.admin
+        )
+        db.add(member)
+        await db.commit()
+        await db.refresh(ws)
+        return ws
+
+    return _create_workspace
+
+
+@pytest_asyncio.fixture
+async def study_factory(db: AsyncSession):
+    """Factory to create studies for specific workspaces."""
+
+    async def _create_study(
+        workspace: Workspace, owner: User, title: str = None
+    ) -> Study:
+        import uuid
+
+        slug = f"study-{uuid.uuid4()}"
+        study = Study(
+            slug=slug,
+            workspace_id=workspace.id,
+            state=StudyState.active,
+            grid_config=[{"score": 0, "capacity": 1}],
+            presort_config={},
+            postsort_config={},
+        )
+        db.add(study)
+        await db.commit()
+        await db.refresh(study)
+
+        # Add minimal translation
+        trans = StudyTranslation(
+            study_id=study.id,
+            language_code="en",
+            title=title or "Test Study",
+            description="Desc",
+            instructions="Instr",
+            consent_title="Yes",
+            consent_description="Legal",
+            consent_accept="Yes",
+            consent_decline="No",
+        )
+        db.add(trans)
+        await db.commit()
+        return study
+
+    return _create_study
+
+
+@pytest_asyncio.fixture
+def auth_token_factory():
+    """Create JWT token for a user."""
+    from datetime import timedelta
+
+    from app.utils.security import create_access_token
+
+    def _create_token(user: User):
+        token = create_access_token(
+            subject=user.email, expires_delta=timedelta(minutes=30)
+        )
+        return {"Authorization": f"Bearer {token}"}
+
+    return _create_token

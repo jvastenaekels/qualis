@@ -24,6 +24,7 @@
         "lint:deadcode": "knip",
         "lint:architecture": "depcruise src --include-only \"^src\" --config .dependency-cruiser.cjs",
         "visualize:deps": "madge --image graph.svg src",
+        "check:api": "orval && git diff --exit-code src/api/generated.ts",
         "generate:api": "orval"
     },
     "dependencies": {

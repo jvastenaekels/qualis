@@ -82,3 +82,10 @@ html {
     /* Hide scrollbar by default, show on hover/scrolling if possible,
      but standard utilities are usually enough for modern browsers */
 }
+
+@layer base {
+    /* Global Focus Ring for Keyboard Navigation */
+    :focus-visible {
+        @apply ring-4 ring-blue-400/50 outline-none;
+    }
+}
