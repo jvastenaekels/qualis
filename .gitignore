@@ -38,3 +38,4 @@ backend/.coverage
 backend/htmlcov/
 frontend/coverage/
 .coverage
+.agent/
