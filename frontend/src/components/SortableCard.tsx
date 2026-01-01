@@ -118,11 +118,21 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
         return (
             <div
                 ref={setNodeRef}
-                style={{ ...style, ...aspectStyle }}
                 {...attributes}
                 {...listeners}
+                role="button"
+                tabIndex={0}
+                style={{ ...style, ...aspectStyle }}
                 data-testid={`card-${id}`}
                 onPointerDown={handlePointerDown}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (!isDragging && onClick) {
+                            onClick();
+                        }
+                    }
+                }}
                 onClick={() => {
                     // Prevent event from bubbling if it's a drag activation
                     if (isDragging) return;

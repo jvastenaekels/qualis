@@ -25,4 +25,12 @@ export const handlers = [
     http.post('*/api/study/:slug/submit', () => {
         return HttpResponse.json({ confirmation_code: 'TEST-CODE' });
     }),
+
+    http.post('*/api/study/:slug/consent', () => {
+        return HttpResponse.json({ status: 'ok' });
+    }),
+
+    http.post('*/api/logs', () => {
+        return HttpResponse.json({ status: 'ok' });
+    }),
 ];

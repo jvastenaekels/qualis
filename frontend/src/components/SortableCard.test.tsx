@@ -34,19 +34,17 @@ vi.mock('framer-motion', () => ({
             style,
             ...props
         }: any) => (
-            <div
+            <button
+                type="button"
                 className={className}
                 onClick={onClick}
                 onMouseEnter={onMouseEnter}
                 onMouseLeave={onMouseLeave}
                 style={style}
                 data-testid={props['data-testid']}
-                role="button"
-                tabIndex={0}
-                onKeyDown={() => {}}
             >
                 {children}
-            </div>
+            </button>
         ),
     },
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,

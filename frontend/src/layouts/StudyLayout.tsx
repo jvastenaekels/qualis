@@ -248,6 +248,7 @@ const StudyLayoutContent: React.FC = () => {
                     {/* Language Selector (Globe Icon) */}
                     <div className="relative" ref={langMenuRef}>
                         <button
+                            type="button"
                             onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
                             className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
                             title="Change language"
@@ -267,6 +268,7 @@ const StudyLayoutContent: React.FC = () => {
                                     .map((lang) => (
                                         <button
                                             key={lang}
+                                            type="button"
                                             onClick={() => changeLanguage(lang)}
                                             className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${i18n.language.startsWith(lang) ? 'text-blue-600 font-semibold' : 'text-slate-700'}`}
                                         >

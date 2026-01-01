@@ -1,3 +1,5 @@
+"""Integration tests for workspace isolation."""
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,7 +18,7 @@ async def test_workspace_isolation_studies(
     # Setup: User A in Workspace A
     user_a = await user_factory()
     workspace_a = await workspace_factory(owner=user_a)
-    study_a = await study_factory(workspace=workspace_a, owner=user_a)
+    await study_factory(workspace=workspace_a, owner=user_a)
 
     # Setup: User B in Workspace B
     user_b = await user_factory()
@@ -52,7 +54,7 @@ async def test_workspace_isolation_invites(
 ):
     """Test that User A cannot invite members to Workspace B."""
     user_a = await user_factory()
-    workspace_a = await workspace_factory(owner=user_a)
+    await workspace_factory(owner=user_a)
 
     user_b = await user_factory()
     workspace_b = await workspace_factory(owner=user_b)

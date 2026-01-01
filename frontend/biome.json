@@ -36,7 +36,8 @@
                 "noNonNullAssertion": "warn"
             },
             "a11y": {
-                "recommended": false
+                "recommended": true,
+                "useSemanticElements": "off"
             }
         }
     },

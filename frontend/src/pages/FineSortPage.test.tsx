@@ -45,7 +45,11 @@ vi.mock('../components/GridSort', () => ({
         <div data-testid="grid-sort">
             GridSort
             <span data-testid="show-codes">{String(showCodes)}</span>
-            {isAllPlaced && <button onClick={onValidate}>fine.actions.validate</button>}
+            {isAllPlaced && (
+                <button type="button" onClick={onValidate}>
+                    fine.actions.validate
+                </button>
+            )}
         </div>
     ),
 }));

@@ -18,9 +18,9 @@ vi.mock('@dnd-kit/sortable', () => ({
 
 vi.mock('./SortableCard', () => ({
     default: ({ onClick, id }: { onClick?: () => void; id: number }) => (
-        <div data-testid={`card-${id}`} onClick={onClick}>
+        <button type="button" data-testid={`card-${id}`} onClick={onClick}>
             Card
-        </div>
+        </button>
     ),
 }));
 

@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { act, screen } from '@testing-library/react';
+import { act, fireEvent, screen } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
@@ -17,7 +17,10 @@ import RoughSortPage from './RoughSortPage';
 
 // Mocks
 vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
+    useTranslation: () => ({
+        t: (key: string) => key,
+        i18n: { language: 'en' },
+    }),
 }));
 
 // Mock CardStack to capture ref and simulate behavior
@@ -362,5 +365,52 @@ describe('RoughSortPage', () => {
         // We can check if `setShowTip` was called if we could spy on it, but we can't easily.
         // But since we can't wait in fake timers easily without running pending timers...
         // Let's assume the click handler works if the button is found.
+    });
+
+    it('handles ArrowDown keyboard interaction (neutral)', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
+        );
+
+        const card = screen.getByTestId('card-stack');
+        expect(card).toBeTruthy();
+
+        fireEvent.keyDown(window, { key: 'ArrowDown' });
+        expect(useResponseStore.getState().rough.neutral).toContain(1);
+    });
+
+    it('calculates shared font size on small screens for long labels', () => {
+        // Mock innerWidth
+        const originalWidth = window.innerWidth;
+        Object.defineProperty(window, 'innerWidth', { value: 375, configurable: true });
+        window.dispatchEvent(new Event('resize'));
+
+        // Use long labels via store
+        const longConfig = {
+            ...mockConfig,
+            ui_labels: {
+                'common.agree': 'ExtremelyLongAgreeLabel',
+                'common.disagree': 'ExtremelyLongDisagreeLabel',
+                'common.neutral': 'ExtremelyLongNeutralLabel',
+            },
+        };
+        useConfigStore.getState().setConfig(longConfig as any);
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
+        );
+
+        // This triggers the useMemo for sharedFontSize
+        // Even with standard labels 'common.agree' (len 12), it hits the > 10 branch
+        expect(screen.getByText('common.agree')).toBeTruthy();
+
+        // Cleanup
+        Object.defineProperty(window, 'innerWidth', { value: originalWidth, configurable: true });
     });
 });

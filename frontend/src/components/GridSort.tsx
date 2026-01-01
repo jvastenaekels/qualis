@@ -242,6 +242,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     >
                         <div className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md">
                             <button
+                                type="button"
                                 onClick={zoomIn}
                                 className="p-2 hover:bg-slate-100 rounded text-slate-600"
                                 aria-label={t('fine.toolbar.zoom_in')}
@@ -249,6 +250,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 <ZoomIn size={20} />
                             </button>
                             <button
+                                type="button"
                                 onClick={zoomOut}
                                 className="p-2 hover:bg-slate-100 rounded text-slate-600"
                                 aria-label={t('fine.toolbar.zoom_out')}
@@ -257,6 +259,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             </button>
                             <div className="h-px bg-slate-200 my-0.5"></div>
                             <button
+                                type="button"
                                 onClick={performAutoFit}
                                 className="p-2 hover:bg-slate-100 rounded text-slate-600"
                                 aria-label={t('fine.toolbar.fit_screen')}
@@ -287,6 +290,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                         ref={pyramidRef}
                                         className="flex flex-row gap-2 items-end flex-nowrap"
                                         role="grid"
+                                        tabIndex={0}
                                     >
                                         {gridColumns.map((col, colIndex) => (
                                             <div
@@ -306,12 +310,17 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                     </span>
                                                 </div>
 
-                                                <div className="flex flex-col gap-2" role="row">
+                                                <div
+                                                    className="flex flex-col gap-2"
+                                                    role="row"
+                                                    tabIndex={-1}
+                                                >
                                                     {Array.from({ length: col.capacity }).map(
                                                         (_, rowIndex) => (
                                                             <DroppableSlot
                                                                 key={`${colIndex}-${rowIndex}`}
                                                                 id={`slot_${colIndex}_${rowIndex}`}
+                                                                role="gridcell"
                                                                 onClick={() =>
                                                                     onSlotClick?.(
                                                                         colIndex,
@@ -449,6 +458,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 return (
                                     <button
                                         key={pile}
+                                        type="button"
                                         onClick={() => {
                                             setActivePile(pile as PileType);
                                             // Only trigger zonal focus/zoom on mobile
@@ -513,6 +523,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     <div className="flex-none p-4 border-t border-indigo-100 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
                         {isAllPlaced && !selectedCardId ? (
                             <button
+                                type="button"
                                 onClick={onValidate}
                                 className="w-full flex items-center justify-center gap-2 py-3 bg-green-600 text-white rounded-xl font-bold text-sm shadow-md hover:bg-green-700 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500"
                             >

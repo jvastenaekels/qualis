@@ -11,22 +11,33 @@ interface DroppableSlotProps extends React.HTMLAttributes<HTMLDivElement> {
     id: string; // Format: "col-row"
     isOver?: boolean;
     children?: React.ReactNode;
+    role?: string;
 }
 
 const DroppableSlot: React.FC<DroppableSlotProps> = React.memo(
-    ({ id, children, className, onClick, style, ...props }) => {
+    ({ id, children, className, onClick, style, role = 'button', ...props }) => {
         const { setNodeRef, isOver } = useDroppable({
             id,
         });
 
-        return (
-            <div
-                ref={setNodeRef}
-                onClick={onClick}
-                data-testid={id}
-                style={style} // Apply style
-                {...props}
-                className={`
+        const commonProps = {
+            ref: setNodeRef,
+            onClick,
+            onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    const pseudoEvent = {
+                        ...e,
+                        currentTarget: e.currentTarget,
+                        target: e.target,
+                    } as unknown as React.MouseEvent<HTMLDivElement>;
+                    onClick?.(pseudoEvent);
+                }
+            },
+            'data-testid': id,
+            style,
+            ...props,
+            className: `
         rounded-2xl border-2
         flex items-center justify-center
         transition-colors duration-200
@@ -39,8 +50,19 @@ const DroppableSlot: React.FC<DroppableSlotProps> = React.memo(
                   : 'bg-white/40 border-dashed border-slate-400/60 hover:bg-white/60 hover:border-slate-500 transition-all'
         }
         ${className || ''}
-      `}
-            >
+      `,
+        };
+
+        if (role === 'gridcell') {
+            return (
+                <div {...commonProps} role="gridcell" tabIndex={0}>
+                    {children}
+                </div>
+            );
+        }
+
+        return (
+            <div {...commonProps} role="button" tabIndex={0}>
                 {children}
             </div>
         );

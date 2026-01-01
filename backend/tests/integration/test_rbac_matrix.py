@@ -1,3 +1,5 @@
+"""Integration tests for RBAC matrix."""
+
 import pytest
 from httpx import AsyncClient
 

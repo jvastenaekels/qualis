@@ -1,3 +1,5 @@
+"""Integration tests for participant endpoints."""
+
 from uuid import UUID
 
 import pytest

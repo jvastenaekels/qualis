@@ -20,11 +20,11 @@ describe('useScaleToFit', () => {
         // biome-ignore lint/suspicious/noExplicitAny: Mocking global requires loose typing
         vi.stubGlobal(
             'ResizeObserver',
-            vi.fn((_callback) => ({
-                observe: vi.fn(),
-                disconnect: vi.fn(),
-                unobserve: vi.fn(),
-            }))
+            class {
+                observe = vi.fn();
+                disconnect = vi.fn();
+                unobserve = vi.fn();
+            }
         );
     });
 

@@ -197,7 +197,9 @@ async def seed_study(db, test_user, test_workspace):
 async def user_factory(db: AsyncSession):
     """Factory to create dynamic test users."""
 
-    async def _create_user(email: str = None, password: str = TEST_PASSWORD) -> User:
+    async def _create_user(
+        email: str | None = None, password: str = TEST_PASSWORD
+    ) -> User:
         import uuid
 
         email = email or f"user_{uuid.uuid4()}@example.com"
@@ -215,7 +217,7 @@ async def user_factory(db: AsyncSession):
 async def workspace_factory(db: AsyncSession):
     """Factory to create workspaces with specific owners."""
 
-    async def _create_workspace(owner: User, title: str = None) -> Workspace:
+    async def _create_workspace(owner: User, title: str | None = None) -> Workspace:
         import uuid
 
         title = title or f"Workspace {uuid.uuid4()}"
@@ -239,7 +241,7 @@ async def study_factory(db: AsyncSession):
     """Factory to create studies for specific workspaces."""
 
     async def _create_study(
-        workspace: Workspace, owner: User, title: str = None
+        workspace: Workspace, owner: User, title: str | None = None
     ) -> Study:
         import uuid
 

@@ -141,6 +141,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
                 <div className="flex flex-col gap-3 pt-2">
                     {showRetry && (
                         <button
+                            type="button"
                             onClick={onRetry || (() => window.location.reload())}
                             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
                         >
@@ -151,6 +152,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
 
                     {showReset && (
                         <button
+                            type="button"
                             onClick={handleReset}
                             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors shadow-sm"
                         >
@@ -161,6 +163,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
 
                     {showHome && (
                         <button
+                            type="button"
                             onClick={() => navigate('/')}
                             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
                         >

@@ -46,6 +46,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
         <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white/90 via-white/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-lg z-10">
             <div className="animate-bounce opacity-50">
                 <svg
+                    aria-hidden="true"
                     width="12"
                     height="12"
                     viewBox="0 0 24 24"

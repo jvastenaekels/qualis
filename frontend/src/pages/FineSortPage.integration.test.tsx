@@ -50,7 +50,11 @@ vi.mock('../components/GridSort', () => ({
     default: ({ isAllPlaced, onValidate }: { isAllPlaced: boolean; onValidate: () => void }) => (
         <div data-testid="grid-sort">
             GridSort
-            {isAllPlaced && <button onClick={onValidate}>fine.actions.validate</button>}
+            {isAllPlaced && (
+                <button type="button" onClick={onValidate}>
+                    fine.actions.validate
+                </button>
+            )}
         </div>
     ),
 }));

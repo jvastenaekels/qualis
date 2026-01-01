@@ -42,9 +42,8 @@ const CardPile: React.FC<CardPileProps> = ({ type, count, topCard }) => {
     const labelId = `pile-label-${type}`;
 
     return (
-        <div
+        <section
             className="relative w-24 h-32 sm:w-28 sm:h-36 flex flex-col items-center"
-            role="group"
             aria-labelledby={labelId}
         >
             {/* 1. Underlying Stack Visuals (Pseudo-depth) */}
@@ -66,6 +65,7 @@ const CardPile: React.FC<CardPileProps> = ({ type, count, topCard }) => {
                 ) : (
                     // Empty State
                     <div
+                        role="img"
                         className={`
                       w-full h-full rounded-2xl border-2 border-dashed ${config.borderColor} ${config.bgColor}
                       flex flex-col items-center justify-center gap-2 opacity-50
@@ -84,12 +84,12 @@ const CardPile: React.FC<CardPileProps> = ({ type, count, topCard }) => {
 
             {/* 3. Badge */}
             <div className="absolute -top-2 -right-2 z-20 pointer-events-none">
-                <div
+                <output
                     className="bg-slate-800 text-white text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full shadow-md min-w-[20px] text-center border border-white"
                     aria-label={`${count} ${t('common.cards', 'cards')}`}
                 >
                     {count}
-                </div>
+                </output>
             </div>
 
             {/* Label below */}
@@ -99,7 +99,7 @@ const CardPile: React.FC<CardPileProps> = ({ type, count, topCard }) => {
             >
                 {config.label}
             </div>
-        </div>
+        </section>
     );
 };
 
