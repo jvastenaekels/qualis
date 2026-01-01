@@ -4,13 +4,12 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-
+import type { StudyTranslationCreateSubtitle } from './studyTranslationCreateSubtitle';
+import type { StudyTranslationCreateObjective } from './studyTranslationCreateObjective';
+import type { StudyTranslationCreateConsentTitle } from './studyTranslationCreateConsentTitle';
+import type { StudyTranslationCreateConsentDescription } from './studyTranslationCreateConsentDescription';
 import type { StudyTranslationCreateConsentAccept } from './studyTranslationCreateConsentAccept';
 import type { StudyTranslationCreateConsentDecline } from './studyTranslationCreateConsentDecline';
-import type { StudyTranslationCreateConsentDescription } from './studyTranslationCreateConsentDescription';
-import type { StudyTranslationCreateConsentTitle } from './studyTranslationCreateConsentTitle';
-import type { StudyTranslationCreateObjective } from './studyTranslationCreateObjective';
-import type { StudyTranslationCreateSubtitle } from './studyTranslationCreateSubtitle';
 import type { StudyTranslationCreateUiLabels } from './studyTranslationCreateUiLabels';
 
 /**

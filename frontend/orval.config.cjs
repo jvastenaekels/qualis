@@ -9,6 +9,7 @@ module.exports = {
             schemas: 'src/api/model',
             client: 'react-query',
             mock: false,
+            prettier: true,
             override: {
                 mutator: {
                     path: './src/api/mutator.ts',

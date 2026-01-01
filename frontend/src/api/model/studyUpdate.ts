@@ -4,16 +4,15 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-
-import type { StudyUpdateDefaultLanguage } from './studyUpdateDefaultLanguage';
-import type { StudyUpdateGridConfig } from './studyUpdateGridConfig';
-import type { StudyUpdatePostsortConfig } from './studyUpdatePostsortConfig';
-import type { StudyUpdatePresortConfig } from './studyUpdatePresortConfig';
-import type { StudyUpdateShowStatementCodes } from './studyUpdateShowStatementCodes';
 import type { StudyUpdateSlug } from './studyUpdateSlug';
 import type { StudyUpdateState } from './studyUpdateState';
-import type { StudyUpdateStatements } from './studyUpdateStatements';
+import type { StudyUpdateGridConfig } from './studyUpdateGridConfig';
+import type { StudyUpdatePresortConfig } from './studyUpdatePresortConfig';
+import type { StudyUpdatePostsortConfig } from './studyUpdatePostsortConfig';
+import type { StudyUpdateDefaultLanguage } from './studyUpdateDefaultLanguage';
+import type { StudyUpdateShowStatementCodes } from './studyUpdateShowStatementCodes';
 import type { StudyUpdateTranslations } from './studyUpdateTranslations';
+import type { StudyUpdateStatements } from './studyUpdateStatements';
 
 /**
  * Schema for updating a study.

@@ -4,14 +4,13 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-
-import type { GridColumn } from './gridColumn';
-import type { StatementRead } from './statementRead';
-import type { StudyReadDefaultLanguage } from './studyReadDefaultLanguage';
-import type { StudyReadPostsortConfig } from './studyReadPostsortConfig';
-import type { StudyReadPresortConfig } from './studyReadPresortConfig';
 import type { StudyState } from './studyState';
+import type { GridColumn } from './gridColumn';
+import type { StudyReadPresortConfig } from './studyReadPresortConfig';
+import type { StudyReadPostsortConfig } from './studyReadPostsortConfig';
+import type { StudyReadDefaultLanguage } from './studyReadDefaultLanguage';
 import type { StudyTranslationRead } from './studyTranslationRead';
+import type { StatementRead } from './statementRead';
 
 /**
  * Schema for reading a study.

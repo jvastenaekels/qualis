@@ -4,14 +4,13 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-
-import type { GridColumn } from './gridColumn';
-import type { StatementCreate } from './statementCreate';
-import type { StudyCreateDefaultLanguage } from './studyCreateDefaultLanguage';
-import type { StudyCreatePostsortConfig } from './studyCreatePostsortConfig';
-import type { StudyCreatePresortConfig } from './studyCreatePresortConfig';
 import type { StudyState } from './studyState';
+import type { GridColumn } from './gridColumn';
+import type { StudyCreatePresortConfig } from './studyCreatePresortConfig';
+import type { StudyCreatePostsortConfig } from './studyCreatePostsortConfig';
+import type { StudyCreateDefaultLanguage } from './studyCreateDefaultLanguage';
 import type { StudyTranslationCreate } from './studyTranslationCreate';
+import type { StatementCreate } from './statementCreate';
 
 /**
  * Schema for creating a study.

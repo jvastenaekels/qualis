@@ -4,13 +4,12 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-
+import type { StudyTranslationReadSubtitle } from './studyTranslationReadSubtitle';
+import type { StudyTranslationReadObjective } from './studyTranslationReadObjective';
+import type { StudyTranslationReadConsentTitle } from './studyTranslationReadConsentTitle';
+import type { StudyTranslationReadConsentDescription } from './studyTranslationReadConsentDescription';
 import type { StudyTranslationReadConsentAccept } from './studyTranslationReadConsentAccept';
 import type { StudyTranslationReadConsentDecline } from './studyTranslationReadConsentDecline';
-import type { StudyTranslationReadConsentDescription } from './studyTranslationReadConsentDescription';
-import type { StudyTranslationReadConsentTitle } from './studyTranslationReadConsentTitle';
-import type { StudyTranslationReadObjective } from './studyTranslationReadObjective';
-import type { StudyTranslationReadSubtitle } from './studyTranslationReadSubtitle';
 import type { StudyTranslationReadUiLabels } from './studyTranslationReadUiLabels';
 
 /**

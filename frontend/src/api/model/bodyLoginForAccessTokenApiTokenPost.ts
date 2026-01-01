@@ -4,10 +4,9 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-
+import type { BodyLoginForAccessTokenApiTokenPostGrantType } from './bodyLoginForAccessTokenApiTokenPostGrantType';
 import type { BodyLoginForAccessTokenApiTokenPostClientId } from './bodyLoginForAccessTokenApiTokenPostClientId';
 import type { BodyLoginForAccessTokenApiTokenPostClientSecret } from './bodyLoginForAccessTokenApiTokenPostClientSecret';
-import type { BodyLoginForAccessTokenApiTokenPostGrantType } from './bodyLoginForAccessTokenApiTokenPostGrantType';
 
 export interface BodyLoginForAccessTokenApiTokenPost {
     grant_type?: BodyLoginForAccessTokenApiTokenPostGrantType;

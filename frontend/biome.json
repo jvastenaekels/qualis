@@ -18,9 +18,10 @@
         "lineWidth": 100,
         "attributePosition": "auto"
     },
-    "assist": { "actions": { "source": { "organizeImports": "on" } } },
+    "assist": { "enabled": false },
     "linter": {
         "enabled": true,
+        "includes": ["**", "!src/api/generated.ts", "!src/api/model/**"],
         "rules": {
             "recommended": true,
             "correctness": {

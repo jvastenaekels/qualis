@@ -4,11 +4,10 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-
+import type { SubmissionInputStatus } from './submissionInputStatus';
+import type { SubmissionInputPresortAnswers } from './submissionInputPresortAnswers';
 import type { QSortEntryInput } from './qSortEntryInput';
 import type { SubmissionInputPostsortAnswers } from './submissionInputPostsortAnswers';
-import type { SubmissionInputPresortAnswers } from './submissionInputPresortAnswers';
-import type { SubmissionInputStatus } from './submissionInputStatus';
 
 /**
  * Schema for the full study submission/completion.

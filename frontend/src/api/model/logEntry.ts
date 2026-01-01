@@ -4,10 +4,9 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-
-import type { LogEntryContext } from './logEntryContext';
 import type { LogEntryLevel } from './logEntryLevel';
 import type { LogEntryStack } from './logEntryStack';
+import type { LogEntryContext } from './logEntryContext';
 import type { LogEntryUrl } from './logEntryUrl';
 import type { LogEntryUserAgent } from './logEntryUserAgent';
 
