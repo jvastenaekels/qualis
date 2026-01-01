@@ -140,6 +140,66 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             return 'bg-transparent';
         }, []);
 
+        // --- Keyboard Focus Management (Roving-like) ---
+        const handleGridKeyDown = useCallback(
+            (e: React.KeyboardEvent) => {
+                // Only handle navigation if no modifiers are pressed
+                if (e.ctrlKey || e.altKey || e.metaKey || e.shiftKey) return;
+
+                const target = e.target as HTMLElement;
+                const slotId = target.id;
+                
+                // Parse current position
+                // Format: slot_{col}_{row}
+                const match = slotId.match(/^slot_(\d+)_(\d+)$/);
+                if (!match) return;
+
+                const col = parseInt(match[1], 10);
+                const row = parseInt(match[2], 10);
+                const maxCols = gridColumns.length;
+                
+                let nextCol = col;
+                let nextRow = row;
+
+                switch (e.key) {
+                    case 'ArrowUp':
+                        nextRow = Math.max(0, row - 1);
+                        break;
+                    case 'ArrowDown':
+                        const maxRowsInCol = gridColumns[col].capacity;
+                        nextRow = Math.min(maxRowsInCol - 1, row + 1);
+                        break;
+                    case 'ArrowLeft':
+                        nextCol = Math.max(0, col - 1);
+                        break;
+                    case 'ArrowRight':
+                        nextCol = Math.min(maxCols - 1, col + 1);
+                        break;
+                    default:
+                        return; // Exit if not an arrow key
+                }
+
+                // If moving columns, clamp the row to the new column's capacity
+                // We try to stay at the same relative height (center) or just clamp
+                if (nextCol !== col) {
+                    const newColCapacity = gridColumns[nextCol].capacity;
+                    // Sophisticated logic: try to stay visually close? 
+                    // Simple logic: clamp to bottom
+                    nextRow = Math.min(nextRow, newColCapacity - 1);
+                }
+
+                if (nextCol !== col || nextRow !== row) {
+                    e.preventDefault();
+                    const nextId = `slot_${nextCol}_${nextRow}`;
+                    const nextEl = document.getElementById(nextId);
+                    if (nextEl) {
+                        nextEl.focus();
+                    }
+                }
+            },
+            [gridColumns]
+        );
+
         const getLegendFontSize = useCallback((maxLen: number) => {
             if (maxLen < 12) return 'text-xl sm:text-2xl';
             if (maxLen < 25) return 'text-lg sm:text-xl';
@@ -288,9 +348,10 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 >
                                     <div
                                         ref={pyramidRef}
-                                        className="flex flex-row gap-2 items-end flex-nowrap"
+                                        className="flex flex-row gap-2 items-end flex-nowrap outline-none"
                                         role="grid"
-                                        tabIndex={0}
+                                        tabIndex={-1} // Container not focusable, slots are
+                                        onKeyDown={handleGridKeyDown}
                                     >
                                         {gridColumns.map((col, colIndex) => (
                                             <div
