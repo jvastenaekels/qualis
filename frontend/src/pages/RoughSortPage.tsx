@@ -155,6 +155,10 @@ const RoughSortPage: React.FC = () => {
                 case 'z':
                     if (responses.rough.history.length > 0) undoRoughSort();
                     break;
+                case 'Escape':
+                    setShowTip(false);
+                    setHoveredCard(null);
+                    break;
             }
         };
         window.addEventListener('keydown', handleKeyDown);

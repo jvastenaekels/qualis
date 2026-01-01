@@ -101,6 +101,17 @@ const FineSortPage: React.FC = () => {
         setStep(4);
     }, [setStep]);
 
+    // Handle Escape to deselect
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && selectedCardId !== null) {
+                setSelectedCardId(null);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedCardId]);
+
     // 5. Collision Strategy (Stable)
     const collisionStrategy: CollisionDetection = useCallback(
         (args) => {
