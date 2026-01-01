@@ -148,7 +148,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
                 const target = e.target as HTMLElement;
                 const slotId = target.id;
-                
+
                 // Parse current position
                 // Format: slot_{col}_{row}
                 const match = slotId.match(/^slot_(\d+)_(\d+)$/);
@@ -157,7 +157,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 const col = parseInt(match[1], 10);
                 const row = parseInt(match[2], 10);
                 const maxCols = gridColumns.length;
-                
+
                 let nextCol = col;
                 let nextRow = row;
 
@@ -165,10 +165,11 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     case 'ArrowUp':
                         nextRow = Math.max(0, row - 1);
                         break;
-                    case 'ArrowDown':
+                    case 'ArrowDown': {
                         const maxRowsInCol = gridColumns[col].capacity;
                         nextRow = Math.min(maxRowsInCol - 1, row + 1);
                         break;
+                    }
                     case 'ArrowLeft':
                         nextCol = Math.max(0, col - 1);
                         break;
@@ -183,7 +184,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 // We try to stay at the same relative height (center) or just clamp
                 if (nextCol !== col) {
                     const newColCapacity = gridColumns[nextCol].capacity;
-                    // Sophisticated logic: try to stay visually close? 
+                    // Sophisticated logic: try to stay visually close?
                     // Simple logic: clamp to bottom
                     nextRow = Math.min(nextRow, newColCapacity - 1);
                 }
