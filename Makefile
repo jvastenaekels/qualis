@@ -15,21 +15,21 @@ run-frontend:
 # -------------------------
 
 lint:
-	cd backend && ./venv/bin/ruff check app/
-	cd backend && ./venv/bin/ruff format --check app/
+	cd backend && uv run ruff check app/
+	cd backend && uv run ruff format --check app/
 	cd frontend && npm run lint
 
 check:
-	cd backend && ./venv/bin/mypy app/
-	cd backend && ./venv/bin/bandit -r app/ -ll
-	cd backend && ./venv/bin/radon cc app/ -a -nb --min B
-	cd backend && ./venv/bin/deptry app/
-	cd backend && ./venv/bin/vulture app/ vulture_whitelist.py --min-confidence 60
+	cd backend && uv run mypy app/
+	cd backend && uv run bandit -r app/ -ll
+	cd backend && uv run radon cc app/ -a -nb --min B
+	cd backend && uv run deptry app/
+	cd backend && uv run vulture app/ vulture_whitelist.py --min-confidence 60
 	cd frontend && npm run type-check
 	cd frontend && npm run i18n-check
 
 test:
-	cd backend && ./venv/bin/pytest -n auto tests/
+	cd backend && uv run pytest -n auto tests/
 	cd frontend && npm run test -- --run --coverage
 
 ci: lint check test
