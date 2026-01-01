@@ -50,7 +50,7 @@ def main():
     # 3. Sync Study Configuration (Idempotent: Create or Update)
     if os.path.exists("data/example-study.json"):
         run_task(
-            "scripts/sync_study.py",
+            "seed.py",
             "Study Configuration Sync",
             ["data/example-study.json"],
         )
