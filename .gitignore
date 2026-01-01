@@ -36,3 +36,4 @@ blob-report/
 backend/.coverage
 backend/htmlcov/
 frontend/coverage/
+.coverage
