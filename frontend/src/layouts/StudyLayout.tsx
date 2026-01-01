@@ -280,6 +280,8 @@ const StudyLayoutContent: React.FC = () => {
                                       ? 'completed'
                                       : 'upcoming';
 
+                            const isReachable = step.id <= session.maxReachedStep;
+
                             return (
                                 <div key={step.id} className="flex items-center">
                                     {/* Connection Line */}
@@ -293,7 +295,7 @@ const StudyLayoutContent: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => handleStepClick(step.id)}
-                                        disabled={status === 'upcoming'}
+                                        disabled={!isReachable}
                                         className={`
                            w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
                            ${
@@ -301,7 +303,9 @@ const StudyLayoutContent: React.FC = () => {
                                    ? 'border-blue-600 text-blue-600 bg-white shadow-sm ring-4 ring-blue-50'
                                    : status === 'completed'
                                      ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:scale-110 cursor-pointer'
-                                     : 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
+                                     : isReachable
+                                       ? 'border-blue-200 text-blue-600 bg-blue-50 hover:bg-white hover:border-blue-400 cursor-pointer'
+                                       : 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
                            }
                        `}
                                     >
@@ -309,6 +313,8 @@ const StudyLayoutContent: React.FC = () => {
                                             <Check size={16} strokeWidth={3} />
                                         ) : status === 'current' ? (
                                             <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />
+                                        ) : isReachable ? (
+                                            <div className="w-2 h-2 bg-blue-400 rounded-full opacity-60" />
                                         ) : (
                                             <div className="w-2 h-2 bg-slate-300 rounded-full" />
                                         )}

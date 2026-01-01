@@ -156,7 +156,7 @@
             "help": "How does it work?",
             "methodology": {
                 "extremes": "Tip: Start with what is most obvious to you (the extremes).",
-                "vertical": "In the same column, the order from top to bottom doesn't matter. Only the column counts.",
+                "vertical": "In the same column, the order from top to bottom doesn't matter. Only the left-to-right order counts.",
                 "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices."
             }
         }
