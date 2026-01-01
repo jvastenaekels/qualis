@@ -94,10 +94,10 @@ If you need to trigger tasks manually without a full redeploy:
 
 ```bash
 # Force a schema check
-scalingo --app open-q run python backend/scripts/ensure_schema.py
+scalingo --app open-q run -- python backend/scripts/ensure_schema.py
 
 # Force a study configuration update
-scalingo --app open-q run python backend/seed.py backend/data/example-study.json
+scalingo --app open-q run -- python backend/seed.py backend/data/example-study.json
 ```
 
 ---
@@ -113,13 +113,13 @@ If you need to perform a full "factory reset" of the database (e.g., during init
    Wipe all tables and recreate the schema with default admin account:
 
    ```bash
-   scalingo --app open-q run python backend/init_db.py --reset
+   scalingo --app open-q run -- python backend/init_db.py --reset
    ```
 
 2. **Repopulate Content**
    Seed the default study data:
    ```bash
-   scalingo --app open-q run python backend/seed.py backend/data/example-study.json
+   scalingo --app open-q run -- python backend/seed.py backend/data/example-study.json
    ```
 
 ---
