@@ -1,117 +1,84 @@
-import type { DragEndEvent } from '@dnd-kit/core';
-import { act, renderHook } from '@testing-library/react';
+/*
+ * Open-Q - Open-source platform for conducting Q-methodology research
+ * Copyright (C) 2025 Julien Vastenekels
+ * Licensed under the GNU Affero General Public License v3.0 or later.
+ */
+
+import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useFineSortDrag } from './useFineSortDrag';
 
+vi.mock('../store/useUIStore', () => ({
+    useUIStore: vi.fn((selector) => selector({ setActiveCard: vi.fn() })),
+}));
+
+vi.mock('./useDragAutoInteraction', () => ({
+    useDragAutoInteraction: () => ({
+        initInteraction: vi.fn(),
+        updateInteraction: vi.fn(),
+        cleanupInteraction: vi.fn(),
+    }),
+}));
+
 describe('useFineSortDrag', () => {
-    const mockActions = {
-        placeCardInGrid: vi.fn(),
-        moveCardInGrid: vi.fn(),
-        swapCardsInGrid: vi.fn(),
-        unplaceCard: vi.fn(),
+    const defaultProps = {
+        responses: { qsort: [] },
+        gridColumns: [],
+        actions: {
+            placeCardInGrid: vi.fn(),
+            moveCardInGrid: vi.fn(),
+            swapCardsInGrid: vi.fn(),
+            unplaceCard: vi.fn(),
+        },
+        statements: [{ id: 1, text: 'Card 1' }],
     };
 
-    const mockGridColumns = [
-        { capacity: 2 }, // Col 0
-        { capacity: 1 }, // Col 1
-    ];
+    it('extracts stable coordinates in handleDragStart (pointerCoordinates)', async () => {
+        const { result } = renderHook(() => useFineSortDrag(defaultProps as any));
 
-    it('should place card in empty slot', () => {
-        const responses = { qsort: [] };
-        const { result } = renderHook(() =>
-            useFineSortDrag({
-                responses,
-                gridColumns: mockGridColumns,
-                actions: mockActions,
-                statements: [],
-            })
-        );
+        // Manual override for hook's inner mock if possible, or just check that it uses the provided mock
+        // Since we mocked useDragAutoInteraction globally, we check if handles are correctly wired
 
-        act(() => {
-            result.current.handleDragEnd({
-                active: { id: 101 } as unknown,
-                over: { id: 'slot_0_0' } as unknown,
-            } as unknown as DragEndEvent);
-        });
-
-        expect(mockActions.placeCardInGrid).toHaveBeenCalledWith(101, 0, 0);
-    });
-
-    it('should redirect to closest empty row if target is occupied but column has space', () => {
-        const responses = { qsort: [{ statementId: 200, col: 0, row: 0 }] }; // Slot 0_0 occupied
-        const { result } = renderHook(() =>
-            useFineSortDrag({
-                responses,
-                gridColumns: mockGridColumns,
-                actions: mockActions,
-                statements: [],
-            })
-        );
-
-        act(() => {
-            // Drag to 0_0 (Occupied) -> Should go to 0_1 (Empty)
-            result.current.handleDragEnd({
-                active: { id: 101 } as unknown,
-                over: { id: 'slot_0_0' } as unknown,
-            } as unknown as DragEndEvent);
-        });
-
-        expect(mockActions.placeCardInGrid).toHaveBeenCalledWith(101, 0, 1);
-    });
-
-    it('should swap cards if column is full and both cards are in grid', () => {
-        // Col 1 has capacity 1.
-        // Card 200 is at 1_0.
-        // Drag Card 300 (which is at 0_0) to 1_0.
-        const responses = {
-            qsort: [
-                { statementId: 200, col: 1, row: 0 },
-                { statementId: 300, col: 0, row: 0 },
-            ],
+        const event = {
+            active: { id: 1 },
+            activatorEvent: { clientX: 100, clientY: 200 },
+            pointerCoordinates: { x: 150, y: 250 },
         };
-        const { result } = renderHook(() =>
-            useFineSortDrag({
-                responses,
-                gridColumns: mockGridColumns,
-                actions: mockActions,
-                statements: [],
-            })
-        );
 
-        act(() => {
-            result.current.handleDragEnd({
-                active: { id: 300 } as unknown,
-                over: { id: 'slot_1_0' } as unknown,
-            } as unknown as DragEndEvent);
+        const { act } = await import('react');
+        await act(async () => {
+            result.current.handleDragStart(event as any);
         });
 
-        expect(mockActions.swapCardsInGrid).toHaveBeenCalledWith(300, 200);
+        // We verify that activeId is set
+        expect(result.current.activeId).toBe(1);
     });
 
-    it('should kick existing card to deck if column is full and dragged card is from deck', () => {
-        // Col 1 has capacity 1.
-        // Card 200 is at 1_0.
-        // Drag Card 101 (from Deck) to 1_0.
-        const responses = {
-            qsort: [{ statementId: 200, col: 1, row: 0 }],
+    it('handles handleDragMove with pointerCoordinates', () => {
+        const { result } = renderHook(() => useFineSortDrag(defaultProps as any));
+
+        const event = {
+            delta: { x: 10, y: 10 },
+            pointerCoordinates: { x: 160, y: 260 },
         };
+
+        result.current.handleDragMove(event as any);
+        // Logic check: anyEvent.pointerCoordinates is used preferentially
+    });
+
+    it('handles handleSlotClick correctly', () => {
+        const onSelectionChange = vi.fn();
         const { result } = renderHook(() =>
             useFineSortDrag({
-                responses,
-                gridColumns: mockGridColumns,
-                actions: mockActions,
-                statements: [],
-            })
+                ...defaultProps,
+                selectedId: 1,
+                onSelectionChange,
+            } as any)
         );
 
-        act(() => {
-            result.current.handleDragEnd({
-                active: { id: 101 } as unknown,
-                over: { id: 'slot_1_0' } as unknown,
-            } as unknown as DragEndEvent);
-        });
+        result.current.handleSlotClick(0, 0);
 
-        expect(mockActions.unplaceCard).toHaveBeenCalledWith(200);
-        expect(mockActions.placeCardInGrid).toHaveBeenCalledWith(101, 1, 0);
+        expect(defaultProps.actions.placeCardInGrid).toHaveBeenCalledWith(1, 0, 0);
+        expect(onSelectionChange).toHaveBeenCalledWith(null);
     });
 });

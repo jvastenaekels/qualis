@@ -34,6 +34,9 @@ const RoughSortPage: React.FC = () => {
     const setStep = useSessionStore((state) => state.setStep);
 
     const cardStackRef = useRef<CardStackHandle>(null);
+    const hoveredCard = useUIStore((state) => state.hoveredCard);
+    const setHoveredCard = useUIStore((state) => state.setHoveredCard);
+
     const { t } = useTranslation();
 
     const [showTip, setShowTip] = useState(false);
@@ -163,7 +166,7 @@ const RoughSortPage: React.FC = () => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentCard, responses.rough.history.length, undoRoughSort]);
+    }, [currentCard, responses.rough.history.length, undoRoughSort, setHoveredCard]);
 
     // Calculate shared font size for buttons (Harmonization)
     const sharedFontSize = useMemo(() => {
@@ -179,10 +182,6 @@ const RoughSortPage: React.FC = () => {
         if (maxWordLength > 8) return 'text-xs';
         return 'text-sm';
     }, [t]);
-
-    // --- Zoom Overlay State ---
-    const hoveredCard = useUIStore((state) => state.hoveredCard);
-    const setHoveredCard = useUIStore((state) => state.setHoveredCard);
 
     if (!config) return null;
 

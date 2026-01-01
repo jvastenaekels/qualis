@@ -7,6 +7,7 @@
 import { Eye } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useConfigStore } from '../store/useConfigStore';
 import { useUIStore } from '../store/useUIStore';
 import MethodologyTips from './MethodologyTips';
 
@@ -18,6 +19,9 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     const hoveredCard = useUIStore((state) => state.hoveredCard);
     const activeCard = useUIStore((state) => state.activeCard);
     const selectedCard = useUIStore((state) => state.selectedCard);
+
+    const config = useConfigStore((state) => state.config);
+    const showCodes = config?.show_statement_codes ?? true;
 
     const displayCard = activeCard || hoveredCard || selectedCard;
     const labelKey = activeCard
@@ -40,10 +44,10 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
         checkOverflow();
         window.addEventListener('resize', checkOverflow);
         return () => window.removeEventListener('resize', checkOverflow);
-    }, []);
+    }, []); // Re-run when content changes
 
     const ScrollIndicator = () => (
-        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-white/90 via-white/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-lg z-10">
+        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-indigo-50 via-indigo-50/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-xl z-10 transition-opacity duration-300">
             <div className="animate-bounce opacity-50">
                 <svg
                     aria-hidden="true"
@@ -65,17 +69,19 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
 
     if (variant === 'mobile') {
         return (
-            <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative">
+            <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative overflow-hidden">
                 <div ref={scrollRef} className="p-3 h-20 overflow-y-auto custom-scrollbar relative">
                     {displayCard ? (
                         <div className="animate-in fade-in slide-in-from-top-1 duration-300 pb-2">
                             <div className="text-[10px] font-bold text-indigo-400 mb-0.5 uppercase tracking-wider flex items-center gap-1.5">
                                 <Eye size={12} strokeWidth={2.5} />
-                                {t(labelKey)}{' '}
-                                {displayCard.code && (
-                                    <span className="text-indigo-300 mx-1">•</span>
-                                )}{' '}
-                                {displayCard.code}
+                                {t(labelKey)}
+                                {showCodes && displayCard.code && (
+                                    <>
+                                        <span className="text-indigo-300 mx-1">•</span>
+                                        {displayCard.code}
+                                    </>
+                                )}
                             </div>
                             <div className="flex flex-col gap-0.5">
                                 <p className="text-slate-800 text-sm font-medium leading-relaxed">
@@ -102,9 +108,13 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                     <div className="animate-in fade-in zoom-in-95 duration-200 pb-2">
                         <div className="text-xs font-bold text-indigo-400 mb-1.5 uppercase tracking-wider flex items-center gap-2">
                             <Eye size={14} strokeWidth={2.5} />
-                            {t(labelKey)}{' '}
-                            {displayCard.code && <span className="text-indigo-300 mx-1">•</span>}{' '}
-                            {displayCard.code}
+                            {t(labelKey)}
+                            {showCodes && displayCard.code && (
+                                <>
+                                    <span className="text-indigo-300 mx-1">•</span>
+                                    {displayCard.code}
+                                </>
+                            )}
                         </div>
                         <p className="text-slate-800 text-base sm:text-lg font-medium leading-relaxed">
                             {displayCard.text}

@@ -14,6 +14,10 @@ vi.mock('react-i18next', () => ({
     }),
 }));
 
+vi.mock('../store/useConfigStore', () => ({
+    useConfigStore: vi.fn(),
+}));
+
 vi.mock('../store/useUIStore', () => ({
     useUIStore: vi.fn(),
 }));
@@ -68,9 +72,87 @@ describe('ReadingZone', () => {
                 activeCard: null,
                 selectedCard: { id: 3, text: 'Selected Card' },
             },
+            useConfigStore: { config: { show_statement_codes: true } },
         });
 
         render(<ReadingZone variant="desktop" />);
         expect(screen.getByText('Selected Card')).toBeInTheDocument();
+    });
+
+    it('shows statement code when show_statement_codes is true', () => {
+        setupStoreMocks({
+            useUIStore: {
+                hoveredCard: null,
+                activeCard: { id: 1, text: 'Card with Code', code: 'CABS1' },
+                selectedCard: null,
+            },
+            useConfigStore: { config: { show_statement_codes: true } },
+        });
+
+        render(<ReadingZone variant="desktop" />);
+        expect(screen.getByText(/CABS1/)).toBeInTheDocument();
+    });
+
+    it('hides statement code when show_statement_codes is false', () => {
+        setupStoreMocks({
+            useUIStore: {
+                hoveredCard: null,
+                activeCard: { id: 1, text: 'Card with Code', code: 'CABS1' },
+                selectedCard: null,
+            },
+            useConfigStore: { config: { show_statement_codes: false } },
+        });
+
+        render(<ReadingZone variant="desktop" />);
+        expect(screen.queryByText('CABS1')).not.toBeInTheDocument();
+    });
+
+    it('shows scroll indicator when content overflows', () => {
+        setupStoreMocks({
+            useUIStore: {
+                hoveredCard: { id: 1, text: 'Very long text that should overflow' },
+                activeCard: null,
+                selectedCard: null,
+            },
+            useConfigStore: { config: { show_statement_codes: true } },
+        });
+
+        // Mock scrollHeight and clientHeight
+        // Note: JSDOM doesn't do real layout, so we must mock these
+        const orgScrollHeight = Object.getOwnPropertyDescriptor(
+            HTMLElement.prototype,
+            'scrollHeight'
+        );
+        const orgClientHeight = Object.getOwnPropertyDescriptor(
+            HTMLElement.prototype,
+            'clientHeight'
+        );
+
+        Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
+            configurable: true,
+            value: 200,
+        });
+        Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+            configurable: true,
+            value: 100,
+        });
+
+        render(<ReadingZone variant="desktop" />);
+
+        // The ScrollIndicator contains an svg with a specific path
+        // We can look for the SVG or a container if we added a testid,
+        // but for now let's hope the bounce arrow is unique enough or add a testid.
+        // ReadingZone.tsx has: {hasOverflow && displayCard && <ScrollIndicator />}
+        // ScrollIndicator has: <div className="animate-bounce opacity-50">
+
+        const _svg = document.querySelector('svg animate-bounce'); // This won't work easily
+        // Let's check for the presence of the indicator by its gradient class or SVG
+        expect(document.querySelector('.bg-gradient-to-t')).toBeInTheDocument();
+
+        // Cleanup
+        if (orgScrollHeight)
+            Object.defineProperty(HTMLElement.prototype, 'scrollHeight', orgScrollHeight);
+        if (orgClientHeight)
+            Object.defineProperty(HTMLElement.prototype, 'clientHeight', orgClientHeight);
     });
 });

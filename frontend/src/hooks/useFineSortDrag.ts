@@ -42,6 +42,21 @@ interface UseFineSortDragProps {
     statements: Statement[];
 }
 
+interface ExtendedDragEvent {
+    activatorEvent: {
+        clientX?: number;
+        clientY?: number;
+    };
+    pointerCoordinates?: {
+        x: number;
+        y: number;
+    } | null;
+    delta: {
+        x: number;
+        y: number;
+    };
+}
+
 export const useFineSortDrag = ({
     responses,
     gridColumns,
@@ -78,11 +93,11 @@ export const useFineSortDrag = ({
 
             if (event.activatorEvent) {
                 // Try to get stable coordinates from the event
-                const anyEvent = event as any;
+                const extendedEvent = event as unknown as ExtendedDragEvent;
                 const clientX =
-                    anyEvent.pointerCoordinates?.x ?? (anyEvent.activatorEvent as any).clientX;
+                    extendedEvent.pointerCoordinates?.x ?? extendedEvent.activatorEvent.clientX;
                 const clientY =
-                    anyEvent.pointerCoordinates?.y ?? (anyEvent.activatorEvent as any).clientY;
+                    extendedEvent.pointerCoordinates?.y ?? extendedEvent.activatorEvent.clientY;
 
                 if (clientX !== undefined && clientY !== undefined) {
                     initInteraction(clientX, clientY);
@@ -94,12 +109,19 @@ export const useFineSortDrag = ({
 
     const handleDragMove = useCallback(
         (event: DragMoveEvent) => {
-            const anyEvent = event as any;
-            if (anyEvent.pointerCoordinates) {
-                updateInteraction(anyEvent.pointerCoordinates.x, anyEvent.pointerCoordinates.y);
+            const extendedEvent = event as unknown as ExtendedDragEvent;
+            if (extendedEvent.pointerCoordinates) {
+                updateInteraction(
+                    extendedEvent.pointerCoordinates.x,
+                    extendedEvent.pointerCoordinates.y
+                );
             } else {
-                const activator = anyEvent.activatorEvent as any;
-                if (activator && activator.clientX !== undefined) {
+                const activator = extendedEvent.activatorEvent;
+                if (
+                    activator &&
+                    activator.clientX !== undefined &&
+                    activator.clientY !== undefined
+                ) {
                     const x = activator.clientX + event.delta.x;
                     const y = activator.clientY + event.delta.y;
                     updateInteraction(x, y);
