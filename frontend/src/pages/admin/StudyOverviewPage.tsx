@@ -3,6 +3,7 @@ import {
     useGetStudyStatsApiAdminStudiesSlugStatsGet,
     useListStudyParticipantsApiAdminStudiesSlugParticipantsGet,
     useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch,
+    useGetStudyApiAdminStudiesSlugGet,
 } from '@/api/generated';
 import HealthDashboard from '@/components/admin/dashboard/HealthDashboard';
 import ParticipantTable from '@/components/admin/dashboard/ParticipantTable';
@@ -24,6 +25,7 @@ const StudyOverviewPage = () => {
     const { data: stats, isLoading: statsLoading } = useGetStudyStatsApiAdminStudiesSlugStatsGet(
         slug || ''
     );
+    const { data: study } = useGetStudyApiAdminStudiesSlugGet(slug || '');
     const {
         data: participants,
         isLoading: participantsLoading,
@@ -92,6 +94,11 @@ const StudyOverviewPage = () => {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
+                    {study?.translations?.map((t) => (
+                        <Badge key={t.language_code} variant="secondary" className="text-xs">
+                            {t.language_code.toUpperCase()}
+                        </Badge>
+                    ))}
                     <div className="bg-white shadow-sm border rounded-lg px-4 py-2 flex items-center gap-3">
                         <div className="relative">
                             <Activity className="h-4 w-4 text-emerald-500" />

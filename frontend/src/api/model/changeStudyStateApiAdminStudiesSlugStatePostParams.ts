@@ -7,5 +7,5 @@
 import type { StudyState } from './studyState';
 
 export type ChangeStudyStateApiAdminStudiesSlugStatePostParams = {
-    new_state: StudyState;
+new_state: StudyState;
 };

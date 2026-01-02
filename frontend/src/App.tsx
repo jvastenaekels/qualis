@@ -38,13 +38,15 @@ const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
 const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
 const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage'));
 
+import { AdminDashboard } from '@/components/admin/AdminDashboard';
+
 const AdminIndex = () => {
     const { activeStudyId } = useAdminStore();
 
     if (activeStudyId) {
         return <Navigate to={`/admin/studies/${activeStudyId}`} replace />;
     }
-    return <div className="p-8 text-muted-foreground">Please select a study from the sidebar.</div>;
+    return <AdminDashboard />;
 };
 
 const App = () => {

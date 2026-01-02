@@ -6,9 +6,9 @@
  */
 
 export type GetStudyApiStudySlugGetParams = {
-    /**
-     * @maxLength 5
-     * @pattern ^[a-z]{2}(-[A-Z]{2})?$
-     */
-    lang?: string;
+/**
+ * @maxLength 5
+ * @pattern ^[a-z]{2}(-[A-Z]{2})?$
+ */
+lang?: string;
 };

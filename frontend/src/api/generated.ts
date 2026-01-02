@@ -4,42 +4,45 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
-    DataTag,
-    DefinedInitialDataOptions,
-    DefinedUseQueryResult,
-    MutationFunction,
-    QueryClient,
-    QueryFunction,
-    QueryKey,
-    UndefinedInitialDataOptions,
-    UseMutationOptions,
-    UseMutationResult,
-    UseQueryOptions,
-    UseQueryResult,
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
+  MutationFunction,
+  QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-    BodyLoginForAccessTokenApiTokenPost,
-    ChangeStudyStateApiAdminStudiesSlugStatePostParams,
-    ConsentInput,
-    GetStudyApiStudySlugGetParams,
-    HTTPValidationError,
-    InvitationCreate,
-    InvitationLink,
-    LogEntry,
-    ParticipantDetailRead,
-    ParticipantDiscardUpdate,
-    ParticipantRead,
-    StudyCreate,
-    StudyRead,
-    StudyStatsRead,
-    StudyUpdate,
-    SubmissionInput,
-    Token,
-    UserCreate,
-    UserRead,
+  BodyLoginForAccessTokenApiTokenPost,
+  ChangeStudyStateApiAdminStudiesSlugStatePostParams,
+  ConsentInput,
+  GetStudyApiStudySlugGetParams,
+  HTTPValidationError,
+  InvitationCreate,
+  InvitationLink,
+  LogEntry,
+  ParticipantDetailRead,
+  ParticipantDiscardUpdate,
+  ParticipantRead,
+  StudyCreate,
+  StudyRead,
+  StudyStatsRead,
+  StudyUpdate,
+  SubmissionInput,
+  Token,
+  UserCreate,
+  UserRead
 } from './model';
 
 import { customInstance } from './mutator';
@@ -47,115 +50,95 @@ import { customInstance } from './mutator';
  * Get current active user.
  * @summary Read Users Me
  */
-export const readUsersMeApiMeGet = (signal?: AbortSignal) => {
-    return customInstance<UserRead>({ url: `/api/me`, method: 'GET', signal });
-};
+export const readUsersMeApiMeGet = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<UserRead>(
+      {url: `/api/me`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
 
 export const getReadUsersMeApiMeGetQueryKey = () => {
-    return [`/api/me`] as const;
-};
+    return [
+    `/api/me`
+    ] as const;
+    }
 
-export const getReadUsersMeApiMeGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
-    >;
-}) => {
-    const { query: queryOptions } = options ?? {};
+    
+export const getReadUsersMeApiMeGetQueryOptions = <TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>>, }
+) => {
 
-    const queryKey = queryOptions?.queryKey ?? getReadUsersMeApiMeGetQueryKey();
+const {query: queryOptions} = options ?? {};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readUsersMeApiMeGet>>> = ({ signal }) =>
-        readUsersMeApiMeGet(signal);
+  const queryKey =  queryOptions?.queryKey ?? getReadUsersMeApiMeGetQueryKey();
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type ReadUsersMeApiMeGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof readUsersMeApiMeGet>>
->;
-export type ReadUsersMeApiMeGetQueryError = unknown;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readUsersMeApiMeGet>>> = ({ signal }) => readUsersMeApiMeGet(signal);
 
-export function useReadUsersMeApiMeGet<
-    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
-    TError = unknown,
->(
-    options: {
-        query: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof readUsersMeApiMeGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useReadUsersMeApiMeGet<
-    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof readUsersMeApiMeGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useReadUsersMeApiMeGet<
-    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ReadUsersMeApiMeGetQueryResult = NonNullable<Awaited<ReturnType<typeof readUsersMeApiMeGet>>>
+export type ReadUsersMeApiMeGetQueryError = unknown
+
+
+export function useReadUsersMeApiMeGet<TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+          TError,
+          Awaited<ReturnType<typeof readUsersMeApiMeGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadUsersMeApiMeGet<TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+          TError,
+          Awaited<ReturnType<typeof readUsersMeApiMeGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useReadUsersMeApiMeGet<TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Read Users Me
  */
 
-export function useReadUsersMeApiMeGet<
-    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getReadUsersMeApiMeGetQueryOptions(options);
+export function useReadUsersMeApiMeGet<TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getReadUsersMeApiMeGetQueryOptions(options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * OAuth2 compatible token login, get an access token for future requests.
@@ -163,698 +146,530 @@ export function useReadUsersMeApiMeGet<
  */
 export const loginForAccessTokenApiTokenPost = (
     bodyLoginForAccessTokenApiTokenPost: BodyLoginForAccessTokenApiTokenPost,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    const formUrlEncoded = new URLSearchParams();
-    if (
-        bodyLoginForAccessTokenApiTokenPost.grant_type !== undefined &&
-        bodyLoginForAccessTokenApiTokenPost.grant_type !== null
-    ) {
-        formUrlEncoded.append(`grant_type`, bodyLoginForAccessTokenApiTokenPost.grant_type);
+      
+      const formUrlEncoded = new URLSearchParams();
+if(bodyLoginForAccessTokenApiTokenPost.grant_type !== undefined && bodyLoginForAccessTokenApiTokenPost.grant_type !== null) {
+ formUrlEncoded.append(`grant_type`, bodyLoginForAccessTokenApiTokenPost.grant_type)
+ }
+formUrlEncoded.append(`username`, bodyLoginForAccessTokenApiTokenPost.username)
+formUrlEncoded.append(`password`, bodyLoginForAccessTokenApiTokenPost.password)
+if(bodyLoginForAccessTokenApiTokenPost.scope !== undefined) {
+ formUrlEncoded.append(`scope`, bodyLoginForAccessTokenApiTokenPost.scope)
+ }
+if(bodyLoginForAccessTokenApiTokenPost.client_id !== undefined && bodyLoginForAccessTokenApiTokenPost.client_id !== null) {
+ formUrlEncoded.append(`client_id`, bodyLoginForAccessTokenApiTokenPost.client_id)
+ }
+if(bodyLoginForAccessTokenApiTokenPost.client_secret !== undefined && bodyLoginForAccessTokenApiTokenPost.client_secret !== null) {
+ formUrlEncoded.append(`client_secret`, bodyLoginForAccessTokenApiTokenPost.client_secret)
+ }
+
+      return customInstance<Token>(
+      {url: `/api/token`, method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded', },
+       data: formUrlEncoded, signal
+    },
+      );
     }
-    formUrlEncoded.append(`username`, bodyLoginForAccessTokenApiTokenPost.username);
-    formUrlEncoded.append(`password`, bodyLoginForAccessTokenApiTokenPost.password);
-    if (bodyLoginForAccessTokenApiTokenPost.scope !== undefined) {
-        formUrlEncoded.append(`scope`, bodyLoginForAccessTokenApiTokenPost.scope);
-    }
-    if (
-        bodyLoginForAccessTokenApiTokenPost.client_id !== undefined &&
-        bodyLoginForAccessTokenApiTokenPost.client_id !== null
-    ) {
-        formUrlEncoded.append(`client_id`, bodyLoginForAccessTokenApiTokenPost.client_id);
-    }
-    if (
-        bodyLoginForAccessTokenApiTokenPost.client_secret !== undefined &&
-        bodyLoginForAccessTokenApiTokenPost.client_secret !== null
-    ) {
-        formUrlEncoded.append(`client_secret`, bodyLoginForAccessTokenApiTokenPost.client_secret);
-    }
+  
 
-    return customInstance<Token>({
-        url: `/api/token`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        data: formUrlEncoded,
-        signal,
-    });
-};
 
-export const getLoginForAccessTokenApiTokenPostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>,
-        TError,
-        { data: BodyLoginForAccessTokenApiTokenPost },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>,
-    TError,
-    { data: BodyLoginForAccessTokenApiTokenPost },
-    TContext
-> => {
-    const mutationKey = ['loginForAccessTokenApiTokenPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
+export const getLoginForAccessTokenApiTokenPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>, TError,{data: BodyLoginForAccessTokenApiTokenPost}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>, TError,{data: BodyLoginForAccessTokenApiTokenPost}, TContext> => {
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>,
-        { data: BodyLoginForAccessTokenApiTokenPost }
-    > = (props) => {
-        const { data } = props ?? {};
+const mutationKey = ['loginForAccessTokenApiTokenPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-        return loginForAccessTokenApiTokenPost(data);
-    };
+      
 
-    return { mutationFn, ...mutationOptions };
-};
 
-export type LoginForAccessTokenApiTokenPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>
->;
-export type LoginForAccessTokenApiTokenPostMutationBody = BodyLoginForAccessTokenApiTokenPost;
-export type LoginForAccessTokenApiTokenPostMutationError = HTTPValidationError;
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>, {data: BodyLoginForAccessTokenApiTokenPost}> = (props) => {
+          const {data} = props ?? {};
 
-/**
+          return  loginForAccessTokenApiTokenPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LoginForAccessTokenApiTokenPostMutationResult = NonNullable<Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>>
+    export type LoginForAccessTokenApiTokenPostMutationBody = BodyLoginForAccessTokenApiTokenPost
+    export type LoginForAccessTokenApiTokenPostMutationError = HTTPValidationError
+
+    /**
  * @summary Login For Access Token
  */
-export const useLoginForAccessTokenApiTokenPost = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>,
-            TError,
-            { data: BodyLoginForAccessTokenApiTokenPost },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>,
-    TError,
-    { data: BodyLoginForAccessTokenApiTokenPost },
-    TContext
-> => {
-    const mutationOptions = getLoginForAccessTokenApiTokenPostMutationOptions(options);
+export const useLoginForAccessTokenApiTokenPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>, TError,{data: BodyLoginForAccessTokenApiTokenPost}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof loginForAccessTokenApiTokenPost>>,
+        TError,
+        {data: BodyLoginForAccessTokenApiTokenPost},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getLoginForAccessTokenApiTokenPostMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Register a new user, optionally via an invitation token.
  * @summary Register User
  */
-export const registerUserApiRegisterPost = (userCreate: UserCreate, signal?: AbortSignal) => {
-    return customInstance<UserRead>({
-        url: `/api/register`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: userCreate,
-        signal,
-    });
-};
+export const registerUserApiRegisterPost = (
+    userCreate: UserCreate,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<UserRead>(
+      {url: `/api/register`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: userCreate, signal
+    },
+      );
+    }
+  
 
-export const getRegisterUserApiRegisterPostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof registerUserApiRegisterPost>>,
-        TError,
-        { data: UserCreate },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof registerUserApiRegisterPost>>,
-    TError,
-    { data: UserCreate },
-    TContext
-> => {
-    const mutationKey = ['registerUserApiRegisterPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof registerUserApiRegisterPost>>,
-        { data: UserCreate }
-    > = (props) => {
-        const { data } = props ?? {};
+export const getRegisterUserApiRegisterPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiRegisterPost>>, TError,{data: UserCreate}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof registerUserApiRegisterPost>>, TError,{data: UserCreate}, TContext> => {
 
-        return registerUserApiRegisterPost(data);
-    };
+const mutationKey = ['registerUserApiRegisterPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type RegisterUserApiRegisterPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof registerUserApiRegisterPost>>
->;
-export type RegisterUserApiRegisterPostMutationBody = UserCreate;
-export type RegisterUserApiRegisterPostMutationError = HTTPValidationError;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerUserApiRegisterPost>>, {data: UserCreate}> = (props) => {
+          const {data} = props ?? {};
+
+          return  registerUserApiRegisterPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterUserApiRegisterPostMutationResult = NonNullable<Awaited<ReturnType<typeof registerUserApiRegisterPost>>>
+    export type RegisterUserApiRegisterPostMutationBody = UserCreate
+    export type RegisterUserApiRegisterPostMutationError = HTTPValidationError
+
+    /**
  * @summary Register User
  */
-export const useRegisterUserApiRegisterPost = <TError = HTTPValidationError, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof registerUserApiRegisterPost>>,
-            TError,
-            { data: UserCreate },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof registerUserApiRegisterPost>>,
-    TError,
-    { data: UserCreate },
-    TContext
-> => {
-    const mutationOptions = getRegisterUserApiRegisterPostMutationOptions(options);
+export const useRegisterUserApiRegisterPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerUserApiRegisterPost>>, TError,{data: UserCreate}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof registerUserApiRegisterPost>>,
+        TError,
+        {data: UserCreate},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getRegisterUserApiRegisterPostMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * List studies accessible to the current user (via Workspace membership).
  * @summary List Studies
  */
-export const listStudiesApiAdminStudiesGet = (signal?: AbortSignal) => {
-    return customInstance<StudyRead[]>({ url: `/api/admin/studies/`, method: 'GET', signal });
-};
+export const listStudiesApiAdminStudiesGet = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<StudyRead[]>(
+      {url: `/api/admin/studies/`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
 
 export const getListStudiesApiAdminStudiesGetQueryKey = () => {
-    return [`/api/admin/studies/`] as const;
-};
+    return [
+    `/api/admin/studies/`
+    ] as const;
+    }
 
-export const getListStudiesApiAdminStudiesGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>
-    >;
-}) => {
-    const { query: queryOptions } = options ?? {};
+    
+export const getListStudiesApiAdminStudiesGetQueryOptions = <TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>>, }
+) => {
 
-    const queryKey = queryOptions?.queryKey ?? getListStudiesApiAdminStudiesGetQueryKey();
+const {query: queryOptions} = options ?? {};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>> = ({
-        signal,
-    }) => listStudiesApiAdminStudiesGet(signal);
+  const queryKey =  queryOptions?.queryKey ?? getListStudiesApiAdminStudiesGetQueryKey();
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type ListStudiesApiAdminStudiesGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
->;
-export type ListStudiesApiAdminStudiesGetQueryError = unknown;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>> = ({ signal }) => listStudiesApiAdminStudiesGet(signal);
 
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListStudiesApiAdminStudiesGetQueryResult = NonNullable<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>>
+export type ListStudiesApiAdminStudiesGetQueryError = unknown
+
+
+export function useListStudiesApiAdminStudiesGet<TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+          TError,
+          Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListStudiesApiAdminStudiesGet<TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+          TError,
+          Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListStudiesApiAdminStudiesGet<TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Studies
  */
 
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(options);
+export function useListStudiesApiAdminStudiesGet<TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Create a new study in the user's active workspace.
  * @summary Create Study
  */
-export const createStudyApiAdminStudiesPost = (studyCreate: StudyCreate, signal?: AbortSignal) => {
-    return customInstance<StudyRead>({
-        url: `/api/admin/studies/`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: studyCreate,
-        signal,
-    });
-};
+export const createStudyApiAdminStudiesPost = (
+    studyCreate: StudyCreate,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<StudyRead>(
+      {url: `/api/admin/studies/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: studyCreate, signal
+    },
+      );
+    }
+  
 
-export const getCreateStudyApiAdminStudiesPostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>,
-        TError,
-        { data: StudyCreate },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>,
-    TError,
-    { data: StudyCreate },
-    TContext
-> => {
-    const mutationKey = ['createStudyApiAdminStudiesPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>,
-        { data: StudyCreate }
-    > = (props) => {
-        const { data } = props ?? {};
+export const getCreateStudyApiAdminStudiesPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>, TError,{data: StudyCreate}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>, TError,{data: StudyCreate}, TContext> => {
 
-        return createStudyApiAdminStudiesPost(data);
-    };
+const mutationKey = ['createStudyApiAdminStudiesPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type CreateStudyApiAdminStudiesPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>
->;
-export type CreateStudyApiAdminStudiesPostMutationBody = StudyCreate;
-export type CreateStudyApiAdminStudiesPostMutationError = HTTPValidationError;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>, {data: StudyCreate}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createStudyApiAdminStudiesPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateStudyApiAdminStudiesPostMutationResult = NonNullable<Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>>
+    export type CreateStudyApiAdminStudiesPostMutationBody = StudyCreate
+    export type CreateStudyApiAdminStudiesPostMutationError = HTTPValidationError
+
+    /**
  * @summary Create Study
  */
-export const useCreateStudyApiAdminStudiesPost = <TError = HTTPValidationError, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>,
-            TError,
-            { data: StudyCreate },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>,
-    TError,
-    { data: StudyCreate },
-    TContext
-> => {
-    const mutationOptions = getCreateStudyApiAdminStudiesPostMutationOptions(options);
+export const useCreateStudyApiAdminStudiesPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>, TError,{data: StudyCreate}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createStudyApiAdminStudiesPost>>,
+        TError,
+        {data: StudyCreate},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getCreateStudyApiAdminStudiesPostMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Get study details.
  * @summary Get Study
  */
-export const getStudyApiAdminStudiesSlugGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<StudyRead>({ url: `/api/admin/studies/${slug}`, method: 'GET', signal });
-};
-
-export const getGetStudyApiAdminStudiesSlugGetQueryKey = (slug?: string) => {
-    return [`/api/admin/studies/${slug}`] as const;
-};
-
-export const getGetStudyApiAdminStudiesSlugGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-    TError = HTTPValidationError,
->(
+export const getStudyApiAdminStudiesSlugGet = (
     slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-                TError,
-                TData
-            >
-        >;
-    }
+ signal?: AbortSignal
 ) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey = queryOptions?.queryKey ?? getGetStudyApiAdminStudiesSlugGetQueryKey(slug);
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>> = ({
-        signal,
-    }) => getStudyApiAdminStudiesSlugGet(slug, signal);
-
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type GetStudyApiAdminStudiesSlugGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>
->;
-export type GetStudyApiAdminStudiesSlugGetQueryError = HTTPValidationError;
-
-export function useGetStudyApiAdminStudiesSlugGet<
-    TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>
-                >,
-                'initialData'
-            >;
+      
+      
+      return customInstance<StudyRead>(
+      {url: `/api/admin/studies/${slug}`, method: 'GET', signal
     },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyApiAdminStudiesSlugGet<
-    TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyApiAdminStudiesSlugGet<
-    TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      );
+    }
+  
+
+
+
+export const getGetStudyApiAdminStudiesSlugGetQueryKey = (slug?: string,) => {
+    return [
+    `/api/admin/studies/${slug}`
+    ] as const;
+    }
+
+    
+export const getGetStudyApiAdminStudiesSlugGetQueryOptions = <TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError = HTTPValidationError>(slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStudyApiAdminStudiesSlugGetQueryKey(slug);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>> = ({ signal }) => getStudyApiAdminStudiesSlugGet(slug, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetStudyApiAdminStudiesSlugGetQueryResult = NonNullable<Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>>
+export type GetStudyApiAdminStudiesSlugGetQueryError = HTTPValidationError
+
+
+export function useGetStudyApiAdminStudiesSlugGet<TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError = HTTPValidationError>(
+ slug: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
+          TError,
+          Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStudyApiAdminStudiesSlugGet<TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
+          TError,
+          Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStudyApiAdminStudiesSlugGet<TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Study
  */
 
-export function useGetStudyApiAdminStudiesSlugGet<
-    TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetStudyApiAdminStudiesSlugGetQueryOptions(slug, options);
+export function useGetStudyApiAdminStudiesSlugGet<TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getGetStudyApiAdminStudiesSlugGetQueryOptions(slug,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Update study configuration.
  * @summary Update Study
  */
-export const updateStudyApiAdminStudiesSlugPatch = (slug: string, studyUpdate: StudyUpdate) => {
-    return customInstance<StudyRead>({
-        url: `/api/admin/studies/${slug}`,
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        data: studyUpdate,
-    });
-};
+export const updateStudyApiAdminStudiesSlugPatch = (
+    slug: string,
+    studyUpdate: StudyUpdate,
+ ) => {
+      
+      
+      return customInstance<StudyRead>(
+      {url: `/api/admin/studies/${slug}`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: studyUpdate
+    },
+      );
+    }
+  
 
-export const getUpdateStudyApiAdminStudiesSlugPatchMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>,
-        TError,
-        { slug: string; data: StudyUpdate },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>,
-    TError,
-    { slug: string; data: StudyUpdate },
-    TContext
-> => {
-    const mutationKey = ['updateStudyApiAdminStudiesSlugPatch'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>,
-        { slug: string; data: StudyUpdate }
-    > = (props) => {
-        const { slug, data } = props ?? {};
+export const getUpdateStudyApiAdminStudiesSlugPatchMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>, TError,{slug: string;data: StudyUpdate}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>, TError,{slug: string;data: StudyUpdate}, TContext> => {
 
-        return updateStudyApiAdminStudiesSlugPatch(slug, data);
-    };
+const mutationKey = ['updateStudyApiAdminStudiesSlugPatch'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type UpdateStudyApiAdminStudiesSlugPatchMutationResult = NonNullable<
-    Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>
->;
-export type UpdateStudyApiAdminStudiesSlugPatchMutationBody = StudyUpdate;
-export type UpdateStudyApiAdminStudiesSlugPatchMutationError = HTTPValidationError;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>, {slug: string;data: StudyUpdate}> = (props) => {
+          const {slug,data} = props ?? {};
+
+          return  updateStudyApiAdminStudiesSlugPatch(slug,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateStudyApiAdminStudiesSlugPatchMutationResult = NonNullable<Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>>
+    export type UpdateStudyApiAdminStudiesSlugPatchMutationBody = StudyUpdate
+    export type UpdateStudyApiAdminStudiesSlugPatchMutationError = HTTPValidationError
+
+    /**
  * @summary Update Study
  */
-export const useUpdateStudyApiAdminStudiesSlugPatch = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>,
-            TError,
-            { slug: string; data: StudyUpdate },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>,
-    TError,
-    { slug: string; data: StudyUpdate },
-    TContext
-> => {
-    const mutationOptions = getUpdateStudyApiAdminStudiesSlugPatchMutationOptions(options);
+export const useUpdateStudyApiAdminStudiesSlugPatch = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>, TError,{slug: string;data: StudyUpdate}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateStudyApiAdminStudiesSlugPatch>>,
+        TError,
+        {slug: string;data: StudyUpdate},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getUpdateStudyApiAdminStudiesSlugPatchMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Delete a study (Workspace Admin only).
  * @summary Delete Study
  */
-export const deleteStudyApiAdminStudiesSlugDelete = (slug: string) => {
-    return customInstance<void>({ url: `/api/admin/studies/${slug}`, method: 'DELETE' });
-};
+export const deleteStudyApiAdminStudiesSlugDelete = (
+    slug: string,
+ ) => {
+      
+      
+      return customInstance<void>(
+      {url: `/api/admin/studies/${slug}`, method: 'DELETE'
+    },
+      );
+    }
+  
 
-export const getDeleteStudyApiAdminStudiesSlugDeleteMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>,
-        TError,
-        { slug: string },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>,
-    TError,
-    { slug: string },
-    TContext
-> => {
-    const mutationKey = ['deleteStudyApiAdminStudiesSlugDelete'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>,
-        { slug: string }
-    > = (props) => {
-        const { slug } = props ?? {};
+export const getDeleteStudyApiAdminStudiesSlugDeleteMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>, TError,{slug: string}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>, TError,{slug: string}, TContext> => {
 
-        return deleteStudyApiAdminStudiesSlugDelete(slug);
-    };
+const mutationKey = ['deleteStudyApiAdminStudiesSlugDelete'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type DeleteStudyApiAdminStudiesSlugDeleteMutationResult = NonNullable<
-    Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>
->;
 
-export type DeleteStudyApiAdminStudiesSlugDeleteMutationError = HTTPValidationError;
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>, {slug: string}> = (props) => {
+          const {slug} = props ?? {};
 
-/**
+          return  deleteStudyApiAdminStudiesSlugDelete(slug,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteStudyApiAdminStudiesSlugDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>>
+    
+    export type DeleteStudyApiAdminStudiesSlugDeleteMutationError = HTTPValidationError
+
+    /**
  * @summary Delete Study
  */
-export const useDeleteStudyApiAdminStudiesSlugDelete = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>,
-            TError,
-            { slug: string },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>,
-    TError,
-    { slug: string },
-    TContext
-> => {
-    const mutationOptions = getDeleteStudyApiAdminStudiesSlugDeleteMutationOptions(options);
+export const useDeleteStudyApiAdminStudiesSlugDelete = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>, TError,{slug: string}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteStudyApiAdminStudiesSlugDelete>>,
+        TError,
+        {slug: string},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getDeleteStudyApiAdminStudiesSlugDeleteMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Change study state (Draft <-> Active <-> Closed).
  * @summary Change Study State
@@ -862,230 +677,158 @@ export const useDeleteStudyApiAdminStudiesSlugDelete = <
 export const changeStudyStateApiAdminStudiesSlugStatePost = (
     slug: string,
     params: ChangeStudyStateApiAdminStudiesSlugStatePostParams,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    return customInstance<StudyRead>({
-        url: `/api/admin/studies/${slug}/state`,
-        method: 'POST',
-        params,
-        signal,
-    });
-};
+      
+      
+      return customInstance<StudyRead>(
+      {url: `/api/admin/studies/${slug}/state`, method: 'POST',
+        params, signal
+    },
+      );
+    }
+  
 
-export const getChangeStudyStateApiAdminStudiesSlugStatePostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
-        TError,
-        { slug: string; params: ChangeStudyStateApiAdminStudiesSlugStatePostParams },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
-    TError,
-    { slug: string; params: ChangeStudyStateApiAdminStudiesSlugStatePostParams },
-    TContext
-> => {
-    const mutationKey = ['changeStudyStateApiAdminStudiesSlugStatePost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
-        { slug: string; params: ChangeStudyStateApiAdminStudiesSlugStatePostParams }
-    > = (props) => {
-        const { slug, params } = props ?? {};
+export const getChangeStudyStateApiAdminStudiesSlugStatePostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>, TError,{slug: string;params: ChangeStudyStateApiAdminStudiesSlugStatePostParams}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>, TError,{slug: string;params: ChangeStudyStateApiAdminStudiesSlugStatePostParams}, TContext> => {
 
-        return changeStudyStateApiAdminStudiesSlugStatePost(slug, params);
-    };
+const mutationKey = ['changeStudyStateApiAdminStudiesSlugStatePost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type ChangeStudyStateApiAdminStudiesSlugStatePostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>
->;
 
-export type ChangeStudyStateApiAdminStudiesSlugStatePostMutationError = HTTPValidationError;
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>, {slug: string;params: ChangeStudyStateApiAdminStudiesSlugStatePostParams}> = (props) => {
+          const {slug,params} = props ?? {};
 
-/**
+          return  changeStudyStateApiAdminStudiesSlugStatePost(slug,params,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ChangeStudyStateApiAdminStudiesSlugStatePostMutationResult = NonNullable<Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>>
+    
+    export type ChangeStudyStateApiAdminStudiesSlugStatePostMutationError = HTTPValidationError
+
+    /**
  * @summary Change Study State
  */
-export const useChangeStudyStateApiAdminStudiesSlugStatePost = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
-            TError,
-            { slug: string; params: ChangeStudyStateApiAdminStudiesSlugStatePostParams },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
-    TError,
-    { slug: string; params: ChangeStudyStateApiAdminStudiesSlugStatePostParams },
-    TContext
-> => {
-    const mutationOptions = getChangeStudyStateApiAdminStudiesSlugStatePostMutationOptions(options);
+export const useChangeStudyStateApiAdminStudiesSlugStatePost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>, TError,{slug: string;params: ChangeStudyStateApiAdminStudiesSlugStatePostParams}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
+        TError,
+        {slug: string;params: ChangeStudyStateApiAdminStudiesSlugStatePostParams},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getChangeStudyStateApiAdminStudiesSlugStatePostMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Get aggregated study statistics.
  * @summary Get Study Stats
  */
-export const getStudyStatsApiAdminStudiesSlugStatsGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<StudyStatsRead>({
-        url: `/api/admin/studies/${slug}/stats`,
-        method: 'GET',
-        signal,
-    });
-};
-
-export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryKey = (slug?: string) => {
-    return [`/api/admin/studies/${slug}/stats`] as const;
-};
-
-export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-    TError = HTTPValidationError,
->(
+export const getStudyStatsApiAdminStudiesSlugStatsGet = (
     slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-                TError,
-                TData
-            >
-        >;
-    }
+ signal?: AbortSignal
 ) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey =
-        queryOptions?.queryKey ?? getGetStudyStatsApiAdminStudiesSlugStatsGetQueryKey(slug);
-
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
-    > = ({ signal }) => getStudyStatsApiAdminStudiesSlugStatsGet(slug, signal);
-
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type GetStudyStatsApiAdminStudiesSlugStatsGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
->;
-export type GetStudyStatsApiAdminStudiesSlugStatsGetQueryError = HTTPValidationError;
-
-export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
-                >,
-                'initialData'
-            >;
+      
+      
+      return customInstance<StudyStatsRead>(
+      {url: `/api/admin/studies/${slug}/stats`, method: 'GET', signal
     },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      );
+    }
+  
+
+
+
+export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryKey = (slug?: string,) => {
+    return [
+    `/api/admin/studies/${slug}/stats`
+    ] as const;
+    }
+
+    
+export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions = <TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError = HTTPValidationError>(slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStudyStatsApiAdminStudiesSlugStatsGetQueryKey(slug);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>> = ({ signal }) => getStudyStatsApiAdminStudiesSlugStatsGet(slug, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetStudyStatsApiAdminStudiesSlugStatsGetQueryResult = NonNullable<Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>>
+export type GetStudyStatsApiAdminStudiesSlugStatsGetQueryError = HTTPValidationError
+
+
+export function useGetStudyStatsApiAdminStudiesSlugStatsGet<TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError = HTTPValidationError>(
+ slug: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStudyStatsApiAdminStudiesSlugStatsGet<TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
+          TError,
+          Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStudyStatsApiAdminStudiesSlugStatsGet<TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Study Stats
  */
 
-export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
-    TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions(slug, options);
+export function useGetStudyStatsApiAdminStudiesSlugStatsGet<TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions(slug,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Get detailed participant info including responses.
@@ -1093,175 +836,93 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
  */
 export const getParticipantApiAdminStudiesParticipantsParticipantIdGet = (
     participantId: number,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    return customInstance<ParticipantDetailRead>({
-        url: `/api/admin/studies/participants/${participantId}`,
-        method: 'GET',
-        signal,
-    });
-};
-
-export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryKey = (
-    participantId?: number
-) => {
-    return [`/api/admin/studies/participants/${participantId}`] as const;
-};
-
-export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
-    TError = HTTPValidationError,
->(
-    participantId: number,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>
-                >,
-                TError,
-                TData
-            >
-        >;
+      
+      
+      return customInstance<ParticipantDetailRead>(
+      {url: `/api/admin/studies/participants/${participantId}`, method: 'GET', signal
+    },
+      );
     }
+  
+
+
+
+export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryKey = (participantId?: number,) => {
+    return [
+    `/api/admin/studies/participants/${participantId}`
+    ] as const;
+    }
+
+    
+export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryOptions = <TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError = HTTPValidationError>(participantId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError, TData>>, }
 ) => {
-    const { query: queryOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ??
-        getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryKey(participantId);
+const {query: queryOptions} = options ?? {};
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>
-    > = ({ signal }) =>
-        getParticipantApiAdminStudiesParticipantsParticipantIdGet(participantId, signal);
+  const queryKey =  queryOptions?.queryKey ?? getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryKey(participantId);
 
-    return { queryKey, queryFn, enabled: !!participantId, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>
->;
-export type GetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryError =
-    HTTPValidationError;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>> = ({ signal }) => getParticipantApiAdminStudiesParticipantsParticipantIdGet(participantId, signal);
 
-export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
-    TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
-    TError = HTTPValidationError,
->(
-    participantId: number,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>
-                >,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>
-                    >,
-                    TError,
-                    Awaited<
-                        ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>
-                    >
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
-    TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
-    TError = HTTPValidationError,
->(
-    participantId: number,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>
-                >,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>
-                    >,
-                    TError,
-                    Awaited<
-                        ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>
-                    >
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
-    TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
-    TError = HTTPValidationError,
->(
-    participantId: number,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>
-                >,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(participantId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryResult = NonNullable<Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>>
+export type GetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryError = HTTPValidationError
+
+
+export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError = HTTPValidationError>(
+ participantId: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
+          TError,
+          Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError = HTTPValidationError>(
+ participantId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
+          TError,
+          Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError = HTTPValidationError>(
+ participantId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Participant
  */
 
-export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
-    TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
-    TError = HTTPValidationError,
->(
-    participantId: number,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>
-                >,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryOptions(
-        participantId,
-        options
-    );
+export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError = HTTPValidationError>(
+ participantId: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryOptions(participantId,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Flag or unflag a participant for exclusion from stats/exports.
@@ -1269,425 +930,253 @@ export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
  */
 export const discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch = (
     participantId: number,
-    participantDiscardUpdate: ParticipantDiscardUpdate
-) => {
-    return customInstance<ParticipantRead>({
-        url: `/api/admin/studies/participants/${participantId}/discard`,
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        data: participantDiscardUpdate,
-    });
-};
+    participantDiscardUpdate: ParticipantDiscardUpdate,
+ ) => {
+      
+      
+      return customInstance<ParticipantRead>(
+      {url: `/api/admin/studies/participants/${participantId}/discard`, method: 'PATCH',
+      headers: {'Content-Type': 'application/json', },
+      data: participantDiscardUpdate
+    },
+      );
+    }
+  
 
-export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationOptions =
-    <TError = HTTPValidationError, TContext = unknown>(options?: {
-        mutation?: UseMutationOptions<
-            Awaited<
-                ReturnType<
-                    typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch
-                >
-            >,
-            TError,
-            { participantId: number; data: ParticipantDiscardUpdate },
-            TContext
-        >;
-    }): UseMutationOptions<
-        Awaited<
-            ReturnType<
-                typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch
-            >
-        >,
-        TError,
-        { participantId: number; data: ParticipantDiscardUpdate },
-        TContext
-    > => {
-        const mutationKey = [
-            'discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch',
-        ];
-        const { mutation: mutationOptions } = options
-            ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-                ? options
-                : { ...options, mutation: { ...options.mutation, mutationKey } }
-            : { mutation: { mutationKey } };
 
-        const mutationFn: MutationFunction<
-            Awaited<
-                ReturnType<
-                    typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch
-                >
-            >,
-            { participantId: number; data: ParticipantDiscardUpdate }
-        > = (props) => {
-            const { participantId, data } = props ?? {};
+export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch>>, TError,{participantId: number;data: ParticipantDiscardUpdate}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch>>, TError,{participantId: number;data: ParticipantDiscardUpdate}, TContext> => {
 
-            return discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch(
-                participantId,
-                data
-            );
-        };
+const mutationKey = ['discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-        return { mutationFn, ...mutationOptions };
-    };
+      
 
-export type DiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationResult =
-    NonNullable<
-        Awaited<
-            ReturnType<
-                typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch
-            >
-        >
-    >;
-export type DiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationBody =
-    ParticipantDiscardUpdate;
-export type DiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationError =
-    HTTPValidationError;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch>>, {participantId: number;data: ParticipantDiscardUpdate}> = (props) => {
+          const {participantId,data} = props ?? {};
+
+          return  discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch(participantId,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationResult = NonNullable<Awaited<ReturnType<typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch>>>
+    export type DiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationBody = ParticipantDiscardUpdate
+    export type DiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationError = HTTPValidationError
+
+    /**
  * @summary Discard Participant
  */
-export const useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<
-                ReturnType<
-                    typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch
-                >
-            >,
-            TError,
-            { participantId: number; data: ParticipantDiscardUpdate },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<
-        ReturnType<typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch>
-    >,
-    TError,
-    { participantId: number; data: ParticipantDiscardUpdate },
-    TContext
-> => {
-    const mutationOptions =
-        getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationOptions(
-            options
-        );
+export const useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch>>, TError,{participantId: number;data: ParticipantDiscardUpdate}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof discardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch>>,
+        TError,
+        {participantId: number;data: ParticipantDiscardUpdate},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * List all participants for a specific study.
  * @summary List Study Participants
  */
 export const listStudyParticipantsApiAdminStudiesSlugParticipantsGet = (
     slug: string,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    return customInstance<ParticipantRead[]>({
-        url: `/api/admin/studies/${slug}/participants`,
-        method: 'GET',
-        signal,
-    });
-};
-
-export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryKey = (
-    slug?: string
-) => {
-    return [`/api/admin/studies/${slug}/participants`] as const;
-};
-
-export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-                TError,
-                TData
-            >
-        >;
+      
+      
+      return customInstance<ParticipantRead[]>(
+      {url: `/api/admin/studies/${slug}/participants`, method: 'GET', signal
+    },
+      );
     }
+  
+
+
+
+export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryKey = (slug?: string,) => {
+    return [
+    `/api/admin/studies/${slug}/participants`
+    ] as const;
+    }
+
+    
+export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions = <TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError = HTTPValidationError>(slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError, TData>>, }
 ) => {
-    const { query: queryOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ??
-        getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryKey(slug);
+const {query: queryOptions} = options ?? {};
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
-    > = ({ signal }) => listStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug, signal);
+  const queryKey =  queryOptions?.queryKey ?? getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryKey(slug);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type ListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
->;
-export type ListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryError = HTTPValidationError;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>> = ({ signal }) => listStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug, signal);
 
-export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
-                    >,
-                    TError,
-                    Awaited<
-                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
-                    >
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
-                    >,
-                    TError,
-                    Awaited<
-                        ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>
-                    >
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryResult = NonNullable<Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>>
+export type ListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryError = HTTPValidationError
+
+
+export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError = HTTPValidationError>(
+ slug: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+          TError,
+          Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
+          TError,
+          Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Study Participants
  */
 
-export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
-    TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions(
-        slug,
-        options
-    );
+export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions(slug,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Export study results as CSV.
  * @summary Export Csv
  */
-export const exportCsvApiAdminStudiesSlugExportCsvGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<unknown>({
-        url: `/api/admin/studies/${slug}/export/csv`,
-        method: 'GET',
-        signal,
-    });
-};
-
-export const getExportCsvApiAdminStudiesSlugExportCsvGetQueryKey = (slug?: string) => {
-    return [`/api/admin/studies/${slug}/export/csv`] as const;
-};
-
-export const getExportCsvApiAdminStudiesSlugExportCsvGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-    TError = HTTPValidationError,
->(
+export const exportCsvApiAdminStudiesSlugExportCsvGet = (
     slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-                TError,
-                TData
-            >
-        >;
-    }
+ signal?: AbortSignal
 ) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey =
-        queryOptions?.queryKey ?? getExportCsvApiAdminStudiesSlugExportCsvGetQueryKey(slug);
-
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>
-    > = ({ signal }) => exportCsvApiAdminStudiesSlugExportCsvGet(slug, signal);
-
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ExportCsvApiAdminStudiesSlugExportCsvGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>
->;
-export type ExportCsvApiAdminStudiesSlugExportCsvGetQueryError = HTTPValidationError;
-
-export function useExportCsvApiAdminStudiesSlugExportCsvGet<
-    TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>
-                >,
-                'initialData'
-            >;
+      
+      
+      return customInstance<unknown>(
+      {url: `/api/admin/studies/${slug}/export/csv`, method: 'GET', signal
     },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useExportCsvApiAdminStudiesSlugExportCsvGet<
-    TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useExportCsvApiAdminStudiesSlugExportCsvGet<
-    TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      );
+    }
+  
+
+
+
+export const getExportCsvApiAdminStudiesSlugExportCsvGetQueryKey = (slug?: string,) => {
+    return [
+    `/api/admin/studies/${slug}/export/csv`
+    ] as const;
+    }
+
+    
+export const getExportCsvApiAdminStudiesSlugExportCsvGetQueryOptions = <TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError = HTTPValidationError>(slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportCsvApiAdminStudiesSlugExportCsvGetQueryKey(slug);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>> = ({ signal }) => exportCsvApiAdminStudiesSlugExportCsvGet(slug, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportCsvApiAdminStudiesSlugExportCsvGetQueryResult = NonNullable<Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>>
+export type ExportCsvApiAdminStudiesSlugExportCsvGetQueryError = HTTPValidationError
+
+
+export function useExportCsvApiAdminStudiesSlugExportCsvGet<TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError = HTTPValidationError>(
+ slug: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
+          TError,
+          Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportCsvApiAdminStudiesSlugExportCsvGet<TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
+          TError,
+          Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportCsvApiAdminStudiesSlugExportCsvGet<TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Export Csv
  */
 
-export function useExportCsvApiAdminStudiesSlugExportCsvGet<
-    TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getExportCsvApiAdminStudiesSlugExportCsvGetQueryOptions(slug, options);
+export function useExportCsvApiAdminStudiesSlugExportCsvGet<TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getExportCsvApiAdminStudiesSlugExportCsvGetQueryOptions(slug,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Export study results in PQMethod format (ZIP).
@@ -1695,447 +1184,281 @@ export function useExportCsvApiAdminStudiesSlugExportCsvGet<
  */
 export const exportPqmethodApiAdminStudiesSlugExportPqmethodGet = (
     slug: string,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
-        url: `/api/admin/studies/${slug}/export/pqmethod`,
-        method: 'GET',
-        signal,
-    });
-};
-
-export const getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryKey = (slug?: string) => {
-    return [`/api/admin/studies/${slug}/export/pqmethod`] as const;
-};
-
-export const getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-                TError,
-                TData
-            >
-        >;
+      
+      
+      return customInstance<unknown>(
+      {url: `/api/admin/studies/${slug}/export/pqmethod`, method: 'GET', signal
+    },
+      );
     }
+  
+
+
+
+export const getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryKey = (slug?: string,) => {
+    return [
+    `/api/admin/studies/${slug}/export/pqmethod`
+    ] as const;
+    }
+
+    
+export const getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryOptions = <TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError = HTTPValidationError>(slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError, TData>>, }
 ) => {
-    const { query: queryOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ??
-        getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryKey(slug);
+const {query: queryOptions} = options ?? {};
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>
-    > = ({ signal }) => exportPqmethodApiAdminStudiesSlugExportPqmethodGet(slug, signal);
+  const queryKey =  queryOptions?.queryKey ?? getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryKey(slug);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type ExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>
->;
-export type ExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryError = HTTPValidationError;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>> = ({ signal }) => exportPqmethodApiAdminStudiesSlugExportPqmethodGet(slug, signal);
 
-export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
-    TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
-    TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
-    TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryResult = NonNullable<Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>>
+export type ExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryError = HTTPValidationError
+
+
+export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError = HTTPValidationError>(
+ slug: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
+          TError,
+          Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
+          TError,
+          Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Export Pqmethod
  */
 
-export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
-    TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryOptions(
-        slug,
-        options
-    );
+export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryOptions(slug,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Export study results as R-Kit (ZIP with CSV + R Script).
  * @summary Export R Kit
  */
-export const exportRKitApiAdminStudiesSlugExportRKitGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<unknown>({
-        url: `/api/admin/studies/${slug}/export/r-kit`,
-        method: 'GET',
-        signal,
-    });
-};
-
-export const getExportRKitApiAdminStudiesSlugExportRKitGetQueryKey = (slug?: string) => {
-    return [`/api/admin/studies/${slug}/export/r-kit`] as const;
-};
-
-export const getExportRKitApiAdminStudiesSlugExportRKitGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-    TError = HTTPValidationError,
->(
+export const exportRKitApiAdminStudiesSlugExportRKitGet = (
     slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-                TError,
-                TData
-            >
-        >;
-    }
+ signal?: AbortSignal
 ) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey =
-        queryOptions?.queryKey ?? getExportRKitApiAdminStudiesSlugExportRKitGetQueryKey(slug);
-
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>
-    > = ({ signal }) => exportRKitApiAdminStudiesSlugExportRKitGet(slug, signal);
-
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ExportRKitApiAdminStudiesSlugExportRKitGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>
->;
-export type ExportRKitApiAdminStudiesSlugExportRKitGetQueryError = HTTPValidationError;
-
-export function useExportRKitApiAdminStudiesSlugExportRKitGet<
-    TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>
-                >,
-                'initialData'
-            >;
+      
+      
+      return customInstance<unknown>(
+      {url: `/api/admin/studies/${slug}/export/r-kit`, method: 'GET', signal
     },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useExportRKitApiAdminStudiesSlugExportRKitGet<
-    TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useExportRKitApiAdminStudiesSlugExportRKitGet<
-    TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      );
+    }
+  
+
+
+
+export const getExportRKitApiAdminStudiesSlugExportRKitGetQueryKey = (slug?: string,) => {
+    return [
+    `/api/admin/studies/${slug}/export/r-kit`
+    ] as const;
+    }
+
+    
+export const getExportRKitApiAdminStudiesSlugExportRKitGetQueryOptions = <TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError = HTTPValidationError>(slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getExportRKitApiAdminStudiesSlugExportRKitGetQueryKey(slug);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>> = ({ signal }) => exportRKitApiAdminStudiesSlugExportRKitGet(slug, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ExportRKitApiAdminStudiesSlugExportRKitGetQueryResult = NonNullable<Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>>
+export type ExportRKitApiAdminStudiesSlugExportRKitGetQueryError = HTTPValidationError
+
+
+export function useExportRKitApiAdminStudiesSlugExportRKitGet<TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError = HTTPValidationError>(
+ slug: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
+          TError,
+          Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportRKitApiAdminStudiesSlugExportRKitGet<TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
+          TError,
+          Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useExportRKitApiAdminStudiesSlugExportRKitGet<TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Export R Kit
  */
 
-export function useExportRKitApiAdminStudiesSlugExportRKitGet<
-    TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getExportRKitApiAdminStudiesSlugExportRKitGetQueryOptions(slug, options);
+export function useExportRKitApiAdminStudiesSlugExportRKitGet<TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getExportRKitApiAdminStudiesSlugExportRKitGetQueryOptions(slug,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Get complete study data and participant placements for client-side export generation.
  * @summary Get Study Dump
  */
-export const getStudyDumpApiAdminStudiesSlugDumpGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<unknown>({
-        url: `/api/admin/studies/${slug}/dump`,
-        method: 'GET',
-        signal,
-    });
-};
-
-export const getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey = (slug?: string) => {
-    return [`/api/admin/studies/${slug}/dump`] as const;
-};
-
-export const getGetStudyDumpApiAdminStudiesSlugDumpGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-    TError = HTTPValidationError,
->(
+export const getStudyDumpApiAdminStudiesSlugDumpGet = (
     slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-                TError,
-                TData
-            >
-        >;
-    }
+ signal?: AbortSignal
 ) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey =
-        queryOptions?.queryKey ?? getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey(slug);
-
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>
-    > = ({ signal }) => getStudyDumpApiAdminStudiesSlugDumpGet(slug, signal);
-
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type GetStudyDumpApiAdminStudiesSlugDumpGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>
->;
-export type GetStudyDumpApiAdminStudiesSlugDumpGetQueryError = HTTPValidationError;
-
-export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
-    TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>
-                >,
-                'initialData'
-            >;
+      
+      
+      return customInstance<unknown>(
+      {url: `/api/admin/studies/${slug}/dump`, method: 'GET', signal
     },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
-    TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
-    TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      );
+    }
+  
+
+
+
+export const getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey = (slug?: string,) => {
+    return [
+    `/api/admin/studies/${slug}/dump`
+    ] as const;
+    }
+
+    
+export const getGetStudyDumpApiAdminStudiesSlugDumpGetQueryOptions = <TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError = HTTPValidationError>(slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey(slug);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>> = ({ signal }) => getStudyDumpApiAdminStudiesSlugDumpGet(slug, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetStudyDumpApiAdminStudiesSlugDumpGetQueryResult = NonNullable<Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>>
+export type GetStudyDumpApiAdminStudiesSlugDumpGetQueryError = HTTPValidationError
+
+
+export function useGetStudyDumpApiAdminStudiesSlugDumpGet<TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError = HTTPValidationError>(
+ slug: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
+          TError,
+          Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStudyDumpApiAdminStudiesSlugDumpGet<TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
+          TError,
+          Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStudyDumpApiAdminStudiesSlugDumpGet<TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Study Dump
  */
 
-export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
-    TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetStudyDumpApiAdminStudiesSlugDumpGetQueryOptions(slug, options);
+export function useGetStudyDumpApiAdminStudiesSlugDumpGet<TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError = HTTPValidationError>(
+ slug: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getGetStudyDumpApiAdminStudiesSlugDumpGetQueryOptions(slug,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Generate a JWT invitation link for a collaborator.
@@ -2144,510 +1467,383 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
 export const inviteCollaboratorApiAdminInvitationsSlugInvitePost = (
     slug: string,
     invitationCreate: InvitationCreate,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    return customInstance<InvitationLink>({
-        url: `/api/admin/invitations/${slug}/invite`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: invitationCreate,
-        signal,
-    });
-};
+      
+      
+      return customInstance<InvitationLink>(
+      {url: `/api/admin/invitations/${slug}/invite`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: invitationCreate, signal
+    },
+      );
+    }
+  
 
-export const getInviteCollaboratorApiAdminInvitationsSlugInvitePostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-        TError,
-        { slug: string; data: InvitationCreate },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-    TError,
-    { slug: string; data: InvitationCreate },
-    TContext
-> => {
-    const mutationKey = ['inviteCollaboratorApiAdminInvitationsSlugInvitePost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-        { slug: string; data: InvitationCreate }
-    > = (props) => {
-        const { slug, data } = props ?? {};
+export const getInviteCollaboratorApiAdminInvitationsSlugInvitePostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>, TError,{slug: string;data: InvitationCreate}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>, TError,{slug: string;data: InvitationCreate}, TContext> => {
 
-        return inviteCollaboratorApiAdminInvitationsSlugInvitePost(slug, data);
-    };
+const mutationKey = ['inviteCollaboratorApiAdminInvitationsSlugInvitePost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>
->;
-export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationBody = InvitationCreate;
-export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationError = HTTPValidationError;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>, {slug: string;data: InvitationCreate}> = (props) => {
+          const {slug,data} = props ?? {};
+
+          return  inviteCollaboratorApiAdminInvitationsSlugInvitePost(slug,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationResult = NonNullable<Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>>
+    export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationBody = InvitationCreate
+    export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationError = HTTPValidationError
+
+    /**
  * @summary Invite Collaborator
  */
-export const useInviteCollaboratorApiAdminInvitationsSlugInvitePost = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-            TError,
-            { slug: string; data: InvitationCreate },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-    TError,
-    { slug: string; data: InvitationCreate },
-    TContext
-> => {
-    const mutationOptions =
-        getInviteCollaboratorApiAdminInvitationsSlugInvitePostMutationOptions(options);
+export const useInviteCollaboratorApiAdminInvitationsSlugInvitePost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>, TError,{slug: string;data: InvitationCreate}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
+        TError,
+        {slug: string;data: InvitationCreate},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getInviteCollaboratorApiAdminInvitationsSlugInvitePostMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Verify an invitation token and return details.
  * @summary Verify Invitation
  */
 export const verifyInvitationApiAdminInvitationsVerifyTokenGet = (
     token: string,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
-        url: `/api/admin/invitations/verify/${token}`,
-        method: 'GET',
-        signal,
-    });
-};
-
-export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryKey = (token?: string) => {
-    return [`/api/admin/invitations/verify/${token}`] as const;
-};
-
-export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-    TError = HTTPValidationError,
->(
-    token: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-                TError,
-                TData
-            >
-        >;
+      
+      
+      return customInstance<unknown>(
+      {url: `/api/admin/invitations/verify/${token}`, method: 'GET', signal
+    },
+      );
     }
+  
+
+
+
+export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryKey = (token?: string,) => {
+    return [
+    `/api/admin/invitations/verify/${token}`
+    ] as const;
+    }
+
+    
+export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions = <TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError = HTTPValidationError>(token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError, TData>>, }
 ) => {
-    const { query: queryOptions } = options ?? {};
 
-    const queryKey =
-        queryOptions?.queryKey ??
-        getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryKey(token);
+const {query: queryOptions} = options ?? {};
 
-    const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
-    > = ({ signal }) => verifyInvitationApiAdminInvitationsVerifyTokenGet(token, signal);
+  const queryKey =  queryOptions?.queryKey ?? getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryKey(token);
 
-    return { queryKey, queryFn, enabled: !!token, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type VerifyInvitationApiAdminInvitationsVerifyTokenGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
->;
-export type VerifyInvitationApiAdminInvitationsVerifyTokenGetQueryError = HTTPValidationError;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>> = ({ signal }) => verifyInvitationApiAdminInvitationsVerifyTokenGet(token, signal);
 
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-    TError = HTTPValidationError,
->(
-    token: string,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-    TError = HTTPValidationError,
->(
-    token: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-    TError = HTTPValidationError,
->(
-    token: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(token), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type VerifyInvitationApiAdminInvitationsVerifyTokenGetQueryResult = NonNullable<Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>>
+export type VerifyInvitationApiAdminInvitationsVerifyTokenGetQueryError = HTTPValidationError
+
+
+export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError = HTTPValidationError>(
+ token: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+          TError,
+          Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError = HTTPValidationError>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+          TError,
+          Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError = HTTPValidationError>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Verify Invitation
  */
 
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-    TError = HTTPValidationError,
->(
-    token: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions(
-        token,
-        options
-    );
+export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError = HTTPValidationError>(
+ token: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions(token,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * List all users in the system.
  * @summary List Users
  */
-export const listUsersApiAdminUsersGet = (signal?: AbortSignal) => {
-    return customInstance<UserRead[]>({ url: `/api/admin/users/`, method: 'GET', signal });
-};
+export const listUsersApiAdminUsersGet = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<UserRead[]>(
+      {url: `/api/admin/users/`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
 
 export const getListUsersApiAdminUsersGetQueryKey = () => {
-    return [`/api/admin/users/`] as const;
-};
+    return [
+    `/api/admin/users/`
+    ] as const;
+    }
 
-export const getListUsersApiAdminUsersGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
-    >;
-}) => {
-    const { query: queryOptions } = options ?? {};
+    
+export const getListUsersApiAdminUsersGetQueryOptions = <TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>>, }
+) => {
 
-    const queryKey = queryOptions?.queryKey ?? getListUsersApiAdminUsersGetQueryKey();
+const {query: queryOptions} = options ?? {};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>> = ({
-        signal,
-    }) => listUsersApiAdminUsersGet(signal);
+  const queryKey =  queryOptions?.queryKey ?? getListUsersApiAdminUsersGetQueryKey();
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type ListUsersApiAdminUsersGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>
->;
-export type ListUsersApiAdminUsersGetQueryError = unknown;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>> = ({ signal }) => listUsersApiAdminUsersGet(signal);
 
-export function useListUsersApiAdminUsersGet<
-    TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
->(
-    options: {
-        query: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListUsersApiAdminUsersGet<
-    TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListUsersApiAdminUsersGet<
-    TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListUsersApiAdminUsersGetQueryResult = NonNullable<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>>
+export type ListUsersApiAdminUsersGetQueryError = unknown
+
+
+export function useListUsersApiAdminUsersGet<TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
+          TError,
+          Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListUsersApiAdminUsersGet<TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
+          TError,
+          Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListUsersApiAdminUsersGet<TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary List Users
  */
 
-export function useListUsersApiAdminUsersGet<
-    TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getListUsersApiAdminUsersGetQueryOptions(options);
+export function useListUsersApiAdminUsersGet<TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getListUsersApiAdminUsersGetQueryOptions(options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Create a new user.
  * @summary Create User
  */
-export const createUserApiAdminUsersPost = (userCreate: UserCreate, signal?: AbortSignal) => {
-    return customInstance<UserRead>({
-        url: `/api/admin/users/`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: userCreate,
-        signal,
-    });
-};
+export const createUserApiAdminUsersPost = (
+    userCreate: UserCreate,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<UserRead>(
+      {url: `/api/admin/users/`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: userCreate, signal
+    },
+      );
+    }
+  
 
-export const getCreateUserApiAdminUsersPostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
-        TError,
-        { data: UserCreate },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
-    TError,
-    { data: UserCreate },
-    TContext
-> => {
-    const mutationKey = ['createUserApiAdminUsersPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
-        { data: UserCreate }
-    > = (props) => {
-        const { data } = props ?? {};
+export const getCreateUserApiAdminUsersPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUserApiAdminUsersPost>>, TError,{data: UserCreate}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof createUserApiAdminUsersPost>>, TError,{data: UserCreate}, TContext> => {
 
-        return createUserApiAdminUsersPost(data);
-    };
+const mutationKey = ['createUserApiAdminUsersPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type CreateUserApiAdminUsersPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof createUserApiAdminUsersPost>>
->;
-export type CreateUserApiAdminUsersPostMutationBody = UserCreate;
-export type CreateUserApiAdminUsersPostMutationError = HTTPValidationError;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUserApiAdminUsersPost>>, {data: UserCreate}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createUserApiAdminUsersPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateUserApiAdminUsersPostMutationResult = NonNullable<Awaited<ReturnType<typeof createUserApiAdminUsersPost>>>
+    export type CreateUserApiAdminUsersPostMutationBody = UserCreate
+    export type CreateUserApiAdminUsersPostMutationError = HTTPValidationError
+
+    /**
  * @summary Create User
  */
-export const useCreateUserApiAdminUsersPost = <TError = HTTPValidationError, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
-            TError,
-            { data: UserCreate },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
-    TError,
-    { data: UserCreate },
-    TContext
-> => {
-    const mutationOptions = getCreateUserApiAdminUsersPostMutationOptions(options);
+export const useCreateUserApiAdminUsersPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUserApiAdminUsersPost>>, TError,{data: UserCreate}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createUserApiAdminUsersPost>>,
+        TError,
+        {data: UserCreate},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getCreateUserApiAdminUsersPostMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Delete a user. Cannot delete self.
  * @summary Delete User
  */
-export const deleteUserApiAdminUsersUserIdDelete = (userId: number) => {
-    return customInstance<void>({ url: `/api/admin/users/${userId}`, method: 'DELETE' });
-};
+export const deleteUserApiAdminUsersUserIdDelete = (
+    userId: number,
+ ) => {
+      
+      
+      return customInstance<void>(
+      {url: `/api/admin/users/${userId}`, method: 'DELETE'
+    },
+      );
+    }
+  
 
-export const getDeleteUserApiAdminUsersUserIdDeleteMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>,
-        TError,
-        { userId: number },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>,
-    TError,
-    { userId: number },
-    TContext
-> => {
-    const mutationKey = ['deleteUserApiAdminUsersUserIdDelete'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>,
-        { userId: number }
-    > = (props) => {
-        const { userId } = props ?? {};
+export const getDeleteUserApiAdminUsersUserIdDeleteMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>, TError,{userId: number}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>, TError,{userId: number}, TContext> => {
 
-        return deleteUserApiAdminUsersUserIdDelete(userId);
-    };
+const mutationKey = ['deleteUserApiAdminUsersUserIdDelete'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type DeleteUserApiAdminUsersUserIdDeleteMutationResult = NonNullable<
-    Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>
->;
 
-export type DeleteUserApiAdminUsersUserIdDeleteMutationError = HTTPValidationError;
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>, {userId: number}> = (props) => {
+          const {userId} = props ?? {};
 
-/**
+          return  deleteUserApiAdminUsersUserIdDelete(userId,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteUserApiAdminUsersUserIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>>
+    
+    export type DeleteUserApiAdminUsersUserIdDeleteMutationError = HTTPValidationError
+
+    /**
  * @summary Delete User
  */
-export const useDeleteUserApiAdminUsersUserIdDelete = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>,
-            TError,
-            { userId: number },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>,
-    TError,
-    { userId: number },
-    TContext
-> => {
-    const mutationOptions = getDeleteUserApiAdminUsersUserIdDeleteMutationOptions(options);
+export const useDeleteUserApiAdminUsersUserIdDelete = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>, TError,{userId: number}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteUserApiAdminUsersUserIdDelete>>,
+        TError,
+        {userId: number},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getDeleteUserApiAdminUsersUserIdDeleteMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Submits or updates a study participation.
 
@@ -2656,82 +1852,66 @@ Logic moved to StudyService for maintainability.
  */
 export const submitStudyApiSubmitPost = (
     submissionInput: SubmissionInput,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
-        url: `/api/submit`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: submissionInput,
-        signal,
-    });
-};
+      
+      
+      return customInstance<unknown>(
+      {url: `/api/submit`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: submissionInput, signal
+    },
+      );
+    }
+  
 
-export const getSubmitStudyApiSubmitPostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof submitStudyApiSubmitPost>>,
-        TError,
-        { data: SubmissionInput },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof submitStudyApiSubmitPost>>,
-    TError,
-    { data: SubmissionInput },
-    TContext
-> => {
-    const mutationKey = ['submitStudyApiSubmitPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof submitStudyApiSubmitPost>>,
-        { data: SubmissionInput }
-    > = (props) => {
-        const { data } = props ?? {};
+export const getSubmitStudyApiSubmitPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitStudyApiSubmitPost>>, TError,{data: SubmissionInput}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof submitStudyApiSubmitPost>>, TError,{data: SubmissionInput}, TContext> => {
 
-        return submitStudyApiSubmitPost(data);
-    };
+const mutationKey = ['submitStudyApiSubmitPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type SubmitStudyApiSubmitPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof submitStudyApiSubmitPost>>
->;
-export type SubmitStudyApiSubmitPostMutationBody = SubmissionInput;
-export type SubmitStudyApiSubmitPostMutationError = HTTPValidationError;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitStudyApiSubmitPost>>, {data: SubmissionInput}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitStudyApiSubmitPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitStudyApiSubmitPostMutationResult = NonNullable<Awaited<ReturnType<typeof submitStudyApiSubmitPost>>>
+    export type SubmitStudyApiSubmitPostMutationBody = SubmissionInput
+    export type SubmitStudyApiSubmitPostMutationError = HTTPValidationError
+
+    /**
  * @summary Submit Study
  */
-export const useSubmitStudyApiSubmitPost = <TError = HTTPValidationError, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof submitStudyApiSubmitPost>>,
-            TError,
-            { data: SubmissionInput },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof submitStudyApiSubmitPost>>,
-    TError,
-    { data: SubmissionInput },
-    TContext
-> => {
-    const mutationOptions = getSubmitStudyApiSubmitPostMutationOptions(options);
+export const useSubmitStudyApiSubmitPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitStudyApiSubmitPost>>, TError,{data: SubmissionInput}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof submitStudyApiSubmitPost>>,
+        TError,
+        {data: SubmissionInput},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getSubmitStudyApiSubmitPostMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Fetches study configuration for the frontend, including language resolution.
  * @summary Get Study
@@ -2739,132 +1919,100 @@ export const useSubmitStudyApiSubmitPost = <TError = HTTPValidationError, TConte
 export const getStudyApiStudySlugGet = (
     slug: string,
     params?: GetStudyApiStudySlugGetParams,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({ url: `/api/study/${slug}`, method: 'GET', params, signal });
-};
-
-export const getGetStudyApiStudySlugGetQueryKey = (
-    slug?: string,
-    params?: GetStudyApiStudySlugGetParams
-) => {
-    return [`/api/study/${slug}`, ...(params ? [params] : [])] as const;
-};
-
-export const getGetStudyApiStudySlugGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params?: GetStudyApiStudySlugGetParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>
-        >;
+      
+      
+      return customInstance<unknown>(
+      {url: `/api/study/${slug}`, method: 'GET',
+        params, signal
+    },
+      );
     }
+  
+
+
+
+export const getGetStudyApiStudySlugGetQueryKey = (slug?: string,
+    params?: GetStudyApiStudySlugGetParams,) => {
+    return [
+    `/api/study/${slug}`, ...(params ? [params]: [])
+    ] as const;
+    }
+
+    
+export const getGetStudyApiStudySlugGetQueryOptions = <TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError = HTTPValidationError>(slug: string,
+    params?: GetStudyApiStudySlugGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>>, }
 ) => {
-    const { query: queryOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getGetStudyApiStudySlugGetQueryKey(slug, params);
+const {query: queryOptions} = options ?? {};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>> = ({
-        signal,
-    }) => getStudyApiStudySlugGet(slug, params, signal);
+  const queryKey =  queryOptions?.queryKey ?? getGetStudyApiStudySlugGetQueryKey(slug,params);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type GetStudyApiStudySlugGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof getStudyApiStudySlugGet>>
->;
-export type GetStudyApiStudySlugGetQueryError = HTTPValidationError;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>> = ({ signal }) => getStudyApiStudySlugGet(slug,params, signal);
 
-export function useGetStudyApiStudySlugGet<
-    TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params: undefined | GetStudyApiStudySlugGetParams,
-    options: {
-        query: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof getStudyApiStudySlugGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyApiStudySlugGet<
-    TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params?: GetStudyApiStudySlugGetParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof getStudyApiStudySlugGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetStudyApiStudySlugGet<
-    TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params?: GetStudyApiStudySlugGetParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(slug), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetStudyApiStudySlugGetQueryResult = NonNullable<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>>
+export type GetStudyApiStudySlugGetQueryError = HTTPValidationError
+
+
+export function useGetStudyApiStudySlugGet<TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError = HTTPValidationError>(
+ slug: string,
+    params: undefined |  GetStudyApiStudySlugGetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
+          TError,
+          Awaited<ReturnType<typeof getStudyApiStudySlugGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStudyApiStudySlugGet<TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError = HTTPValidationError>(
+ slug: string,
+    params?: GetStudyApiStudySlugGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
+          TError,
+          Awaited<ReturnType<typeof getStudyApiStudySlugGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetStudyApiStudySlugGet<TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError = HTTPValidationError>(
+ slug: string,
+    params?: GetStudyApiStudySlugGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Get Study
  */
 
-export function useGetStudyApiStudySlugGet<
-    TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params?: GetStudyApiStudySlugGetParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getGetStudyApiStudySlugGetQueryOptions(slug, params, options);
+export function useGetStudyApiStudySlugGet<TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError = HTTPValidationError>(
+ slug: string,
+    params?: GetStudyApiStudySlugGetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getGetStudyApiStudySlugGetQueryOptions(slug,params,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Records participant consent with timestamp and version.
@@ -2873,395 +2021,312 @@ export function useGetStudyApiStudySlugGet<
 export const recordConsentApiStudySlugConsentPost = (
     slug: string,
     consentInput: ConsentInput,
-    signal?: AbortSignal
+ signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
-        url: `/api/study/${slug}/consent`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: consentInput,
-        signal,
-    });
-};
+      
+      
+      return customInstance<unknown>(
+      {url: `/api/study/${slug}/consent`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: consentInput, signal
+    },
+      );
+    }
+  
 
-export const getRecordConsentApiStudySlugConsentPostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>,
-        TError,
-        { slug: string; data: ConsentInput },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>,
-    TError,
-    { slug: string; data: ConsentInput },
-    TContext
-> => {
-    const mutationKey = ['recordConsentApiStudySlugConsentPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>,
-        { slug: string; data: ConsentInput }
-    > = (props) => {
-        const { slug, data } = props ?? {};
+export const getRecordConsentApiStudySlugConsentPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>, TError,{slug: string;data: ConsentInput}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>, TError,{slug: string;data: ConsentInput}, TContext> => {
 
-        return recordConsentApiStudySlugConsentPost(slug, data);
-    };
+const mutationKey = ['recordConsentApiStudySlugConsentPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type RecordConsentApiStudySlugConsentPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>
->;
-export type RecordConsentApiStudySlugConsentPostMutationBody = ConsentInput;
-export type RecordConsentApiStudySlugConsentPostMutationError = HTTPValidationError;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>, {slug: string;data: ConsentInput}> = (props) => {
+          const {slug,data} = props ?? {};
+
+          return  recordConsentApiStudySlugConsentPost(slug,data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RecordConsentApiStudySlugConsentPostMutationResult = NonNullable<Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>>
+    export type RecordConsentApiStudySlugConsentPostMutationBody = ConsentInput
+    export type RecordConsentApiStudySlugConsentPostMutationError = HTTPValidationError
+
+    /**
  * @summary Record Consent
  */
-export const useRecordConsentApiStudySlugConsentPost = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>,
-            TError,
-            { slug: string; data: ConsentInput },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>,
-    TError,
-    { slug: string; data: ConsentInput },
-    TContext
-> => {
-    const mutationOptions = getRecordConsentApiStudySlugConsentPostMutationOptions(options);
+export const useRecordConsentApiStudySlugConsentPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>, TError,{slug: string;data: ConsentInput}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof recordConsentApiStudySlugConsentPost>>,
+        TError,
+        {slug: string;data: ConsentInput},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getRecordConsentApiStudySlugConsentPostMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Receives logging/error data from the frontend.
  * @summary Report Log
  */
-export const reportLogApiLogsPost = (logEntry: LogEntry, signal?: AbortSignal) => {
-    return customInstance<unknown>({
-        url: `/api/logs`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: logEntry,
-        signal,
-    });
-};
+export const reportLogApiLogsPost = (
+    logEntry: LogEntry,
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<unknown>(
+      {url: `/api/logs`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: logEntry, signal
+    },
+      );
+    }
+  
 
-export const getReportLogApiLogsPostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof reportLogApiLogsPost>>,
-        TError,
-        { data: LogEntry },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof reportLogApiLogsPost>>,
-    TError,
-    { data: LogEntry },
-    TContext
-> => {
-    const mutationKey = ['reportLogApiLogsPost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
 
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof reportLogApiLogsPost>>,
-        { data: LogEntry }
-    > = (props) => {
-        const { data } = props ?? {};
+export const getReportLogApiLogsPostMutationOptions = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportLogApiLogsPost>>, TError,{data: LogEntry}, TContext>, }
+): UseMutationOptions<Awaited<ReturnType<typeof reportLogApiLogsPost>>, TError,{data: LogEntry}, TContext> => {
 
-        return reportLogApiLogsPost(data);
-    };
+const mutationKey = ['reportLogApiLogsPost'];
+const {mutation: mutationOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }};
 
-    return { mutationFn, ...mutationOptions };
-};
+      
 
-export type ReportLogApiLogsPostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof reportLogApiLogsPost>>
->;
-export type ReportLogApiLogsPostMutationBody = LogEntry;
-export type ReportLogApiLogsPostMutationError = HTTPValidationError;
 
-/**
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportLogApiLogsPost>>, {data: LogEntry}> = (props) => {
+          const {data} = props ?? {};
+
+          return  reportLogApiLogsPost(data,)
+        }
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReportLogApiLogsPostMutationResult = NonNullable<Awaited<ReturnType<typeof reportLogApiLogsPost>>>
+    export type ReportLogApiLogsPostMutationBody = LogEntry
+    export type ReportLogApiLogsPostMutationError = HTTPValidationError
+
+    /**
  * @summary Report Log
  */
-export const useReportLogApiLogsPost = <TError = HTTPValidationError, TContext = unknown>(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof reportLogApiLogsPost>>,
-            TError,
-            { data: LogEntry },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof reportLogApiLogsPost>>,
-    TError,
-    { data: LogEntry },
-    TContext
-> => {
-    const mutationOptions = getReportLogApiLogsPostMutationOptions(options);
+export const useReportLogApiLogsPost = <TError = HTTPValidationError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportLogApiLogsPost>>, TError,{data: LogEntry}, TContext>, }
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reportLogApiLogsPost>>,
+        TError,
+        {data: LogEntry},
+        TContext
+      > => {
 
-    return useMutation(mutationOptions, queryClient);
-};
+      const mutationOptions = getReportLogApiLogsPostMutationOptions(options);
 
+      return useMutation(mutationOptions, queryClient);
+    }
+    
 /**
  * Health check endpoint to verify API availability.
  * @summary Health Check
  */
-export const healthCheckHealthGet = (signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/health`, method: 'GET', signal });
-};
+export const healthCheckHealthGet = (
+    
+ signal?: AbortSignal
+) => {
+      
+      
+      return customInstance<unknown>(
+      {url: `/health`, method: 'GET', signal
+    },
+      );
+    }
+  
+
+
 
 export const getHealthCheckHealthGetQueryKey = () => {
-    return [`/health`] as const;
-};
+    return [
+    `/health`
+    ] as const;
+    }
 
-export const getHealthCheckHealthGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof healthCheckHealthGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<
-        UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>
-    >;
-}) => {
-    const { query: queryOptions } = options ?? {};
+    
+export const getHealthCheckHealthGetQueryOptions = <TData = Awaited<ReturnType<typeof healthCheckHealthGet>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>>, }
+) => {
 
-    const queryKey = queryOptions?.queryKey ?? getHealthCheckHealthGetQueryKey();
+const {query: queryOptions} = options ?? {};
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof healthCheckHealthGet>>> = ({ signal }) =>
-        healthCheckHealthGet(signal);
+  const queryKey =  queryOptions?.queryKey ?? getHealthCheckHealthGetQueryKey();
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof healthCheckHealthGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type HealthCheckHealthGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof healthCheckHealthGet>>
->;
-export type HealthCheckHealthGetQueryError = unknown;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof healthCheckHealthGet>>> = ({ signal }) => healthCheckHealthGet(signal);
 
-export function useHealthCheckHealthGet<
-    TData = Awaited<ReturnType<typeof healthCheckHealthGet>>,
-    TError = unknown,
->(
-    options: {
-        query: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof healthCheckHealthGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof healthCheckHealthGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useHealthCheckHealthGet<
-    TData = Awaited<ReturnType<typeof healthCheckHealthGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof healthCheckHealthGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof healthCheckHealthGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useHealthCheckHealthGet<
-    TData = Awaited<ReturnType<typeof healthCheckHealthGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type HealthCheckHealthGetQueryResult = NonNullable<Awaited<ReturnType<typeof healthCheckHealthGet>>>
+export type HealthCheckHealthGetQueryError = unknown
+
+
+export function useHealthCheckHealthGet<TData = Awaited<ReturnType<typeof healthCheckHealthGet>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthCheckHealthGet>>,
+          TError,
+          Awaited<ReturnType<typeof healthCheckHealthGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useHealthCheckHealthGet<TData = Awaited<ReturnType<typeof healthCheckHealthGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthCheckHealthGet>>,
+          TError,
+          Awaited<ReturnType<typeof healthCheckHealthGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useHealthCheckHealthGet<TData = Awaited<ReturnType<typeof healthCheckHealthGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Health Check
  */
 
-export function useHealthCheckHealthGet<
-    TData = Awaited<ReturnType<typeof healthCheckHealthGet>>,
-    TError = unknown,
->(
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getHealthCheckHealthGetQueryOptions(options);
+export function useHealthCheckHealthGet<TData = Awaited<ReturnType<typeof healthCheckHealthGet>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof healthCheckHealthGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getHealthCheckHealthGetQueryOptions(options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }
+
+
+
+
 
 /**
  * Serve the Single Page Application (SPA) static files and handle client-side routing.
  * @summary Serve Spa
  */
-export const serveSpaFullPathGet = (fullPath: string, signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/${fullPath}`, method: 'GET', signal });
-};
-
-export const getServeSpaFullPathGetQueryKey = (fullPath?: string) => {
-    return [`/${fullPath}`] as const;
-};
-
-export const getServeSpaFullPathGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
+export const serveSpaFullPathGet = (
     fullPath: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        >;
-    }
+ signal?: AbortSignal
 ) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey = queryOptions?.queryKey ?? getServeSpaFullPathGetQueryKey(fullPath);
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof serveSpaFullPathGet>>> = ({ signal }) =>
-        serveSpaFullPathGet(fullPath, signal);
-
-    return { queryKey, queryFn, enabled: !!fullPath, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ServeSpaFullPathGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof serveSpaFullPathGet>>
->;
-export type ServeSpaFullPathGetQueryError = HTTPValidationError;
-
-export function useServeSpaFullPathGet<
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
-    fullPath: string,
-    options: {
-        query: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof serveSpaFullPathGet>>
-                >,
-                'initialData'
-            >;
+      
+      
+      return customInstance<unknown>(
+      {url: `/${fullPath}`, method: 'GET', signal
     },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useServeSpaFullPathGet<
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
-    fullPath: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-                    TError,
-                    Awaited<ReturnType<typeof serveSpaFullPathGet>>
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useServeSpaFullPathGet<
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
-    fullPath: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+      );
+    }
+  
+
+
+
+export const getServeSpaFullPathGetQueryKey = (fullPath?: string,) => {
+    return [
+    `/${fullPath}`
+    ] as const;
+    }
+
+    
+export const getServeSpaFullPathGetQueryOptions = <TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError = HTTPValidationError>(fullPath: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getServeSpaFullPathGetQueryKey(fullPath);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof serveSpaFullPathGet>>> = ({ signal }) => serveSpaFullPathGet(fullPath, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(fullPath), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ServeSpaFullPathGetQueryResult = NonNullable<Awaited<ReturnType<typeof serveSpaFullPathGet>>>
+export type ServeSpaFullPathGetQueryError = HTTPValidationError
+
+
+export function useServeSpaFullPathGet<TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError = HTTPValidationError>(
+ fullPath: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+          TError,
+          Awaited<ReturnType<typeof serveSpaFullPathGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useServeSpaFullPathGet<TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError = HTTPValidationError>(
+ fullPath: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+          TError,
+          Awaited<ReturnType<typeof serveSpaFullPathGet>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useServeSpaFullPathGet<TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError = HTTPValidationError>(
+ fullPath: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 /**
  * @summary Serve Spa
  */
 
-export function useServeSpaFullPathGet<
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
-    fullPath: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getServeSpaFullPathGetQueryOptions(fullPath, options);
+export function useServeSpaFullPathGet<TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError = HTTPValidationError>(
+ fullPath: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>>, }
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+  const queryOptions = getServeSpaFullPathGetQueryOptions(fullPath,options)
 
-    query.queryKey = queryOptions.queryKey;
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-    return query;
+  query.queryKey = queryOptions.queryKey ;
+
+  return query;
 }

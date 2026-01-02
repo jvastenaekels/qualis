@@ -1,29 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Command } from 'cmdk';
-import {
-    LayoutDashboard,
-    PencilRuler,
-    Users,
-    Moon,
-    Sun,
-    LogOut,
-    Copy,
-    FileText,
-    Search,
-} from 'lucide-react';
+import { Briefcase, LayoutDashboard, PencilRuler, Users, Moon, Sun, LogOut, Copy, FileText, Search } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
+import { useListStudiesApiAdminStudiesGet, useListWorkspacesApiAdminWorkspacesGet } from '@/api/generated';
 import { useSessionStore } from '@/store/useSessionStore';
 import { toast } from 'sonner';
 
 export const CommandMenu = () => {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-    const { activeStudyId } = useAdminStore();
+    const { activeStudyId, activeWorkspaceId, setActiveWorkspace, setActiveStudy } = useAdminStore();
     const logout = useAuthStore((state) => state.logout);
     const { data: studies } = useListStudiesApiAdminStudiesGet();
+    const { data: workspaces } = useListWorkspacesApiAdminWorkspacesGet();
+
+    const filteredStudies = studies?.filter(s => s.workspace_id === activeWorkspaceId);
 
     // Toggle on Cmd+K or Ctrl+K
     useEffect(() => {
@@ -81,24 +74,53 @@ export const CommandMenu = () => {
                         No results found.
                     </Command.Empty>
 
-                    {/* Go to Section */}
-                    <Command.Group
-                        heading="Go to"
-                        className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
-                    >
-                        {(studies ?? []).slice(0, 5).map((study) => (
+                    {/* Workspaces */}
+                    <Command.Group heading="Switch Workspace" className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        {workspaces?.map((ws) => (
+                            <Command.Item
+                                key={ws.id}
+                                value={`workspace ${ws.title}`}
+                                onSelect={() =>
+                                    runCommand(() => {
+                                        setActiveWorkspace(ws.id);
+                                        toast.success(`Switched to ${ws.title}`);
+                                    })
+                                }
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                            >
+                                <Briefcase className="h-4 w-4 text-slate-400" />
+                                <span>{ws.title}</span>
+                                {ws.id === activeWorkspaceId && (
+                                    <span className="ml-auto text-xs text-slate-400">Active</span>
+                                )}
+                            </Command.Item>
+                        ))}
+                    </Command.Group>
+
+                    {/* Studies (Filtered) */}
+                    <Command.Group heading="Switch Study" className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                        {filteredStudies?.map((study) => (
                             <Command.Item
                                 key={study.slug}
-                                value={`go ${study.slug}`}
+                                value={`study ${study.slug}`}
                                 onSelect={() =>
-                                    runCommand(() => navigate(`/admin/studies/${study.slug}`))
+                                    runCommand(() => {
+                                        setActiveStudy(study.slug);
+                                        navigate(`/admin/studies/${study.slug}`);
+                                    })
                                 }
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
                             >
                                 <FileText className="h-4 w-4 text-slate-400" />
                                 <span>{study.slug}</span>
+                                {study.slug === activeStudyId && (
+                                    <span className="ml-auto text-xs text-slate-400">Active</span>
+                                )}
                             </Command.Item>
                         ))}
+                        {(!filteredStudies || filteredStudies.length === 0) && (
+                            <div className="px-4 py-2 text-sm text-slate-500">No studies in this workspace.</div>
+                        )}
                     </Command.Group>
 
                     {/* Contextual Actions (only when study is active) */}

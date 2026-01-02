@@ -120,19 +120,29 @@ const StudyDesignPage = () => {
 
     if (!draft) return <div>Study not found</div>;
 
+import { LayoutProvider } from '@/contexts/LayoutContext';
+
     const renderPreview = () => {
-        switch (activeStep) {
-            case 'intro':
-                return <WelcomePage />;
-            case 'pre-sort':
-                return <PreSortPage />;
-            case 'q-sort':
-                return <RoughSortPage />;
-            case 'post-sort':
-                return <PostSortPage />;
-            default:
-                return <WelcomePage />;
-        }
+        return (
+            <LayoutProvider>
+                <div className="h-full w-full">
+                    {(() => {
+                        switch (activeStep) {
+                            case 'intro':
+                                return <WelcomePage />;
+                            case 'pre-sort':
+                                return <PreSortPage />;
+                            case 'q-sort':
+                                return <RoughSortPage />;
+                            case 'post-sort':
+                                return <PostSortPage />;
+                            default:
+                                return <WelcomePage />;
+                        }
+                    })()}
+                </div>
+            </LayoutProvider>
+        );
     };
 
     return (

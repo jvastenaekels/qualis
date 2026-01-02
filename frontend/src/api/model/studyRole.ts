@@ -8,11 +8,12 @@
 /**
  * Enum for study-specific roles.
  */
-export type StudyRole = (typeof StudyRole)[keyof typeof StudyRole];
+export type StudyRole = typeof StudyRole[keyof typeof StudyRole];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const StudyRole = {
-    owner: 'owner',
-    editor: 'editor',
-    viewer: 'viewer',
+  owner: 'owner',
+  editor: 'editor',
+  viewer: 'viewer',
 } as const;

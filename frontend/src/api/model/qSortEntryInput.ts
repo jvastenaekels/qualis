@@ -10,7 +10,7 @@ import type { QSortEntryInputCardComment } from './qSortEntryInputCardComment';
  * Schema for individual statement placement during submission.
  */
 export interface QSortEntryInput {
-    statement_id: number;
-    grid_score: number;
-    card_comment?: QSortEntryInputCardComment;
+  statement_id: number;
+  grid_score: number;
+  card_comment?: QSortEntryInputCardComment;
 }

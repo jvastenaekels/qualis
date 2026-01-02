@@ -9,10 +9,10 @@ import type { BodyLoginForAccessTokenApiTokenPostClientId } from './bodyLoginFor
 import type { BodyLoginForAccessTokenApiTokenPostClientSecret } from './bodyLoginForAccessTokenApiTokenPostClientSecret';
 
 export interface BodyLoginForAccessTokenApiTokenPost {
-    grant_type?: BodyLoginForAccessTokenApiTokenPostGrantType;
-    username: string;
-    password: string;
-    scope?: string;
-    client_id?: BodyLoginForAccessTokenApiTokenPostClientId;
-    client_secret?: BodyLoginForAccessTokenApiTokenPostClientSecret;
+  grant_type?: BodyLoginForAccessTokenApiTokenPostGrantType;
+  username: string;
+  password: string;
+  scope?: string;
+  client_id?: BodyLoginForAccessTokenApiTokenPostClientId;
+  client_secret?: BodyLoginForAccessTokenApiTokenPostClientSecret;
 }

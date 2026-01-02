@@ -17,6 +17,7 @@ from app.routers.admin import exports as admin_exports
 from app.routers.admin import invitations as admin_invitations
 from app.routers.admin import studies as admin_studies
 from app.routers.admin import users as admin_users
+from app.routers.admin import workspaces as admin_workspaces
 
 # Configure Logging
 logging.basicConfig(
@@ -92,6 +93,9 @@ app.include_router(
     admin_invitations.router, prefix="/api/admin/invitations", tags=["admin-invites"]
 )
 app.include_router(admin_users.router, prefix="/api/admin/users", tags=["admin-users"])
+app.include_router(
+    admin_workspaces.router, prefix="/api/admin/workspaces", tags=["admin-workspaces"]
+)
 app.include_router(submissions.router, prefix="/api", tags=["submissions"])
 app.include_router(
     participants.router, prefix="/api/study/{slug}", tags=["participants"]

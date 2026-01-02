@@ -8,13 +8,14 @@
 /**
  * Enum for study lifecycle states.
  */
-export type StudyState = (typeof StudyState)[keyof typeof StudyState];
+export type StudyState = typeof StudyState[keyof typeof StudyState];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const StudyState = {
-    draft: 'draft',
-    active: 'active',
-    paused: 'paused',
-    closed: 'closed',
-    archived: 'archived',
+  draft: 'draft',
+  active: 'active',
+  paused: 'paused',
+  closed: 'closed',
+  archived: 'archived',
 } as const;

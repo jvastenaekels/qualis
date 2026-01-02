@@ -9,8 +9,8 @@
  * Schema for reading user details.
  */
 export interface UserRead {
-    email: string;
-    id: number;
-    is_active: boolean;
-    is_superuser: boolean;
+  email: string;
+  id: number;
+  is_active: boolean;
+  is_superuser: boolean;
 }

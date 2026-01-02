@@ -9,6 +9,6 @@
  * Schema defining a column in the sorting grid.
  */
 export interface GridColumn {
-    score: number;
-    capacity: number;
+  score: number;
+  capacity: number;
 }

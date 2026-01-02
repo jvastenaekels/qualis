@@ -10,6 +10,6 @@ import type { StudyRole } from './studyRole';
  * Schema for creating a study invitation.
  */
 export interface InvitationCreate {
-    email: string;
-    role?: StudyRole;
+  email: string;
+  role?: StudyRole;
 }

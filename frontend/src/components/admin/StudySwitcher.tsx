@@ -23,10 +23,11 @@ import { CreateStudyDialog } from './CreateStudyDialog';
 export function StudySwitcher() {
     const { isMobile } = useSidebar();
     const { data: studies, isLoading } = useListStudiesApiAdminStudiesGet();
-    const { activeStudyId, setActiveStudy } = useAdminStore();
+    const { activeStudyId, setActiveStudy, activeWorkspaceId } = useAdminStore();
     const [showCreateDialog, setShowCreateDialog] = React.useState(false);
 
-    const activeStudy = studies?.find((s) => s.slug === activeStudyId);
+    const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
+    const activeStudy = filteredStudies?.find((s) => s.slug === activeStudyId);
 
     if (isLoading) {
         return (
@@ -73,7 +74,7 @@ export function StudySwitcher() {
                             <DropdownMenuLabel className="text-xs text-muted-foreground">
                                 Studies
                             </DropdownMenuLabel>
-                            {studies?.map((study) => (
+                            {filteredStudies?.map((study) => (
                                 <DropdownMenuItem
                                     key={study.id}
                                     onClick={() => setActiveStudy(study.slug)}

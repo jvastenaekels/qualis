@@ -16,18 +16,18 @@ import type { StatementCreate } from './statementCreate';
  * Schema for creating a study.
  */
 export interface StudyCreate {
-    /**
-     * @minLength 3
-     * @maxLength 100
-     * @pattern ^[a-z0-9-]+$
-     */
-    slug: string;
-    state?: StudyState;
-    grid_config: GridColumn[];
-    presort_config: StudyCreatePresortConfig;
-    postsort_config: StudyCreatePostsortConfig;
-    default_language?: StudyCreateDefaultLanguage;
-    show_statement_codes?: boolean;
-    translations: StudyTranslationCreate[];
-    statements?: StatementCreate[];
+  /**
+   * @minLength 3
+   * @maxLength 100
+   * @pattern ^[a-z0-9-]+$
+   */
+  slug: string;
+  state?: StudyState;
+  grid_config: GridColumn[];
+  presort_config: StudyCreatePresortConfig;
+  postsort_config: StudyCreatePostsortConfig;
+  default_language?: StudyCreateDefaultLanguage;
+  show_statement_codes?: boolean;
+  translations: StudyTranslationCreate[];
+  statements?: StatementCreate[];
 }

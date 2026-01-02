@@ -16,17 +16,17 @@ import type { QSortEntryInput } from './qSortEntryInput';
  * Schema for detailed participant view including responses.
  */
 export interface ParticipantDetailRead {
-    id: number;
-    study_id: number;
-    session_token: string;
-    language_used: string;
-    status: ParticipantStatus;
-    created_at: string;
-    submitted_at: ParticipantDetailReadSubmittedAt;
-    is_discarded: boolean;
-    discard_reason: ParticipantDetailReadDiscardReason;
-    user_agent: ParticipantDetailReadUserAgent;
-    presort_answers: ParticipantDetailReadPresortAnswers;
-    postsort_answers: ParticipantDetailReadPostsortAnswers;
-    qsort_entries: QSortEntryInput[];
+  id: number;
+  study_id: number;
+  session_token: string;
+  language_used: string;
+  status: ParticipantStatus;
+  created_at: string;
+  submitted_at: ParticipantDetailReadSubmittedAt;
+  is_discarded: boolean;
+  discard_reason: ParticipantDetailReadDiscardReason;
+  user_agent: ParticipantDetailReadUserAgent;
+  presort_answers: ParticipantDetailReadPresortAnswers;
+  postsort_answers: ParticipantDetailReadPostsortAnswers;
+  qsort_entries: QSortEntryInput[];
 }

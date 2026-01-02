@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import { Database, LayoutDashboard, PencilRuler, Send, SquareTerminal, Users } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
+import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import {
     Sidebar,
     SidebarContent,
@@ -82,6 +83,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         <Sidebar variant="inset" {...props}>
             <SidebarHeader>
+                <WorkspaceSwitcher />
                 <StudySwitcher />
             </SidebarHeader>
             <SidebarContent>

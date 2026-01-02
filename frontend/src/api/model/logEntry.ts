@@ -14,10 +14,10 @@ import type { LogEntryUserAgent } from './logEntryUserAgent';
  * Schema for frontend log entries.
  */
 export interface LogEntry {
-    level: LogEntryLevel;
-    message: string;
-    stack?: LogEntryStack;
-    context?: LogEntryContext;
-    url?: LogEntryUrl;
-    userAgent?: LogEntryUserAgent;
+  level: LogEntryLevel;
+  message: string;
+  stack?: LogEntryStack;
+  context?: LogEntryContext;
+  url?: LogEntryUrl;
+  userAgent?: LogEntryUserAgent;
 }

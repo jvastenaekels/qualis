@@ -9,6 +9,6 @@
  * Schema for returning a generated invitation link.
  */
 export interface InvitationLink {
-    invite_url: string;
-    token: string;
+  invite_url: string;
+  token: string;
 }
