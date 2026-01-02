@@ -27,6 +27,7 @@ vi.mock('react-i18next', () => ({
 vi.mock('../components/CardStack', async () => {
     const { forwardRef, useImperativeHandle } = await import('react');
     return {
+        // biome-ignore lint/suspicious/noExplicitAny: mock component
         default: forwardRef(({ statement, onVote }: any, ref: any) => {
             useImperativeHandle(ref, () => ({
                 swipe: (dir: string) => onVote(dir),
@@ -66,6 +67,18 @@ describe('RoughSortPage', () => {
         useConfigStore.getState().setConfig(mockConfig as unknown as StudyConfig);
         useSessionStore.getState().resetSession();
         useResponseStore.getState().resetResponses();
+    });
+
+    it('renders completed status message correctly', () => {
+        // biome-ignore lint/suspicious/noExplicitAny: mock config
+        useConfigStore.getState().setConfig({ state: 'completed' } as any as StudyConfig);
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/sort/rough'] }
+        );
+        expect(screen.getByText('rough.complete.title')).toBeTruthy();
     });
 
     it('sets the current step to 3 on mount', () => {
@@ -397,6 +410,7 @@ describe('RoughSortPage', () => {
                 'common.neutral': 'ExtremelyLongNeutralLabel',
             },
         };
+        // biome-ignore lint/suspicious/noExplicitAny: mock config
         useConfigStore.getState().setConfig(longConfig as any);
 
         renderWithProviders(

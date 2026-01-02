@@ -291,3 +291,22 @@ def auth_token_factory():
         return {"Authorization": f"Bearer {token}"}
 
     return _create_token
+
+
+@pytest_asyncio.fixture
+async def study_collaborator_factory(db: AsyncSession):
+    """Factory to add users as collaborators on studies with specific roles."""
+    from app.models import StudyCollaborator, StudyRole
+
+    async def _add_collaborator(
+        study: Study, user: User, role: StudyRole
+    ) -> None:
+        collab = StudyCollaborator(
+            study_id=study.id,
+            user_id=user.id,
+            role=role,
+        )
+        db.add(collab)
+        await db.commit()
+
+    return _add_collaborator

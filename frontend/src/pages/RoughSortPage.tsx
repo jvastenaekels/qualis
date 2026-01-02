@@ -86,13 +86,13 @@ const RoughSortPage: React.FC = () => {
     }, [responses.rough.history.length, showTip]);
 
     const unsortedCards = useMemo(() => {
-        if (!config) return [];
+        if (!config?.statements) return [];
         const sortedIds = new Set(responses.rough.history);
         return config.statements.filter((s) => !sortedIds.has(s.id));
     }, [config, responses.rough.history]);
 
     const currentCard = unsortedCards[0];
-    const progress = config
+    const progress = config?.statements
         ? ((config.statements.length - unsortedCards.length) / config.statements.length) * 100
         : 0;
 

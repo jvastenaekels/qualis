@@ -11,9 +11,10 @@
  */
 
 import { lazy, Suspense } from 'react';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Routes, Navigate } from 'react-router-dom';
 import { ApiError } from './api/client';
 import ErrorBoundary from './components/ErrorBoundary';
+import { useAdminStore } from './store/useAdminStore';
 import StudyLayout from './layouts/StudyLayout';
 import ConsentPage from './pages/ConsentPage';
 import ErrorPage from './pages/ErrorPage';
@@ -26,6 +27,24 @@ import WelcomePage from './pages/WelcomePage';
 
 // Lazy load heavy interactive components
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));
+const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+
+// Admin imports
+import RequireAdmin from './components/auth/RequireAdmin';
+const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
+const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
+const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
+const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage'));
+
+const AdminIndex = () => {
+    const { activeStudyId } = useAdminStore();
+
+    if (activeStudyId) {
+        return <Navigate to={`/admin/studies/${activeStudyId}`} replace />;
+    }
+    return <div className="p-8 text-muted-foreground">Please select a study from the sidebar.</div>;
+};
 
 const App = () => {
     return (
@@ -40,7 +59,20 @@ const App = () => {
                 >
                     <Routes>
                         <Route path="/" element={<LandingPage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegistrationPage />} />
 
+                        {/* Admin Routes */}
+                        <Route path="/admin" element={<RequireAdmin />}>
+                            <Route element={<AdminLayout />}>
+                                <Route index element={<AdminIndex />} />
+                                <Route path="studies/:slug" element={<StudyOverviewPage />} />
+                                <Route path="studies/:slug/design" element={<StudyDesignPage />} />
+                                <Route path="studies/:slug/team" element={<TeamManagementPage />} />
+                            </Route>
+                        </Route>
+
+                        {/* Study Routes */}
                         <Route path="/study/:slug" element={<StudyLayout />}>
                             <Route path="welcome" element={<WelcomePage />} />
                             <Route path="consent" element={<ConsentPage />} />

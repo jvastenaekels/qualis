@@ -2,12 +2,15 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import check_workspace_permission, get_current_user
+from app.dependencies import check_study_permission, get_current_user
 from app.models import (
     Study,
+    StudyCollaborator,
+    StudyRole,
     StudyState,
     User,
     Workspace,
@@ -15,8 +18,12 @@ from app.models import (
     WorkspaceRole,
 )
 from app.schemas import (
+    ParticipantDiscardUpdate,
+    ParticipantRead,
+    ParticipantDetailRead,
     StudyCreate,
     StudyRead,
+    StudyStatsRead,
     StudyUpdate,
 )
 
@@ -74,8 +81,14 @@ async def create_study(
     db.add(db_study)
     await db.flush()  # to get ID
 
-    # TODO: Handle translations and statements creation here if included in StudyCreate
-    from ...models import Statement, StatementTranslation, StudyTranslation
+    # 4. Add creator as Study Owner
+    db.add(
+        StudyCollaborator(
+            study_id=db_study.id, user_id=current_user.id, role=StudyRole.owner
+        )
+    )
+
+    from app.models import Statement, StatementTranslation, StudyTranslation
 
     for t_in in study.translations:
         db.add(StudyTranslation(study_id=db_study.id, **t_in.model_dump()))
@@ -96,7 +109,7 @@ async def create_study(
 
     await db.commit()
     # Re-fetch with relationships for Response Serialization
-    from ...services.study_service import StudyService
+    from app.services.study_service import StudyService
 
     updated_study = await StudyService.get_study_by_slug(db, db_study.slug)
     if updated_study is None:
@@ -112,9 +125,16 @@ async def list_studies(
     """List studies accessible to the current user (via Workspace membership)."""
     query = (
         select(Study)
-        .join(Study.workspace)
-        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
-        .where(WorkspaceMember.user_id == current_user.id)
+        .outerjoin(StudyCollaborator, StudyCollaborator.study_id == Study.id)
+        .outerjoin(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .where(
+            (StudyCollaborator.user_id == current_user.id)
+            | (
+                (WorkspaceMember.user_id == current_user.id)
+                & (WorkspaceMember.role == WorkspaceRole.admin)
+            )
+        )
+        .distinct()
     )
     result = await db.execute(query)
     return list(result.scalars().all())
@@ -122,7 +142,7 @@ async def list_studies(
 
 @router.get("/{slug}", response_model=StudyRead)
 async def get_study(
-    study: Study = Depends(check_workspace_permission(WorkspaceRole.viewer)),
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Get study details."""
@@ -133,7 +153,7 @@ async def get_study(
 @router.patch("/{slug}", response_model=StudyRead)
 async def update_study(
     study_update: StudyUpdate,
-    study: Study = Depends(check_workspace_permission(WorkspaceRole.researcher)),
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Update study configuration."""
@@ -167,7 +187,7 @@ async def update_study(
 
     # 3. Update translations
     if study_update.translations is not None:
-        from ...models import StudyTranslation
+        from app.models import StudyTranslation
 
         # Replace all translations for simplicity or update existing?
         # For now, we'll implement a "sync" logic: update existing, add new, remove old.
@@ -185,7 +205,7 @@ async def update_study(
 
     # 4. Update statements
     if study_update.statements is not None:
-        from ...models import StatementTranslation
+        from app.models import StatementTranslation
 
         # We only allow updating translations for existing statements by code
         # No adding/removing statements here if not in DRAFT (but let's keep it safe for all)
@@ -203,7 +223,9 @@ async def update_study(
                         new_s_trans_list.append(st_obj)
                     else:
                         new_s_trans_list.append(
-                            StatementTranslation(**st_in.model_dump())
+                            StatementTranslation(
+                                statement_id=target_s.id, **st_in.model_dump()
+                            )
                         )
                 target_s.translations = new_s_trans_list
             elif study.state == StudyState.draft:
@@ -213,7 +235,7 @@ async def update_study(
 
     await db.commit()
     # Re-fetch with relationships for Response Serialization
-    from ...services.study_service import StudyService
+    from app.services.study_service import StudyService
 
     updated_study = await StudyService.get_study_by_slug(db, study.slug)
     if updated_study is None:
@@ -224,14 +246,14 @@ async def update_study(
 @router.post("/{slug}/state", response_model=StudyRead)
 async def change_study_state(
     new_state: StudyState,
-    study: Study = Depends(check_workspace_permission(WorkspaceRole.researcher)),
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Change study state (Draft <-> Active <-> Closed)."""
     study.state = new_state
     await db.commit()
     # Re-fetch with relationships for Response Serialization
-    from ...services.study_service import StudyService
+    from app.services.study_service import StudyService
 
     updated_study = await StudyService.get_study_by_slug(db, study.slug)
     if updated_study is None:
@@ -243,10 +265,120 @@ async def change_study_state(
 
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_study(
-    study: Study = Depends(check_workspace_permission(WorkspaceRole.admin)),
+    study: Study = Depends(check_study_permission(StudyRole.owner)),
     db: AsyncSession = Depends(get_db),
 ):
     """Delete a study (Workspace Admin only)."""
     await db.delete(study)
     await db.commit()
     return None
+
+
+@router.get("/{slug}/stats", response_model=StudyStatsRead)
+async def get_study_stats(
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get aggregated study statistics."""
+    from app.services.study_service import StudyService
+
+    return await StudyService.get_study_stats(db, study.id)
+
+
+@router.get("/participants/{participant_id}", response_model=ParticipantDetailRead)
+async def get_participant(
+    participant_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get detailed participant info including responses."""
+    from app.models import Participant
+
+    stmt = (
+        select(Participant)
+        .join(Participant.study)
+        .outerjoin(StudyCollaborator, StudyCollaborator.study_id == Study.id)
+        .outerjoin(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .where(
+            Participant.id == participant_id,
+            (
+                (StudyCollaborator.user_id == current_user.id)
+                & (StudyCollaborator.role.in_([StudyRole.owner, StudyRole.editor]))
+            )
+            | (
+                (WorkspaceMember.user_id == current_user.id)
+                & (WorkspaceMember.role == WorkspaceRole.admin)
+            ),
+        )
+        .options(selectinload(Participant.qsort_entries))
+    )
+    result = await db.execute(stmt)
+    participant = result.scalar_one_or_none()
+
+    if not participant:
+        raise HTTPException(
+            status_code=404, detail="Participant not found or access denied"
+        )
+
+    return participant
+
+
+@router.patch("/participants/{participant_id}/discard", response_model=ParticipantRead)
+async def discard_participant(
+    participant_id: int,
+    discard_data: ParticipantDiscardUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Flag or unflag a participant for exclusion from stats/exports."""
+    from app.models import Participant
+
+    # Security: Ensure participant belongs to a study in a workspace user can access
+    stmt = (
+        select(Participant)
+        .join(Participant.study)
+        .outerjoin(StudyCollaborator, StudyCollaborator.study_id == Study.id)
+        .outerjoin(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .where(
+            Participant.id == participant_id,
+            (
+                (StudyCollaborator.user_id == current_user.id)
+                & (StudyCollaborator.role.in_([StudyRole.owner, StudyRole.editor]))
+            )
+            | (
+                (WorkspaceMember.user_id == current_user.id)
+                & (WorkspaceMember.role == WorkspaceRole.admin)
+            ),
+        )
+    )
+    result = await db.execute(stmt)
+    participant = result.scalar_one_or_none()
+
+    if not participant:
+        raise HTTPException(
+            status_code=404, detail="Participant not found or access denied"
+        )
+
+    participant.is_discarded = discard_data.is_discarded
+    participant.discard_reason = discard_data.discard_reason
+
+    await db.commit()
+    await db.refresh(participant)
+    return participant
+
+
+@router.get("/{slug}/participants", response_model=list[ParticipantRead])
+async def list_study_participants(
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all participants for a specific study."""
+    from app.models import Participant
+
+    stmt = (
+        select(Participant)
+        .where(Participant.study_id == study.id)
+        .order_by(Participant.created_at.desc())
+    )
+    result = await db.execute(stmt)
+    return list(result.scalars().all())

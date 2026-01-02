@@ -71,6 +71,7 @@ describe('StudyStatusPage', () => {
     });
 
     it('renders completed status message correctly', () => {
+        // biome-ignore lint/suspicious/noExplicitAny: mock config
         useConfigStore.getState().setConfig({ state: 'completed' } as any);
         // Note: StudyStatusPage passes 'type' prop based on StudyLayout or Router?
         // Actually StudyStatusPage component is dumb, it takes props.

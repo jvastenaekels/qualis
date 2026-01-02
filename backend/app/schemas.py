@@ -4,9 +4,9 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from .models import ParticipantStatus, StudyState, WorkspaceRole
+from app.models import ParticipantStatus, StudyRole, StudyState, WorkspaceRole
 
 # Auth Schemas
 
@@ -39,6 +39,7 @@ class UserCreate(UserBase):
     password: str
     is_active: bool = True
     is_superuser: bool = False
+    invitation_token: str | None = None
 
 
 class UserRead(UserBase):
@@ -193,6 +194,16 @@ class StudyCreate(StudyBase):
     translations: list[StudyTranslationCreate]
     statements: list[StatementCreate] = []
 
+    @model_validator(mode="after")
+    def check_grid_symmetry(self) -> "StudyCreate":
+        """Validate that total grid capacity matches the number of statements."""
+        total_capacity = sum(col.capacity for col in self.grid_config)
+        if len(self.statements) != total_capacity:
+            raise ValueError(
+                f"Grid capacity ({total_capacity}) does not match statement count ({len(self.statements)})"
+            )
+        return self
+
 
 class StudyUpdate(BaseModel):
     """Schema for updating a study."""
@@ -207,6 +218,20 @@ class StudyUpdate(BaseModel):
     translations: list[StudyTranslationCreate] | None = None
     statements: list[StatementUpdate] | None = None
 
+    @model_validator(mode="after")
+    def check_grid_symmetry(self) -> "StudyUpdate":
+        """Validate symmetry if both grid_config and statements are being updated, or if only one is updated against the other."""
+        # Note: In a partial update, we might not have both.
+        # Full validation happens in the service layer if necessary,
+        # but we catch obvious mismatches here if both are provided.
+        if self.grid_config is not None and self.statements is not None:
+            total_capacity = sum(col.capacity for col in self.grid_config)
+            if len(self.statements) != total_capacity:
+                raise ValueError(
+                    f"Grid capacity ({total_capacity}) does not match statement count ({len(self.statements)})"
+                )
+        return self
+
 
 class StudyRead(StudyBase):
     """Schema for reading a study."""
@@ -217,6 +242,16 @@ class StudyRead(StudyBase):
     translations: list[StudyTranslationRead] = []
     statements: list[StatementRead] = []
     model_config = ConfigDict(from_attributes=True)
+
+
+class StudyStatsRead(BaseModel):
+    """Schema for study statistics."""
+
+    started_count: int
+    completed_count: int
+    completion_rate: float
+    median_duration_seconds: float | None
+    device_breakdown: dict[str, int]  # e.g. {"mobile": 10, "desktop": 20}
 
 
 # Submission Schemas
@@ -291,3 +326,54 @@ class SubmissionInput(BaseModel):
         except (TypeError, ValueError):
             raise ValueError("Invalid answers dictionary")
         return v
+
+
+class ParticipantRead(BaseModel):
+    """Schema for reading a participant."""
+
+    id: int
+    study_id: int
+    session_token: UUID
+    language_used: str
+    status: ParticipantStatus
+    created_at: datetime
+    submitted_at: datetime | None
+    is_discarded: bool
+    discard_reason: str | None
+    user_agent: str | None
+    # We don't expose IP address directly to researchers usually, maybe masked or hash
+    # For now, let's keep it private or added if requested.
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ParticipantDetailRead(ParticipantRead):
+    """Schema for detailed participant view including responses."""
+
+    presort_answers: dict[str, Any]
+    postsort_answers: dict[str, Any]
+    qsort_entries: list[QSortEntryInput]
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ParticipantDiscardUpdate(BaseModel):
+    """Schema for discarding/flagging a participant."""
+
+    is_discarded: bool
+    discard_reason: str | None = None
+
+
+# Collaboration & Invitation Schemas
+
+
+class InvitationCreate(BaseModel):
+    """Schema for creating a study invitation."""
+
+    email: str
+    role: StudyRole = StudyRole.editor
+
+
+class InvitationLink(BaseModel):
+    """Schema for returning a generated invitation link."""
+
+    invite_url: str
+    token: str

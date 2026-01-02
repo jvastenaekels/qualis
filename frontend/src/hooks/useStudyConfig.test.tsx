@@ -49,13 +49,12 @@ describe('useStudyConfig', () => {
             statements: [],
         };
 
-        // Mock hook response
         vi.mocked(useGetStudyConfig).mockReturnValue({
             data: mockData,
             isLoading: false,
             error: null,
             refetch: vi.fn(),
-        } as any);
+        });
 
         renderHook(() => useStudyConfig());
 
@@ -82,6 +81,7 @@ describe('useStudyConfig', () => {
             isLoading: false,
             error: null,
             refetch: vi.fn(),
+            // biome-ignore lint/suspicious/noExplicitAny: mock hook
         } as any);
 
         renderHook(() => useStudyConfig());
@@ -97,6 +97,7 @@ describe('useStudyConfig', () => {
             isLoading: false,
             error: error,
             refetch: vi.fn(),
+            // biome-ignore lint/suspicious/noExplicitAny: mock hook
         } as any);
 
         renderHook(() => useStudyConfig());

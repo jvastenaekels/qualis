@@ -23,6 +23,7 @@ async def record_consent(
 ):
     """Records participant consent with timestamp and version."""
     client_ip = request.client.host if request.client else "unknown"
+    user_agent = request.headers.get("user-agent")
     return await StudyService.record_consent(
         db,
         study_slug=data.study_slug,
@@ -30,4 +31,5 @@ async def record_consent(
         language_code=data.language_code,
         consent_hash=data.consent_hash,
         ip_address=client_ip,
+        user_agent=user_agent,
     )

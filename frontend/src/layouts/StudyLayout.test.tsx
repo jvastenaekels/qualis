@@ -12,6 +12,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test/test-utils';
 import StudyLayout from './StudyLayout';
+import { useStudyConfig } from '../hooks/useStudyConfig';
 
 // Mock dependencies
 // i18n is already being mocked globally in setupTests.ts for some things, but here we mock specifically.
@@ -45,6 +46,7 @@ describe('StudyLayout Language Sync', () => {
                 require_code: false,
                 require_consent: true,
                 consent_text: 'Consent',
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
             } as any,
             isLoading: false,
             error: null,
@@ -114,6 +116,7 @@ describe('Layout Scroll Behavior', () => {
                 require_code: false,
                 require_consent: true,
                 consent_text: 'Consent',
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
             } as any,
             isLoading: false,
             error: null,
@@ -179,8 +182,6 @@ describe('Layout Scroll Behavior', () => {
     });
 });
 
-import { useStudyConfig } from '../hooks/useStudyConfig';
-
 describe('Layout Loading & Error States', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -190,6 +191,8 @@ describe('Layout Loading & Error States', () => {
             isLoading: false,
             error: null,
         });
+        // biome-ignore lint/suspicious/noExplicitAny: mock hook
+        vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() } as any);
     });
 
     it('Renders loading spinner when config is missing and loading is true', () => {
@@ -239,6 +242,7 @@ describe('Layout Loading & Error States', () => {
 describe('Layout Route Protection', () => {
     beforeEach(() => {
         useConfigStore.setState({
+            // biome-ignore lint/suspicious/noExplicitAny: mock config
             config: { slug: 'test' } as any, // Minimal config to bypass loading
             isLoading: false,
             error: null,

@@ -30,6 +30,10 @@ async def test_create_study_flow(
             }
         ],
         "grid_config": [{"score": 1, "capacity": 2}],
+        "statements": [
+            {"code": "S1", "translations": [{"language_code": "en", "text": "S1"}]},
+            {"code": "S2", "translations": [{"language_code": "en", "text": "S2"}]}
+        ],
         "presort_config": {},
         "postsort_config": {},
         "default_language": "en",

@@ -16,8 +16,6 @@ describe('useScaleToFit', () => {
         container = document.createElement('div');
         content = document.createElement('div');
 
-        // Mock ResizeObserver
-        // biome-ignore lint/suspicious/noExplicitAny: Mocking global requires loose typing
         vi.stubGlobal(
             'ResizeObserver',
             class {

@@ -156,7 +156,7 @@
             "help": "Miten tämä toimii?",
             "methodology": {
                 "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
-                "vertical": "Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä. Vain järjestys vasemmalta oikealle ruudukossa merkitsee.",
+                "vertical": "Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä.",
                 "constraint": "Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida."
             }
         }

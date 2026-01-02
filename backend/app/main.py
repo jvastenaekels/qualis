@@ -14,6 +14,7 @@ from app.middleware.errors import global_exception_handler
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import auth, logs, participants, submissions
 from app.routers.admin import exports as admin_exports
+from app.routers.admin import invitations as admin_invitations
 from app.routers.admin import studies as admin_studies
 from app.routers.admin import users as admin_users
 
@@ -86,6 +87,9 @@ app.include_router(
 )
 app.include_router(
     admin_exports.router, prefix="/api/admin/studies", tags=["admin-exports"]
+)
+app.include_router(
+    admin_invitations.router, prefix="/api/admin/invitations", tags=["admin-invites"]
 )
 app.include_router(admin_users.router, prefix="/api/admin/users", tags=["admin-users"])
 app.include_router(submissions.router, prefix="/api", tags=["submissions"])

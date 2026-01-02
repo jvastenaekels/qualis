@@ -51,6 +51,14 @@ class WorkspaceRole(str, Enum):
     viewer = "viewer"
 
 
+class StudyRole(str, Enum):
+    """Enum for study-specific roles."""
+
+    owner = "owner"
+    editor = "editor"
+    viewer = "viewer"
+
+
 # Workspace Models
 class Workspace(Base):
     """SQLAlchemy model for workspaces."""
@@ -95,6 +103,26 @@ class WorkspaceMember(Base):
     user: Mapped["User"] = relationship(back_populates="memberships")
 
 
+class StudyCollaborator(Base):
+    """Association model for study collaborators with roles."""
+
+    __tablename__ = "study_collaborators"
+
+    study_id: Mapped[int] = mapped_column(
+        ForeignKey("studies.id", ondelete="CASCADE"), primary_key=True
+    )
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    role: Mapped[StudyRole] = mapped_column(SAEnum(StudyRole), default=StudyRole.viewer)
+    added_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    study: Mapped["Study"] = relationship(back_populates="collaborators")
+    user: Mapped["User"] = relationship(back_populates="study_collaborations")
+
+
 # User Model
 class User(Base):
     """SQLAlchemy model for users."""
@@ -109,6 +137,10 @@ class User(Base):
 
     # Relationships
     memberships: Mapped[list["WorkspaceMember"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    study_collaborations: Mapped[list["StudyCollaborator"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
@@ -157,6 +189,9 @@ class Study(Base):
     )
     participants: Mapped[list["Participant"]] = relationship(
         back_populates="study", cascade="all, delete-orphan"
+    )
+    collaborators: Mapped[list["StudyCollaborator"]] = relationship(
+        back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
 
 
@@ -240,6 +275,9 @@ class Participant(Base):
     )
     session_token: Mapped[UUID] = mapped_column(unique=True, index=True, default=uuid4)
     language_used: Mapped[str] = mapped_column(String(5))
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     status: Mapped[ParticipantStatus] = mapped_column(
         SAEnum(ParticipantStatus), default=ParticipantStatus.started
     )
@@ -248,7 +286,10 @@ class Participant(Base):
     confirmation_code: Mapped[str | None] = mapped_column(
         String(8), unique=True, index=True, nullable=True
     )
+    is_discarded: Mapped[bool] = mapped_column(Boolean, default=False)
+    discard_reason: Mapped[str | None] = mapped_column(String, nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String, nullable=True)
+    user_agent: Mapped[str | None] = mapped_column(String, nullable=True)
     submitted_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )

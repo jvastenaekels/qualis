@@ -50,6 +50,7 @@ class StudyService:
         language_code: str,
         consent_hash: str | None = None,
         ip_address: str | None = None,
+        user_agent: str | None = None,
     ):
         """Records the exact time and version (hash) of consent."""
         # 1. Get Study
@@ -73,6 +74,7 @@ class StudyService:
                 consented_at=datetime.now(),
                 consent_hash=consent_hash,
                 ip_address=hashed_ip,
+                user_agent=user_agent,
                 status=ParticipantStatus.started,
             )
             db.add(participant)
@@ -82,6 +84,7 @@ class StudyService:
             participant.consent_hash = consent_hash
             participant.language_used = language_code
             participant.ip_address = hashed_ip
+            participant.user_agent = user_agent
 
         await db.commit()
         return {"status": "recorded"}
@@ -163,7 +166,10 @@ class StudyService:
 
     @staticmethod
     async def process_submission(
-        db: AsyncSession, data: SubmissionInput, client_ip: str
+        db: AsyncSession,
+        data: SubmissionInput,
+        client_ip: str,
+        user_agent: str | None = None,
     ):
         """Process and save a participant's submission."""
         # 1. IP Hashing
@@ -214,6 +220,7 @@ class StudyService:
                 status=data.status,
                 confirmation_code=confirmation_code,
                 ip_address=hashed_ip,
+                user_agent=user_agent,
                 submitted_at=datetime.now(),
             )
             db.add(participant)
@@ -229,6 +236,7 @@ class StudyService:
                 participant.status = data.status
             participant.confirmation_code = confirmation_code
             participant.ip_address = hashed_ip
+            participant.user_agent = user_agent
             participant.submitted_at = datetime.now()
 
             await db.flush()
@@ -253,3 +261,138 @@ class StudyService:
         await db.commit()
 
         return confirmation_code
+
+    @staticmethod
+    async def get_study_stats(db: AsyncSession, study_id: int) -> dict[str, Any]:
+        """Calculates aggregated statistics for a study."""
+        # 1. Get all participants for this study (excluding discarded)
+        stmt = select(Participant).where(
+            Participant.study_id == study_id, Participant.is_discarded.is_(False)
+        )
+        result = await db.execute(stmt)
+        participants = result.scalars().all()
+
+        started_count = len(participants)
+        completed_participants = [
+            p for p in participants if p.status == ParticipantStatus.completed
+        ]
+        completed_count = len(completed_participants)
+
+        # 2. Completion Rate
+        completion_rate = completed_count / started_count if started_count > 0 else 0.0
+
+        # 3. Median Duration (Seconds)
+        durations = []
+        for p in completed_participants:
+            if p.submitted_at and p.consented_at:
+                duration = (p.submitted_at - p.consented_at).total_seconds()
+                if duration > 0:
+                    durations.append(duration)
+
+        median_duration = None
+        if durations:
+            import statistics
+
+            median_duration = statistics.median(durations)
+
+        # 4. Device Breakdown (Simple Heuristic)
+        device_breakdown = {"mobile": 0, "desktop": 0}
+        for p in participants:
+            ua = (p.user_agent or "").lower()
+            if any(x in ua for x in ["mobile", "android", "iphone", "ipad"]):
+                device_breakdown["mobile"] += 1
+            else:
+                device_breakdown["desktop"] += 1
+
+        return {
+            "started_count": started_count,
+            "completed_count": completed_count,
+            "completion_rate": completion_rate,
+            "median_duration_seconds": median_duration,
+            "device_breakdown": device_breakdown,
+        }
+
+    @staticmethod
+    async def get_study_full_dump(db: AsyncSession, study_id: int) -> dict[str, Any]:
+        """Extracts complete study data and valid participant sorts for export."""
+        # 1. Get Study with statements (ordered by ID for consistency)
+        stmt = (
+            select(Study)
+            .where(Study.id == study_id)
+            .options(
+                selectinload(Study.statements).selectinload(Statement.translations),
+                selectinload(Study.translations),
+            )
+        )
+        result = await db.execute(stmt)
+        study = result.scalar_one_or_none()
+        if not study:
+            raise HTTPException(status_code=404, detail="Study not found")
+
+        # 2. Get all non-discarded completed participants with their Q-sort entries
+        p_stmt = (
+            select(Participant)
+            .where(
+                Participant.study_id == study_id,
+                Participant.status == ParticipantStatus.completed,
+                Participant.is_discarded.is_(False),
+            )
+            .options(selectinload(Participant.qsort_entries))
+        )
+        p_result = await db.execute(p_stmt)
+        participants = p_result.scalars().all()
+
+        # 3. Build Export Structure
+        # PQMethod and others need a fixed reference for statement order.
+        # We sort by original statement ID.
+        sorted_statements = sorted(study.statements, key=lambda s: s.id)
+        statement_id_to_index = {s.id: i for i, s in enumerate(sorted_statements)}
+
+        participant_data = []
+        for p in participants:
+            placements = {
+                entry.statement_id: entry.grid_score for entry in p.qsort_entries
+            }
+            # Create a score list in the exact order of sorted_statements
+            scores = [placements.get(s.id, None) for s in sorted_statements]
+
+            participant_data.append(
+                {
+                    "id": str(p.session_token)[:8].upper(),
+                    "duration_seconds": (
+                        p.submitted_at - p.consented_at
+                    ).total_seconds()
+                    if p.submitted_at and p.consented_at
+                    else None,
+                    "scores": scores,
+                    # For raw CSV/KenQ
+                    "placements": placements,
+                    "presort": p.presort_answers,
+                    "postsort": p.postsort_answers,
+                    "language": p.language_used,
+                }
+            )
+
+        return {
+            "study": {
+                "slug": study.slug,
+                "grid_config": study.grid_config,
+                "statements": [
+                    {
+                        "id": s.id,
+                        "code": s.code,
+                        "translations": [
+                            {"lang": t.language_code, "text": t.text}
+                            for t in s.translations
+                        ],
+                    }
+                    for s in sorted_statements
+                ],
+                "translations": [
+                    {"lang": t.language_code, "title": t.title}
+                    for t in study.translations
+                ],
+            },
+            "participants": participant_data,
+            "statement_id_to_index": statement_id_to_index,
+        }

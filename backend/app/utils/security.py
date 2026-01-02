@@ -46,3 +46,33 @@ def create_access_token(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
     return cast(str, encoded_jwt)
+
+
+def create_invitation_token(
+    email: str, study_id: int, role: str, expires_delta: timedelta | None = None
+) -> str:
+    """Create a JWT invitation token."""
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(days=7)  # Default 7 days
+
+    to_encode = {
+        "exp": expire,
+        "sub": email,
+        "study_id": study_id,
+        "role": role,
+        "type": "invitation",
+    }
+    encoded_jwt = jwt.encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
+    return cast(str, encoded_jwt)
+
+
+def decode_invitation_token(token: str) -> dict[str, Any]:
+    """Decode and validate an invitation token."""
+    payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    if payload.get("type") != "invitation":
+        raise jwt.InvalidTokenError("Not an invitation token")
+    return cast(dict[str, Any], payload)

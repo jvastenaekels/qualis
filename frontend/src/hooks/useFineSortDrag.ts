@@ -145,10 +145,13 @@ export const useFineSortDrag = ({
 
             // 1. Check for Deck Drop (Return to Pile)
             if (overIdString.startsWith('deck-')) {
-                const category = overIdString.replace('deck-', '') as
-                    | 'agree'
-                    | 'neutral'
-                    | 'disagree';
+                let categoryStr = overIdString.replace('deck-', '');
+                // Handle deck area drop
+                if (categoryStr.startsWith('area-')) {
+                    categoryStr = categoryStr.replace('area-', '');
+                }
+
+                const category = categoryStr as 'agree' | 'neutral' | 'disagree';
                 actions.unplaceCard(cardId);
                 actions.categorizeCard(cardId, category);
                 return;

@@ -21,7 +21,10 @@ async def submit_study(
     Logic moved to StudyService for maintainability.
     """
     client_ip = request.client.host if request.client else "unknown"
-    confirmation_code = await StudyService.process_submission(db, data, client_ip)
+    user_agent = request.headers.get("user-agent")
+    confirmation_code = await StudyService.process_submission(
+        db, data, client_ip, user_agent
+    )
     return {"status": "success", "confirmation_code": confirmation_code}
 
 

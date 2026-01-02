@@ -8,6 +8,18 @@ import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test/test-utils';
 import PostSortPage from './PostSortPage';
 
+// Mock GridSort
+vi.mock('../components/GridSort', () => ({
+    // biome-ignore lint/suspicious/noExplicitAny: mock props
+    default: ({ isAllPlaced, onValidate, showCodes }: any) => (
+        <div data-testid="grid-sort">
+            {/* biome-ignore lint/a11y/useButtonType: mock component */}
+            <button onClick={() => onValidate(isAllPlaced)}>Validate</button>
+            {showCodes && <span>Show Codes</span>}
+        </div>
+    ),
+}));
+
 // Mock dependencies
 vi.mock('../hooks/useSubmitStudy', () => ({
     useSubmitStudy: vi.fn(() => ({
@@ -43,6 +55,7 @@ describe('PostSortPage', () => {
                     { score: 1, capacity: 1 },
                 ],
                 state: 'active',
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
             } as any,
         });
 

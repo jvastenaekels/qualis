@@ -5,7 +5,7 @@ import FineSortPage from './FineSortPage';
 // Mocks
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => ({
-    ...((await vi.importActual('react-router-dom')) as any),
+    ...(await vi.importActual<Record<string, unknown>>('react-router-dom')),
     useNavigate: () => mockNavigate,
     useParams: () => ({ slug: 'test-study' }),
 }));

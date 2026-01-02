@@ -38,6 +38,120 @@ import type {
 
 import { customInstance } from './mutator';
 /**
+ * Get current active user.
+ * @summary Read Users Me
+ */
+export const readUsersMeApiMeGet = (signal?: AbortSignal) => {
+    return customInstance<UserRead>({ url: `/api/me`, method: 'GET', signal });
+};
+
+export const getReadUsersMeApiMeGetQueryKey = () => {
+    return [`/api/me`] as const;
+};
+
+export const getReadUsersMeApiMeGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+    TError = unknown,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
+    >;
+}) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey = queryOptions?.queryKey ?? getReadUsersMeApiMeGetQueryKey();
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readUsersMeApiMeGet>>> = ({ signal }) =>
+        readUsersMeApiMeGet(signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ReadUsersMeApiMeGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof readUsersMeApiMeGet>>
+>;
+export type ReadUsersMeApiMeGetQueryError = unknown;
+
+export function useReadUsersMeApiMeGet<
+    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+    TError = unknown,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof readUsersMeApiMeGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useReadUsersMeApiMeGet<
+    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof readUsersMeApiMeGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useReadUsersMeApiMeGet<
+    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Read Users Me
+ */
+
+export function useReadUsersMeApiMeGet<
+    TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof readUsersMeApiMeGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getReadUsersMeApiMeGetQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * OAuth2 compatible token login, get an access token for future requests.
  * @summary Login For Access Token
  */

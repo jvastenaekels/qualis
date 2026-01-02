@@ -45,6 +45,22 @@ const DroppablePile: React.FC<
     );
 };
 
+const DroppableDeckArea: React.FC<{
+    id: string;
+    children: React.ReactNode;
+    className: string;
+}> = ({ id, children, className }) => {
+    const { setNodeRef, isOver } = useDroppable({ id });
+    return (
+        <div
+            ref={setNodeRef}
+            className={`${className} ${isOver ? 'ring-2 ring-indigo-400 bg-indigo-50/10' : ''}`}
+        >
+            {children}
+        </div>
+    );
+};
+
 interface GridSortProps {
     agreeCards: { id: number; text: string; code?: string }[];
     disagreeCards: { id: number; text: string; code?: string }[];
@@ -586,28 +602,33 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         </div>
                     </div>
 
-                    <motion.div
-                        key={activePile}
-                        initial={{
-                            backgroundColor:
-                                activePile === 'disagree'
-                                    ? '#fee2e2'
-                                    : activePile === 'agree'
-                                      ? '#dcfce7'
-                                      : '#f1f5f9',
-                        }}
-                        animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }}
-                        transition={{ duration: 0.8 }}
-                        className={`
+                    <DroppableDeckArea
+                        id={`deck-area-${activePile}`}
+                        className="flex-1 min-h-0 flex flex-col overflow-hidden relative"
+                    >
+                        <motion.div
+                            key={activePile}
+                            initial={{
+                                backgroundColor:
+                                    activePile === 'disagree'
+                                        ? '#fee2e2'
+                                        : activePile === 'agree'
+                                          ? '#dcfce7'
+                                          : '#f1f5f9',
+                            }}
+                            animate={{ backgroundColor: 'rgba(248, 250, 252, 0.5)' }}
+                            transition={{ duration: 0.8 }}
+                            className={`
                         flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-center justify-start custom-scrollbar
                         ${activeCards.length === 0 ? 'justify-center' : ''}
                         lg:grid lg:grid-cols-2 lg:gap-2 lg:overflow-y-auto lg:overflow-x-hidden lg:p-2
                         ${activeCards.length === 0 ? 'lg:place-content-center' : 'lg:content-start'}
                     `}
-                        data-testid="deck-cards-container"
-                    >
-                        {renderDeckCards()}
-                    </motion.div>
+                            data-testid="deck-cards-container"
+                        >
+                            {renderDeckCards()}
+                        </motion.div>
+                    </DroppableDeckArea>
                     {/* PANEL FOOTER: Guidance or Validation */}
                     <div className="flex-none p-4 border-t border-indigo-100 bg-white shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
                         {isAllPlaced ? (

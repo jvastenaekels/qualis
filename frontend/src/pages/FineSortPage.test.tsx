@@ -53,6 +53,7 @@ vi.mock('../hooks/useLayout', () => ({
 
 // Mock GridSort
 vi.mock('../components/GridSort', () => ({
+    // biome-ignore lint/suspicious/noExplicitAny: mock prop
     default: ({ isAllPlaced, onValidate, showCodes }: any) => (
         <div data-testid="grid-sort">
             GridSort

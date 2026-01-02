@@ -12,7 +12,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.database import get_db
-from app.models import Study, User, WorkspaceMember, WorkspaceRole
+from app.models import (
+    Study,
+    User,
+    WorkspaceMember,
+    WorkspaceRole,
+    StudyCollaborator,
+    StudyRole,
+)
 from app.schemas import TokenData
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
@@ -51,48 +58,85 @@ async def get_current_user(
 
 # --- RBAC Logic ---
 
-ROLE_HIERARCHY = {
-    WorkspaceRole.admin: 30,
-    WorkspaceRole.researcher: 20,
-    WorkspaceRole.viewer: 10,
+ROLE_MAP = {
+    WorkspaceRole.admin: StudyRole.owner,
+    WorkspaceRole.researcher: StudyRole.editor,
+    WorkspaceRole.viewer: StudyRole.viewer,
+}
+
+STUDY_ROLE_HIERARCHY = {
+    StudyRole.owner: 30,
+    StudyRole.editor: 20,
+    StudyRole.viewer: 10,
 }
 
 
-def check_workspace_permission(required_role: WorkspaceRole) -> Callable:
-    """Factory creating a dependency to verify workspace access (via Study slug)."""
+def check_study_permission(required_role: StudyRole) -> Callable:
+    """Factory creating a dependency to verify study access."""
 
     async def permission_dependency(
         slug: str = Path(..., description="The slug of the study"),
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db),
     ) -> Study:
-        """Dependency that returns the Study if the user has required workspace role."""
-        # 1. Access Study joined with Workspace joined with Member
-        # We need to find the study by slug, ensure it belongs to a workspace,
-        # and ensure the current user is a member of that workspace with sufficient role.
+        """Dependency that returns the Study if the user has required study role."""
+        # Check StudyCollaborator table
         query = (
-            select(Study, WorkspaceMember)
-            .join(Study.workspace)
-            .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+            select(Study, StudyCollaborator)
+            .join(StudyCollaborator, StudyCollaborator.study_id == Study.id)
             .where(Study.slug == slug)
-            .where(WorkspaceMember.user_id == current_user.id)
+            .where(StudyCollaborator.user_id == current_user.id)
         )
 
         result = await db.execute(query)
         row = result.one_or_none()
 
         if not row:
-            # Either study doesn't exist, or user is not in the workspace
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Study not found or access denied",
+            # Fallback for Workspace Admins/Superusers?
+            # In Phase 4, we want Study-level focus, but let's allow legacy Workspace Admin for now
+            # to avoid locking out existing users before full migration.
+            ws_query = (
+                select(Study, WorkspaceMember)
+                .join(Study.workspace)
+                .join(
+                    WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id
+                )
+                .where(Study.slug == slug)
+                .where(WorkspaceMember.user_id == current_user.id)
             )
+            ws_result = await db.execute(ws_query)
+            ws_row = ws_result.one_or_none()
 
-        study, member = row
+            if not ws_row:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Study not found or access denied",
+                )
+
+            study, member = ws_row
+            # Fallback: Map WorkspaceRole to StudyRole
+            mapped_role = ROLE_MAP.get(member.role)
+            if not mapped_role:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
+                )
+
+            user_level = STUDY_ROLE_HIERARCHY[mapped_role]
+            required_level = STUDY_ROLE_HIERARCHY[required_role]
+
+            if user_level < required_level:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=f"Insufficient permissions. Required: {required_role.value}",
+                )
+
+            return cast(Study, study)
+
+        study, collaborator = row
 
         # Check Role Hierarchy
-        required_level = ROLE_HIERARCHY[required_role]
-        user_level = ROLE_HIERARCHY[member.role]
+        required_level = STUDY_ROLE_HIERARCHY[required_role]
+        user_level = STUDY_ROLE_HIERARCHY[collaborator.role]
 
         if user_level < required_level:
             raise HTTPException(

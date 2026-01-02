@@ -37,6 +37,7 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
                 { score: 1, capacity: 1 },
             ],
             presort_config: {},
+            // biome-ignore lint/suspicious/noExplicitAny: mock config
         } as any);
 
         // Mock viewport size for mobile

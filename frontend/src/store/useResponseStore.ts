@@ -70,6 +70,11 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             },
 
             categorizeCard: (statementId, category) => {
+                const validCategories = ['agree', 'disagree', 'neutral'];
+                if (!validCategories.includes(category)) {
+                    console.error(`Invalid category: ${category}`);
+                    return;
+                }
                 set((state) => {
                     const { rough } = state;
 

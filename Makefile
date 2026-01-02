@@ -5,7 +5,7 @@ install:
 	cd frontend && npm install
 
 run-backend:
-	cd backend && ./venv/bin/uvicorn app.main:app --reload
+	cd backend && uv run uvicorn app.main:app --reload
 
 run-frontend:
 	cd frontend && npm run dev

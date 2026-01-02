@@ -59,6 +59,7 @@ vi.mock('../components/GridSort', () => ({
     ),
 }));
 
+// biome-ignore lint/suspicious/noExplicitAny: mock global
 (global as any).ResizeObserver = class {
     observe() {}
     unobserve() {}
