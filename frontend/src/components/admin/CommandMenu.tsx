@@ -15,6 +15,7 @@ import {
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
+import { useSessionStore } from '@/store/useSessionStore';
 import { toast } from 'sonner';
 
 export const CommandMenu = () => {
@@ -57,6 +58,7 @@ export const CommandMenu = () => {
 
     const handleLogout = () => {
         logout();
+        useSessionStore.getState().resetSession();
         navigate('/login');
         toast.success('Logged out successfully');
     };

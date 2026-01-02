@@ -7,10 +7,13 @@ import ExportCenter from '@/components/admin/dashboard/ExportCenter';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
 import { DashboardSkeleton } from '@/components/admin/DashboardSkeleton';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Activity, Users } from 'lucide-react';
 import { useState } from 'react';
 import type { ParticipantRead as Participant } from '@/api/model';
 import { toast } from 'sonner';
+import StudyStatusControl from '@/components/admin/dashboard/StudyStatusControl';
+import { cn } from '@/lib/utils';
 
 const StudyOverviewPage = () => {
     const { slug } = useParams();
@@ -20,6 +23,7 @@ const StudyOverviewPage = () => {
         isLoading: participantsLoading,
         refetch: refetchParticipants,
     } = useListStudyParticipants(slug || '');
+    const { refetch: refetchStats } = useGetStudyStats(slug || '');
     const discardMutation = useDiscardParticipant();
 
     const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null);
@@ -56,12 +60,26 @@ const StudyOverviewPage = () => {
                 <div className="space-y-1">
                     <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
                         {slug}
-                        <Badge
-                            variant="outline"
-                            className="ml-2 bg-emerald-50 text-emerald-700 border-emerald-100 font-bold uppercase tracking-widest text-[10px]"
-                        >
-                            Live Fieldwork
-                        </Badge>
+                        {stats && (
+                            <Badge
+                                variant="outline"
+                                role="status"
+                                className={cn(
+                                    'ml-2 font-bold uppercase tracking-widest text-[10px]',
+                                    stats.status === 'active'
+                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                        : stats.status === 'completed'
+                                          ? 'bg-slate-50 text-slate-700 border-slate-100'
+                                          : 'bg-amber-50 text-amber-700 border-amber-100'
+                                )}
+                            >
+                                {stats.status === 'active'
+                                    ? 'Live Fieldwork'
+                                    : stats.status === 'completed'
+                                      ? 'Closed'
+                                      : 'Draft Mode'}
+                            </Badge>
+                        )}
                     </h1>
                     <p className="text-slate-500 text-sm">
                         Real-time analytics and participant overview for this study.
@@ -109,6 +127,14 @@ const StudyOverviewPage = () => {
                 </Card>
 
                 <div className="col-span-12 md:col-span-4 space-y-6">
+                    <StudyStatusControl
+                        slug={slug || ''}
+                        currentState={stats?.status || 'draft'}
+                        onStateChange={() => {
+                            refetchParticipants();
+                            refetchStats();
+                        }}
+                    />
                     <RecruitmentModule slug={slug || ''} />
                     <ExportCenter slug={slug || ''} />
                 </div>

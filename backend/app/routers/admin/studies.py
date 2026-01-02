@@ -157,6 +157,9 @@ async def update_study(
     db: AsyncSession = Depends(get_db),
 ) -> Study:
     """Update study configuration."""
+    # Ensure relationships are loaded for logic below
+    await db.refresh(study, attribute_names=["translations", "statements"])
+
     # Structural changes only allowed in DRAFT
     is_structural_edit = any(
         f in study_update.model_dump(exclude_unset=True) for f in ["grid_config"]

@@ -2043,3 +2043,55 @@ export function useServeSpaFullPathGet<
 
     return query;
 }
+
+// --- SHIMS FOR MISSING GENERATED HOOKS ---
+// These are added manually to fix build errors until Orval is re-run with correct API spec.
+
+export const useGetParticipant = (id: string | number) => {
+    return useQuery({
+        queryKey: ['participants', id],
+        queryFn: ({ signal }) =>
+            customInstance<any>({ url: `/api/admin/participants/${id}`, method: 'GET', signal }),
+        enabled: !!id,
+    });
+};
+
+export const useInviteCollaboratorApiAdminInvitationsSlugInvitePost = () => {
+    return useMutation({
+        mutationFn: ({ slug, data }: { slug: string; data: any }) =>
+            customInstance<any>({
+                url: `/api/admin/invitations/${slug}/invite`,
+                method: 'POST',
+                data,
+            }),
+    });
+};
+
+export const useGetStudyStats = (slug: string) => {
+    return useQuery({
+        queryKey: ['studies', slug, 'stats'],
+        queryFn: ({ signal }) =>
+            customInstance<any>({ url: `/api/admin/studies/${slug}/stats`, method: 'GET', signal }),
+        enabled: !!slug,
+    });
+};
+
+export const useListStudyParticipants = (slug: string) => {
+    return useQuery({
+        queryKey: ['studies', slug, 'participants'],
+        queryFn: ({ signal }) =>
+            customInstance<any>({
+                url: `/api/admin/studies/${slug}/participants`,
+                method: 'GET',
+                signal,
+            }),
+        enabled: !!slug,
+    });
+};
+
+export const useDiscardParticipant = () => {
+    return useMutation({
+        mutationFn: (id: string | number) =>
+            customInstance<any>({ url: `/api/admin/participants/${id}`, method: 'DELETE' }),
+    });
+};

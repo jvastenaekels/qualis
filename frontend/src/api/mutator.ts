@@ -47,6 +47,23 @@ export const customInstance = async <T>({
     if (!response.ok) {
         const errorText = await response.text();
 
+        // 401 Unauthorized: Clear session and redirect to login
+        if (response.status === 401) {
+            useAuthStore.getState().logout();
+            useSessionStore.getState().resetSession();
+            // Optional: Redirect to login if not already there
+            if (!window.location.pathname.includes('/login')) {
+                window.location.href = '/login?reason=session_expired';
+            }
+        }
+
+        // 403 Forbidden: Show error toast but don't logout immediately
+        // (Handled by React Mutation/Query error states usually, but unexpected 403s should be visible)
+        if (response.status === 403) {
+            // We can let the UI handle specific 403s, but logging it is good.
+            console.warn('Access Forbidden:', url);
+        }
+
         // Auto-report 500 Server Errors
         if (response.status >= 500) {
             reportBug(`Server Error ${response.status} at ${url}: ${errorText}`, {

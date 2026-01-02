@@ -30,19 +30,19 @@ const ExportCenter: React.FC<ExportCenterProps> = ({ slug }) => {
 
             switch (format) {
                 case 'csv':
-                    endpoint = `/admin/studies/${slug}/export/csv`;
+                    endpoint = `/api/admin/studies/${slug}/export/csv`;
                     filename = `${slug}_results.csv`;
                     break;
                 case 'pqmethod':
-                    endpoint = `/admin/studies/${slug}/export/pqmethod`;
+                    endpoint = `/api/admin/studies/${slug}/export/pqmethod`;
                     filename = `${slug}_pqmethod.zip`;
                     break;
                 case 'r-kit':
-                    endpoint = `/admin/studies/${slug}/export/r-kit`;
+                    endpoint = `/api/admin/studies/${slug}/export/r-kit`;
                     filename = `${slug}_r_kit.zip`;
                     break;
                 case 'kenq':
-                    endpoint = `/admin/studies/${slug}/dump`;
+                    endpoint = `/api/admin/studies/${slug}/dump`;
                     filename = `${slug}_kenq.json`;
                     break;
             }
@@ -136,6 +136,7 @@ const ExportCenter: React.FC<ExportCenterProps> = ({ slug }) => {
                                     size="sm"
                                     variant="ghost"
                                     disabled={exporting !== null}
+                                    aria-label={`Export ${opt.title}`}
                                     // biome-ignore lint/suspicious/noExplicitAny: Format union type is complex for individual buttons
                                     onClick={() => handleDownload(opt.id as any)}
                                     className="h-8 w-8 rounded-full p-0 group-hover:bg-indigo-50 group-hover:text-indigo-600"

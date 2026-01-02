@@ -29,21 +29,32 @@ vi.mock('sonner', () => ({
 const mockLoginMutation = vi.fn();
 const mockMeQuery = vi.fn();
 
+// Mutable object to control hook return values
+const mockLoginHookReturnValue = {
+    mutateAsync: mockLoginMutation,
+    isPending: false,
+};
+
 vi.mock('@/api/generated', () => ({
-    useLoginForAccessTokenApiTokenPost: () => ({
-        mutateAsync: mockLoginMutation,
-    }),
+    useLoginForAccessTokenApiTokenPost: () => mockLoginHookReturnValue,
     useReadUsersMeApiMeGet: () => ({
         refetch: mockMeQuery,
     }),
 }));
 
-vi.mock('@/store/useAuthStore', () => ({
-    useAuthStore: {
-        setState: vi.fn(),
-        getState: () => ({ token: null }),
-    },
-}));
+vi.mock('@/store/useAuthStore', () => {
+    const setAuth = vi.fn();
+    const useAuthStore = vi.fn((selector) => {
+        const state = { setAuth, token: null };
+        return selector ? selector(state) : state;
+    });
+    // Attach static methods
+    // biome-ignore lint/suspicious/noExplicitAny: needed for mocking static store methods
+    (useAuthStore as any).setState = vi.fn();
+    // biome-ignore lint/suspicious/noExplicitAny: needed for mocking static store methods
+    (useAuthStore as any).getState = vi.fn(() => ({ token: null }));
+    return { useAuthStore };
+});
 
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
@@ -68,6 +79,7 @@ const renderLoginPage = () => {
 describe('LoginPage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        mockLoginHookReturnValue.isPending = false;
     });
 
     describe('rendering', () => {
@@ -81,14 +93,14 @@ describe('LoginPage', () => {
         it('renders sign in button', () => {
             renderLoginPage();
 
-            expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: /continue/i })).toBeInTheDocument();
         });
 
         it('renders branding elements', () => {
             renderLoginPage();
 
             // Should have some branding (title or logo)
-            expect(screen.getByText(/open-q/i)).toBeInTheDocument();
+            expect(screen.getByRole('heading', { name: /open-q admin/i })).toBeInTheDocument();
         });
     });
 
@@ -129,7 +141,7 @@ describe('LoginPage', () => {
 
             const emailInput = screen.getByLabelText(/email/i);
             const passwordInput = screen.getByLabelText(/password/i);
-            const submitButton = screen.getByRole('button', { name: /sign in/i });
+            const submitButton = screen.getByRole('button', { name: /continue/i });
 
             fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
             fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -150,7 +162,7 @@ describe('LoginPage', () => {
 
             const emailInput = screen.getByLabelText(/email/i);
             const passwordInput = screen.getByLabelText(/password/i);
-            const submitButton = screen.getByRole('button', { name: /sign in/i });
+            const submitButton = screen.getByRole('button', { name: /continue/i });
 
             fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
             fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -171,7 +183,7 @@ describe('LoginPage', () => {
 
             const emailInput = screen.getByLabelText(/email/i);
             const passwordInput = screen.getByLabelText(/password/i);
-            const submitButton = screen.getByRole('button', { name: /sign in/i });
+            const submitButton = screen.getByRole('button', { name: /continue/i });
 
             fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
             fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
@@ -190,7 +202,7 @@ describe('LoginPage', () => {
 
             const emailInput = screen.getByLabelText(/email/i);
             const passwordInput = screen.getByLabelText(/password/i);
-            const submitButton = screen.getByRole('button', { name: /sign in/i });
+            const submitButton = screen.getByRole('button', { name: /continue/i });
 
             fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
             fireEvent.change(passwordInput, { target: { value: 'password' } });
@@ -204,22 +216,12 @@ describe('LoginPage', () => {
 
     describe('loading state', () => {
         it('disables form during submission', async () => {
-            // Create a promise that never resolves to simulate loading
-            mockLoginMutation.mockImplementation(() => new Promise(() => {}));
+            mockLoginHookReturnValue.isPending = true;
 
             renderLoginPage();
 
-            const emailInput = screen.getByLabelText(/email/i);
-            const passwordInput = screen.getByLabelText(/password/i);
-            const submitButton = screen.getByRole('button', { name: /sign in/i });
-
-            fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-            fireEvent.change(passwordInput, { target: { value: 'password' } });
-            fireEvent.click(submitButton);
-
-            await waitFor(() => {
-                expect(submitButton).toBeDisabled();
-            });
+            const submitButton = screen.getByRole('button', { name: /authenticating/i });
+            expect(submitButton).toBeDisabled();
         });
     });
 });

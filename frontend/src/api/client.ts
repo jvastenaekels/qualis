@@ -58,6 +58,32 @@ export async function reportBug(error: Error | string, context?: ErrorContext) {
             keepalive: true, // Ensure request is sent even if page unloads
         });
     } catch (e) {
-        console.warn('Failed to report bug:', e);
+        console.warn('Failed to report bug to /api/logs:', e);
     }
 }
+
+// Default export for axios-like usage in some older components
+// Note: This is a shim to allow the project to build while we transition to Orval
+export default {
+    get: async (
+        url: string,
+        options?: RequestInit & { headers?: Record<string, string>; responseType?: string }
+    ) => {
+        const fullUrl =
+            url.startsWith('http') || url.startsWith('/api')
+                ? `${BASE_URL}${url}`
+                : `${BASE_URL}/api${url}`;
+        const response = await fetch(fullUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                ...options?.headers,
+            },
+            ...options,
+        });
+        if (!response.ok) throw new Error(await response.text());
+        return {
+            data: await (options?.responseType === 'blob' ? response.blob() : response.json()),
+        };
+    },
+};

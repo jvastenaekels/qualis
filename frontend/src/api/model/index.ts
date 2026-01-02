@@ -74,5 +74,6 @@ export * from './submissionInputStatus';
 export * from './token';
 export * from './userCreate';
 export * from './userRead';
+export * from './studyRole';
 export * from './validationError';
 export * from './validationErrorLocItem';

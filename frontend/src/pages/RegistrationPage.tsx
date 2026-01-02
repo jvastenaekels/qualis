@@ -22,10 +22,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from 'sonner';
-import {
-    useVerifyInvitationApiAdminInvitationsVerifyTokenGet,
-    useRegisterUserApiAuthRegisterPost,
-} from '@/api/generated';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { customInstance } from '@/api/mutator';
 
 const RegistrationPage = () => {
     const [searchParams] = useSearchParams();
@@ -41,13 +39,28 @@ const RegistrationPage = () => {
         data: invite,
         isLoading: isVerifying,
         error: verifyError,
-    } = useVerifyInvitationApiAdminInvitationsVerifyTokenGet(token || '', {
-        query: {
-            enabled: !!token,
-        },
+    } = useQuery<{ email: string; study_id: number; role: string }>({
+        queryKey: ['verify-invite', token],
+        queryFn: ({ signal }) =>
+            customInstance({
+                url: `/api/admin/invitations/verify`,
+                method: 'GET',
+                params: { token },
+                signal,
+            }),
+        enabled: !!token,
+        retry: false,
     });
 
-    const registerMutation = useRegisterUserApiAuthRegisterPost();
+    // Manual Mutation for Registration
+    const registerMutation = useMutation({
+        mutationFn: (data: Record<string, unknown>) =>
+            customInstance<unknown>({
+                url: `/api/auth/register`,
+                method: 'POST',
+                data,
+            }),
+    });
 
     useEffect(() => {
         if (invite) {
@@ -64,16 +77,28 @@ const RegistrationPage = () => {
 
         try {
             await registerMutation.mutateAsync({
-                data: {
-                    email,
-                    password,
-                    invitation_token: token || undefined,
-                },
+                email,
+                password,
+                invitation_token: token || undefined,
             });
             setIsSuccess(true);
             toast.success('Account created successfully!');
-        } catch (error) {
-            toast.error('Registration failed');
+        } catch (error: unknown) {
+            // ... existing error handling
+            let message = 'Registration failed';
+            try {
+                // Try to parse JSON error from backend
+                if (error instanceof Error) {
+                    const body = JSON.parse(error.message);
+                    message = body.detail || body.message || message;
+                }
+            } catch (_e) {
+                // Fallback to raw message if not JSON
+                if (error instanceof Error) {
+                    message = error.message || message;
+                }
+            }
+            toast.error(message);
             console.error(error);
         }
     };
@@ -214,7 +239,10 @@ const RegistrationPage = () => {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="password text-xs font-bold uppercase text-slate-400 tracking-wider">
+                                <Label
+                                    htmlFor="password"
+                                    className="text-xs font-bold uppercase text-slate-400 tracking-wider"
+                                >
                                     Choose Password
                                 </Label>
                                 <div className="relative">
@@ -231,7 +259,10 @@ const RegistrationPage = () => {
                                 </div>
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="confirm-password text-xs font-bold uppercase text-slate-400 tracking-wider">
+                                <Label
+                                    htmlFor="confirm-password"
+                                    className="text-xs font-bold uppercase text-slate-400 tracking-wider"
+                                >
                                     Confirm Password
                                 </Label>
                                 <div className="relative">

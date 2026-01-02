@@ -24,6 +24,7 @@ import PreSortPage from './pages/PreSortPage';
 import ResetPage from './pages/ResetPage';
 import RoughSortPage from './pages/RoughSortPage';
 import WelcomePage from './pages/WelcomePage';
+import { Toaster } from 'sonner';
 
 // Lazy load heavy interactive components
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));
@@ -48,8 +49,8 @@ const AdminIndex = () => {
 
 const App = () => {
     return (
-        <ErrorBoundary>
-            <Router>
+        <Router>
+            <ErrorBoundary>
                 <Suspense
                     fallback={
                         <div className="h-screen w-screen flex items-center justify-center bg-slate-50 text-slate-400 font-medium">
@@ -89,8 +90,9 @@ const App = () => {
                         </Route>
                     </Routes>
                 </Suspense>
-            </Router>
-        </ErrorBoundary>
+            </ErrorBoundary>
+            <Toaster richColors position="top-center" closeButton />
+        </Router>
     );
 };
 

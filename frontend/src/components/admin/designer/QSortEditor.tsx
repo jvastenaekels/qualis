@@ -206,6 +206,7 @@ const QSortEditor = () => {
                                         size="icon"
                                         className="h-6 w-6 hover:bg-primary/10 hover:text-primary rounded-full shadow-sm border bg-background"
                                         onClick={() => updateGridCapacity(idx, 1)}
+                                        aria-label={`Increase capacity for column ${idx}`}
                                     >
                                         <Plus className="h-3 w-3" />
                                     </Button>
@@ -234,6 +235,7 @@ const QSortEditor = () => {
                                         className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive rounded-full shadow-sm border bg-background"
                                         onClick={() => updateGridCapacity(idx, -1)}
                                         disabled={(col.capacity || 0) <= 0}
+                                        aria-label={`Decrease capacity for column ${idx}`}
                                     >
                                         <Minus className="h-3 w-3" />
                                     </Button>

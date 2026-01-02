@@ -32,5 +32,8 @@ test:
 	cd backend && uv run pytest -n auto tests/
 	cd frontend && npm run test -- --run --coverage
 
-ci: lint check test
+e2e:
+	cd frontend && npm run e2e
+
+ci: lint check test e2e
 	@echo "\n--- All CI checks passed locally! ---"
