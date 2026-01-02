@@ -39,6 +39,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';
 import { useFineSortDrag } from '../hooks/useFineSortDrag';
+import { useGridSanity } from '../hooks/useGridSanity';
 import { useLayoutAction } from '../hooks/useLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -218,6 +219,14 @@ const FineSortPage: React.FC = () => {
             });
         }
     }, [config, responses.qsort, responses.rough, actions]);
+
+    // SANITY CHECK: Ensure no overlapping cards or out-of-bounds cards
+    useGridSanity({
+        qsort: responses.qsort,
+        gridColumns,
+        unplaceCard: actions.unplaceCard,
+        categorizeCard: actions.categorizeCard,
+    });
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
