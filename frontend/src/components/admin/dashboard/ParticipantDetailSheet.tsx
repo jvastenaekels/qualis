@@ -6,7 +6,7 @@ import {
     SheetTitle,
     SheetDescription,
 } from '@/components/ui/sheet';
-import { useGetParticipant } from '@/api/generated';
+import { useGetParticipantApiAdminStudiesParticipantsParticipantIdGet } from '@/api/generated';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { User, Monitor, Calendar, Clock, MessageSquare, CheckCircle2, XCircle } from 'lucide-react';
@@ -27,7 +27,9 @@ const ParticipantDetailSheet: React.FC<ParticipantDetailSheetProps> = ({
         data: p,
         isLoading,
         error,
-    } = useGetParticipant(participantId || 0, { query: { enabled: !!participantId && open } });
+    } = useGetParticipantApiAdminStudiesParticipantsParticipantIdGet(participantId || 0, {
+        query: { enabled: !!participantId && open },
+    });
 
     return (
         <Sheet open={open} onOpenChange={onOpenChange}>

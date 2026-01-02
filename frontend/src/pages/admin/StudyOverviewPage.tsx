@@ -1,5 +1,9 @@
 import { useParams } from 'react-router-dom';
-import { useGetStudyStats, useListStudyParticipants, useDiscardParticipant } from '@/api/generated';
+import {
+    useGetStudyStatsApiAdminStudiesSlugStatsGet,
+    useListStudyParticipantsApiAdminStudiesSlugParticipantsGet,
+    useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch,
+} from '@/api/generated';
 import HealthDashboard from '@/components/admin/dashboard/HealthDashboard';
 import ParticipantTable from '@/components/admin/dashboard/ParticipantTable';
 import ParticipantDetailSheet from '@/components/admin/dashboard/ParticipantDetailSheet';
@@ -17,15 +21,17 @@ import { cn } from '@/lib/utils';
 
 const StudyOverviewPage = () => {
     const { slug } = useParams();
-    const { data: stats, isLoading: statsLoading } = useGetStudyStats(slug || '');
+    const { data: stats, isLoading: statsLoading } = useGetStudyStatsApiAdminStudiesSlugStatsGet(
+        slug || ''
+    );
     const {
         data: participants,
         isLoading: participantsLoading,
         refetch: refetchParticipants,
-    } = useListStudyParticipants(slug || '');
-    const { refetch: refetchStats } = useGetStudyStats(slug || '');
-    const discardMutation = useDiscardParticipant();
-
+    } = useListStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug || '');
+    const { refetch: refetchStats } = useGetStudyStatsApiAdminStudiesSlugStatsGet(slug || '');
+    const discardMutation = useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch();
+    
     const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null);
     const [detailOpen, setDetailOpen] = useState(false);
 
