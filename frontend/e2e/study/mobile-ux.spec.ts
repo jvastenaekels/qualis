@@ -93,7 +93,7 @@ test.describe('Mobile UX (Focus Flow) [Refactored]', () => {
         await roughSortPage.waitForLoad();
         // Distribute to populate Fine Sort Disagree deck (Mock logic puts 1st in Disagree)
         await roughSortPage.completeRoughSort(mockStudyConfig.statements.length);
-        
+
         // Navigation: RoughSortPage.completeRoughSort waits for animations but maybe not click next?
         // Check implementation of RoughSortPage: it *doesn't* click next, just sorts.
         // We need to click next.
@@ -102,7 +102,7 @@ test.describe('Mobile UX (Focus Flow) [Refactored]', () => {
 
         // 5. FINE SORT
         await fineSortPage.waitForLoad();
-        
+
         // Mobile Interactions
         await fineSortPage.tapFirstCard();
         await fineSortPage.verifyWorkbenchActive();

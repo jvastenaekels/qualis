@@ -20,7 +20,7 @@ test.describe('Mobile UX (Focus Flow)', () => {
     test('should activate workbench on card tap', async ({ page }) => {
         // Go directly to fine sort
         await page.goto(`/study/${mockStudyConfig.slug}/welcome`);
-        
+
         // Welcome Page
         const startBtn = page.getByTestId('start-btn');
         await expect(startBtn).toBeVisible({ timeout: 15000 });

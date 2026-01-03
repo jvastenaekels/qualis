@@ -49,7 +49,7 @@ test.describe('Admin Flow (Zero to Hero) [Refactored]', () => {
         );
         await page.reload();
         await participantsRes;
-        
+
         // Verify participant visible (using exact false to match partial token or ID)
         await adminPage.verifyParticipant(/sess-123/);
 

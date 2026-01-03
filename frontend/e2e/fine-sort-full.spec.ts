@@ -68,7 +68,7 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
 
             // Consent Page
             await page.locator('[data-testid="loading-spinner"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
-            
+
             // Check consent
             const checkbox = page.getByTestId('consent-checkbox');
             await expect(checkbox).toBeVisible({ timeout: 15000 });
@@ -96,7 +96,7 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
                 const cardsTotal = mockStudyConfig.statements.length;
                 const agreeBtn = page.getByTestId('rough-agree-btn');
                 const disagreeBtn = page.getByTestId('rough-disagree-btn');
-                
+
                 // Sort all cards: first to disagree, rest to agree
                 for (let i = 0; i < cardsTotal; i++) {
                     if (i === 0) {

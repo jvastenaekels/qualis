@@ -21,7 +21,7 @@ export class PreSortPage extends BasePage {
         const ageInput = this.page.locator('input[name="age"]');
         await expect(ageInput).toBeVisible({ timeout: 10000 });
         await ageInput.fill('25');
-        
+
         // Verify filling
         const ageVal = await ageInput.inputValue();
         if (ageVal !== '25') {
@@ -36,7 +36,7 @@ export class PreSortPage extends BasePage {
         const educationSelect = this.page.locator('select[name="education"]');
         await expect(educationSelect).toBeVisible();
         await educationSelect.selectOption({ index: 1 });
-        
+
         await expect(this.submitButton).toBeVisible();
         await expect(this.submitButton).toBeEnabled();
         await this.submitButton.click();

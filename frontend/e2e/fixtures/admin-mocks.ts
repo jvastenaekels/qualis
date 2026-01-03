@@ -34,7 +34,7 @@ export async function setupAdminMocks(page: Page) {
 
 
     // Catch-all requests FIRST so specific routes override them (since Playwright checks in reverse order)
-    
+
     // Catch-all for any other API requests (Strict check to avoid matching source files like /src/api/...)
     await page.route((url) => url.pathname.startsWith('/api/'), async (route) => {
         console.log(`[Mock Catch-All] Intercepting unmocked request: ${route.request().url()}`);

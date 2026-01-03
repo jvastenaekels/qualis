@@ -87,10 +87,10 @@ test.describe('Fine Sort Comprehensive UX & Layout [Refactored]', () => {
                 await roughSortPage.waitForLoad();
                 // Important: Distribute cards to ensure deck is populated in Fine Sort
                 await roughSortPage.completeRoughSort(mockStudyConfig.statements.length);
-                
-                // Navigate to Fine Sort (RoughSortPage complete logic handles sorting, 
+
+                // Navigate to Fine Sort (RoughSortPage complete logic handles sorting,
                 // but we might need explicit next click if not covered)
-                // Assuming completeRoughSort finishes the sorting. 
+                // Assuming completeRoughSort finishes the sorting.
                 // We need to click next if not done.
                 // Checking if we are still on rough sort:
                 if (await page.getByRole('button', { name: /next|suivant|continue/i }).count() > 0) {
@@ -114,7 +114,7 @@ test.describe('Fine Sort Comprehensive UX & Layout [Refactored]', () => {
             await fineSortPage.checkFooter(/Drag|Glissez|Tap|Appuyez/);
 
             // B. Selection State: Click a card -> Footer changes
-            // For now, this logic is inside FineSortPage but complex checks (bounding box) 
+            // For now, this logic is inside FineSortPage but complex checks (bounding box)
             // might remain in test or be moved later. Keeping simple interaction check.
             const deckCard = fineSortPage.deckContainer.locator('[data-testid^="card-"]').first();
             await deckCard.click();
@@ -127,7 +127,7 @@ test.describe('Fine Sort Comprehensive UX & Layout [Refactored]', () => {
         await test.step('Verify Deck & Drag Functionality', async () => {
             const initialDeckCount = await fineSortPage.getDeckCount();
             await fineSortPage.dragFirstCardToSlot();
-            
+
             // Verify Logic
             // 1. Deck count decreases
             const newDeckCount = await fineSortPage.getDeckCount();

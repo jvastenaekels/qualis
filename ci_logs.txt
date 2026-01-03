@@ -108,7 +108,7 @@ Backend Lint & Quality	Install uv	2026-01-03T12:08:33.5008327Z   enable-cache: t
 Backend Lint & Quality	Install uv	2026-01-03T12:08:33.5008717Z   github-token: ***
 Backend Lint & Quality	Install uv	2026-01-03T12:08:33.5009012Z   cache-dependency-glob: **/uv.lock
 Backend Lint & Quality	Install uv	**/requirements*.txt
-Backend Lint & Quality	Install uv	
+Backend Lint & Quality	Install uv
 Backend Lint & Quality	Install uv	2026-01-03T12:08:33.5009375Z   prune-cache: true
 Backend Lint & Quality	Install uv	2026-01-03T12:08:33.5009615Z   ignore-nothing-to-cache: false
 Backend Lint & Quality	Install uv	2026-01-03T12:08:33.5010234Z   ignore-empty-workdir: false
@@ -313,15 +313,15 @@ Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.6846074Z [main
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.6846878Z [main]	INFO	cli exclude tests: None
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.6847351Z [main]	INFO	running on Python 3.13.11
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8791174Z Run started:2026-01-03 12:08:50.878924+00:00
-Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8794916Z 
+Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8794916Z
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8796859Z Test results:
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8798956Z 	No issues identified.
-Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8801150Z 
+Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8801150Z
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8803046Z Code scanned:
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8805190Z 	Total lines of code: 2339
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8807325Z 	Total lines skipped (#nosec): 0
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8809701Z 	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
-Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8811726Z 
+Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8811726Z
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8812937Z Run metrics:
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8817242Z 	Total issues (by severity):
 Backend Lint & Quality	Security SAST (Bandit)	2026-01-03T12:08:50.8822534Z 		Undefined: 0
@@ -376,7 +376,7 @@ Backend Lint & Quality	Complexity (Radon)	2026-01-03T12:08:53.8083975Z     M 316
 Backend Lint & Quality	Complexity (Radon)	2026-01-03T12:08:53.8084457Z     C 28:0 StudyService - B
 Backend Lint & Quality	Complexity (Radon)	2026-01-03T12:08:53.8100138Z app/services/export_service.py
 Backend Lint & Quality	Complexity (Radon)	2026-01-03T12:08:53.8102489Z     M 14:4 ExportService.generate_csv - C
-Backend Lint & Quality	Complexity (Radon)	2026-01-03T12:08:53.8106831Z 
+Backend Lint & Quality	Complexity (Radon)	2026-01-03T12:08:53.8106831Z
 Backend Lint & Quality	Complexity (Radon)	2026-01-03T12:08:53.8107461Z 15 blocks (classes, functions, methods) analyzed.
 Backend Lint & Quality	Complexity (Radon)	2026-01-03T12:08:53.8108588Z Average complexity: C (11.733333333333333)
 Backend Lint & Quality	Architecture (Import Linter)	﻿2026-01-03T12:08:53.8285970Z ##[group]Run cd backend && uv run lint-imports
@@ -388,26 +388,26 @@ Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:53.8325290Z
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:53.8325617Z   UV_CACHE_DIR: /home/runner/work/_temp/setup-uv-cache
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:53.8325882Z ##[endgroup]
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:53.8469567Z warning: `VIRTUAL_ENV=/home/runner/work/open-q/open-q/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
-Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0115720Z 
+Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0115720Z
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0140562Z ╔══╗─────────▶╔╗ ╔╗      ╔╗◀───┐
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0141994Z ╚╣╠╝◀─────┐  ╔╝╚╗║║────▶╔╝╚╗   │
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0142847Z  ║║   ╔══╦══╦╩╗╔╝║║  ╔╦═╩╗╔╝╔═╦══╗
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0144097Z  ║║╔══╣╔╗║╔╗║╔╣║ ║║ ╔╬╣╔╗║║ ║│║╔═╝
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0144933Z ╔╣╠╣║║║╚╝║╚╝║║║╚╗║╚═╝║║║║║╚╗║═╣║
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0146226Z ╚══╩╩╩╣╔═╩══╩╝╚═╝╚═══╩╩╝╚╩═╩╩═╩╝
-Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0147207Z   └──▶║║                    ▲ 
+Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0147207Z   └──▶║║                    ▲
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0148481Z       ╚╝────────────────────┘
-Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0149140Z 
-Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0386589Z 
+Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0149140Z
+Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0386589Z
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0391965Z ---------
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0394758Z Contracts
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0397384Z ---------
-Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0400152Z 
+Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0400152Z
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0401919Z Analyzed 21 files, 50 dependencies.
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0405826Z -----------------------------------
-Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0406145Z 
+Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0406145Z
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0406314Z Three tier architecture KEPT
-Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0407501Z 
+Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0407501Z
 Backend Lint & Quality	Architecture (Import Linter)	2026-01-03T12:08:54.0407800Z Contracts: 1 kept, 0 broken.
 Backend Lint & Quality	Dependency Hygiene (Deptry)	﻿2026-01-03T12:08:54.0666589Z ##[group]Run cd backend && uv run deptry app
 Backend Lint & Quality	Dependency Hygiene (Deptry)	2026-01-03T12:08:54.0667252Z [36;1mcd backend && uv run deptry app[0m
@@ -419,7 +419,7 @@ Backend Lint & Quality	Dependency Hygiene (Deptry)	2026-01-03T12:08:54.0717454Z 
 Backend Lint & Quality	Dependency Hygiene (Deptry)	2026-01-03T12:08:54.0717935Z ##[endgroup]
 Backend Lint & Quality	Dependency Hygiene (Deptry)	2026-01-03T12:08:54.0901689Z warning: `VIRTUAL_ENV=/home/runner/work/open-q/open-q/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
 Backend Lint & Quality	Dependency Hygiene (Deptry)	2026-01-03T12:08:54.2205347Z Scanning 27 files...
-Backend Lint & Quality	Dependency Hygiene (Deptry)	2026-01-03T12:08:54.2358561Z 
+Backend Lint & Quality	Dependency Hygiene (Deptry)	2026-01-03T12:08:54.2358561Z
 Backend Lint & Quality	Dependency Hygiene (Deptry)	2026-01-03T12:08:54.2359537Z [1m[32mSuccess! No dependency issues found.[m
 Backend Lint & Quality	Dead Code (Vulture)	﻿2026-01-03T12:08:54.2569581Z ##[group]Run cd backend && uv run vulture app vulture_whitelist.py --min-confidence 60
 Backend Lint & Quality	Dead Code (Vulture)	2026-01-03T12:08:54.2570665Z [36;1mcd backend && uv run vulture app vulture_whitelist.py --min-confidence 60[0m
@@ -557,7 +557,7 @@ Backend Tests	Install uv	2026-01-03T12:08:30.7375532Z   enable-cache: true
 Backend Tests	Install uv	2026-01-03T12:08:30.7376765Z   github-token: ***
 Backend Tests	Install uv	2026-01-03T12:08:30.7377831Z   cache-dependency-glob: **/uv.lock
 Backend Tests	Install uv	**/requirements*.txt
-Backend Tests	Install uv	
+Backend Tests	Install uv
 Backend Tests	Install uv	2026-01-03T12:08:30.7379335Z   prune-cache: true
 Backend Tests	Install uv	2026-01-03T12:08:30.7380186Z   ignore-nothing-to-cache: false
 Backend Tests	Install uv	2026-01-03T12:08:30.7381217Z   ignore-empty-workdir: false
@@ -740,7 +740,7 @@ Backend Tests	Unit Tests (Pytest)	2026-01-03T12:08:40.9143319Z plugins: anyio-4.
 Backend Tests	Unit Tests (Pytest)	2026-01-03T12:08:40.9144295Z asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
 Backend Tests	Unit Tests (Pytest)	2026-01-03T12:08:40.9145189Z created: 2/2 workers
 Backend Tests	Unit Tests (Pytest)	2026-01-03T12:08:40.9145546Z 2 workers [134 items]
-Backend Tests	Unit Tests (Pytest)	2026-01-03T12:08:40.9145778Z 
+Backend Tests	Unit Tests (Pytest)	2026-01-03T12:08:40.9145778Z
 Backend Tests	Unit Tests (Pytest)	2026-01-03T12:08:54.3329741Z ........................................................................ [ 53%]
 Backend Tests	Unit Tests (Pytest)	2026-01-03T12:09:02.2371574Z ...........s..................................................           [100%]
 Backend Tests	Unit Tests (Pytest)	2026-01-03T12:09:02.2374722Z ======================= 133 passed, 1 skipped in 23.10s ========================
@@ -905,173 +905,173 @@ Frontend Tests	Install dependencies	2026-01-03T12:08:41.8170737Z npm warn deprec
 Frontend Tests	Install dependencies	2026-01-03T12:08:42.0507169Z npm warn deprecated abab@2.0.6: Use your platform's native atob() and btoa() methods instead
 Frontend Tests	Install dependencies	2026-01-03T12:08:42.1667698Z npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
 Frontend Tests	Install dependencies	2026-01-03T12:08:42.2653938Z npm warn deprecated domexception@4.0.0: Use your platform's native DOMException instead
-Frontend Tests	Install dependencies	2026-01-03T12:08:48.6739960Z 
+Frontend Tests	Install dependencies	2026-01-03T12:08:48.6739960Z
 Frontend Tests	Install dependencies	2026-01-03T12:08:48.6743335Z added 1018 packages, and audited 1019 packages in 14s
-Frontend Tests	Install dependencies	2026-01-03T12:08:48.6743819Z 
+Frontend Tests	Install dependencies	2026-01-03T12:08:48.6743819Z
 Frontend Tests	Install dependencies	2026-01-03T12:08:48.6744105Z 266 packages are looking for funding
 Frontend Tests	Install dependencies	2026-01-03T12:08:48.6744588Z   run `npm fund` for details
-Frontend Tests	Install dependencies	2026-01-03T12:08:48.6762256Z 
+Frontend Tests	Install dependencies	2026-01-03T12:08:48.6762256Z
 Frontend Tests	Install dependencies	2026-01-03T12:08:48.6762910Z found 0 vulnerabilities
 Frontend Tests	Unit Tests (Vitest)	﻿2026-01-03T12:08:48.7478155Z ##[group]Run npm run test -- --run --coverage
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:48.7478525Z [36;1mnpm run test -- --run --coverage[0m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:48.7512822Z shell: /usr/bin/bash -e {0}
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:48.7513057Z ##[endgroup]
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:48.8669211Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:48.8669211Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:48.8670340Z > open-q@0.0.0 test
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:48.8671793Z > vitest --run --coverage
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:48.8672089Z 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:49.6349546Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:48.8672089Z
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:49.6349546Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:49.6351949Z [1m[46m RUN [49m[22m [36mv4.0.16 [39m[90m/home/runner/work/open-q/open-q/frontend[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:49.6354021Z       [2mCoverage enabled with [22m[33mv8[39m
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:49.6354413Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:49.6354413Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:51.1745169Z [90mstderr[2m | src/pages/RoughSortPage.test.tsx[2m > [22m[2mRoughSortPage[2m > [22m[2mrenders completed status message correctly
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:51.1753241Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:51.1761538Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:51.1767673Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:51.1767673Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:51.5208418Z  [32m✓[39m src/pages/RoughSortPage.test.tsx [2m([22m[2m16 tests[22m[2m)[22m[33m 343[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:52.5987431Z [90mstderr[2m | src/layouts/StudyLayout.test.tsx[2m > [22m[2mStudyLayout Language Sync[2m > [22m[2mUpdates i18n when Store language changes
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:52.5990888Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:52.5994772Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:52.5996537Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:52.5996537Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:52.7180853Z  [32m✓[39m src/layouts/StudyLayout.test.tsx [2m([22m[2m12 tests[22m[2m)[22m[32m 131[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.1662205Z [90mstderr[2m | src/pages/FineSortPage.test.tsx[2m > [22m[2mFineSortPage Integration[2m > [22m[2mrenders and initializes correctly
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.1672093Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.1675958Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.1677511Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.1677511Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.1785875Z [90mstderr[2m | src/pages/FineSortPage.test.tsx[2m > [22m[2mFineSortPage Integration[2m > [22m[2mreconciles missing cards into Neutral deck
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.1791374Z [22m[39mReconciling missing cards: [ [33m4[39m ]
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.1791776Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.1791776Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.2046860Z [90mstderr[2m | src/pages/FineSortPage.test.tsx[2m > [22m[2mFineSortPage Integration[2m > [22m[2mEscape key deselects active card
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.2053295Z [22m[39mReconciling missing cards: [ [33m1[39m, [33m2[39m, [33m3[39m, [33m4[39m ]
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.2053863Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.2053863Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.2485678Z  [32m✓[39m src/pages/FineSortPage.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 89[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:54.9715350Z  [32m✓[39m src/store/atomicStores.test.ts [2m([22m[2m20 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[32m 17[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:56.0006989Z [90mstderr[2m | src/pages/LoginPage.test.tsx[2m > [22m[2mLoginPage[2m > [22m[2mrendering[2m > [22m[2mrenders login form with email and password fields
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:56.0024188Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:56.0031996Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:56.0037055Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:56.0037055Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:56.3706551Z  [32m✓[39m src/pages/LoginPage.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 403[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:57.6409097Z  [32m✓[39m src/components/admin/designer/QSortEditor.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 247[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:58.5019100Z [90mstderr[2m | src/hooks/useSubmitStudy.test.ts[2m > [22m[2museSubmitStudy[2m > [22m[2msubmits correctly transformed payload on success
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:58.5026681Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:58.5034466Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:58.5040191Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:58.5040191Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:58.5521643Z  [32m✓[39m src/hooks/useSubmitStudy.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 52[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6521175Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2mkeyboard shortcut[2m > [22m[2mopens on Cmd+K
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6525632Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6529681Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6531961Z `DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6532680Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6532680Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6533260Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6533844Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6533844Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6534429Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6535576Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6536349Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6536349Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6959697Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2mkeyboard shortcut[2m > [22m[2mopens on Ctrl+K
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6964788Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6965467Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6965467Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6966015Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6966721Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6966721Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6967296Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6968962Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6969565Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.6969565Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7672040Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2mkeyboard shortcut[2m > [22m[2mtoggles closed on second Cmd+K
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7674470Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7675458Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7675458Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7676484Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7677037Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7677037Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7677599Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7678681Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7687515Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.7687515Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8363264Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2mstudy navigation[2m > [22m[2mdisplays studies in Go to section
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8365592Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8366442Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8366442Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8366997Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8367521Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8367521Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8368050Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8369311Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8396625Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.8396625Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9240978Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2mstudy navigation[2m > [22m[2mnavigates to study when selected
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9242823Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9243507Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9243507Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9245346Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9246979Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9246979Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9247491Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9248143Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9248462Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9248462Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9716738Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2mcontextual actions[2m > [22m[2mshows study actions when study is active
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9724957Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9725670Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9725670Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9726456Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9727022Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9727022Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9727612Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9728699Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9732675Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:08:59.9732675Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0103975Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2mcontextual actions[2m > [22m[2mcopies public link on action
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0109981Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0126630Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0126630Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0127649Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0128430Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0128430Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0129230Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0130517Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0136798Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0136798Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0773941Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2msystem actions[2m > [22m[2mshows theme toggle
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0780745Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0781776Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0781776Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0782644Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0787177Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0787177Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0789642Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0791250Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0792298Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.0792298Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1382325Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2msystem actions[2m > [22m[2mshows logout option
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1427724Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1428647Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1428647Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1429309Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1430408Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1430408Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1431099Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1432311Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1432950Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1432950Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1816945Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2msystem actions[2m > [22m[2mnavigates to login and logs out on logout click
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1819300Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1820115Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1820115Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1820795Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1821455Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1821455Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1822126Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1823369Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1825560Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.1825560Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2543926Z [90mstderr[2m | src/components/admin/CommandMenu.test.tsx[2m > [22m[2mCommandMenu[2m > [22m[2msearch functionality[2m > [22m[2mfilters results based on input
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2545964Z [22m[39m`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2546740Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2546740Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2547287Z If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2547608Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2547608Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2547932Z For more information, see https://radix-ui.com/primitives/docs/components/dialog
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2548827Z Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2549230Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2549230Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:00.2893176Z  [32m✓[39m src/components/admin/CommandMenu.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 698[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:01.4651837Z [90mstderr[2m | src/components/SortableCard.test.tsx[2m > [22m[2mSortableCard[2m > [22m[2mrenders card text correctly
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:01.4657772Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:01.4661706Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:01.4663245Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:01.4663245Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:01.5342676Z  [32m✓[39m src/components/SortableCard.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[32m 74[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.0729875Z [90mstderr[2m | src/pages/FineSortPage.mobile.test.tsx[2m > [22m[2mFineSortPage Mobile Interaction (Integration)[2m > [22m[2mdisplays the precise "empty pile" message when a category is fully placed
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.0731842Z [22m[39mReconciling missing cards: [ [33m2[39m, [33m3[39m ]
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.0734609Z ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.0738714Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.0740505Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.0740505Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.1818780Z [90mstderr[2m | src/pages/FineSortPage.mobile.test.tsx[2m > [22m[2mFineSortPage Mobile Interaction (Integration)[2m > [22m[2mallows "Tap-to-Swap" interaction: Select Card -> Tap Occupied Slot -> Swap
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.1827301Z [22m[39mReconciling missing cards: [ [33m3[39m ]
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.1827706Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.1827706Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:03.3956939Z  [32m✓[39m src/pages/FineSortPage.mobile.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[33m 434[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:04.8909175Z  [32m✓[39m src/components/GridSort.layout.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 224[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:06.1990915Z [90mstderr[2m | src/pages/WelcomePage.test.tsx[2m > [22m[2mWelcomePage[2m > [22m[2mrenders study details (title, subtitle, description, objective)
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:06.1994361Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:06.1998681Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:06.2000264Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:06.2000264Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:06.4053710Z  [32m✓[39m src/pages/WelcomePage.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 244[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:07.5154423Z [90mstderr[2m | src/pages/ConsentPage.test.tsx[2m > [22m[2mConsentPage[2m > [22m[2mrenders consent title and description from config
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:07.5158161Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:07.5162134Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:07.5163948Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:07.5163948Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:07.6581635Z  [32m✓[39m src/pages/ConsentPage.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 156[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:09.1232350Z  [32m✓[39m src/components/GridSort.interactions.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 214[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:09.9370553Z  [32m✓[39m src/hooks/useGridZoom.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 28[2mms[22m[39m
@@ -1079,21 +1079,21 @@ Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:11.1460399Z  [32m✓[39m s
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:12.4744262Z [90mstderr[2m | src/pages/FineSortPage.integration.test.tsx[2m > [22m[2mFineSortPage Integration[2m > [22m[2mrenders "Finish Sorting" button in Header when grid is full
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:12.4751439Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:12.4755392Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:12.4757163Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:12.4757163Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:12.5294547Z  [32m✓[39m src/pages/FineSortPage.integration.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 65[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:13.3738360Z [90mstderr[2m | src/pages/StudyStatusPage.test.tsx[2m > [22m[2mStudyStatusPage[2m > [22m[2mrenders not_found state by default
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:13.3745994Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:13.3750977Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:13.3753992Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:13.3753992Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:13.4341711Z  [32m✓[39m src/pages/StudyStatusPage.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 64[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:14.1309811Z [90mstderr[2m | src/store/useResponseStore.test.ts[2m > [22m[2museResponseStore[2m > [22m[2mshould NOT place card if column is full
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:14.1312384Z [22m[39mColumn 0 is full.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:14.1313938Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:14.1313938Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:14.1491465Z  [32m✓[39m src/store/useResponseStore.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 14[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:15.1860607Z [90mstderr[2m | src/tests/Navigation.integration.test.tsx[2m > [22m[2mNavigation Integration[2m > [22m[2mnavigates forward and backward correctly
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:15.1866043Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:15.1871947Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:15.1875244Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:15.1875244Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:15.2244206Z  [32m✓[39m src/tests/Navigation.integration.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 91[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:16.0458612Z  [32m✓[39m src/hooks/useFineSortDrag.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 29[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:16.8617086Z [90mstderr[2m | src/hooks/useStudyConfig.test.tsx[2m > [22m[2museStudyConfig[2m > [22m[2mhandles API errors (e.g. 404/500) gracefully
@@ -1108,12 +1108,12 @@ Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:16.8626213Z     at [90mfile
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:16.8628295Z     at Traces.$ [90m(file:///home/runner/work/open-q/open-q/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.U4xDYhzZ.js:115:27[90m)[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:16.8631727Z     at trace [90m(file:///home/runner/work/open-q/open-q/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:16.8634644Z     at runTest [90m(file:///home/runner/work/open-q/open-q/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:16.8635526Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:16.8635526Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:16.8897772Z  [32m✓[39m src/hooks/useStudyConfig.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 35[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:18.0067303Z [90mstderr[2m | src/pages/PostSortPage.test.tsx[2m > [22m[2mPostSortPage[2m > [22m[2mRedirects to /fine-sort if qsort is incomplete
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:18.0070931Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:18.0075065Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:18.0080270Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:18.0080270Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:18.0613773Z  [32m✓[39m src/pages/PostSortPage.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 84[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:19.0619924Z  [32m✓[39m src/hooks/useScaleToFit.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 32[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:19.7637668Z  [32m✓[39m src/api/mutator.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 14[2mms[22m[39m
@@ -1121,32 +1121,32 @@ Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:21.0207307Z  [2m[90m↓[3
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:22.0190926Z [90mstderr[2m | src/pages/ErrorPage.test.tsx[2m > [22m[2mErrorPage[2m > [22m[2mrenders generic error message by default
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:22.0198265Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:22.0205493Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:22.0209370Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:22.0209370Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:22.1088357Z  [32m✓[39m src/pages/ErrorPage.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 80[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:23.1969702Z  [32m✓[39m src/components/admin/EmptyState.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 84[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.1937299Z [90mstderr[2m | src/pages/PreSortPage.test.tsx[2m > [22m[2mPreSortPage[2m > [22m[2mrenders form fields based on config
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.1941942Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.1947259Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.1950907Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.1950907Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.2834784Z [90mstderr[2m | src/pages/PreSortPage.test.tsx[2m > [22m[2mPreSortPage[2m > [22m[2msubmits valid form data
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.2836531Z [22m[39mNo routes matched location "/study/test/rough-sort" 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.2837122Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.2836531Z [22m[39mNo routes matched location "/study/test/rough-sort"
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.2837122Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:24.3531209Z  [32m✓[39m src/pages/PreSortPage.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 179[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:25.6860693Z [90mstderr[2m | src/components/GridSort.pedagogy.test.tsx[2m > [22m[2mGridSort Pedagogy[2m > [22m[2mrenders the Objective Bar with Target icon and title
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:25.6864691Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:25.6869816Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:25.6876027Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:25.6876027Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:25.7702859Z  [32m✓[39m src/components/GridSort.pedagogy.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 130[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:26.9962325Z [90mstderr[2m | src/pages/RoughSortPage.integration.test.tsx[2m > [22m[2mRoughSortPage Integration[2m > [22m[2mshows "Next" button in page body when rough sort is complete
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:26.9970225Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:26.9974600Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:26.9981507Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:26.9981507Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:27.0728948Z  [32m✓[39m src/pages/RoughSortPage.integration.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 75[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:27.8815024Z  [32m✓[39m src/hooks/useDeckManagement.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 28[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:29.2611077Z [90mstderr[2m | src/pages/FineSortPage.reconciliation.test.tsx[2m > [22m[2mFineSortPage Reconciliation[2m > [22m[2mrecovers missing cards into neutral deck on mount
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:29.2621084Z [22m[39mReconciling missing cards: [ [33m3[39m ]
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:29.2621921Z Reconciling missing cards: [ [33m3[39m ]
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:29.2622421Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:29.2622421Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:29.3169784Z  [32m✓[39m src/pages/FineSortPage.reconciliation.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 121[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:30.0162815Z  [32m✓[39m src/api/client.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:30.8631395Z  [32m✓[39m src/components/SourceDeck.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 45[2mms[22m[39m
@@ -1154,126 +1154,126 @@ Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:31.6727603Z  [32m✓[39m s
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:32.6573695Z [90mstderr[2m | src/AppRouter.test.tsx[2m > [22m[2mApp Routing Protection[2m > [22m[2mredirects to welcome if not consented on protected route
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:32.6577319Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:32.6581932Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:32.6583750Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:32.6583750Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:32.7421974Z  [32m✓[39m src/AppRouter.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 92[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:33.4631782Z  [32m✓[39m src/utils/i18nOverrides.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 12[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:34.1588001Z  [32m✓[39m src/store/useConfigStore.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:34.9703078Z  [32m✓[39m src/hooks/useFineSortDrag.deck.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 28[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7432891Z [90mstderr[2m | src/hooks/useGridSanity.test.ts[2m > [22m[2museGridSanity[2m > [22m[2mremoves overlapping cards
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7439675Z [22m[39mSanity: Card 2 overlaps at 0_0. Removing.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7441024Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7441024Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7448651Z [90mstderr[2m | src/hooks/useGridSanity.test.ts[2m > [22m[2museGridSanity[2m > [22m[2mremoves out-of-bounds cards (row too high)
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7450600Z [22m[39mSanity: Card 1 out of bounds at 0,5. Removing.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7452548Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7452548Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7462428Z [90mstderr[2m | src/hooks/useGridSanity.test.ts[2m > [22m[2museGridSanity[2m > [22m[2mremoves out-of-bounds cards (col invalid)
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7464574Z [22m[39mSanity: Card 1 out of bounds at 5,0. Removing.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7465357Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7465357Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:35.7735283Z  [32m✓[39m src/hooks/useGridSanity.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 31[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:36.6703437Z [90mstderr[2m | src/components/ReadingZone.test.tsx[2m > [22m[2mReadingZone[2m > [22m[2mshows methodology tips when idle (no card selected or hovered)
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:36.6706403Z [22m[39m`ReactDOMTestUtils.act` is deprecated in favor of `React.act`. Import `act` from `react` instead of `react-dom/test-utils`. See https://react.dev/warnings/react-dom-test-utils for more info.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:36.6707606Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:36.6707606Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:36.7047245Z  [32m✓[39m src/components/ReadingZone.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 41[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:37.4045852Z  [32m✓[39m src/store/useSessionStore.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:38.6627605Z  [32m✓[39m src/components/CardStack.test.tsx [2m([22m[2m2 tests[22m[2m)[22m[32m 65[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:39.6949254Z [90mstderr[2m | src/pages/ResetPage.test.tsx[2m > [22m[2mResetPage[2m > [22m[2mResets all stores and redirects after delay
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:39.6955236Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:39.6965583Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:39.6967465Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:39.6967465Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:39.7260765Z  [32m✓[39m src/pages/ResetPage.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 74[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:40.5445585Z  [32m✓[39m src/components/DroppableSlot.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 30[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:41.9243113Z [90mstderr[2m | src/pages/FineSortPage.desktop.test.tsx[2m > [22m[2mFineSortPage Desktop Layout (Integration)[2m > [22m[2morganizes deck cards in two columns on desktop
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:41.9248242Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:41.9253789Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:41.9255333Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:41.9255333Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:42.1149507Z  [32m✓[39m src/pages/FineSortPage.desktop.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 214[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:43.0973442Z  [32m✓[39m src/components/MethodologyTips.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 41[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:43.9340677Z  [32m✓[39m src/components/CardPile.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 37[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:44.8840797Z [90mstderr[2m | src/pages/LandingPage.test.tsx[2m > [22m[2mLandingPage[2m > [22m[2mrenders landing page inputs
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:44.8844566Z [22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:44.8848664Z ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:44.8850194Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:44.8850194Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:44.9441192Z  [32m✓[39m src/pages/LandingPage.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 69[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:45.8503071Z  [32m✓[39m src/components/admin/DashboardSkeleton.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 73[2mms[22m[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:46.5526698Z  [32m✓[39m src/store/roughSort.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 8[2mms[22m[39m
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.2907583Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.2907583Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.2913418Z [2m Test Files [22m [1m[32m51 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (52)[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.2918702Z [2m      Tests [22m [1m[32m256 passed[39m[22m[2m | [22m[33m6 skipped[39m[90m (262)[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.2923484Z [2m   Start at [22m 12:08:49
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.2928491Z [2m   Duration [22m 57.64s[2m (transform 1.48s, setup 12.54s, import 14.40s, tests 5.55s, environment 14.77s)[22m
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.2932332Z 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.2932332Z
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.2942867Z [34m % [39m[2mCoverage report from [22m[33mv8[39m
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3007686Z -------------------|---------|----------|---------|---------|-------------------
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3012001Z File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3012001Z File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3012916Z -------------------|---------|----------|---------|---------|-------------------
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3021192Z All files          |   73.39 |    57.94 |   80.66 |   74.62 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3024307Z  api               |   74.41 |    71.15 |      80 |    77.5 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3028145Z   client.ts        |   66.66 |    60.86 |   66.66 |   73.33 | 73-85             
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3028877Z   mutator.ts       |      80 |    79.31 |     100 |      80 | 52-56,64          
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3029585Z  components        |   70.02 |    58.56 |   79.04 |   69.94 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3030347Z   CardPile.tsx     |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3031088Z   CardStack.tsx    |    53.7 |    31.57 |   63.63 |   48.97 | ...98,117,174-175 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3031846Z   ...pableSlot.tsx |      60 |    69.23 |      50 |      60 | 27-34             
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3032627Z   ...rBoundary.tsx |   17.64 |       10 |      50 |   17.64 | 28-57,64          
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3033832Z   GridSort.tsx     |   66.37 |    67.32 |   96.29 |   66.32 | ...82,189-239,249 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3034628Z   ...ologyTips.tsx |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3035419Z   ReadingZone.tsx  |   96.66 |    75.86 |   88.88 |      96 | 51                
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3036889Z   SortableCard.tsx |   69.81 |       60 |      70 |   70.83 | ...50,159-160,223 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3038916Z   ...Animation.tsx |   74.41 |    49.13 |   65.51 |   77.47 | ...62,174,449-455 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3039729Z   SourceDeck.tsx   |     100 |     87.5 |     100 |     100 | 47                
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3040532Z  components/admin  |   82.43 |    79.31 |   69.69 |    82.6 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3043251Z   CommandMenu.tsx  |   75.92 |    66.66 |   61.53 |   75.51 | ...04,158-181,207 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3044049Z   ...dSkeleton.tsx |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3044827Z   EmptyState.tsx   |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3045872Z  ...admin/designer |      92 |    81.57 |    90.9 |   93.47 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3046827Z   QSortEditor.tsx  |      92 |    81.57 |    90.9 |   93.47 | 59,64,236         
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3047576Z  components/ui     |     100 |       75 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3048275Z   button.tsx       |     100 |    66.66 |     100 |     100 | 43                
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3048940Z   card.tsx         |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3049595Z   input.tsx        |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3054375Z   label.tsx        |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3055211Z   skeleton.tsx     |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3055945Z   textarea.tsx     |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3056840Z   tooltip.tsx      |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3057542Z  contexts          |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3058239Z   ...xt.context.ts |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3058938Z   ...utContext.tsx |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3059626Z  hooks             |   64.53 |    49.66 |   79.51 |   65.78 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3060332Z   ...Management.ts |   95.65 |       75 |     100 |   95.23 | 41                
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3061062Z   ...nteraction.ts |   17.97 |     5.45 |   33.33 |   19.04 | ...-84,92-141,153 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3061785Z   ...neSortDrag.ts |   71.21 |    48.78 |      90 |   72.13 | 120-128,161-179   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3062490Z   ...tudyConfig.ts |     100 |       50 |     100 |     100 | 6                 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3063207Z   ...lculations.ts |   41.66 |    34.37 |      60 |   46.15 | 40-88,112-114     
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3063949Z   ...dPlacement.ts |   85.71 |    81.81 |    87.5 |   85.71 | 51-54,89          
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3067945Z   useGridSanity.ts |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3071997Z   useGridZoom.ts   |   61.71 |    45.61 |   61.53 |   65.21 | ...91-196,200,202 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3081227Z   useLayout.ts     |      80 |       50 |     100 |      80 | 13,21             
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3082026Z   useScaleToFit.ts |      96 |    81.81 |     100 |     100 | 18,49             
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3082830Z   ...tudyConfig.ts |   83.33 |    70.27 |     100 |    82.5 | 34-35,68-70,72,77 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3083583Z   ...ubmitStudy.ts |     100 |    73.68 |     100 |     100 | 39-72             
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3084275Z  layouts           |   75.94 |    72.38 |   72.72 |      76 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3085278Z   StudyLayout.tsx  |   75.94 |    72.38 |   72.72 |      76 | ...54,216-246,300 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3086001Z  lib               |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3086855Z   utils.ts         |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3087521Z  pages             |   74.92 |    52.99 |   78.17 |   76.69 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3088235Z   ConsentPage.tsx  |   93.47 |    65.38 |     100 |   94.87 | 97-98             
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3088984Z   ErrorPage.tsx    |   88.46 |    73.17 |      60 |   88.46 | 53,145-167        
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3089728Z   FineSortPage.tsx |   71.51 |    43.68 |   78.33 |   72.72 | ...04,322-340,353 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3090491Z   LandingPage.tsx  |     100 |       50 |     100 |     100 | 20                
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3091221Z   LoginPage.tsx    |     100 |       80 |     100 |     100 | 51,63             
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3091999Z   PostSortPage.tsx |   44.52 |    31.37 |    42.5 |   44.91 | ...50,362,384-490 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3092785Z   PreSortPage.tsx  |   91.93 |    58.53 |     100 |   96.22 | 104-105           
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3093829Z   ResetPage.tsx    |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3094559Z   ...hSortPage.tsx |   80.76 |    67.56 |    92.5 |   83.65 | ...62-164,182-183 
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3095306Z   ...tatusPage.tsx |     100 |       80 |     100 |     100 | 79                
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3096247Z   WelcomePage.tsx  |   88.88 |    76.92 |   81.81 |    90.9 | 95-98             
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3096972Z  store             |      90 |    71.42 |   94.44 |   94.94 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3097693Z   useAuthStore.ts  |      50 |      100 |   33.33 |      50 | 20-21             
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3098434Z   ...onfigStore.ts |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3099832Z   ...ponseStore.ts |   89.13 |    71.42 |   96.77 |      96 | 56,75-76          
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3101136Z   ...ssionStore.ts |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3102425Z   useUIStore.ts    |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3103700Z  utils             |     100 |      100 |     100 |     100 |                   
-Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3104915Z   i18nOverrides.ts |     100 |      100 |     100 |     100 |                   
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3021192Z All files          |   73.39 |    57.94 |   80.66 |   74.62 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3024307Z  api               |   74.41 |    71.15 |      80 |    77.5 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3028145Z   client.ts        |   66.66 |    60.86 |   66.66 |   73.33 | 73-85
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3028877Z   mutator.ts       |      80 |    79.31 |     100 |      80 | 52-56,64
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3029585Z  components        |   70.02 |    58.56 |   79.04 |   69.94 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3030347Z   CardPile.tsx     |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3031088Z   CardStack.tsx    |    53.7 |    31.57 |   63.63 |   48.97 | ...98,117,174-175
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3031846Z   ...pableSlot.tsx |      60 |    69.23 |      50 |      60 | 27-34
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3032627Z   ...rBoundary.tsx |   17.64 |       10 |      50 |   17.64 | 28-57,64
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3033832Z   GridSort.tsx     |   66.37 |    67.32 |   96.29 |   66.32 | ...82,189-239,249
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3034628Z   ...ologyTips.tsx |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3035419Z   ReadingZone.tsx  |   96.66 |    75.86 |   88.88 |      96 | 51
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3036889Z   SortableCard.tsx |   69.81 |       60 |      70 |   70.83 | ...50,159-160,223
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3038916Z   ...Animation.tsx |   74.41 |    49.13 |   65.51 |   77.47 | ...62,174,449-455
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3039729Z   SourceDeck.tsx   |     100 |     87.5 |     100 |     100 | 47
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3040532Z  components/admin  |   82.43 |    79.31 |   69.69 |    82.6 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3043251Z   CommandMenu.tsx  |   75.92 |    66.66 |   61.53 |   75.51 | ...04,158-181,207
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3044049Z   ...dSkeleton.tsx |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3044827Z   EmptyState.tsx   |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3045872Z  ...admin/designer |      92 |    81.57 |    90.9 |   93.47 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3046827Z   QSortEditor.tsx  |      92 |    81.57 |    90.9 |   93.47 | 59,64,236
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3047576Z  components/ui     |     100 |       75 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3048275Z   button.tsx       |     100 |    66.66 |     100 |     100 | 43
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3048940Z   card.tsx         |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3049595Z   input.tsx        |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3054375Z   label.tsx        |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3055211Z   skeleton.tsx     |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3055945Z   textarea.tsx     |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3056840Z   tooltip.tsx      |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3057542Z  contexts          |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3058239Z   ...xt.context.ts |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3058938Z   ...utContext.tsx |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3059626Z  hooks             |   64.53 |    49.66 |   79.51 |   65.78 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3060332Z   ...Management.ts |   95.65 |       75 |     100 |   95.23 | 41
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3061062Z   ...nteraction.ts |   17.97 |     5.45 |   33.33 |   19.04 | ...-84,92-141,153
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3061785Z   ...neSortDrag.ts |   71.21 |    48.78 |      90 |   72.13 | 120-128,161-179
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3062490Z   ...tudyConfig.ts |     100 |       50 |     100 |     100 | 6
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3063207Z   ...lculations.ts |   41.66 |    34.37 |      60 |   46.15 | 40-88,112-114
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3063949Z   ...dPlacement.ts |   85.71 |    81.81 |    87.5 |   85.71 | 51-54,89
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3067945Z   useGridSanity.ts |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3071997Z   useGridZoom.ts   |   61.71 |    45.61 |   61.53 |   65.21 | ...91-196,200,202
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3081227Z   useLayout.ts     |      80 |       50 |     100 |      80 | 13,21
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3082026Z   useScaleToFit.ts |      96 |    81.81 |     100 |     100 | 18,49
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3082830Z   ...tudyConfig.ts |   83.33 |    70.27 |     100 |    82.5 | 34-35,68-70,72,77
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3083583Z   ...ubmitStudy.ts |     100 |    73.68 |     100 |     100 | 39-72
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3084275Z  layouts           |   75.94 |    72.38 |   72.72 |      76 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3085278Z   StudyLayout.tsx  |   75.94 |    72.38 |   72.72 |      76 | ...54,216-246,300
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3086001Z  lib               |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3086855Z   utils.ts         |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3087521Z  pages             |   74.92 |    52.99 |   78.17 |   76.69 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3088235Z   ConsentPage.tsx  |   93.47 |    65.38 |     100 |   94.87 | 97-98
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3088984Z   ErrorPage.tsx    |   88.46 |    73.17 |      60 |   88.46 | 53,145-167
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3089728Z   FineSortPage.tsx |   71.51 |    43.68 |   78.33 |   72.72 | ...04,322-340,353
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3090491Z   LandingPage.tsx  |     100 |       50 |     100 |     100 | 20
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3091221Z   LoginPage.tsx    |     100 |       80 |     100 |     100 | 51,63
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3091999Z   PostSortPage.tsx |   44.52 |    31.37 |    42.5 |   44.91 | ...50,362,384-490
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3092785Z   PreSortPage.tsx  |   91.93 |    58.53 |     100 |   96.22 | 104-105
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3093829Z   ResetPage.tsx    |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3094559Z   ...hSortPage.tsx |   80.76 |    67.56 |    92.5 |   83.65 | ...62-164,182-183
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3095306Z   ...tatusPage.tsx |     100 |       80 |     100 |     100 | 79
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3096247Z   WelcomePage.tsx  |   88.88 |    76.92 |   81.81 |    90.9 | 95-98
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3096972Z  store             |      90 |    71.42 |   94.44 |   94.94 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3097693Z   useAuthStore.ts  |      50 |      100 |   33.33 |      50 | 20-21
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3098434Z   ...onfigStore.ts |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3099832Z   ...ponseStore.ts |   89.13 |    71.42 |   96.77 |      96 | 56,75-76
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3101136Z   ...ssionStore.ts |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3102425Z   useUIStore.ts    |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3103700Z  utils             |     100 |      100 |     100 |     100 |
+Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3104915Z   i18nOverrides.ts |     100 |      100 |     100 |     100 |
 Frontend Tests	Unit Tests (Vitest)	2026-01-03T12:09:47.3106323Z -------------------|---------|----------|---------|---------|-------------------
 Frontend Tests	Post Setup Node.js	﻿2026-01-03T12:09:47.4108007Z Post job cleanup.
 Frontend Tests	Post Setup Node.js	2026-01-03T12:09:47.6049108Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-aff534ae2f7947fa6222968a70c508b36122341ae52fa1b70cf0838a8cc2fa1e, not saving cache.
@@ -1422,7 +1422,7 @@ Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.7820810Z ##[group]
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.7821404Z [36;1m/home/runner/work/_actions/lycheeverse/lychee-action/v1.9.0/entrypoint.sh[0m
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.7857508Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.7857860Z env:
-Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.7858036Z   INPUT_GITHUB_TOKEN: 
+Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.7858036Z   INPUT_GITHUB_TOKEN:
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.7858357Z   INPUT_ARGS: --verbose --no-progress './docs/**/*.md' './README.md'
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.7858685Z   INPUT_DEBUG: false
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.7858876Z   INPUT_FAIL: true
@@ -1462,7 +1462,7 @@ Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.9317810Z ✔ [200]
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:32.9537426Z ✔ [200] https://img.shields.io/badge/License-AGPL%20v3-blue.svg
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7277532Z ✔ [200] https://doc.scalingo.com/cli
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7362652Z ## Summary
-Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7363046Z 
+Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7363046Z
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7363231Z | Status        | Count |
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7363725Z |---------------|-------|
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7364327Z | 🔍 Total      | 31    |
@@ -1472,7 +1472,7 @@ Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7366025Z | 🔀 Re
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7366531Z | 👻 Excluded   | 9     |
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7367041Z | ❓ Unknown    | 0     |
 Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7367608Z | 🚫 Errors     | 0     |
-Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7382959Z 
+Documentation Links	Link Checker (Lychee)	2026-01-03T12:08:33.7382959Z
 Documentation Links	Post Run actions/checkout@v4	﻿2026-01-03T12:08:33.7593312Z Post job cleanup.
 Documentation Links	Post Run actions/checkout@v4	2026-01-03T12:08:33.8572499Z [command]/usr/bin/git version
 Documentation Links	Post Run actions/checkout@v4	2026-01-03T12:08:33.8604365Z git version 2.52.0
@@ -1633,79 +1633,79 @@ Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:40.1278414Z npm wa
 Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:40.3108150Z npm warn deprecated abab@2.0.6: Use your platform's native atob() and btoa() methods instead
 Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:40.4065200Z npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
 Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:40.4723101Z npm warn deprecated domexception@4.0.0: Use your platform's native DOMException instead
-Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5541293Z 
+Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5541293Z
 Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5543880Z added 1018 packages, and audited 1019 packages in 11s
-Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5545087Z 
+Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5545087Z
 Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5545631Z 266 packages are looking for funding
 Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5546155Z   run `npm fund` for details
-Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5546627Z 
+Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5546627Z
 Frontend Lint & Quality	Install dependencies	2026-01-03T12:08:45.5546813Z found 0 vulnerabilities
 Frontend Lint & Quality	Lint & Format (Biome)	﻿2026-01-03T12:08:45.6268235Z ##[group]Run npm run lint
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:45.6268721Z [36;1mnpm run lint[0m
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:45.6301376Z shell: /usr/bin/bash -e {0}
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:45.6301853Z ##[endgroup]
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:45.8019200Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:45.8019200Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:45.8022420Z > open-q@0.0.0 lint
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:45.8023096Z > biome check src
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:45.8025529Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:45.8025529Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6682228Z src/pages/FineSortPage.reconciliation.test.tsx:37:42 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6683175Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6683175Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6683430Z   ! Unexpected any. Specify a different type.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6683914Z   
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6683914Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6684478Z     36 │ vi.mock('../store/useResponseStore', () => ({
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6685364Z   > 37 │     useResponseStore: (selector: (state: any) => any) => {
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6686127Z        │                                          ^^^
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6686752Z     38 │         const state = {
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6687309Z     39 │             rough: {
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6687715Z   
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6687715Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6688353Z   i any disables many type checking rules. Its use should be avoided.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6689399Z   
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6689601Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6689399Z
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6689601Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6690768Z src/pages/FineSortPage.reconciliation.test.tsx:37:50 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6691511Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6691511Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6691762Z   ! Unexpected any. Specify a different type.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6692270Z   
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6692270Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6692811Z     36 │ vi.mock('../store/useResponseStore', () => ({
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6693647Z   > 37 │     useResponseStore: (selector: (state: any) => any) => {
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6694440Z        │                                                  ^^^
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6695054Z     38 │         const state = {
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6695562Z     39 │             rough: {
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6695966Z   
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6695966Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6696501Z   i any disables many type checking rules. Its use should be avoided.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6697112Z   
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6697311Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6697112Z
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6697311Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6698268Z src/pages/FineSortPage.test.tsx:91:8 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6699049Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6699049Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6699280Z   ! Unexpected any. Specify a different type.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6699743Z   
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6699743Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6700176Z     89 │         neutralCards,
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6700884Z     90 │         gridColumns,
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6701377Z   > 91 │     }: any) => (
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6701828Z        │        ^^^
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6702368Z     92 │         <div data-testid="grid-sort">
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6703108Z     93 │             <h1>Fine Sort Grid</h1>
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6703580Z   
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6703580Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6704128Z   i any disables many type checking rules. Its use should be avoided.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6704752Z   
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6704962Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6704752Z
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6704962Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6721589Z src/pages/FineSortPage.test.tsx:106:57 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6722416Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6722416Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6722666Z   ! Unexpected any. Specify a different type.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6723187Z   
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6723187Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6723961Z     104 │             <div data-testid="deck-neutral">{neutralCards?.length ?? 0}</div>
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6724835Z     105 │             <div data-testid="grid-slots">
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6725851Z   > 106 │                 {gridColumns?.reduce((acc: number, col: any) => acc + col.capacity, 0) ?? 0}
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6726780Z         │                                                         ^^^
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6727355Z     107 │             </div>
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6727824Z     108 │         </div>
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6728203Z   
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6728203Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6728835Z   i any disables many type checking rules. Its use should be avoided.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6729507Z   
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6729698Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6729507Z
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6729698Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6730622Z src/App.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6731134Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6731134Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6731568Z   × Formatter would have printed the following content:
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6732420Z   
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6732420Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6733392Z      84  84 │                                   <Route path="studies/:slug/design" element={<StudyDesignPage />} />
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6734557Z      85  85 │                                   <Route path="studies/:slug/team" element={<TeamManagementPage />} />
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6736136Z      86     │ - ································<Route·path="studies/:slug/recruitment"·element={<RecruitmentPage·/>}·/>
@@ -1716,14 +1716,14 @@ Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6756292Z      
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6756926Z Checked 259 files in 793ms. No fixes applied.
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6757975Z      87  90 │                                   <Route path="studies/:slug/exports" element={<DataExportsPage />} />
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6759136Z      88  91 │                               </Route>
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6759621Z   
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6759834Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6759621Z
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6759834Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6761427Z check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6762041Z Found 1 error.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6762297Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6762297Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6762793Z   × Some errors were emitted while running checks.
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6763287Z   
-Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6763454Z 
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6763287Z
+Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6763454Z
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6763623Z Found 4 warnings.
 Frontend Lint & Quality	Lint & Format (Biome)	2026-01-03T12:08:46.6912220Z ##[error]Process completed with exit code 1.
 Frontend Lint & Quality	Post Run actions/checkout@v4	﻿2026-01-03T12:08:46.7088750Z Post job cleanup.
@@ -1881,7 +1881,7 @@ E2E Tests (Playwright)	Install uv	2026-01-03T12:09:58.8608536Z   enable-cache: t
 E2E Tests (Playwright)	Install uv	2026-01-03T12:09:58.8608917Z   github-token: ***
 E2E Tests (Playwright)	Install uv	2026-01-03T12:09:58.8609186Z   cache-dependency-glob: **/uv.lock
 E2E Tests (Playwright)	Install uv	**/requirements*.txt
-E2E Tests (Playwright)	Install uv	
+E2E Tests (Playwright)	Install uv
 E2E Tests (Playwright)	Install uv	2026-01-03T12:09:58.8609519Z   prune-cache: true
 E2E Tests (Playwright)	Install uv	2026-01-03T12:09:58.8609919Z   ignore-nothing-to-cache: false
 E2E Tests (Playwright)	Install uv	2026-01-03T12:09:58.8610522Z   ignore-empty-workdir: false
@@ -2297,7 +2297,7 @@ E2E Tests (Playwright)	Setup Backend	2026-01-03T12:10:05.1195447Z 1. Tables veri
 E2E Tests (Playwright)	Setup Backend	2026-01-03T12:10:05.1407574Z 2. No users found. Initializing admin account and default workspace...
 E2E Tests (Playwright)	Setup Backend	2026-01-03T12:10:05.7500893Z 3. Admin user created: admin@example.com
 E2E Tests (Playwright)	Setup Backend	2026-01-03T12:10:05.7502645Z 4. Default workspace created: Example Workspace
-E2E Tests (Playwright)	Setup Backend	2026-01-03T12:10:05.7503088Z 
+E2E Tests (Playwright)	Setup Backend	2026-01-03T12:10:05.7503088Z
 E2E Tests (Playwright)	Setup Backend	2026-01-03T12:10:05.7503698Z Note: To seed a study, use: python seed.py data/example-study.json
 E2E Tests (Playwright)	Setup Backend	2026-01-03T12:10:05.7504379Z --- Initialization Complete ---
 E2E Tests (Playwright)	Setup Backend	2026-01-03T12:40:04.1458388Z ##[error]The operation was canceled.

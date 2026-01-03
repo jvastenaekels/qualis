@@ -39,7 +39,7 @@ export class AdminPage extends BasePage {
     async configureQSort(statements: string[]) {
         await this.page.getByRole('link', { name: /designer/i }).click();
         await this.page.getByRole('tab', { name: /tri \(q-sort\)/i }).click();
-        
+
         const textarea = this.page.getByPlaceholder(/paste your statements here/i);
         await textarea.fill(statements.join('\n'));
         await this.page.getByRole('button', { name: /process & replace/i }).click();

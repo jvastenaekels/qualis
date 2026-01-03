@@ -134,46 +134,46 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-            node-version: "20"
-            cache: "npm"
-            cache-dependency-path: frontend/package-lock.json
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-            python-version: "3.13"
-            enable-cache: true
+          python-version: "3.13"
+          enable-cache: true
 
       - name: Setup Backend
         env:
-            UV_NO_PROGRESS: "1"
+          UV_NO_PROGRESS: "1"
         run: |
-            cd backend
-            uv sync -v
-            uv run -v python init_db.py --reset
+          cd backend
+          uv sync -v
+          uv run -v python init_db.py --reset
 
       - name: Start Backend
         run: |
-            cd backend
-            uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 &
-            # Wait for backend to be ready with a slightly more robust check
-            for i in {1..30}; do
+          cd backend
+          uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          # Wait for backend to be ready with a slightly more robust check
+          for i in {1..30}; do
             if curl -s http://127.0.0.1:8000/health > /dev/null; then
-                echo "Backend is ready!"
-                exit 0
+              echo "Backend is ready!"
+              exit 0
             fi
             echo "Waiting for backend ($i/30)..."
             sleep 2
-            done
-            echo "Backend failed to start"
-            exit 1
+          done
+          echo "Backend failed to start"
+          exit 1
 
       - name: Seed Database
         env:
-            API_BASE_URL: http://127.0.0.1:8000
+          API_BASE_URL: http://127.0.0.1:8000
         run: |
-            cd backend
-            uv run python seed.py data/example-study.json
+          cd backend
+          uv run python seed.py data/example-study.json
 
       - name: Install frontend dependencies
         run: cd frontend && npm ci
@@ -186,9 +186,9 @@ jobs:
         uses: actions/cache@v4
         id: playwright-cache
         with:
-            path: |
+          path: |
             ~/.cache/ms-playwright
-            key: ${{ runner.os }}-playwright-all-${{ env.PLAYWRIGHT_VERSION }}
+          key: ${{ runner.os }}-playwright-all-${{ env.PLAYWRIGHT_VERSION }}
 
       - name: Install Playwright browsers
         run: cd frontend && npx playwright install --with-deps
@@ -200,16 +200,16 @@ jobs:
       - name: Run Study E2E tests
         run: cd frontend && npm run test:e2e:study
         env:
-            CI: true
-            API_BASE_URL: http://127.0.0.1:8000
+          CI: true
+          API_BASE_URL: http://127.0.0.1:8000
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-            name: playwright-report-study
-            path: frontend/playwright-report/
-            retention-days: 7
+          name: playwright-report-study
+          path: frontend/playwright-report/
+          retention-days: 7
 
   e2e-admin:
     name: E2E Tests (Admin)
@@ -224,44 +224,44 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-            node-version: "20"
-            cache: "npm"
-            cache-dependency-path: frontend/package-lock.json
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-            python-version: "3.13"
-            enable-cache: true
+          python-version: "3.13"
+          enable-cache: true
 
       - name: Setup Backend
         env:
-            UV_NO_PROGRESS: "1"
+          UV_NO_PROGRESS: "1"
         run: |
-            cd backend
-            uv sync -v
-            uv run -v python init_db.py --reset
+          cd backend
+          uv sync -v
+          uv run -v python init_db.py --reset
 
       - name: Start Backend
         run: |
-            cd backend
-            uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 &
-            for i in {1..30}; do
+          cd backend
+          uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          for i in {1..30}; do
             if curl -s http://127.0.0.1:8000/health > /dev/null; then
-                echo "Backend is ready!"
-                exit 0
+              echo "Backend is ready!"
+              exit 0
             fi
             echo "Waiting for backend ($i/30)..."
             sleep 2
-            done
-            exit 1
+          done
+          exit 1
 
       - name: Seed Database
         env:
-            API_BASE_URL: http://127.0.0.1:8000
+          API_BASE_URL: http://127.0.0.1:8000
         run: |
-            cd backend
-            uv run python seed.py data/example-study.json
+          cd backend
+          uv run python seed.py data/example-study.json
 
       - name: Install frontend dependencies
         run: cd frontend && npm ci
@@ -274,9 +274,9 @@ jobs:
         uses: actions/cache@v4
         id: playwright-cache
         with:
-            path: |
+          path: |
             ~/.cache/ms-playwright
-            key: ${{ runner.os }}-playwright-all-${{ env.PLAYWRIGHT_VERSION }}
+          key: ${{ runner.os }}-playwright-all-${{ env.PLAYWRIGHT_VERSION }}
 
       - name: Install Playwright browsers
         run: cd frontend && npx playwright install --with-deps
@@ -288,13 +288,13 @@ jobs:
       - name: Run Admin E2E tests
         run: cd frontend && npm run test:e2e:admin
         env:
-            CI: true
-            API_BASE_URL: http://127.0.0.1:8000
+          CI: true
+          API_BASE_URL: http://127.0.0.1:8000
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-            name: playwright-report-admin
-            path: frontend/playwright-report/
-            retention-days: 7
+          name: playwright-report-admin
+          path: frontend/playwright-report/
+          retention-days: 7
