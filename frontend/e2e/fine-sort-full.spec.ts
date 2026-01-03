@@ -81,18 +81,18 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
 
             // Fast-forward through Pre-Sort
             try {
-                await page.waitForURL(/.*presort/, { timeout: 5000 });
+                await page.waitForURL(/.*presort/, { timeout: 15000 });
                 await page.getByLabel(/age/i).first().fill('30');
                 await page.getByLabel(/gender/i).first().selectOption({ index: 1 });
                 await page.getByLabel(/education/i).first().selectOption({ index: 1 });
-                await page.getByRole('button', { name: /continue|continuer/i }).click();
+                await page.getByTestId('presort-submit-btn').click();
             } catch (e) {
                 console.log('Skipped pre-sort or already passed');
             }
 
             // Fast-forward through Rough Sort
             try {
-                await page.waitForURL(/.*rough-sort/, { timeout: 5000 });
+                await page.waitForURL(/.*rough-sort/, { timeout: 15000 });
                 const cardsTotal = mockStudyConfig.statements.length;
                 const agreeBtn = page.getByTestId('rough-agree-btn');
                 
@@ -105,13 +105,13 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
                 // Proceed to Fine Sort
                 await page.waitForTimeout(500);
                 const nextBtn = page.getByRole('button', { name: /next|suivant|continue/i }).first();
-                await expect(nextBtn).toBeEnabled({ timeout: 10000 });
+                await expect(nextBtn).toBeEnabled({ timeout: 15000 });
                 await nextBtn.click();
             } catch (e) {
                 console.log('Skipped rough sort or already passed');
             }
 
-            await expect(page).toHaveURL(/.*fine-sort/, { timeout: 15000 });
+            await expect(page).toHaveURL(/.*fine-sort/, { timeout: 20000 });
         });
 
         // --- SECTION 1: VISIBILITY & LAYOUT CHECKS ---

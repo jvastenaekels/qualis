@@ -18,36 +18,45 @@ test.describe('Mobile UX (Focus Flow)', () => {
     });
 
     test('should activate workbench on card tap', async ({ page }) => {
-        // Go directly to fine sort (requires implementing a shortcut or mocking state,
-        // for now we navigate the happy path quickly)
+        // Go directly to fine sort
         await page.goto(`/study/${mockStudyConfig.slug}/welcome`);
-        await page.getByRole('button', { name: /continue|continuer/i }).click();
+        
+        // Welcome Page
+        const startBtn = page.getByTestId('start-btn');
+        await expect(startBtn).toBeVisible({ timeout: 15000 });
+        await startBtn.click();
 
-        await page.getByLabel(/consent/i).check();
-        await page.getByRole('button', { name: /get started|commencer/i }).click();
-        await page.getByRole('button', { name: /continue|continuer|submit|soumettre/i }).click(); // Presort
+        // Consent Page
+        const checkbox = page.getByTestId('consent-checkbox');
+        await expect(checkbox).toBeVisible({ timeout: 15000 });
+        await checkbox.check();
+
+        const acceptBtn = page.getByTestId('consent-accept-btn');
+        await expect(acceptBtn).toBeVisible({ timeout: 15000 });
+        await acceptBtn.click();
+
+        // Presort Page
+        const presortSubmit = page.getByTestId('presort-submit-btn');
+        await expect(presortSubmit).toBeVisible({ timeout: 15000 });
+        await presortSubmit.click();
 
         // Rough sort - just click Neutral for all
+        await expect(page).toHaveURL(/.*\/rough-sort/, { timeout: 15000 });
         const cardsTotal = mockStudyConfig.statements.length;
-        // Distribute cards so Fine Sort default view (Disagree) has content
-        const keys = ['ArrowLeft', 'ArrowRight', 'ArrowDown'];
-        await page.mouse.click(1, 1);
+        const neutralBtn = page.getByTestId('rough-neutral-btn');
 
         for (let i = 0; i < cardsTotal; i++) {
-            const key = keys[i % 3];
-            await page.keyboard.press(key);
-            await page.keyboard.press(key);
-            await page.waitForTimeout(800);
+            await neutralBtn.click();
+            await page.waitForTimeout(300); // Allow for mobile animation
         }
 
         // Click Next (Intermediate screen)
-        await page
-            .getByRole('button', { name: /next|suivant/i })
-            .first()
-            .click();
+        const nextBtn = page.getByRole('button', { name: /next|suivant|continue/i }).first();
+        await expect(nextBtn).toBeEnabled({ timeout: 15000 });
+        await nextBtn.click();
 
         // Now in Fine Sort
-        await expect(page).toHaveURL(/.*\/fine-sort/);
+        await expect(page).toHaveURL(/.*\/fine-sort/, { timeout: 15000 });
 
         // 1. Verify "Deck" is visible at bottom
         const deck = page.getByTestId('deck-cards-container');

@@ -180,6 +180,7 @@ const PreSortPage: React.FC = () => {
                 <div className="pt-4 flex justify-end w-full">
                     <button
                         type="submit"
+                        data-testid="presort-submit-btn"
                         // If no config, always valid. Otherwise respect form validation.
                         disabled={
                             (config?.presort_config &&
