@@ -78,4 +78,39 @@ describe('App Routing Protection', () => {
 
         expect(screen.getByTestId('page-fine')).toBeTruthy();
     });
+
+    it('redirects from base study URL to welcome by default', () => {
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="welcome" element={<MockWelcome />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo'] }
+        );
+
+        expect(screen.getByTestId('page-welcome')).toBeTruthy();
+    });
+
+    it('redirects from base study URL to current step in session', () => {
+        // Mock current step as 3 (Rough Sort)
+        useSessionStore.getState().setStep(3);
+        // Consent is required for Rough Sort
+        useSessionStore.getState().setConsent(true);
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="welcome" element={<MockWelcome />} />
+                    <Route
+                        path="rough-sort"
+                        element={<div data-testid="rough-sort-page">Rough</div>}
+                    />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo'] }
+        );
+
+        expect(screen.getByTestId('rough-sort-page')).toBeTruthy();
+    });
 });

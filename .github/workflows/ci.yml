@@ -145,8 +145,11 @@ jobs:
           enable-cache: true
 
       - name: Setup Backend
+        env:
+          UV_NO_PROGRESS: "1"
         run: |
           cd backend
+          uv sync -v
           uv run -v python init_db.py --reset
 
       - name: Start Backend

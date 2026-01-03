@@ -162,6 +162,22 @@ const StudyLayoutContent: React.FC = () => {
         return <Navigate to={`/study/${slug}/welcome`} replace />;
     }
 
+    // Redirect study base URL to current/welcome step
+    // biome-ignore lint/style/useTemplate: clearer here
+    const isStudyBase =
+        location.pathname === '/study/' + slug || location.pathname === '/study/' + slug + '/';
+    if (isStudyBase) {
+        const stepRoutes: Record<number, string> = {
+            1: 'welcome',
+            2: 'presort',
+            3: 'rough-sort',
+            4: 'fine-sort',
+            5: 'post-sort',
+        };
+        const target = stepRoutes[session.currentStep] || 'welcome';
+        return <Navigate to={`/study/${slug}/${target}`} replace />;
+    }
+
     // Enforce One-Time Submission
     // If completed, redirect everything to post-sort (Thank You page)
     if (session.isCompleted && !location.pathname.includes('post-sort')) {

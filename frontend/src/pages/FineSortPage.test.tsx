@@ -88,7 +88,14 @@ vi.mock('../components/GridSort', () => ({
         disagreeCards,
         neutralCards,
         gridColumns,
-    }: any) => (
+    }: {
+        isAllPlaced: boolean;
+        onValidate: () => void;
+        agreeCards: unknown[];
+        disagreeCards: unknown[];
+        neutralCards: unknown[];
+        gridColumns: { capacity: number }[];
+    }) => (
         <div data-testid="grid-sort">
             <h1>Fine Sort Grid</h1>
             <button
@@ -103,7 +110,10 @@ vi.mock('../components/GridSort', () => ({
             <div data-testid="deck-disagree">{disagreeCards?.length ?? 0}</div>
             <div data-testid="deck-neutral">{neutralCards?.length ?? 0}</div>
             <div data-testid="grid-slots">
-                {gridColumns?.reduce((acc: number, col: any) => acc + col.capacity, 0) ?? 0}
+                {gridColumns?.reduce(
+                    (acc: number, col: { capacity: number }) => acc + col.capacity,
+                    0
+                ) ?? 0}
             </div>
         </div>
     ),
