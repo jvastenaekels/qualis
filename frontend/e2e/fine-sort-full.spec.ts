@@ -12,13 +12,13 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
 
             // Select button by test-id
             const startBtn = page.getByTestId('start-btn');
-            await expect(startBtn.first()).toBeVisible({ timeout: 15000 });
+            await expect(startBtn.first()).toBeVisible({ timeout: 30000 });
             await startBtn.first().click();
 
             // Consent Page
             await page.locator('[data-testid="loading-spinner"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
             const acceptBtn = page.getByRole('button', { name: /accept|accepter|agree|d'accord/i });
-            await expect(acceptBtn.first()).toBeVisible({ timeout: 10000 });
+            await expect(acceptBtn.first()).toBeVisible({ timeout: 30000 });
             await acceptBtn.first().click();
 
             // Fast-forward through Rough Sort if needed

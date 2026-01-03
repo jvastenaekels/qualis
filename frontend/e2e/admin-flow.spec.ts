@@ -104,7 +104,7 @@ test.describe('Admin Flow (Zero to Hero)', () => {
             // If we got here and it's not handled, continue (or 404)
             // But since the glob matches everything under studies/*, we must handle or fallback
             // For now, let's assume it's a get study if nothing else matches
-            return route.continue();
+            return route.fulfill({ status: 404, body: 'Not Found in Mock' });
         });
 
         await page.route(/\/api\/logs\/?/, async (route) => {
