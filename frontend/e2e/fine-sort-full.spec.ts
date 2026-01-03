@@ -95,11 +95,16 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
                 await page.waitForURL(/.*rough-sort/, { timeout: 15000 });
                 const cardsTotal = mockStudyConfig.statements.length;
                 const agreeBtn = page.getByTestId('rough-agree-btn');
+                const disagreeBtn = page.getByTestId('rough-disagree-btn');
                 
-                // Sort all cards
+                // Sort all cards: first to disagree, rest to agree
                 for (let i = 0; i < cardsTotal; i++) {
-                    await agreeBtn.click();
-                    await page.waitForTimeout(100); // Wait for animation
+                    if (i === 0) {
+                        await disagreeBtn.click();
+                    } else {
+                        await agreeBtn.click();
+                    }
+                    await page.waitForTimeout(200); // Wait for animation
                 }
 
                 // Proceed to Fine Sort

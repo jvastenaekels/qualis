@@ -44,9 +44,14 @@ test.describe('Mobile UX (Focus Flow)', () => {
         await expect(page).toHaveURL(/.*\/rough-sort/, { timeout: 15000 });
         const cardsTotal = mockStudyConfig.statements.length;
         const neutralBtn = page.getByTestId('rough-neutral-btn');
+        const disagreeBtn = page.getByTestId('rough-disagree-btn');
 
         for (let i = 0; i < cardsTotal; i++) {
-            await neutralBtn.click();
+            if (i === 0) {
+                await disagreeBtn.click();
+            } else {
+                await neutralBtn.click();
+            }
             await page.waitForTimeout(300); // Allow for mobile animation
         }
 
