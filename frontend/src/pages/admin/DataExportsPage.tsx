@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Database, Download, Table, FileSpreadsheet } from 'lucide-react';
+import { Database, Download, FileSpreadsheet } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -29,8 +29,10 @@ const DataExportsPage = () => {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 <Card>
                     <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                         <div className="space-y-1">
-                            <CardTitle className="text-base font-semibold">Raw JSON Exporter</CardTitle>
+                        <div className="space-y-1">
+                            <CardTitle className="text-base font-semibold">
+                                Raw JSON Exporter
+                            </CardTitle>
                             <CardDescription>Full participant response dump</CardDescription>
                         </div>
                         <Database className="h-4 w-4 text-slate-400" />
@@ -42,10 +44,12 @@ const DataExportsPage = () => {
                     </CardContent>
                 </Card>
 
-                 <Card>
+                <Card>
                     <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                         <div className="space-y-1">
-                            <CardTitle className="text-base font-semibold">CSV Analysis Format</CardTitle>
+                        <div className="space-y-1">
+                            <CardTitle className="text-base font-semibold">
+                                CSV Analysis Format
+                            </CardTitle>
                             <CardDescription>Ready for PQMethod/R</CardDescription>
                         </div>
                         <FileSpreadsheet className="h-4 w-4 text-slate-400" />

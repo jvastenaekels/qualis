@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Send, Copy, Mail, QrCode } from 'lucide-react';
+import { Mail, QrCode } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const RecruitmentPage = () => {
