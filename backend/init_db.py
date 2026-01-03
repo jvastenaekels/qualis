@@ -94,6 +94,7 @@ async def init_db(reset: bool = False):
         print(f"4. Default workspace created: {default_workspace.title}")
         print("\nNote: To seed a study, use: python seed.py data/example-study.json")
         print("--- Initialization Complete ---")
+    await engine.dispose()
 
 
 if __name__ == "__main__":
