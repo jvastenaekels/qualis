@@ -19,9 +19,11 @@ from app.models import User
 
 async def init_db(reset: bool = False):
     """Initialize the database tables."""
+    print("DEBUG: Starting init_db...")
     print("--- Initializing Database Infrastructure ---")
 
     async with engine.begin() as conn:
+        print(f"DEBUG: Engine connected. Connection: {conn}")
         if reset:
             print("0. Dropping all existing tables (--reset flag)...")
             # Use raw SQL with CASCADE for PostgreSQL compatibility
