@@ -68,7 +68,9 @@ async def test_workspace_rbac_flow(
         "slug": "rbac-study",
         "translations": [{"language_code": "en", "title": "T", "instructions": "I"}],
         "grid_config": [{"score": 0, "capacity": 1}],
-        "statements": [{"code": "S1", "translations": [{"language_code": "en", "text": "S1"}]}],
+        "statements": [
+            {"code": "S1", "translations": [{"language_code": "en", "text": "S1"}]}
+        ],
         "presort_config": {},
         "postsort_config": {},
     }

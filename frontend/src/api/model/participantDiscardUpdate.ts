@@ -10,6 +10,6 @@ import type { ParticipantDiscardUpdateDiscardReason } from './participantDiscard
  * Schema for discarding/flagging a participant.
  */
 export interface ParticipantDiscardUpdate {
-  is_discarded: boolean;
-  discard_reason?: ParticipantDiscardUpdateDiscardReason;
+    is_discarded: boolean;
+    discard_reason?: ParticipantDiscardUpdateDiscardReason;
 }

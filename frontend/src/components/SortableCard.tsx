@@ -34,6 +34,24 @@ interface SortableCardProps {
     allowScroll?: boolean;
 }
 
+const CARD_SPRING_TRANSITION = {
+    type: 'spring',
+    stiffness: 350,
+    damping: 25,
+    duration: 0.4,
+};
+
+const CARD_PULSE_ANIMATION = {
+    scale: [1, 1.03, 1],
+    filter: ['brightness(1)', 'brightness(1.1)', 'brightness(1)'],
+    transition: {
+        duration: 0.5,
+        ease: 'easeInOut',
+        times: [0, 0.5, 1],
+        type: 'tween',
+    },
+};
+
 const SortableCard: React.FC<SortableCardProps> = React.memo(
     ({
         id,
@@ -165,21 +183,9 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                     //           ? undefined
                     //           : `card-${id}`
                     // }
-                    transition={{
-                        type: 'spring',
-                        stiffness: 350,
-                        damping: 25,
-                        duration: 0.4,
-                    }}
+                    transition={CARD_SPRING_TRANSITION}
                     // Trigger a subtle pulse/flash when the card content (id) changes or on mount
-                    animate={
-                        process.env.NODE_ENV === 'test'
-                            ? undefined
-                            : {
-                                  scale: [1, 1.03, 1],
-                                  filter: ['brightness(1)', 'brightness(1.1)', 'brightness(1)'],
-                              }
-                    }
+                    animate={process.env.NODE_ENV === 'test' ? undefined : CARD_PULSE_ANIMATION}
                     key={id} // Ensure animation re-triggers if ID changes in this slot
                     className={`
                     w-full h-full

@@ -89,7 +89,7 @@ test.describe('Admin Flow (Zero to Hero)', () => {
             if (url.includes('/participants')) {
                  return route.fulfill({ json: participantsStore });
             }
-            
+
             if (url.includes('/export/csv')) {
                  return route.fulfill({ status: 200, contentType: 'text/csv', body: 'p1,s1,2' });
             }
@@ -100,7 +100,7 @@ test.describe('Admin Flow (Zero to Hero)', () => {
             if (study) {
                  return route.fulfill({ json: study });
             }
-            
+
             // If we got here and it's not handled, continue (or 404)
             // But since the glob matches everything under studies/*, we must handle or fallback
             // For now, let's assume it's a get study if nothing else matches
@@ -130,7 +130,7 @@ test.describe('Admin Flow (Zero to Hero)', () => {
         await page.getByRole('menuitem', { name: /add study/i }).click();
         await page.getByLabel(/study title/i).fill('Zero Hero Study');
         await page.getByLabel(/url slug/i).fill('zero-hero');
-        
+
         const createResponsePromise = page.waitForResponse(
             (resp) => resp.url().includes('/api/admin/studies') && resp.status() === 201
         );

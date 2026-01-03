@@ -16,21 +16,21 @@ import type { StatementRead } from './statementRead';
  * Schema for reading a study.
  */
 export interface StudyRead {
-  /**
-   * @minLength 3
-   * @maxLength 100
-   * @pattern ^[a-z0-9-]+$
-   */
-  slug: string;
-  state?: StudyState;
-  grid_config: GridColumn[];
-  presort_config: StudyReadPresortConfig;
-  postsort_config: StudyReadPostsortConfig;
-  default_language?: StudyReadDefaultLanguage;
-  show_statement_codes?: boolean;
-  id: number;
-  workspace_id: number;
-  created_at: string;
-  translations?: StudyTranslationRead[];
-  statements?: StatementRead[];
+    /**
+     * @minLength 3
+     * @maxLength 100
+     * @pattern ^[a-z0-9-]+$
+     */
+    slug: string;
+    state?: StudyState;
+    grid_config: GridColumn[];
+    presort_config: StudyReadPresortConfig;
+    postsort_config: StudyReadPostsortConfig;
+    default_language?: StudyReadDefaultLanguage;
+    show_statement_codes?: boolean;
+    id: number;
+    workspace_id: number;
+    created_at: string;
+    translations?: StudyTranslationRead[];
+    statements?: StatementRead[];
 }

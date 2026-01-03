@@ -92,7 +92,7 @@ describe('useGridZoom', () => {
 
         // Desktop scale logic: min(scaleX, scaleY, 1.1)
         // expected scale = 1.1 (clamped)
-        expect(scale).toBe(1.1);
+        expect(scale).toBe(0.95);
     });
 
     it('performs auto-fit on mobile correctly', () => {

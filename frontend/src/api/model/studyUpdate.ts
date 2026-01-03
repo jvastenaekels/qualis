@@ -18,13 +18,13 @@ import type { StudyUpdateStatements } from './studyUpdateStatements';
  * Schema for updating a study.
  */
 export interface StudyUpdate {
-  slug?: StudyUpdateSlug;
-  state?: StudyUpdateState;
-  grid_config?: StudyUpdateGridConfig;
-  presort_config?: StudyUpdatePresortConfig;
-  postsort_config?: StudyUpdatePostsortConfig;
-  default_language?: StudyUpdateDefaultLanguage;
-  show_statement_codes?: StudyUpdateShowStatementCodes;
-  translations?: StudyUpdateTranslations;
-  statements?: StudyUpdateStatements;
+    slug?: StudyUpdateSlug;
+    state?: StudyUpdateState;
+    grid_config?: StudyUpdateGridConfig;
+    presort_config?: StudyUpdatePresortConfig;
+    postsort_config?: StudyUpdatePostsortConfig;
+    default_language?: StudyUpdateDefaultLanguage;
+    show_statement_codes?: StudyUpdateShowStatementCodes;
+    translations?: StudyUpdateTranslations;
+    statements?: StudyUpdateStatements;
 }

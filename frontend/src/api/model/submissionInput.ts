@@ -13,15 +13,15 @@ import type { SubmissionInputPostsortAnswers } from './submissionInputPostsortAn
  * Schema for the full study submission/completion.
  */
 export interface SubmissionInput {
-  study_slug: string;
-  session_token: string;
-  /**
-   * @maxLength 5
-   * @pattern ^[a-z]{2}(-[A-Z]{2})?$
-   */
-  language_used: string;
-  status?: SubmissionInputStatus;
-  presort_answers?: SubmissionInputPresortAnswers;
-  qsort: QSortEntryInput[];
-  postsort_answers?: SubmissionInputPostsortAnswers;
+    study_slug: string;
+    session_token: string;
+    /**
+     * @maxLength 5
+     * @pattern ^[a-z]{2}(-[A-Z]{2})?$
+     */
+    language_used: string;
+    status?: SubmissionInputStatus;
+    presort_answers?: SubmissionInputPresortAnswers;
+    qsort: QSortEntryInput[];
+    postsort_answers?: SubmissionInputPostsortAnswers;
 }

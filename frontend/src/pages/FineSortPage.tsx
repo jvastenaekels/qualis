@@ -50,18 +50,15 @@ import type { InteractionUtils } from '../types/grid';
 const FineSortPage: React.FC = () => {
     // 1. Hooks (Store / Router) - Top Level
     const config = useConfigStore((state) => state.config);
-    const responses = useResponseStore((state) => ({
-        rough: state.rough,
-        qsort: state.qsort,
-    }));
-    const {
-        placeCardInGrid,
-        moveCardInGrid,
-        swapCardsInGrid,
-        unplaceCard,
-        resetFineSort,
-        categorizeCard,
-    } = useResponseStore();
+    const rough = useResponseStore((state) => state.rough);
+    const qsort = useResponseStore((state) => state.qsort);
+
+    const placeCardInGrid = useResponseStore((state) => state.placeCardInGrid);
+    const moveCardInGrid = useResponseStore((state) => state.moveCardInGrid);
+    const swapCardsInGrid = useResponseStore((state) => state.swapCardsInGrid);
+    const unplaceCard = useResponseStore((state) => state.unplaceCard);
+    const resetFineSort = useResponseStore((state) => state.resetFineSort);
+    const categorizeCard = useResponseStore((state) => state.categorizeCard);
 
     const setStep = useSessionStore((state) => state.setStep);
     const navigate = useNavigate();
@@ -126,20 +123,20 @@ const FineSortPage: React.FC = () => {
     );
 
     const { unplacedAgree, unplacedDisagree, unplacedNeutral, isAllPlaced } = useMemo(() => {
-        const placedIds = new Set(responses.qsort.map((c) => c.statementId));
+        const placedIds = new Set(qsort.map((c) => c.statementId));
         const statements = config?.statements || [];
 
-        const unplacedAgree = responses.rough.agree
+        const unplacedAgree = rough.agree
             .filter((id) => !placedIds.has(id))
             .map((id) => statements.find((s) => s.id === id))
             .filter((s): s is NonNullable<typeof s> => !!s);
 
-        const unplacedDisagree = responses.rough.disagree
+        const unplacedDisagree = rough.disagree
             .filter((id) => !placedIds.has(id))
             .map((id) => statements.find((s) => s.id === id))
             .filter((s): s is NonNullable<typeof s> => !!s);
 
-        const unplacedNeutral = responses.rough.neutral
+        const unplacedNeutral = rough.neutral
             .filter((id) => !placedIds.has(id))
             .map((id) => statements.find((s) => s.id === id))
             .filter((s): s is NonNullable<typeof s> => !!s);
@@ -150,7 +147,7 @@ const FineSortPage: React.FC = () => {
             unplacedNeutral.length === 0;
 
         return { unplacedAgree, unplacedDisagree, unplacedNeutral, isAllPlaced };
-    }, [responses.qsort, responses.rough, config?.statements]);
+    }, [qsort, rough, config?.statements]);
 
     useEffect(() => {
         setHeaderAction(null);
@@ -180,7 +177,7 @@ const FineSortPage: React.FC = () => {
         handleCardClick,
         handleSlotClick,
     } = useFineSortDrag({
-        responses,
+        responses: { qsort },
         gridColumns,
         onSelectionChange: setSelectedCardId,
         selectedId: selectedCardId,
@@ -197,15 +194,11 @@ const FineSortPage: React.FC = () => {
 
     // RECONCILIATION: Recover missing cards into Neutral deck
     useEffect(() => {
-        if (!config || !responses.qsort || !responses.rough) return;
+        if (!config || !qsort || !rough) return;
 
         const allStatementIds = config.statements.map((s) => s.id);
-        const placedIds = responses.qsort.map((p) => p.statementId);
-        const roughIds = [
-            ...responses.rough.agree,
-            ...responses.rough.neutral,
-            ...responses.rough.disagree,
-        ];
+        const placedIds = qsort.map((p) => p.statementId);
+        const roughIds = [...rough.agree, ...rough.neutral, ...rough.disagree];
 
         const missingIds = allStatementIds.filter(
             (id) => !placedIds.includes(id) && !roughIds.includes(id)
@@ -218,11 +211,11 @@ const FineSortPage: React.FC = () => {
                 actions.categorizeCard(id, 'neutral');
             });
         }
-    }, [config, responses.qsort, responses.rough, actions]);
+    }, [config, qsort, rough, actions]);
 
     // SANITY CHECK: Ensure no overlapping cards or out-of-bounds cards
     useGridSanity({
-        qsort: responses.qsort,
+        qsort,
         gridColumns,
         unplaceCard: actions.unplaceCard,
         categorizeCard: actions.categorizeCard,
@@ -269,7 +262,7 @@ const FineSortPage: React.FC = () => {
                 const cardId = cardIdMatch ? parseInt(cardIdMatch[1], 10) : parseInt(idString, 10);
 
                 if (!Number.isNaN(cardId)) {
-                    const placed = responses.qsort.find((p) => p.statementId === cardId);
+                    const placed = qsort.find((p) => p.statementId === cardId);
                     return placed ? `slot_${placed.col}_${placed.row}` : null;
                 }
                 return null;
@@ -288,7 +281,7 @@ const FineSortPage: React.FC = () => {
                 })
                 .filter((c): c is NonNullable<typeof c> => c !== null);
         },
-        [responses.qsort]
+        [qsort]
     );
 
     // 9. Memoized render function for slot content
@@ -297,7 +290,7 @@ const FineSortPage: React.FC = () => {
     const renderSlotContent = useCallback(
         (col: number, row: number, dimensions: { width: number; height: number }) => {
             if (!config) return null;
-            const cardInSlot = responses.qsort.find((c) => c.col === col && c.row === row);
+            const cardInSlot = qsort.find((c) => c.col === col && c.row === row);
             const statement = cardInSlot
                 ? config.statements.find((s) => s.id === cardInSlot.statementId)
                 : null;
@@ -319,7 +312,7 @@ const FineSortPage: React.FC = () => {
             }
             return null;
         },
-        [config, responses.qsort, selectedCardId, handleCardClick, activeId, showCodes]
+        [config, qsort, selectedCardId, handleCardClick, activeId, showCodes]
     );
 
     // 10. Condition Check (After all hooks)

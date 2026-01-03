@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
 type PileType = 'disagree' | 'neutral' | 'agree';
 
@@ -20,7 +20,14 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
     neutralCards,
 }: UseDeckManagementProps<T>) => {
     const [activePile, setActivePile] = useState<PileType>('disagree');
+    const [isPending, startTransition] = useTransition();
     const [hasPerformedZonalFocus, setHasPerformedZonalFocus] = useState(false);
+
+    const setActivePileTransition = (pile: PileType) => {
+        startTransition(() => {
+            setActivePile(pile);
+        });
+    };
 
     const activeCards = useMemo(() => {
         switch (activePile) {
@@ -49,10 +56,11 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
 
     return {
         activePile,
-        setActivePile,
+        setActivePile: setActivePileTransition,
         activeCards,
         deckHeight,
         hasPerformedZonalFocus,
         setHasPerformedZonalFocus,
+        isPending,
     };
 };

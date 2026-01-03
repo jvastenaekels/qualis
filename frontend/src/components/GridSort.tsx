@@ -5,7 +5,7 @@
  */
 
 import { useDroppable } from '@dnd-kit/core';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Check, Frown, Meh, RotateCcw, Smile, Target, ZoomIn, ZoomOut } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,14 +14,10 @@ import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { useDeckManagement } from '../hooks/useDeckManagement';
 import { useGridCalculations } from '../hooks/useGridCalculations';
 import { useGridZoom } from '../hooks/useGridZoom';
-import { useUIStore } from '../store/useUIStore';
 import type { InteractionUtils } from '../types/grid';
 import DroppableSlot from './DroppableSlot';
-import MethodologyTips from './MethodologyTips';
 import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
-
-
 
 // Sub-component: Droppable Pile
 const DroppablePile: React.FC<
@@ -32,7 +28,7 @@ const DroppablePile: React.FC<
         onClick: () => void;
         active?: boolean;
     } & React.ButtonHTMLAttributes<HTMLButtonElement>
-> = ({ id, children, className, onClick, active, ...props }) => {
+> = React.memo(({ id, children, className, onClick, active, ...props }) => {
     const { setNodeRef, isOver } = useDroppable({ id });
 
     return (
@@ -46,13 +42,13 @@ const DroppablePile: React.FC<
             {children}
         </button>
     );
-};
+});
 
 const DroppableDeckArea: React.FC<{
     id: string;
     children: React.ReactNode;
     className: string;
-}> = ({ id, children, className }) => {
+}> = React.memo(({ id, children, className }) => {
     const { setNodeRef, isOver } = useDroppable({ id });
     return (
         <div
@@ -62,7 +58,7 @@ const DroppableDeckArea: React.FC<{
             {children}
         </div>
     );
-};
+});
 
 interface GridSortProps {
     agreeCards: { id: number; text: string; code?: string }[];
@@ -296,27 +292,18 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     </div>
                 ))
             ) : (
-                <div
-                    className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-8 lg:col-span-2 lg:h-full lg:place-self-center"
-                >
+                <div className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-8 lg:col-span-2 lg:h-full lg:place-self-center">
                     <div className="flex flex-col items-center gap-3">
                         <div className="p-4 bg-green-50 rounded-full border border-green-100 shadow-sm animate-in zoom-in duration-300">
                             <Check size={32} className="text-green-500" strokeWidth={3} />
                         </div>
-                        <span className="text-sm font-bold text-slate-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">{t('fine.deck.all_placed')}</span>
+                        <span className="text-sm font-bold text-slate-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
+                            {t('fine.deck.all_placed')}
+                        </span>
                     </div>
                 </div>
             );
-        }, [
-            activeCards,
-            selectedCardId,
-            onCardClick,
-            isMobile,
-            cardDimensions,
-            disableHoverZoom,
-            t,
-            showCodes,
-        ]);
+        }, [activeCards, selectedCardId, onCardClick, isMobile, disableHoverZoom, t, showCodes]);
 
         return (
             <div className="flex flex-col lg:flex-row h-[100dvh] bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">

@@ -10,9 +10,9 @@ import sys
 script_dir = os.path.dirname(os.path.abspath(__file__))  # .../backend/scripts
 backend_dir = os.path.dirname(script_dir)  # .../backend
 if backend_dir not in sys.path:
-    sys.path.insert(0, backend_dir)  # noqa: E402
+    sys.path.insert(0, backend_dir)
 
-from app.utils.script_utils import APIClient
+from app.utils.script_utils import APIClient  # noqa: E402
 
 
 async def create_user_cli():

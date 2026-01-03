@@ -11,9 +11,9 @@ import type { StudyStatsReadDeviceBreakdown } from './studyStatsReadDeviceBreakd
  * Schema for study statistics.
  */
 export interface StudyStatsRead {
-  started_count: number;
-  completed_count: number;
-  completion_rate: number;
-  median_duration_seconds: StudyStatsReadMedianDurationSeconds;
-  device_breakdown: StudyStatsReadDeviceBreakdown;
+    started_count: number;
+    completed_count: number;
+    completion_rate: number;
+    median_duration_seconds: StudyStatsReadMedianDurationSeconds;
+    device_breakdown: StudyStatsReadDeviceBreakdown;
 }

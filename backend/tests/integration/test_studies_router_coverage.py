@@ -5,7 +5,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Study, StudyRole, StudyState, Participant, ParticipantStatus
+from app.models import StudyRole, StudyState, Participant, ParticipantStatus
 
 
 class TestStudyRouterCoverage:
@@ -116,7 +116,9 @@ class TestStudyRouterCoverage:
         await study_collaborator_factory(study, user, StudyRole.viewer)
         headers = auth_token_factory(user)
 
-        response = await client.get(f"/api/admin/studies/{study.slug}/stats", headers=headers)
+        response = await client.get(
+            f"/api/admin/studies/{study.slug}/stats", headers=headers
+        )
         assert response.status_code == 200
         data = response.json()
         assert "started_count" in data
@@ -142,6 +144,7 @@ class TestStudyRouterCoverage:
 
         # Create participant
         import uuid
+
         p = Participant(
             study_id=study.id,
             session_token=uuid.uuid4(),
@@ -152,7 +155,9 @@ class TestStudyRouterCoverage:
         await db.commit()
 
         # 1. Get Participant
-        response = await client.get(f"/api/admin/studies/participants/{p.id}", headers=headers)
+        response = await client.get(
+            f"/api/admin/studies/participants/{p.id}", headers=headers
+        )
         assert response.status_code == 200
         assert response.json()["id"] == p.id
 
@@ -169,6 +174,7 @@ class TestStudyRouterCoverage:
         p_id = p.id
         db.expire_all()
         p_refresh = await db.scalar(select(Participant).where(Participant.id == p_id))
+        assert p_refresh is not None
         assert p_refresh.is_discarded is True
 
     @pytest.mark.asyncio
@@ -188,16 +194,22 @@ class TestStudyRouterCoverage:
         user = await user_factory()
         workspace = await workspace_factory(owner=user)
         study = await study_factory(workspace=workspace, owner=user)
-        
+
         # Add a statement manually
         s1 = Statement(study_id=study.id, code="S1")
         db.add(s1)
         await db.flush()
-        db.add(StatementTranslation(statement_id=s1.id, language_code="en", text="Old Text"))
+        db.add(
+            StatementTranslation(
+                statement_id=s1.id, language_code="en", text="Old Text"
+            )
+        )
         await db.commit()
-        
+
         # Verify statement exists
-        r_verify = await db.execute(select(Statement).where(Statement.study_id == study.id))
+        r_verify = await db.execute(
+            select(Statement).where(Statement.study_id == study.id)
+        )
         assert r_verify.scalar_one_or_none() is not None
 
         await study_collaborator_factory(study, user, StudyRole.editor)
@@ -219,10 +231,10 @@ class TestStudyRouterCoverage:
             ],
             "statements": [
                 {
-                    "code": "S1", # Matches code used above
-                    "translations": [{"language_code": "en", "text": "Start Update"}]
+                    "code": "S1",  # Matches code used above
+                    "translations": [{"language_code": "en", "text": "Start Update"}],
                 }
-            ]
+            ],
         }
 
         response = await client.patch(
@@ -232,11 +244,11 @@ class TestStudyRouterCoverage:
         )
         assert response.status_code == 200
         data = response.json()
-        
+
         # Check title
         en_trans = next(t for t in data["translations"] if t["language_code"] == "en")
         assert en_trans["title"] == "Updated Title"
-        
+
         # Check statement
         stmt = next(s for s in data["statements"] if s["code"] == "S1")
         stmt_trans = next(t for t in stmt["translations"] if t["language_code"] == "en")

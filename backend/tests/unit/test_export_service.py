@@ -10,9 +10,9 @@ import io
 import zipfile
 from unittest.mock import MagicMock
 
+from typing import Any
 import pytest
 
-from app.models import Participant, ParticipantStatus, QSortEntry, Statement, Study
 from app.services.export_service import ExportService
 
 
@@ -51,8 +51,8 @@ class MockParticipant:
         self.status = MagicMock(value="completed")
         self.submitted_at = None
         self.ip_address = "hashed"
-        self.presort_answers = {}
-        self.postsort_answers = {}
+        self.presort_answers: dict[str, Any] = {}
+        self.postsort_answers: dict[str, Any] = {}
         self.qsort_entries = entries
 
 
@@ -62,9 +62,13 @@ class MockStudy:
     def __init__(self, statements: list, slug: str = "test-study"):
         self.slug = slug
         self.statements = statements
-        self.presort_config = {}
-        self.postsort_config = {}
-        self.grid_config = [{"score": -1, "capacity": 1}, {"score": 0, "capacity": 2}, {"score": 1, "capacity": 1}]
+        self.presort_config: dict[str, Any] = {}
+        self.postsort_config: dict[str, Any] = {}
+        self.grid_config = [
+            {"score": -1, "capacity": 1},
+            {"score": 0, "capacity": 2},
+            {"score": 1, "capacity": 1},
+        ]
 
 
 class TestRosettaStone:
@@ -101,7 +105,9 @@ class TestRosettaStone:
 
         # Act: Generate .dat file
         sorted_statements = sorted(statements, key=lambda s: s.id)
-        dat_content = ExportService._generate_dat(study, [participant], sorted_statements)
+        dat_content = ExportService._generate_dat(
+            study, [participant], sorted_statements
+        )
 
         # Assert: Verify the scores are in ID-sorted order
         lines = dat_content.strip().split("\n")
@@ -114,7 +120,6 @@ class TestRosettaStone:
         # Data line: "      1  0-1 1" (PID + scores in order: ID 50=0, ID 100=-1, ID 200=1)
         data_line = lines[1]
         # Extract scores (after 8-char PID)
-        pid_section = data_line[:8]
         scores_section = data_line[8:]
 
         # Expected order: ID 50 (score 0) -> ID 100 (score -1) -> ID 200 (score 1)
@@ -127,7 +132,9 @@ class TestRosettaStone:
         pos_0 = scores_section.find(" 0")
         pos_neg1 = scores_section.find("-1")
         pos_1 = scores_section.rfind(" 1")  # Use rfind to get the last " 1"
-        assert pos_0 < pos_neg1 < pos_1, f"Scores not in definition order: 0@{pos_0}, -1@{pos_neg1}, 1@{pos_1}"
+        assert (
+            pos_0 < pos_neg1 < pos_1
+        ), f"Scores not in definition order: 0@{pos_0}, -1@{pos_neg1}, 1@{pos_1}"
 
     def test_sta_file_uses_statement_definition_order(self):
         """

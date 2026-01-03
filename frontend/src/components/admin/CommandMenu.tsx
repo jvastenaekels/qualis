@@ -1,22 +1,37 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Command } from 'cmdk';
-import { Briefcase, LayoutDashboard, PencilRuler, Users, Moon, Sun, LogOut, Copy, FileText, Search } from 'lucide-react';
+import {
+    Briefcase,
+    LayoutDashboard,
+    PencilRuler,
+    Users,
+    Moon,
+    Sun,
+    LogOut,
+    Copy,
+    FileText,
+    Search,
+} from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useListStudiesApiAdminStudiesGet, useListWorkspacesApiAdminWorkspacesGet } from '@/api/generated';
+import {
+    useListStudiesApiAdminStudiesGet,
+    useListWorkspacesApiAdminWorkspacesGet,
+} from '@/api/generated';
 import { useSessionStore } from '@/store/useSessionStore';
 import { toast } from 'sonner';
 
 export const CommandMenu = () => {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
-    const { activeStudyId, activeWorkspaceId, setActiveWorkspace, setActiveStudy } = useAdminStore();
+    const { activeStudyId, activeWorkspaceId, setActiveWorkspace, setActiveStudy } =
+        useAdminStore();
     const logout = useAuthStore((state) => state.logout);
     const { data: studies } = useListStudiesApiAdminStudiesGet();
     const { data: workspaces } = useListWorkspacesApiAdminWorkspacesGet();
 
-    const filteredStudies = studies?.filter(s => s.workspace_id === activeWorkspaceId);
+    const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
 
     // Toggle on Cmd+K or Ctrl+K
     useEffect(() => {
@@ -75,7 +90,10 @@ export const CommandMenu = () => {
                     </Command.Empty>
 
                     {/* Workspaces */}
-                    <Command.Group heading="Switch Workspace" className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    <Command.Group
+                        heading="Switch Workspace"
+                        className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                    >
                         {workspaces?.map((ws) => (
                             <Command.Item
                                 key={ws.id}
@@ -98,7 +116,10 @@ export const CommandMenu = () => {
                     </Command.Group>
 
                     {/* Studies (Filtered) */}
-                    <Command.Group heading="Switch Study" className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                    <Command.Group
+                        heading="Switch Study"
+                        className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                    >
                         {filteredStudies?.map((study) => (
                             <Command.Item
                                 key={study.slug}
@@ -119,7 +140,9 @@ export const CommandMenu = () => {
                             </Command.Item>
                         ))}
                         {(!filteredStudies || filteredStudies.length === 0) && (
-                            <div className="px-4 py-2 text-sm text-slate-500">No studies in this workspace.</div>
+                            <div className="px-4 py-2 text-sm text-slate-500">
+                                No studies in this workspace.
+                            </div>
                         )}
                     </Command.Group>
 

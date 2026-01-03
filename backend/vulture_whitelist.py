@@ -79,3 +79,5 @@ collaborators
 invite_collaborator
 verify_invitation
 register_user
+list_workspaces
+create_workspace

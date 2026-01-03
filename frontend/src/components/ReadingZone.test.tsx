@@ -19,8 +19,8 @@ describe('ReadingZone', () => {
         // In Step 5045, MethodologyTips logic sets step=0 initially.
         // tips[0] = t('fine.workbench.drag_or_tap')
         // So we expect to find this text.
-        expect(screen.getByText('fine.workbench.drag_or_tap')).toBeInTheDocument();
-        
+        expect(screen.getByText('fine.workbench.methodology.extremes')).toBeInTheDocument();
+
         // Also check if the Lightbulb icon container is present (by class or role?)
         // The text is the most important part.
     });
@@ -28,10 +28,10 @@ describe('ReadingZone', () => {
     it('shows hovered card text when a card is hovered', () => {
         // Arrange
         act(() => {
-           useUIStore.setState({ 
+            useUIStore.setState({
                 hoveredCard: { id: 1, text: 'Hovered Statement Content', code: 'S1' },
-                activeCard: null, 
-                selectedCard: null 
+                activeCard: null,
+                selectedCard: null,
             });
         });
 
@@ -48,10 +48,10 @@ describe('ReadingZone', () => {
     it('shows selected card text when a card is selected', () => {
         // Arrange
         act(() => {
-            useUIStore.setState({ 
-                hoveredCard: null, 
+            useUIStore.setState({
+                hoveredCard: null,
                 activeCard: null,
-                selectedCard: { id: 2, text: 'Selected Statement Content', code: 'S2' } 
+                selectedCard: { id: 2, text: 'Selected Statement Content', code: 'S2' },
             });
         });
 

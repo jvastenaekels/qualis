@@ -31,8 +31,19 @@ repos:
     hooks:
       - id: mypy
         files: ^backend/
-        args: ["--config-file=backend/pyproject.toml"]
-        additional_dependencies: [types-requests, pydantic]
+        args:
+          ["--config-file=backend/pyproject.toml", "--ignore-missing-imports"]
+        additional_dependencies:
+          [
+            types-requests,
+            pydantic,
+            fastapi,
+            sqlalchemy,
+            pydantic-settings,
+            slowapi,
+            httpx,
+            pytest,
+          ]
 
   # Sécurité & Hygiène (Local System Hooks)
   - repo: local
@@ -40,7 +51,7 @@ repos:
       # Radon : Complexity
       - id: radon-cc
         name: Radon (Complexity)
-        entry: backend/venv/bin/radon cc
+        entry: radon cc
         language: system
         args: ["-a", "-nb", "--min", "B"]
         files: ^backend/
@@ -49,7 +60,7 @@ repos:
       # Deptry : Dependency Hygiene
       - id: deptry
         name: Deptry (Check Dependencies)
-        entry: bash -c 'cd backend && ./venv/bin/deptry app'
+        entry: bash -c 'cd backend && deptry app'
         language: system
         files: ^backend/pyproject.toml|backend/.*\.py$
         pass_filenames: false
@@ -57,7 +68,7 @@ repos:
       # Bandit : Security SAST
       - id: bandit
         name: Bandit (Security)
-        entry: backend/venv/bin/bandit
+        entry: bandit
         language: system
         args: ["-r", "backend/app", "-ll"]
         files: ^backend/

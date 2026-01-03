@@ -10,6 +10,6 @@ import type { StatementTranslationCreate } from './statementTranslationCreate';
  * Schema for updating a statement text (by code).
  */
 export interface StatementUpdate {
-  code: string;
-  translations: StatementTranslationCreate[];
+    code: string;
+    translations: StatementTranslationCreate[];
 }

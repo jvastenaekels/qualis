@@ -34,23 +34,22 @@ vi.mock('../store/useConfigStore', () => ({
 }));
 
 vi.mock('../store/useResponseStore', () => ({
-    useResponseStore: (selector: (state: unknown) => unknown) => {
-        if (!selector)
-            return {
-                categorizeCard: mockCategorizeCard,
-                placeCardInGrid: vi.fn(),
-                moveCardInGrid: vi.fn(),
-                swapCardsInGrid: vi.fn(),
-                unplaceCard: vi.fn(),
-            };
-        return selector({
+    useResponseStore: (selector: (state: any) => any) => {
+        const state = {
             rough: {
                 agree: [1],
                 disagree: [],
                 neutral: [2], // Card 3 is missing entirely
             },
             qsort: [],
-        });
+            placeCardInGrid: vi.fn(),
+            moveCardInGrid: vi.fn(),
+            swapCardsInGrid: vi.fn(),
+            unplaceCard: vi.fn(),
+            categorizeCard: mockCategorizeCard,
+            resetFineSort: vi.fn(),
+        };
+        return selector ? selector(state) : state;
     },
 }));
 

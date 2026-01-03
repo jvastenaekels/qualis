@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
-import { act, renderWithProviders, screen, setupStoreMocks, fireEvent } from '../test/test-utils';
+import { renderWithProviders, screen, setupStoreMocks, fireEvent } from '../test/test-utils';
 import FineSortPage from './FineSortPage';
 
 // --- Mocks ---
@@ -53,10 +53,10 @@ vi.mock('../store/useResponseStore', () => ({
 
 vi.mock('../store/useUIStore', () => ({
     useUIStore: Object.assign(vi.fn(), {
-        getState: () => ({ 
-            setSelectedCard: vi.fn(), 
-            setActiveCard: vi.fn(), 
-            setHoveredCard: vi.fn() 
+        getState: () => ({
+            setSelectedCard: vi.fn(),
+            setActiveCard: vi.fn(),
+            setHoveredCard: vi.fn(),
         }),
     }),
 }));
@@ -82,7 +82,14 @@ vi.mock('../hooks/useLayout', () => ({
 // Mock GridSort Component (Spying on props)
 vi.mock('../components/GridSort', () => ({
     // biome-ignore lint/suspicious/noExplicitAny: mock
-    default: ({ isAllPlaced, onValidate, agreeCards, disagreeCards, neutralCards, gridColumns }: any) => (
+    default: ({
+        isAllPlaced,
+        onValidate,
+        agreeCards,
+        disagreeCards,
+        neutralCards,
+        gridColumns,
+    }: any) => (
         <div data-testid="grid-sort">
             <h1>Fine Sort Grid</h1>
             <button
@@ -96,7 +103,9 @@ vi.mock('../components/GridSort', () => ({
             <div data-testid="deck-agree">{agreeCards?.length ?? 0}</div>
             <div data-testid="deck-disagree">{disagreeCards?.length ?? 0}</div>
             <div data-testid="deck-neutral">{neutralCards?.length ?? 0}</div>
-            <div data-testid="grid-slots">{gridColumns?.reduce((acc: number, col: any) => acc + col.capacity, 0) ?? 0}</div>
+            <div data-testid="grid-slots">
+                {gridColumns?.reduce((acc: number, col: any) => acc + col.capacity, 0) ?? 0}
+            </div>
         </div>
     ),
 }));
@@ -118,12 +127,18 @@ describe('FineSortPage Integration', () => {
             useResponseStore: {
                 rough: { agree: [1], disagree: [2], neutral: [3, 4] }, // All accounted for
                 qsort: [],
+                placeCardInGrid: vi.fn(),
+                moveCardInGrid: vi.fn(),
+                swapCardsInGrid: vi.fn(),
+                unplaceCard: vi.fn(),
+                categorizeCard: vi.fn(),
+                resetFineSort: vi.fn(),
             },
             useSessionStore: { currentStep: 4, language: 'en', setStep: vi.fn() },
-            useUIStore: { 
-                setSelectedCard: vi.fn(), 
-                setActiveCard: vi.fn(), 
-                setHoveredCard: vi.fn() 
+            useUIStore: {
+                setSelectedCard: vi.fn(),
+                setActiveCard: vi.fn(),
+                setHoveredCard: vi.fn(),
             },
         });
 
@@ -145,12 +160,17 @@ describe('FineSortPage Integration', () => {
                 // Scenario: Card 4 is in statements but NOT in rough buckets or qsort
                 rough: { agree: [1], disagree: [2], neutral: [3] },
                 qsort: [],
+                placeCardInGrid: vi.fn(),
+                moveCardInGrid: vi.fn(),
+                swapCardsInGrid: vi.fn(),
+                unplaceCard: vi.fn(),
+                resetFineSort: vi.fn(),
             },
             useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: { 
-                setSelectedCard: vi.fn(), 
-                setActiveCard: vi.fn(), 
-                setHoveredCard: vi.fn() 
+            useUIStore: {
+                setSelectedCard: vi.fn(),
+                setActiveCard: vi.fn(),
+                setHoveredCard: vi.fn(),
             },
         });
 
@@ -170,12 +190,18 @@ describe('FineSortPage Integration', () => {
                     { statementId: 3, col: 1, row: 0 },
                     { statementId: 4, col: 1, row: 1 },
                 ],
+                placeCardInGrid: vi.fn(),
+                moveCardInGrid: vi.fn(),
+                swapCardsInGrid: vi.fn(),
+                unplaceCard: vi.fn(),
+                categorizeCard: vi.fn(),
+                resetFineSort: vi.fn(),
             },
             useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: { 
-                setSelectedCard: vi.fn(), 
-                setActiveCard: vi.fn(), 
-                setHoveredCard: vi.fn() 
+            useUIStore: {
+                setSelectedCard: vi.fn(),
+                setActiveCard: vi.fn(),
+                setHoveredCard: vi.fn(),
             },
         });
 
@@ -196,12 +222,18 @@ describe('FineSortPage Integration', () => {
                     { statementId: 3, col: 1, row: 0 },
                     { statementId: 4, col: 1, row: 1 },
                 ], // All 4 placed
+                placeCardInGrid: vi.fn(),
+                moveCardInGrid: vi.fn(),
+                swapCardsInGrid: vi.fn(),
+                unplaceCard: vi.fn(),
+                categorizeCard: vi.fn(),
+                resetFineSort: vi.fn(),
             },
             useSessionStore: { currentStep: 4, setStep: vi.fn() },
-            useUIStore: { 
-                setSelectedCard: vi.fn(), 
-                setActiveCard: vi.fn(), 
-                setHoveredCard: vi.fn() 
+            useUIStore: {
+                setSelectedCard: vi.fn(),
+                setActiveCard: vi.fn(),
+                setHoveredCard: vi.fn(),
             },
         });
 
@@ -218,12 +250,21 @@ describe('FineSortPage Integration', () => {
         const setSelectedCardMock = vi.fn();
         setupStoreMocks({
             useConfigStore: { config: mockConfig },
-            useUIStore: { 
-                setSelectedCard: setSelectedCardMock, 
-                setActiveCard: vi.fn(), 
-                setHoveredCard: vi.fn() 
+            useUIStore: {
+                setSelectedCard: setSelectedCardMock,
+                setActiveCard: vi.fn(),
+                setHoveredCard: vi.fn(),
             },
-            useResponseStore: { rough: { agree: [], disagree: [], neutral: [] }, qsort: [] },
+            useResponseStore: {
+                rough: { agree: [], disagree: [], neutral: [] },
+                qsort: [],
+                placeCardInGrid: vi.fn(),
+                moveCardInGrid: vi.fn(),
+                swapCardsInGrid: vi.fn(),
+                unplaceCard: vi.fn(),
+                categorizeCard: vi.fn(),
+                resetFineSort: vi.fn(),
+            },
             useSessionStore: { currentStep: 4, setStep: vi.fn() },
         });
 

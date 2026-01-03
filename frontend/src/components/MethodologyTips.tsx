@@ -4,8 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { Lightbulb, Sparkles } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -33,7 +32,10 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
     if (variant === 'mobile') {
         return (
             <div className="h-full flex flex-col items-center justify-center gap-1.5 text-indigo-400">
-                <div key={step} className="text-center flex flex-col items-center animate-in fade-in slide-in-from-bottom-1 duration-300">
+                <div
+                    key={step}
+                    className="text-center flex flex-col items-center animate-in fade-in slide-in-from-bottom-1 duration-300"
+                >
                     <div className="flex items-center gap-1.5 opacity-60 mb-0.5">
                         <Lightbulb size={10} className="text-amber-400 fill-amber-400/20" />
                         <p className="text-[10px] font-bold uppercase tracking-widest">

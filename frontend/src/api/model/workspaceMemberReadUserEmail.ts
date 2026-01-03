@@ -5,4 +5,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type StudyStatsReadDeviceBreakdown = { [key: string]: number };
+export type WorkspaceMemberReadUserEmail = string | null;

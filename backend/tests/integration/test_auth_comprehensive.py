@@ -15,9 +15,7 @@ class TestLogin:
     """Tests for POST /api/token"""
 
     @pytest.mark.asyncio
-    async def test_login_success(
-        self, client: AsyncClient, test_user: User
-    ):
+    async def test_login_success(self, client: AsyncClient, test_user: User):
         """Valid credentials return access token."""
         response = await client.post(
             "/api/token",
@@ -29,9 +27,7 @@ class TestLogin:
         assert data["token_type"] == "bearer"
 
     @pytest.mark.asyncio
-    async def test_login_wrong_password(
-        self, client: AsyncClient, test_user: User
-    ):
+    async def test_login_wrong_password(self, client: AsyncClient, test_user: User):
         """Wrong password returns 401."""
         response = await client.post(
             "/api/token",
@@ -54,9 +50,7 @@ class TestRegister:
     """Tests for POST /api/register"""
 
     @pytest.mark.asyncio
-    async def test_register_success(
-        self, client: AsyncClient, db: AsyncSession
-    ):
+    async def test_register_success(self, client: AsyncClient, db: AsyncSession):
         """New user registration creates account."""
         response = await client.post(
             "/api/register",
@@ -74,9 +68,7 @@ class TestRegister:
         assert user is not None
 
     @pytest.mark.asyncio
-    async def test_register_duplicate_email(
-        self, client: AsyncClient, test_user: User
-    ):
+    async def test_register_duplicate_email(self, client: AsyncClient, test_user: User):
         """Duplicate email returns 400."""
         response = await client.post(
             "/api/register",

@@ -6,13 +6,13 @@
  */
 
 /**
- * Enum for study-specific roles.
+ * Enum for workspace roles.
  */
-export type StudyRole = (typeof StudyRole)[keyof typeof StudyRole];
+export type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const StudyRole = {
-    owner: 'owner',
-    editor: 'editor',
+export const WorkspaceRole = {
+    admin: 'admin',
+    researcher: 'researcher',
     viewer: 'viewer',
 } as const;

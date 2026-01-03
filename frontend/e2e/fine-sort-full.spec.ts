@@ -6,9 +6,21 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
         // --- SETUP ---
         await test.step('Navigate to Fine Sort', async () => {
             await page.goto('/study/example-study');
-            await page.getByRole('button', { name: /start/i }).click(); // Welcome
-            await page.getByRole('button', { name: /accept|accepter/i }).click(); // Consent
-            
+
+            // Wait for loading to finish
+            await page.locator('[data-testid="loading-spinner"]').waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+
+            // Select button by test-id
+            const startBtn = page.getByTestId('start-btn');
+            await expect(startBtn.first()).toBeVisible({ timeout: 15000 });
+            await startBtn.first().click();
+
+            // Consent Page
+            await page.locator('[data-testid="loading-spinner"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
+            const acceptBtn = page.getByRole('button', { name: /accept|accepter|agree|d'accord/i });
+            await expect(acceptBtn.first()).toBeVisible({ timeout: 10000 });
+            await acceptBtn.first().click();
+
             // Fast-forward through Rough Sort if needed
             // Try to jump to fine sort if URL manipulation works, otherwise speed-click
             // Knowing the app, we might need to "Click Agree" on all rough sort cards
@@ -26,7 +38,7 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
                 // Already at fine sort or skipped?
                 console.log('Skipped rough sort or already passed');
             }
-            
+
             await expect(page).toHaveURL(/.*fine-sort/);
         });
 
@@ -38,7 +50,7 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
 
             // Zoom Controls (Top Right)
             await expect(page.locator('button[aria-label*="zoom"]')).toHaveCount(2); // In/Out
-            
+
             // Pile Selectors (should see tabs)
             const pileTabs = page.getByRole('tab');
             await expect(pileTabs).toHaveCount(3);
@@ -62,11 +74,11 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
             // B. Selection State: Click a card -> Footer changes
             const deckCard = page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').first();
             await deckCard.click();
-            
+
             // Footer text should change to "Place on grid"
             const placeInstruction = page.locator('text=/Place|Placez/');
             await expect(placeInstruction).toBeVisible();
-            
+
             // Deselect (Click bg or same card) - Optional, but good to test toggle
             // For now, assume drag continues
         });
@@ -75,12 +87,12 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
         await test.step('Verify Deck & Drag Functionality', async () => {
             const deckCard = page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').first();
             const targetSlot = page.locator('[data-testid="droppable-slot"]').first();
-            
+
             const initialDeckCount = await page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').count();
-            
+
             // Drag
             await deckCard.dragTo(targetSlot);
-            
+
             // Verify Logic
             // 1. Deck count decreases
             await expect(page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]')).toHaveCount(initialDeckCount - 1);
@@ -93,18 +105,18 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
             // Switch to separate pile (e.g. Agree)
             const agreeTab = page.getByRole('tab').nth(2); // 0=Disagree, 1=Neutral, 2=Agree
             await agreeTab.click();
-            
+
             // Verify Deck Updated (different cards or just deck visible)
             await expect(page.getByTestId('deck-cards-container')).toBeVisible();
-            
+
             // Verify Active State of Tab
             await expect(agreeTab).toHaveAttribute('aria-selected', 'true');
         });
-        
+
         await test.step('Verify Empty State (Simulation)', async () => {
-            // It's hard to empty a deck in E2E without robust mocking, 
+            // It's hard to empty a deck in E2E without robust mocking,
             // but we can check if the "Success Checkmark" is NOT visible when cards exist.
-            const successIcon = page.locator('.lucide-check-circle, .lucide-check'); 
+            const successIcon = page.locator('.lucide-check-circle, .lucide-check');
             // The success message shouldn't be main view if cards exist
             // This is a "Negative Assertion" to ensure we don't show empty state prematurely.
             // But we can check if we can FIND the success message locator hidden or absent

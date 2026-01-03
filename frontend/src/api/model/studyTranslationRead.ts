@@ -16,25 +16,25 @@ import type { StudyTranslationReadUiLabels } from './studyTranslationReadUiLabel
  * Schema for reading a study translation.
  */
 export interface StudyTranslationRead {
-  /**
-   * @maxLength 5
-   * @pattern ^[a-z]{2}(-[A-Z]{2})?$
-   */
-  language_code: string;
-  /**
-   * @minLength 1
-   * @maxLength 200
-   */
-  title: string;
-  description?: string;
-  instructions?: string;
-  subtitle?: StudyTranslationReadSubtitle;
-  objective?: StudyTranslationReadObjective;
-  consent_title?: StudyTranslationReadConsentTitle;
-  consent_description?: StudyTranslationReadConsentDescription;
-  consent_accept?: StudyTranslationReadConsentAccept;
-  consent_decline?: StudyTranslationReadConsentDecline;
-  ui_labels?: StudyTranslationReadUiLabels;
-  id: number;
-  study_id: number;
+    /**
+     * @maxLength 5
+     * @pattern ^[a-z]{2}(-[A-Z]{2})?$
+     */
+    language_code: string;
+    /**
+     * @minLength 1
+     * @maxLength 200
+     */
+    title: string;
+    description?: string;
+    instructions?: string;
+    subtitle?: StudyTranslationReadSubtitle;
+    objective?: StudyTranslationReadObjective;
+    consent_title?: StudyTranslationReadConsentTitle;
+    consent_description?: StudyTranslationReadConsentDescription;
+    consent_accept?: StudyTranslationReadConsentAccept;
+    consent_decline?: StudyTranslationReadConsentDecline;
+    ui_labels?: StudyTranslationReadUiLabels;
+    id: number;
+    study_id: number;
 }

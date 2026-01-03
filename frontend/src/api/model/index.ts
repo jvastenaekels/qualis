@@ -95,3 +95,8 @@ export * from './userCreateInvitationToken';
 export * from './userRead';
 export * from './validationError';
 export * from './validationErrorLocItem';
+export * from './workspaceCreate';
+export * from './workspaceMemberRead';
+export * from './workspaceMemberReadUserEmail';
+export * from './workspaceRead';
+export * from './workspaceRole';

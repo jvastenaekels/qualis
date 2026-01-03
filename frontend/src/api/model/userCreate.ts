@@ -10,9 +10,9 @@ import type { UserCreateInvitationToken } from './userCreateInvitationToken';
  * Schema for creating a new user.
  */
 export interface UserCreate {
-  email: string;
-  password: string;
-  is_active?: boolean;
-  is_superuser?: boolean;
-  invitation_token?: UserCreateInvitationToken;
+    email: string;
+    password: string;
+    is_active?: boolean;
+    is_superuser?: boolean;
+    invitation_token?: UserCreateInvitationToken;
 }

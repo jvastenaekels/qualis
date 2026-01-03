@@ -142,6 +142,7 @@ const WelcomePage: React.FC = () => {
             <div className="flex justify-center">
                 <button
                     type="button"
+                    data-testid="start-btn"
                     onClick={handleContinue}
                     className="group w-full sm:w-auto px-10 py-4 bg-blue-600 text-white rounded-full font-bold text-lg hover:bg-blue-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3"
                 >

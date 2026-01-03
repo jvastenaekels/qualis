@@ -1,17 +1,10 @@
 import { useState } from 'react';
-import { Plus, Layout, Users, Activity, ExternalLink } from 'lucide-react';
+import { Plus, Layout, Activity, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
@@ -25,7 +18,7 @@ export function AdminDashboard() {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const { data: allStudies, isLoading } = useListStudiesApiAdminStudiesGet();
 
-    const studies = allStudies?.filter(s => s.workspace_id === activeWorkspaceId);
+    const studies = allStudies?.filter((s) => s.workspace_id === activeWorkspaceId);
 
     const activeStudiesCount = studies?.filter((s) => s.state === 'active').length || 0;
     const totalStudies = studies?.length || 0;
@@ -36,7 +29,11 @@ export function AdminDashboard() {
     };
 
     if (isLoading) {
-        return <div className="p-8"><Skeleton className="h-[400px] w-full" /></div>;
+        return (
+            <div className="p-8">
+                <Skeleton className="h-[400px] w-full" />
+            </div>
+        );
     }
 
     return (
@@ -65,9 +62,7 @@ export function AdminDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{totalStudies}</div>
-                        <p className="text-xs text-muted-foreground">
-                            Across all statuses
-                        </p>
+                        <p className="text-xs text-muted-foreground">Across all statuses</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -88,9 +83,7 @@ export function AdminDashboard() {
             <Card className="col-span-4">
                 <CardHeader>
                     <CardTitle>Recent Studies</CardTitle>
-                    <CardDescription>
-                        A list of your most recently updated studies.
-                    </CardDescription>
+                    <CardDescription>A list of your most recently updated studies.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     {studies && studies.length > 0 ? (
@@ -98,8 +91,15 @@ export function AdminDashboard() {
                             {studies.slice(0, 5).map((study) => (
                                 <div
                                     key={study.id}
+                                    role="button"
+                                    tabIndex={0}
                                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer group"
                                     onClick={() => handleOpenStudy(study.slug)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            handleOpenStudy(study.slug);
+                                        }
+                                    }}
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
@@ -110,16 +110,21 @@ export function AdminDashboard() {
                                                 {study.slug}
                                             </p>
                                             <p className="text-sm text-muted-foreground">
-                                                Created {formatDistanceToNow(new Date(study.created_at), { addSuffix: true })}
+                                                Created{' '}
+                                                {formatDistanceToNow(new Date(study.created_at), {
+                                                    addSuffix: true,
+                                                })}
                                             </p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                            study.state === 'active' 
-                                                ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
-                                                : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-400'
-                                        }`}>
+                                        <div
+                                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                                study.state === 'active'
+                                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
+                                                    : 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-400'
+                                            }`}
+                                        >
                                             {study.state}
                                         </div>
                                         <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />

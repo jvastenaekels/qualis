@@ -1,52 +1,49 @@
 import pytest
 from httpx import AsyncClient
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 from app.models import Workspace, WorkspaceMember, WorkspaceRole
 
 
 @pytest.mark.asyncio
 async def test_list_workspaces(
-    async_client: AsyncClient,
-    normal_user_token_headers: dict[str, str],
-    normal_user: dict,
-    db: Session,
+    client: AsyncClient,
+    test_user,
+    auth_token_factory,
+    db: AsyncSession,
 ):
     """Test listing workspaces for a user."""
     # Create a workspace manually for this user
     ws = Workspace(title="Test WS", slug="test-ws")
     db.add(ws)
-    db.commit()
-    
+    await db.flush()
+
     member = WorkspaceMember(
-        workspace_id=ws.id, user_id=normal_user["id"], role=WorkspaceRole.admin
+        workspace_id=ws.id, user_id=test_user.id, role=WorkspaceRole.admin
     )
     db.add(member)
-    db.commit()
+    await db.commit()
 
-    response = await async_client.get(
-        "/api/admin/workspaces", headers=normal_user_token_headers
-    )
+    headers = auth_token_factory(test_user)
+    response = await client.get("/api/admin/workspaces/", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert len(data) >= 1
-    assert data[0]["slug"] == "test-ws"
+    assert any(d["slug"] == "test-ws" for d in data)
 
 
 @pytest.mark.asyncio
 async def test_create_workspace(
-    async_client: AsyncClient,
-    normal_user_token_headers: dict[str, str],
+    client: AsyncClient,
+    test_user,
+    auth_token_factory,
 ):
     """Test creating a new workspace."""
-    payload = {
-        "title": "New Workspace",
-        "slug": "new-workspace-123"
-    }
-    response = await async_client.post(
-        "/api/admin/workspaces", 
-        headers=normal_user_token_headers,
-        json=payload
+    headers = auth_token_factory(test_user)
+    payload = {"title": "New Workspace", "slug": "new-workspace-123"}
+    response = await client.post(
+        "/api/admin/workspaces/", headers=headers, json=payload
     )
     assert response.status_code == 201
     data = response.json()

@@ -8,7 +8,7 @@ from httpx import AsyncClient
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Study, StudyRole, StudyState
+from app.models import Study, StudyRole
 
 
 class TestCreateStudy:
@@ -43,13 +43,18 @@ class TestCreateStudy:
             ],
             "grid_config": [{"score": 0, "capacity": 1}],
             "statements": [
-                {"code": "S1", "translations": [{"language_code": "en", "text": "S1 text"}]}
+                {
+                    "code": "S1",
+                    "translations": [{"language_code": "en", "text": "S1 text"}],
+                }
             ],
             "presort_config": {},
             "postsort_config": {},
         }
 
-        response = await client.post("/api/admin/studies/", json=payload, headers=headers)
+        response = await client.post(
+            "/api/admin/studies/", json=payload, headers=headers
+        )
         assert response.status_code == 201
         data = response.json()
         assert data["slug"] == "new-study"
@@ -84,12 +89,16 @@ class TestCreateStudy:
                 }
             ],
             "grid_config": [{"score": 0, "capacity": 1}],
-            "statements": [{"code": "S1", "translations": [{"language_code": "en", "text": "S1"}]}],
+            "statements": [
+                {"code": "S1", "translations": [{"language_code": "en", "text": "S1"}]}
+            ],
             "presort_config": {},
             "postsort_config": {},
         }
 
-        response = await client.post("/api/admin/studies/", json=payload, headers=headers)
+        response = await client.post(
+            "/api/admin/studies/", json=payload, headers=headers
+        )
         assert response.status_code == 400
         assert "already exists" in response.json()["detail"]
 
@@ -116,12 +125,16 @@ class TestCreateStudy:
                 }
             ],
             "grid_config": [{"score": 0, "capacity": 1}],
-            "statements": [{"code": "S1", "translations": [{"language_code": "en", "text": "S1"}]}],
+            "statements": [
+                {"code": "S1", "translations": [{"language_code": "en", "text": "S1"}]}
+            ],
             "presort_config": {},
             "postsort_config": {},
         }
 
-        response = await client.post("/api/admin/studies/", json=payload, headers=headers)
+        response = await client.post(
+            "/api/admin/studies/", json=payload, headers=headers
+        )
         assert response.status_code == 403
 
 
@@ -327,7 +340,9 @@ class TestDeleteStudy:
         await study_collaborator_factory(study, editor, StudyRole.editor)
 
         headers = auth_token_factory(editor)
-        response = await client.delete(f"/api/admin/studies/{study.slug}", headers=headers)
+        response = await client.delete(
+            f"/api/admin/studies/{study.slug}", headers=headers
+        )
         assert response.status_code == 403
 
 

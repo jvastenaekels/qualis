@@ -4,11 +4,11 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { useContext } from 'react';
+import { use } from 'react';
 import { LayoutActionContext, LayoutStateContext } from '../contexts/LayoutContext.context';
 
 export const useLayoutState = () => {
-    const context = useContext(LayoutStateContext);
+    const context = use(LayoutStateContext);
     if (!context) {
         throw new Error('useLayoutState must be used within a LayoutProvider');
     }
@@ -16,7 +16,7 @@ export const useLayoutState = () => {
 };
 
 export const useLayoutAction = () => {
-    const context = useContext(LayoutActionContext);
+    const context = use(LayoutActionContext);
     if (!context) {
         throw new Error('useLayoutAction must be used within a LayoutProvider');
     }

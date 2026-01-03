@@ -272,11 +272,11 @@ async def test_get_study_full_dump(db, seed_study):
     await db.commit()
 
     dump = await StudyService.get_study_full_dump(db, seed_study.id)
-    
+
     assert dump["study"]["slug"] == seed_study.slug
     assert len(dump["study"]["statements"]) == 4
     assert len(dump["participants"]) == 1
-    
+
     p_data = dump["participants"][0]
     # Check if scores aligns with statement order (ids: 1, 2, 3, 4)
     # scores should be [-1, 0, 0, 1]

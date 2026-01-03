@@ -10,7 +10,7 @@ backend_dir = os.path.dirname(script_dir)
 if backend_dir not in sys.path:
     sys.path.insert(0, backend_dir)
 
-from sqlalchemy import text
+from sqlalchemy import text  # noqa: E402
 
 from app.database import engine  # noqa: E402
 

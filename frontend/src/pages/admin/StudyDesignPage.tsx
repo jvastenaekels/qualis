@@ -28,6 +28,7 @@ import PreSortPage from '@/pages/PreSortPage';
 import RoughSortPage from '@/pages/RoughSortPage';
 import PostSortPage from '@/pages/PostSortPage';
 import { useConfigStore } from '@/store/useConfigStore';
+import { LayoutProvider } from '@/contexts/LayoutContext';
 import { toast } from 'sonner';
 
 const StudyDesignPage = () => {
@@ -122,8 +123,6 @@ const StudyDesignPage = () => {
     }
 
     if (!draft) return <div>Study not found</div>;
-
-import { LayoutProvider } from '@/contexts/LayoutContext';
 
     const renderPreview = () => {
         return (
@@ -299,7 +298,9 @@ import { LayoutProvider } from '@/contexts/LayoutContext';
                             <div
                                 className={cn(
                                     'bg-background rounded-2xl shadow-2xl border overflow-hidden flex flex-col relative transition-all duration-300',
-                                    viewMode === 'mobile' ? 'w-[375px] aspect-[9/19.5]' : 'w-full h-full rounded-lg'
+                                    viewMode === 'mobile'
+                                        ? 'w-[375px] aspect-[9/19.5]'
+                                        : 'w-full h-full rounded-lg'
                                 )}
                             >
                                 {/* Browser Chrome Mockup */}

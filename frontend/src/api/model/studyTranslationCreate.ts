@@ -16,23 +16,23 @@ import type { StudyTranslationCreateUiLabels } from './studyTranslationCreateUiL
  * Schema for creating a study translation.
  */
 export interface StudyTranslationCreate {
-  /**
-   * @maxLength 5
-   * @pattern ^[a-z]{2}(-[A-Z]{2})?$
-   */
-  language_code: string;
-  /**
-   * @minLength 1
-   * @maxLength 200
-   */
-  title: string;
-  description?: string;
-  instructions?: string;
-  subtitle?: StudyTranslationCreateSubtitle;
-  objective?: StudyTranslationCreateObjective;
-  consent_title?: StudyTranslationCreateConsentTitle;
-  consent_description?: StudyTranslationCreateConsentDescription;
-  consent_accept?: StudyTranslationCreateConsentAccept;
-  consent_decline?: StudyTranslationCreateConsentDecline;
-  ui_labels?: StudyTranslationCreateUiLabels;
+    /**
+     * @maxLength 5
+     * @pattern ^[a-z]{2}(-[A-Z]{2})?$
+     */
+    language_code: string;
+    /**
+     * @minLength 1
+     * @maxLength 200
+     */
+    title: string;
+    description?: string;
+    instructions?: string;
+    subtitle?: StudyTranslationCreateSubtitle;
+    objective?: StudyTranslationCreateObjective;
+    consent_title?: StudyTranslationCreateConsentTitle;
+    consent_description?: StudyTranslationCreateConsentDescription;
+    consent_accept?: StudyTranslationCreateConsentAccept;
+    consent_decline?: StudyTranslationCreateConsentDecline;
+    ui_labels?: StudyTranslationCreateUiLabels;
 }

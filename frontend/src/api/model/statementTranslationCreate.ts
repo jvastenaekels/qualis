@@ -9,11 +9,11 @@
  * Schema for creating a statement translation.
  */
 export interface StatementTranslationCreate {
-  /**
-   * @maxLength 5
-   * @pattern ^[a-z]{2}(-[A-Z]{2})?$
-   */
-  language_code: string;
-  /** @minLength 1 */
-  text: string;
+    /**
+     * @maxLength 5
+     * @pattern ^[a-z]{2}(-[A-Z]{2})?$
+     */
+    language_code: string;
+    /** @minLength 1 */
+    text: string;
 }

@@ -48,22 +48,22 @@ export const useGridCalculations = ({
         const GAP = 8; // gap-2
         const PADDING_X = 32; // px-4 * 2
         const PADDING_Y = 32;
-        
-        const availableW = W - PADDING_X - ((numCols - 1) * GAP);
-        const availableH = H - PADDING_Y - ((maxRows - 1) * GAP);
+
+        const availableW = W - PADDING_X - (numCols - 1) * GAP;
+        const availableH = H - PADDING_Y - (maxRows - 1) * GAP;
 
         if (availableW <= 0 || availableH <= 0) return;
 
         // Ideal raw dimensions to just fit
         const rawW = availableW / numCols;
         const rawH = availableH / maxRows;
-        
+
         // We want to maintain a reasonable Aspect Ratio (e.g. 3/2 or 4/3)
-        // But also fill space. 
+        // But also fill space.
         // Let's deduce an optimal Aspect Ratio that fits the screen shape best
         // constrained between square (1.0) and wide (2.2)
         const currentRatio = rawW / rawH; // This is the ratio if we stretch to fill perfectly
-        
+
         // Clamp ratio to keep cards looking like cards
         const clampedRatio = Math.max(1.2, Math.min(currentRatio, 1.8));
 
@@ -85,11 +85,14 @@ export const useGridCalculations = ({
         setCardDimensions((prev) => {
             if (Math.abs(prev.width - newWidth) < 2 && Math.abs(prev.height - newHeight) < 2)
                 return prev;
-            const next = { width: newWidth, height: newHeight };
-            onDimensionsChange?.(next);
-            return next;
+            return { width: newWidth, height: newHeight };
         });
-    }, [gridColumns, onDimensionsChange, selectedCardId]);
+    }, [gridColumns, selectedCardId]);
+
+    // Notify parent of dimension changes via Effect to avoid "setState during render" warning
+    useEffect(() => {
+        onDimensionsChange?.(cardDimensions);
+    }, [cardDimensions, onDimensionsChange]);
 
     // Initial Calculation and responsive trigger
     useEffect(() => {

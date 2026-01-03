@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useSubmitStudyApiSubmitPost } from '../api/generated';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -22,73 +22,70 @@ export const useSubmitStudy = () => {
 
     const { mutateAsync: submitStudyMutation } = useSubmitStudyApiSubmitPost();
 
-    const submit = async (
-        status: 'started' | 'completed' = 'completed',
-        options?: { silent?: boolean }
-    ) => {
-        if (!options?.silent) {
-            setIsLoading(true);
-        }
-        setError(null);
-
-        try {
-            if (!config) throw new Error('Study config is missing');
-            // ... (rest of validation)
-            if (!config) throw new Error('No configuration loaded');
-            if (!session.token) throw new Error('No session token');
-
-            // Transform Q-Sort data to match backend schema
-            // Frontend: { statementId, col, row }
-            // Backend: { statement_id, grid_score, card_comment }
-            const qsortPayload = responses.qsort.map(
-                (item: { statementId: number; col: number; row: number }) => {
-                    const colKey = item.col; // col index
-                    // Grid config is array of { score, capacity } sorted by col index?
-                    // Or map? The type says { score, capacity }[] in store.
-                    // Assuming index matches col.
-                    const score = config.grid_config?.[colKey]
-                        ? config.grid_config[colKey].score
-                        : 0;
-
-                    return {
-                        statement_id: item.statementId,
-                        grid_score: score,
-                        card_comment: responses.postsort.card_comments[item.statementId] || null,
-                    };
-                }
-            );
-
-            const payload = {
-                session_token: session.token,
-                study_slug: config.slug,
-                language_used: session.language || 'en', // precise: fallback to 'en' if null
-                status: status,
-                presort_answers: responses.presort,
-                qsort: qsortPayload,
-                postsort_answers: {
-                    ...responses.postsort,
-                },
-            };
-
-            const data = await submitStudyMutation({ data: payload });
-
-            if (status === 'completed') {
-                setIsSuccess(true);
-                // The mutation response type should optionally contain confirmation_code depending on backend
-                // If Orval generated unknown, we might need to cast or fix the swagger if possible.
-                // Assuming it returns Generic Response or similar?
-                // Let's inspect the data variable or trusting the previous implementation which expected { confirmation_code }
-                setConfirmationCode((data as { confirmation_code: string }).confirmation_code);
-            }
-        } catch (err: unknown) {
-            console.error(err);
-            setError(err instanceof Error ? err.message : 'An unexpected error occurred');
-        } finally {
+    const submit = useCallback(
+        async (status: 'started' | 'completed' = 'completed', options?: { silent?: boolean }) => {
             if (!options?.silent) {
-                setIsLoading(false);
+                setIsLoading(true);
             }
-        }
-    };
+            setError(null);
+
+            try {
+                if (!config) throw new Error('Study config is missing');
+                if (!session.token) throw new Error('No session token');
+
+                const qsortPayload = responses.qsort.map(
+                    (item: { statementId: number; col: number; row: number }) => {
+                        const colKey = item.col;
+                        const score = config.grid_config?.[colKey]
+                            ? config.grid_config[colKey].score
+                            : 0;
+
+                        return {
+                            statement_id: item.statementId,
+                            grid_score: score,
+                            card_comment:
+                                responses.postsort.card_comments[item.statementId] || null,
+                        };
+                    }
+                );
+
+                const payload = {
+                    session_token: session.token,
+                    study_slug: config.slug,
+                    language_used: session.language || 'en',
+                    status: status,
+                    presort_answers: responses.presort,
+                    qsort: qsortPayload,
+                    postsort_answers: {
+                        ...responses.postsort,
+                    },
+                };
+
+                const data = await submitStudyMutation({ data: payload });
+
+                if (status === 'completed') {
+                    setIsSuccess(true);
+                    setConfirmationCode((data as { confirmation_code: string }).confirmation_code);
+                }
+            } catch (err: unknown) {
+                console.error(err);
+                setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+            } finally {
+                if (!options?.silent) {
+                    setIsLoading(false);
+                }
+            }
+        },
+        [
+            config,
+            session.token,
+            session.language,
+            responses.qsort,
+            responses.postsort,
+            responses.presort,
+            submitStudyMutation,
+        ]
+    );
 
     return { submit, isLoading, isSuccess, error, confirmationCode };
 };

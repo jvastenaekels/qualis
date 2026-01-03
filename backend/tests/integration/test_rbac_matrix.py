@@ -80,7 +80,9 @@ async def test_rbac_editor_permissions(
                 "instructions": "Test",
             }
         ],
-        "statements": [{"code": "S1", "translations": [{"language_code": "en", "text": "S1"}]}],
+        "statements": [
+            {"code": "S1", "translations": [{"language_code": "en", "text": "S1"}]}
+        ],
     }
     response = await client.post("/api/admin/studies/", json=payload, headers=headers)
     assert response.status_code == 201

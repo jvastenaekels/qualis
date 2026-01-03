@@ -13,14 +13,14 @@ import type { ParticipantReadUserAgent } from './participantReadUserAgent';
  * Schema for reading a participant.
  */
 export interface ParticipantRead {
-  id: number;
-  study_id: number;
-  session_token: string;
-  language_used: string;
-  status: ParticipantStatus;
-  created_at: string;
-  submitted_at: ParticipantReadSubmittedAt;
-  is_discarded: boolean;
-  discard_reason: ParticipantReadDiscardReason;
-  user_agent: ParticipantReadUserAgent;
+    id: number;
+    study_id: number;
+    session_token: string;
+    language_used: string;
+    status: ParticipantStatus;
+    created_at: string;
+    submitted_at: ParticipantReadSubmittedAt;
+    is_discarded: boolean;
+    discard_reason: ParticipantReadDiscardReason;
+    user_agent: ParticipantReadUserAgent;
 }

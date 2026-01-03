@@ -72,9 +72,12 @@ describe('GridSort Detailed UI Verification', () => {
 
         // Expect Instruction 1: Sequence Number
         // There might be other "1"s (e.g. badge counts), so we look for the one in the instruction circle
-        const instructionNumber = screen.getAllByText('1').find(el => 
-            el.className.includes('bg-slate-200') || el.className.includes('rounded-full')
-        );
+        const instructionNumber = screen
+            .getAllByText('1')
+            .find(
+                (el) =>
+                    el.className.includes('bg-slate-200') || el.className.includes('rounded-full')
+            );
         expect(instructionNumber).toBeInTheDocument();
         // Expect Instruction Text
         expect(screen.getByText('fine.workbench.initial_instruction')).toBeInTheDocument();

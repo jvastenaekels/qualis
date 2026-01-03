@@ -32,8 +32,9 @@ const StudyOverviewPage = () => {
         refetch: refetchParticipants,
     } = useListStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug || '');
     const { refetch: refetchStats } = useGetStudyStatsApiAdminStudiesSlugStatsGet(slug || '');
-    const discardMutation = useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch();
-    
+    const discardMutation =
+        useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch();
+
     const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null);
     const [detailOpen, setDetailOpen] = useState(false);
 

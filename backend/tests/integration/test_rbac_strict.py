@@ -10,7 +10,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Study, StudyRole, User
+from app.models import StudyRole
 
 
 class TestStudyLevelRBACMatrix:
@@ -70,9 +70,7 @@ class TestStudyLevelRBACMatrix:
             headers = {}
 
         # Test GET
-        response = await client.get(
-            f"/api/admin/studies/{study.slug}", headers=headers
-        )
+        response = await client.get(f"/api/admin/studies/{study.slug}", headers=headers)
         assert response.status_code == expected_get, f"GET failed: {response.json()}"
 
         # Test PATCH (only if GET was successful or expecting auth failure)
@@ -88,13 +86,17 @@ class TestStudyLevelRBACMatrix:
                 json={},
                 headers=headers,
             )
-        assert response.status_code == expected_patch, f"PATCH failed: {response.json()}"
+        assert (
+            response.status_code == expected_patch
+        ), f"PATCH failed: {response.json()}"
 
         # Test DELETE
         response = await client.delete(
             f"/api/admin/studies/{study.slug}", headers=headers
         )
-        assert response.status_code == expected_delete, f"DELETE failed: {response.json() if response.status_code != 204 else 'OK'}"
+        assert (
+            response.status_code == expected_delete
+        ), f"DELETE failed: {response.json() if response.status_code != 204 else 'OK'}"
 
 
 class TestStudyIsolation:
@@ -237,7 +239,13 @@ class TestInvitationTokenSecurity:
 
     @pytest.mark.asyncio
     async def test_invitation_token_email_mismatch_rejected(
-        self, client: AsyncClient, db: AsyncSession, user_factory, workspace_factory, study_factory, study_collaborator_factory
+        self,
+        client: AsyncClient,
+        db: AsyncSession,
+        user_factory,
+        workspace_factory,
+        study_factory,
+        study_collaborator_factory,
     ):
         """
         Given: A valid invitation token for email_a@example.com

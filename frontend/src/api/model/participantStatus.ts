@@ -8,11 +8,10 @@
 /**
  * Enum for participant progress status.
  */
-export type ParticipantStatus = typeof ParticipantStatus[keyof typeof ParticipantStatus];
-
+export type ParticipantStatus = (typeof ParticipantStatus)[keyof typeof ParticipantStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ParticipantStatus = {
-  started: 'started',
-  completed: 'completed',
+    started: 'started',
+    completed: 'completed',
 } as const;

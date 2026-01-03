@@ -133,7 +133,10 @@ const StudyLayoutContent: React.FC = () => {
     if (!config && configLoading) {
         return (
             <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
-                <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <div
+                    data-testid="loading-spinner"
+                    className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
+                ></div>
                 <div className="space-y-2 text-center animate-pulse">
                     <p className="text-slate-500 font-bold text-xl">{t('common.loading')}</p>
                     <p className="text-slate-400 text-sm">Preparing your study session...</p>

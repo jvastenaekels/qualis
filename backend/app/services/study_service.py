@@ -5,7 +5,7 @@
 """Service layer for Study-related operations."""
 
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, cast
 
 from fastapi import HTTPException
@@ -71,7 +71,7 @@ class StudyService:
                 study_id=study.id,
                 session_token=session_token,
                 language_used=language_code,
-                consented_at=datetime.now(),
+                consented_at=datetime.now(timezone.utc),
                 consent_hash=consent_hash,
                 ip_address=hashed_ip,
                 user_agent=user_agent,
@@ -80,7 +80,7 @@ class StudyService:
             db.add(participant)
         else:
             # Update existing (if somehow re-consenting or resuming)
-            participant.consented_at = datetime.now()
+            participant.consented_at = datetime.now(timezone.utc)
             participant.consent_hash = consent_hash
             participant.language_used = language_code
             participant.ip_address = hashed_ip
@@ -221,7 +221,7 @@ class StudyService:
                 confirmation_code=confirmation_code,
                 ip_address=hashed_ip,
                 user_agent=user_agent,
-                submitted_at=datetime.now(),
+                submitted_at=datetime.now(timezone.utc),
             )
             db.add(participant)
             await db.flush()
@@ -237,7 +237,7 @@ class StudyService:
             participant.confirmation_code = confirmation_code
             participant.ip_address = hashed_ip
             participant.user_agent = user_agent
-            participant.submitted_at = datetime.now()
+            participant.submitted_at = datetime.now(timezone.utc)
 
             await db.flush()
 

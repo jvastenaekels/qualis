@@ -23,7 +23,8 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     const config = useConfigStore((state) => state.config);
     const showCodes = config?.show_statement_codes ?? true;
 
-    const displayCard = activeCard || hoveredCard || selectedCard;
+    const rawDisplayCard = activeCard || hoveredCard || selectedCard;
+    const displayCard = React.useDeferredValue(rawDisplayCard);
     const labelKey = activeCard
         ? 'fine.workbench.active_card'
         : hoveredCard

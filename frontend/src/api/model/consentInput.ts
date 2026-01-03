@@ -10,12 +10,12 @@ import type { ConsentInputConsentHash } from './consentInputConsentHash';
  * Schema for recording participant consent.
  */
 export interface ConsentInput {
-  study_slug: string;
-  session_token: string;
-  consent_hash?: ConsentInputConsentHash;
-  /**
-   * @maxLength 5
-   * @pattern ^[a-z]{2}(-[A-Z]{2})?$
-   */
-  language_code: string;
+    study_slug: string;
+    session_token: string;
+    consent_hash?: ConsentInputConsentHash;
+    /**
+     * @maxLength 5
+     * @pattern ^[a-z]{2}(-[A-Z]{2})?$
+     */
+    language_code: string;
 }

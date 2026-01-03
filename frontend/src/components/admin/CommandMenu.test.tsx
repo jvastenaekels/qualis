@@ -26,7 +26,12 @@ vi.mock('sonner', () => ({
 }));
 
 vi.mock('@/store/useAdminStore', () => ({
-    useAdminStore: vi.fn(() => ({ activeStudyId: 'test-study' })),
+    useAdminStore: vi.fn(() => ({
+        activeStudyId: 'test-study',
+        activeWorkspaceId: 1,
+        setActiveWorkspace: vi.fn(),
+        setActiveStudy: vi.fn(),
+    })),
 }));
 
 vi.mock('@/store/useAuthStore', () => ({
@@ -40,7 +45,17 @@ vi.mock('@/store/useAuthStore', () => ({
 
 vi.mock('@/api/generated', () => ({
     useListStudiesApiAdminStudiesGet: vi.fn(() => ({
-        data: [{ slug: 'study-1' }, { slug: 'study-2' }, { slug: 'study-3' }],
+        data: [
+            { slug: 'study-1', workspace_id: 1 },
+            { slug: 'study-2', workspace_id: 1 },
+            { slug: 'study-3', workspace_id: 2 },
+        ],
+    })),
+    useListWorkspacesApiAdminWorkspacesGet: vi.fn(() => ({
+        data: [
+            { id: 1, title: 'Workspace 1' },
+            { id: 2, title: 'Workspace 2' },
+        ],
     })),
 }));
 
@@ -126,9 +141,9 @@ describe('CommandMenu', () => {
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
 
             await waitFor(() => {
-                expect(screen.getByText('Open Overview')).toBeInTheDocument();
-                expect(screen.getByText('Open Designer')).toBeInTheDocument();
-                expect(screen.getByText('Team Management')).toBeInTheDocument();
+                expect(screen.getByText('Open Dashboard')).toBeInTheDocument();
+                expect(screen.getByText('Protocol Design')).toBeInTheDocument();
+                expect(screen.getByText('Collaborators')).toBeInTheDocument();
                 expect(screen.getByText('Copy Public Link')).toBeInTheDocument();
             });
         });

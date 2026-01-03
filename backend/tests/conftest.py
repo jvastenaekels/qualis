@@ -298,9 +298,7 @@ async def study_collaborator_factory(db: AsyncSession):
     """Factory to add users as collaborators on studies with specific roles."""
     from app.models import StudyCollaborator, StudyRole
 
-    async def _add_collaborator(
-        study: Study, user: User, role: StudyRole
-    ) -> None:
+    async def _add_collaborator(study: Study, user: User, role: StudyRole) -> None:
         collab = StudyCollaborator(
             study_id=study.id,
             user_id=user.id,

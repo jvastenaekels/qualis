@@ -16,7 +16,6 @@ from app.models import (
     QSortEntry,
     Statement,
     StatementTranslation,
-    Study,
     StudyRole,
 )
 
@@ -45,7 +44,9 @@ class TestCSVExport:
         stmt = Statement(study_id=study.id, code="S1")
         db.add(stmt)
         await db.flush()
-        db.add(StatementTranslation(statement_id=stmt.id, language_code="en", text="S1"))
+        db.add(
+            StatementTranslation(statement_id=stmt.id, language_code="en", text="S1")
+        )
 
         # Add participant
         p = Participant(
@@ -117,7 +118,11 @@ class TestPQMethodExport:
         stmt = Statement(study_id=study.id, code="S1")
         db.add(stmt)
         await db.flush()
-        db.add(StatementTranslation(statement_id=stmt.id, language_code="en", text="Statement 1"))
+        db.add(
+            StatementTranslation(
+                statement_id=stmt.id, language_code="en", text="Statement 1"
+            )
+        )
         await db.commit()
 
         headers = auth_token_factory(owner)
@@ -159,7 +164,9 @@ class TestRKitExport:
         stmt = Statement(study_id=study.id, code="S1")
         db.add(stmt)
         await db.flush()
-        db.add(StatementTranslation(statement_id=stmt.id, language_code="en", text="S1"))
+        db.add(
+            StatementTranslation(statement_id=stmt.id, language_code="en", text="S1")
+        )
         await db.commit()
 
         headers = auth_token_factory(owner)
