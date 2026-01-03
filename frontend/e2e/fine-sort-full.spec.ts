@@ -1,13 +1,18 @@
 
 import { test, expect } from '@playwright/test';
+import { mockStudyAPI, mockSubmitAPI, mockStudyConfig } from './fixtures/study-config';
 
 test.describe('Fine Sort Comprehensive UX & Layout', () => {
-    // Skip in CI due to complex navigation/timing dependencies
-    test.skip(!!process.env.CI, 'Skipped in CI - requires UI timing refinement');
+    test.beforeEach(async ({ page }) => {
+        // Setup mocked API for consistent test behavior
+        await mockStudyAPI(page);
+        await mockSubmitAPI(page);
+    });
+
     test('should verify all critical UI elements and interactions', async ({ page }) => {
         // --- SETUP ---
         await test.step('Navigate to Fine Sort', async () => {
-            await page.goto('/study/example-study');
+            await page.goto(`/study/${mockStudyConfig.slug}`);
 
             // Wait for loading to finish
             await page.locator('[data-testid="loading-spinner"]').waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
