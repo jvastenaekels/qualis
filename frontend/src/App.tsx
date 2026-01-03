@@ -37,6 +37,8 @@ const AdminLayout = lazy(() => import('./layouts/AdminLayout'));
 const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
 const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
 const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage'));
+const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
+const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
 
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 
@@ -81,6 +83,8 @@ const App = () => {
                                 <Route path="studies/:slug" element={<StudyOverviewPage />} />
                                 <Route path="studies/:slug/design" element={<StudyDesignPage />} />
                                 <Route path="studies/:slug/team" element={<TeamManagementPage />} />
+                                <Route path="studies/:slug/recruitment" element={<RecruitmentPage />} />
+                                <Route path="studies/:slug/exports" element={<DataExportsPage />} />
                             </Route>
                         </Route>
 

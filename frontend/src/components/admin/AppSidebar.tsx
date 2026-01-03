@@ -67,12 +67,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       },
                       {
                           title: 'Recruitment',
-                          url: `#`,
+                          url: `/admin/studies/${activeStudyId}/recruitment`,
                           icon: Send, // Placeholder
                       },
                       {
                           title: 'Data & Exports',
-                          url: `#`,
+                          url: `/admin/studies/${activeStudyId}/exports`,
                           icon: Database,
                       },
                   ],

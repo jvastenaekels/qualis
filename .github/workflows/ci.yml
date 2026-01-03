@@ -126,6 +126,8 @@ jobs:
     needs: [backend-tests, frontend-tests]
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      PYTHONUNBUFFERED: "1"
     steps:
       - uses: actions/checkout@v4
 
@@ -145,16 +147,13 @@ jobs:
       - name: Setup Backend
         run: |
           cd backend
-          # Fix uv environment mismatch in CI by targeting local venv explicitly
           uv sync
-          export VIRTUAL_ENV=$PWD/.venv
-          uv run --active python init_db.py --reset
+          uv run python init_db.py --reset
 
       - name: Start Backend
         run: |
           cd backend
-          export VIRTUAL_ENV=$PWD/.venv
-          uv run --active uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 &
           # Wait for backend to be ready with a slightly more robust check
           for i in {1..30}; do
             if curl -s http://127.0.0.1:8000/health > /dev/null; then
@@ -172,8 +171,7 @@ jobs:
           API_BASE_URL: http://127.0.0.1:8000
         run: |
           cd backend
-          export VIRTUAL_ENV=$PWD/.venv
-          uv run --active python seed.py data/example-study.json
+          uv run python seed.py data/example-study.json
 
       - name: Install frontend dependencies
         run: cd frontend && npm ci
