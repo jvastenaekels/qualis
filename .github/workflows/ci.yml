@@ -125,7 +125,7 @@ jobs:
     name: E2E Tests (Playwright)
     needs: [backend-tests, frontend-tests]
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -135,6 +135,26 @@ jobs:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Setup Backend & Seed
+        run: |
+          cd backend
+          uv sync
+          uv run python init_db.py --reset
+          uv run python seed.py data/example-study.json
+
+      - name: Start Backend in Background
+        run: |
+          cd backend
+          uv run uvicorn app.main:app --host 127.0.0.1 --port 8000 &
+          # Wait for backend to be ready
+          timeout 60 bash -c 'until curl -s http://127.0.0.1:8000/health; do sleep 2; echo "Waiting for backend..."; done'
 
       - name: Install frontend dependencies
         run: cd frontend && npm ci
@@ -162,6 +182,7 @@ jobs:
         run: cd frontend && npm run e2e
         env:
           CI: true
+          API_BASE_URL: http://127.0.0.1:8000
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
