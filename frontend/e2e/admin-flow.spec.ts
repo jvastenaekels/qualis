@@ -110,6 +110,18 @@ test.describe('Admin Flow (Zero to Hero)', () => {
         await page.route(/\/api\/logs\/?/, async (route) => {
             await route.fulfill({ status: 204 });
         });
+
+        // Catch-all for any other admin API requests to prevent 401s from real backend
+        await page.route(/\/api\/admin\/.*/, async (route) => {
+            console.log(`[Mock Catch-All] Intercepting unmocked admin request: ${route.request().url()}`);
+            await route.fulfill({ status: 200, json: {} });
+        });
+
+        // Catch-all for any other API requests
+        await page.route(/\/api\/.*/, async (route) => {
+            console.log(`[Mock Catch-All] Intercepting unmocked request: ${route.request().url()}`);
+            await route.fulfill({ status: 200, json: {} });
+        });
     });
 
     test('Zero to Hero: Full Lifecycle', async ({ page, isMobile }) => {
