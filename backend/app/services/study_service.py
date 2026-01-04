@@ -10,6 +10,7 @@ from typing import Any, cast
 
 from fastapi import HTTPException
 from sqlalchemy import delete, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -211,21 +212,37 @@ class StudyService:
         participant = participant_result.scalar_one_or_none()
 
         if not participant:
-            participant = Participant(
-                study_id=study.id,
-                session_token=data.session_token,
-                language_used=data.language_used,
-                presort_answers=data.presort_answers,
-                postsort_answers=data.postsort_answers,
-                status=data.status,
-                confirmation_code=confirmation_code,
-                ip_address=hashed_ip,
-                user_agent=user_agent,
-                submitted_at=datetime.now(timezone.utc),
-            )
-            db.add(participant)
-            await db.flush()
-        else:
+            try:
+                participant = Participant(
+                    study_id=study.id,
+                    session_token=data.session_token,
+                    language_used=data.language_used,
+                    presort_answers=data.presort_answers,
+                    postsort_answers=data.postsort_answers,
+                    status=data.status,
+                    confirmation_code=confirmation_code,
+                    ip_address=hashed_ip,
+                    user_agent=user_agent,
+                    submitted_at=datetime.now(timezone.utc),
+                )
+                db.add(participant)
+                await db.flush()
+            except IntegrityError:
+                # Race condition: Participant was created by another request in the meantime.
+                # Rollback the failed insert and fetch the existing participant.
+                await db.rollback()
+                participant_result = await db.execute(participant_stmt)
+                participant = participant_result.scalar_one_or_none()
+                if not participant:
+                    # Should not happen if IntegrityError was due to session_token
+                    raise HTTPException(
+                        status_code=500,
+                        detail="Concurrency error: Could not resolve participant.",
+                    )
+
+        # If we fell through (either from 'else' or after catching exception), participant exists.
+        if participant and participant not in db.new:
+            # Update existing participant
             if participant.status == ParticipantStatus.completed:
                 return str(participant.session_token)[:8].upper()
 
