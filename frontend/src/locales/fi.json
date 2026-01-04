@@ -87,7 +87,25 @@
         "preview_title": "Esikatselu",
         "objective_label": "Tutkimuksen tavoite",
         "instructions_label": "Kulku",
-        "default_instructions": "1. **Tutustutaanpa hieman:** muutamia nopeita kysymyksiä, jotta ymmärrämme paremmin taustaasi.\n2. **Ensimmäiset mielikuvat:** tutustu väitteisiin ja kerro välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).\n3. **Oma näkemyksesi:** tarkenna ajatuksiasi asettamalla kukin väite ruudukkoon niin, että se heijastaa juuri sinun näkökulmaasi.\n4. **Perustelut:** muutama sana tärkeimpien valintojesi selittämiseksi."
+        "default_instructions": "1. **Tutustutaanpa hieman:** muutamia nopeita kysymyksiä, jotta ymmärrämme paremmin taustaasi.\n2. **Ensimmäiset mielikuvat:** tutustu väitteisiin ja kerro välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).\n3. **Oma näkemyksesi:** tarkenna ajatuksiasi asettamalla kukin väite ruudukkoon niin, että se heijastaa juuri sinun näkökulmaasi.\n4. **Perustelut:** muutama sana tärkeimpien valintojesi selittämiseksi.",
+        "steps": {
+            "profile": {
+                "title": "Tutustutaan",
+                "description": "muutama nopea kysymys taustasi ymmärtämiseksi."
+            },
+            "rough": {
+                "title": "Ensivaikutelma",
+                "description": "tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä)."
+            },
+            "fine": {
+                "title": "Näkökulmasi",
+                "description": "sijoita väittämät ruudukkoon tarkentaaksesi näkemystäsi, priorisoiden sinulle tärkeimmät asiat."
+            },
+            "post": {
+                "title": "Miksi",
+                "description": "muutama sana perustellaksesi merkittävimmät valintasi."
+            }
+        }
     },
     "consent": {
         "title": "Suostumus osallistumiseen",

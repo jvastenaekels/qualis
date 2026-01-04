@@ -12,7 +12,7 @@
  * Acts as the entry point for a study session.
  */
 
-import { ArrowRight, Target } from 'lucide-react';
+import { ArrowRight, MessageSquareText, Scale, Target, User, Zap } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
@@ -45,6 +45,33 @@ const WelcomePage: React.FC = () => {
     const handleContinue = () => {
         navigate(`/study/${slug}/consent`);
     };
+
+    const steps = [
+        {
+            key: 'profile',
+            icon: <User size={20} className="text-blue-600" />,
+            title: t('welcome.steps.profile.title'),
+            description: t('welcome.steps.profile.description'),
+        },
+        {
+            key: 'rough',
+            icon: <Zap size={20} className="text-amber-500 fill-amber-100" />,
+            title: t('welcome.steps.rough.title'),
+            description: t('welcome.steps.rough.description'),
+        },
+        {
+            key: 'fine',
+            icon: <Scale size={20} className="text-emerald-600" />,
+            title: t('welcome.steps.fine.title'),
+            description: t('welcome.steps.fine.description'),
+        },
+        {
+            key: 'post',
+            icon: <MessageSquareText size={20} className="text-purple-600" />,
+            title: t('welcome.steps.post.title'),
+            description: t('welcome.steps.post.description'),
+        },
+    ];
 
     return (
         <div className="max-w-5xl mx-auto py-12 px-4 animate-in fade-in duration-500">
@@ -88,35 +115,59 @@ const WelcomePage: React.FC = () => {
                         <div className="uppercase tracking-wider text-xs font-bold text-blue-700 mb-4 bg-blue-100 w-fit px-3 py-1.5 rounded-md border border-blue-200">
                             {t('welcome.instructions_label', 'Instructions')}
                         </div>
-                        <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium rec-steps">
-                            <Markdown
-                                components={{
-                                    ol: ({ node: _node, ...props }) => (
-                                        <ol className="space-y-5" {...props} />
-                                    ),
-                                    li: ({ node: _node, ...props }) => (
-                                        <li className="flex gap-4 items-start group">
-                                            <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm border border-blue-200 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm mt-0.5 step-badge">
-                                                {/* Number injected via CSS */}
-                                            </span>
-                                            <div className="pt-1 text-slate-600 group-hover:text-slate-900 transition-colors leading-relaxed">
-                                                {props.children}
-                                            </div>
-                                        </li>
-                                    ),
-                                    strong: ({ node: _node, ...props }) => (
-                                        <strong className="text-slate-900 font-bold" {...props} />
-                                    ),
-                                }}
-                            >
-                                {study.instructions || t('welcome.default_instructions')}
-                            </Markdown>
-                            <style>{`
+
+                        {study.instructions ? (
+                            <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium rec-steps">
+                                <Markdown
+                                    components={{
+                                        ol: ({ node: _node, ...props }) => (
+                                            <ol className="space-y-5" {...props} />
+                                        ),
+                                        li: ({ node: _node, ...props }) => (
+                                            <li className="flex gap-4 items-start group">
+                                                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm border border-blue-200 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm mt-0.5 step-badge">
+                                                    {/* Number injected via CSS */}
+                                                </span>
+                                                <div className="pt-1 text-slate-600 group-hover:text-slate-900 transition-colors leading-relaxed">
+                                                    {props.children}
+                                                </div>
+                                            </li>
+                                        ),
+                                        strong: ({ node: _node, ...props }) => (
+                                            <strong
+                                                className="text-slate-900 font-bold"
+                                                {...props}
+                                            />
+                                        ),
+                                    }}
+                                >
+                                    {study.instructions}
+                                </Markdown>
+                                <style>{`
                                 .rec-steps ol { counter-reset: step-counter; list-style: none; padding: 0; margin: 0; }
                                 .rec-steps li { counter-increment: step-counter; padding: 0; margin: 0; }
                                 .rec-steps .step-badge::before { content: counter(step-counter); }
                             `}</style>
-                        </div>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-6 mt-2">
+                                {steps.map((step, _index) => (
+                                    <div key={step.key} className="flex gap-4 items-start group">
+                                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center group-hover:border-blue-300 group-hover:shadow-md transition-all duration-300">
+                                            {step.icon}
+                                        </div>
+                                        <div className="pt-0.5">
+                                            <h4 className="text-slate-900 font-bold text-lg leading-tight mb-1 group-hover:text-blue-700 transition-colors">
+                                                {step.title}
+                                            </h4>
+                                            <p className="text-slate-600 leading-relaxed text-[0.95rem]">
+                                                {step.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Visual Column */}

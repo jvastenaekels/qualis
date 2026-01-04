@@ -87,7 +87,25 @@
         "preview_title": "Aperçu",
         "objective_label": "Objectif de l'étude",
         "instructions_label": "Déroulement",
-        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les énoncés et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre point de vue :** affinez votre perspective en classant chaque énoncé sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
+        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les énoncés et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre point de vue :** affinez votre perspective en classant chaque énoncé sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants.",
+        "steps": {
+            "profile": {
+                "title": "Faisons connaissance",
+                "description": "quelques questions rapides pour mieux comprendre votre parcours."
+            },
+            "rough": {
+                "title": "Premières impressions",
+                "description": "découvrez les énoncés et donnez votre réaction immédiate (d'accord, neutre ou pas d'accord)."
+            },
+            "fine": {
+                "title": "Votre perspective",
+                "description": "placez les énoncés sur la grille pour affiner votre point de vue, en priorisant ce qui compte le plus pour vous."
+            },
+            "post": {
+                "title": "Pourquoi",
+                "description": "quelques mots pour expliquer vos choix les plus significatifs."
+            }
+        }
     },
     "consent": {
         "title": "Consentement à la participation",

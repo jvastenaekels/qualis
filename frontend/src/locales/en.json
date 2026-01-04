@@ -87,7 +87,25 @@
         "preview_title": "Preview",
         "objective_label": "Study Objective",
         "instructions_label": "Process",
-        "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Your perspective:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Why:** a few words to explain your most significant choices."
+        "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Your perspective:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Why:** a few words to explain your most significant choices.",
+        "steps": {
+            "profile": {
+                "title": "Let's meet",
+                "description": "a few quick questions to better understand your background."
+            },
+            "rough": {
+                "title": "First impressions",
+                "description": "discover the statements and give your immediate reaction (agree, neutral, or disagree)."
+            },
+            "fine": {
+                "title": "Your perspective",
+                "description": "place the statements onto the grid to refine your point of view, prioritizing what matters most to you."
+            },
+            "post": {
+                "title": "Why",
+                "description": "a few words to explain your most significant choices."
+            }
+        }
     },
     "consent": {
         "title": "Participation Consent",
