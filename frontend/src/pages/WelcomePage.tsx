@@ -38,10 +38,6 @@ const WelcomePage: React.FC = () => {
         setStep(1);
     }, [setStep]);
 
-    if (!config) return null;
-
-    const study = config;
-
     // Dynamic scaling logic for animation
     const containerRef = React.useRef<HTMLDivElement>(null);
     const [scale, setScale] = React.useState(2.0);
@@ -73,6 +69,10 @@ const WelcomePage: React.FC = () => {
 
         return () => observer.disconnect();
     }, []);
+
+    if (!config) return null;
+
+    const study = config;
 
     const handleContinue = () => {
         navigate(`/study/${slug}/consent`);
