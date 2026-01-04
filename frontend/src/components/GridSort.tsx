@@ -272,6 +272,8 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         }, [autoFitEnabled, performAutoFit]);
 
         const renderDeckCards = useCallback(() => {
+            // Mobile: Fixed 3/4 ratio. Desktop: 1.5 ratio (or whatever grid requires, usually landscape)
+            const mobileRatio = 3 / 4;
             const gridRatio =
                 cardDimensions && cardDimensions.height > 0
                     ? cardDimensions.width / cardDimensions.height
@@ -281,8 +283,10 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 activeCards.map((card) => (
                     <div
                         key={card.id}
-                        className={`flex-none h-full lg:w-full lg:flex-none lg:h-auto ${!isMobile ? 'w-[130px] sm:w-[140px]' : ''}`}
-                        style={isMobile ? { aspectRatio: gridRatio } : undefined}
+                        // Mobile: fixed height 140px, 3/4 ratio.
+                        // Desktop: w-full (fills grid col), aspect ratio matches grid slots.
+                        className={`flex-none ${isMobile ? 'h-[140px]' : 'h-full w-[130px] sm:w-[140px]'} lg:w-full lg:flex-none`}
+                        style={{ aspectRatio: isMobile ? mobileRatio : gridRatio }}
                     >
                         <SortableCard
                             id={card.id}
@@ -291,7 +295,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             variant="compact"
                             isSelected={selectedCardId === card.id}
                             onClick={() => onCardClick?.(card.id)}
-                            aspectRatio={isMobile ? gridRatio : 'auto'}
+                            aspectRatio={isMobile ? mobileRatio : gridRatio}
                             disableHoverZoom={disableHoverZoom || isMobile}
                         />
                     </div>
@@ -510,7 +514,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         `}
                     style={{
                         height: isMobile ? 'auto' : '100%',
-                        maxHeight: isMobile ? '33vh' : 'none',
+                        maxHeight: isMobile ? 'none' : 'none', // Removed 33vh restriction
                     }}
                 >
                     {/* Reading Zone - Desktop Sidebar version */}
@@ -607,7 +611,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         id={`deck-area-${activePile}`}
                         className={`
                             flex-col overflow-hidden relative
-                            ${isMobile ? 'h-[14vh] min-h-[90px] flex-none' : 'flex-1 min-h-0 flex'}
+                            ${isMobile ? 'h-[180px] flex-none' : 'flex-1 min-h-0 flex'}
                         `}
                     >
                         <div
@@ -624,7 +628,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         </div>
                     </DroppableDeckArea>
                     {/* PANEL FOOTER: Guidance or Validation */}
-                    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100]">
+                    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[80px] flex-none">
                         {isAllPlaced ? (
                             <button
                                 type="button"
@@ -634,7 +638,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 {t('fine.actions.validate')} <Check size={18} strokeWidth={3} />
                             </button>
                         ) : (
-                            <div className="flex items-center justify-center min-h-[48px] bg-indigo-50 border border-indigo-100 rounded-xl px-4">
+                            <div className="flex items-center justify-center min-h-[48px] bg-indigo-50 border border-indigo-100 rounded-xl px-4 w-full">
                                 <div className="flex items-center gap-3 text-slate-500">
                                     {selectedCardId ? (
                                         <>
