@@ -91,19 +91,19 @@
         "steps": {
             "profile": {
                 "title": "Faisons connaissance",
-                "description": "quelques questions rapides pour mieux comprendre votre parcours."
+                "description": "Quelques questions rapides pour mieux comprendre votre parcours."
             },
             "rough": {
                 "title": "Premières impressions",
-                "description": "découvrez les énoncés et donnez votre réaction immédiate (d'accord, neutre ou pas d'accord)."
+                "description": "Découvrez les énoncés et donnez votre réaction immédiate (d'accord, neutre ou pas d'accord)."
             },
             "fine": {
                 "title": "Votre perspective",
-                "description": "placez les énoncés sur la grille pour affiner votre point de vue, en priorisant ce qui compte le plus pour vous."
+                "description": "Placez les énoncés sur la grille pour affiner votre point de vue, en priorisant ce qui compte le plus pour vous."
             },
             "post": {
                 "title": "Pourquoi",
-                "description": "quelques mots pour expliquer vos choix les plus significatifs."
+                "description": "Quelques mots pour expliquer vos choix les plus significatifs."
             }
         }
     },

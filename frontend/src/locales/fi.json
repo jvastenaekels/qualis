@@ -91,19 +91,19 @@
         "steps": {
             "profile": {
                 "title": "Tutustutaan",
-                "description": "muutama nopea kysymys taustasi ymmärtämiseksi."
+                "description": "Muutama nopea kysymys taustasi ymmärtämiseksi."
             },
             "rough": {
                 "title": "Ensivaikutelma",
-                "description": "tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä)."
+                "description": "Tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä)."
             },
             "fine": {
                 "title": "Näkökulmasi",
-                "description": "sijoita väittämät ruudukkoon tarkentaaksesi näkemystäsi, priorisoiden sinulle tärkeimmät asiat."
+                "description": "Sijoita väittämät ruudukkoon tarkentaaksesi näkemystäsi, priorisoiden sinulle tärkeimmät asiat."
             },
             "post": {
                 "title": "Miksi",
-                "description": "muutama sana perustellaksesi merkittävimmät valintasi."
+                "description": "Muutama sana perustellaksesi merkittävimmät valintasi."
             }
         }
     },

@@ -91,19 +91,19 @@
         "steps": {
             "profile": {
                 "title": "Let's meet",
-                "description": "a few quick questions to better understand your background."
+                "description": "A few quick questions to better understand your background."
             },
             "rough": {
                 "title": "First impressions",
-                "description": "discover the statements and give your immediate reaction (agree, neutral, or disagree)."
+                "description": "Discover the statements and give your immediate reaction (agree, neutral, or disagree)."
             },
             "fine": {
                 "title": "Your perspective",
-                "description": "place the statements onto the grid to refine your point of view, prioritizing what matters most to you."
+                "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you."
             },
             "post": {
                 "title": "Why",
-                "description": "a few words to explain your most significant choices."
+                "description": "A few words to explain your most significant choices."
             }
         }
     },
