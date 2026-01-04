@@ -29,7 +29,7 @@ interface SortableCardProps {
     isSelected?: boolean;
     onClick?: () => void;
     dimensions?: { width: number; height: number };
-    aspectRatio?: number;
+    aspectRatio?: number | 'auto';
     disableHoverZoom?: boolean;
     allowScroll?: boolean;
 }
@@ -123,8 +123,10 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
         }
 
         // Aspect Ratio Logic: Use prop if provided, otherwise default to 3/4
-        const aspectStyle = aspectRatio ? { aspectRatio: `${aspectRatio}` } : {};
-        const aspectClass = !aspectRatio && !dimensions ? 'aspect-[3/4]' : '';
+        const aspectStyle =
+            aspectRatio && aspectRatio !== 'auto' ? { aspectRatio: `${aspectRatio}` } : {};
+        const aspectClass =
+            !aspectRatio && !dimensions ? 'aspect-[3/4]' : aspectRatio === 'auto' ? 'h-full' : '';
 
         const handlePointerDown = (e: React.PointerEvent) => {
             // On touch devices, we want immediate feedback in the Reading Zone
