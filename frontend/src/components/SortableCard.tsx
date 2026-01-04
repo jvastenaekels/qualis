@@ -200,9 +200,11 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                     // biome-ignore lint/suspicious/noExplicitAny: framer type mismatch
                     transition={CARD_SPRING_TRANSITION as any}
                     // Trigger a subtle pulse/flash when the card content (id) changes or on mount
-                    // biome-ignore lint/suspicious/noExplicitAny: framer type mismatch
                     animate={
-                        process.env.NODE_ENV === 'test' ? undefined : (CARD_PULSE_ANIMATION as any)
+                        process.env.NODE_ENV === 'test'
+                            ? undefined
+                            : // biome-ignore lint/suspicious/noExplicitAny: framer type mismatch
+                              (CARD_PULSE_ANIMATION as any)
                     }
                     key={id} // Ensure animation re-triggers if ID changes in this slot
                     className={`

@@ -73,7 +73,6 @@ const FineSortPage: React.FC = () => {
     );
     const [zoomLevel, setZoomLevel] = useState(1);
     const [interactionUtils, setInteractionUtils] = useState<InteractionUtils | null>(null);
-    const [panVersion, setPanVersion] = useState(0);
 
     const setSelectedCard = useUIStore((state) => state.setSelectedCard);
 
@@ -166,8 +165,6 @@ const FineSortPage: React.FC = () => {
         [placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard, categorizeCard]
     );
 
-    const handlePan = useCallback(() => setPanVersion((v) => v + 1), []);
-
     // DnD Hooks
     const {
         activeId,
@@ -182,7 +179,6 @@ const FineSortPage: React.FC = () => {
         onSelectionChange: setSelectedCardId,
         selectedId: selectedCardId,
         interactionUtils,
-        onPan: handlePan,
         statements: config?.statements || [],
         actions,
     });
@@ -234,52 +230,34 @@ const FineSortPage: React.FC = () => {
     // 7. Collision Strategy (Stable)
     const collisionStrategy: CollisionDetection = useCallback(
         (args) => {
-            const { pointerCoordinates } = args;
-            if (!pointerCoordinates) return [];
+            // 1. Priority: Direct hit via pointerWithin (uses cached rects, efficient)
+            const pointerCollisions = pointerWithin(args);
 
-            // 1. Element at point (Viewport accurate)
-            const elAtPoint = document.elementFromPoint(pointerCoordinates.x, pointerCoordinates.y);
-            let resolvedPointId: string | null = null;
+            // Check for direct slot or deck hit
+            const targetContainer = pointerCollisions.find((c) => {
+                const idStr = String(c.id);
+                return idStr.startsWith('slot_') || idStr.startsWith('deck-');
+            });
 
-            if (elAtPoint) {
-                let curr = elAtPoint as HTMLElement;
-                while (curr && curr !== document.body) {
-                    const id = curr.getAttribute('id') || curr.dataset.testid;
-                    if (id?.startsWith('slot_') || id?.startsWith('deck-')) {
-                        resolvedPointId = id;
-                        break;
-                    }
-                    curr = curr.parentElement as HTMLElement;
+            if (targetContainer) return [targetContainer];
+
+            // 2. Secondary: Hit on a placed card? Resolve to its slot.
+            const cardCollision = pointerCollisions.find((c) => {
+                // Check if it's a card ID (number)
+                return typeof c.id === 'number' || !Number.isNaN(Number(c.id));
+            });
+
+            if (cardCollision) {
+                const cardId = Number(cardCollision.id);
+                const placed = qsort.find((p) => p.statementId === cardId);
+                if (placed) {
+                    // Return a synthetic collision with the slot ID
+                    return [{ id: `slot_${placed.col}_${placed.row}`, data: cardCollision.data }];
                 }
             }
 
-            const resolveToSlot = (id: string | number) => {
-                const idString = String(id);
-                if (idString.startsWith('slot_') || idString.startsWith('deck-')) return idString;
-
-                // Handle card-ID format (from data-testid)
-                const cardIdMatch = idString.match(/^card-(\d+)$/);
-                const cardId = cardIdMatch ? parseInt(cardIdMatch[1], 10) : parseInt(idString, 10);
-
-                if (!Number.isNaN(cardId)) {
-                    const placed = qsort.find((p) => p.statementId === cardId);
-                    return placed ? `slot_${placed.col}_${placed.row}` : null;
-                }
-                return null;
-            };
-
-            if (resolvedPointId) return [{ id: resolvedPointId }];
-
-            // 2. Fallbacks
-            const pointerCollisions = pointerWithin(args);
-            const collisions =
-                pointerCollisions.length > 0 ? pointerCollisions : closestCenter(args);
-            return collisions
-                .map((c) => {
-                    const slotId = resolveToSlot(c.id);
-                    return slotId ? { ...c, id: slotId } : null;
-                })
-                .filter((c): c is NonNullable<typeof c> => c !== null);
+            // 3. Fallback to closest center
+            return closestCenter(args);
         },
         [qsort]
     );
@@ -348,7 +326,10 @@ const FineSortPage: React.FC = () => {
         []
     );
 
-    const handleTransformChange = useCallback(() => setPanVersion((v) => v + 1), []);
+    const handleTransformChange = useCallback(() => {
+        // panVersion was removed as it's no longer used for measurement frequency
+    }, []);
+
     const handleReset = useCallback(() => {
         if (window.confirm(t('fine.deck.confirm_reset'))) resetFineSort();
     }, [resetFineSort, t]);
@@ -374,8 +355,7 @@ const FineSortPage: React.FC = () => {
             autoScroll={false}
             measuring={{
                 droppable: {
-                    strategy: MeasuringStrategy.Always,
-                    frequency: panVersion,
+                    strategy: MeasuringStrategy.WhileDragging,
                 },
             }}
             modifiers={[snapCenterToCursor]}
