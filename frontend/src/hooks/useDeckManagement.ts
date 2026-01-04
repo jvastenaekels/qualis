@@ -46,11 +46,6 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
 
     // Calculate optimal deck height based on longest statement
     const deckHeight = useMemo(() => {
-        if (isMobile) {
-            // Mobile: Fixed compact height (Piles ~50px + Cards ~110px + Footer Buffer ~96px = ~256px)
-            return 260;
-        }
-
         const allCards = [...agreeCards, ...disagreeCards, ...neutralCards];
         if (allCards.length === 0) return 320;
 

@@ -508,10 +508,11 @@ const GridSort: React.FC<GridSortProps> = React.memo(
           bg-white lg:border-r border-t lg:border-t-0 border-gray-200
           z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md
           flex flex-col lg:h-full transition-all duration-300
-          overflow-hidden pb-24
+        overflow-hidden
         `}
                     style={{
-                        height: isMobile ? `${Math.max(deckHeight, 180)}px` : '100%',
+                        height: isMobile ? 'auto' : '100%',
+                        maxHeight: isMobile ? '40vh' : 'none',
                     }}
                 >
                     {/* Reading Zone - Desktop Sidebar version */}
@@ -606,7 +607,10 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
                     <DroppableDeckArea
                         id={`deck-area-${activePile}`}
-                        className="flex-1 min-h-0 flex flex-col overflow-hidden relative"
+                        className={`
+                            flex-col overflow-hidden relative
+                            ${isMobile ? 'h-[15vh] min-h-[100px] flex-none' : 'flex-1 min-h-0 flex'}
+                        `}
                     >
                         <div
                             key={activePile}
@@ -622,7 +626,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         </div>
                     </DroppableDeckArea>
                     {/* PANEL FOOTER: Guidance or Validation */}
-                    <div className="fixed bottom-0 right-0 w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100]">
+                    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100]">
                         {isAllPlaced ? (
                             <button
                                 type="button"
