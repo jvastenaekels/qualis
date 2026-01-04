@@ -277,7 +277,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 activeCards.map((card) => (
                     <div
                         key={card.id}
-                        className="flex-none w-[130px] sm:w-[140px] lg:w-full lg:flex-none"
+                        className="flex-none h-full w-[130px] sm:w-[140px] lg:w-full lg:flex-none lg:h-auto"
                     >
                         <SortableCard
                             id={card.id}
@@ -286,7 +286,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             variant="compact"
                             isSelected={selectedCardId === card.id}
                             onClick={() => onCardClick?.(card.id)}
-                            aspectRatio={1.5}
+                            aspectRatio="auto"
                             disableHoverZoom={disableHoverZoom || isMobile}
                         />
                     </div>
@@ -595,7 +595,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         <div
                             key={activePile}
                             className={`
-                        flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-center justify-start custom-scrollbar
+                        flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-stretch justify-start custom-scrollbar
                         ${activeCards.length === 0 ? 'justify-center' : ''}
                         lg:grid lg:grid-cols-2 lg:gap-2 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:p-3
                         ${activeCards.length === 0 ? 'lg:place-content-center' : ''}

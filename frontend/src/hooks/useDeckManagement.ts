@@ -45,13 +45,13 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
     // Calculate optimal deck height based on longest statement
     const deckHeight = useMemo(() => {
         const allCards = [...agreeCards, ...disagreeCards, ...neutralCards];
-        if (allCards.length === 0) return 220;
+        if (allCards.length === 0) return 320;
 
         // Safety check for empty text
         const maxLength = Math.max(...allCards.map((card) => card.text?.length || 0));
         const estimatedLines = Math.ceil(maxLength / 50);
-        const calculatedHeight = 220 + estimatedLines * 20;
-        return Math.min(Math.max(calculatedHeight, 280), 420);
+        const calculatedHeight = 320 + estimatedLines * 25;
+        return Math.min(Math.max(calculatedHeight, 320), 600);
     }, [agreeCards, disagreeCards, neutralCards]);
 
     return {
