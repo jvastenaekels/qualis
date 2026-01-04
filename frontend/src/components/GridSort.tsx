@@ -272,8 +272,8 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         }, [autoFitEnabled, performAutoFit]);
 
         const renderDeckCards = useCallback(() => {
-            // Mobile: Fixed 3/4 ratio. Desktop: 1.5 ratio (or whatever grid requires, usually landscape)
-            const mobileRatio = 3 / 4;
+            // Mobile: Landscape 1.5 ratio. Desktop: 1.5 ratio (or whatever grid requires, usually landscape)
+            const mobileRatio = 1.5;
             const gridRatio =
                 cardDimensions && cardDimensions.height > 0
                     ? cardDimensions.width / cardDimensions.height
@@ -283,9 +283,9 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 activeCards.map((card) => (
                     <div
                         key={card.id}
-                        // Mobile: fixed height 140px, 3/4 ratio.
+                        // Mobile: fixed height 100px, landscape 1.5 ratio.
                         // Desktop: w-full (fills grid col), aspect ratio matches grid slots.
-                        className={`flex-none ${isMobile ? 'h-[140px]' : 'h-full w-[130px] sm:w-[140px]'} lg:w-full lg:flex-none`}
+                        className={`flex-none ${isMobile ? 'h-[100px]' : 'h-full w-[130px] sm:w-[140px]'} lg:w-full lg:flex-none`}
                         style={{ aspectRatio: isMobile ? mobileRatio : gridRatio }}
                     >
                         <SortableCard
@@ -611,7 +611,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         id={`deck-area-${activePile}`}
                         className={`
                             flex-col overflow-hidden relative
-                            ${isMobile ? 'h-[200px] flex-none' : 'flex-1 min-h-0 max-h-[280px] flex'}
+                            ${isMobile ? 'h-[130px] flex-none' : 'flex-1 min-h-0 max-h-[280px] flex'}
                         `}
                     >
                         <div
