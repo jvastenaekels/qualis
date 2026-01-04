@@ -205,8 +205,10 @@ class StudyService:
             StudyService.validate_distribution(study, data.qsort)
 
         # 5. Find or Create Participant
-        participant_stmt = select(Participant).where(
-            Participant.session_token == data.session_token
+        participant_stmt = (
+            select(Participant)
+            .where(Participant.session_token == data.session_token)
+            .with_for_update()
         )
         participant_result = await db.execute(participant_stmt)
         participant = participant_result.scalar_one_or_none()
