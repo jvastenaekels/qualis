@@ -72,11 +72,11 @@ describe('useDeckManagement', () => {
             })
         );
 
-        // lowResult should be around 180 + (5/50)*15 = 181.5 -> clamped to 250
-        // highResult should be around 180 + (1000/50)*15 = 180 + 300 = 480 -> clamped to 340
+        // lowResult should be around 220 + (5/50)*20 = 222 -> clamped to 280
+        // highResult should be around 220 + (1000/50)*20 = 220 + 400 = 620 -> clamped to 420
         expect(highResult.current.deckHeight).toBeGreaterThan(lowResult.current.deckHeight);
-        expect(highResult.current.deckHeight).toBe(340);
-        expect(lowResult.current.deckHeight).toBe(250);
+        expect(highResult.current.deckHeight).toBe(420);
+        expect(lowResult.current.deckHeight).toBe(280);
     });
 
     it('should maintain zonal focus state', () => {
