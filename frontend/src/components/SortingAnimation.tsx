@@ -146,7 +146,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
     const MOBILE_SOURCE_CENTER_Y = 40;
     const DESKTOP_GRID_ROW0_Y = 26;
     const DESKTOP_GRID_OFFSET_X = -50; // Balanced
-    const DESKTOP_DECK_OFFSET_X = 50;  // Balanced
+    const DESKTOP_DECK_OFFSET_X = 50; // Balanced
 
     const currentGridBaseY = isDesktop ? DESKTOP_GRID_ROW0_Y : MOBILE_GRID_ROW0_Y;
     const currentSourceBaseY = isDesktop ? 0 : MOBILE_SOURCE_CENTER_Y;
