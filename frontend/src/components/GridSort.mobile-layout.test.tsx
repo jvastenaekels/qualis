@@ -88,7 +88,7 @@ describe('GridSort Mobile Layout Refinements', () => {
         // Removed specific h-20 check as it might be component internal
     });
 
-    it('forces portrait aspect ratio (0.75) for cards in mobile deck', () => {
+    it('forces landscape aspect ratio (1.5) for cards in mobile deck', () => {
         render(
             <DndContext>
                 <GridSort {...defaultProps} />
@@ -96,7 +96,7 @@ describe('GridSort Mobile Layout Refinements', () => {
         );
 
         const card = screen.getByTestId('mock-card');
-        expect(card.getAttribute('data-aspect')).toBe('0.75');
+        expect(card.getAttribute('data-aspect')).toBe('1.5');
     });
 
     it('disables vertical scroll in mobile deck cards-container and sets fixed height', () => {
