@@ -34,7 +34,11 @@ const FINE_STEPS = [
     { id: 'C0_2', x: 0, y: -ROW_H * 2, source: 1 },
 ];
 
-const SortingAnimation: React.FC = () => {
+interface SortingAnimationProps {
+    scale?: number;
+}
+
+const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
     const [phase, setPhase] = useState<'ROUGH' | 'FINE'>('ROUGH');
     const [step, setStep] = useState(0);
 
@@ -185,6 +189,8 @@ const SortingAnimation: React.FC = () => {
         (activeFineStep ? activeFineStep.x : 0) + (isDesktop ? DESKTOP_GRID_OFFSET_X : 0);
     const fineTargetY = currentGridBaseY + (activeFineStep ? activeFineStep.y : 0);
 
+    const finalScale = scale ?? 2.0;
+
     return (
         <div
             className="relative w-full h-80 md:h-72 flex items-center justify-center py-6 select-none pointer-events-none"
@@ -193,8 +199,14 @@ const SortingAnimation: React.FC = () => {
             {/* ROUGH PHASE */}
             <div
                 data-testid="phase-1"
+                style={{
+                    transform:
+                        phase === 'ROUGH'
+                            ? `scale(${finalScale}) translateY(${isDesktop ? '-48px' : '-32px'})`
+                            : `scale(${finalScale - 0.1})`,
+                }}
                 className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out
-                ${phase === 'ROUGH' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] z-10'}`}
+                ${phase === 'ROUGH' ? 'opacity-100 z-20' : 'opacity-0 z-10'}`}
             >
                 <div className="relative z-20">
                     <DynamicStack count={roughDeckCount} type="deck" />
@@ -257,8 +269,14 @@ const SortingAnimation: React.FC = () => {
             {/* FINE PHASE */}
             <div
                 data-testid="phase-2"
+                style={{
+                    transform:
+                        phase === 'FINE'
+                            ? `scale(${finalScale}) translateY(${isDesktop ? '-48px' : '-32px'})`
+                            : `scale(${finalScale - 0.1})`,
+                }}
                 className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ease-in-out
-                ${phase === 'FINE' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] z-10'}`}
+                ${phase === 'FINE' ? 'opacity-100 z-20' : 'opacity-0 z-10'}`}
             >
                 <div
                     className="absolute z-10 flex items-end justify-center left-1/2"
