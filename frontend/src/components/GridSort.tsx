@@ -514,7 +514,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         `}
                     style={{
                         height: isMobile ? 'auto' : '100%',
-                        maxHeight: isMobile ? 'none' : 'none', // Removed 33vh restriction
+                        maxHeight: isMobile ? '45dvh' : 'none',
                     }}
                 >
                     {/* Reading Zone - Desktop Sidebar version */}
