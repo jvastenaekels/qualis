@@ -25,7 +25,7 @@ export const StatementSchema = z.object({
 });
 
 export const PreSortFieldSchema = z.object({
-    type: z.enum(['text', 'number', 'select']),
+    type: z.enum(['text', 'number', 'select', 'checkbox', 'radio', 'date', 'email', 'textarea']),
     label: z.union([z.string(), z.record(z.string())]),
     required: z.boolean().optional(),
     options: z
@@ -39,8 +39,12 @@ export const PreSortFieldSchema = z.object({
             ])
         )
         .optional(),
+    placeholder: z.union([z.string(), z.record(z.string())]).optional(),
     min: z.number().optional(),
     max: z.number().optional(),
+    minLength: z.number().optional(),
+    maxLength: z.number().optional(),
+    rows: z.number().optional(),
 });
 
 export const StudyConfigSchema = z.object({

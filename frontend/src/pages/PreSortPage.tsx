@@ -48,12 +48,34 @@ const PreSortPage: React.FC = () => {
                         field.max,
                         t('common.errors.max', { max: field.max })
                     );
+            } else if (field.type === 'email') {
+                fieldSchema = z.string().email('Please enter a valid email address');
+            } else if (field.type === 'date') {
+                fieldSchema = z.string(); // HTML date input returns string
+            } else if (field.type === 'checkbox') {
+                // Checkbox group returns array of strings
+                fieldSchema = z.array(z.string());
             } else {
+                // text, textarea, radio, select
                 fieldSchema = z.string();
+                if (field.minLength !== undefined) {
+                    fieldSchema = (fieldSchema as z.ZodString).min(
+                        field.minLength,
+                        `Minimum ${field.minLength} characters required`
+                    );
+                }
+                if (field.maxLength !== undefined) {
+                    fieldSchema = (fieldSchema as z.ZodString).max(
+                        field.maxLength,
+                        `Maximum ${field.maxLength} characters allowed`
+                    );
+                }
             }
 
             if (field.required) {
-                if (field.type !== 'number') {
+                if (field.type === 'checkbox') {
+                    fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(1, t('presort.error_required'));
+                } else if (field.type !== 'number') {
                     fieldSchema = (fieldSchema as z.ZodString).min(1, t('presort.error_required'));
                 }
             } else {
@@ -109,6 +131,9 @@ const PreSortPage: React.FC = () => {
         const commonClasses =
             'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[44px] text-base';
         const labelText = getLocalizedText(fieldConfig.label);
+        const placeholderText = fieldConfig.placeholder
+            ? getLocalizedText(fieldConfig.placeholder)
+            : labelText;
 
         switch (fieldConfig.type) {
             case 'number':
@@ -118,7 +143,38 @@ const PreSortPage: React.FC = () => {
                         type="number"
                         {...register(key)}
                         className={commonClasses}
-                        placeholder={labelText}
+                        placeholder={placeholderText}
+                        min={fieldConfig.min}
+                        max={fieldConfig.max}
+                    />
+                );
+            case 'email':
+                return (
+                    <input
+                        id={key}
+                        type="email"
+                        {...register(key)}
+                        className={commonClasses}
+                        placeholder={placeholderText}
+                    />
+                );
+            case 'date':
+                return (
+                    <input
+                        id={key}
+                        type="date"
+                        {...register(key)}
+                        className={commonClasses}
+                    />
+                );
+            case 'textarea':
+                return (
+                    <textarea
+                        id={key}
+                        {...register(key)}
+                        className={commonClasses}
+                        placeholder={placeholderText}
+                        rows={fieldConfig.rows || 4}
                     />
                 );
             case 'select':
@@ -137,6 +193,54 @@ const PreSortPage: React.FC = () => {
                         })}
                     </select>
                 );
+            case 'radio':
+                return (
+                    <div className="space-y-2 mt-2">
+                        {fieldConfig.options?.map((opt) => {
+                            const optValue = typeof opt === 'object' ? opt.value : opt;
+                            const optLabel =
+                                typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
+                            return (
+                                <label
+                                    key={optValue}
+                                    className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
+                                >
+                                    <input
+                                        type="radio"
+                                        {...register(key)}
+                                        value={optValue}
+                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="text-base">{optLabel}</span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                );
+            case 'checkbox':
+                return (
+                    <div className="space-y-2 mt-2">
+                        {fieldConfig.options?.map((opt) => {
+                            const optValue = typeof opt === 'object' ? opt.value : opt;
+                            const optLabel =
+                                typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
+                            return (
+                                <label
+                                    key={optValue}
+                                    className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
+                                >
+                                    <input
+                                        type="checkbox"
+                                        {...register(key)}
+                                        value={optValue}
+                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 rounded"
+                                    />
+                                    <span className="text-base">{optLabel}</span>
+                                </label>
+                            );
+                        })}
+                    </div>
+                );
             default: // text
                 return (
                     <input
@@ -144,7 +248,9 @@ const PreSortPage: React.FC = () => {
                         type="text"
                         {...register(key)}
                         className={commonClasses}
-                        placeholder={labelText}
+                        placeholder={placeholderText}
+                        minLength={fieldConfig.minLength}
+                        maxLength={fieldConfig.maxLength}
                     />
                 );
         }

@@ -27,6 +27,11 @@ import {
     Hash,
     PlusCircle,
     List as ListCircle,
+    CheckSquare,
+    Calendar,
+    Mail,
+    AlignLeft,
+    Circle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -37,13 +42,19 @@ import {
 } from '@/components/ui/accordion';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 
-type QuestionType = 'text' | 'number' | 'select' | 'checkbox';
+type QuestionType = 'text' | 'number' | 'select' | 'checkbox' | 'date' | 'email' | 'textarea' | 'radio';
 
 interface QuestionConfig {
     type: QuestionType;
     label: string | Record<string, string>;
     required: boolean;
     options?: (string | { label: Record<string, string>; value: string })[];
+    placeholder?: string | Record<string, string>;
+    min?: number;
+    max?: number;
+    minLength?: number;
+    maxLength?: number;
+    rows?: number; // For textarea
 }
 
 interface QuestionItemProps {
@@ -105,9 +116,12 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                     <div className="p-1.5 bg-muted rounded">
                                         {question.type === 'text' && <Type className="h-3 w-3" />}
                                         {question.type === 'number' && <Hash className="h-3 w-3" />}
-                                        {question.type === 'select' && (
-                                            <ListCircle className="h-3 w-3" />
-                                        )}
+                                        {question.type === 'select' && <ListCircle className="h-3 w-3" />}
+                                        {question.type === 'checkbox' && <CheckSquare className="h-3 w-3" />}
+                                        {question.type === 'radio' && <Circle className="h-3 w-3" />}
+                                        {question.type === 'date' && <Calendar className="h-3 w-3" />}
+                                        {question.type === 'email' && <Mail className="h-3 w-3" />}
+                                        {question.type === 'textarea' && <AlignLeft className="h-3 w-3" />}
                                     </div>
                                     <span className="text-sm font-medium truncate">
                                         {label || (
@@ -169,9 +183,13 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                     </div>
                                 </div>
 
-                                {question.type === 'select' && (
+                                {(question.type === 'select' || question.type === 'radio' || question.type === 'checkbox') && (
                                     <div className="space-y-3 pt-2 border-t border-dashed">
-                                        <Label className="text-xs">Options</Label>
+                                        <Label className="text-xs">
+                                            Options
+                                            {question.type === 'checkbox' && ' (multiple selection allowed)'}
+                                            {question.type === 'radio' && ' (single selection)'}
+                                        </Label>
                                         <div className="space-y-2">
                                             {(question.options || []).map((opt, idx) => (
                                                 <div
@@ -309,12 +327,17 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
     const addQuestion = (qType: QuestionType) => {
         const id = `q_${Date.now()}`;
-        const newQuestion = {
-            type: qType === 'checkbox' ? 'select' : qType, // Mapping checkbox to select for now
+        const newQuestion: QuestionConfig = {
+            type: qType,
             label: { [activeLocale]: 'New Question' },
             required: false,
-            options:
-                qType === 'select' || qType === 'checkbox' ? ['Option 1', 'Option 2'] : undefined,
+            options: (qType === 'select' || qType === 'checkbox' || qType === 'radio')
+                ? ['Option 1', 'Option 2']
+                : undefined,
+            placeholder: qType === 'text' || qType === 'email' || qType === 'textarea'
+                ? { [activeLocale]: 'Enter your answer...' }
+                : undefined,
+            rows: qType === 'textarea' ? 4 : undefined,
         };
 
         // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
@@ -328,33 +351,87 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-center justify-between bg-muted/20 p-4 rounded-lg border border-dashed">
-                <span className="text-sm font-medium text-muted-foreground">Add a new block</span>
-                <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addQuestion('text')}
-                        className="bg-background"
-                    >
-                        <Type className="h-4 w-4 mr-2" /> Text
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addQuestion('number')}
-                        className="bg-background"
-                    >
-                        <Hash className="h-4 w-4 mr-2" /> Number
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => addQuestion('select')}
-                        className="bg-background"
-                    >
-                        <PlusCircle className="h-4 w-4 mr-2" /> Select
-                    </Button>
+            <div className="bg-muted/20 p-4 rounded-lg border border-dashed space-y-3">
+                <span className="text-sm font-medium text-muted-foreground">Add a new field</span>
+
+                <div className="space-y-2">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Basic Fields
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addQuestion('text')}
+                            className="bg-background"
+                        >
+                            <Type className="h-3.5 w-3.5 mr-1.5" /> Text
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addQuestion('textarea')}
+                            className="bg-background"
+                        >
+                            <AlignLeft className="h-3.5 w-3.5 mr-1.5" /> Long Text
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addQuestion('number')}
+                            className="bg-background"
+                        >
+                            <Hash className="h-3.5 w-3.5 mr-1.5" /> Number
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addQuestion('date')}
+                            className="bg-background"
+                        >
+                            <Calendar className="h-3.5 w-3.5 mr-1.5" /> Date
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addQuestion('email')}
+                            className="bg-background"
+                        >
+                            <Mail className="h-3.5 w-3.5 mr-1.5" /> Email
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        Choice Fields
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addQuestion('select')}
+                            className="bg-background"
+                        >
+                            <ListCircle className="h-3.5 w-3.5 mr-1.5" /> Dropdown
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addQuestion('radio')}
+                            className="bg-background"
+                        >
+                            <Circle className="h-3.5 w-3.5 mr-1.5" /> Radio
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => addQuestion('checkbox')}
+                            className="bg-background"
+                        >
+                            <CheckSquare className="h-3.5 w-3.5 mr-1.5" /> Checkboxes
+                        </Button>
+                    </div>
                 </div>
             </div>
 
