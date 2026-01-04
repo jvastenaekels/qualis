@@ -310,7 +310,16 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     </div>
                 </div>
             );
-        }, [activeCards, selectedCardId, onCardClick, isMobile, disableHoverZoom, t, showCodes, cardDimensions]);
+        }, [
+            activeCards,
+            selectedCardId,
+            onCardClick,
+            isMobile,
+            disableHoverZoom,
+            t,
+            showCodes,
+            cardDimensions,
+        ]);
 
         return (
             <div className="flex flex-col lg:flex-row h-[100dvh] bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">
