@@ -12,9 +12,9 @@
         "attention": "Attention",
         "error": "Erreur",
         "submitting": "Envoi en cours...",
-        "cards": "affirmations",
+        "cards": "énoncés",
         "close": "Fermer",
-        "statement": "Affirmation",
+        "statement": "Énoncé",
         "errors": {
             "network": "Erreur de connexion réseau. Veuillez vérifier votre connexion internet.",
             "not_found": "Étude non trouvée.",
@@ -87,7 +87,7 @@
         "preview_title": "Aperçu",
         "objective_label": "Objectif de l'étude",
         "instructions_label": "Déroulement",
-        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les affirmations et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre point de vue :** affinez votre perspective en classant chaque affirmation sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
+        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les énoncés et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Votre point de vue :** affinez votre perspective en classant chaque énoncé sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Le pourquoi du comment :** quelques mots pour nous expliquer vos choix les plus importants."
     },
     "consent": {
         "title": "Consentement à la participation",
@@ -103,7 +103,7 @@
     },
     "rough": {
         "header": {
-            "title": "Quelle est votre position face à cette affirmation ?",
+            "title": "Quelle est votre position face à cet énoncé ?",
             "subtitle": "Glissez à **gauche** pour « Pas d'accord », à **droite** pour « D'accord », ou en **bas** pour « Neutre / Indécis ».",
             "hint": "Fiez-vous à votre **instinct**. C'est du spontané — vous pourrez changer d'avis juste après."
         },
@@ -117,14 +117,14 @@
     },
     "fine": {
         "header": {
-            "title": "Classez les affirmations sur la grille selon votre expérience unique et personnelle"
+            "title": "Classez les énoncés sur la grille selon votre expérience unique et personnelle"
         },
         "deck": {
-            "title": "Affirmations disponibles",
-            "all_placed": "Toutes les affirmations de cette pile sont classées"
+            "title": "Énoncés disponibles",
+            "all_placed": "Tous les énoncés de cette pile sont classés"
         },
         "toolbar": {
-            "preview": "Aperçu de l'affirmation",
+            "preview": "Aperçu de l'énoncé",
             "zoom_in": "Zoom avant",
             "zoom_out": "Zoom arrière",
             "fit_screen": "Ajuster à l'écran",
@@ -146,13 +146,13 @@
             "validate": "Confirmer le classement",
             "finish": "Terminer le classement",
             "ready": "Voir la vue d'ensemble",
-            "not_ready": "Veuillez placer toutes les affirmations pour continuer"
+            "not_ready": "Veuillez placer tous les énoncés pour continuer"
         },
         "workbench": {
-            "active_card": "Affirmation active",
-            "place_on_grid": "Touchez un emplacement sur la grille pour placer l'affirmation",
+            "active_card": "Énoncé actif",
+            "place_on_grid": "Touchez un emplacement sur la grille pour placer l'énoncé",
             "drag_or_tap": "Glissez ou touchez une case",
-            "initial_instruction": "Glissez ou touchez une affirmation",
+            "initial_instruction": "Glissez ou touchez un énoncé",
             "help": "Comment faire ?",
             "methodology": {
                 "extremes": "Astuce : commencez par ce qui est le plus évident pour vous (les extrêmes).",
@@ -163,9 +163,9 @@
     },
     "post": {
         "title": "Pour conclure",
-        "description": "Nous y sommes presque ! Vos explications sur les affirmations les plus significatives sont précieuses pour l'analyse.",
+        "description": "Nous y sommes presque ! Vos explications sur les énoncés les plus significatifs sont précieuses pour l'analyse.",
         "extreme": {
-            "why": "Pourquoi avez-vous choisi de placer cette affirmation ici ? En quoi est-elle significative pour vous ?",
+            "why": "Pourquoi avez-vous choisi de placer cet énoncé ici ? En quoi est-il significatif pour vous ?",
             "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
             "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
             "label_agree": "Le plus en accord",
@@ -173,8 +173,8 @@
         },
         "optional": {
             "title": "Commentaires additionnels (optionnel)",
-            "description": "N'hésitez pas à commenter d'autres affirmations pour préciser vos choix.",
-            "select_placeholder": "Choisir une affirmation...",
+            "description": "N'hésitez pas à commenter d'autres énoncés pour préciser vos choix.",
+            "select_placeholder": "Choisir un énoncé...",
             "placeholder": "Votre commentaire ici..."
         },
         "missing": {
