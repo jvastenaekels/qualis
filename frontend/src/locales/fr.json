@@ -99,7 +99,7 @@
             },
             "fine": {
                 "title": "Votre perspective",
-                "description": "Placez les énoncés sur la grille pour affiner votre point de vue, en priorisant ce qui compte le plus pour vous."
+                "description": "Placez les énoncés sur la grille pour affiner votre point de vue, en priorisant ce qui compte le plus pour vous"
             },
             "post": {
                 "title": "Pourquoi",
@@ -135,7 +135,7 @@
     },
     "fine": {
         "header": {
-            "title": "Classez les énoncés sur la grille en priorisant ce qui compte le plus pour vous."
+            "title": "Classez les énoncés sur la grille en priorisant ce qui compte le plus pour vous"
         },
         "deck": {
             "title": "Énoncés disponibles",

@@ -99,7 +99,7 @@
             },
             "fine": {
                 "title": "Näkökulmasi",
-                "description": "Sijoita väittämät ruudukkoon tarkentaaksesi näkemystäsi, priorisoiden sinulle tärkeimmät asiat."
+                "description": "Aseta väittämät ruudukkoon tarkentaaksesi näkökulmaasi, priorisoimalla itsellesi tärkeimmät asiat"
             },
             "post": {
                 "title": "Miksi",
@@ -135,7 +135,7 @@
     },
     "fine": {
         "header": {
-            "title": "Järjestä väittämät ruudukkoon asettamalla etusijalle se, mikä on sinulle tärkeintä."
+            "title": "Järjestä väittämät ruudukkoon asettamalla etusijalle se, mikä on sinulle tärkeintä"
         },
         "deck": {
             "title": "Vapaat väitteet",

@@ -99,7 +99,7 @@
             },
             "fine": {
                 "title": "Your perspective",
-                "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you."
+                "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you"
             },
             "post": {
                 "title": "Why",
@@ -135,7 +135,7 @@
     },
     "fine": {
         "header": {
-            "title": "Sort the statements on the grid by prioritizing what matters most to you."
+            "title": "Sort the statements on the grid by prioritizing what matters most to you"
         },
         "deck": {
             "title": "Available Statements",
