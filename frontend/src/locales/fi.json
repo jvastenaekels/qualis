@@ -79,7 +79,7 @@
     "welcome": {
         "start": "Aloita",
         "consent": {
-            "label": "Vahvistan olevani vähintään 18-vuotias, lukeneeni ja ymmärtäneeni yllä olevat tiedot, ja suostun osallistumaan tähän tutkimukseen vapaaehtoisesti.",
+            "label": "Olen lukenut ja hyväksyn yllä olevat ehdot.",
             "error": "Hyväksy ehdot jatkaaksesi."
         },
         "reset_confirm": "Oletko varma, että haluat aloittaa uuden istunnon? Tämä poistaa nykyisen edistymisesi.",

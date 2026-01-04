@@ -145,11 +145,7 @@ const ConsentPage: React.FC = () => {
                                 htmlFor="consent"
                                 className="font-medium text-slate-900 cursor-pointer block"
                             >
-                                {config.consent?.title ||
-                                    t(
-                                        'welcome.consent.label',
-                                        'I have read and understood the information provided and agree to participate.'
-                                    )}
+                                {t('welcome.consent.label')}
                             </label>
                             {errors.consent && (
                                 <p className="text-red-600 mt-2 text-sm">

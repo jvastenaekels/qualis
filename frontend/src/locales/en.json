@@ -79,7 +79,7 @@
     "welcome": {
         "start": "Get Started",
         "consent": {
-            "label": "I confirm I am at least 18 years old. I understand my participation is voluntary and revocable, and I consent to the anonymous processing of my data for research purposes.",
+            "label": "I have read and agree to the terms above.",
             "error": "Please accept the terms to continue."
         },
         "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",

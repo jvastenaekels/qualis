@@ -55,7 +55,10 @@ describe('ConsentPage', () => {
         renderWithProviders(<ConsentPage />);
         expect(screen.getByText('Consent to Participate')).toBeInTheDocument();
         expect(screen.getByText('Consent Description')).toBeInTheDocument();
-        expect(screen.getByText('Consent Title')).toBeInTheDocument();
+        // The title "Consent Title" from config.consent.title is no longer used for the checkbox label
+        // It might be used elsewhere if we change the H1, but currently H1 is hardcoded/localized.
+        // So we expect the generic localized label instead:
+        expect(screen.getByText('welcome.consent.label')).toBeInTheDocument();
     });
 
     it('validates consent checkbox', async () => {
@@ -139,11 +142,7 @@ describe('ConsentPage', () => {
 
         // Should use defaults from i18n
         // Note: our mock i18n returns the default value if provided, or the key
-        expect(
-            screen.getByText(
-                'I have read and understood the information provided and agree to participate.'
-            )
-        ).toBeInTheDocument();
+        expect(screen.getByText('welcome.consent.label')).toBeInTheDocument();
         expect(screen.getByText('consent.default_text')).toBeInTheDocument(); // Key fallback from mock
     });
 });
