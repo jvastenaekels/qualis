@@ -549,11 +549,16 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                         key={pile}
                                         id={`deck-${pile}`}
                                         className={`
-                                            relative flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-200
+                                            relative flex-1 flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-200
                                             ${isActive ? style.activeBg : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}
                                             ${isActive ? 'shadow-sm scale-[1.02]' : ''}
                                         `}
-                                        onClick={() => setActivePile(pile as PileType)}
+                                        onClick={() => {
+                                            setActivePile(pile as PileType);
+                                            if (isMobile) {
+                                                setHasPerformedZonalFocus(true);
+                                            }
+                                        }}
                                         active={isActive}
                                         role="tab"
                                         aria-selected={isActive}

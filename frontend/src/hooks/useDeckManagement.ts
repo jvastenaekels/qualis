@@ -50,8 +50,8 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
         // Safety check for empty text
         const maxLength = Math.max(...allCards.map((card) => card.text?.length || 0));
         const estimatedLines = Math.ceil(maxLength / 50);
-        const calculatedHeight = 180 + estimatedLines * 15;
-        return Math.min(Math.max(calculatedHeight, 250), 340);
+        const calculatedHeight = 220 + estimatedLines * 20;
+        return Math.min(Math.max(calculatedHeight, 280), 420);
     }, [agreeCards, disagreeCards, neutralCards]);
 
     return {
