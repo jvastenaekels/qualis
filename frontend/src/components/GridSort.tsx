@@ -611,7 +611,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         id={`deck-area-${activePile}`}
                         className={`
                             flex-col overflow-hidden relative
-                            ${isMobile ? 'h-[180px] flex-none' : 'flex-1 min-h-0 flex'}
+                            ${isMobile ? 'h-[130px] flex-none' : 'flex-1 min-h-0 flex'}
                         `}
                     >
                         <div

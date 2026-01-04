@@ -100,7 +100,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     }
 
     return (
-        <div className="w-full bg-indigo-50/50 backdrop-blur-md border border-indigo-100 rounded-xl h-40 relative group overflow-hidden">
+        <div className="w-full bg-indigo-50/50 backdrop-blur-md border border-indigo-100 rounded-xl h-32 relative group overflow-hidden">
             <div
                 ref={scrollRef}
                 className="w-full h-full p-4 overflow-y-auto custom-scrollbar relative"
