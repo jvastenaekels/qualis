@@ -38,6 +38,38 @@ const WelcomePage: React.FC = () => {
         setStep(1);
     }, [setStep]);
 
+    // Dynamic scaling logic for animation
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [scale, setScale] = React.useState(2.0);
+
+    React.useEffect(() => {
+        const updateScale = () => {
+            if (!containerRef.current) return;
+            const { height, width } = containerRef.current.getBoundingClientRect();
+
+            // Desired height for 2.0 scale is approx 360px (margin included)
+            // Base visual height of component content at scale 1 is ~180px.
+            const targetHeight = 360;
+            const targetWidth = 320;
+
+            // Calculate max scale allowed by height
+            // We multiply by 2.0 because targetHeight assumes scale 2.0
+            const heightScale = Math.min(2.0, (height / targetHeight) * 2.0);
+            const widthScale = Math.min(2.0, (width / targetWidth) * 2.0);
+
+            // Use the smaller of constraints, but don't go below 0.5 (readability)
+            let newScale = Math.min(heightScale, widthScale);
+            newScale = Math.max(0.5, newScale);
+
+            setScale(newScale);
+        };
+
+        const observer = new ResizeObserver(updateScale);
+        if (containerRef.current) observer.observe(containerRef.current);
+
+        return () => observer.disconnect();
+    }, []);
+
     if (!config) return null;
 
     const study = config;
@@ -176,13 +208,17 @@ const WelcomePage: React.FC = () => {
                             {t('welcome.preview_title', "It's child's play!")}
                         </div>
 
-                        <div className="w-full flex-1 flex items-center justify-center relative">
+                        <div
+                            ref={containerRef}
+                            data-testid="animation-container"
+                            className="w-full flex-1 flex items-center justify-center relative"
+                        >
                             {/* Anchor Shape */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-200/50 rounded-full blur-2xl opacity-60 pointer-events-none" />
 
                             {/* Animation */}
                             <div className="transform origin-center grayscale-[0.2] contrast-125 z-10 w-full flex justify-center">
-                                <SortingAnimation />
+                                <SortingAnimation scale={scale} />
                             </div>
                         </div>
                     </div>
