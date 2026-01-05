@@ -95,7 +95,7 @@ export async function setupAdminMocks(page: Page) {
 
             const newState = new URL(url).searchParams.get('new_state');
             if (newState === 'active') study.state = 'active';
-            if (newState === 'closed') study.state = 'completed';
+            if (newState === 'closed') study.state = 'closed';
             return route.fulfill({ json: study });
         }
 
