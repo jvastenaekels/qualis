@@ -37,7 +37,9 @@ async def get_study(
     request: Request,
     slug: str = Path(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=100),
     lang: str = Query("en", pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5),
-    session_token: UUID | None = Query(None, description="Participant session token for deterministic randomization"),
+    session_token: UUID | None = Query(
+        None, description="Participant session token for deterministic randomization"
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     """Fetches study configuration for the frontend, including language resolution.
@@ -99,10 +101,8 @@ async def get_study(
     if study.randomize_statements and session_token:
         # Use session token as deterministic seed
         random_seed_str = str(session_token)
-        random.seed(random_seed_str)
-        random.shuffle(statements_data)
-        # Reset random state to avoid affecting other code
-        random.seed()
+        local_random = random.Random(random_seed_str)
+        local_random.shuffle(statements_data)
 
     return {
         "slug": study.slug,
