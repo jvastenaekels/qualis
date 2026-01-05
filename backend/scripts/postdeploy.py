@@ -49,6 +49,9 @@ def main():
     # 1. Initialize Database
     run_task("init_db.py", "Infrastructure Initialization")
 
+    # 1.5. Run Migrations
+    run_task("scripts/migrate.py", "Database Schema Migration")
+
     # 2. Sync Study Configuration
     if os.path.exists("data/example-study.json"):
         run_task(

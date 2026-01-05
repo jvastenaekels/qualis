@@ -124,6 +124,27 @@ async def migrate_participants_table():
             await conn.execute(
                 text("ALTER TABLE participants ADD COLUMN random_seed VARCHAR")
             )
+            migrations_applied = True
+
+        # created_at
+        if not await check_column_exists(conn, "participants", "created_at"):
+            logger.info("  Adding 'created_at' column...")
+            dialect = conn.dialect.name
+            if dialect == "postgresql":
+                await conn.execute(
+                    text(
+                        "ALTER TABLE participants ADD COLUMN created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL"
+                    )
+                )
+            else:
+                await conn.execute(
+                    text(
+                        "ALTER TABLE participants ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
+                    )
+                )
+            migrations_applied = True
+
+        if migrations_applied:
             await conn.commit()
             logger.info("✓ Participants table updated")
         else:

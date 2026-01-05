@@ -323,6 +323,7 @@ const StudyDesignPage = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => setIsPreviewVisible(!isPreviewVisible)}
+                        className="hidden lg:flex"
                     >
                         {isPreviewVisible ? (
                             <EyeOff className="h-4 w-4 mr-2" />
@@ -343,7 +344,7 @@ const StudyDesignPage = () => {
 
                     <Button variant="secondary" size="sm" onClick={handleTestRun} className="gap-2">
                         <Eye className="h-4 w-4" />
-                        Test Run
+                        <span className="hidden sm:inline">Test Run</span>
                     </Button>
 
                     <Button
@@ -360,7 +361,9 @@ const StudyDesignPage = () => {
                         ) : (
                             <Save className="h-4 w-4 mr-2" />
                         )}
-                        {isDirty ? 'Save Design*' : 'Save Design'}
+                        <span className="hidden sm:inline">
+                            {isDirty ? 'Save Design*' : 'Save Design'}
+                        </span>
                     </Button>
                 </div>
             </div>
@@ -375,23 +378,41 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <TabsList className="grid grid-cols-6 mb-8 w-full max-w-4xl mx-auto shadow-sm">
-                            <TabsTrigger value="intro" className="gap-2">
+                        <TabsList className="flex flex-nowrap overflow-x-auto w-full max-w-4xl mx-auto shadow-sm mb-8 scrollbar-hide snap-x">
+                            <TabsTrigger
+                                value="intro"
+                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                            >
                                 👋 Welcome
                             </TabsTrigger>
-                            <TabsTrigger value="pre-sort" className="gap-2">
+                            <TabsTrigger
+                                value="pre-sort"
+                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                            >
                                 📋 Questionnaire
                             </TabsTrigger>
-                            <TabsTrigger value="q-sort" className="gap-2">
+                            <TabsTrigger
+                                value="q-sort"
+                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                            >
                                 🃏 Q-Sort Task
                             </TabsTrigger>
-                            <TabsTrigger value="post-sort" className="gap-2">
+                            <TabsTrigger
+                                value="post-sort"
+                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                            >
                                 📝 Post-Interview
                             </TabsTrigger>
-                            <TabsTrigger value="interface" className="gap-2">
+                            <TabsTrigger
+                                value="interface"
+                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                            >
                                 🎨 Interface
                             </TabsTrigger>
-                            <TabsTrigger value="branding" className="gap-2">
+                            <TabsTrigger
+                                value="branding"
+                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                            >
                                 <Palette className="h-4 w-4" /> Theme
                             </TabsTrigger>
                         </TabsList>
@@ -453,7 +474,7 @@ const StudyDesignPage = () => {
                 {isPreviewVisible && (
                     <div
                         className={cn(
-                            'border-l bg-muted/10 flex flex-col shrink-0 transition-[width] duration-300 ease-in-out',
+                            'border-l bg-muted/10 flex-col shrink-0 transition-[width] duration-300 ease-in-out hidden lg:flex',
                             viewMode === 'mobile' ? 'w-[450px]' : 'w-[50vw]'
                         )}
                     >
