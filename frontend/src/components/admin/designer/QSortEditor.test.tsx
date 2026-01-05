@@ -148,8 +148,13 @@ describe('QSortEditor', () => {
         );
 
         // Find delete button for the first statement
-        const statementItem = screen.getByText('Existing Statement').closest('div');
-        const deleteButton = within(statementItem!).getByRole('button');
+        // We find the container by the 'group' class which wraps the statement item
+        const statementItem = screen.getByText('Existing Statement').closest('.group');
+        expect(statementItem).toBeInTheDocument();
+
+        // There are two buttons: the text itself (for edit) and the delete button
+        // We want the delete button (the second one)
+        const deleteButton = within(statementItem!).getAllByRole('button')[1];
         fireEvent.click(deleteButton);
 
         expect(mockUpdateDraft).toHaveBeenCalled();

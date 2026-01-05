@@ -81,3 +81,10 @@ verify_invitation
 register_user
 list_workspaces
 create_workspace
+branding
+ui_labels
+consent_title
+consent_description
+consent_accept
+consent_decline
+random_seed
