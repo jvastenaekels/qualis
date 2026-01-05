@@ -61,7 +61,7 @@ test.describe('Admin Flow (Zero to Hero) [Refactored]', () => {
         await adminPage.exportCSV();
 
         // 7. CLOSE
-        await adminPage.closeStudy('Zero Hero Study');
+        await adminPage.closeStudy('zero-hero');
 
         // 8. LOGOUT
         await adminPage.logout();
