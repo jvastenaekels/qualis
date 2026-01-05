@@ -181,7 +181,7 @@ class StudyService:
                         score = int(item["score"])
                         capacity = int(item["capacity"])
                         target_dist[score] = capacity
-                    except (ValueError, TypeError) as e:
+                    except (ValueError, TypeError):
                         # Log but continue - malformed grid config item
                         continue
         elif isinstance(study.grid_config, dict):
@@ -314,7 +314,7 @@ class StudyService:
                 )
                 db.add(participant)
                 await db.flush()
-            except IntegrityError as e:
+            except IntegrityError:
                 # Race condition: Participant was created by another request in the meantime.
                 # Rollback the failed insert and fetch the existing participant.
                 await db.rollback()
