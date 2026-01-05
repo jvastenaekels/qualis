@@ -65,7 +65,9 @@ export const useSubmitStudy = () => {
 
                 if (status === 'completed') {
                     setIsSuccess(true);
-                    setConfirmationCode((data as { confirmation_code: string }).confirmation_code);
+                    const code = (data as { confirmation_code: string }).confirmation_code;
+                    setConfirmationCode(code);
+                    session.completeSession(code);
                 }
             } catch (err: unknown) {
                 console.error(err);
