@@ -272,8 +272,8 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         }, [autoFitEnabled, performAutoFit]);
 
         const renderDeckCards = useCallback(() => {
-            // Mobile: Fixed 3/4 ratio. Desktop: 1.5 ratio (or whatever grid requires, usually landscape)
-            const mobileRatio = 3 / 4;
+            // Mobile: Landscape 1.5 ratio. Desktop: 1.5 ratio (or whatever grid requires, usually landscape)
+            const mobileRatio = 1.5;
             const gridRatio =
                 cardDimensions && cardDimensions.height > 0
                     ? cardDimensions.width / cardDimensions.height
@@ -283,9 +283,9 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 activeCards.map((card) => (
                     <div
                         key={card.id}
-                        // Mobile: fixed height 140px, 3/4 ratio.
+                        // Mobile: fixed height 100px, landscape 1.5 ratio.
                         // Desktop: w-full (fills grid col), aspect ratio matches grid slots.
-                        className={`flex-none ${isMobile ? 'h-[140px]' : 'h-full w-[130px] sm:w-[140px]'} lg:w-full lg:flex-none`}
+                        className={`flex-none ${isMobile ? 'h-[100px]' : 'h-full w-[130px] sm:w-[140px]'} lg:w-full lg:flex-none`}
                         style={{ aspectRatio: isMobile ? mobileRatio : gridRatio }}
                     >
                         <SortableCard
@@ -301,12 +301,12 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     </div>
                 ))
             ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-8 lg:col-span-2 lg:h-full lg:place-self-center">
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="p-4 bg-green-50 rounded-full border border-green-100 shadow-sm animate-in zoom-in duration-300">
-                            <Check size={32} className="text-green-500" strokeWidth={3} />
+                <div className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-4 lg:col-span-2 lg:h-full lg:place-self-center">
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="p-2 bg-green-50 rounded-full border border-green-100 shadow-sm animate-in zoom-in duration-300">
+                            <Check size={20} className="text-green-500" strokeWidth={2.5} />
                         </div>
-                        <span className="text-sm font-bold text-slate-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
+                        <span className="text-xs font-bold text-slate-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
                             {t('fine.deck.all_placed')}
                         </span>
                     </div>
@@ -514,7 +514,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         `}
                     style={{
                         height: isMobile ? 'auto' : '100%',
-                        maxHeight: isMobile ? 'none' : 'none', // Removed 33vh restriction
+                        maxHeight: isMobile ? '45dvh' : 'none',
                     }}
                 >
                     {/* Reading Zone - Desktop Sidebar version */}
@@ -611,7 +611,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         id={`deck-area-${activePile}`}
                         className={`
                             flex-col overflow-hidden relative
-                            ${isMobile ? 'h-[180px] flex-none' : 'flex-1 min-h-0 flex'}
+                            ${isMobile ? 'h-[130px] flex-none' : 'flex-1 min-h-0 max-h-[280px] flex'}
                         `}
                     >
                         <div
@@ -628,7 +628,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         </div>
                     </DroppableDeckArea>
                     {/* PANEL FOOTER: Guidance or Validation */}
-                    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[80px] flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
+                    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] h-[110px] flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
                         {isAllPlaced ? (
                             <button
                                 type="button"

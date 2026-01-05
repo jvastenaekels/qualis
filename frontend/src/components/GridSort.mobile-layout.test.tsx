@@ -88,7 +88,7 @@ describe('GridSort Mobile Layout Refinements', () => {
         // Removed specific h-20 check as it might be component internal
     });
 
-    it('forces portrait aspect ratio (0.75) for cards in mobile deck', () => {
+    it('forces landscape aspect ratio (1.5) for cards in mobile deck', () => {
         render(
             <DndContext>
                 <GridSort {...defaultProps} />
@@ -96,7 +96,7 @@ describe('GridSort Mobile Layout Refinements', () => {
         );
 
         const card = screen.getByTestId('mock-card');
-        expect(card.getAttribute('data-aspect')).toBe('0.75');
+        expect(card.getAttribute('data-aspect')).toBe('1.5');
     });
 
     it('disables vertical scroll in mobile deck cards-container and sets fixed height', () => {
@@ -120,9 +120,9 @@ describe('GridSort Mobile Layout Refinements', () => {
         // Find the specific instruction text
         const instruction = screen.getByText('fine.workbench.initial_instruction');
 
-        // Traverse up to find the footer container (which we know has min-h-[80px])
+        // Traverse up to find the footer container (which we know has h-[110px])
         // We use closest() with the class we added in the implementation
-        const footer = instruction.closest('.min-h-\\[80px\\]');
+        const footer = instruction.closest('.h-\\[110px\\]');
 
         expect(footer).toBeInTheDocument();
         expect(footer?.className).toContain('flex-none');
