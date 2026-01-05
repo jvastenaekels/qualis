@@ -88,3 +88,5 @@ consent_description
 consent_accept
 consent_decline
 random_seed
+logo_url
+accent_color
