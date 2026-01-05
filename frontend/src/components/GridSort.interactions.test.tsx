@@ -22,7 +22,12 @@ vi.mock('./SortableCard', () => ({
         onClick,
         onAction,
         id,
-    }: { text: string; onClick?: () => void; onAction?: (id: number) => void; id: number }) => (
+    }: {
+        text: string;
+        onClick?: () => void;
+        onAction?: (id: number) => void;
+        id: number;
+    }) => (
         <button
             type="button"
             data-testid={`card-${id}`}
