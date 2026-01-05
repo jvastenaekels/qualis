@@ -55,6 +55,12 @@ export class AdminPage extends BasePage {
     }
 
     async exportCSV() {
+        // Navigate to Analytics/Exports
+        await this.page.getByRole('link', { name: /explore analytics/i }).first().click();
+
+        // Switch to File downloads tab
+        await this.page.getByRole('tab', { name: /file downloads/i }).click();
+
         const csvBtn = this.page.getByRole('button', { name: /export universal csv/i });
         const downloadPromise = this.page.waitForEvent('download');
         await csvBtn.click();
