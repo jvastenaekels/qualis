@@ -21,8 +21,13 @@ import SortingAnimation from '../components/SortingAnimation';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { cn } from '@/lib/utils';
 
-const WelcomePage: React.FC = () => {
+interface WelcomePageProps {
+    highlightKey?: string | null;
+}
+
+const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     const { slug } = useParams();
     const navigate = useNavigate();
     const { t } = useTranslation();
@@ -256,16 +261,19 @@ const WelcomePage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Continue Button */}
             <div className="flex justify-center">
                 <button
                     type="button"
                     data-testid="start-btn"
                     onClick={handleContinue}
                     style={{ backgroundColor: 'var(--brand-accent)' }}
-                    className="group w-full sm:w-auto px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3"
+                    className={cn(
+                        'group w-full sm:w-auto px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3',
+                        highlightKey === 'welcome.start' &&
+                            'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                    )}
                 >
-                    {t('common.continue', 'Continue')}
+                    {t('welcome.start', 'Get Started')}
                     <ArrowRight
                         size={20}
                         className="group-hover:translate-x-1 transition-transform"

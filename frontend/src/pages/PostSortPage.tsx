@@ -18,9 +18,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { PreSortField } from '../schemas/study';
+import { cn } from '@/lib/utils';
 import { SurveyField } from '../components/survey/SurveyField';
 
-const PostSortPage: React.FC = () => {
+interface PostSortPageProps {
+    highlightKey?: string | null;
+}
+
+const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey }) => {
     const config = useConfigStore((state) => state.config);
     const session = useSessionStore((state) => ({
         isCompleted: state.isCompleted,
@@ -638,11 +643,11 @@ const PostSortPage: React.FC = () => {
                         onClick={handleSubmit}
                         disabled={isLoading}
                         style={{ backgroundColor: 'var(--brand-accent)' }}
-                        className="
-                            text-white px-8 py-4 rounded-2xl font-black text-lg shadow-lg
-                            hover:brightness-110 hover:scale-[1.02] active:scale-95 transition-all duration-300
-                            flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed
-                        "
+                        className={cn(
+                            'group w-full sm:w-auto px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed',
+                            highlightKey === 'post.submit' &&
+                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                        )}
                     >
                         {isLoading ? (
                             <Loader2 className="w-6 h-6 animate-spin" />

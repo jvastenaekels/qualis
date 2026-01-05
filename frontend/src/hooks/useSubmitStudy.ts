@@ -31,7 +31,11 @@ export const useSubmitStudy = () => {
 
             try {
                 if (!config) throw new Error('Study config is missing');
-                if (!session.token) throw new Error('No session token');
+
+                const searchParams = new URLSearchParams(window.location.search);
+                const isTestMode = searchParams.get('mode') === 'test';
+
+                if (!isTestMode && !session.token) throw new Error('No session token');
 
                 const qsortPayload = responses.qsort.map(
                     (item: { statementId: number; col: number; row: number }) => {
@@ -60,9 +64,6 @@ export const useSubmitStudy = () => {
                         ...responses.postsort,
                     },
                 };
-
-                const searchParams = new URLSearchParams(window.location.search);
-                const isTestMode = searchParams.get('mode') === 'test';
 
                 if (isTestMode) {
                     console.log('PILOT SUBMISSION (Simulated):', payload);

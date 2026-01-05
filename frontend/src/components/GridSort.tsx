@@ -18,6 +18,7 @@ import type { InteractionUtils } from '../types/grid';
 import DroppableSlot from './DroppableSlot';
 import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
+import { cn } from '@/lib/utils';
 
 // Sub-component: Droppable Pile
 const DroppablePile: React.FC<
@@ -82,6 +83,7 @@ interface GridSortProps {
     isAllPlaced?: boolean;
     onValidate?: () => void;
     showCodes?: boolean;
+    highlightKey?: string | null;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -104,6 +106,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         isAllPlaced = false,
         onValidate,
         showCodes,
+        highlightKey,
     }) => {
         const { t } = useTranslation();
 
@@ -475,18 +478,33 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                     <>
                                                         <span
                                                             data-testid="legend-disagree"
-                                                            className={`text-red-600 flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis ${fs}`}
+                                                            className={cn(
+                                                                `text-red-600 flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis ${fs}`,
+                                                                highlightKey ===
+                                                                    'fine.legend.disagree' &&
+                                                                    'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative rounded px-1 shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                                                            )}
                                                         >
                                                             {l1}
                                                         </span>
                                                         <span
-                                                            className={`text-slate-400 flex-1 text-center whitespace-nowrap overflow-hidden text-ellipsis ${fs}`}
+                                                            className={cn(
+                                                                `text-slate-400 flex-1 text-center whitespace-nowrap overflow-hidden text-ellipsis ${fs}`,
+                                                                highlightKey ===
+                                                                    'fine.legend.neutral' &&
+                                                                    'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative rounded px-1 shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                                                            )}
                                                         >
                                                             {l2}
                                                         </span>
                                                         <span
                                                             data-testid="legend-agree"
-                                                            className={`text-green-600 flex-1 text-right whitespace-nowrap overflow-hidden text-ellipsis ${fs}`}
+                                                            className={cn(
+                                                                `text-green-600 flex-1 text-right whitespace-nowrap overflow-hidden text-ellipsis ${fs}`,
+                                                                highlightKey ===
+                                                                    'fine.legend.agree' &&
+                                                                    'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative rounded px-1 shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                                                            )}
                                                         >
                                                             {l3}
                                                         </span>
@@ -634,7 +652,12 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             <button
                                 type="button"
                                 onClick={onValidate}
-                                className="w-full flex items-center justify-center gap-2 py-3 bg-green-600 text-white rounded-xl font-bold text-sm shadow-md hover:bg-green-700 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500"
+                                style={{ backgroundColor: 'var(--brand-accent)' }}
+                                className={cn(
+                                    'w-full flex items-center justify-center gap-2 py-4 text-white rounded-full font-bold text-base shadow-lg hover:brightness-110 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500',
+                                    highlightKey === 'fine.actions.validate' &&
+                                        'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                                )}
                             >
                                 {t('fine.actions.validate')} <Check size={18} strokeWidth={3} />
                             </button>

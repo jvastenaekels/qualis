@@ -59,15 +59,15 @@ describe('InterfaceEditor', () => {
     it('renders sorting terminology configuration', () => {
         render(<InterfaceEditor />);
 
-        expect(screen.getByText('Positive pole (right)')).toBeInTheDocument();
-        expect(screen.getByText('Negative pole (left)')).toBeInTheDocument();
-        expect(screen.getByText('Neutral / middle')).toBeInTheDocument();
+        expect(screen.getByText('Most Agree')).toBeInTheDocument();
+        expect(screen.getByText('Most Disagree')).toBeInTheDocument();
+        expect(screen.getAllByText('Neutral').length).toBeGreaterThanOrEqual(1);
     });
 
     it('updates labels via updateTranslation', () => {
         render(<InterfaceEditor />);
 
-        const nextButtonInput = screen.getByPlaceholderText('Default: Next step');
+        const nextButtonInput = screen.getByPlaceholderText('Next step');
         fireEvent.change(nextButtonInput, { target: { value: 'Forward' } });
 
         expect(mockUpdateTranslation).toHaveBeenCalledWith('en', expect.any(Function));

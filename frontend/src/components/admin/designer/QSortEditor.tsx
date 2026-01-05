@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import {
     Plus,
     Minus,
@@ -315,6 +316,62 @@ const QSortEditor = () => {
                             );
                         })}
                     </div>
+
+                    {/* Research Settings */}
+                    <Card className="shadow-sm mt-8">
+                        <CardHeader>
+                            <CardTitle className="text-base font-bold">Research settings</CardTitle>
+                            <CardDescription>
+                                Configure how statements are presented to participants
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex items-center justify-between py-2">
+                                <div className="space-y-1">
+                                    <Label
+                                        htmlFor="randomize-statements"
+                                        className="text-sm font-medium"
+                                    >
+                                        Randomize statement order
+                                    </Label>
+                                    <p className="text-xs text-muted-foreground max-w-md">
+                                        Present statements in random order for each participant to
+                                        prevent order effects.
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="randomize-statements"
+                                    checked={draft.randomize_statements ?? false}
+                                    onCheckedChange={(checked: boolean) => {
+                                        updateDraft((d) => {
+                                            d.randomize_statements = checked;
+                                        });
+                                    }}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between py-2 border-t">
+                                <div className="space-y-1">
+                                    <Label htmlFor="show-codes" className="text-sm font-medium">
+                                        Show statement codes
+                                    </Label>
+                                    <p className="text-xs text-muted-foreground max-w-md">
+                                        Display statement codes (e.g., "S1", "S2") alongside the
+                                        text.
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="show-codes"
+                                    checked={draft.show_statement_codes ?? false}
+                                    onCheckedChange={(checked: boolean) => {
+                                        updateDraft((d) => {
+                                            d.show_statement_codes = checked;
+                                        });
+                                    }}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
 
                 <TabsContent value="grid" className="space-y-6 pt-4">
@@ -443,62 +500,6 @@ const QSortEditor = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Research Settings */}
-                    <Card className="shadow-sm mt-8">
-                        <CardHeader>
-                            <CardTitle className="text-base">Research settings</CardTitle>
-                            <CardDescription>
-                                Configure how statements are presented to participants
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center justify-between py-2">
-                                <div className="space-y-1">
-                                    <Label
-                                        htmlFor="randomize-statements"
-                                        className="text-sm font-medium"
-                                    >
-                                        Randomize statement order
-                                    </Label>
-                                    <p className="text-xs text-muted-foreground max-w-md">
-                                        Present statements in random order for each participant to
-                                        prevent order effects.
-                                    </p>
-                                </div>
-                                <Switch
-                                    id="randomize-statements"
-                                    checked={draft.randomize_statements ?? false}
-                                    onCheckedChange={(checked: boolean) => {
-                                        updateDraft((d) => {
-                                            d.randomize_statements = checked;
-                                        });
-                                    }}
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between py-2 border-t">
-                                <div className="space-y-1">
-                                    <Label htmlFor="show-codes" className="text-sm font-medium">
-                                        Show statement codes
-                                    </Label>
-                                    <p className="text-xs text-muted-foreground max-w-md">
-                                        Display statement codes (e.g., "S1", "S2") alongside the
-                                        text.
-                                    </p>
-                                </div>
-                                <Switch
-                                    id="show-codes"
-                                    checked={draft.show_statement_codes ?? false}
-                                    onCheckedChange={(checked: boolean) => {
-                                        updateDraft((d) => {
-                                            d.show_statement_codes = checked;
-                                        });
-                                    }}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
                 </TabsContent>
             </Tabs>
         </div>

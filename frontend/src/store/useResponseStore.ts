@@ -63,6 +63,19 @@ const triggerAutoSave = () => {
     }, 800);
 };
 
+const isPilot = () => {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('mode') === 'test') {
+            sessionStorage.setItem('open-q-pilot-mode', 'true');
+            return true;
+        }
+        return sessionStorage.getItem('open-q-pilot-mode') === 'true';
+    } catch {
+        return false;
+    }
+};
+
 export const useResponseStore = create<Responses & ResponseActions>()(
     persist(
         (set, get) => ({
@@ -219,7 +232,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             resetResponses: () => set(initialResponses),
         }),
         {
-            name: 'open-q-responses',
+            name: isPilot() ? 'open-q-pilot-responses' : 'open-q-responses',
             version: 1,
         }
     )

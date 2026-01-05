@@ -45,7 +45,14 @@ const StudyLayoutContent: React.FC = () => {
     const config = useConfigStore((state) => state.config);
     const configLoading = useConfigStore((state) => state.isLoading);
     const configError = useConfigStore((state) => state.error);
-    const session = useSessionStore();
+
+    // session selectors
+    const maxReachedStep = useSessionStore((state) => state.maxReachedStep);
+    const currentStep = useSessionStore((state) => state.currentStep);
+    const isCompleted = useSessionStore((state) => state.isCompleted);
+    const hasConsented = useSessionStore((state) => state.hasConsented);
+    const sessionLanguage = useSessionStore((state) => state.language);
+    const isPilotMode = useSessionStore((state) => state.isPilotMode);
 
     const location = useLocation();
     const { headerAction } = useLayoutState();
@@ -55,7 +62,7 @@ const StudyLayoutContent: React.FC = () => {
     const stepMenuRef = useRef<HTMLDivElement>(null);
 
     const handleStepClick = (stepId: number) => {
-        if (stepId > session.maxReachedStep) return;
+        if (stepId > maxReachedStep) return;
 
         const routes: Record<number, string> = {
             1: 'welcome',
@@ -67,7 +74,7 @@ const StudyLayoutContent: React.FC = () => {
 
         const route = routes[stepId];
         if (route) {
-            navigate(`/study/${slug}/${route}`);
+            navigate(`/study/${slug}/${route}${location.search}`);
         }
     };
 
@@ -92,10 +99,10 @@ const StudyLayoutContent: React.FC = () => {
 
     // Sync i18n with Store (Persistence Source of Truth) - Atomic update with config
     useEffect(() => {
-        if (session.language && session.language !== i18n.language && !configLoading) {
-            i18n.changeLanguage(session.language);
+        if (sessionLanguage && sessionLanguage !== i18n.language && !configLoading) {
+            i18n.changeLanguage(sessionLanguage);
         }
-    }, [session.language, configLoading]);
+    }, [sessionLanguage, configLoading]);
 
     const changeLanguage = (lng: string) => {
         // Sync store (this will trigger config refetch)
@@ -151,7 +158,13 @@ const StudyLayoutContent: React.FC = () => {
     }
 
     // Study State Check (Draft, Paused, Closed)
-    if (config?.state && config.state !== 'active') {
+    // Pilot mode allows viewing regardless of study state
+    const isPilotModePersistent =
+        isPilotMode ||
+        new URLSearchParams(location.search).get('mode') === 'test' ||
+        sessionStorage.getItem('open-q-pilot-mode') === 'true';
+
+    if (!isPilotModePersistent && config?.state && config.state !== 'active') {
         return <StudyStatusPage type={config.state as StudyStatusType} onRetry={retry} />;
     }
 
@@ -159,8 +172,8 @@ const StudyLayoutContent: React.FC = () => {
     const isProtected = ['presort', 'sort', 'review'].some((path) =>
         location.pathname.includes(path)
     );
-    if (isProtected && !session.hasConsented) {
-        return <Navigate to={`/study/${slug}/welcome`} replace />;
+    if (isProtected && !hasConsented) {
+        return <Navigate to={`/study/${slug}/welcome${location.search}`} replace />;
     }
 
     // Redirect study base URL to current/welcome step
@@ -175,21 +188,20 @@ const StudyLayoutContent: React.FC = () => {
             4: 'fine-sort',
             5: 'post-sort',
         };
-        const target = stepRoutes[session.currentStep] || 'welcome';
-        return <Navigate to={`/study/${slug}/${target}`} replace />;
+        const target = stepRoutes[currentStep] || 'welcome';
+        return <Navigate to={`/study/${slug}/${target}${location.search}`} replace />;
     }
 
     // Enforce One-Time Submission
     // If completed, redirect everything to post-sort (Thank You page)
-    if (session.isCompleted && !location.pathname.includes('post-sort')) {
-        return <Navigate to={`/study/${slug}/post-sort`} replace />;
+    if (isCompleted && !location.pathname.includes('post-sort')) {
+        return <Navigate to={`/study/${slug}/post-sort${location.search}`} replace />;
     }
 
     // Determine if we should show the mobile footer (only if headerAction exists)
     // This effectively acts as the bottom bar for mobile when an action is present
     const showMobileFooter = !!headerAction;
 
-    const isTestMode = new URLSearchParams(location.search).get('mode') === 'test';
     const branding = config?.branding;
     const accentColor = branding?.accent_color || '#2563eb'; // Default to blue-600
 
@@ -199,7 +211,7 @@ const StudyLayoutContent: React.FC = () => {
             style={{ '--brand-accent': accentColor } as React.CSSProperties}
         >
             {/* Pilot Mode Banner */}
-            {isTestMode && (
+            {isPilotModePersistent && (
                 <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex items-center justify-center gap-2 text-amber-900 text-[11px] font-bold uppercase tracking-wider relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
                     <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                     Pilot Mode: Changes are temporary & data will not be saved
@@ -221,7 +233,7 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="md:hidden absolute top-0 left-0 w-full h-1 bg-slate-100">
                     <div
                         className="h-full bg-[var(--brand-accent)] transition-all duration-300 ease-in-out"
-                        style={{ width: `${(session.currentStep / steps.length) * 100}%` }}
+                        style={{ width: `${(currentStep / steps.length) * 100}%` }}
                     />
                 </div>
 
@@ -235,7 +247,7 @@ const StudyLayoutContent: React.FC = () => {
                                 alt={config?.title || 'Study Logo'}
                                 className="h-8 w-auto object-contain"
                             />
-                        ) : session.currentStep === 1 ? (
+                        ) : currentStep === 1 ? (
                             <img
                                 src="/open-q-logo.svg"
                                 alt="Open-Q"
@@ -260,7 +272,7 @@ const StudyLayoutContent: React.FC = () => {
                                 ${!isStepMenuOpen ? 'text-slate-500 bg-slate-100 hover:bg-slate-200' : 'shadow-md scale-105'}
                             `}
                         >
-                            {t('layout.mobile_step')} {session.currentStep}/{steps.length}
+                            {t('layout.mobile_step')} {currentStep}/{steps.length}
                             <ChevronDown
                                 size={12}
                                 className={`transition-transform duration-200 ${isStepMenuOpen ? 'rotate-180' : ''}`}
@@ -274,8 +286,8 @@ const StudyLayoutContent: React.FC = () => {
                                     {t('layout.navigation')}
                                 </div>
                                 {steps.map((step) => {
-                                    const isReached = step.id <= session.maxReachedStep;
-                                    const isCurrent = step.id === session.currentStep;
+                                    const isReached = step.id <= maxReachedStep;
+                                    const isCurrent = step.id === currentStep;
 
                                     return (
                                         <button
@@ -308,14 +320,12 @@ const StudyLayoutContent: React.FC = () => {
                                             <span className="text-sm">
                                                 {step.id}. {t(step.labelKey)}
                                             </span>
-                                            {isReached &&
-                                                !isCurrent &&
-                                                session.currentStep > step.id && (
-                                                    <Check
-                                                        size={14}
-                                                        style={{ color: 'var(--brand-accent)' }}
-                                                    />
-                                                )}
+                                            {isReached && !isCurrent && currentStep > step.id && (
+                                                <Check
+                                                    size={14}
+                                                    style={{ color: 'var(--brand-accent)' }}
+                                                />
+                                            )}
                                         </button>
                                     );
                                 })}
@@ -329,13 +339,13 @@ const StudyLayoutContent: React.FC = () => {
                     <div className="flex items-center gap-1">
                         {steps.map((step, index) => {
                             const status =
-                                session.currentStep === step.id
+                                currentStep === step.id
                                     ? 'current'
-                                    : session.currentStep > step.id
+                                    : currentStep > step.id
                                       ? 'completed'
                                       : 'upcoming';
 
-                            const isReachable = step.id <= session.maxReachedStep;
+                            const isReachable = step.id <= maxReachedStep;
 
                             return (
                                 <div key={step.id} className="flex items-center">

@@ -16,8 +16,13 @@ import { SurveyField } from '../components/survey/SurveyField';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { cn } from '@/lib/utils';
 
-const PreSortPage: React.FC = () => {
+interface PreSortPageProps {
+    highlightKey?: string | null;
+}
+
+const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
     const { slug } = useParams();
     const navigate = useNavigate();
 
@@ -173,10 +178,14 @@ const PreSortPage: React.FC = () => {
                                 !isValid) ||
                             false
                         }
-                        className="w-full sm:w-auto px-6 py-2 text-white rounded-md font-bold text-sm hover:brightness-110 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        className={cn(
+                            'group w-full sm:w-auto px-8 py-3 text-white rounded-full font-bold text-base hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',
+                            highlightKey === 'common.next' &&
+                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[10] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                        )}
                         style={{ backgroundColor: 'var(--brand-accent)' }}
                     >
-                        {t('presort.submit')} <ArrowRight size={16} />
+                        {t('common.next', t('presort.submit'))} <ArrowRight size={16} />
                     </button>
                 </div>
             </form>

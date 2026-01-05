@@ -76,7 +76,7 @@ describe('WelcomePage', () => {
             { initialEntries: ['/study/test-study/welcome'] }
         );
 
-        const button = screen.getByRole('button', { name: /Continue/i });
+        const button = screen.getByRole('button', { name: /Get Started/i });
         expect(button).toBeInTheDocument();
 
         fireEvent.click(button);

@@ -47,7 +47,11 @@ import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
 import type { InteractionUtils } from '../types/grid';
 
-const FineSortPage: React.FC = () => {
+interface FineSortPageProps {
+    highlightKey?: string | null;
+}
+
+const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
     // 1. Hooks (Store / Router) - Top Level
     const config = useConfigStore((state) => state.config);
     const rough = useResponseStore((state) => state.rough);
@@ -383,6 +387,7 @@ const FineSortPage: React.FC = () => {
                         isAllPlaced={isAllPlaced}
                         onValidate={handleValidate}
                         showCodes={showCodes}
+                        highlightKey={highlightKey}
                     />
                 </SortableContext>
             </div>

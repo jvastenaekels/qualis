@@ -17,7 +17,13 @@ import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
 
-const RoughSortPage: React.FC = () => {
+import { cn } from '@/lib/utils';
+
+interface RoughSortPageProps {
+    highlightKey?: string | null;
+}
+
+const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     const { slug } = useParams();
     const navigate = useNavigate();
 
@@ -200,7 +206,7 @@ const RoughSortPage: React.FC = () => {
                         type="button"
                         onClick={() => navigate(`/study/${slug}/fine-sort`)}
                         style={{ backgroundColor: 'var(--brand-accent)' }}
-                        className="px-8 py-3 text-white rounded-md font-bold text-base hover:brightness-110 shadow-md flex items-center justify-center gap-2 animate-pulse hover:animate-none transition-all w-full sm:w-auto"
+                        className="px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 animate-pulse hover:animate-none w-full sm:w-auto"
                     >
                         {t('common.next')} <ArrowRight size={18} />
                     </button>
@@ -290,7 +296,11 @@ const RoughSortPage: React.FC = () => {
                         style={{ scale: scaleDisagree, opacity: opacityDisagree }}
                         onClick={() => handleVote('disagree')}
                         data-testid="rough-disagree-btn"
-                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-1"
+                        className={cn(
+                            'z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-1',
+                            highlightKey === 'common.disagree' &&
+                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                        )}
                         aria-label={t('common.disagree')}
                         aria-keyshortcuts="ArrowLeft"
                     >
@@ -351,7 +361,11 @@ const RoughSortPage: React.FC = () => {
                         style={{ scale: scaleAgree, opacity: opacityAgree }}
                         onClick={() => handleVote('agree')}
                         data-testid="rough-agree-btn"
-                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-1"
+                        className={cn(
+                            'z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-1',
+                            highlightKey === 'common.agree' &&
+                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                        )}
                         aria-label={t('common.agree')}
                         aria-keyshortcuts="ArrowRight"
                     >
@@ -377,7 +391,11 @@ const RoughSortPage: React.FC = () => {
                         style={{ scale: scaleNeutral, opacity: opacityNeutral }}
                         onClick={() => handleVote('neutral')}
                         data-testid="rough-neutral-btn"
-                        className="w-auto min-w-[160px] max-w-[240px] px-8 sm:max-w-none sm:w-[18.2rem] h-16 sm:h-[5.6rem] rounded-2xl bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
+                        className={cn(
+                            'w-auto min-w-[160px] max-w-[240px] px-8 sm:max-w-none sm:w-[18.2rem] h-16 sm:h-[5.6rem] rounded-2xl bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors',
+                            highlightKey === 'common.neutral' &&
+                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                        )}
                         aria-label={t('common.neutral')}
                         aria-keyshortcuts="ArrowDown"
                     >

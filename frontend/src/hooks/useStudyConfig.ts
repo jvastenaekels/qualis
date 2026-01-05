@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { ZodError } from 'zod';
 import { ApiError } from '../api/client';
 import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
 import { useGetStudyConfig } from './useGetStudyConfig';
@@ -18,12 +19,15 @@ export const useStudyConfig = () => {
     const resetConfig = useConfigStore((state) => state.resetConfig);
 
     // Session Store
-    const session = useSessionStore();
+    const isPilotMode = useSessionStore((state) => state.isPilotMode);
+    const setPilotMode = useSessionStore((state) => state.setPilotMode);
+    const sessionLanguage = useSessionStore((state) => state.language);
     const setLanguage = useSessionStore((state) => state.setLanguage);
     const resetSession = useSessionStore((state) => state.resetSession);
+    const resetResponses = useResponseStore((state) => state.resetResponses);
 
     // Determine language to request
-    const langToRequest = session.language ?? window.navigator.language.substring(0, 2);
+    const langToRequest = sessionLanguage ?? window.navigator.language.substring(0, 2);
 
     // --- Query Hook ---
     const searchParams = new URLSearchParams(window.location.search);
@@ -32,13 +36,29 @@ export const useStudyConfig = () => {
     const { data, isLoading, error, refetch } = useGetStudyConfig(
         slug,
         langToRequest,
-        // Disable query if we're in test mode and have local data
-        { enabled: !!slug && !isTestMode }
+        // Disable query if we're in pilot mode (using local draft)
+        { enabled: !!slug && !isPilotMode && !isTestMode }
     );
 
     // --- Effect: Handle Test Mode Loading ---
     useEffect(() => {
+        if (slug && isTestMode && !isPilotMode) {
+            // Set flag for storage isolation in this tab
+            sessionStorage.setItem('open-q-pilot-mode', 'true');
+            setPilotMode(true);
+        }
+    }, [isTestMode, slug, isPilotMode, setPilotMode]);
+
+    // --- Effect: Handle Test Mode Loading (Config) ---
+    useEffect(() => {
         if (isTestMode && slug) {
+            // Check if we need a fresh start (set by StudyDesignPage)
+            if (localStorage.getItem(`open-q-pilot-reset-${slug}`)) {
+                resetSession();
+                resetResponses();
+                localStorage.removeItem(`open-q-pilot-reset-${slug}`);
+            }
+
             const draftKey = `open-q-test-config-${slug}`;
             const draftJson = localStorage.getItem(draftKey);
             if (draftJson) {
@@ -49,8 +69,8 @@ export const useStudyConfig = () => {
                         applyStudyOverrides(draft.language || 'en', draft.ui_labels);
                     }
                     if (
-                        !session.language ||
-                        (draft.language && session.language !== draft.language)
+                        !sessionLanguage ||
+                        (draft.language && sessionLanguage !== draft.language)
                     ) {
                         setLanguage(draft.language || 'en');
                     }
@@ -71,9 +91,11 @@ export const useStudyConfig = () => {
         slug,
         setConfig,
         setLanguage,
-        session.language,
+        sessionLanguage,
         setConfigError,
         setConfigLoading,
+        resetSession,
+        resetResponses,
     ]);
 
     // --- Effect: Handle Stale Data (Reset on Slug Change) ---
@@ -100,13 +122,13 @@ export const useStudyConfig = () => {
                 applyStudyOverrides(data.language || 'en', data.ui_labels);
             }
 
-            if (!session.language || (data.language && session.language !== data.language)) {
+            if (!sessionLanguage || (data.language && sessionLanguage !== data.language)) {
                 setLanguage(data.language || 'en');
             }
             // Clear error on success
             setConfigError(null);
         }
-    }, [data, setConfig, setLanguage, session.language, setConfigError, isTestMode]);
+    }, [data, setConfig, setLanguage, sessionLanguage, setConfigError, isTestMode]);
 
     // --- Effect: Sync Error ---
     useEffect(() => {

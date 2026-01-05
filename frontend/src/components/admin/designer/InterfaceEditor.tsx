@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { RefreshCcw, MousePointerClick, ArrowRight, Check } from 'lucide-react';
+import { RefreshCcw, MousePointerClick, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const InterfaceEditor = () => {
-    const { draft, activeLocale, updateTranslation } = useStudyDesigner();
+    const { draft, activeLocale, updateTranslation, setActiveSubStep } = useStudyDesigner();
+    const { t } = useTranslation();
 
     if (!draft) return null;
 
@@ -24,7 +26,7 @@ const InterfaceEditor = () => {
         });
     };
 
-    const getLabel = (key: string) => uiLabels[key] || '';
+    const getLabel = (key: string) => uiLabels[key] || t(key);
 
     return (
         <div className="space-y-6">
@@ -50,33 +52,42 @@ const InterfaceEditor = () => {
                         <div className="space-y-2">
                             <Label>Start button</Label>
                             <Input
-                                placeholder="Default: Get started"
                                 value={getLabel('welcome.start')}
                                 onChange={(e) => updateLabel('welcome.start', e.target.value)}
+                                onFocus={() => setActiveSubStep('welcome.start')}
+                                placeholder="Get Started"
                             />
                         </div>
                         <div className="space-y-2">
                             <Label>Next step button</Label>
                             <Input
-                                placeholder="Default: Next step"
                                 value={getLabel('common.next')}
                                 onChange={(e) => updateLabel('common.next', e.target.value)}
+                                onFocus={() => setActiveSubStep('common.next')}
+                                placeholder="Next step"
                             />
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label>Submit button</Label>
                             <Input
-                                placeholder="Default: Share my perspective"
-                                value={getLabel('common.submit')}
-                                onChange={(e) => updateLabel('common.submit', e.target.value)}
+                                value={getLabel('post.submit')}
+                                onChange={(e) => updateLabel('post.submit', e.target.value)}
+                                onFocus={() => setActiveSubStep('post.submit')}
+                                placeholder="Share my perspective"
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Continue button</Label>
+                            <Label>Confirm Sort button</Label>
                             <Input
-                                placeholder="Default: Continue"
-                                value={getLabel('common.continue')}
-                                onChange={(e) => updateLabel('common.continue', e.target.value)}
+                                value={getLabel('fine.actions.validate')}
+                                onChange={(e) =>
+                                    updateLabel('fine.actions.validate', e.target.value)
+                                }
+                                onFocus={() => setActiveSubStep('fine.actions.validate')}
+                                placeholder="Confirm Sort"
                             />
                         </div>
                     </div>
@@ -90,101 +101,84 @@ const InterfaceEditor = () => {
                         <RefreshCcw className="h-4 w-4" /> Sorting terminology
                     </CardTitle>
                     <CardDescription>
-                        Define the poles of your sorting scale (Reference for Rough sort & grid).
+                        Define the labels for the spontaneous sort and the grid spectrum.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    {/* Positive pole */}
-                    <div className="space-y-3">
-                        <h4 className="text-sm font-medium text-emerald-600 flex items-center gap-2">
-                            <Check className="h-4 w-4" /> Positive pole (right)
-                        </h4>
-                        <div className="grid grid-cols-2 gap-4 pl-6 border-l-2 border-emerald-100">
+                    <div className="space-y-4">
+                        <Label className="text-xs text-muted-foreground uppercase tracking-wider">
+                            Rough Sort Labels
+                        </Label>
+                        <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
-                                <Label className="text-xs text-muted-foreground">
-                                    Rough sort label
-                                </Label>
+                                <Label>Agree</Label>
                                 <Input
-                                    placeholder="Default: Somewhat agree"
                                     value={getLabel('common.agree')}
                                     onChange={(e) => updateLabel('common.agree', e.target.value)}
+                                    onFocus={() => setActiveSubStep('common.agree')}
+                                    placeholder="Agree"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-xs text-muted-foreground">
-                                    Fine sort legend
-                                </Label>
+                                <Label>Neutral</Label>
                                 <Input
-                                    placeholder="Default: Most agree"
-                                    value={getLabel('fine.legend.agree')}
-                                    onChange={(e) =>
-                                        updateLabel('fine.legend.agree', e.target.value)
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Negative pole */}
-                    <div className="space-y-3">
-                        <h4 className="text-sm font-medium text-red-600 flex items-center gap-2">
-                            <Check className="h-4 w-4" /> Negative pole (left)
-                        </h4>
-                        <div className="grid grid-cols-2 gap-4 pl-6 border-l-2 border-red-100">
-                            <div className="space-y-2">
-                                <Label className="text-xs text-muted-foreground">
-                                    Rough sort label
-                                </Label>
-                                <Input
-                                    placeholder="Default: Somewhat disagree"
-                                    value={getLabel('common.disagree')}
-                                    onChange={(e) => updateLabel('common.disagree', e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-xs text-muted-foreground">
-                                    Fine sort legend
-                                </Label>
-                                <Input
-                                    placeholder="Default: Most disagree"
-                                    value={getLabel('fine.legend.disagree')}
-                                    onChange={(e) =>
-                                        updateLabel('fine.legend.disagree', e.target.value)
-                                    }
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <Separator />
-
-                    {/* Neutral */}
-                    <div className="space-y-3">
-                        <h4 className="text-sm font-medium text-slate-600">Neutral / middle</h4>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                                <Label className="text-xs text-muted-foreground">
-                                    Rough sort label
-                                </Label>
-                                <Input
-                                    placeholder="Default: Neutral"
                                     value={getLabel('common.neutral')}
                                     onChange={(e) => updateLabel('common.neutral', e.target.value)}
+                                    onFocus={() => setActiveSubStep('common.neutral')}
+                                    placeholder="Neutral"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label className="text-xs text-muted-foreground">
-                                    Fine sort legend
-                                </Label>
+                                <Label>Disagree</Label>
                                 <Input
-                                    placeholder="Default: Neutral"
-                                    value={getLabel('fine.legend.neutral')}
-                                    onChange={(e) =>
-                                        updateLabel('fine.legend.neutral', e.target.value)
-                                    }
+                                    value={getLabel('common.disagree')}
+                                    onChange={(e) => updateLabel('common.disagree', e.target.value)}
+                                    onFocus={() => setActiveSubStep('common.disagree')}
+                                    placeholder="Disagree"
                                 />
+                            </div>
+                        </div>
+
+                        <Separator />
+
+                        <div className="space-y-2">
+                            <Label className="text-xs text-muted-foreground uppercase tracking-wider">
+                                Grid Legends (extremes)
+                            </Label>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Most Agree</Label>
+                                    <Input
+                                        value={getLabel('fine.legend.agree')}
+                                        onChange={(e) =>
+                                            updateLabel('fine.legend.agree', e.target.value)
+                                        }
+                                        onFocus={() => setActiveSubStep('fine.legend.agree')}
+                                        placeholder="Most Agree"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Neutral</Label>
+                                    <Input
+                                        value={getLabel('fine.legend.neutral')}
+                                        onChange={(e) =>
+                                            updateLabel('fine.legend.neutral', e.target.value)
+                                        }
+                                        onFocus={() => setActiveSubStep('fine.legend.neutral')}
+                                        placeholder="Neutral"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Most Disagree</Label>
+                                    <Input
+                                        value={getLabel('fine.legend.disagree')}
+                                        onChange={(e) =>
+                                            updateLabel('fine.legend.disagree', e.target.value)
+                                        }
+                                        onFocus={() => setActiveSubStep('fine.legend.disagree')}
+                                        placeholder="Most Disagree"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

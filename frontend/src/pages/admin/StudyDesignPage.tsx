@@ -39,6 +39,8 @@ import FineSortPage from '@/pages/FineSortPage';
 import { useConfigStore } from '@/store/useConfigStore';
 import { LayoutProvider } from '@/contexts/LayoutContext';
 import { toast } from 'sonner';
+import i18n from '@/i18n';
+import { applyStudyOverrides } from '@/utils/i18nOverrides';
 
 const StudyDesignPage = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -98,17 +100,23 @@ const StudyDesignPage = () => {
 
             // Map statements for preview
             // biome-ignore lint/suspicious/noExplicitAny: statement mapping
-            syntheticStudy.statements = (draft.statements || []).map((s: any) => {
+            syntheticStudy.statements = (draft.statements || []).map((s: any, index: number) => {
                 // biome-ignore lint/suspicious/noExplicitAny: translation mapping
                 const st = s.translations?.find((t: any) => t.language_code === activeLocale);
                 return {
-                    id: s.code, // Participant components use ID but we use code in designer
+                    id: index + 1, // Use stable index-based ID
                     code: s.code,
                     text: st?.text || '',
                 };
             });
 
             setConfig(syntheticStudy);
+
+            // Sync i18n for preview
+            i18n.changeLanguage(activeLocale);
+            if (translation?.ui_labels) {
+                applyStudyOverrides(activeLocale, translation.ui_labels);
+            }
 
             // Broadcast to detachable preview windows
             if (slug) {
@@ -194,10 +202,10 @@ const StudyDesignPage = () => {
             },
             ui_labels: translation?.ui_labels || {},
             language: activeLocale,
-            statements: (draft.statements || []).map((s: any) => {
+            statements: (draft.statements || []).map((s: any, index: number) => {
                 const st = s.translations?.find((t: any) => t.language_code === activeLocale);
                 return {
-                    id: Math.floor(Math.random() * 1000000), // Mock numerical ID
+                    id: index + 1, // Stable numerical ID
                     code: s.code,
                     text: st?.text || '',
                 };
@@ -206,6 +214,7 @@ const StudyDesignPage = () => {
 
         // 2. Persist to localStorage
         localStorage.setItem(`open-q-test-config-${slug}`, JSON.stringify(syntheticConfig));
+        localStorage.setItem(`open-q-pilot-reset-${slug}`, 'true');
 
         // 3. Open in new tab with mode=test
         window.open(`/study/${slug}?mode=test`, '_blank');
@@ -257,33 +266,100 @@ const StudyDesignPage = () => {
                 }}
             >
                 <LayoutProvider>
-                    <div className="h-full w-full bg-background text-foreground">
-                        {(() => {
-                            switch (activeStep) {
-                                case 'intro':
-                                    return <WelcomePage />;
-                                case 'pre-sort':
-                                    return <PreSortPage />;
-                                case 'q-sort':
-                                    return activeSubStep === 'grid' ? (
-                                        <FineSortPage />
-                                    ) : (
-                                        <RoughSortPage />
-                                    );
-                                case 'post-sort':
-                                    return <PostSortPage />;
-                                case 'branding':
-                                    return <BrandingEditor />;
-                                case 'interface': // Show Welcome page for interface edits
-                                    return <WelcomePage />;
-                                default:
-                                    return <WelcomePage />;
-                            }
-                        })()}
-                    </div>
+                    {(() => {
+                        if (!draft) return null;
+
+                        const accentColor = draft.branding?.accent_color || '#2563eb';
+                        const highlightKey = activeSubStep;
+
+                        return (
+                            <div
+                                className="h-full w-full bg-background text-foreground"
+                                style={{ '--brand-accent': accentColor } as React.CSSProperties}
+                            >
+                                {(() => {
+                                    switch (activeStep) {
+                                        case 'welcome':
+                                            return <WelcomePage />;
+                                        case 'consent':
+                                            return <WelcomePage />;
+                                        case 'presort':
+                                            return <PreSortPage highlightKey={highlightKey} />;
+                                        case 'rough':
+                                            return <RoughSortPage highlightKey={highlightKey} />;
+                                        case 'fine':
+                                            return <FineSortPage highlightKey={highlightKey} />;
+                                        case 'postsort':
+                                            return <PostSortPage highlightKey={highlightKey} />;
+                                        case 'interface': {
+                                            // Determine appropriate page for interface labels
+                                            if (highlightKey?.startsWith('welcome.')) {
+                                                return <WelcomePage highlightKey={highlightKey} />;
+                                            }
+                                            if (highlightKey === 'common.next') {
+                                                return <PreSortPage highlightKey={highlightKey} />;
+                                            }
+                                            if (
+                                                highlightKey === 'common.agree' ||
+                                                highlightKey === 'common.disagree' ||
+                                                highlightKey === 'common.neutral'
+                                            ) {
+                                                return (
+                                                    <RoughSortPage highlightKey={highlightKey} />
+                                                );
+                                            }
+                                            if (
+                                                highlightKey?.startsWith('fine.legend.') ||
+                                                highlightKey === 'fine.actions.validate'
+                                            ) {
+                                                return <FineSortPage highlightKey={highlightKey} />;
+                                            }
+                                            if (highlightKey === 'post.submit') {
+                                                return <PostSortPage highlightKey={highlightKey} />;
+                                            }
+                                            return <WelcomePage highlightKey={highlightKey} />;
+                                        }
+                                        default:
+                                            return <WelcomePage />;
+                                    }
+                                })()}
+                            </div>
+                        );
+                    })()}
                 </LayoutProvider>
             </Frame>
         );
+    };
+
+    const getPreviewTitle = () => {
+        switch (activeStep) {
+            case 'intro':
+                return 'Welcome Page';
+            case 'pre-sort':
+                return 'Questionnaire';
+            case 'q-sort':
+                return activeSubStep === 'grid' ? 'Fine Sort (Grid)' : 'Rough Sort';
+            case 'post-sort':
+                return 'Post-sort Survey';
+            case 'branding':
+                return 'Theme Preview';
+            case 'interface':
+                if (activeSubStep?.includes('welcome')) return 'Context: Welcome Page';
+                if (
+                    activeSubStep?.includes('agree') ||
+                    activeSubStep?.includes('disagree') ||
+                    activeSubStep?.includes('neutral')
+                ) {
+                    if (activeSubStep.includes('fine.legend')) return 'Context: Fine Sort';
+                    return 'Context: Rough Sort';
+                }
+                if (activeSubStep?.includes('submit')) return 'Context: Fine Sort (End)';
+                if (activeSubStep?.includes('continue')) return 'Context: Post-sort';
+                if (activeSubStep?.includes('next')) return 'Context: Questionnaire';
+                return 'Interface Preview';
+            default:
+                return 'Preview';
+        }
     };
 
     return (
@@ -587,8 +663,13 @@ const StudyDesignPage = () => {
                                         <div className="w-2 h-2 rounded-full bg-amber-400/50" />
                                         <div className="w-2 h-2 rounded-full bg-emerald-400/50" />
                                     </div>
-                                    <div className="h-5 flex-1 bg-background rounded border px-2 flex items-center mx-2 text-[10px] text-muted-foreground opacity-50 font-mono">
-                                        open-q.sh/study/{draft.slug}
+                                    <div className="h-5 flex-1 flex items-center justify-between mx-2">
+                                        <div className="bg-background rounded border px-2 flex items-center flex-1 h-full text-[10px] text-muted-foreground opacity-50 font-mono truncate mr-2">
+                                            open-q.sh/study/{draft.slug}
+                                        </div>
+                                        <div className="text-[9px] font-bold text-primary uppercase tracking-wider whitespace-nowrap px-1.5 py-0.5 bg-primary/10 rounded">
+                                            {getPreviewTitle()}
+                                        </div>
                                     </div>
                                     <RefreshCw className="h-3 w-3 text-muted-foreground opacity-30" />
                                 </div>

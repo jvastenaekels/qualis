@@ -16,7 +16,8 @@ const IntroductionEditor = () => {
     if (!draft) return null;
 
     const translation = draft.translations?.find((t) => t.language_code === activeLocale);
-    const hasConsent = !!translation?.consent_title;
+    const hasConsent =
+        translation?.consent_title !== null && translation?.consent_title !== undefined;
 
     const handleChange = (field: keyof StudyTranslation, value: string) => {
         updateTranslation(activeLocale, (t_trans: any) => {
@@ -106,7 +107,10 @@ const IntroductionEditor = () => {
                     </div>
                     <Switch
                         id="enable-instructions"
-                        checked={!!translation?.instructions && translation?.instructions !== null}
+                        checked={
+                            translation?.instructions !== null &&
+                            translation?.instructions !== undefined
+                        }
                         onCheckedChange={(checked: boolean) => {
                             if (checked) {
                                 handleChange('instructions', '');
