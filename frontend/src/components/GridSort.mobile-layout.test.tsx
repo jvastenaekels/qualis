@@ -120,8 +120,8 @@ describe('GridSort Mobile Layout Refinements', () => {
         // Find the specific instruction text
         const instruction = screen.getByText('fine.workbench.initial_instruction');
 
-        // Traverse up to find the footer container (which we know has h-[140px])
-        // We use closest() with the class we added in the implementation
+        // Traverse up to find the footer container (h-[140px] on mobile, lg:h-[110px] on desktop)
+        // We use closest() with the base mobile class
         const footer = instruction.closest('.h-\\[140px\\]');
 
         expect(footer).toBeInTheDocument();
