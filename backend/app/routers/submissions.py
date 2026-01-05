@@ -24,12 +24,27 @@ async def submit_study(
 
     Logic moved to StudyService for maintainability.
     """
-    client_ip = request.client.host if request.client else "unknown"
+    # Edge case: Handle None request.client
+    client_ip = "unknown"
+    if request.client and hasattr(request.client, "host"):
+        client_ip = request.client.host or "unknown"
+
     user_agent = request.headers.get("user-agent")
-    confirmation_code = await StudyService.process_submission(
-        db, data, client_ip, user_agent
-    )
-    return {"status": "success", "confirmation_code": confirmation_code}
+
+    try:
+        confirmation_code = await StudyService.process_submission(
+            db, data, client_ip, user_agent
+        )
+        return {"status": "success", "confirmation_code": confirmation_code}
+    except HTTPException:
+        # Re-raise HTTP exceptions (they're already properly formatted)
+        raise
+    except Exception as e:
+        # Edge case: Catch any unexpected errors and return proper HTTP error
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected error during submission: {str(e)}",
+        )
 
 
 @router.get("/study/{slug}")
