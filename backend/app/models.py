@@ -181,6 +181,9 @@ class Study(Base):
     postsort_config: Mapped[dict[str, Any]] = mapped_column(
         JSON
     )  # e.g. Logic for follow-up
+    branding: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON, nullable=True
+    )  # e.g. {"logo_url": "...", "accent_color": "..."}
 
     # Relationships
     workspace: Mapped["Workspace"] = relationship(back_populates="studies")
@@ -213,7 +216,7 @@ class StudyTranslation(Base):
     subtitle: Mapped[str | None] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String)
     objective: Mapped[str | None] = mapped_column(String, nullable=True)
-    instructions: Mapped[str] = mapped_column(String)  # HTML/MD
+    instructions: Mapped[str | None] = mapped_column(String, nullable=True)  # HTML/MD
     ui_labels: Mapped[dict[str, str]] = mapped_column(
         JSON, default=dict
     )  # Button adjustments

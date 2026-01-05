@@ -91,7 +91,7 @@ class StudyTranslationBase(BaseModel):
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
     title: str = Field(..., min_length=1, max_length=200)
     description: str = ""
-    instructions: str = ""
+    instructions: str | None = None
     subtitle: str | None = None
     objective: str | None = None
     consent_title: str | None = None
@@ -173,6 +173,13 @@ class GridColumn(BaseModel):
     capacity: int
 
 
+class BrandingBase(BaseModel):
+    """Schema for study branding."""
+
+    logo_url: str | None = None
+    accent_color: str | None = None
+
+
 # Study Schemas
 
 
@@ -184,6 +191,7 @@ class StudyBase(BaseModel):
     grid_config: list[GridColumn]
     presort_config: dict[str, Any]
     postsort_config: dict[str, Any]
+    branding: BrandingBase | None = None
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool = False
     randomize_statements: bool = False
@@ -214,6 +222,7 @@ class StudyUpdate(BaseModel):
     grid_config: list[GridColumn] | None = None
     presort_config: dict[str, Any] | None = None
     postsort_config: dict[str, Any] | None = None
+    branding: BrandingBase | None = None
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool | None = None
     randomize_statements: bool | None = None
