@@ -283,16 +283,20 @@ class SubmissionInput(BaseModel):
     status: ParticipantStatus | None = (
         ParticipantStatus.completed
     )  # Default to completed
-    presort_answers: dict[str, Any] = {}
+    presort_answers: dict[str, Any] | None = {}
     qsort: list[QSortEntryInput]
-    postsort_answers: dict[str, Any] = {}
+    postsort_answers: dict[str, Any] | None = {}
 
     @field_validator("qsort")
     @classmethod
     def validate_qsort_structure(
-        _cls, v: list[QSortEntryInput]
+        _cls, v: list[QSortEntryInput] | None
     ) -> list[QSortEntryInput]:
         """Validate that the Q-sort contains unique statements."""
+        # Edge case: Handle None qsort
+        if v is None:
+            raise ValueError("Q-sort data cannot be None")
+
         # Basic validation: check for duplicates
         if not v:
             # It is possible to have empty qsort if just starting or rough sorting?
@@ -314,17 +318,23 @@ class SubmissionInput(BaseModel):
 
     @field_validator("presort_answers", "postsort_answers")
     @classmethod
-    def validate_answers_dict(_cls, v: dict[str, Any]) -> dict[str, Any]:
+    def validate_answers_dict(_cls, v: dict[str, Any] | None) -> dict[str, Any]:
         """Validate that the answers dictionary is not too large."""
+        # Edge case: Convert None to empty dict
+        if v is None:
+            return {}
+
         # Prevent massive JSON blobs
         import json
 
         try:
             dumped = json.dumps(v)
             if len(dumped) > 100_000:  # 100KB limit
-                raise ValueError("Answers dictionary too large")
-        except (TypeError, ValueError):
-            raise ValueError("Invalid answers dictionary")
+                raise ValueError("Answers dictionary too large (max 100KB)")
+        except TypeError as e:
+            raise ValueError(f"Invalid answers dictionary: contains non-serializable data - {str(e)}")
+        except ValueError as e:
+            raise ValueError(f"Invalid answers dictionary: {str(e)}")
         return v
 
 

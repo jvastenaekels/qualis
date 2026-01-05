@@ -143,6 +143,13 @@ class StudyService:
     @staticmethod
     def validate_distribution(study: Study, qsort: list[Any]):
         """Validates the Q-sort distribution against the study's grid configuration."""
+        # Edge case: Ensure study has statements
+        if not study.statements:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: No statements defined.",
+            )
+
         stmt_count = len(study.statements)
         if len(qsort) != stmt_count:
             raise HTTPException(
@@ -150,19 +157,53 @@ class StudyService:
                 detail=f"Submission incomplete. Expected {stmt_count} cards, got {len(qsort)}.",
             )
 
+        # Edge case: Empty qsort should be caught above, but double-check
+        if not qsort:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot validate distribution: Q-sort is empty.",
+            )
+
         submission_counts = Counter(entry.grid_score for entry in qsort)
         target_dist = {}
+
+        # Edge case: Handle None or invalid grid_config
+        if study.grid_config is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: grid_config is missing.",
+            )
 
         if isinstance(study.grid_config, list):
             for item in study.grid_config:
                 if isinstance(item, dict) and "score" in item and "capacity" in item:
-                    target_dist[int(item["score"])] = item["capacity"]
+                    try:
+                        score = int(item["score"])
+                        capacity = int(item["capacity"])
+                        target_dist[score] = capacity
+                    except (ValueError, TypeError) as e:
+                        # Log but continue - malformed grid config item
+                        continue
         elif isinstance(study.grid_config, dict):
             for score_str, capacity in study.grid_config.items():
                 try:
-                    target_dist[int(score_str)] = capacity
-                except ValueError:
+                    score = int(score_str)
+                    cap = int(capacity)
+                    target_dist[score] = cap
+                except (ValueError, TypeError):
                     continue
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: grid_config has invalid type.",
+            )
+
+        # Edge case: No valid target distribution parsed
+        if not target_dist:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: Could not parse grid_config.",
+            )
 
         for score_val, capacity in target_dist.items():
             count = submission_counts.get(score_val, 0)
@@ -198,6 +239,13 @@ class StudyService:
         if not study:
             raise HTTPException(status_code=404, detail="Study not found")
 
+        # Edge case: Ensure study has statements loaded
+        if not hasattr(study, "statements") or study.statements is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: Statements not loaded.",
+            )
+
         # 2.5 Validation: Study State
         from ..models import StudyState
 
@@ -207,8 +255,23 @@ class StudyService:
                 detail=f"Study is not active (state: {study.state.value}). Submissions are not allowed.",
             )
 
+        # Edge case: Ensure qsort is not None
+        if data.qsort is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Submission error: Q-sort data is missing.",
+            )
+
         # 3. Validation: Statement Ownership
         valid_statement_ids = {s.id for s in study.statements}
+
+        # Edge case: Handle empty valid_statement_ids
+        if not valid_statement_ids:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: No statements defined.",
+            )
+
         for entry in data.qsort:
             if entry.statement_id not in valid_statement_ids:
                 raise HTTPException(
@@ -219,6 +282,12 @@ class StudyService:
         # 4. Validation: Distribution (only for completed)
         if data.status == ParticipantStatus.completed:
             StudyService.validate_distribution(study, data.qsort)
+
+        # Edge case: Ensure presort_answers and postsort_answers are dicts, not None
+        presort_answers = data.presort_answers if data.presort_answers is not None else {}
+        postsort_answers = (
+            data.postsort_answers if data.postsort_answers is not None else {}
+        )
 
         # 5. Find or Create Participant
         participant_stmt = (
@@ -235,8 +304,8 @@ class StudyService:
                     study_id=study.id,
                     session_token=data.session_token,
                     language_used=data.language_used,
-                    presort_answers=data.presort_answers,
-                    postsort_answers=data.postsort_answers,
+                    presort_answers=presort_answers,
+                    postsort_answers=postsort_answers,
                     status=data.status,
                     confirmation_code=confirmation_code,
                     ip_address=hashed_ip,
@@ -245,7 +314,7 @@ class StudyService:
                 )
                 db.add(participant)
                 await db.flush()
-            except IntegrityError:
+            except IntegrityError as e:
                 # Race condition: Participant was created by another request in the meantime.
                 # Rollback the failed insert and fetch the existing participant.
                 await db.rollback()
@@ -257,6 +326,13 @@ class StudyService:
                         status_code=500,
                         detail="Concurrency error: Could not resolve participant.",
                     )
+            except Exception as e:
+                # Edge case: Catch any unexpected database errors
+                await db.rollback()
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Database error while creating participant: {str(e)}",
+                )
 
         # If we fell through (either from 'else' or after catching exception), participant exists.
         if participant and participant not in db.new:
@@ -265,8 +341,8 @@ class StudyService:
                 return str(participant.session_token)[:8].upper()
 
             participant.language_used = data.language_used
-            participant.presort_answers = data.presort_answers
-            participant.postsort_answers = data.postsort_answers
+            participant.presort_answers = presort_answers
+            participant.postsort_answers = postsort_answers
             if data.status:
                 participant.status = data.status
             participant.confirmation_code = confirmation_code
@@ -282,18 +358,33 @@ class StudyService:
             )
             await db.flush()
 
-        # 6. Save Q-Sort Entries
-        new_entries = [
-            QSortEntry(
-                participant_id=participant.id,
-                statement_id=entry.statement_id,
-                grid_score=entry.grid_score,
-                card_comment=entry.card_comment,
+        # Edge case: Ensure participant.id exists before creating QSortEntry
+        if not participant or participant.id is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Database error: Participant ID is missing after save.",
             )
-            for entry in data.qsort
-        ]
-        db.add_all(new_entries)
-        await db.commit()
+
+        # 6. Save Q-Sort Entries
+        try:
+            new_entries = [
+                QSortEntry(
+                    participant_id=participant.id,
+                    statement_id=entry.statement_id,
+                    grid_score=entry.grid_score,
+                    card_comment=entry.card_comment,
+                )
+                for entry in data.qsort
+            ]
+            db.add_all(new_entries)
+            await db.commit()
+        except Exception as e:
+            # Edge case: Handle commit failures
+            await db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Database error while saving Q-sort entries: {str(e)}",
+            )
 
         return confirmation_code
 
@@ -385,11 +476,19 @@ class StudyService:
 
         participant_data = []
         for p in participants:
-            placements = {
-                entry.statement_id: entry.grid_score for entry in p.qsort_entries
-            }
+            # Edge case: Handle missing or None qsort_entries
+            placements = {}
+            if p.qsort_entries:
+                placements = {
+                    entry.statement_id: entry.grid_score for entry in p.qsort_entries
+                }
+
             # Create a score list in the exact order of sorted_statements
             scores = [placements.get(s.id, None) for s in sorted_statements]
+
+            # Edge case: Ensure presort and postsort are not None
+            presort = p.presort_answers if p.presort_answers is not None else {}
+            postsort = p.postsort_answers if p.postsort_answers is not None else {}
 
             participant_data.append(
                 {
@@ -402,8 +501,8 @@ class StudyService:
                     "scores": scores,
                     # For raw CSV/KenQ
                     "placements": placements,
-                    "presort": p.presort_answers,
-                    "postsort": p.postsort_answers,
+                    "presort": presort,
+                    "postsort": postsort,
                     "language": p.language_used,
                 }
             )
