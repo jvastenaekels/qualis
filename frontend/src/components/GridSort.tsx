@@ -627,7 +627,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         </div>
                     </DroppableDeckArea>
                     {/* PANEL FOOTER: Guidance or Validation */}
-                    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[140px] flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
+                    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[150px] flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
                         {isAllPlaced ? (
                             <button
                                 type="button"

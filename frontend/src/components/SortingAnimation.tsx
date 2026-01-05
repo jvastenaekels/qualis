@@ -202,7 +202,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                 style={{
                     transform:
                         phase === 'ROUGH'
-                            ? `scale(${finalScale}) translateY(${isDesktop ? '0px' : '-16px'})`
+                            ? `scale(${finalScale}) translateY(${isDesktop ? '0px' : '0px'})`
                             : `scale(${finalScale - 0.1})`,
                 }}
                 className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out
@@ -272,7 +272,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                 style={{
                     transform:
                         phase === 'FINE'
-                            ? `scale(${finalScale}) translateY(${isDesktop ? '-8px' : '-16px'})`
+                            ? `scale(${finalScale}) translateY(${isDesktop ? '-8px' : '-8px'})`
                             : `scale(${finalScale - 0.1})`,
                 }}
                 className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ease-in-out
@@ -402,7 +402,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                 </div>
             </div>
 
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none">
+            <div className="absolute bottom-0 md:-bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none">
                 <div
                     className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`}
                 />
