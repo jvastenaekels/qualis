@@ -202,7 +202,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                 style={{
                     transform:
                         phase === 'ROUGH'
-                            ? `scale(${finalScale}) translateY(${isDesktop ? '-24px' : '-16px'})`
+                            ? `scale(${finalScale}) translateY(${isDesktop ? '0px' : '-16px'})`
                             : `scale(${finalScale - 0.1})`,
                 }}
                 className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out
@@ -272,7 +272,7 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                 style={{
                     transform:
                         phase === 'FINE'
-                            ? `scale(${finalScale}) translateY(${isDesktop ? '-24px' : '-16px'})`
+                            ? `scale(${finalScale}) translateY(${isDesktop ? '0px' : '-16px'})`
                             : `scale(${finalScale - 0.1})`,
                 }}
                 className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ease-in-out

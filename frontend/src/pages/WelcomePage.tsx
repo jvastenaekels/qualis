@@ -203,7 +203,7 @@ const WelcomePage: React.FC = () => {
                     </div>
 
                     {/* Visual Column */}
-                    <div className="md:col-span-5 p-8 md:px-10 md:pt-6 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[350px] md:min-h-[500px] relative overflow-hidden">
+                    <div className="md:col-span-5 p-8 md:p-12 bg-slate-100 flex flex-col items-start min-h-[350px] md:min-h-[500px] relative overflow-hidden">
                         <div className="absolute top-4 left-6 z-20 uppercase tracking-wider text-xs font-bold text-slate-600 bg-slate-200/80 backdrop-blur-sm w-fit px-3 py-1.5 rounded-md border border-slate-300 shadow-sm">
                             {t('welcome.preview_title', "It's child's play!")}
                         </div>
