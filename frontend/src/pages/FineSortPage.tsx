@@ -279,7 +279,7 @@ const FineSortPage: React.FC = () => {
                         text={statement.text}
                         code={showCodes ? statement.code : undefined}
                         isSelected={selectedCardId === statement.id}
-                        onClick={() => handleCardClick(statement.id)}
+                        onAction={handleCardClick}
                         dimensions={dimensions}
                         disableHoverZoom={
                             activeId !== null ||

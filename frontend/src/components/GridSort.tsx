@@ -294,7 +294,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                             code={showCodes ? card.code : undefined}
                             variant="compact"
                             isSelected={selectedCardId === card.id}
-                            onClick={() => onCardClick?.(card.id)}
+                            onAction={onCardClick}
                             aspectRatio={isMobile ? mobileRatio : gridRatio}
                             disableHoverZoom={disableHoverZoom || isMobile}
                         />

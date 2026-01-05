@@ -28,6 +28,7 @@ interface SortableCardProps {
     variant?: 'hand' | 'grid' | 'compact';
     isSelected?: boolean;
     onClick?: () => void;
+    onAction?: (id: number) => void;
     dimensions?: { width: number; height: number };
     aspectRatio?: number | 'auto';
     disableHoverZoom?: boolean;
@@ -162,7 +163,9 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
 
                         // Only trigger click if not dragging
                         // Note: isDragging might not be immediate
-                        if (onClick) {
+                        if (onAction) {
+                            onAction(id);
+                        } else if (onClick) {
                             onClick();
                         }
                     }
@@ -175,7 +178,9 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         clearTimeout(hoverTimerRef.current);
                         hoverTimerRef.current = null;
                     }
-                    if (onClick) {
+                    if (onAction) {
+                        onAction(id);
+                    } else if (onClick) {
                         onClick();
                     }
                 }}
@@ -192,13 +197,13 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
             `}
             >
                 <motion.div
-                    // layoutId={
-                    //     process.env.NODE_ENV === 'test'
-                    //         ? undefined
-                    //         : isOverlay
-                    //           ? undefined
-                    //           : `card-${id}`
-                    // }
+                    layoutId={
+                        process.env.NODE_ENV === 'test'
+                            ? undefined
+                            : isOverlay
+                              ? undefined
+                              : `card-${id}`
+                    }
                     // biome-ignore lint/suspicious/noExplicitAny: framer type mismatch
                     transition={CARD_SPRING_TRANSITION as any}
                     // Trigger a subtle pulse/flash when the card content (id) changes or on mount
