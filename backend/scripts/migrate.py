@@ -14,8 +14,9 @@ from pathlib import Path
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sqlalchemy import text, inspect
-from app.database import engine
+from sqlalchemy import text, inspect, select
+from app.database import engine, SessionLocal
+from app.models import Study, StudyCollaborator, StudyRole, WorkspaceMember
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
@@ -73,6 +74,22 @@ async def migrate_studies_table():
             )
             migrations_applied = True
 
+        # branding
+        if not await check_column_exists(conn, "studies", "branding"):
+            logger.info("  Adding 'branding' column...")
+            dialect = conn.dialect.name
+            if dialect == "postgresql":
+                await conn.execute(
+                    text(
+                        "ALTER TABLE studies ADD COLUMN branding JSON DEFAULT '{}'::json"
+                    )
+                )
+            else:
+                await conn.execute(
+                    text("ALTER TABLE studies ADD COLUMN branding JSON DEFAULT '{}'")
+                )
+            migrations_applied = True
+
         if migrations_applied:
             await conn.commit()
             logger.info("✓ Studies table updated")
@@ -118,6 +135,8 @@ async def migrate_participants_table():
         if not await check_table_exists(conn, "participants"):
             logger.warning("Participants table doesn't exist - skipping migration")
             return
+
+        migrations_applied = False
 
         if not await check_column_exists(conn, "participants", "random_seed"):
             logger.info("  Adding 'random_seed' column...")
@@ -167,6 +186,66 @@ async def verify_workspace_tables():
         logger.info("✓ Workspace tables verified")
 
 
+async def migrate_data_collaborators():
+    """Migrate workspace members to study collaborators."""
+    logger.info("Checking for necessary data migration (Workspace -> Collaborators)...")
+
+    # Map WorkspaceRole to StudyRole
+    ROLE_MAP = {
+        "admin": StudyRole.owner,
+        "researcher": StudyRole.editor,
+        "viewer": StudyRole.viewer,
+    }
+
+    async with SessionLocal() as db:
+        # Check if we have workspace members but no collaborators (or need to sync)
+        # This is a bit naive, but safe since we check for existence before adding.
+
+        # Verify tables exist first to avoid crashing if schema is broken
+        try:
+            await db.execute(select(WorkspaceMember).limit(1))
+            await db.execute(select(StudyCollaborator).limit(1))
+        except Exception:
+            logger.warning("Skipping data migration: Tables not ready")
+            return
+
+        members_result = await db.execute(select(WorkspaceMember))
+        members = members_result.scalars().all()
+
+        member_migrated_count = 0
+        for member in members:
+            # Find all studies in this workspace
+            studies_in_ws_result = await db.execute(
+                select(Study).where(Study.workspace_id == member.workspace_id)
+            )
+            studies_in_ws = studies_in_ws_result.scalars().all()
+
+            for study in studies_in_ws:
+                # Check if collaborator already exists
+                existing = await db.execute(
+                    select(StudyCollaborator).where(
+                        StudyCollaborator.study_id == study.id,
+                        StudyCollaborator.user_id == member.user_id,
+                    )
+                )
+                if not existing.scalar_one_or_none():
+                    collab = StudyCollaborator(
+                        study_id=study.id,
+                        user_id=member.user_id,
+                        role=ROLE_MAP.get(member.role, StudyRole.viewer),
+                    )
+                    db.add(collab)
+                    member_migrated_count += 1
+
+        if member_migrated_count > 0:
+            await db.commit()
+            logger.info(
+                f"✓ Migrated {member_migrated_count} workspace memberships to collaborators"
+            )
+        else:
+            logger.info("✓ Data migration up to date (no new collaborators to migrate)")
+
+
 async def run_all_migrations():
     """Run all migrations in order."""
     logger.info("=" * 60)
@@ -181,6 +260,9 @@ async def run_all_migrations():
         await migrate_studies_table()
         await migrate_translations_table()
         await migrate_participants_table()
+
+        # Then run data migrations
+        await migrate_data_collaborators()
 
         logger.info("=" * 60)
         logger.info("✓ All migrations completed successfully!")
