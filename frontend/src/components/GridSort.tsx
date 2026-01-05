@@ -301,12 +301,12 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     </div>
                 ))
             ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-8 lg:col-span-2 lg:h-full lg:place-self-center">
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="p-4 bg-green-50 rounded-full border border-green-100 shadow-sm animate-in zoom-in duration-300">
-                            <Check size={32} className="text-green-500" strokeWidth={3} />
+                <div className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-4 lg:col-span-2 lg:h-full lg:place-self-center">
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="p-2 bg-green-50 rounded-full border border-green-100 shadow-sm animate-in zoom-in duration-300">
+                            <Check size={20} className="text-green-500" strokeWidth={2.5} />
                         </div>
-                        <span className="text-sm font-bold text-slate-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
+                        <span className="text-xs font-bold text-slate-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
                             {t('fine.deck.all_placed')}
                         </span>
                     </div>
@@ -514,7 +514,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         `}
                     style={{
                         height: isMobile ? 'auto' : '100%',
-                        maxHeight: isMobile ? 'none' : 'none', // Removed 33vh restriction
+                        maxHeight: isMobile ? '45dvh' : 'none',
                     }}
                 >
                     {/* Reading Zone - Desktop Sidebar version */}

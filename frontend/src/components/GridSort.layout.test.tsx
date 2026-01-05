@@ -138,8 +138,8 @@ describe('GridSort Detailed UI Verification', () => {
         // We can checks for the green checkmark class presence on the container
         const emptyStateText = screen.getByText('fine.deck.all_placed');
         const container = emptyStateText.closest('div');
-        // The container has `flex flex-col items-center gap-3`
-        expect(container?.className).toContain('gap-3');
+        // The container has `flex flex-col items-center gap-2`
+        expect(container?.className).toContain('gap-2');
     });
 
     // 4. Layout & Sidebar
