@@ -284,7 +284,9 @@ class StudyService:
             StudyService.validate_distribution(study, data.qsort)
 
         # Edge case: Ensure presort_answers and postsort_answers are dicts, not None
-        presort_answers = data.presort_answers if data.presort_answers is not None else {}
+        presort_answers = (
+            data.presort_answers if data.presort_answers is not None else {}
+        )
         postsort_answers = (
             data.postsort_answers if data.postsort_answers is not None else {}
         )

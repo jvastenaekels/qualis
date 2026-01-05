@@ -332,7 +332,9 @@ class SubmissionInput(BaseModel):
             if len(dumped) > 100_000:  # 100KB limit
                 raise ValueError("Answers dictionary too large (max 100KB)")
         except TypeError as e:
-            raise ValueError(f"Invalid answers dictionary: contains non-serializable data - {str(e)}")
+            raise ValueError(
+                f"Invalid answers dictionary: contains non-serializable data - {str(e)}"
+            )
         except ValueError as e:
             raise ValueError(f"Invalid answers dictionary: {str(e)}")
         return v
