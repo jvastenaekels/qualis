@@ -514,7 +514,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         `}
                     style={{
                         height: isMobile ? 'auto' : '100%',
-                        maxHeight: isMobile ? '45dvh' : 'none',
+                        maxHeight: isMobile ? '50dvh' : 'none',
                     }}
                 >
                     {/* Reading Zone - Desktop Sidebar version */}
@@ -611,7 +611,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         id={`deck-area-${activePile}`}
                         className={`
                             flex-col overflow-hidden relative
-                            ${isMobile ? 'h-[130px] flex-none' : 'flex-1 min-h-0 max-h-[280px] flex'}
+                            ${isMobile ? 'h-[120px] flex-none' : 'flex-1 min-h-0 max-h-[280px] flex'}
                         `}
                     >
                         <div
