@@ -72,8 +72,11 @@ export class AdminPage extends BasePage {
         if (slug) {
             await this.goto(`/admin/studies/${slug}`);
         }
-        await this.page.getByRole('button', { name: /closed/i }).first().click();
-        await this.page.getByRole('button', { name: /close study/i }).click();
+        // Click the 'Closed' card to trigger the dialog
+        await this.page.getByRole('button', { name: /Closed/i }).first().click();
+        await this.page.getByRole('button', { name: /Close Study/i }).click();
+
+        // Wait for status badge to update
         await expect(this.page.getByRole('status')).toHaveText(/Closed/i);
     }
 
