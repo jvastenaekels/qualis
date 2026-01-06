@@ -48,13 +48,13 @@ export const useSubmitStudy = () => {
                             statement_id: item.statementId,
                             grid_score: score,
                             card_comment:
-                                responses.postsort.card_comments[item.statementId] || null,
+                                responses.postsort.card_comments[item.statementId] || undefined,
                         };
                     }
                 );
 
                 const payload = {
-                    session_token: session.token,
+                    session_token: session.token || '00000000-0000-0000-0000-000000000000',
                     study_slug: config.slug,
                     language_used: session.language || 'en',
                     status: status,

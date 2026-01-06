@@ -9,12 +9,14 @@ const BrandingEditor = () => {
 
     if (!draft) return null;
 
-    const branding = draft.branding || { logo_url: null, accent_color: null };
+    // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
+    const branding = (draft as any).branding || { logo_url: null, accent_color: null };
 
     const updateBranding = (field: 'logo_url' | 'accent_color', value: string | null) => {
         updateDraft((d) => {
-            if (!d.branding) d.branding = { logo_url: null, accent_color: null };
-            (d.branding as any)[field] = value;
+            // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
+            if (!(d as any).branding) (d as any).branding = { logo_url: null, accent_color: null };
+            (d as any).branding[field] = value;
         });
     };
 

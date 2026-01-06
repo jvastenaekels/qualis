@@ -287,14 +287,14 @@ const StudyOverviewPage = () => {
                                                 variant="outline"
                                                 className={cn(
                                                     'capitalize',
-                                                    p.status === 'completed'
-                                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                                        : p.status === 'discarded'
-                                                          ? 'bg-red-50 text-red-700 border-red-100'
+                                                    p.is_discarded
+                                                        ? 'bg-red-50 text-red-700 border-red-100'
+                                                        : p.status === 'completed'
+                                                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
                                                           : 'bg-slate-50 text-slate-600 border-slate-100'
                                                 )}
                                             >
-                                                {p.status}
+                                                {p.is_discarded ? 'Discarded' : p.status}
                                             </Badge>
                                         </div>
                                     </div>

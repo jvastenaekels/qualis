@@ -146,7 +146,8 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey }) => {
         const subscription = watch((value) => {
             setPostSortResponse(
                 'questions_answers',
-                value as Record<string, string | number | boolean>
+                // biome-ignore lint/suspicious/noExplicitAny: complex dynamic type
+                value as any
             );
         });
         return () => subscription.unsubscribe();

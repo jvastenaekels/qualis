@@ -269,7 +269,8 @@ const StudyDesignPage = () => {
                     {(() => {
                         if (!draft) return null;
 
-                        const accentColor = draft.branding?.accent_color || '#2563eb';
+                        // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
+                        const accentColor = (draft as any).branding?.accent_color || '#2563eb';
                         const highlightKey = activeSubStep;
 
                         return (
@@ -279,18 +280,20 @@ const StudyDesignPage = () => {
                             >
                                 {(() => {
                                     switch (activeStep) {
-                                        case 'welcome':
+                                        case 'intro':
                                             return <WelcomePage />;
-                                        case 'consent':
-                                            return <WelcomePage />;
-                                        case 'presort':
+                                        case 'pre-sort':
                                             return <PreSortPage highlightKey={highlightKey} />;
-                                        case 'rough':
-                                            return <RoughSortPage highlightKey={highlightKey} />;
-                                        case 'fine':
-                                            return <FineSortPage highlightKey={highlightKey} />;
-                                        case 'postsort':
+                                        case 'q-sort':
+                                            return activeSubStep === 'grid' ? (
+                                                <FineSortPage highlightKey={highlightKey} />
+                                            ) : (
+                                                <RoughSortPage highlightKey={highlightKey} />
+                                            );
+                                        case 'post-sort':
                                             return <PostSortPage highlightKey={highlightKey} />;
+                                        case 'branding':
+                                            return <WelcomePage />;
                                         case 'interface': {
                                             // Determine appropriate page for interface labels
                                             if (highlightKey?.startsWith('welcome.')) {

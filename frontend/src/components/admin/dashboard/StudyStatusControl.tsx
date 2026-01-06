@@ -29,7 +29,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
 }) => {
     const changeStateMutation = useChangeStudyStateApiAdminStudiesSlugStatePost();
 
-    const handleStateChange = async (newState: 'draft' | 'active' | 'closed') => {
+    const handleStateChange = async (newState: 'draft' | 'active' | 'closed' | 'paused') => {
         try {
             await changeStateMutation.mutateAsync({
                 slug,
@@ -39,6 +39,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                 draft: 'reverted to draft',
                 active: 'launched',
                 closed: 'closed',
+                paused: 'paused',
             };
             toast.success(`Study ${stateLabels[newState]} successfully`);
             onStateChange();

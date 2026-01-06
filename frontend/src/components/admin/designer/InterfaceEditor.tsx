@@ -26,7 +26,7 @@ const InterfaceEditor = () => {
         });
     };
 
-    const getLabel = (key: string) => uiLabels[key] || t(key);
+    const getLabel = (key: string) => (uiLabels[key] || t(key)) as string;
 
     return (
         <div className="space-y-6">

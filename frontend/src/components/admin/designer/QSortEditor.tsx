@@ -326,30 +326,6 @@ const QSortEditor = () => {
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="flex items-center justify-between py-2">
-                                <div className="space-y-1">
-                                    <Label
-                                        htmlFor="randomize-statements"
-                                        className="text-sm font-medium"
-                                    >
-                                        Randomize statement order
-                                    </Label>
-                                    <p className="text-xs text-muted-foreground max-w-md">
-                                        Present statements in random order for each participant to
-                                        prevent order effects.
-                                    </p>
-                                </div>
-                                <Switch
-                                    id="randomize-statements"
-                                    checked={draft.randomize_statements ?? false}
-                                    onCheckedChange={(checked: boolean) => {
-                                        updateDraft((d) => {
-                                            d.randomize_statements = checked;
-                                        });
-                                    }}
-                                />
-                            </div>
-
                             <div className="flex items-center justify-between py-2 border-t">
                                 <div className="space-y-1">
                                     <Label htmlFor="show-codes" className="text-sm font-medium">
