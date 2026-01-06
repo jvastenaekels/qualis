@@ -292,32 +292,46 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                 {/* Row A: Horizon (Disagree - Card - Agree) */}
                 <div className="flex flex-row items-center justify-center gap-2 sm:gap-8 md:gap-12 w-full">
                     {/* Left Button (Disagree) */}
-                    <motion.button
-                        style={{ scale: scaleDisagree, opacity: opacityDisagree }}
-                        onClick={() => handleVote('disagree')}
-                        data-testid="rough-disagree-btn"
-                        className={cn(
-                            'z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-1',
-                            highlightKey === 'common.disagree' &&
-                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
-                        )}
-                        aria-label={t('common.disagree')}
-                        aria-keyshortcuts="ArrowLeft"
-                    >
-                        <div className="flex flex-col items-center gap-0.5 sm:gap-1">
-                            <Frown
-                                size={20}
-                                strokeWidth={2.5}
-                                className="sm:w-7 sm:h-7 opacity-80"
-                            />
-                            <span
-                                lang={t('common.lang_code', { defaultValue: 'en' })}
-                                className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight break-words hyphens-auto`}
-                            >
-                                {t('common.disagree')}
-                            </span>
-                        </div>
-                    </motion.button>
+                    <div className="relative">
+                        <motion.button
+                            style={{ scale: scaleDisagree, opacity: opacityDisagree }}
+                            onClick={() => handleVote('disagree')}
+                            data-testid="rough-disagree-btn"
+                            className={cn(
+                                'z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-1',
+                                highlightKey === 'common.disagree' &&
+                                    'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                            )}
+                            aria-label={t('common.disagree')}
+                            aria-keyshortcuts="ArrowLeft"
+                        >
+                            <div className="flex flex-col items-center gap-0.5 sm:gap-1">
+                                <Frown
+                                    size={20}
+                                    strokeWidth={2.5}
+                                    className="sm:w-7 sm:h-7 opacity-80"
+                                />
+                                <span
+                                    lang={t('common.lang_code', { defaultValue: 'en' })}
+                                    className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight break-words hyphens-auto`}
+                                >
+                                    {t('common.disagree')}
+                                </span>
+                            </div>
+                        </motion.button>
+                        <AnimatePresence>
+                            {responses.rough.disagree.length > 0 && (
+                                <motion.span
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0, opacity: 0 }}
+                                    className="absolute -top-3 -right-3 w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-30 bg-red-600 text-white border-white"
+                                >
+                                    {responses.rough.disagree.length}
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
+                    </div>
 
                     {/* Card Zone */}
                     <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-sm md:max-w-md">
@@ -357,58 +371,91 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     </div>
 
                     {/* Right Button (Agree) */}
-                    <motion.button
-                        style={{ scale: scaleAgree, opacity: opacityAgree }}
-                        onClick={() => handleVote('agree')}
-                        data-testid="rough-agree-btn"
-                        className={cn(
-                            'z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-1',
-                            highlightKey === 'common.agree' &&
-                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
-                        )}
-                        aria-label={t('common.agree')}
-                        aria-keyshortcuts="ArrowRight"
-                    >
-                        <div className="flex flex-col items-center gap-0.5 sm:gap-1">
-                            <Smile
-                                size={20}
-                                strokeWidth={2.5}
-                                className="sm:w-7 sm:h-7 opacity-80"
-                            />
-                            <span
-                                lang={t('common.lang_code', { defaultValue: 'en' })}
-                                className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight break-words hyphens-auto`}
-                            >
-                                {t('common.agree')}
-                            </span>
-                        </div>
-                    </motion.button>
+                    <div className="relative">
+                        <motion.button
+                            style={{ scale: scaleAgree, opacity: opacityAgree }}
+                            onClick={() => handleVote('agree')}
+                            data-testid="rough-agree-btn"
+                            className={cn(
+                                'z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-1',
+                                highlightKey === 'common.agree' &&
+                                    'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                            )}
+                            aria-label={t('common.agree')}
+                            aria-keyshortcuts="ArrowRight"
+                        >
+                            <div className="flex flex-col items-center gap-0.5 sm:gap-1">
+                                <Smile
+                                    size={20}
+                                    strokeWidth={2.5}
+                                    className="sm:w-7 sm:h-7 opacity-80"
+                                />
+                                <span
+                                    lang={t('common.lang_code', { defaultValue: 'en' })}
+                                    className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight break-words hyphens-auto`}
+                                >
+                                    {t('common.agree')}
+                                </span>
+                            </div>
+                        </motion.button>
+                        <AnimatePresence>
+                            {responses.rough.agree.length > 0 && (
+                                <motion.span
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0, opacity: 0 }}
+                                    className="absolute -top-3 -right-3 w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-30 bg-green-600 text-white border-white"
+                                >
+                                    {responses.rough.agree.length}
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
+                    </div>
                 </div>
 
                 {/* Row B: Anchor (Neutral Pill + Undo) */}
                 <div className="flex flex-col items-center gap-4 w-full px-2">
-                    <motion.button
-                        style={{ scale: scaleNeutral, opacity: opacityNeutral }}
-                        onClick={() => handleVote('neutral')}
-                        data-testid="rough-neutral-btn"
-                        className={cn(
-                            'w-auto min-w-[160px] max-w-[240px] px-8 sm:max-w-none sm:w-[18.2rem] h-16 sm:h-[5.6rem] rounded-2xl bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors',
-                            highlightKey === 'common.neutral' &&
-                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
-                        )}
-                        aria-label={t('common.neutral')}
-                        aria-keyshortcuts="ArrowDown"
-                    >
-                        <div className="flex items-center gap-2 text-gray-600">
-                            <Meh size={20} strokeWidth={2.5} className="opacity-80" />
-                            <span
-                                lang={t('common.lang_code', { defaultValue: 'en' })}
-                                className={`${sharedFontSize} font-bold tracking-wide break-words hyphens-auto`}
-                            >
-                                {t('common.neutral')}
-                            </span>
-                        </div>
-                    </motion.button>
+                    <div className="relative">
+                        <motion.button
+                            style={{ scale: scaleNeutral, opacity: opacityNeutral }}
+                            onClick={() => handleVote('neutral')}
+                            data-testid="rough-neutral-btn"
+                            // CHANGED: Blue styling + Same dimensions/layout as Agree/Disagree
+                            className={cn(
+                                'z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-blue-50 text-blue-600 hover:bg-blue-100 border-2 border-blue-100 shadow-sm transition-colors gap-1 px-1',
+                                highlightKey === 'common.neutral' &&
+                                    'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                            )}
+                            aria-label={t('common.neutral')}
+                            aria-keyshortcuts="ArrowDown"
+                        >
+                            <div className="flex flex-col items-center gap-0.5 sm:gap-1">
+                                <Meh
+                                    size={20}
+                                    strokeWidth={2.5}
+                                    className="sm:w-7 sm:h-7 opacity-80"
+                                />
+                                <span
+                                    lang={t('common.lang_code', { defaultValue: 'en' })}
+                                    className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight break-words hyphens-auto`}
+                                >
+                                    {t('common.neutral')}
+                                </span>
+                            </div>
+                        </motion.button>
+                        <AnimatePresence>
+                            {responses.rough.neutral.length > 0 && (
+                                <motion.span
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    exit={{ scale: 0, opacity: 0 }}
+                                    className="absolute -top-3 -right-3 w-7 h-7 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-30 bg-blue-600 text-white border-white"
+                                >
+                                    {responses.rough.neutral.length}
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
+                    </div>
 
                     <button
                         type="button"

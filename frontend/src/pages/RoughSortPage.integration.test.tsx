@@ -57,7 +57,7 @@ describe('RoughSortPage Integration', () => {
         setupStoreMocks({
             useConfigStore: { config: mockConfig },
             useResponseStore: {
-                rough: { history: [1] },
+                rough: { history: [1], agree: [], disagree: [], neutral: [] },
                 categorizeCard: vi.fn(),
                 undoRoughSort: vi.fn(),
             },
@@ -83,7 +83,7 @@ describe('RoughSortPage Integration', () => {
         setupStoreMocks({
             useConfigStore: { config: mockConfig },
             useResponseStore: {
-                rough: { history: [] },
+                rough: { history: [], agree: [], disagree: [], neutral: [] },
                 categorizeCard: vi.fn(),
                 undoRoughSort: vi.fn(),
             },
