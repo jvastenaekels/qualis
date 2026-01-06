@@ -102,7 +102,9 @@ export function useReadUsersMeApiMeGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useReadUsersMeApiMeGet<
     TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
     TError = unknown,
@@ -121,7 +123,9 @@ export function useReadUsersMeApiMeGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useReadUsersMeApiMeGet<
     TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
     TError = unknown,
@@ -132,7 +136,9 @@ export function useReadUsersMeApiMeGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Read Users Me
  */
@@ -147,7 +153,9 @@ export function useReadUsersMeApiMeGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getReadUsersMeApiMeGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -353,7 +361,11 @@ export const useRegisterUserApiRegisterPost = <TError = HTTPValidationError, TCo
  * @summary List Studies
  */
 export const listStudiesApiAdminStudiesGet = (signal?: AbortSignal) => {
-    return customInstance<StudyRead[]>({ url: `/api/admin/studies/`, method: 'GET', signal });
+    return customInstance<StudyRead[]>({
+        url: `/api/admin/studies/`,
+        method: 'GET',
+        signal,
+    });
 };
 
 export const getListStudiesApiAdminStudiesGetQueryKey = () => {
@@ -410,7 +422,9 @@ export function useListStudiesApiAdminStudiesGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useListStudiesApiAdminStudiesGet<
     TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
     TError = unknown,
@@ -433,7 +447,9 @@ export function useListStudiesApiAdminStudiesGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useListStudiesApiAdminStudiesGet<
     TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
     TError = unknown,
@@ -448,7 +464,9 @@ export function useListStudiesApiAdminStudiesGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List Studies
  */
@@ -467,7 +485,9 @@ export function useListStudiesApiAdminStudiesGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -563,7 +583,11 @@ export const useCreateStudyApiAdminStudiesPost = <TError = HTTPValidationError, 
  * @summary Get Study
  */
 export const getStudyApiAdminStudiesSlugGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<StudyRead>({ url: `/api/admin/studies/${slug}`, method: 'GET', signal });
+    return customInstance<StudyRead>({
+        url: `/api/admin/studies/${slug}`,
+        method: 'GET',
+        signal,
+    });
 };
 
 export const getGetStudyApiAdminStudiesSlugGetQueryKey = (slug?: string) => {
@@ -593,7 +617,12 @@ export const getGetStudyApiAdminStudiesSlugGetQueryOptions = <
         signal,
     }) => getStudyApiAdminStudiesSlugGet(slug, signal);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!slug,
+        ...queryOptions,
+    } as UseQueryOptions<
         Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
         TError,
         TData
@@ -628,7 +657,9 @@ export function useGetStudyApiAdminStudiesSlugGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetStudyApiAdminStudiesSlugGet<
     TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
     TError = HTTPValidationError,
@@ -652,7 +683,9 @@ export function useGetStudyApiAdminStudiesSlugGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetStudyApiAdminStudiesSlugGet<
     TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
     TError = HTTPValidationError,
@@ -668,7 +701,9 @@ export function useGetStudyApiAdminStudiesSlugGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Study
  */
@@ -688,7 +723,9 @@ export function useGetStudyApiAdminStudiesSlugGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getGetStudyApiAdminStudiesSlugGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -786,7 +823,10 @@ export const useUpdateStudyApiAdminStudiesSlugPatch = <
  * @summary Delete Study
  */
 export const deleteStudyApiAdminStudiesSlugDelete = (slug: string) => {
-    return customInstance<void>({ url: `/api/admin/studies/${slug}`, method: 'DELETE' });
+    return customInstance<void>({
+        url: `/api/admin/studies/${slug}`,
+        method: 'DELETE',
+    });
 };
 
 export const getDeleteStudyApiAdminStudiesSlugDeleteMutationOptions = <
@@ -881,7 +921,10 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostMutationOptions = <
     mutation?: UseMutationOptions<
         Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
         TError,
-        { slug: string; params: ChangeStudyStateApiAdminStudiesSlugStatePostParams },
+        {
+            slug: string;
+            params: ChangeStudyStateApiAdminStudiesSlugStatePostParams;
+        },
         TContext
     >;
 }): UseMutationOptions<
@@ -926,7 +969,10 @@ export const useChangeStudyStateApiAdminStudiesSlugStatePost = <
         mutation?: UseMutationOptions<
             Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
             TError,
-            { slug: string; params: ChangeStudyStateApiAdminStudiesSlugStatePostParams },
+            {
+                slug: string;
+                params: ChangeStudyStateApiAdminStudiesSlugStatePostParams;
+            },
             TContext
         >;
     },
@@ -982,7 +1028,12 @@ export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions = <
         Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
     > = ({ signal }) => getStudyStatsApiAdminStudiesSlugStatsGet(slug, signal);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!slug,
+        ...queryOptions,
+    } as UseQueryOptions<
         Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
         TError,
         TData
@@ -1017,7 +1068,9 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
     TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
     TError = HTTPValidationError,
@@ -1041,7 +1094,9 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
     TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
     TError = HTTPValidationError,
@@ -1057,7 +1112,9 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Study Stats
  */
@@ -1077,7 +1134,9 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -1138,7 +1197,12 @@ export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryOp
     > = ({ signal }) =>
         getParticipantApiAdminStudiesParticipantsParticipantIdGet(participantId, signal);
 
-    return { queryKey, queryFn, enabled: !!participantId, ...queryOptions } as UseQueryOptions<
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!participantId,
+        ...queryOptions,
+    } as UseQueryOptions<
         Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
         TError,
         TData
@@ -1180,7 +1244,9 @@ export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
     TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
     TError = HTTPValidationError,
@@ -1210,7 +1276,9 @@ export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
     TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
     TError = HTTPValidationError,
@@ -1228,7 +1296,9 @@ export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Participant
  */
@@ -1250,7 +1320,9 @@ export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryOptions(
         participantId,
         options
@@ -1426,7 +1498,12 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOpti
         Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
     > = ({ signal }) => listStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug, signal);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!slug,
+        ...queryOptions,
+    } as UseQueryOptions<
         Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
         TError,
         TData
@@ -1465,7 +1542,9 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
     TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
     TError = HTTPValidationError,
@@ -1493,7 +1572,9 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
     TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
     TError = HTTPValidationError,
@@ -1509,7 +1590,9 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List Study Participants
  */
@@ -1529,7 +1612,9 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions(
         slug,
         options
@@ -1584,7 +1669,12 @@ export const getExportCsvApiAdminStudiesSlugExportCsvGetQueryOptions = <
         Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>
     > = ({ signal }) => exportCsvApiAdminStudiesSlugExportCsvGet(slug, signal);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!slug,
+        ...queryOptions,
+    } as UseQueryOptions<
         Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
         TError,
         TData
@@ -1619,7 +1709,9 @@ export function useExportCsvApiAdminStudiesSlugExportCsvGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useExportCsvApiAdminStudiesSlugExportCsvGet<
     TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
     TError = HTTPValidationError,
@@ -1643,7 +1735,9 @@ export function useExportCsvApiAdminStudiesSlugExportCsvGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useExportCsvApiAdminStudiesSlugExportCsvGet<
     TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
     TError = HTTPValidationError,
@@ -1659,7 +1753,9 @@ export function useExportCsvApiAdminStudiesSlugExportCsvGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Export Csv
  */
@@ -1679,7 +1775,9 @@ export function useExportCsvApiAdminStudiesSlugExportCsvGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getExportCsvApiAdminStudiesSlugExportCsvGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -1735,7 +1833,12 @@ export const getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryOptions =
         Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>
     > = ({ signal }) => exportPqmethodApiAdminStudiesSlugExportPqmethodGet(slug, signal);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!slug,
+        ...queryOptions,
+    } as UseQueryOptions<
         Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
         TError,
         TData
@@ -1770,7 +1873,9 @@ export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
     TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
     TError = HTTPValidationError,
@@ -1794,7 +1899,9 @@ export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
     TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
     TError = HTTPValidationError,
@@ -1810,7 +1917,9 @@ export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Export Pqmethod
  */
@@ -1830,7 +1939,9 @@ export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryOptions(
         slug,
         options
@@ -1885,7 +1996,12 @@ export const getExportRKitApiAdminStudiesSlugExportRKitGetQueryOptions = <
         Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>
     > = ({ signal }) => exportRKitApiAdminStudiesSlugExportRKitGet(slug, signal);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!slug,
+        ...queryOptions,
+    } as UseQueryOptions<
         Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
         TError,
         TData
@@ -1920,7 +2036,9 @@ export function useExportRKitApiAdminStudiesSlugExportRKitGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useExportRKitApiAdminStudiesSlugExportRKitGet<
     TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
     TError = HTTPValidationError,
@@ -1944,7 +2062,9 @@ export function useExportRKitApiAdminStudiesSlugExportRKitGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useExportRKitApiAdminStudiesSlugExportRKitGet<
     TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
     TError = HTTPValidationError,
@@ -1960,7 +2080,9 @@ export function useExportRKitApiAdminStudiesSlugExportRKitGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Export R Kit
  */
@@ -1980,7 +2102,9 @@ export function useExportRKitApiAdminStudiesSlugExportRKitGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getExportRKitApiAdminStudiesSlugExportRKitGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -2032,7 +2156,12 @@ export const getGetStudyDumpApiAdminStudiesSlugDumpGetQueryOptions = <
         Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>
     > = ({ signal }) => getStudyDumpApiAdminStudiesSlugDumpGet(slug, signal);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!slug,
+        ...queryOptions,
+    } as UseQueryOptions<
         Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
         TError,
         TData
@@ -2067,7 +2196,9 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
     TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
     TError = HTTPValidationError,
@@ -2091,7 +2222,9 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
     TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
     TError = HTTPValidationError,
@@ -2107,7 +2240,9 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Study Dump
  */
@@ -2127,7 +2262,9 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getGetStudyDumpApiAdminStudiesSlugDumpGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -2270,7 +2407,12 @@ export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions = 
         Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
     > = ({ signal }) => verifyInvitationApiAdminInvitationsVerifyTokenGet(token, signal);
 
-    return { queryKey, queryFn, enabled: !!token, ...queryOptions } as UseQueryOptions<
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!token,
+        ...queryOptions,
+    } as UseQueryOptions<
         Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
         TError,
         TData
@@ -2305,7 +2447,9 @@ export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
     TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
     TError = HTTPValidationError,
@@ -2329,7 +2473,9 @@ export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
     TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
     TError = HTTPValidationError,
@@ -2345,7 +2491,9 @@ export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Verify Invitation
  */
@@ -2365,7 +2513,9 @@ export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions(
         token,
         options
@@ -2385,7 +2535,11 @@ export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
  * @summary List Users
  */
 export const listUsersApiAdminUsersGet = (signal?: AbortSignal) => {
-    return customInstance<UserRead[]>({ url: `/api/admin/users/`, method: 'GET', signal });
+    return customInstance<UserRead[]>({
+        url: `/api/admin/users/`,
+        method: 'GET',
+        signal,
+    });
 };
 
 export const getListUsersApiAdminUsersGetQueryKey = () => {
@@ -2438,7 +2592,9 @@ export function useListUsersApiAdminUsersGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useListUsersApiAdminUsersGet<
     TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
     TError = unknown,
@@ -2457,7 +2613,9 @@ export function useListUsersApiAdminUsersGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useListUsersApiAdminUsersGet<
     TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
     TError = unknown,
@@ -2468,7 +2626,9 @@ export function useListUsersApiAdminUsersGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List Users
  */
@@ -2483,7 +2643,9 @@ export function useListUsersApiAdminUsersGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getListUsersApiAdminUsersGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -2579,7 +2741,10 @@ export const useCreateUserApiAdminUsersPost = <TError = HTTPValidationError, TCo
  * @summary Delete User
  */
 export const deleteUserApiAdminUsersUserIdDelete = (userId: number) => {
-    return customInstance<void>({ url: `/api/admin/users/${userId}`, method: 'DELETE' });
+    return customInstance<void>({
+        url: `/api/admin/users/${userId}`,
+        method: 'DELETE',
+    });
 };
 
 export const getDeleteUserApiAdminUsersUserIdDeleteMutationOptions = <
@@ -2720,7 +2885,9 @@ export function useListWorkspacesApiAdminWorkspacesGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useListWorkspacesApiAdminWorkspacesGet<
     TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
     TError = unknown,
@@ -2743,7 +2910,9 @@ export function useListWorkspacesApiAdminWorkspacesGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useListWorkspacesApiAdminWorkspacesGet<
     TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
     TError = unknown,
@@ -2758,7 +2927,9 @@ export function useListWorkspacesApiAdminWorkspacesGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary List Workspaces
  */
@@ -2777,7 +2948,9 @@ export function useListWorkspacesApiAdminWorkspacesGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getListWorkspacesApiAdminWorkspacesGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -2967,7 +3140,12 @@ export const getStudyApiStudySlugGet = (
     params?: GetStudyApiStudySlugGetParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({ url: `/api/study/${slug}`, method: 'GET', params, signal });
+    return customInstance<unknown>({
+        url: `/api/study/${slug}`,
+        method: 'GET',
+        params,
+        signal,
+    });
 };
 
 export const getGetStudyApiStudySlugGetQueryKey = (
@@ -2997,11 +3175,14 @@ export const getGetStudyApiStudySlugGetQueryOptions = <
         signal,
     }) => getStudyApiStudySlugGet(slug, params, signal);
 
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!slug,
+        ...queryOptions,
+    } as UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
 };
 
 export type GetStudyApiStudySlugGetQueryResult = NonNullable<
@@ -3029,7 +3210,9 @@ export function useGetStudyApiStudySlugGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetStudyApiStudySlugGet<
     TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
     TError = HTTPValidationError,
@@ -3050,7 +3233,9 @@ export function useGetStudyApiStudySlugGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useGetStudyApiStudySlugGet<
     TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
     TError = HTTPValidationError,
@@ -3063,7 +3248,9 @@ export function useGetStudyApiStudySlugGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get Study
  */
@@ -3080,7 +3267,9 @@ export function useGetStudyApiStudySlugGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getGetStudyApiStudySlugGetQueryOptions(slug, params, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -3314,7 +3503,9 @@ export function useHealthCheckHealthGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useHealthCheckHealthGet<
     TData = Awaited<ReturnType<typeof healthCheckHealthGet>>,
     TError = unknown,
@@ -3333,7 +3524,9 @@ export function useHealthCheckHealthGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useHealthCheckHealthGet<
     TData = Awaited<ReturnType<typeof healthCheckHealthGet>>,
     TError = unknown,
@@ -3344,7 +3537,9 @@ export function useHealthCheckHealthGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Health Check
  */
@@ -3359,7 +3554,9 @@ export function useHealthCheckHealthGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getHealthCheckHealthGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -3376,7 +3573,11 @@ export function useHealthCheckHealthGet<
  * @summary Serve Spa
  */
 export const serveSpaFullPathGet = (fullPath: string, signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/${fullPath}`, method: 'GET', signal });
+    return customInstance<unknown>({
+        url: `/${fullPath}`,
+        method: 'GET',
+        signal,
+    });
 };
 
 export const getServeSpaFullPathGetQueryKey = (fullPath?: string) => {
@@ -3401,11 +3602,14 @@ export const getServeSpaFullPathGetQueryOptions = <
     const queryFn: QueryFunction<Awaited<ReturnType<typeof serveSpaFullPathGet>>> = ({ signal }) =>
         serveSpaFullPathGet(fullPath, signal);
 
-    return { queryKey, queryFn, enabled: !!fullPath, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!fullPath,
+        ...queryOptions,
+    } as UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
 };
 
 export type ServeSpaFullPathGetQueryResult = NonNullable<
@@ -3432,7 +3636,9 @@ export function useServeSpaFullPathGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): DefinedUseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useServeSpaFullPathGet<
     TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
     TError = HTTPValidationError,
@@ -3452,7 +3658,9 @@ export function useServeSpaFullPathGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 export function useServeSpaFullPathGet<
     TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
     TError = HTTPValidationError,
@@ -3464,7 +3672,9 @@ export function useServeSpaFullPathGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Serve Spa
  */
@@ -3480,7 +3690,9 @@ export function useServeSpaFullPathGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+): UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+} {
     const queryOptions = getServeSpaFullPathGetQueryOptions(fullPath, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {

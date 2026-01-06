@@ -40,6 +40,7 @@ const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage')
 const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
 const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
 const DesignerPreviewPage = lazy(() => import('./pages/admin/DesignerPreviewPage'));
+const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
 
 import { AdminDashboard } from '@/components/admin/AdminDashboard';
 
@@ -80,6 +81,7 @@ const App = () => {
                                     element={<RecruitmentPage />}
                                 />
                                 <Route path="studies/:slug/exports" element={<DataExportsPage />} />
+                                <Route path="profile" element={<ProfilePage />} />
                             </Route>
                             <Route
                                 path="studies/:slug/design/preview"

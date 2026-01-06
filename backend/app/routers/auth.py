@@ -12,13 +12,15 @@ from app.core.config import settings
 from app.database import get_db
 from app.dependencies import get_current_user
 from app.models import User, StudyCollaborator, StudyRole
-from app.schemas import Token, UserRead, UserCreate
+from app.schemas import Token, UserRead, UserCreate, UserUpdate, PasswordChange
 from app.utils.security import (
     create_access_token,
     verify_password,
     get_password_hash,
     decode_invitation_token,
 )
+from app.limiter import limiter
+from fastapi import Request
 
 router = APIRouter()
 
@@ -32,7 +34,9 @@ async def read_users_me(
 
 
 @router.post("/token", response_model=Token)
+@limiter.limit("5/minute")
 async def login_for_access_token(
+    request: Request,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: AsyncSession = Depends(get_db),
 ):
@@ -94,6 +98,7 @@ async def register_user(
     # 3. Create User
     new_user = User(
         email=user_in.email,
+        full_name=user_in.full_name,
         hashed_password=get_password_hash(user_in.password),
         is_active=True,
     )
@@ -112,3 +117,49 @@ async def register_user(
     await db.commit()
     await db.refresh(new_user)
     return new_user
+
+
+@router.patch("/me", response_model=UserRead)
+async def update_user_me(
+    user_update: UserUpdate,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: AsyncSession = Depends(get_db),
+):
+    """Update current user profile."""
+    # Check email uniqueness if changing email
+    if user_update.email and user_update.email != current_user.email:
+        query = select(User).where(User.email == user_update.email)
+        result = await db.execute(query)
+        if result.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered",
+            )
+        current_user.email = user_update.email
+
+    if user_update.full_name is not None:
+        current_user.full_name = user_update.full_name
+
+    await db.commit()
+    await db.refresh(current_user)
+    return current_user
+
+
+@router.post("/me/password", status_code=status.HTTP_200_OK)
+async def change_password(
+    password_data: PasswordChange,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: AsyncSession = Depends(get_db),
+):
+    """Change current user password."""
+    if not verify_password(
+        password_data.current_password, current_user.hashed_password
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect current password",
+        )
+
+    current_user.hashed_password = get_password_hash(password_data.new_password)
+    await db.commit()
+    return {"message": "Password updated successfully"}

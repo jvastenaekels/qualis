@@ -90,3 +90,6 @@ consent_decline
 random_seed
 logo_url
 accent_color
+update_user_me  # unused function (backend/app/routers/auth.py)
+change_password  # unused function (backend/app/routers/auth.py)
+full_name  # unused variable

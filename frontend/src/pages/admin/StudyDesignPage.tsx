@@ -146,11 +146,13 @@ const StudyDesignPage = () => {
 
     useEffect(() => {
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            if (isDirty) {
+            // biome-ignore lint/suspicious/noExplicitAny: window hack
+            if (isDirty && !(window as any).__isAutoLogout) {
                 e.preventDefault();
                 e.returnValue = '';
             }
         };
+
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [isDirty]);

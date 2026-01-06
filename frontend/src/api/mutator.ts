@@ -49,6 +49,10 @@ export const customInstance = async <T>({
 
         // 401 Unauthorized: Clear session and redirect to login
         if (response.status === 401) {
+            // Set flag to prevent unsaved changes dialog
+            // biome-ignore lint/suspicious/noExplicitAny: window hack
+            (window as any).__isAutoLogout = true;
+
             useAuthStore.getState().logout();
             useSessionStore.getState().resetSession();
             // Optional: Redirect to login if not already there

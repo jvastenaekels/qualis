@@ -170,6 +170,24 @@ async def migrate_participants_table():
             logger.info("✓ Participants table up to date")
 
 
+async def migrate_users_table():
+    """Add missing columns to users table."""
+    logger.info("Checking 'users' table...")
+
+    async with engine.connect() as conn:
+        if not await check_table_exists(conn, "users"):
+            logger.warning("Users table doesn't exist - skipping migration")
+            return
+
+        if not await check_column_exists(conn, "users", "full_name"):
+            logger.info("  Adding 'full_name' column...")
+            await conn.execute(text("ALTER TABLE users ADD COLUMN full_name VARCHAR"))
+            await conn.commit()
+            logger.info("✓ Users table updated")
+        else:
+            logger.info("✓ Users table up to date")
+
+
 async def verify_workspace_tables():
     """Verify workspace architecture tables exist."""
     logger.info("Verifying workspace architecture...")
@@ -260,6 +278,7 @@ async def run_all_migrations():
         await migrate_studies_table()
         await migrate_translations_table()
         await migrate_participants_table()
+        await migrate_users_table()
 
         # Then run data migrations
         await migrate_data_collaborators()

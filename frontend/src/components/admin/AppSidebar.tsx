@@ -1,5 +1,14 @@
-import type * as React from 'react';
-import { Database, LayoutDashboard, PencilRuler, Send, SquareTerminal, Users } from 'lucide-react';
+import {
+    BadgeCheck,
+    ChevronsUpDown,
+    Database,
+    LayoutDashboard,
+    LogOut,
+    PencilRuler,
+    Send,
+    SquareTerminal,
+    Users,
+} from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
 import {
@@ -13,25 +22,88 @@ import {
     SidebarGroup,
     SidebarGroupLabel,
 } from '@/components/ui/sidebar';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useAdminStore } from '@/store/useAdminStore';
-import { Link, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/store/useAuthStore';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 
 // biome-ignore lint/suspicious/noExplicitAny: mock user
 function NavUser({ user }: { user: any }) {
-    // Basic implementation
+    const logout = useAuthStore((state) => state.logout);
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     return (
         <SidebarMenu>
             <SidebarMenuItem>
-                <SidebarMenuButton size="lg">
-                    <div className="rounded-md bg-primary text-primary-foreground p-1">
-                        {user?.email?.substring(0, 2).toUpperCase()}
-                    </div>
-                    <div className="flex flex-col text-left">
-                        <span className="font-semibold text-sm">{user?.email}</span>
-                        <span className="text-xs text-muted-foreground">Admin</span>
-                    </div>
-                </SidebarMenuButton>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton
+                            size="lg"
+                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                        >
+                            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold">
+                                {user?.full_name
+                                    ? user.full_name.substring(0, 2).toUpperCase()
+                                    : user?.email?.substring(0, 2).toUpperCase()}
+                            </div>
+                            <div className="grid flex-1 text-left text-sm leading-tight">
+                                <span className="truncate font-semibold">
+                                    {user?.full_name || 'Admin User'}
+                                </span>
+                                <span className="truncate text-xs">{user?.email}</span>
+                            </div>
+                            <ChevronsUpDown className="ml-auto size-4" />
+                        </SidebarMenuButton>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                        side="bottom"
+                        align="end"
+                        sideOffset={4}
+                    >
+                        <DropdownMenuLabel className="p-0 font-normal">
+                            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-indigo-600 text-white font-bold">
+                                    {user?.full_name
+                                        ? user.full_name.substring(0, 2).toUpperCase()
+                                        : user?.email?.substring(0, 2).toUpperCase()}
+                                </div>
+                                <div className="grid flex-1 text-left text-sm leading-tight">
+                                    <span className="truncate font-semibold">
+                                        {user?.full_name || 'Admin User'}
+                                    </span>
+                                    <span className="truncate text-xs">{user?.email}</span>
+                                </div>
+                            </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                            <DropdownMenuItem onSelect={() => navigate('/admin/profile')}>
+                                <BadgeCheck className="mr-2 h-4 w-4" />
+                                Profile
+                            </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onSelect={handleLogout}>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Log out
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </SidebarMenuItem>
         </SidebarMenu>
     );

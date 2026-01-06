@@ -1,7 +1,7 @@
 .PHONY: install run-backend run-frontend lint check test ci
 
 install:
-	cd backend && python3 -m venv venv && ./venv/bin/pip install -r requirements.txt -r requirements-dev.txt
+	cd backend && python3 -m venv venv && ./venv/bin/pip install -r requirements.txt
 	cd frontend && npm install
 
 run-backend:
@@ -25,6 +25,7 @@ check:
 	cd backend && uv run radon cc app/ -a -nb --min B
 	cd backend && uv run deptry app/
 	cd backend && uv run vulture app/ vulture_whitelist.py --min-confidence 60
+	cd backend && uv run pip-audit
 	cd frontend && npm run type-check
 	cd frontend && npm run i18n-check
 

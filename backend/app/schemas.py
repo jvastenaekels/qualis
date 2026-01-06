@@ -31,6 +31,7 @@ class UserBase(BaseModel):
     """Base schema for users."""
 
     email: str
+    full_name: str | None = None
 
 
 class UserCreate(UserBase):
@@ -49,6 +50,20 @@ class UserRead(UserBase):
     is_active: bool
     is_superuser: bool
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserUpdate(BaseModel):
+    """Schema for updating user profile."""
+
+    email: str | None = None
+    full_name: str | None = None
+
+
+class PasswordChange(BaseModel):
+    """Schema for changing password."""
+
+    current_password: str
+    new_password: str = Field(..., min_length=8)
 
 
 # Workspace Schemas
