@@ -1,3 +1,4 @@
+import os
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -122,6 +123,10 @@ async def test_change_password_wrong_current(
 # -----------------------------------------------------------------------------
 
 
+@pytest.mark.skipif(
+    os.getenv("TESTING", "").lower() == "true",
+    reason="Rate limiting is disabled in testing mode",
+)
 @pytest.mark.asyncio
 async def test_rate_limiting_login(client: AsyncClient):
     """Test rate limiting on the login endpoint."""

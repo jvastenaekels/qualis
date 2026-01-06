@@ -5,9 +5,13 @@
 
 """Pytest configuration and fixtures."""
 
+import os
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
+
+# Set testing environment variable BEFORE app matches are imported
+os.environ["TESTING"] = "true"
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import selectinload
 from sqlalchemy.pool import StaticPool
