@@ -140,7 +140,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                             value={value}
                             onChange={(e) => onChange(e.target.value)}
                             placeholder={placeholder}
-                            className="w-full h-full min-h-[120px] p-3 text-sm font-mono focus:outline-none resize-none border-none bg-transparent"
+                            className="w-full h-full min-h-[120px] p-3 text-sm focus:outline-none resize-none border-none bg-transparent"
                         />
                     ) : (
                         <div className="p-4 prose prose-sm max-w-none prose-slate min-h-[120px] bg-slate-50/30">
