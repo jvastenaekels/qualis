@@ -567,9 +567,9 @@
 
             "intro": {
                 "welcome_title": "Message de bienvenue",
-                "process_title": "Étapes de l'étude",
+                "process_title": "Aperçu des étapes",
                 "process_steps": {
-                    "title": "Étapes de l'étude",
+                    "title": "Aperçu des étapes",
                     "desc": "Définissez les phases affichées aux participants sur la page d'accueil. Si vide, les étapes par défaut seront utilisées.",
                     "add_step": "Ajouter une étape",
                     "empty": {
@@ -595,7 +595,7 @@
                     "subtitle_placeholder": "ex: Département RSE",
                     "objective": "Question de tri",
                     "objective_placeholder": "Quelle est la question de recherche ou le but de cette étude ?",
-                    "task_overview": "Introduction au processus",
+                    "task_overview": "Introduction",
                     "task_placeholder": "Expliquez brièvement le processus aux participants (optionnel)...",
                     "consent_title_label": "Titre du consentement",
                     "legal_text": "Texte légal / accord",

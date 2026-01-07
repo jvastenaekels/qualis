@@ -142,8 +142,8 @@ const IntroductionEditor = () => {
                                     value={translation?.instructions || ''}
                                     onChange={(val: string) => handleChange('instructions', val)}
                                     placeholder={t('admin.design.intro.fields.task_placeholder')}
-                                    minRows={2}
-                                    maxRows={2}
+                                    minRows={1}
+                                    maxRows={1}
                                 />
                             </div>
                         </CardContent>
