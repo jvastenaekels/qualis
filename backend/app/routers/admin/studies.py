@@ -6,7 +6,11 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import check_study_permission, get_current_user
+from app.dependencies import (
+    check_study_permission,
+    get_current_user,
+    get_current_workspace,
+)
 from app.models import (
     Participant,
     Study,
@@ -36,9 +40,25 @@ router = APIRouter()
 async def create_study(
     study: StudyCreate,
     current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
-    """Create a new study in the user's active workspace."""
+    """Create a new study in the active workspace."""
+    workspace, member = workspace_ctx
+
+    # Check permission (Researcher or Admin)
+    # Check Role Hierarchy
+    # We could import WORKSPACE_ROLE_HIERARCHY but we can also just check role value for now
+    if member.role not in [
+        WorkspaceRole.admin,
+        WorkspaceRole.researcher,
+        WorkspaceRole.owner,
+    ]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You need to be an Admin or Researcher in this Workspace to create a study.",
+        )
+
     # 1. Check slug uniqueness
     query = select(Study).where(Study.slug == study.slug)
     result = await db.execute(query)
@@ -46,27 +66,6 @@ async def create_study(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Study with this slug already exists",
-        )
-
-    # 2. Find a valid workspace for the user (Admin or Researcher)
-    # In a real app, workspace_id might be passed in headers or body.
-    # Here we pick the first workspace where user has create permissions.
-    ws_query = (
-        select(Workspace)
-        .join(WorkspaceMember)
-        .where(WorkspaceMember.user_id == current_user.id)
-        .where(
-            WorkspaceMember.role.in_([WorkspaceRole.admin, WorkspaceRole.researcher])
-        )
-        .limit(1)
-    )
-    ws_res = await db.execute(ws_query)
-    workspace = ws_res.scalar_one_or_none()
-
-    if not workspace:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You need to be an Admin or Researcher in a Workspace to create a study.",
         )
 
     # 3. Create Study
@@ -129,22 +128,17 @@ async def create_study(
 
 @router.get("/", response_model=list[StudyRead])
 async def list_studies(
-    current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ) -> list[Study]:
-    """List studies accessible to the current user (via Workspace membership)."""
+    """List studies in the active workspace."""
+    workspace, _ = workspace_ctx
+
+    # Simple filter by workspace. Isolation secured.
     query = (
         select(Study)
-        .outerjoin(StudyCollaborator, StudyCollaborator.study_id == Study.id)
-        .outerjoin(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
-        .where(
-            (StudyCollaborator.user_id == current_user.id)
-            | (
-                (WorkspaceMember.user_id == current_user.id)
-                & (WorkspaceMember.role == WorkspaceRole.admin)
-            )
-        )
-        .distinct()
+        .where(Study.workspace_id == workspace.id)
+        .order_by(Study.created_at.desc())
     )
     result = await db.execute(query)
     return list(result.scalars().all())
