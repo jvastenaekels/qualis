@@ -127,7 +127,10 @@ class TestStudyAdmin:
         test_workspace: Workspace,
         auth_token_factory,
     ):
-        headers = auth_token_factory(test_user)
+        headers = {
+            **auth_token_factory(test_user),
+            "X-Workspace-ID": str(test_workspace.id),
+        }
         payload = {
             "slug": "new-study-admin",
             "translations": [
@@ -152,8 +155,12 @@ class TestStudyAdmin:
         test_user: User,
         seed_study: Study,
         auth_token_factory,
+        test_workspace: Workspace,
     ):
-        headers = auth_token_factory(test_user)
+        headers = {
+            **auth_token_factory(test_user),
+            "X-Workspace-ID": str(test_workspace.id),
+        }
         response = await client.get("/api/admin/studies/", headers=headers)
         assert response.status_code == 200
         assert any(s["slug"] == seed_study.slug for s in response.json())
@@ -164,9 +171,13 @@ class TestStudyAdmin:
         test_user: User,
         seed_study: Study,
         auth_token_factory,
+        test_workspace: Workspace,
         db: AsyncSession,
     ):
-        headers = auth_token_factory(test_user)
+        headers = {
+            **auth_token_factory(test_user),
+            "X-Workspace-ID": str(test_workspace.id),
+        }
         # Ensure DRAFT for update if needed, but the router allows update in active usually
         response = await client.patch(
             f"/api/admin/studies/{seed_study.slug}",
@@ -182,6 +193,7 @@ class TestStudyAdmin:
         test_user: User,
         seed_study: Study,
         auth_token_factory,
+        test_workspace: Workspace,
         db: AsyncSession,
     ):
         # 1. Promote user to Superuser
@@ -191,7 +203,10 @@ class TestStudyAdmin:
         seed_study.state = StudyState.archived
         await db.commit()
 
-        headers = auth_token_factory(test_user)
+        headers = {
+            **auth_token_factory(test_user),
+            "X-Workspace-ID": str(test_workspace.id),
+        }
         slug = seed_study.slug
         response = await client.delete(f"/api/admin/studies/{slug}", headers=headers)
         assert response.status_code == 204
@@ -210,9 +225,13 @@ class TestStudyLifecycle:
         client: AsyncClient,
         test_user: User,
         seed_study: Study,
+        test_workspace: Workspace,
         auth_token_factory,
     ):
-        headers = auth_token_factory(test_user)
+        headers = {
+            **auth_token_factory(test_user),
+            "X-Workspace-ID": str(test_workspace.id),
+        }
 
         # Pause study
         response = await client.post(
@@ -264,6 +283,9 @@ class TestStudyLifecycle:
         script_utils_module.APIClient = lambda *args, **kwargs: orig_api_cls(  # type: ignore
             client=client
         )
+
+        # Inject workspace context globally for this client instance
+        client.headers["X-Workspace-ID"] = str(test_workspace.id)
 
         try:
             await sync_study_from_file(tmp_path)

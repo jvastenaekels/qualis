@@ -260,7 +260,32 @@
             "study_management": "Tutkimuksen hallinta",
             "search": "Hae...",
             "studies": "Tutkimukset",
-            "select_study_msg": "Valitse tai luo tutkimus aloittaaksesi."
+            "select_study_msg": "Valitse tai luo tutkimus aloittaaksesi.",
+            "study": "Tutkimus"
+        },
+        "workspace": {
+            "switcher": {
+                "settings": "Työtilan asetukset",
+                "settings_desc": "Jäsenet ja profiilit",
+                "new_workspace": "Uusi työtila",
+                "new_workspace_desc": "Luo uusi organisaatio"
+            },
+            "create": {
+                "title": "Luo työtila",
+                "description": "Luo uusi organisaatio hallinnoidaksesi tutkimuksiasi ja tiimiäsi.",
+                "card_title": "Työtilan tiedot",
+                "card_description": "Syötä nimi ja URL-tunnus uudelle työtilallesi.",
+                "name_label": "Työtilan nimi",
+                "name_placeholder": "Yliopiston tutkimusryhmäni",
+                "url_label": "Työtilan URL",
+                "url_placeholder": "tutkimusryhma",
+                "url_description": "Tätä käytetään työtilasi URL-osoitteessa.",
+                "cancel": "Peruuta",
+                "create_button": "Luo työtila",
+                "creating": "Luodaan...",
+                "success": "Työtila luotu onnistuneesti",
+                "error": "Työtilan luominen epäonnistui"
+            }
         },
         "recruitment": {
             "title": "Rekrytointi",

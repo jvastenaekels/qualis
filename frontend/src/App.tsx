@@ -44,6 +44,7 @@ const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetai
 const DesignerPreviewPage = lazy(() => import('./pages/admin/DesignerPreviewPage'));
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
 const WorkspaceSettingsPage = lazy(() => import('./pages/admin/WorkspaceSettingsPage'));
+const CreateWorkspacePage = lazy(() => import('./pages/admin/CreateWorkspacePage'));
 import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
 import { studyLayoutLoader } from './layouts/StudyLayout.loader';
 import { studyOverviewPageLoader } from './pages/admin/StudyOverviewPage.loader';
@@ -124,6 +125,10 @@ const router = createBrowserRouter([
                         path: 'workspaces/:slug/settings',
                         element: <WorkspaceSettingsPage />,
                         loader: workspaceSettingsPageLoader,
+                    },
+                    {
+                        path: 'workspaces/new',
+                        element: <CreateWorkspacePage />,
                     },
                     {
                         path: 'profile',

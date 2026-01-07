@@ -259,7 +259,32 @@
             "study_management": "Gestion",
             "search": "Chercher...",
             "studies": "Études",
-            "select_study_msg": "Veuillez sélectionner ou créer une étude pour commencer."
+            "select_study_msg": "Veuillez sélectionner ou créer une étude pour commencer.",
+            "study": "Étude"
+        },
+        "workspace": {
+            "switcher": {
+                "settings": "Paramètres de l'espace",
+                "settings_desc": "Membres et profils",
+                "new_workspace": "Nouvel espace",
+                "new_workspace_desc": "Créer une nouvelle organisation"
+            },
+            "create": {
+                "title": "Créer un espace de travail",
+                "description": "Créez une nouvelle organisation pour gérer vos études et votre équipe.",
+                "card_title": "Détails de l'espace",
+                "card_description": "Entrez le nom et l'identifiant URL de votre nouvel espace.",
+                "name_label": "Nom de l'espace",
+                "name_placeholder": "Mon groupe de recherche universitaire",
+                "url_label": "URL de l'espace",
+                "url_placeholder": "mon-groupe-recherche",
+                "url_description": "Ceci sera utilisé dans l'URL de votre espace de travail.",
+                "cancel": "Annuler",
+                "create_button": "Créer l'espace",
+                "creating": "Création...",
+                "success": "Espace créé avec succès",
+                "error": "Échec de la création de l'espace"
+            }
         },
         "recruitment": {
             "title": "Recrutement",

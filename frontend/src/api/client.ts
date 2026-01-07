@@ -71,39 +71,65 @@ export default {
     get: async (
         url: string,
         options?: RequestInit & { headers?: Record<string, string>; responseType?: string }
-    ) => {
-        const fullUrl =
-            url.startsWith('http') || url.startsWith('/api')
-                ? `${BASE_URL}${url}`
-                : `${BASE_URL}/api${url}`;
+    ) => request(url, { ...options, method: 'GET' }),
 
-        // Get token from either admin store or participant session store
-        const adminToken = useAuthStore.getState().token;
-        const sessionToken = useSessionStore.getState().token;
-        const token = adminToken || sessionToken;
+    post: async (
+        url: string,
+        data?: unknown,
+        options?: RequestInit & { headers?: Record<string, string> }
+    ) => request(url, { ...options, method: 'POST', body: JSON.stringify(data) }),
 
-        const response = await fetch(fullUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                ...options?.headers,
-            },
-            ...options,
-        });
+    patch: async (
+        url: string,
+        data?: unknown,
+        options?: RequestInit & { headers?: Record<string, string> }
+    ) => request(url, { ...options, method: 'PATCH', body: JSON.stringify(data) }),
 
-        if (!response.ok) {
-            if (response.status === 401) {
-                // Handle session expiry for manual fetches too
-                useAuthStore.getState().logout();
-                if (!window.location.pathname.includes('/login')) {
-                    window.location.href = '/login?reason=session_expired';
-                }
-            }
-            throw new Error(await response.text());
-        }
-        return {
-            data: await (options?.responseType === 'blob' ? response.blob() : response.json()),
-        };
-    },
+    delete: async (url: string, options?: RequestInit & { headers?: Record<string, string> }) =>
+        request(url, { ...options, method: 'DELETE' }),
 };
+
+async function request(
+    url: string,
+    options: RequestInit & { headers?: Record<string, string>; responseType?: string }
+) {
+    const fullUrl =
+        url.startsWith('http') || url.startsWith('/api')
+            ? `${BASE_URL}${url}`
+            : `${BASE_URL}/api${url}`;
+
+    // Get token from either admin store or participant session store
+    const adminToken = useAuthStore.getState().token;
+    const sessionToken = useSessionStore.getState().token;
+    const token = adminToken || sessionToken;
+
+    // Get current workspace ID
+    const currentWorkspace = useAuthStore.getState().currentWorkspace;
+    const workspaceId = currentWorkspace?.id ? String(currentWorkspace.id) : undefined;
+
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
+        ...options?.headers,
+    };
+
+    const response = await fetch(fullUrl, {
+        ...options,
+        headers,
+    });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            // Handle session expiry for manual fetches too
+            useAuthStore.getState().logout();
+            if (!window.location.pathname.includes('/login')) {
+                window.location.href = '/login?reason=session_expired';
+            }
+        }
+        throw new Error(await response.text());
+    }
+    return {
+        data: await (options?.responseType === 'blob' ? response.blob() : response.json()),
+    };
+}

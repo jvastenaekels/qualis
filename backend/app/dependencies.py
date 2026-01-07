@@ -74,15 +74,9 @@ async def get_current_workspace(
     x_workspace_id: str | None = Header(None, alias="X-Workspace-ID"),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-) -> "Workspace":
-    """Validate workspace context from header."""
+) -> tuple["Workspace", WorkspaceMember]:
+    """Validate workspace context from header and return workspace + member info."""
     if not x_workspace_id:
-        # Fallback or strict? Plan implies strict isolation.
-        # But for transition, maybe optional?
-        # User plan says: "Raise 403 Forbidden if access denied".
-        # If header checks are enforced, then missing header is 400 or 401.
-        # Let's assume strict for now, or allow path override in future.
-        # For now, if no header, we can't context switch.
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="X-Workspace-ID header is required",
@@ -100,22 +94,22 @@ async def get_current_workspace(
     # Check permission
     # Query membership
     query = (
-        select(Workspace)
+        select(Workspace, WorkspaceMember)
         .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
         .where(Workspace.id == workspace_id)
         .where(WorkspaceMember.user_id == current_user.id)
     )
 
     result = await db.execute(query)
-    workspace = result.scalar_one_or_none()
+    row = result.one_or_none()
 
-    if not workspace:
+    if not row:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access to this workspace is denied",
         )
 
-    return cast(Workspace, workspace)
+    return cast(tuple[Workspace, WorkspaceMember], row)
 
 
 # --- RBAC Logic ---

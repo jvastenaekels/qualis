@@ -33,11 +33,16 @@ export const customInstance = async <T>({
     const sessionToken = useSessionStore.getState().token;
     const token = adminToken || sessionToken;
 
+    // Get current workspace ID
+    const currentWorkspace = useAuthStore.getState().currentWorkspace;
+    const workspaceId = currentWorkspace?.id ? String(currentWorkspace.id) : undefined;
+
     const response = await fetch(fullUrl, {
         method,
         headers: {
             'Content-Type': 'application/json',
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
             ...(headers as Record<string, string>),
         },
         body: data ? (data instanceof URLSearchParams ? data : JSON.stringify(data)) : undefined,

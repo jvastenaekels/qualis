@@ -259,7 +259,32 @@
             "study_management": "Study Management",
             "search": "Search...",
             "studies": "Studies",
-            "select_study_msg": "Please select or create a study to begin."
+            "select_study_msg": "Please select or create a study to begin.",
+            "study": "Study"
+        },
+        "workspace": {
+            "switcher": {
+                "settings": "Workspace Settings",
+                "settings_desc": "Members & Profiles",
+                "new_workspace": "New Workspace",
+                "new_workspace_desc": "Create new organization"
+            },
+            "create": {
+                "title": "Create Workspace",
+                "description": "Create a new organization to manage your studies and team.",
+                "card_title": "Workspace Details",
+                "card_description": "Enter the name and URL slug for your new workspace.",
+                "name_label": "Workspace Name",
+                "name_placeholder": "My University Research Group",
+                "url_label": "Workspace URL",
+                "url_placeholder": "my-research-group",
+                "url_description": "This will be used in your workspace URL.",
+                "cancel": "Cancel",
+                "create_button": "Create Workspace",
+                "creating": "Creating...",
+                "success": "Workspace created successfully",
+                "error": "Failed to create workspace"
+            }
         },
         "recruitment": {
             "title": "Recruitment",

@@ -17,31 +17,46 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
+import { useNavigate } from 'react-router-dom';
 import {
     useListWorkspacesApiAdminWorkspacesGet,
     useListStudiesApiAdminStudiesGet,
 } from '@/api/generated';
-import { useAdminStore } from '@/store/useAdminStore';
+import { useAuthStore } from '@/store/useAuthStore';
+import type { WorkspaceWithRole } from '@/types/backend';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export function WorkspaceSwitcher() {
     const { isMobile } = useSidebar();
     const { t } = useTranslation();
-    const { data: workspaces, isLoading: isWorkspacesLoading } =
+    const navigate = useNavigate();
+
+    // Fetch data using generated hook (React Query)
+    const { data: workspacesData, isLoading: isWorkspacesLoading } =
         useListWorkspacesApiAdminWorkspacesGet();
+    // Cast to our type including role
+    const workspaces = workspacesData as WorkspaceWithRole[] | undefined;
+
     const { data: studies, isLoading: isStudiesLoading } = useListStudiesApiAdminStudiesGet();
-    const { activeWorkspaceId, setActiveWorkspace } = useAdminStore();
+
+    // Use Auth Store for global state
+    const { currentWorkspace, setCurrentWorkspace, setWorkspaces } = useAuthStore();
+
+    // Sync React Query data to Zustand Store
+    React.useEffect(() => {
+        if (workspaces) {
+            setWorkspaces(workspaces);
+        }
+    }, [workspaces, setWorkspaces]);
 
     const isLoading = isWorkspacesLoading || isStudiesLoading;
 
-    const activeWorkspace = workspaces?.find((w) => w.id === activeWorkspaceId);
-
     // Auto-select first workspace if none selected and data loaded
     React.useEffect(() => {
-        if (!activeWorkspaceId && workspaces && workspaces.length > 0) {
-            setActiveWorkspace(workspaces[0].id);
+        if (!currentWorkspace && workspaces && workspaces.length > 0) {
+            setCurrentWorkspace(workspaces[0]);
         }
-    }, [activeWorkspaceId, workspaces, setActiveWorkspace]);
+    }, [currentWorkspace, workspaces, setCurrentWorkspace]);
 
     if (isLoading) {
         return (
@@ -67,15 +82,15 @@ export function WorkspaceSwitcher() {
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight ml-1">
                                 <span className="truncate font-bold tracking-tight text-slate-900">
-                                    {activeWorkspace ? activeWorkspace.title : 'Select Workspace'}
+                                    {currentWorkspace ? currentWorkspace.title : 'Select Workspace'}
                                 </span>
-                                {activeWorkspace && (
+                                {currentWorkspace && (
                                     <span className="truncate text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
                                         {studies?.filter(
-                                            (s) => s.workspace_id === activeWorkspace.id
+                                            (s) => s.workspace_id === currentWorkspace.id
                                         ).length || 0}{' '}
                                         {studies?.filter(
-                                            (s) => s.workspace_id === activeWorkspace.id
+                                            (s) => s.workspace_id === currentWorkspace.id
                                         ).length === 1
                                             ? t
                                                 ? t('admin.sidebar.study', 'Study')
@@ -96,18 +111,18 @@ export function WorkspaceSwitcher() {
                         sideOffset={4}
                     >
                         <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">
-                            Workspaces
+                            {t('admin.command_menu.switch_workspace', 'WORKSPACES')}
                         </DropdownMenuLabel>
                         <div className="space-y-1 my-1">
                             {workspaces?.map((workspace) => {
                                 const studyCount =
                                     studies?.filter((s) => s.workspace_id === workspace.id)
                                         .length || 0;
-                                const isActive = workspace.id === activeWorkspaceId;
+                                const isActive = workspace.id === currentWorkspace?.id;
                                 return (
                                     <DropdownMenuItem
                                         key={workspace.id}
-                                        onClick={() => setActiveWorkspace(workspace.id)}
+                                        onClick={() => setCurrentWorkspace(workspace)}
                                         className={cn(
                                             'flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer transition-all duration-200 outline-none',
                                             isActive
@@ -130,6 +145,20 @@ export function WorkspaceSwitcher() {
                                                 {workspace.title}
                                             </span>
                                             <span className="text-[10px] font-medium opacity-60 flex items-center gap-1">
+                                                {/* Show Role Badge */}
+                                                <span
+                                                    className={cn(
+                                                        'uppercase px-1 rounded-sm text-[8px]',
+                                                        workspace.user_role === 'owner'
+                                                            ? 'bg-amber-100 text-amber-700'
+                                                            : workspace.user_role === 'admin'
+                                                              ? 'bg-blue-100 text-blue-700'
+                                                              : 'bg-slate-100'
+                                                    )}
+                                                >
+                                                    {workspace.user_role}
+                                                </span>
+                                                <span className="mx-1">•</span>
                                                 <Layout className="size-2.5" /> {studyCount}
                                             </span>
                                         </div>
@@ -137,7 +166,7 @@ export function WorkspaceSwitcher() {
                                             <div className="ml-auto flex items-center gap-1 bg-indigo-100/50 px-1.5 py-0.5 rounded-full ring-1 ring-indigo-500/20">
                                                 <div className="size-1 rounded-full bg-indigo-500 animate-pulse" />
                                                 <span className="text-[9px] font-black uppercase tracking-tighter">
-                                                    Active
+                                                    {t('admin.command_menu.active', 'ACTIVE')}
                                                 </span>
                                             </div>
                                         )}
@@ -146,35 +175,39 @@ export function WorkspaceSwitcher() {
                             })}
                         </div>
                         <DropdownMenuSeparator className="bg-slate-100 my-1" />
-                        {activeWorkspace && (
+                        {currentWorkspace && (
                             <DropdownMenuItem
                                 className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 transition-all duration-200"
                                 onClick={() => {
-                                    window.location.href = `/admin/workspaces/${activeWorkspace.slug}/settings`;
+                                    navigate(`/admin/workspaces/${currentWorkspace.slug}/settings`);
                                 }}
                             >
                                 <div className="flex size-7 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm">
                                     <Settings className="size-3.5" />
                                 </div>
                                 <div className="flex flex-col">
-                                    <span className="text-sm font-bold">Workspace Settings</span>
+                                    <span className="text-sm font-bold">
+                                        {t('admin.workspace.switcher.settings')}
+                                    </span>
                                     <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                        Members & Profiles
+                                        {t('admin.workspace.switcher.settings_desc')}
                                     </span>
                                 </div>
                             </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
-                            className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-not-allowed opacity-60 text-slate-400 group"
-                            disabled
+                            className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 group"
+                            onClick={() => navigate('/admin/workspaces/new')}
                         >
                             <div className="flex size-7 items-center justify-center rounded-md border border-dashed border-slate-200 bg-slate-50 transition-colors group-hover:border-slate-300">
                                 <Plus className="size-3.5" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-sm font-bold">New Workspace</span>
+                                <span className="text-sm font-bold">
+                                    {t('admin.workspace.switcher.new_workspace')}
+                                </span>
                                 <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">
-                                    Coming Soon
+                                    {t('admin.workspace.switcher.new_workspace_desc')}
                                 </span>
                             </div>
                         </DropdownMenuItem>

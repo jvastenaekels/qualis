@@ -50,4 +50,4 @@ async def test_create_workspace(
     assert data["slug"] == "new-workspace-123"
     assert data["title"] == "New Workspace"
     assert len(data["members"]) == 1
-    assert data["members"][0]["role"] == "admin"
+    assert data["members"][0]["role"] == "owner"
