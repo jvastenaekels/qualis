@@ -29,7 +29,7 @@ interface PostSortPageProps {
     highlightKey?: string | null;
 }
 
-const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey }) => {
+const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey }) => {
     const config = useConfigStore((state) => state.config);
     const session = useSessionStore((state) => ({
         isCompleted: state.isCompleted,
@@ -603,44 +603,6 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey }) => {
                         <hr className="border-slate-200 my-8" />
                     </div>
                 )}
-
-                {/* 4. MISSING STATEMENTS */}
-                <div className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <label
-                        htmlFor="missing_statement"
-                        className="block text-lg font-bold text-slate-800 mb-2"
-                    >
-                        {getPrompt('missing', t('post.missing.label'))}
-                    </label>
-                    <p className="text-sm text-slate-500 mb-4">{t('post.missing.description')}</p>
-                    <textarea
-                        id="missing_statement"
-                        value={responses.postsort?.missing_statement || ''}
-                        onChange={(e) => setPostSortResponse('missing_statement', e.target.value)}
-                        className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[var(--brand-accent)] focus:ring-opacity-20 focus:border-[var(--brand-accent)] min-h-[80px]"
-                        placeholder={t('post.missing.placeholder')}
-                        disabled={isLoading}
-                    />
-                </div>
-
-                {/* 5. GENERAL COMMENTS */}
-                <div className="bg-white p-4 md:p-6 rounded-xl border border-slate-200 shadow-sm">
-                    <label
-                        htmlFor="general_comment"
-                        className="block text-lg font-bold text-slate-800 mb-2"
-                    >
-                        {getPrompt('general', t('post.general.label'))}
-                    </label>
-                    <p className="text-sm text-slate-500 mb-4">{t('post.general.description')}</p>
-                    <textarea
-                        id="general_comment"
-                        value={responses.postsort?.general_comment || ''}
-                        onChange={(e) => setPostSortResponse('general_comment', e.target.value)}
-                        className="w-full p-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[var(--brand-accent)] focus:ring-opacity-20 focus:border-[var(--brand-accent)] min-h-[80px]"
-                        placeholder={t('post.general.placeholder')}
-                        disabled={isLoading}
-                    />
-                </div>
 
                 {/* Email / Contact Section */}
                 {/* biome-ignore lint/suspicious/noExplicitAny: config type stale */}

@@ -1,4 +1,3 @@
-
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -59,7 +58,10 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
             await page.goto(`/study/${mockStudyConfig.slug}/welcome`);
 
             // Wait for loading to finish
-            await page.locator('[data-testid="loading-spinner"]').waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
+            await page
+                .locator('[data-testid="loading-spinner"]')
+                .waitFor({ state: 'hidden', timeout: 15000 })
+                .catch(() => {});
 
             // Select button by test-id
             const startBtn = page.getByTestId('start-btn');
@@ -67,7 +69,10 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
             await startBtn.first().click();
 
             // Consent Page
-            await page.locator('[data-testid="loading-spinner"]').waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
+            await page
+                .locator('[data-testid="loading-spinner"]')
+                .waitFor({ state: 'hidden', timeout: 10000 })
+                .catch(() => {});
 
             // Check consent
             const checkbox = page.getByTestId('consent-checkbox');
@@ -83,10 +88,16 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
             try {
                 await page.waitForURL(/.*presort/, { timeout: 15000 });
                 await page.getByLabel(/age/i).first().fill('30');
-                await page.getByLabel(/gender/i).first().selectOption({ index: 1 });
-                await page.getByLabel(/education/i).first().selectOption({ index: 1 });
+                await page
+                    .getByLabel(/gender/i)
+                    .first()
+                    .selectOption({ index: 1 });
+                await page
+                    .getByLabel(/education/i)
+                    .first()
+                    .selectOption({ index: 1 });
                 await page.getByTestId('presort-submit-btn').click();
-            } catch (e) {
+            } catch (_e) {
                 console.log('Skipped pre-sort or already passed');
             }
 
@@ -109,10 +120,12 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
 
                 // Proceed to Fine Sort
                 await page.waitForTimeout(500);
-                const nextBtn = page.getByRole('button', { name: /next|suivant|continue/i }).first();
+                const nextBtn = page
+                    .getByRole('button', { name: /next|suivant|continue/i })
+                    .first();
                 await expect(nextBtn).toBeEnabled({ timeout: 15000 });
                 await nextBtn.click();
-            } catch (e) {
+            } catch (_e) {
                 console.log('Skipped rough sort or already passed');
             }
 
@@ -149,7 +162,9 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
             }
 
             // B. Selection State: Click a card -> Footer changes
-            const deckCard = page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').first();
+            const deckCard = page
+                .locator('[data-testid="deck-cards-container"] [data-testid^="card-"]')
+                .first();
             await deckCard.click();
 
             // Footer text should change to "Place on grid"
@@ -162,17 +177,23 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
 
         // --- SECTION 3: DECK & DRAG ---
         await test.step('Verify Deck & Drag Functionality', async () => {
-            const deckCard = page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').first();
+            const deckCard = page
+                .locator('[data-testid="deck-cards-container"] [data-testid^="card-"]')
+                .first();
             const targetSlot = page.locator('[data-testid="droppable-slot"]').first();
 
-            const initialDeckCount = await page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').count();
+            const initialDeckCount = await page
+                .locator('[data-testid="deck-cards-container"] [data-testid^="card-"]')
+                .count();
 
             // Drag
             await deckCard.dragTo(targetSlot);
 
             // Verify Logic
             // 1. Deck count decreases
-            await expect(page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]')).toHaveCount(initialDeckCount - 1);
+            await expect(
+                page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]')
+            ).toHaveCount(initialDeckCount - 1);
             // 2. Slot is filled (contains card)
             await expect(targetSlot.locator('[data-testid^="card-"]')).toBeVisible();
         });
@@ -193,13 +214,17 @@ test.describe('Fine Sort Comprehensive UX & Layout', () => {
         await test.step('Verify Empty State (Simulation)', async () => {
             // It's hard to empty a deck in E2E without robust mocking,
             // but we can check if the "Success Checkmark" is NOT visible when cards exist.
-            const successIcon = page.locator('.lucide-check-circle, .lucide-check');
+            const _successIcon = page.locator('.lucide-check-circle, .lucide-check');
             // The success message shouldn't be main view if cards exist
             // This is a "Negative Assertion" to ensure we don't show empty state prematurely.
             // But we can check if we can FIND the success message locator hidden or absent
             const emptyMessage = page.getByText(/All placed|Toutes les affirmations/i);
-            if (await page.locator('[data-testid="deck-cards-container"] [data-testid^="card-"]').count() > 0) {
-                 await expect(emptyMessage).not.toBeVisible();
+            if (
+                (await page
+                    .locator('[data-testid="deck-cards-container"] [data-testid^="card-"]')
+                    .count()) > 0
+            ) {
+                await expect(emptyMessage).not.toBeVisible();
             }
         });
     });

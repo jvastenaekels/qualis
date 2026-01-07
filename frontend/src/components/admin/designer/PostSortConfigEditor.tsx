@@ -4,7 +4,6 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Info, Plus, X } from 'lucide-react';
 import { useState } from 'react';
@@ -30,22 +29,20 @@ const PostSortConfigEditor = () => {
     const config = draft.postsort_config as any;
 
     const extremeColumns = config?.extreme_columns || [];
-    const askMissing = config?.ask_missing ?? false;
-    const askGeneralComment = config?.ask_general_comment ?? true;
     const allowRandomComments = config?.allow_random_comments ?? true;
     const prompts = config?.prompts || {};
 
     const gridConfig = draft.grid_config as Array<{ score: number; capacity: number }> | undefined;
     const availableScores = gridConfig?.map((col) => col.score) || [];
 
-    const getPromptText = (key: 'extreme' | 'missing' | 'general'): string => {
+    const getPromptText = (key: 'extreme'): string => {
         const prompt = prompts[key];
         if (!prompt) return '';
         if (typeof prompt === 'string') return prompt;
         return prompt[activeLocale] || prompt.en || '';
     };
 
-    const setPromptText = (key: 'extreme' | 'missing' | 'general', value: string) => {
+    const setPromptText = (key: 'extreme', value: string) => {
         updateDraft((d) => {
             if (!d.postsort_config) d.postsort_config = {};
             // biome-ignore lint/suspicious/noExplicitAny: cast to any
@@ -82,38 +79,6 @@ const PostSortConfigEditor = () => {
             const ps = d.postsort_config as any;
             if (ps) {
                 ps.extreme_columns = (ps.extreme_columns || []).filter((s: number) => s !== score);
-            }
-        });
-    };
-
-    const toggleAskMissing = (checked: boolean) => {
-        updateDraft((d) => {
-            if (!d.postsort_config) d.postsort_config = {};
-            // biome-ignore lint/suspicious/noExplicitAny: cast to any
-            const ps = d.postsort_config as any;
-            ps.ask_missing = checked;
-            if (checked && !ps.prompts?.missing) {
-                if (!ps.prompts) ps.prompts = {};
-                ps.prompts.missing = {
-                    en: 'Were there any statements you wish had been included in this study?',
-                    fr: 'Y avait-il des affirmations que vous auriez aimé voir incluses ?',
-                };
-            }
-        });
-    };
-
-    const toggleAskGeneralComment = (checked: boolean) => {
-        updateDraft((d) => {
-            if (!d.postsort_config) d.postsort_config = {};
-            // biome-ignore lint/suspicious/noExplicitAny: cast to any
-            const ps = d.postsort_config as any;
-            ps.ask_general_comment = checked;
-            if (checked && !ps.prompts?.general) {
-                if (!ps.prompts) ps.prompts = {};
-                ps.prompts.general = {
-                    en: 'Do you have any additional comments or feedback?',
-                    fr: 'Avez-vous des commentaires ou remarques supplémentaires ?',
-                };
             }
         });
     };
@@ -263,88 +228,19 @@ const PostSortConfigEditor = () => {
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <CardTitle className="text-base">
-                                {t('admin.design.postsort.missing.title')}
-                            </CardTitle>
-                            <CardDescription className="text-sm">
-                                {t('admin.design.postsort.missing.desc')}
-                            </CardDescription>
-                        </div>
-                        <Switch
-                            checked={askMissing}
-                            onCheckedChange={(checked: boolean) => {
-                                if (checked === askMissing) return;
-                                toggleAskMissing(checked);
-                            }}
-                        />
-                    </div>
-                </CardHeader>
-                {askMissing && (
-                    <CardContent className="space-y-2">
-                        <Label htmlFor="missing-prompt">
-                            {t('admin.design.postsort.missing.prompt_label')}
-                        </Label>
-                        <Input
-                            id="missing-prompt"
-                            value={getPromptText('missing')}
-                            onChange={(e) => setPromptText('missing', e.target.value)}
-                            placeholder={t('admin.design.postsort.missing.prompt_placeholder')}
-                        />
-                    </CardContent>
-                )}
-            </Card>
-
-            <Card>
-                <CardHeader>
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <CardTitle className="text-base">
-                                {t('admin.design.postsort.general.title')}
-                            </CardTitle>
-                            <CardDescription className="text-sm">
-                                {t('admin.design.postsort.general.desc')}
-                            </CardDescription>
-                        </div>
-                        <Switch
-                            checked={askGeneralComment}
-                            onCheckedChange={(checked: boolean) => {
-                                if (checked === askGeneralComment) return;
-                                toggleAskGeneralComment(checked);
-                            }}
-                        />
-                    </div>
-                </CardHeader>
-                {askGeneralComment && (
-                    <CardContent className="space-y-2">
-                        <Label htmlFor="general-prompt">
-                            {t('admin.design.postsort.general.prompt_label')}
-                        </Label>
-                        <Textarea
-                            id="general-prompt"
-                            value={getPromptText('general')}
-                            onChange={(e) => setPromptText('general', e.target.value)}
-                            placeholder={t('admin.design.postsort.general.prompt_placeholder')}
-                            className="min-h-[80px]"
-                        />
-                    </CardContent>
-                )}
-            </Card>
-
-            <div className="flex items-center justify-between rounded-lg border p-4 bg-slate-50 mt-4">
+            <div className="flex items-center justify-between rounded-lg border p-4 bg-blue-50/50 border-blue-100 mt-4 shadow-sm group hover:border-blue-200 transition-colors">
                 <div className="space-y-0.5">
-                    <Label className="text-base flex items-center gap-2">
-                        Collecte d'Email
-                        <Badge variant="outline" className="text-xs font-normal">
-                            Optionnel
+                    <Label className="text-base flex items-center gap-2 text-blue-900">
+                        {t('admin.design.postsort.email.title')}
+                        <Badge
+                            variant="outline"
+                            className="text-[10px] font-bold uppercase tracking-wider bg-white/50"
+                        >
+                            {t('common.optional', 'Optional')}
                         </Badge>
                     </Label>
-                    <p className="text-sm text-muted-foreground">
-                        Demander l'email du participant à la fin pour un entretien ou l'envoi des
-                        résultats.
+                    <p className="text-sm text-blue-800/60">
+                        {t('admin.design.postsort.email.desc')}
                     </p>
                 </div>
                 <Switch
@@ -361,29 +257,47 @@ const PostSortConfigEditor = () => {
                 />
             </div>
             {config?.email_collection_enabled && (
-                <div className="ml-8 mt-2 space-y-2 border-l-2 border-slate-200 pl-4">
-                    <div className="flex items-center justify-between">
-                        <Label className="text-sm">Demander accord entretien</Label>
-                        <Switch
-                            checked={config?.interview_consent_enabled ?? true}
-                            onCheckedChange={(checked: boolean) => {
-                                const currentValue = config?.interview_consent_enabled ?? true;
-                                if (checked === currentValue) return;
-                                updateDraft((d) => {
-                                    // biome-ignore lint/suspicious/noExplicitAny: complex config
-                                    (d.postsort_config as any).interview_consent_enabled = checked;
-                                });
-                            }}
-                        />
+                <div className="ml-8 mt-2 space-y-3 border-l-2 border-blue-100 pl-6 animate-in slide-in-from-left-2 duration-300">
+                    <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
+                        <div className="flex items-center justify-between group/item mb-1">
+                            <Label className="text-sm font-medium text-amber-900 group-hover/item:text-amber-950 transition-colors">
+                                {t('admin.design.postsort.email.interview')}
+                            </Label>
+                            <Switch
+                                checked={config?.interview_consent_enabled ?? true}
+                                onCheckedChange={(checked: boolean) => {
+                                    const currentValue = config?.interview_consent_enabled ?? true;
+                                    if (checked === currentValue) return;
+                                    updateDraft((d) => {
+                                        if (!d.postsort_config) d.postsort_config = {};
+                                        // biome-ignore lint/suspicious/noExplicitAny: complex config
+                                        (d.postsort_config as any).interview_consent_enabled =
+                                            checked;
+                                    });
+                                }}
+                            />
+                        </div>
+                        <p className="text-xs text-amber-700">
+                            {t('admin.design.postsort.email.interview_warning')}
+                        </p>
                     </div>
-                    <div className="flex items-center justify-between">
-                        <Label className="text-sm">Demander accord résultats (Newsletter)</Label>
+
+                    <div className="flex items-center justify-between group/item py-2">
+                        <div className="space-y-0.5">
+                            <Label className="text-sm text-slate-600 group-hover/item:text-slate-900 transition-colors">
+                                {t('admin.design.postsort.email.results')}
+                            </Label>
+                            <p className="text-xs text-muted-foreground">
+                                {t('admin.design.postsort.email.results_hint')}
+                            </p>
+                        </div>
                         <Switch
                             checked={config?.newsletter_consent_enabled ?? true}
                             onCheckedChange={(checked: boolean) => {
                                 const currentValue = config?.newsletter_consent_enabled ?? true;
                                 if (checked === currentValue) return;
                                 updateDraft((d) => {
+                                    if (!d.postsort_config) d.postsort_config = {};
                                     // biome-ignore lint/suspicious/noExplicitAny: complex config
                                     (d.postsort_config as any).newsletter_consent_enabled = checked;
                                 });

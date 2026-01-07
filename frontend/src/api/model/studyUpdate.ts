@@ -16,6 +16,8 @@ import type { StudyUpdateRandomizeStatements } from './studyUpdateRandomizeState
 import type { StudyUpdateTranslations } from './studyUpdateTranslations';
 import type { StudyUpdateStatements } from './studyUpdateStatements';
 import type { StudyUpdateAccessPassword } from './studyUpdateAccessPassword';
+import type { StudyUpdateStartDate } from './studyUpdateStartDate';
+import type { StudyUpdateEndDate } from './studyUpdateEndDate';
 
 /**
  * Schema for updating a study.
@@ -33,4 +35,6 @@ export interface StudyUpdate {
     translations?: StudyUpdateTranslations;
     statements?: StudyUpdateStatements;
     access_password?: StudyUpdateAccessPassword;
+    start_date?: StudyUpdateStartDate;
+    end_date?: StudyUpdateEndDate;
 }

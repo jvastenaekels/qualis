@@ -37,8 +37,18 @@ export const mockStudyConfig = {
             options: [
                 { value: 'Male', label: { en: 'Male', fr: 'Homme', fi: 'Mies' } },
                 { value: 'Female', label: { en: 'Female', fr: 'Femme', fi: 'Nainen' } },
-                { value: 'Non-binary', label: { en: 'Non-binary', fr: 'Non-binaire', fi: 'Muunsukupuolinen' } },
-                { value: 'Prefer not to say', label: { en: 'Prefer not to answer', fr: 'Je préfère ne pas répondre', fi: 'En halua vastata' } },
+                {
+                    value: 'Non-binary',
+                    label: { en: 'Non-binary', fr: 'Non-binaire', fi: 'Muunsukupuolinen' },
+                },
+                {
+                    value: 'Prefer not to say',
+                    label: {
+                        en: 'Prefer not to answer',
+                        fr: 'Je préfère ne pas répondre',
+                        fi: 'En halua vastata',
+                    },
+                },
             ],
             label: { en: 'Gender', fr: 'Genre', fi: 'Sukupuoli' },
             required: true,
@@ -46,9 +56,30 @@ export const mockStudyConfig = {
         education: {
             type: 'select',
             options: [
-                { value: 'High School', label: { en: 'High School / Secondary', fr: 'Études secondaires', fi: 'Toisen asteen koulutus' } },
-                { value: 'Bachelor', label: { en: "Bachelor's Degree", fr: 'Licence / Bachelor', fi: 'Kandidaatti (Bachelor)' } },
-                { value: 'Master', label: { en: "Master's Degree", fr: 'Master / Maîtrise', fi: 'Maisteri (Master)' } },
+                {
+                    value: 'High School',
+                    label: {
+                        en: 'High School / Secondary',
+                        fr: 'Études secondaires',
+                        fi: 'Toisen asteen koulutus',
+                    },
+                },
+                {
+                    value: 'Bachelor',
+                    label: {
+                        en: "Bachelor's Degree",
+                        fr: 'Licence / Bachelor',
+                        fi: 'Kandidaatti (Bachelor)',
+                    },
+                },
+                {
+                    value: 'Master',
+                    label: {
+                        en: "Master's Degree",
+                        fr: 'Master / Maîtrise',
+                        fi: 'Maisteri (Master)',
+                    },
+                },
                 { value: 'PhD', label: { en: 'PhD / Doctorate', fr: 'Doctorat', fi: 'Tohtori' } },
                 { value: 'Other', label: { en: 'Other', fr: 'Autre', fi: 'Muu' } },
             ],
@@ -99,7 +130,7 @@ export async function mockStudyAPI(
 
     // Mock Consent Recording
     await page.route(`**/api/study/${config.slug}/consent`, async (route) => {
-         await route.fulfill({ status: 200, body: '{}' });
+        await route.fulfill({ status: 200, body: '{}' });
     });
 }
 

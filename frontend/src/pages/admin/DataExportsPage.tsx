@@ -36,14 +36,14 @@ const DataExportsPage = () => {
                             className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm px-4 py-2 gap-2 transition-all"
                         >
                             <TableIcon className="w-4 h-4" />
-                            Interactive view
+                            {t('admin.data.tabs.browse', 'Interactive view')}
                         </TabsTrigger>
                         <TabsTrigger
                             value="export"
                             className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm px-4 py-2 gap-2 transition-all"
                         >
                             <Download className="w-4 h-4" />
-                            File downloads
+                            {t('admin.data.tabs.export', 'Export data')}
                         </TabsTrigger>
                     </TabsList>
                 </div>
@@ -71,34 +71,44 @@ const DataExportsPage = () => {
                         <div className="col-span-12 md:col-span-4 space-y-6">
                             <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-white border border-indigo-100 shadow-sm">
                                 <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-tight mb-4 flex items-center gap-2">
-                                    <Database className="w-4 h-4" /> Format guide
+                                    <Database className="w-4 h-4" />{' '}
+                                    {t('admin.data.guide.title', 'Format guide')}
                                 </h3>
                                 <div className="space-y-4 text-xs text-slate-600 leading-relaxed">
                                     <div className="space-y-1">
                                         <div className="font-semibold text-indigo-700">
-                                            Universal CSV
+                                            {t('admin.data.guide.csv.title', 'Universal CSV')}
                                         </div>
                                         <p>
-                                            Raw rectangular data. Best for R, Python, SPSS, or Excel
-                                            analysis. Includes all metadata.
+                                            {t(
+                                                'admin.data.guide.csv.desc',
+                                                'Raw rectangular data. Best for R, Python, SPSS, or Excel analysis. Includes all metadata.'
+                                            )}
                                         </p>
                                     </div>
                                     <div className="space-y-1">
                                         <div className="font-semibold text-indigo-700">
-                                            KenQ JSON
+                                            {t('admin.data.guide.json.title', 'KenQ JSON')}
                                         </div>
                                         <p>
-                                            Optimized for the Web-KenQ analysis tool. Contains study
-                                            definition and sorts.
+                                            {t(
+                                                'admin.data.guide.json.desc',
+                                                'Optimized for the Web-KenQ analysis tool. Contains study definition and sorts.'
+                                            )}
                                         </p>
                                     </div>
                                     <div className="space-y-1">
                                         <div className="font-semibold text-indigo-700">
-                                            PQMethod Bundle (ZIP)
+                                            {t(
+                                                'admin.data.guide.zip.title',
+                                                'PQMethod Bundle (ZIP)'
+                                            )}
                                         </div>
                                         <p>
-                                            Contains legacy .DAT and .STA files for DOS PQMethod
-                                            software.
+                                            {t(
+                                                'admin.data.guide.zip.desc',
+                                                'Contains legacy .DAT and .STA files for DOS PQMethod analysis.'
+                                            )}
                                         </p>
                                     </div>
                                 </div>

@@ -24,7 +24,7 @@ export function StudyPageHeader({
                 <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-3">
                         {Icon && (
-                            <div className="p-2 bg-indigo-50 rounded-xl border border-indigo-100 hidden sm:block">
+                            <div className="p-2.5 bg-gradient-to-br from-indigo-50 to-white rounded-xl border border-indigo-100 shadow-sm hidden sm:block">
                                 <Icon className="size-5 text-indigo-600" />
                             </div>
                         )}
@@ -34,7 +34,7 @@ export function StudyPageHeader({
                                 {statusBadge}
                             </h1>
                             {description && (
-                                <p className="text-slate-500 text-sm font-medium">{description}</p>
+                                <p className="text-slate-600 text-sm font-medium">{description}</p>
                             )}
                         </div>
                     </div>

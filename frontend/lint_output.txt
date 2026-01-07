@@ -1,0 +1,147 @@
+
+> open-q@0.0.0 lint
+> biome check src
+
+src/components/admin/designer/IntroductionEditor.tsx:13:7 lint/suspicious/noRedeclare ━━━━━━━━━━
+
+  × Shouldn't redeclare 'IntroductionEditor'. Consider to delete it or rename it.
+
+    11 │ import { ProcessStepEditor } from './ProcessStepEditor';
+    12 │
+  > 13 │ const IntroductionEditor = () => {
+       │       ^^^^^^^^^^^^^^^^^^
+    14 │     const { t } = useTranslation();
+    15 │     const { draft, activeLocale, updateTranslation } = useStudyDesigner();
+
+  i 'IntroductionEditor' is defined here:
+
+    1 │ import { Textarea } from '@/components/ui/textarea';
+  > 2 │ import IntroductionEditor from './IntroductionEditor';
+      │        ^^^^^^^^^^^^^^^^^^
+    3 │ import { useStudyDesigner } from '@/store/useStudyDesigner';
+    4 │ import { Input } from '@/components/ui/input';
+
+
+src/components/admin/designer/IntroductionEditor.tsx:1:8 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━
+
+  × This import is unused.
+
+  > 1 │ import { Textarea } from '@/components/ui/textarea';
+      │        ^^^^^^^^^^^^
+    2 │ import IntroductionEditor from './IntroductionEditor';
+    3 │ import { useStudyDesigner } from '@/store/useStudyDesigner';
+
+  i Unused imports might be the result of an incomplete refactoring.
+
+  i Unsafe fix: Remove the unused imports.
+
+    1 │ import·{·Textarea·}·from·'@/components/ui/textarea';
+      │ ----------------------------------------------------
+
+src/components/admin/designer/PostSortConfigEditor.tsx:7:8 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━
+
+  × This import is unused.
+
+    5 │ import { Button } from '@/components/ui/button';
+    6 │ import { Badge } from '@/components/ui/badge';
+  > 7 │ import { Input } from '@/components/ui/input';
+      │        ^^^^^^^^^
+    8 │ import { Textarea } from '@/components/ui/textarea';
+    9 │ import { Info, Plus, X } from 'lucide-react';
+
+  i Unused imports might be the result of an incomplete refactoring.
+
+  i Unsafe fix: Remove the unused imports.
+
+      5   5 │   import { Button } from '@/components/ui/button';
+      6   6 │   import { Badge } from '@/components/ui/badge';
+      7     │ - import·{·Input·}·from·'@/components/ui/input';
+      8   7 │   import { Textarea } from '@/components/ui/textarea';
+      9   8 │   import { Info, Plus, X } from 'lucide-react';
+
+
+src/components/admin/designer/PostSortConfigEditor.tsx:33:11 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  × This variable askMissing is unused.
+
+    32 │     const extremeColumns = config?.extreme_columns || [];
+  > 33 │     const askMissing = config?.ask_missing ?? false;
+       │           ^^^^^^^^^^
+    34 │     const askGeneralComment = config?.ask_general_comment ?? true;
+    35 │     const allowRandomComments = config?.allow_random_comments ?? true;
+
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+
+  i Unsafe fix: If this is intentional, prepend askMissing with an underscore.
+
+     31  31 │
+     32  32 │       const extremeColumns = config?.extreme_columns || [];
+     33     │ - ····const·askMissing·=·config?.ask_missing·??·false;
+         33 │ + ····const·_askMissing·=·config?.ask_missing·??·false;
+     34  34 │       const askGeneralComment = config?.ask_general_comment ?? true;
+     35  35 │       const allowRandomComments = config?.allow_random_comments ?? true;
+
+
+src/components/admin/designer/PostSortConfigEditor.tsx:34:11 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━
+
+  × This variable askGeneralComment is unused.
+
+    32 │     const extremeColumns = config?.extreme_columns || [];
+    33 │     const askMissing = config?.ask_missing ?? false;
+  > 34 │     const askGeneralComment = config?.ask_general_comment ?? true;
+       │           ^^^^^^^^^^^^^^^^^
+    35 │     const allowRandomComments = config?.allow_random_comments ?? true;
+    36 │     const prompts = config?.prompts || {};
+
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+
+  i Unsafe fix: If this is intentional, prepend askGeneralComment with an underscore.
+
+     32  32 │       const extremeColumns = config?.extreme_columns || [];
+     33  33 │       const askMissing = config?.ask_missing ?? false;
+     34     │ - ····const·askGeneralComment·=·config?.ask_general_comment·??·true;
+         34 │ + ····const·_askGeneralComment·=·config?.ask_general_comment·??·true;
+     35  35 │       const allowRandomComments = config?.allow_random_comments ?? true;
+     36  36 │       const prompts = config?.prompts || {};
+
+
+src/components/admin/designer/PostSortConfigEditor.tsx format ━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+
+     87  87 │       };
+     88  88 │
+     89     │ -
+     90  89 │       const toggleAllowRandomComments = (checked: boolean) => {
+     91  90 │           updateDraft((d) => {
+    ······· │
+    237 236 │                       <Label className="text-base flex items-center gap-2 text-blue-900">
+    238 237 │                           {t('admin.design.postsort.email.title')}
+    239     │ - ························<Badge·variant="outline"·className="text-[10px]·font-bold·uppercase·tracking-wider·bg-white/50">
+        238 │ + ························<Badge
+        239 │ + ····························variant="outline"
+        240 │ + ····························className="text-[10px]·font-bold·uppercase·tracking-wider·bg-white/50"
+        241 │ + ························>
+    240 242 │                               {t('common.optional', 'Optional')}
+    241 243 │                           </Badge>
+
+
+src/components/admin/designer/ProcessStepEditor.tsx:173:34 lint/correctness/noUnusedVariables ━━━━━━━━━━
+
+  × This variable updateTranslation is unused.
+
+    171 │ export function ProcessStepEditor() {
+    172 │     const { t } = useTranslation();
+  > 173 │     const { draft, activeLocale, updateTranslation } = useStudyDesigner();
+        │                                  ^^^^^^^^^^^^^^^^^
+    174 │
+    175 │     const sensors = useSensors(
+
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+
+
+Checked 351 files in 225ms. No fixes applied.
+Found 7 errors.
+check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.

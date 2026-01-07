@@ -1,13 +1,11 @@
-import { type Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class FineSortPage extends BasePage {
     readonly deckContainer = this.page.getByTestId('deck-cards-container');
-    readonly footerInstruction = this.page.locator('#footer-instruction, .footer-instruction, [class*="footer"]'); // Adjust selector as needed based on actual implementation or text
-
-    constructor(page: Page) {
-        super(page);
-    }
+    readonly footerInstruction = this.page.locator(
+        '#footer-instruction, .footer-instruction, [class*="footer"]'
+    ); // Adjust selector as needed based on actual implementation or text
 
     async waitForLoad() {
         await expect(this.page).toHaveURL(/.*\/fine-sort/, { timeout: 20000 });

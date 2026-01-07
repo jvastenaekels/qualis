@@ -78,7 +78,7 @@ test.describe('Fine Sort Comprehensive UX & Layout [Refactored]', () => {
             try {
                 await preSortPage.waitForLoad();
                 await preSortPage.completePreSort();
-            } catch (e) {
+            } catch (_e) {
                 console.log('Skipped pre-sort or already passed');
             }
 
@@ -93,10 +93,15 @@ test.describe('Fine Sort Comprehensive UX & Layout [Refactored]', () => {
                 // Assuming completeRoughSort finishes the sorting.
                 // We need to click next if not done.
                 // Checking if we are still on rough sort:
-                if (await page.getByRole('button', { name: /next|suivant|continue/i }).count() > 0) {
-                     await page.getByRole('button', { name: /next|suivant|continue/i }).first().click();
+                if (
+                    (await page.getByRole('button', { name: /next|suivant|continue/i }).count()) > 0
+                ) {
+                    await page
+                        .getByRole('button', { name: /next|suivant|continue/i })
+                        .first()
+                        .click();
                 }
-            } catch (e) {
+            } catch (_e) {
                 console.log('Skipped rough sort or already passed');
             }
 

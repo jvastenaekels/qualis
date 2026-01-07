@@ -29,6 +29,34 @@ from .recruitment_service import RecruitmentService
 from ..utils.crypto import hash_ip
 
 
+DEFAULT_PROCESS_STEPS = [
+    {
+        "id": "profile",
+        "icon": "User",
+        "title": "Let's meet",
+        "description": "A few quick questions to better understand your background.",
+    },
+    {
+        "id": "rough",
+        "icon": "Zap",
+        "title": "First impressions",
+        "description": "Discover the statements and give your immediate reaction (agree, neutral, or disagree).",
+    },
+    {
+        "id": "fine",
+        "icon": "Scale",
+        "title": "Your perspective",
+        "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you.",
+    },
+    {
+        "id": "post",
+        "icon": "MessageSquareText",
+        "title": "Why",
+        "description": "A few words to explain your most significant choices.",
+    },
+]
+
+
 class StudyService:
     """Service handling study logic."""
 
@@ -231,6 +259,8 @@ class StudyService:
             "postsort_config": study.postsort_config,
             "grid_config": study.grid_config,
             "statements": statements_data,
+            "process_steps": getattr(translation, "process_steps", [])
+            or DEFAULT_PROCESS_STEPS,
             "consent": {
                 "title": get_t_attr("consent_title"),
                 "description": get_t_attr("consent_description"),
@@ -249,6 +279,8 @@ class StudyService:
             "requires_password": False,
             "start_date": study.start_date,
             "end_date": study.end_date,
+            "branding": study.branding
+            or {"logo_url": None, "accent_color": None, "partners": []},
         }
 
     @staticmethod

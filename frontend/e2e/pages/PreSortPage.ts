@@ -1,12 +1,8 @@
-import { type Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class PreSortPage extends BasePage {
     readonly submitButton = this.page.getByTestId('presort-submit-btn');
-
-    constructor(page: Page) {
-        super(page);
-    }
 
     async waitForLoad() {
         // Pre-sort might be skipped in some studies, but we assume it exists if called
@@ -25,8 +21,8 @@ export class PreSortPage extends BasePage {
         // Verify filling
         const ageVal = await ageInput.inputValue();
         if (ageVal !== '25') {
-             // Try force
-             await ageInput.fill('25', { force: true });
+            // Try force
+            await ageInput.fill('25', { force: true });
         }
 
         const genderSelect = this.page.locator('select[name="gender"]');

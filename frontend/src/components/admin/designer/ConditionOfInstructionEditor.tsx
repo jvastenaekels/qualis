@@ -20,7 +20,9 @@ const ConditionOfInstructionEditor = () => {
         translation?.pre_instruction !== null && translation?.pre_instruction !== undefined;
 
     const handleChange = (field: keyof StudyTranslation, value: string | null) => {
+        // biome-ignore lint/suspicious/noExplicitAny: dynamic field update on translation object
         updateTranslation(activeLocale, (t_trans: any) => {
+            // biome-ignore lint/suspicious/noExplicitAny: dynamic field access
             (t_trans as any)[field] = value;
         });
     };
@@ -35,18 +37,20 @@ const ConditionOfInstructionEditor = () => {
                     {t('admin.design.condition.title')}
                 </div>
 
-                <Card className="shadow-sm border-primary/20 bg-primary/5">
+                <Card className="shadow-sm border-blue-200 bg-blue-50/50">
                     <CardHeader>
-                        <CardTitle className="text-sm">
+                        <CardTitle className="text-sm font-bold text-blue-900">
                             {t('admin.design.condition.label')}
                         </CardTitle>
-                        <CardDescription>{t('admin.design.condition.desc')}</CardDescription>
+                        <CardDescription className="text-blue-800">
+                            {t('admin.design.condition.desc')}
+                        </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid gap-2">
                             <Label
                                 htmlFor="condition_of_instruction"
-                                className="text-sm font-semibold"
+                                className="text-sm font-semibold text-blue-900"
                             >
                                 {t('admin.design.condition.field_label')}
                             </Label>
@@ -57,7 +61,7 @@ const ConditionOfInstructionEditor = () => {
                                     handleChange('condition_of_instruction', e.target.value)
                                 }
                                 placeholder={t('admin.design.condition.placeholder')}
-                                className="font-semibold text-lg"
+                                className="font-bold text-lg bg-white border-blue-200 focus-visible:ring-blue-500"
                             />
                         </div>
                     </CardContent>

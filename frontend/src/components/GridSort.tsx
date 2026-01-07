@@ -212,6 +212,7 @@ const LegendLabel: React.FC<{
 
 const GridLegend: React.FC<{
     highlightKey?: string | null;
+    // biome-ignore lint/suspicious/noExplicitAny: translation function
     t: any;
     getLegendFontSize: (maxLen: number) => string;
 }> = React.memo(({ highlightKey, t, getLegendFontSize }) => {

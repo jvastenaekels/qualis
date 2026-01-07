@@ -47,9 +47,9 @@ describe('InterfaceEditor', () => {
         render(<InterfaceEditor />);
 
         // Check for labels
-        expect(screen.getByText('Start button')).toBeInTheDocument();
-        expect(screen.getByText('Next step button')).toBeInTheDocument();
-        expect(screen.getByText('Submit button')).toBeInTheDocument();
+        expect(screen.getByText('admin.design.interface.nav.start')).toBeInTheDocument();
+        expect(screen.getByText('admin.design.interface.nav.next')).toBeInTheDocument();
+        expect(screen.getByText('admin.design.interface.nav.submit')).toBeInTheDocument();
 
         // Check for existing value from draft
         const startInput = screen.getByDisplayValue('Custom Start');
@@ -59,15 +59,17 @@ describe('InterfaceEditor', () => {
     it('renders sorting terminology configuration', () => {
         render(<InterfaceEditor />);
 
-        expect(screen.getByText('Most Agree')).toBeInTheDocument();
-        expect(screen.getByText('Most Disagree')).toBeInTheDocument();
-        expect(screen.getAllByText('Neutral').length).toBeGreaterThanOrEqual(1);
+        expect(screen.getByText('admin.design.interface.terms.most_agree')).toBeInTheDocument();
+        expect(screen.getByText('admin.design.interface.terms.most_disagree')).toBeInTheDocument();
+        expect(
+            screen.getAllByText('admin.design.interface.terms.neutral').length
+        ).toBeGreaterThanOrEqual(1);
     });
 
     it('updates labels via updateTranslation', () => {
         render(<InterfaceEditor />);
 
-        const nextButtonInput = screen.getByPlaceholderText('Next step');
+        const nextButtonInput = screen.getByPlaceholderText('common.next');
         fireEvent.change(nextButtonInput, { target: { value: 'Forward' } });
 
         expect(mockUpdateTranslation).toHaveBeenCalledWith('en', expect.any(Function));

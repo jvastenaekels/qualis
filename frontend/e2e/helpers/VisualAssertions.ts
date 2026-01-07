@@ -10,11 +10,14 @@ export class VisualAssertions {
     /**
      * Capture a screenshot with standardized naming and options
      */
-    async captureScreenshot(name: string, options?: {
-        fullPage?: boolean;
-        clip?: { x: number; y: number; width: number; height: number };
-        mask?: any[];
-    }) {
+    async captureScreenshot(
+        name: string,
+        options?: {
+            fullPage?: boolean;
+            clip?: { x: number; y: number; width: number; height: number };
+            mask?: any[];
+        }
+    ) {
         await this.page.waitForLoadState('networkidle');
         await this.page.evaluate(() => document.fonts.ready);
 
@@ -30,10 +33,13 @@ export class VisualAssertions {
     /**
      * Compare screenshot against baseline with configurable threshold
      */
-    async compareScreenshot(name: string, options?: {
-        maxDiffPixelRatio?: number;
-        threshold?: number;
-    }) {
+    async compareScreenshot(
+        name: string,
+        options?: {
+            maxDiffPixelRatio?: number;
+            threshold?: number;
+        }
+    ) {
         await this.page.waitForLoadState('networkidle');
         await this.page.evaluate(() => document.fonts.ready);
 
@@ -100,10 +106,13 @@ export class VisualAssertions {
         await this.page.evaluate(() => {
             return Promise.all(
                 Array.from(document.images)
-                    .filter(img => !img.complete)
-                    .map(img => new Promise(resolve => {
-                        img.onload = img.onerror = resolve;
-                    }))
+                    .filter((img) => !img.complete)
+                    .map(
+                        (img) =>
+                            new Promise((resolve) => {
+                                img.onload = img.onerror = resolve;
+                            })
+                    )
             );
         });
     }
@@ -134,6 +143,6 @@ export class VisualAssertions {
      * Mask dynamic content (timestamps, IDs) before screenshot
      */
     getMask(selectors: string[]) {
-        return selectors.map(selector => this.page.locator(selector));
+        return selectors.map((selector) => this.page.locator(selector));
     }
 }

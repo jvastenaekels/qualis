@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 
 // MOCK DATA & STATE
 export const MOCK_USER = {
@@ -12,8 +12,36 @@ let studiesStore: any[] = [];
 let participantsStore: any[] = [];
 
 export function resetStores() {
-    studiesStore = [];
-    participantsStore = [];
+    studiesStore = [
+        {
+            id: 1,
+            slug: 'example-study',
+            title: 'Example Study',
+            state: 'active',
+            created_at: new Date().toISOString(),
+            collaborators: [{ user_id: 1, role: 'owner', user: { email: MOCK_USER.email } }],
+            statements: [
+                { id: 1, text: 'Statement 1' },
+                { id: 2, text: 'Statement 2' },
+            ],
+            grid_config: [],
+            translations: [{ language_code: 'en', title: 'Example Study' }],
+        },
+    ];
+    participantsStore = [
+        {
+            id: 'p1',
+            session_token: 'test-session-token-123',
+            status: 'completed',
+            is_completed: true,
+            is_discarded: false,
+            created_at: new Date().toISOString(),
+            submitted_at: new Date().toISOString(),
+            duration: 120,
+            language_used: 'en',
+            recruitment_token: 'direct',
+        },
+    ];
 }
 
 export function getParticipantsStore() {
@@ -36,14 +64,16 @@ export async function setupAdminMocks(page: Page) {
         }
     });
 
-
     // Catch-all requests FIRST so specific routes override them (since Playwright checks in reverse order)
 
     // Catch-all for any other API requests (Strict check to avoid matching source files like /src/api/...)
-    await page.route((url) => url.pathname.startsWith('/api/'), async (route) => {
-        console.log(`[Mock Catch-All] ${route.request().method()} ${route.request().url()}`);
-        await route.fulfill({ status: 200, json: [] });
-    });
+    await page.route(
+        (url) => url.pathname.startsWith('/api/'),
+        async (route) => {
+            console.log(`[Mock Catch-All] ${route.request().method()} ${route.request().url()}`);
+            await route.fulfill({ status: 200, json: [] });
+        }
+    );
 
     // Valid for all tests using this fixture
     await page.route(/\/api\/logs\/?/, async (route) => {
@@ -69,9 +99,7 @@ export async function setupAdminMocks(page: Page) {
                 title: body.title,
                 state: 'draft',
                 created_at: new Date().toISOString(),
-                collaborators: [
-                    { user_id: 1, role: 'owner', user: { email: MOCK_USER.email } },
-                ],
+                collaborators: [{ user_id: 1, role: 'owner', user: { email: MOCK_USER.email } }],
                 statements: [],
                 grid_config: [],
                 translations: [{ language_code: 'en', title: body.title }],
@@ -83,11 +111,40 @@ export async function setupAdminMocks(page: Page) {
         }
     });
 
-    await page.route(/\/api\/admin\/studies\/[a-zA-Z0-9_\-]+/, async (route) => {
+    // WORKSPACES
+    await page.route(/\/api\/admin\/workspaces(\/|\?|$)/, async (route) => {
+        console.log(`[Mock Workspaces] ${route.request().method()} ${route.request().url()}`);
+        await route.fulfill({
+            json: [
+                {
+                    id: 1,
+                    name: 'Example Workspace',
+                    slug: 'example-workspace',
+                    created_at: new Date().toISOString(),
+                    role: 'owner',
+                },
+            ],
+        });
+    });
+
+    await page.route(/\/api\/admin\/workspaces\/[a-zA-Z0-9_-]+\/members/, async (route) => {
+        console.log(`[Mock Workspace Members] ${route.request().method()} ${route.request().url()}`);
+        await route.fulfill({
+            json: [
+                {
+                    user_id: 1,
+                    role: 'owner',
+                    workspace_id: 1,
+                    user: MOCK_USER,
+                },
+            ],
+        });
+
+    await page.route(/\/api\/admin\/studies\/[a-zA-Z0-9_-]+/, async (route) => {
         const url = route.request().url();
         console.log(`[Mock Single] ${route.request().method()} ${url}`);
         // Handle sub-resources manually since glob is broad
-            if (url.includes('/state')) {
+        if (url.includes('/state')) {
             const slug = url.match(/studies\/([\w-]+)\/state/)?.[1];
             const study = studiesStore.find((s) => s.slug === slug);
             if (!study) return route.fulfill({ status: 404 });
@@ -111,21 +168,24 @@ export async function setupAdminMocks(page: Page) {
         }
 
         if (url.includes('/participants')) {
-                return route.fulfill({ json: participantsStore });
+            return route.fulfill({ json: participantsStore });
         }
 
         if (url.includes('/export/csv')) {
-                return route.fulfill({ status: 200, contentType: 'text/csv', body: 'p1,s1,2' });
+            return route.fulfill({ status: 200, contentType: 'text/csv', body: 'p1,s1,2' });
+        }
+
+        if (url.includes('/dump')) {
+            return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mock: 'dump' }) });
         }
 
         // Fallback: Get Single Study
         const slug = url.split('/').pop()?.split('?')[0];
         const study = studiesStore.find((s) => s.slug === slug);
         if (study) {
-                return route.fulfill({ json: study });
+            return route.fulfill({ json: study });
         }
 
         return route.fulfill({ status: 404, body: 'Not Found in Mock' });
     });
-
 }

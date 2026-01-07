@@ -68,21 +68,31 @@ test.describe('Participant Discard E2E Tests', () => {
         await detailSheet.waitFor({ state: 'visible' });
 
         // Capture detail sheet
-        await visual.captureElement('[data-testid="participant-detail-sheet"]', 'participant-detail-sheet-normal');
+        await visual.captureElement(
+            '[data-testid="participant-detail-sheet"]',
+            'participant-detail-sheet-normal'
+        );
     });
 
     test('should toggle discard status via button', async ({ page }) => {
         await page.goto('/admin/studies/example-study/exports');
 
         // Select a non-discarded participant
-        const normalRow = page.locator('[data-testid="participant-row"]').filter({ hasText: 'test-participant-201' });
+        const normalRow = page
+            .locator('[data-testid="participant-row"]')
+            .filter({ hasText: 'test-participant-201' });
         await normalRow.click();
 
         // Wait for detail sheet
-        await page.waitForSelector('[data-testid="participant-detail-sheet"]', { state: 'visible' });
+        await page.waitForSelector('[data-testid="participant-detail-sheet"]', {
+            state: 'visible',
+        });
 
         // Capture before discard
-        await visual.captureElement('[data-testid="participant-detail-sheet"]', 'participant-before-discard');
+        await visual.captureElement(
+            '[data-testid="participant-detail-sheet"]',
+            'participant-before-discard'
+        );
 
         // Click discard button
         const discardButton = page.getByRole('button', { name: /discard participant/i });
@@ -95,31 +105,46 @@ test.describe('Participant Discard E2E Tests', () => {
         await expect(page.getByText('Discarded')).toBeVisible();
 
         // Capture after discard
-        await visual.captureElement('[data-testid="participant-detail-sheet"]', 'participant-after-discard');
+        await visual.captureElement(
+            '[data-testid="participant-detail-sheet"]',
+            'participant-after-discard'
+        );
 
         // Close sheet
         await page.keyboard.press('Escape');
 
         // Verify row is now dimmed in table
-        const updatedRow = page.locator('[data-testid="participant-row"]').filter({ hasText: 'test-participant-201' });
-        await visual.captureElement('[data-testid="participant-row"]:has-text("test-participant-201")', 'participant-row-discarded');
+        const _updatedRow = page
+            .locator('[data-testid="participant-row"]')
+            .filter({ hasText: 'test-participant-201' });
+        await visual.captureElement(
+            '[data-testid="participant-row"]:has-text("test-participant-201")',
+            'participant-row-discarded'
+        );
     });
 
     test('should restore discarded participant', async ({ page }) => {
         await page.goto('/admin/studies/example-study/exports');
 
         // Select the discarded participant
-        const discardedRow = page.locator('[data-testid="participant-row"]').filter({ hasText: 'test-participant-202' });
+        const discardedRow = page
+            .locator('[data-testid="participant-row"]')
+            .filter({ hasText: 'test-participant-202' });
         await discardedRow.click();
 
         // Wait for detail sheet
-        await page.waitForSelector('[data-testid="participant-detail-sheet"]', { state: 'visible' });
+        await page.waitForSelector('[data-testid="participant-detail-sheet"]', {
+            state: 'visible',
+        });
 
         // Verify discarded badge is visible
         await expect(page.getByText('Discarded')).toBeVisible();
 
         // Capture discarded state
-        await visual.captureElement('[data-testid="participant-detail-sheet"]', 'participant-discarded-state');
+        await visual.captureElement(
+            '[data-testid="participant-detail-sheet"]',
+            'participant-discarded-state'
+        );
 
         // Click restore button
         const restoreButton = page.getByRole('button', { name: /restore participant/i });
@@ -132,7 +157,10 @@ test.describe('Participant Discard E2E Tests', () => {
         await expect(page.getByText('Discarded')).not.toBeVisible();
 
         // Capture restored state
-        await visual.captureElement('[data-testid="participant-detail-sheet"]', 'participant-restored-state');
+        await visual.captureElement(
+            '[data-testid="participant-detail-sheet"]',
+            'participant-restored-state'
+        );
     });
 
     test('should display discarded row with visual dimming', async ({ page }) => {
@@ -142,24 +170,33 @@ test.describe('Participant Discard E2E Tests', () => {
         await page.waitForSelector('[data-testid="participants-table"]', { state: 'visible' });
 
         // Find discarded row
-        const discardedRow = page.locator('[data-testid="participant-row"]').filter({ hasText: 'test-participant-202' });
+        const discardedRow = page
+            .locator('[data-testid="participant-row"]')
+            .filter({ hasText: 'test-participant-202' });
 
         // Verify row has dimmed styling
         await expect(discardedRow).toHaveClass(/opacity-50|grayscale/);
 
         // Capture discarded row
-        await visual.captureElement('[data-testid="participant-row"]:has-text("test-participant-202")', 'table-row-discarded-visual');
+        await visual.captureElement(
+            '[data-testid="participant-row"]:has-text("test-participant-202")',
+            'table-row-discarded-visual'
+        );
     });
 
     test('should show discarded badge in detail sheet header', async ({ page }) => {
         await page.goto('/admin/studies/example-study/exports');
 
         // Select discarded participant
-        const discardedRow = page.locator('[data-testid="participant-row"]').filter({ hasText: 'test-participant-202' });
+        const discardedRow = page
+            .locator('[data-testid="participant-row"]')
+            .filter({ hasText: 'test-participant-202' });
         await discardedRow.click();
 
         // Wait for sheet
-        await page.waitForSelector('[data-testid="participant-detail-sheet"]', { state: 'visible' });
+        await page.waitForSelector('[data-testid="participant-detail-sheet"]', {
+            state: 'visible',
+        });
 
         // Capture header with badge
         await visual.captureElement('[data-testid="sheet-header"]', 'discarded-badge-in-header');
@@ -177,7 +214,10 @@ test.describe('Participant Discard E2E Tests', () => {
         await page.getByRole('tab', { name: /file downloads/i }).click();
 
         // Capture export section
-        await visual.captureElement('[data-testid="export-section"]', 'export-options-with-discarded');
+        await visual.captureElement(
+            '[data-testid="export-section"]',
+            'export-options-with-discarded'
+        );
 
         // Note: Actual export verification would require checking downloaded file content
         // which is typically done in integration tests rather than visual tests
@@ -191,12 +231,14 @@ test.describe('Participant Discard E2E Tests', () => {
         await row.click();
 
         // Wait for sheet
-        await page.waitForSelector('[data-testid="participant-detail-sheet"]', { state: 'visible' });
+        await page.waitForSelector('[data-testid="participant-detail-sheet"]', {
+            state: 'visible',
+        });
 
         const discardButton = page.getByRole('button', { name: /discard participant/i });
 
         // Intercept API to delay response
-        await page.route('**/api/admin/studies/participants/**/discard', async route => {
+        await page.route('**/api/admin/studies/participants/**/discard', async (route) => {
             await page.waitForTimeout(2000);
             await route.continue();
         });
@@ -212,7 +254,9 @@ test.describe('Participant Discard E2E Tests', () => {
     });
 
     test.describe('Recent Activity Integration', () => {
-        test('should show discarded participants in separate section on dashboard', async ({ page }) => {
+        test('should show discarded participants in separate section on dashboard', async ({
+            page,
+        }) => {
             await page.goto('/admin/studies/example-study');
 
             // Wait for Recent Activity card
@@ -222,7 +266,10 @@ test.describe('Participant Discard E2E Tests', () => {
             // Check for "Discarded" section
             const discardedSection = page.locator('text=Discarded').locator('..');
             if (await discardedSection.isVisible()) {
-                await visual.captureElement('[data-testid="discarded-section"]', 'recent-activity-discarded-section');
+                await visual.captureElement(
+                    '[data-testid="discarded-section"]',
+                    'recent-activity-discarded-section'
+                );
             }
         });
     });
@@ -234,7 +281,9 @@ test.describe('Participant Discard E2E Tests', () => {
             const row = page.locator('[data-testid="participant-row"]').first();
             await row.click();
 
-            await page.waitForSelector('[data-testid="participant-detail-sheet"]', { state: 'visible' });
+            await page.waitForSelector('[data-testid="participant-detail-sheet"]', {
+                state: 'visible',
+            });
 
             const discardButton = page.getByRole('button', { name: /discard participant/i });
             await discardButton.hover();

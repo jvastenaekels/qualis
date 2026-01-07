@@ -110,6 +110,7 @@ export default function InteractiveDataView({
                 setSelectedParticipant({
                     ...selectedParticipant,
                     is_discarded: isDiscarded,
+                    // biome-ignore lint/suspicious/noExplicitAny: complex participant object update
                 } as any);
             }
         } catch (err) {

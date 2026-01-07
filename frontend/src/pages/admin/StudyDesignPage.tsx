@@ -6,18 +6,16 @@ import {
     Wand2,
     Save,
     Eye,
-    EyeOff,
-    RefreshCw,
-    CheckCircle2,
     RotateCcw,
     Loader2,
-    Smartphone,
-    Monitor,
     Lock,
     AlertTriangle,
-    ExternalLink,
+    Globe,
+    Check,
+    ChevronDown,
+    Languages,
+    Settings2,
 } from 'lucide-react';
-import Frame from 'react-frame-component';
 import { Button } from '@/components/ui/button';
 import { DesignerSkeleton } from '@/components/admin/DashboardSkeleton';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
@@ -29,26 +27,30 @@ import BrandingEditor from '@/components/admin/designer/BrandingEditor';
 import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
 import ConditionOfInstructionEditor from '@/components/admin/designer/ConditionOfInstructionEditor';
 import { GuidanceCard } from '@/components/admin/designer/GuidanceCard';
-import WelcomePage from '@/pages/WelcomePage';
-import PreSortPage from '@/pages/PreSortPage';
-import RoughSortPage from '@/pages/RoughSortPage';
-import PostSortPage from '@/pages/PostSortPage';
-import FineSortPage from '@/pages/FineSortPage';
-import { useConfigStore } from '@/store/useConfigStore';
-import { LayoutProvider } from '@/contexts/LayoutContext';
+
 import { toast } from 'sonner';
-import i18n from '@/i18n';
 import { useTranslation } from 'react-i18next';
-import { applyStudyOverrides } from '@/utils/i18nOverrides';
+import {
+    useGetStudyApiAdminStudiesSlugGet,
+    useUpdateStudyApiAdminStudiesSlugPatch,
+} from '@/api/generated';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import LanguageManagerModal from '@/components/admin/designer/LanguageManagerModal';
 
 const StudyDesignPage = () => {
     const { t } = useTranslation();
     const { slug } = useParams<{ slug: string }>();
-    const _navigate = useNavigate();
+    const navigate = useNavigate();
     const {
         draft,
         activeStep,
-        activeSubStep,
         activeLocale,
         setStudy,
         setActiveStep,
@@ -56,25 +58,14 @@ const StudyDesignPage = () => {
         resetDraft,
     } = useStudyDesigner();
 
-    const [isPreviewVisible, setIsPreviewVisible] = useState(true);
-    const [viewMode, setViewMode] = useState<'mobile' | 'desktop'>('mobile');
-    const setConfig = useConfigStore((state) => state.setConfig);
+    const [isLangModalOpen, setIsLangModalOpen] = useState(false);
 
-    // const { data: study, isLoading } = useGetStudyApiAdminStudiesSlugGet(slug ?? '', {
-    //     query: {
-    //         enabled: !!slug,
-    //     },
-    // });
-    // const updateMutation = useUpdateStudyApiAdminStudiesSlugPatch();
-
-    // Mock data for build
-    // biome-ignore lint/suspicious/noExplicitAny: mock
-    const study: any = { id: 1, title: 'Mock Study', slug: slug || 'test', config: {} };
-    const isLoading = false;
-    const _error = null;
-    const _refetch = () => {};
-    // biome-ignore lint/suspicious/noExplicitAny: mock
-    const updateMutation: any = { mutateAsync: async () => {}, isPending: false };
+    const { data: study, isLoading } = useGetStudyApiAdminStudiesSlugGet(slug ?? '', {
+        query: {
+            enabled: !!slug,
+        },
+    });
+    const updateMutation = useUpdateStudyApiAdminStudiesSlugPatch();
 
     // Initialize designer state when study is loaded
     useEffect(() => {
@@ -83,78 +74,11 @@ const StudyDesignPage = () => {
         }
     }, [study, setStudy]);
 
-    // Sync draft with ConfigStore for preview components
-    useEffect(() => {
-        if (draft) {
-            // Find active translation
-            // biome-ignore lint/suspicious/noExplicitAny: translation map
-            const translation = (draft.translations as any[])?.find(
-                // biome-ignore lint/suspicious/noExplicitAny: complex type
-                (t: any) => t.language_code === activeLocale
-            );
-
-            // Construct a "synthetic" study object for components
-            const syntheticStudy = {
-                ...draft,
-                title: translation?.title || 'No Title',
-                subtitle: translation?.subtitle,
-                description: translation?.description,
-                objective: translation?.objective,
-                instructions: translation?.instructions,
-                condition_of_instruction: translation?.condition_of_instruction,
-                consent_title: translation?.consent_title,
-                consent_description: translation?.consent_description,
-                // biome-ignore lint/suspicious/noExplicitAny: simulation context
-            } as any; // Using any for simulation context to avoid complex schema mismatches
-
-            // Map statements for preview
-            // biome-ignore lint/suspicious/noExplicitAny: statement mapping
-            syntheticStudy.statements = (draft.statements || []).map((s: any, index: number) => {
-                // biome-ignore lint/suspicious/noExplicitAny: translation mapping
-                const st = s.translations?.find((t: any) => t.language_code === activeLocale);
-                return {
-                    id: index + 1, // Use stable index-based ID
-                    code: s.code,
-                    text: st?.text || '',
-                };
-            });
-
-            setConfig(syntheticStudy);
-
-            // Sync i18n for preview
-            i18n.changeLanguage(activeLocale);
-            if (translation?.ui_labels) {
-                applyStudyOverrides(activeLocale, translation.ui_labels);
-            }
-
-            // Broadcast to detachable preview windows
-            if (slug) {
-                const bc = new BroadcastChannel(`open-q-designer-${slug}`);
-                bc.postMessage({
-                    type: 'SYNC_DRAFT',
-                    payload: {
-                        config: syntheticStudy,
-                        activeStep,
-                    },
-                });
-                // Persist for initial load of new popups
-                localStorage.setItem(
-                    `open-q-designer-sync-${slug}`,
-                    JSON.stringify({
-                        config: syntheticStudy,
-                        activeStep,
-                    })
-                );
-                bc.close();
-            }
-        }
-    }, [draft, activeLocale, activeStep, setConfig, slug]);
-
     // Dirty State Detection
     const isDirty = JSON.stringify(draft) !== JSON.stringify(study);
 
     // Permission States
-    const isFullyReadOnly = draft?.state === 'closed';
+    const isFullyReadOnly = draft?.state === 'closed' || draft?.state === 'paused';
     const isStructureLocked = draft?.state !== 'draft'; // active, paused, closed
 
     useEffect(() => {
@@ -246,133 +170,6 @@ const StudyDesignPage = () => {
 
     if (!draft) return <div>{t('common.errors.study_not_found.title')}</div>;
 
-    const renderPreview = () => {
-        // Collect styles for the iframe
-        const head = (
-            <>
-                {/* Dev mode fallback */}
-                <link href="/src/index.css" rel="stylesheet" />
-                {/* Capture all style tags (Vite dev & some prod) */}
-                {Array.from(document.querySelectorAll('style')).map((style, i) => (
-                    <style
-                        key={`style-${i}`}
-                        // biome-ignore lint/security/noDangerouslySetInnerHtml: injecting styles to preview
-                        dangerouslySetInnerHTML={{ __html: style.innerHTML }}
-                    />
-                ))}
-                {/* Capture all linked stylesheets (Prod bundles) */}
-                {Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((link, i) => (
-                    <link
-                        key={`link-${i}`}
-                        rel="stylesheet"
-                        href={(link as HTMLLinkElement).href}
-                    />
-                ))}
-            </>
-        );
-
-        return (
-            <Frame
-                initialContent='<!DOCTYPE html><html><head></head><body><div id="mount"></div></body></html>'
-                head={head}
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    border: 'none',
-                    backgroundColor: 'white',
-                }}
-            >
-                <LayoutProvider>
-                    {(() => {
-                        if (!draft) return null;
-
-                        // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
-                        const accentColor = (draft as any).branding?.accent_color || '#2563eb';
-                        const highlightKey = activeSubStep;
-
-                        return (
-                            <div
-                                className="h-full w-full bg-background text-foreground"
-                                style={{ '--brand-accent': accentColor } as React.CSSProperties}
-                            >
-                                {(() => {
-                                    switch (activeStep) {
-                                        case 'intro':
-                                            return <WelcomePage />;
-                                        case 'pre-sort':
-                                            return <PreSortPage highlightKey={highlightKey} />;
-                                        case 'q-sort':
-                                            return activeSubStep === 'grid' ? (
-                                                <FineSortPage highlightKey={highlightKey} />
-                                            ) : (
-                                                <RoughSortPage highlightKey={highlightKey} />
-                                            );
-                                        case 'post-sort':
-                                            return <PostSortPage highlightKey={highlightKey} />;
-                                        case 'branding':
-                                            return <WelcomePage />;
-                                        case 'interface': {
-                                            // Determine appropriate page for interface labels
-                                            if (highlightKey?.startsWith('welcome.')) {
-                                                return <WelcomePage highlightKey={highlightKey} />;
-                                            }
-                                            if (highlightKey === 'common.next') {
-                                                return <PreSortPage highlightKey={highlightKey} />;
-                                            }
-                                            if (
-                                                highlightKey === 'common.agree' ||
-                                                highlightKey === 'common.disagree' ||
-                                                highlightKey === 'common.neutral'
-                                            ) {
-                                                return (
-                                                    <RoughSortPage highlightKey={highlightKey} />
-                                                );
-                                            }
-                                            if (
-                                                highlightKey?.startsWith('fine.legend.') ||
-                                                highlightKey === 'fine.actions.validate'
-                                            ) {
-                                                return <FineSortPage highlightKey={highlightKey} />;
-                                            }
-                                            if (highlightKey === 'post.submit') {
-                                                return <PostSortPage highlightKey={highlightKey} />;
-                                            }
-                                            return <WelcomePage highlightKey={highlightKey} />;
-                                        }
-                                        default:
-                                            return <WelcomePage />;
-                                    }
-                                })()}
-                            </div>
-                        );
-                    })()}
-                </LayoutProvider>
-            </Frame>
-        );
-    };
-
-    const getPreviewTitle = () => {
-        // biome-ignore lint/suspicious/noExplicitAny: allow condition step
-        switch (activeStep as any) {
-            case 'intro':
-                return t('admin.design.tabs.welcome');
-            case 'pre-sort':
-                return t('admin.design.tabs.presort');
-            case 'condition':
-                return t('admin.design.tabs.condition');
-            case 'q-sort':
-                return activeSubStep === 'grid' ? t('admin.design.qsort.grid.title') : 'Rough Sort'; // TODO: Add key for Rough Sort specifically if different from Q-sort task
-            case 'post-sort':
-                return t('admin.design.tabs.postsort');
-            case 'branding':
-                return t('admin.design.tabs.theme');
-            case 'interface':
-                return t('admin.design.tabs.interface');
-            default:
-                return t('admin.design.toolbar.preview');
-        }
-    };
-
     return (
         <div
             className="flex flex-col h-[calc(100vh-theme(spacing.16))] animate-in fade-in duration-500 overflow-x-hidden"
@@ -414,45 +211,80 @@ const StudyDesignPage = () => {
                 </div>
 
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                    <div className="flex items-center gap-1 bg-muted/50 rounded-lg p-0.5 sm:p-1">
-                        {/* Language Switcher */}
-                        {(() => {
-                            const supportedLangs = Array.from(
-                                // biome-ignore lint/suspicious/noExplicitAny: complex draft type
-                                new Set((draft.translations || []).map((t: any) => t.language_code))
-                            );
-                            const langs = supportedLangs.length > 0 ? supportedLangs : ['en'];
-                            return langs.map((lang: string) => (
+                    {/* Language Switcher - Study Content Language */}
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-muted-foreground text-xs hidden sm:flex">
+                            <Languages className="h-3.5 w-3.5" />
+                            <span className="hidden lg:inline">
+                                {t('admin.design.toolbar.editing_language')}
+                            </span>
+                        </div>
+
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
                                 <Button
-                                    key={lang}
-                                    variant={activeLocale === lang ? 'secondary' : 'ghost'}
+                                    variant="outline"
                                     size="sm"
-                                    className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs"
-                                    onClick={() => setActiveLocale(lang)}
+                                    data-testid="language-switcher"
+                                    className="h-8 gap-2 font-bold bg-white/50 border-slate-200"
                                 >
-                                    {lang.toUpperCase()}
+                                    <Globe className="h-3.5 w-3.5 text-indigo-500" />
+                                    {activeLocale.toUpperCase()}
+                                    <ChevronDown className="h-3 w-3 opacity-50" />
                                 </Button>
-                            ));
-                        })()}
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                align="end"
+                                className="w-48 rounded-xl shadow-xl border-slate-200"
+                            >
+                                <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                                    {t('admin.design.toolbar.select_lang', 'Select language')}
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {(() => {
+                                    const activeLangs = (draft.translations || [])
+                                        // biome-ignore lint/suspicious/noExplicitAny: duck typing translation
+                                        .filter((t) => !(t as any).is_disabled)
+                                        .map((t) => t.language_code);
+
+                                    const langs = activeLangs.length > 0 ? activeLangs : ['en'];
+                                    return langs.map((lang: string) => (
+                                        <DropdownMenuItem
+                                            key={lang}
+                                            onSelect={() => setActiveLocale(lang)}
+                                            className={cn(
+                                                'flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg',
+                                                activeLocale === lang &&
+                                                    'bg-indigo-50 text-indigo-700 font-bold'
+                                            )}
+                                        >
+                                            <span className="flex items-center gap-2 uppercase tracking-wide">
+                                                {lang}
+                                            </span>
+                                            {activeLocale === lang && (
+                                                <Check className="h-3.5 w-3.5" />
+                                            )}
+                                        </DropdownMenuItem>
+                                    ));
+                                })()}
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    onSelect={() => setIsLangModalOpen(true)}
+                                    className="gap-2 cursor-pointer py-2 px-3 rounded-lg text-indigo-600 focus:text-indigo-700 focus:bg-indigo-50"
+                                >
+                                    <Settings2 className="h-3.5 w-3.5" />
+                                    <span className="font-semibold">
+                                        {t('admin.design.toolbar.manage_langs', 'Manage Languages')}
+                                    </span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
 
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsPreviewVisible(!isPreviewVisible)}
-                        className="hidden lg:flex h-8"
-                    >
-                        {isPreviewVisible ? (
-                            <EyeOff className="h-4 w-4 sm:mr-2" />
-                        ) : (
-                            <Eye className="h-4 w-4 sm:mr-2" />
-                        )}
-                        <span className="hidden xl:inline">
-                            {isPreviewVisible
-                                ? t('admin.design.toolbar.hide_preview')
-                                : t('admin.design.toolbar.preview')}
-                        </span>
-                    </Button>
+                    <LanguageManagerModal
+                        isOpen={isLangModalOpen}
+                        onClose={() => setIsLangModalOpen(false)}
+                    />
 
                     <Button
                         variant="outline"
@@ -513,14 +345,18 @@ const StudyDesignPage = () => {
                             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Lock className="h-6 w-6 text-red-600" />
                             </div>
-                            <h3 className="text-lg font-semibold">{t('admin.status.closed')}</h3>
+                            <h3 className="text-lg font-semibold">
+                                {draft.state === 'closed'
+                                    ? t('admin.status.closed')
+                                    : t('admin.status.paused')}
+                            </h3>
                             <p className="text-sm text-muted-foreground mt-2 mb-6">
                                 {t('admin.design.qsort.grid.locked_desc')}
                             </p>
                             <div className="flex gap-3 justify-center">
                                 <Button
                                     variant="outline"
-                                    onClick={() => _navigate(`/admin/studies/${draft.slug}`)}
+                                    onClick={() => navigate(`/admin/studies/${draft.slug}`)}
                                 >
                                     {t('admin.design.toolbar.closed')}
                                 </Button>
@@ -536,53 +372,77 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <TabsList className="flex flex-nowrap overflow-x-auto w-full max-w-4xl mx-auto shadow-sm mb-8 scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent snap-x snap-mandatory">
+                        <TabsList className="bg-slate-100/50 backdrop-blur-sm border border-slate-200/60 p-1 flex flex-nowrap overflow-x-auto w-full max-w-4xl mx-auto shadow-sm mb-10 scrollbar-none snap-x snap-mandatory rounded-xl h-11">
                             <TabsTrigger
                                 value="intro"
-                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
                             >
                                 👋 {t('admin.design.tabs.welcome')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="pre-sort"
-                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
                             >
                                 📋 {t('admin.design.tabs.presort')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="condition"
-                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
                             >
                                 🎯 {t('admin.design.tabs.condition')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="q-sort"
-                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                                data-testid="tab-q-sort"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
                             >
                                 🃏 {t('admin.design.tabs.qsort')}
                                 {isStructureLocked && (
-                                    <Lock className="h-3 w-3 ml-1 text-muted-foreground" />
+                                    <Lock size={12} className="text-muted-foreground/60" />
                                 )}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="post-sort"
-                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
                             >
-                                📝 {t('admin.design.tabs.postsort')}
-                            </TabsTrigger>
-                            <TabsTrigger
-                                value="interface"
-                                className="gap-2 min-w-fit px-4 flex-none snap-start"
-                            >
-                                ✨ {t('admin.design.tabs.interface')}
+                                🏁 {t('admin.design.tabs.postsort')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="branding"
-                                className="gap-2 min-w-fit px-4 flex-none snap-start"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
                             >
                                 🎨 {t('admin.design.tabs.theme')}
                             </TabsTrigger>
+                            <TabsTrigger
+                                value="interface"
+                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all"
+                            >
+                                ✨ {t('admin.design.tabs.interface')}
+                            </TabsTrigger>
                         </TabsList>
+
+                        {(() => {
+                            const isCopy = draft.translations?.find(
+                                (t) => t.language_code === activeLocale
+                            )?._is_copy;
+                            if (!isCopy) return null;
+
+                            return (
+                                <div className="max-w-4xl mx-auto mb-6 bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center gap-4 text-amber-900 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
+                                    <div className="h-10 w-10 bg-amber-100 rounded-full flex items-center justify-center shrink-0">
+                                        <AlertTriangle className="h-6 w-6 text-amber-600" />
+                                    </div>
+                                    <div>
+                                        <h4 className="font-black text-sm uppercase tracking-tight">
+                                            {t('admin.design.translation_needed')}
+                                        </h4>
+                                        <p className="text-sm text-amber-800/80 font-medium">
+                                            {t('admin.design.translation_needed_desc')}
+                                        </p>
+                                    </div>
+                                </div>
+                            );
+                        })()}
 
                         <div className="max-w-3xl mx-auto pb-20">
                             <TabsContent value="intro" className="mt-0 outline-none space-y-6">
@@ -604,16 +464,6 @@ const StudyDesignPage = () => {
                             </TabsContent>
 
                             <TabsContent value="condition" className="mt-0 outline-none space-y-6">
-                                <GuidanceCard
-                                    title={t(
-                                        'admin.design.guidance.condition_title',
-                                        'The Condition of Instruction'
-                                    )}
-                                    description={t(
-                                        'admin.design.guidance.condition_desc',
-                                        'This is the most critical part of your Q-study. It defines the specific point of view or scenario from which participants should sort the statements.'
-                                    )}
-                                />
                                 <ConditionOfInstructionEditor />
                             </TabsContent>
 
@@ -674,101 +524,6 @@ const StudyDesignPage = () => {
                         </div>
                     </Tabs>
                 </div>
-
-                {/* Right Pane: Preview */}
-                {isPreviewVisible && (
-                    <div
-                        className={cn(
-                            'border-l bg-muted/10 flex-col shrink-0 transition-all duration-300 ease-in-out hidden lg:flex',
-                            viewMode === 'mobile' ? 'w-[min(450px,35vw)]' : 'w-[min(60vw,1200px)]'
-                        )}
-                    >
-                        <div className="p-4 border-b bg-background/50 flex items-center justify-between shrink-0">
-                            <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-lg">
-                                <Button
-                                    size="icon"
-                                    variant={viewMode === 'mobile' ? 'default' : 'ghost'}
-                                    className="h-6 w-6"
-                                    onClick={() => setViewMode('mobile')}
-                                    title={t('admin.design.view_mode.mobile')}
-                                >
-                                    <Smartphone className="h-3 w-3" />
-                                </Button>
-                                <Button
-                                    size="icon"
-                                    variant={viewMode === 'desktop' ? 'default' : 'ghost'}
-                                    className="h-6 w-6"
-                                    onClick={() => setViewMode('desktop')}
-                                    title={t('admin.design.view_mode.desktop')}
-                                >
-                                    <Monitor className="h-3 w-3" />
-                                </Button>
-                                <div className="w-px h-3 bg-border mx-1" />
-                                <Button
-                                    size="icon"
-                                    variant="ghost"
-                                    className="h-6 w-6"
-                                    onClick={() =>
-                                        window.open(
-                                            `/admin/studies/${slug}/design/preview`,
-                                            '_blank',
-                                            'width=1200,height=800'
-                                        )
-                                    }
-                                    title={t('admin.design.toolbar.popout')}
-                                >
-                                    <ExternalLink className="h-3 w-3" />
-                                </Button>
-                            </div>
-                            <div className="text-[10px] text-muted-foreground px-2 py-0.5 bg-background rounded border font-mono">
-                                {activeLocale.toUpperCase()}
-                            </div>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto p-8 flex items-start justify-center bg-slate-100/50">
-                            <div
-                                className={cn(
-                                    'bg-background rounded-2xl shadow-2xl border overflow-hidden flex flex-col relative transition-all duration-300',
-                                    viewMode === 'mobile'
-                                        ? 'w-[375px] aspect-[9/19.5]'
-                                        : 'w-full h-full rounded-lg'
-                                )}
-                            >
-                                {/* Browser Chrome Mockup */}
-                                <div className="h-8 bg-muted/30 border-b flex items-center px-4 gap-2 shrink-0">
-                                    <div className="flex gap-1.5">
-                                        <div className="w-2 h-2 rounded-full bg-red-400/50" />
-                                        <div className="w-2 h-2 rounded-full bg-amber-400/50" />
-                                        <div className="w-2 h-2 rounded-full bg-emerald-400/50" />
-                                    </div>
-                                    <div className="h-5 flex-1 flex items-center justify-between mx-2">
-                                        <div className="bg-background rounded border px-2 flex items-center flex-1 h-full text-[10px] text-muted-foreground opacity-50 font-mono truncate mr-2">
-                                            open-q.sh/study/{draft.slug}
-                                        </div>
-                                        <div className="text-[9px] font-bold text-primary uppercase tracking-wider whitespace-nowrap px-1.5 py-0.5 bg-primary/10 rounded">
-                                            {getPreviewTitle()}
-                                        </div>
-                                    </div>
-                                    <RefreshCw className="h-3 w-3 text-muted-foreground opacity-30" />
-                                </div>
-
-                                {/* Simulation Content */}
-                                <div className="flex-1 overflow-y-auto bg-background isolate">
-                                    {renderPreview()}
-                                </div>
-
-                                {viewMode === 'mobile' && (
-                                    <div className="absolute bottom-4 left-0 right-0 flex justify-center pointer-events-none">
-                                        <div className="bg-primary/90 text-primary-foreground text-[10px] py-1 px-3 rounded-full backdrop-blur shadow-lg flex items-center gap-2">
-                                            <CheckCircle2 className="h-3 w-3" />
-                                            Preview mode
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     );

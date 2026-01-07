@@ -1,5 +1,3 @@
-import type { StudyTranslationRead as StudyTranslation } from '@/api/model/studyTranslationRead';
-import { useTranslation } from 'react-i18next';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Info } from 'lucide-react';
 import type React from 'react';
 import MarkdownEditor from './MarkdownEditor';
+import { ProcessStepEditor } from './ProcessStepEditor';
+import { useTranslation } from 'react-i18next';
+import type { StudyTranslation } from '@/api/model';
 
 const IntroductionEditor = () => {
     const { t } = useTranslation();
@@ -110,6 +111,7 @@ const IntroductionEditor = () => {
                     </div>
                     <Switch
                         id="enable-instructions"
+                        aria-label={t('admin.design.intro.process_title')}
                         checked={
                             translation?.instructions !== null &&
                             translation?.instructions !== undefined
@@ -140,12 +142,15 @@ const IntroductionEditor = () => {
                                     value={translation?.instructions || ''}
                                     onChange={(val: string) => handleChange('instructions', val)}
                                     placeholder={t('admin.design.intro.fields.task_placeholder')}
-                                    className="min-h-[200px]"
+                                    minRows={2}
+                                    maxRows={2}
                                 />
                             </div>
                         </CardContent>
                     </Card>
                 )}
+
+                <ProcessStepEditor />
             </section>
 
             <section className="space-y-4 pb-12">
@@ -158,6 +163,7 @@ const IntroductionEditor = () => {
                     </div>
                     <Switch
                         id="enable-consent"
+                        aria-label={t('admin.design.intro.consent_title')}
                         checked={hasConsent}
                         onCheckedChange={(checked: boolean) => {
                             // Defensive check to prevent infinite loops

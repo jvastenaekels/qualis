@@ -38,6 +38,13 @@ import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
+import {
+    useGetWorkspaceApiAdminWorkspacesSlugGet,
+    useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet,
+    useUpdateWorkspaceApiAdminWorkspacesSlugPatch,
+    useUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch,
+    useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete,
+} from '@/api/generated';
 
 const workspaceSchema = z.object({
     title: z.string().min(1, 'Title is required').max(50),
@@ -51,30 +58,24 @@ const workspaceSchema = z.object({
 type WorkspaceFormValues = z.infer<typeof workspaceSchema>;
 
 export default function WorkspaceSettingsPage() {
-    const { slug: _slug } = useLoaderData() as { slug: string };
-    const _navigate = useNavigate();
+    const { slug } = useLoaderData() as { slug: string };
+    const navigate = useNavigate();
     // const { t } = useTranslation(); // Unused
     const { user: currentUser } = useAuthStore();
 
-    // const { data: workspace, isLoading: isWorkspaceLoading } =
-    //     useGetWorkspaceApiAdminWorkspacesSlugGet(slug);
-    const workspace = { title: 'Mock Workspace', slug: 'mock-workspace' };
-    const isWorkspaceLoading = false;
+    const { data: workspace, isLoading: isWorkspaceLoading } =
+        useGetWorkspaceApiAdminWorkspacesSlugGet(slug);
 
-    // const {
-    //     data: members,
-    //     isLoading: isMembersLoading,
-    //     refetch: refetchMembers,
-    // } = useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet(slug);
-    // biome-ignore lint/suspicious/noExplicitAny: mock
-    const members: any[] = [];
-    const isMembersLoading = false;
-    const _refetchMembers = () => {};
+    const {
+        data: members,
+        isLoading: isMembersLoading,
+        refetch: refetchMembers,
+    } = useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet(slug);
 
-    // const updateWorkspaceMutation = useUpdateWorkspaceApiAdminWorkspacesSlugPatch();
-    // const updateMemberMutation = useUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch();
-    // const removeMemberMutation =
-    //     useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete();
+    const updateWorkspaceMutation = useUpdateWorkspaceApiAdminWorkspacesSlugPatch();
+    const updateMemberMutation = useUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch();
+    const removeMemberMutation =
+        useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete();
 
     const form = useForm<WorkspaceFormValues>({
         resolver: zodResolver(workspaceSchema),
@@ -92,37 +93,35 @@ export default function WorkspaceSettingsPage() {
                 slug: workspace.slug,
             });
         }
-    }, [form]);
+    }, [form, workspace]);
 
-    async function onUpdateWorkspace(_data: WorkspaceFormValues) {
+    async function onUpdateWorkspace(data: WorkspaceFormValues) {
         try {
-            // await updateWorkspaceMutation.mutateAsync({
-            //     slug,
-            //     data: {
-            //         title: data.title,
-            //         slug: data.slug,
-            //     },
-            // });
-            // toast.success('Workspace updated');
-            // if (data.slug !== slug) {
-            //     navigate(`/admin/workspaces/${data.slug}/settings`);
-            // }
-            toast.error('Update disabled (API missing)');
+            await updateWorkspaceMutation.mutateAsync({
+                slug,
+                data: {
+                    title: data.title,
+                    slug: data.slug,
+                },
+            });
+            toast.success('Workspace updated');
+            if (data.slug !== slug) {
+                navigate(`/admin/workspaces/${data.slug}/settings`);
+            }
         } catch (_err) {
             toast.error('Failed to update workspace');
         }
     }
 
-    const handleRoleChange = async (_userId: number, _role: WorkspaceRole) => {
+    const handleRoleChange = async (userId: number, role: WorkspaceRole) => {
         try {
-            // await updateMemberMutation.mutateAsync({
-            //     slug,
-            //     userId,
-            //     data: { role },
-            // });
-            // toast.success('Member role updated');
-            // refetchMembers();
-            toast.error('Role update disabled (API missing)');
+            await updateMemberMutation.mutateAsync({
+                slug,
+                userId,
+                data: { role },
+            });
+            toast.success('Member role updated');
+            refetchMembers();
         } catch (_err) {
             toast.error('Failed to update member role');
         }
@@ -135,10 +134,9 @@ export default function WorkspaceSettingsPage() {
         }
         if (!confirm('Are you sure you want to remove this member?')) return;
         try {
-            // await removeMemberMutation.mutateAsync({ slug, userId });
-            // toast.success('Member removed');
-            // refetchMembers();
-            toast.error('Remove member disabled (API missing)');
+            await removeMemberMutation.mutateAsync({ slug, userId });
+            toast.success('Member removed');
+            refetchMembers();
         } catch (_err) {
             toast.error('Failed to remove member');
         }

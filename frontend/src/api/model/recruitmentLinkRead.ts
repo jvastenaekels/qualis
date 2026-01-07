@@ -22,5 +22,6 @@ export interface RecruitmentLinkRead {
     study_id: number;
     token: string;
     usage_count: number;
+    start_count: number;
     created_at: string;
 }

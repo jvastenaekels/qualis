@@ -168,6 +168,7 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         };
 
         // Simulate the onUpdate handler logic
+        // biome-ignore lint/suspicious/noExplicitAny: test data
         const onUpdateHandler = (d: typeof testDraft, questionId: string, data: any) => {
             if (d.presort_config && 'enabled' in d.presort_config) {
                 if (!d.presort_config.fields) d.presort_config.fields = {};

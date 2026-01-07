@@ -351,6 +351,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
             const currentConfig = d.presort_config || {};
 
             // If currently legacy (no enabled flag), migrate to new structure
+            // biome-ignore lint/suspicious/noExplicitAny: migration config
             let newConfig: any;
             if (!('enabled' in currentConfig)) {
                 newConfig = {

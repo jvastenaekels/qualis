@@ -253,6 +253,7 @@ class StudyTranslation(Base):
     consent_description: Mapped[str | None] = mapped_column(String, nullable=True)
     consent_accept: Mapped[str | None] = mapped_column(String, nullable=True)
     consent_decline: Mapped[str | None] = mapped_column(String, nullable=True)
+    process_steps: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
 
     study: Mapped["Study"] = relationship(back_populates="translations")
 

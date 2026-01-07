@@ -21,7 +21,7 @@ export function AdminDashboard() {
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const { data: allStudies, isLoading } = useListStudiesApiAdminStudiesGet();
     const { t, i18n } = useTranslation();
-
+    // biome-ignore lint/suspicious/noExplicitAny: date locales from date-fns
     const dateLocales: Record<string, any> = {
         en: enUS,
         fr: fr,
@@ -32,7 +32,7 @@ export function AdminDashboard() {
     const studies = allStudies?.filter((s) => s.workspace_id === activeWorkspaceId);
 
     const activeStudiesCount = studies?.filter((s) => s.state === 'active').length || 0;
-    const totalStudies = studies?.length || 0;
+    const _totalStudies = studies?.length || 0;
 
     const handleOpenStudy = (slug: string) => {
         setActiveStudy(slug);
@@ -75,22 +75,7 @@ export function AdminDashboard() {
             </div>
 
             {/* Stats Overview */}
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                <Card className="hover:shadow-xl transition-all duration-300 border border-white/20 shadow-lg bg-white/40 backdrop-blur-xl group overflow-hidden">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500" />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
-                        <CardTitle className="text-[10px] font-bold uppercase text-slate-500 tracking-[0.2em]">
-                            {t('admin.dashboard.total_studies')}
-                        </CardTitle>
-                        <Layout className="h-4 w-4 text-indigo-400" />
-                    </CardHeader>
-                    <CardContent className="relative">
-                        <div className="text-3xl font-black text-slate-900">{totalStudies}</div>
-                        <p className="text-[10px] font-semibold text-slate-400 mt-1 uppercase tracking-wider">
-                            {t('admin.dashboard.across_statuses')}
-                        </p>
-                    </CardContent>
-                </Card>
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 <Card className="hover:shadow-xl transition-all duration-300 border border-emerald-500/10 shadow-lg bg-white/40 backdrop-blur-xl group overflow-hidden">
                     <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-8 -mt-8 transition-transform group-hover:scale-150 duration-500" />
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
@@ -103,11 +88,12 @@ export function AdminDashboard() {
                         <div className="text-3xl font-black text-emerald-600">
                             {activeStudiesCount}
                         </div>
-                        <p className="text-[10px] font-semibold text-slate-400 mt-1 uppercase tracking-wider">
+                        <p className="text-[10px] font-semibold text-slate-500 mt-1 uppercase tracking-wider">
                             {t('admin.dashboard.receiving_responses')}
                         </p>
                     </CardContent>
                 </Card>
+                {/* Other specialized metrics could go here */}
             </div>
 
             {/* Recent Studies */}
@@ -144,7 +130,7 @@ export function AdminDashboard() {
                                             <p className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
                                                 {study.slug}
                                             </p>
-                                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-tighter mt-0.5">
+                                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-tighter mt-0.5">
                                                 {t('admin.dashboard.created')}{' '}
                                                 {formatDistanceToNow(new Date(study.created_at), {
                                                     addSuffix: true,

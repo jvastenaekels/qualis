@@ -203,7 +203,7 @@ const TeamSettings = () => {
                                         variant="outline"
                                         className="h-5 px-1 font-mono text-[9px]"
                                     >
-                                        OWNER
+                                        {t('admin.team.roles.owner_badge', 'OWNER')}
                                     </Badge>
                                     <span className="text-muted-foreground">
                                         {t(
@@ -217,7 +217,7 @@ const TeamSettings = () => {
                                         variant="outline"
                                         className="h-5 px-1 font-mono text-[9px]"
                                     >
-                                        EDITOR
+                                        {t('admin.team.roles.editor_badge', 'EDITOR')}
                                     </Badge>
                                     <span className="text-muted-foreground">
                                         {t(
@@ -231,7 +231,7 @@ const TeamSettings = () => {
                                         variant="outline"
                                         className="h-5 px-1 font-mono text-[9px]"
                                     >
-                                        VIEWER
+                                        {t('admin.team.roles.viewer_badge', 'VIEWER')}
                                     </Badge>
                                     <span className="text-muted-foreground">
                                         {t(

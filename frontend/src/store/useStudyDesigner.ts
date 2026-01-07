@@ -55,6 +55,7 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                     consent_accept: t.consent_accept,
                     consent_decline: t.consent_decline,
                     ui_labels: t.ui_labels,
+                    process_steps: t.process_steps,
                 })),
                 statements: (study.statements || []).map((s) => ({
                     code: s.code,
@@ -90,6 +91,9 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                         draft.translations?.push(translation);
                     }
                     fn(translation);
+                    // Clear copy flag on any edit
+                    // biome-ignore lint/suspicious/noExplicitAny: custom property
+                    (translation as any)._is_copy = false;
                 }),
             };
         }),

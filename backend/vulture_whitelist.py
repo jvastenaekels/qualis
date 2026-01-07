@@ -118,3 +118,12 @@ list_workspace_members
 update_workspace_member
 remove_workspace_member
 WorkspaceInvitationCreate
+
+# New exceptions
+IP_HASH_SALT
+assemble_db_url
+cls
+effective_emails_from_name
+requires_password
+icon
+partners

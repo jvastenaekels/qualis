@@ -22,7 +22,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarGroup,
-    SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import {
     DropdownMenu,
@@ -237,9 +236,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             </SidebarMenuItem>
                         </SidebarMenu>
 
-                        <SidebarGroupLabel className="px-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-2">
+                        {/* Remove redundant 'Gestion' label as per plan 5.1 */}
+                        {/* <SidebarGroupLabel className="px-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 mb-2">
                             {t('admin.sidebar.study_management')}
-                        </SidebarGroupLabel>
+                        </SidebarGroupLabel> */}
                         <SidebarMenu>
                             {navMain[0].items.map((item) => (
                                 <SidebarMenuItem key={item.title}>

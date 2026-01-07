@@ -216,16 +216,7 @@
             "select_placeholder": "Select a statement to comment...",
             "placeholder": "Your comment here..."
         },
-        "missing": {
-            "label": "Is there something important about your view that wasn't captured?",
-            "description": "If you feel an important aspect was left out, please describe it here.",
-            "placeholder": "Optional..."
-        },
-        "general": {
-            "label": "General comments",
-            "description": "Any feedback on the study or additional thoughts?",
-            "placeholder": "Optional..."
-        },
+
         "submit": "Share my perspective",
         "validation_error": "Please briefly explain your key choices to continue.",
         "success": {
@@ -401,33 +392,26 @@
         "study_overview": {
             "title": "Overview",
             "subtitle": "Real-time analytics and participant overview for this study.",
-            "description": "Real-time analytics and participant overview for this study.",
-            "stats": {
-                "sample_size": "Sample Size (N)",
-                "valid": "valid",
-                "completion_rate": "Completion Rate",
-                "active": "active",
-                "mobile": "mobile",
-                "median_duration": "Median Duration",
-                "time_to_complete": "Time to complete"
-            },
-            "design_mode": "Design Mode",
-            "design_mode_desc": "Update your statements and grid configuration.",
-            "edit_design": "Edit Design",
+            "sample_size": "Sample Size (N)",
+            "valid": "valid",
+            "completion_rate": "Completion Rate",
+            "active": "active",
+            "mobile": "mobile",
+            "median_duration": "Median Duration",
+            "time_to_complete": "Time to complete",
             "recent_activity": "Recent Activity",
-            "recent_activity_desc": "Latest submissions (5 most recent)",
-            "no_participants": "No participants yet.",
+            "latest_submissions": "Latest submissions (last 5 of {{total}})",
             "recently_completed": "Recently Completed",
-            "in_progress": "In Progress",
-            "submitted": "Submitted",
+            "view_all": "View all participants and data details",
+            "no_participants": "No participants yet.",
             "view_data": "View",
-            "started": "Started",
-            "discarded": "Discarded",
+            "submitted": "Submitted",
+            "edit_design": "Edit Design",
             "steps": {
                 "welcome": "Welcome",
                 "consent": "Consent",
                 "rough_sort": "Rough Sort",
-                "fine_sort": "Fine Sort",
+                "fine_sort": "Q-Sort",
                 "final": "Final Steps"
             }
         },
@@ -453,9 +437,70 @@
                     "desc": "This will prevent new participants from entering. Existing sessions can still finish. You can reopen later.",
                     "action": "Close Study"
                 }
+            },
+            "steps": {
+                "draft": {
+                    "label": "Draft",
+                    "description": "Configuration & design"
+                },
+                "active": {
+                    "label": "Active",
+                    "description": "Collecting responses"
+                },
+                "paused": {
+                    "label": "Paused",
+                    "description": "On hold"
+                },
+                "closed": {
+                    "label": "Closed",
+                    "description": "Analysis & export"
+                }
+            }
+        },
+        "team": {
+            "title": "Research Team",
+            "description": "Manage collaborators and study-level access control.",
+            "invite_title": "Invite Collaborator",
+            "invite_description": "Generate a secure link to invite a new member to this study.",
+            "email_label": "Email Address",
+            "role_label": "Role",
+            "select_role": "Select a role",
+            "generate_link": "Generate Link",
+            "share_label": "Share this link with the invitee:",
+            "copy_success": "Link copied to clipboard",
+            "invite_success": "Invitation link generated!",
+            "invite_error": "Failed to generate invitation",
+            "list_title": "Collaborators",
+            "list_description": "Manage access for existing collaborators.",
+            "added_on": "Added on",
+            "headers": {
+                "collaborator": "Collaborator",
+                "role": "Role",
+                "actions": "Actions"
+            },
+            "roles": {
+                "owner": "Owner (Full Control)",
+                "editor": "Editor (Design & Analysis)",
+                "viewer": "Viewer (Read-only)",
+                "owner_badge": "OWNER",
+                "editor_badge": "EDITOR",
+                "viewer_badge": "VIEWER"
+            },
+            "permissions": {
+                "owner": "Can delete the study and manage team.",
+                "editor": "Can modify design and view results.",
+                "viewer": "Read-only access to all modules."
             }
         },
         "design": {
+            "translation_needed": "Review required (Copy)",
+            "translation_needed_desc": "This content was automatically copied from another language. Please review and localize it.",
+            "guidance": {
+                "intro_title": "Welcome to the Studio",
+                "intro_desc": "Start by defining the purpose of your study. This information will be shown to participants before they begin the sorting process.",
+                "qsort_title": "Statement & Grid Balance",
+                "qsort_desc": "Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually has between 30 and 60 items for robust factor analysis."
+            },
             "toolbar": {
                 "title": "Study design",
                 "preview": "Show preview",
@@ -465,7 +510,21 @@
                 "test_run": "Test run",
                 "save": "Save",
                 "saving": "Saving...",
-                "closed": "Closed"
+                "closed": "Closed",
+                "editing_language": "Editing",
+                "manage_langs": "Manage Languages",
+                "select_lang": "Select language"
+            },
+            "languages": {
+                "manage_title": "Manage Languages",
+                "manage_desc": "Enable or disable languages available for participants to see in this study.",
+                "auto_translate": "Automatic Translation",
+                "auto_translate_desc": "Soon you will be able to use AI to automatically translate your study into 30+ languages.",
+                "activate_title": "Activate Language",
+                "activate_desc": "Choose a source language to copy translations from. This prevents empty fields for participants.",
+                "source_label": "Source Language",
+                "copy_notice": "All fields will be copied. You will see a visual indicator on fields that still need your translation.",
+                "confirm_activate": "Activate & Copy"
             },
             "tabs": {
                 "welcome": "Welcome",
@@ -482,7 +541,25 @@
             },
             "intro": {
                 "welcome_title": "Welcome message",
-                "process_title": "Custom process explanation",
+                "process_title": "Study Steps",
+                "process_steps": {
+                    "title": "Study Steps",
+                    "desc": "Define the phases shown to participants on the welcome page. If left empty, default steps will be used.",
+                    "add_step": "Add step",
+                    "empty": {
+                        "title": "No custom steps defined",
+                        "desc": "The study will use the standard Q-methodology workflow (Meet, First impressions, Perspective, Why)."
+                    },
+                    "fields": {
+                        "title": "Step title",
+                        "description": "Short description",
+                        "icon": "Icon"
+                    },
+                    "defaults": {
+                        "new_step": "New study step",
+                        "new_desc": "Explain what the participant will do in this phase."
+                    }
+                },
                 "consent_title": "Custom consent form",
                 "consent_details": "Consent form details",
                 "fields": {
@@ -568,7 +645,7 @@
                     "process_append": "Process & append statements"
                 },
                 "set": {
-                    "title": "Statement set",
+                    "title": "Q-set",
                     "clear": "Clear all",
                     "confirm_clear": "Are you sure you want to delete ALL statements? This cannot be undone.",
                     "updated": "Statement updated",
@@ -584,11 +661,11 @@
                 "grid": {
                     "title": "Forced distribution grid",
                     "desc": "The grid shape forces participants to discriminate between statements, approximating a normal distribution.",
-                    "perfect": "Perfect match!",
-                    "too_many": "too many statements",
-                    "empty_slots": "empty slots",
+                    "slot_count": "{{count}} slots allocated",
                     "stat_count": "{{count}} statements",
-                    "slot_count": "{{count}} grid slots",
+                    "perfect": "Perfect Balance",
+                    "too_many": "{{count}} too many statements",
+                    "too_few": "{{count}} statements missing",
                     "tooltip_title": "Why forced distribution?",
                     "tooltip_desc": "Q-methodology uses a quasi-normal distribution (kurtosis > 0) to ensure participants make meaningful distinctions. The pyramid shape prevents central tendency bias.",
                     "locked": "Grid structure is locked",
@@ -616,17 +693,14 @@
                     "title": "Custom questions",
                     "desc": "Add custom questions to the post-sort survey."
                 },
-                "missing": {
-                    "title": "Ask about missing statements",
-                    "desc": "Ask if there were missing topics.",
-                    "prompt_label": "Missing statements prompt",
-                    "prompt_placeholder": "Were there any statements you wish had been included?"
-                },
-                "general": {
-                    "title": "Ask for general feedback",
-                    "desc": "General comments at the end.",
-                    "prompt_label": "General feedback prompt",
-                    "prompt_placeholder": "Do you have any additional comments or feedback?"
+
+                "email": {
+                    "title": "Participant Follow-up",
+                    "desc": "Collect email addresses for follow-up or research results.",
+                    "interview": "Offer follow-up interview",
+                    "results": "Offer study results (Newsletter)",
+                    "interview_warning": "Note: agreeing to be contacted lifts anonymity for the researcher.",
+                    "results_hint": "Email solely for results, anonymity preserved."
                 }
             },
             "interface": {
@@ -675,10 +749,40 @@
                 "tip": {
                     "title": "Branding tip",
                     "desc": "Ensuring high accessibility is key. When picking an accent color, make sure it has enough contrast against white backgrounds for readability."
+                },
+                "partners": {
+                    "title": "Institutional Partners",
+                    "desc": "Add logos of supporting institutions or partners.",
+                    "add": "Add Partner",
+                    "name_label": "Partner Name",
+                    "logo_label": "Logo URL",
+                    "url_label": "Website (optional)",
+                    "url_placeholder": "Logo URL (https://...)"
                 }
             }
         },
         "data": {
+            "title": "Analytics & Data",
+            "description": "Inspect participant performance, qualitative feedback, and export datasets.",
+            "tabs": {
+                "browse": "Interactive view",
+                "export": "Export data"
+            },
+            "guide": {
+                "title": "Format guide",
+                "csv": {
+                    "title": "Universal CSV",
+                    "desc": "Raw rectangular data. Best for R, Python, SPSS, or Excel analysis. Includes all metadata."
+                },
+                "json": {
+                    "title": "KenQ JSON",
+                    "desc": "Optimized for the Web-KenQ analysis tool. Contains study definition and sorts."
+                },
+                "zip": {
+                    "title": "PQMethod Bundle (ZIP)",
+                    "desc": "Contains legacy .DAT and .STA files for DOS PQMethod analysis."
+                }
+            },
             "table": {
                 "id_token": "ID / Token",
                 "lang": "Lang",

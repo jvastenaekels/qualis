@@ -1,4 +1,4 @@
-import { type Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class RoughSortPage extends BasePage {
@@ -6,21 +6,21 @@ export class RoughSortPage extends BasePage {
     readonly disagreeBtn = this.page.getByTestId('rough-disagree-btn');
     readonly neutralBtn = this.page.getByTestId('rough-neutral-btn');
 
-    constructor(page: Page) {
-        super(page);
-    }
-
     async waitForLoad() {
         await expect(this.page).toHaveURL(/.*\/rough-sort/, { timeout: 15000 });
     }
 
-    async completeRoughSort(totalCards: number, distributions: { agree?: number, disagree?: number, neutral?: number } = {}) {
+    async completeRoughSort(
+        totalCards: number,
+        distributions: { agree?: number; disagree?: number; neutral?: number } = {}
+    ) {
         // Default to distributed sort if no specific distribution is asked,
         // to ensure Fine Sort gets popluated decks
-        const defaultMode = !distributions.agree && !distributions.disagree && !distributions.neutral;
+        const defaultMode =
+            !distributions.agree && !distributions.disagree && !distributions.neutral;
 
         if (defaultMode) {
-             // Distribute: First to Disagree, rest to Agree
+            // Distribute: First to Disagree, rest to Agree
             for (let i = 0; i < totalCards; i++) {
                 if (i === 0) {
                     await this.disagreeBtn.click();
@@ -30,14 +30,16 @@ export class RoughSortPage extends BasePage {
                 await this.page.waitForTimeout(200); // Animation wait
             }
         } else {
-             // Custom distribution logic would go here if needed
-             // For now, implementing the robust default logic is key for CI stability
-             // This mimics the fix applied in recent troubleshooting.
+            // Custom distribution logic would go here if needed
+            // For now, implementing the robust default logic is key for CI stability
+            // This mimics the fix applied in recent troubleshooting.
         }
 
         // After sorting, we need to click "Next"
         // Wait for completion screen
-        const nextBtn = this.page.getByRole('button', { name: /Next|Suivant|Seuraava|Jatka/i }).first();
+        const nextBtn = this.page
+            .getByRole('button', { name: /Next|Suivant|Seuraava|Jatka/i })
+            .first();
         await expect(nextBtn).toBeVisible({ timeout: 5000 });
         await nextBtn.click();
     }

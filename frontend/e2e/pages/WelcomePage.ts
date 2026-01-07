@@ -1,13 +1,9 @@
-import { type Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class WelcomePage extends BasePage {
     readonly startButton = this.page.getByTestId('start-btn');
     readonly loadingSpinner = this.page.locator('[data-testid="loading-spinner"]');
-
-    constructor(page: Page) {
-        super(page);
-    }
 
     async visit(slug: string) {
         await this.goto(`/study/${slug}/welcome`);

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { setupAdminMocks, resetStores } from '../fixtures/admin-mocks';
 import { AdminPage } from '../pages/AdminPage';
 import { VisualAssertions } from '../helpers/VisualAssertions';
@@ -24,7 +24,7 @@ test.describe('Admin Visual Regression Tests', () => {
             await page.waitForSelector('[data-testid="study-overview"]', { state: 'visible' });
 
             // Mask dynamic content (timestamps, participant IDs)
-            const masks = visual.getMask([
+            const _masks = visual.getMask([
                 '[data-testid="participant-time"]',
                 '[data-testid="participant-id"]',
             ]);
@@ -38,9 +38,18 @@ test.describe('Admin Visual Regression Tests', () => {
             await page.goto('/admin/studies/example-study');
 
             // Capture individual metrics cards
-            await visual.captureElement('[data-testid="completion-rate-card"]', 'metrics-completion-rate');
-            await visual.captureElement('[data-testid="participants-card"]', 'metrics-participants');
-            await visual.captureElement('[data-testid="median-duration-card"]', 'metrics-median-duration');
+            await visual.captureElement(
+                '[data-testid="completion-rate-card"]',
+                'metrics-completion-rate'
+            );
+            await visual.captureElement(
+                '[data-testid="participants-card"]',
+                'metrics-participants'
+            );
+            await visual.captureElement(
+                '[data-testid="median-duration-card"]',
+                'metrics-median-duration'
+            );
         });
 
         test('should show Recent Activity with status grouping', async ({ page }) => {
@@ -51,7 +60,10 @@ test.describe('Admin Visual Regression Tests', () => {
             await activityCard.waitFor({ state: 'visible' });
 
             // Capture Recent Activity card
-            await visual.captureElement('[data-testid="recent-activity-card"]', 'recent-activity-card');
+            await visual.captureElement(
+                '[data-testid="recent-activity-card"]',
+                'recent-activity-card'
+            );
         });
 
         test('should display empty state when no participants', async ({ page }) => {
@@ -109,9 +121,14 @@ test.describe('Admin Visual Regression Tests', () => {
             await page.goto('/admin/studies/example-study/recruitment');
 
             // Wait for table to load
-            await page.waitForSelector('[data-testid="recruitment-links-table"]', { state: 'visible' });
+            await page.waitForSelector('[data-testid="recruitment-links-table"]', {
+                state: 'visible',
+            });
 
-            await visual.captureElement('[data-testid="recruitment-links-table"]', 'recruitment-links-table');
+            await visual.captureElement(
+                '[data-testid="recruitment-links-table"]',
+                'recruitment-links-table'
+            );
         });
 
         test('should show create link dialog with guidance', async ({ page }) => {
@@ -150,9 +167,14 @@ test.describe('Admin Visual Regression Tests', () => {
             await firstRow.click();
 
             // Wait for sheet to open
-            await page.waitForSelector('[data-testid="participant-detail-sheet"]', { state: 'visible' });
+            await page.waitForSelector('[data-testid="participant-detail-sheet"]', {
+                state: 'visible',
+            });
 
-            await visual.captureElement('[data-testid="participant-detail-sheet"]', 'participant-detail-sheet');
+            await visual.captureElement(
+                '[data-testid="participant-detail-sheet"]',
+                'participant-detail-sheet'
+            );
         });
 
         test('should display discarded participant with visual markers', async ({ page }) => {
@@ -160,9 +182,14 @@ test.describe('Admin Visual Regression Tests', () => {
             await page.goto('/admin/studies/example-study/exports');
 
             // Look for discarded participant row
-            const discardedRow = page.locator('[data-testid="participant-row"]').filter({ hasText: 'Discarded' });
-            if (await discardedRow.count() > 0) {
-                await visual.captureElement('[data-testid="participant-row"]:has-text("Discarded")', 'participant-discarded-row');
+            const discardedRow = page
+                .locator('[data-testid="participant-row"]')
+                .filter({ hasText: 'Discarded' });
+            if ((await discardedRow.count()) > 0) {
+                await visual.captureElement(
+                    '[data-testid="participant-row"]:has-text("Discarded")',
+                    'participant-discarded-row'
+                );
             }
         });
     });
@@ -178,7 +205,10 @@ test.describe('Admin Visual Regression Tests', () => {
         test('should display collaborators table', async ({ page }) => {
             await page.goto('/admin/studies/example-study/team');
 
-            await visual.captureElement('[data-testid="collaborators-table"]', 'collaborators-table');
+            await visual.captureElement(
+                '[data-testid="collaborators-table"]',
+                'collaborators-table'
+            );
         });
     });
 
@@ -232,7 +262,7 @@ test.describe('Admin Visual Regression Tests', () => {
     test.describe('Loading & Error States', () => {
         test('should display loading skeletons correctly', async ({ page }) => {
             // Intercept API and delay response
-            await page.route('**/api/admin/studies/**', async route => {
+            await page.route('**/api/admin/studies/**', async (route) => {
                 await page.waitForTimeout(2000);
                 await route.continue();
             });
@@ -247,7 +277,7 @@ test.describe('Admin Visual Regression Tests', () => {
 
         test('should display error state gracefully', async ({ page }) => {
             // Intercept API and return error
-            await page.route('**/api/admin/studies/**', route => {
+            await page.route('**/api/admin/studies/**', (route) => {
                 route.fulfill({
                     status: 500,
                     body: JSON.stringify({ detail: 'Internal server error' }),

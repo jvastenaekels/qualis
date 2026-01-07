@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.dependencies import check_study_permission, get_current_user
 from app.models import (
+    Participant,
     Study,
     StudyCollaborator,
     StudyRole,
@@ -17,6 +18,7 @@ from app.models import (
     WorkspaceMember,
     WorkspaceRole,
 )
+from sqlalchemy import func
 from app.schemas import (
     ParticipantDiscardUpdate,
     ParticipantRead,
@@ -77,6 +79,7 @@ async def create_study(
         postsort_config=study.postsort_config,
         default_language=study.default_language or "en",
         show_statement_codes=study.show_statement_codes,
+        branding=study.branding.model_dump() if study.branding else None,
         start_date=study.start_date,
         end_date=study.end_date,
     )
@@ -91,9 +94,14 @@ async def create_study(
     )
 
     from app.models import Statement, StatementTranslation, StudyTranslation
+    from app.services.study_service import DEFAULT_PROCESS_STEPS
 
     for t_in in study.translations:
-        db.add(StudyTranslation(study_id=db_study.id, **t_in.model_dump()))
+        t_data = t_in.model_dump()
+        # Inject default process steps if not provided
+        if not t_data.get("process_steps"):
+            t_data["process_steps"] = DEFAULT_PROCESS_STEPS
+        db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
     # 4. Add Statements and their translations
     for s_in in study.statements:
@@ -170,12 +178,20 @@ async def update_study(
         # Existing in DB is a JSON list of dicts.
         current_grid = study.grid_config
 
-        # If they are different AND study is not draft, raise error
-        if new_grid != current_grid and study.state != StudyState.draft:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Cannot modify grid structure of an active, paused, or closed study.",
+        # If they are different AND (study is not draft OR has submissions), raise error
+        if new_grid != current_grid:
+            # Plan 1.1: Reject grid modification if study has submissions, regardless of state
+            stmt = select(func.count(Participant.id)).where(
+                Participant.study_id == study.id
             )
+            res = await db.execute(stmt)
+            has_submissions = (res.scalar() or 0) > 0
+
+            if has_submissions or study.state != StudyState.draft:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot modify grid structure if study has submissions or is not in draft mode.",
+                )
 
     # Block updates if archived
     if study.state == StudyState.archived:

@@ -9,7 +9,6 @@ import { Progress } from '@/components/ui/progress';
 import {
     Activity,
     Users,
-    PencilRuler,
     CheckCircle2,
     Clock,
     AlertTriangle,
@@ -86,38 +85,26 @@ const StudyOverviewPage = () => {
                 )}
                 icon={LayoutDashboard}
                 statusBadge={
-                    study?.state !== 'active' && (
-                        <Badge
-                            variant="outline"
-                            role="status"
-                            className={cn(
-                                'font-black uppercase tracking-[0.2em] text-[10px] px-2 py-0.5 rounded-full',
-                                study?.state === 'paused'
-                                    ? 'bg-orange-50 text-orange-700 border-orange-100'
-                                    : study?.state === 'closed'
-                                      ? 'bg-slate-50 text-slate-700 border-slate-100'
-                                      : 'bg-amber-50 text-amber-700 border-amber-100'
-                            )}
-                        >
-                            {getStatusLabel(study?.state || 'draft')}
-                        </Badge>
-                    )
+                    <Badge
+                        variant="outline"
+                        role="status"
+                        className={cn(
+                            'font-black uppercase tracking-[0.2em] text-[10px] px-2 py-0.5 rounded-full',
+                            study?.state === 'active'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                : study?.state === 'paused'
+                                  ? 'bg-orange-50 text-orange-700 border-orange-100'
+                                  : study?.state === 'closed'
+                                    ? 'bg-slate-50 text-slate-700 border-slate-100'
+                                    : 'bg-amber-50 text-amber-700 border-amber-100'
+                        )}
+                    >
+                        {getStatusLabel(study?.state || 'draft')}
+                    </Badge>
                 }
                 actions={
                     <div className="flex items-center gap-2">
-                        {study?.state === 'draft' && (
-                            <Button
-                                asChild
-                                size="sm"
-                                variant="outline"
-                                className="gap-2 border-indigo-100 hover:bg-indigo-50 hover:text-indigo-600 transition-all shadow-sm font-bold text-xs"
-                            >
-                                <Link to={`/admin/studies/${slug}/design`}>
-                                    <PencilRuler className="h-3.5 w-3.5" />
-                                    {t('admin.study_overview.edit_design', 'Edit design')}
-                                </Link>
-                            </Button>
-                        )}
+                        {/* Removed redundant 'Edit design' button as per plan 5.1 */}
                     </div>
                 }
             />

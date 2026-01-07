@@ -115,7 +115,10 @@ test.describe('Workspace Management E2E Tests', () => {
         await expect(page.getByText(/role updated/i)).toBeVisible();
 
         // Capture updated table
-        await visual.captureElement('[data-testid="members-table"]', 'workspace-members-table-after-role-change');
+        await visual.captureElement(
+            '[data-testid="members-table"]',
+            'workspace-members-table-after-role-change'
+        );
     });
 
     test('should remove team member', async ({ page }) => {
@@ -129,7 +132,7 @@ test.describe('Workspace Management E2E Tests', () => {
         await removeButton.click();
 
         // Confirm dialog
-        page.on('dialog', dialog => dialog.accept());
+        page.on('dialog', (dialog) => dialog.accept());
 
         // Wait for removal
         await expect(page.getByText(/member removed/i)).toBeVisible();
@@ -142,7 +145,10 @@ test.describe('Workspace Management E2E Tests', () => {
         await page.goto('/admin/workspaces/example-workspace/settings');
 
         // Capture permissions info card
-        await visual.captureElement('[data-testid="permissions-matrix"]', 'permissions-matrix-card');
+        await visual.captureElement(
+            '[data-testid="permissions-matrix"]',
+            'permissions-matrix-card'
+        );
     });
 
     test('should show invite collaborator placeholder', async ({ page }) => {

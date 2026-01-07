@@ -497,11 +497,12 @@ interface DeckButtonProps {
     type: 'agree' | 'disagree' | 'neutral';
     count: number;
     onClick: () => void;
+    // biome-ignore lint/suspicious/noExplicitAny: framer-motion Transform value
     scale: any;
-    // biome-ignore lint/suspicious/noExplicitAny: legacy
+    // biome-ignore lint/suspicious/noExplicitAny: framer-motion Transform value
     opacity: any;
     highlightKey?: string | null;
-    // biome-ignore lint/suspicious/noExplicitAny: legacy
+    // biome-ignore lint/suspicious/noExplicitAny: translation function
     t: any;
     sharedFontSize: string;
     isNeutral?: boolean;

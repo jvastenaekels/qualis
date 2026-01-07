@@ -7,11 +7,14 @@
 import type { StudyTranslationCreateInstructions } from './studyTranslationCreateInstructions';
 import type { StudyTranslationCreateSubtitle } from './studyTranslationCreateSubtitle';
 import type { StudyTranslationCreateObjective } from './studyTranslationCreateObjective';
+import type { StudyTranslationCreateConditionOfInstruction } from './studyTranslationCreateConditionOfInstruction';
+import type { StudyTranslationCreatePreInstruction } from './studyTranslationCreatePreInstruction';
 import type { StudyTranslationCreateConsentTitle } from './studyTranslationCreateConsentTitle';
 import type { StudyTranslationCreateConsentDescription } from './studyTranslationCreateConsentDescription';
 import type { StudyTranslationCreateConsentAccept } from './studyTranslationCreateConsentAccept';
 import type { StudyTranslationCreateConsentDecline } from './studyTranslationCreateConsentDecline';
 import type { StudyTranslationCreateUiLabels } from './studyTranslationCreateUiLabels';
+import type { ProcessStep } from './processStep';
 
 /**
  * Schema for creating a study translation.
@@ -31,11 +34,12 @@ export interface StudyTranslationCreate {
     instructions?: StudyTranslationCreateInstructions;
     subtitle?: StudyTranslationCreateSubtitle;
     objective?: StudyTranslationCreateObjective;
+    condition_of_instruction?: StudyTranslationCreateConditionOfInstruction;
+    pre_instruction?: StudyTranslationCreatePreInstruction;
     consent_title?: StudyTranslationCreateConsentTitle;
     consent_description?: StudyTranslationCreateConsentDescription;
     consent_accept?: StudyTranslationCreateConsentAccept;
     consent_decline?: StudyTranslationCreateConsentDecline;
     ui_labels?: StudyTranslationCreateUiLabels;
-    condition_of_instruction?: string;
-    pre_instruction?: string;
+    process_steps?: ProcessStep[];
 }

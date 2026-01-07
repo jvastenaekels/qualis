@@ -6,10 +6,6 @@
  */
 import type { BrandingBaseLogoUrl } from './brandingBaseLogoUrl';
 import type { BrandingBaseAccentColor } from './brandingBaseAccentColor';
-
-/**
- * Schema for study branding.
- */
 import type { PartnerLogo } from './partnerLogo';
 
 /**

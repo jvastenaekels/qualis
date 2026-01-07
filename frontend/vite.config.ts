@@ -23,7 +23,12 @@ export default defineConfig({
             output: {
                 manualChunks: {
                     vendor: ['react', 'react-dom', 'react-router-dom', 'zustand'],
-                    dnd: ['@dnd-kit/core', '@dnd-kit/sortable', '@dnd-kit/utilities', '@dnd-kit/modifiers'],
+                    dnd: [
+                        '@dnd-kit/core',
+                        '@dnd-kit/sortable',
+                        '@dnd-kit/utilities',
+                        '@dnd-kit/modifiers',
+                    ],
                     ui: ['framer-motion', 'lucide-react'],
                 },
             },

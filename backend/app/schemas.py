@@ -129,6 +129,24 @@ class WorkspaceInvitationCreate(BaseModel):
 # Translation Schemas
 
 
+class PartnerLogo(BaseModel):
+    """Schema for a partner institution logo."""
+
+    id: str
+    name: str
+    logo_url: str
+    url: str | None = None
+
+
+class ProcessStep(BaseModel):
+    """Schema for a dynamic study process step."""
+
+    id: str = Field(..., description="Unique ID for DND and tracking")
+    title: str = Field(..., min_length=1, max_length=100)
+    description: str = Field(..., max_length=500)
+    icon: str = Field(..., description="Lucide icon name")
+
+
 class StudyTranslationBase(BaseModel):
     """Base schema for study translations."""
 
@@ -145,6 +163,7 @@ class StudyTranslationBase(BaseModel):
     consent_accept: str | None = None
     consent_decline: str | None = None
     ui_labels: dict[str, Any] = {}
+    process_steps: list[ProcessStep] = []
 
 
 class StudyTranslationCreate(StudyTranslationBase):
@@ -217,15 +236,6 @@ class GridColumn(BaseModel):
 
     score: int
     capacity: int
-
-
-class PartnerLogo(BaseModel):
-    """Schema for a partner institution logo."""
-
-    id: str
-    name: str
-    logo_url: str
-    url: str | None = None
 
 
 class BrandingBase(BaseModel):

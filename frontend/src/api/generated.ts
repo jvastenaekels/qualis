@@ -50,7 +50,10 @@ import type {
     UserUpdate,
     VerifyInvitationApiAdminInvitationsVerifyGetParams,
     WorkspaceCreate,
+    WorkspaceMemberRead,
+    WorkspaceMemberUpdate,
     WorkspaceRead,
+    WorkspaceUpdate,
 } from './model';
 
 import { customInstance } from './mutator';
@@ -247,7 +250,15 @@ export const useUpdateUserMeApiMePatch = <TError = HTTPValidationError, TContext
 };
 
 /**
- * OAuth2 compatible token login, get an access token for future requests.
+ * OAuth2 compatible token login, getting an access token for future requests.
+
+Validation Flow:
+1. Verify username (email) and password.
+2. If the user has 2FA enabled:
+   - Check for `x-totp-token` header.
+   - If missing, return a special Token response indicating `requires_2fa=True`.
+   - If present, verify the TOTP token.
+3. If all checks pass, issue a Bearer access token.
  * @summary Login For Access Token
  */
 export const loginForAccessTokenApiTokenPost = (
@@ -358,6 +369,11 @@ export const useLoginForAccessTokenApiTokenPost = <
 
 /**
  * Register a new user, optionally via an invitation token.
+
+If an `invitation_token` is provided:
+1. Decodes and verifies the token.
+2. Ensures the token's subject matches the provided email.
+3. Automatically adds the new user as a collaborator to the study specified in the token.
  * @summary Register User
  */
 export const registerUserApiRegisterPost = (userCreate: UserCreate, signal?: AbortSignal) => {
@@ -1230,7 +1246,7 @@ export const useUpdateStudyApiAdminStudiesSlugPatch = <
 };
 
 /**
- * Delete a study (Workspace Admin only).
+ * Delete a study (Superuser only, and must be Archived).
  * @summary Delete Study
  */
 export const deleteStudyApiAdminStudiesSlugDelete = (slug: string) => {
@@ -1306,7 +1322,7 @@ export const useDeleteStudyApiAdminStudiesSlugDelete = <
 };
 
 /**
- * Change study state (Draft <-> Active <-> Closed).
+ * Change study state (Draft <-> Active <-> Closed <-> Archived).
  * @summary Change Study State
  */
 export const changeStudyStateApiAdminStudiesSlugStatePost = (
@@ -2588,7 +2604,7 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
 }
 
 /**
- * Generate a JWT invitation link for a collaborator.
+ * Generate a JWT invitation link and send an email.
  * @summary Invite Collaborator
  */
 export const inviteCollaboratorApiAdminInvitationsSlugInvitePost = (
@@ -3665,6 +3681,573 @@ export const useCreateWorkspaceApiAdminWorkspacesPost = <
     TContext
 > => {
     const mutationOptions = getCreateWorkspaceApiAdminWorkspacesPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Get workspace details.
+ * @summary Get Workspace
+ */
+export const getWorkspaceApiAdminWorkspacesSlugGet = (slug: string, signal?: AbortSignal) => {
+    return customInstance<WorkspaceRead>({
+        url: `/api/admin/workspaces/${slug}`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetWorkspaceApiAdminWorkspacesSlugGetQueryKey = (slug?: string) => {
+    return [`/api/admin/workspaces/${slug}`] as const;
+};
+
+export const getGetWorkspaceApiAdminWorkspacesSlugGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getGetWorkspaceApiAdminWorkspacesSlugGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+    > = ({ signal }) => getWorkspaceApiAdminWorkspacesSlugGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetWorkspaceApiAdminWorkspacesSlugGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+>;
+export type GetWorkspaceApiAdminWorkspacesSlugGetQueryError = HTTPValidationError;
+
+export function useGetWorkspaceApiAdminWorkspacesSlugGet<
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetWorkspaceApiAdminWorkspacesSlugGet<
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetWorkspaceApiAdminWorkspacesSlugGet<
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Workspace
+ */
+
+export function useGetWorkspaceApiAdminWorkspacesSlugGet<
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetWorkspaceApiAdminWorkspacesSlugGetQueryOptions(slug, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Update workspace details.
+ * @summary Update Workspace
+ */
+export const updateWorkspaceApiAdminWorkspacesSlugPatch = (
+    slug: string,
+    workspaceUpdate: WorkspaceUpdate
+) => {
+    return customInstance<WorkspaceRead>({
+        url: `/api/admin/workspaces/${slug}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: workspaceUpdate,
+    });
+};
+
+export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+        TError,
+        { slug: string; data: WorkspaceUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+    TError,
+    { slug: string; data: WorkspaceUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateWorkspaceApiAdminWorkspacesSlugPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+        { slug: string; data: WorkspaceUpdate }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return updateWorkspaceApiAdminWorkspacesSlugPatch(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateWorkspaceApiAdminWorkspacesSlugPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>
+>;
+export type UpdateWorkspaceApiAdminWorkspacesSlugPatchMutationBody = WorkspaceUpdate;
+export type UpdateWorkspaceApiAdminWorkspacesSlugPatchMutationError = HTTPValidationError;
+
+/**
+ * @summary Update Workspace
+ */
+export const useUpdateWorkspaceApiAdminWorkspacesSlugPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+            TError,
+            { slug: string; data: WorkspaceUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+    TError,
+    { slug: string; data: WorkspaceUpdate },
+    TContext
+> => {
+    const mutationOptions = getUpdateWorkspaceApiAdminWorkspacesSlugPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * List all members of a workspace.
+ * @summary List Workspace Members
+ */
+export const listWorkspaceMembersApiAdminWorkspacesSlugMembersGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<WorkspaceMemberRead[]>({
+        url: `/api/admin/workspaces/${slug}/members`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey = (slug?: string) => {
+    return [`/api/admin/workspaces/${slug}/members`] as const;
+};
+
+export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+    > = ({ signal }) => listWorkspaceMembersApiAdminWorkspacesSlugMembersGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+>;
+export type ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryError = HTTPValidationError;
+
+export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>
+                    >,
+                    TError,
+                    Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>
+                    >,
+                    TError,
+                    Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Workspace Members
+ */
+
+export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Update a workspace member's role.
+ * @summary Update Workspace Member
+ */
+export const updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch = (
+    slug: string,
+    userId: number,
+    workspaceMemberUpdate: WorkspaceMemberUpdate
+) => {
+    return customInstance<WorkspaceMemberRead>({
+        url: `/api/admin/workspaces/${slug}/members/${userId}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: workspaceMemberUpdate,
+    });
+};
+
+export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+        TError,
+        { slug: string; userId: number; data: WorkspaceMemberUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+    TError,
+    { slug: string; userId: number; data: WorkspaceMemberUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+        { slug: string; userId: number; data: WorkspaceMemberUpdate }
+    > = (props) => {
+        const { slug, userId, data } = props ?? {};
+
+        return updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch(slug, userId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationResult =
+    NonNullable<
+        Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>
+    >;
+export type UpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationBody =
+    WorkspaceMemberUpdate;
+export type UpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Update Workspace Member
+ */
+export const useUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>
+            >,
+            TError,
+            { slug: string; userId: number; data: WorkspaceMemberUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+    TError,
+    { slug: string; userId: number; data: WorkspaceMemberUpdate },
+    TContext
+> => {
+    const mutationOptions =
+        getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Remove a member from the workspace.
+ * @summary Remove Workspace Member
+ */
+export const removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete = (
+    slug: string,
+    userId: number
+) => {
+    return customInstance<void>({
+        url: `/api/admin/workspaces/${slug}/members/${userId}`,
+        method: 'DELETE',
+    });
+};
+
+export const getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+        TError,
+        { slug: string; userId: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+    TError,
+    { slug: string; userId: number },
+    TContext
+> => {
+    const mutationKey = ['removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+        { slug: string; userId: number }
+    > = (props) => {
+        const { slug, userId } = props ?? {};
+
+        return removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete(slug, userId);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type RemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationResult =
+    NonNullable<
+        Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>
+    >;
+
+export type RemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Remove Workspace Member
+ */
+export const useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>
+            >,
+            TError,
+            { slug: string; userId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+    TError,
+    { slug: string; userId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };

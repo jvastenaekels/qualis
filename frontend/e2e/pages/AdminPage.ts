@@ -24,7 +24,7 @@ export class AdminPage extends BasePage {
         // Assuming desktop for now based on original test structure, or can add logic.
         const sidebarTrigger = this.page.locator('[data-sidebar="trigger"]');
         if (await sidebarTrigger.isVisible()) {
-             await sidebarTrigger.click().catch(() => {});
+            await sidebarTrigger.click().catch(() => {});
         }
 
         await this.page.getByTestId('study-switcher').click();
@@ -41,8 +41,8 @@ export class AdminPage extends BasePage {
     }
 
     async configureQSort(statements: string[]) {
-        await this.page.getByText('Study design').first().click();
-        await this.page.getByRole('tab', { name: /Q-Sort Task/i }).click();
+        await this.page.getByRole('link', { name: /design/i }).first().click();
+        await this.page.getByTestId('tab-q-sort').click();
 
         const textarea = this.page.getByPlaceholder(/paste your statements here/i);
         await textarea.fill(statements.join('\n'));
@@ -53,17 +53,20 @@ export class AdminPage extends BasePage {
 
     async launchStudy() {
         await this.page.getByRole('link', { name: /dashboard/i }).click();
-        await this.page.getByRole('button', { name: /active/i }).first().click();
+        await this.page
+            .getByRole('button', { name: /active/i })
+            .first()
+            .click();
         await this.page.getByRole('button', { name: /set to active/i }).click();
-        await expect(this.page.getByText(/receiving data/i)).toBeVisible();
+        await expect(this.page.getByText(/Collecting responses/i)).toBeVisible();
     }
 
     async exportCSV() {
         // Navigate to Analytics/Exports
-        await this.page.getByRole('link', { name: /explore analytics/i }).first().click();
+        await this.page.getByRole('link', { name: /data/i }).first().click();
 
-        // Switch to File downloads tab
-        await this.page.getByRole('tab', { name: /file downloads/i }).click();
+        // Switch to Export data tab
+        await this.page.getByRole('tab', { name: /Export data/i }).click();
 
         const csvBtn = this.page.getByRole('button', { name: /export universal csv/i });
         const downloadPromise = this.page.waitForEvent('download');
@@ -77,7 +80,10 @@ export class AdminPage extends BasePage {
             await this.goto(`/admin/studies/${slug}`);
         }
         // Click the 'Closed' card to trigger the dialog
-        await this.page.getByRole('button', { name: /Closed/i }).first().click();
+        await this.page
+            .getByRole('button', { name: /Closed/i })
+            .first()
+            .click();
         await this.page.getByRole('button', { name: /Close Study/i }).click();
 
         // Wait for status badge to update
@@ -121,7 +127,9 @@ export class AdminPage extends BasePage {
     async verifyResponsiveLayout(viewport: { width: number; height: number }) {
         await this.page.setViewportSize(viewport);
         await this.page.waitForTimeout(500); // Allow layout to settle
-        return await this.visual.compareScreenshot(`responsive-${viewport.width}x${viewport.height}`);
+        return await this.visual.compareScreenshot(
+            `responsive-${viewport.width}x${viewport.height}`
+        );
     }
 
     async captureDashboard(name: string = 'dashboard-overview') {

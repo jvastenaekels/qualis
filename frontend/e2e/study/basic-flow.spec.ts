@@ -40,7 +40,7 @@ const mockStudyConfig = {
 
 test.describe('Full Study Flow (Example Study) [Refactored]', () => {
     test.beforeEach(async ({ page }) => {
-        page.on('console', msg => console.log(`[Browser]: ${msg.text()}`));
+        page.on('console', (msg) => console.log(`[Browser]: ${msg.text()}`));
         // Mock Study API
         await page.route(`**/api/study/${mockStudyConfig.slug}**`, async (route) => {
             await route.fulfill({

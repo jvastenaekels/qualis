@@ -484,7 +484,13 @@ const QSortEditor = () => {
                                 >
                                     {isValid
                                         ? t('admin.design.qsort.grid.perfect')
-                                        : `${Math.abs(totalStatements - totalSlots)} ${totalStatements > totalSlots ? t('admin.design.qsort.grid.too_many') : t('admin.design.qsort.grid.empty_slots')}`}
+                                        : totalStatements > totalSlots
+                                          ? t('admin.design.qsort.grid.too_many', {
+                                                count: Math.abs(totalStatements - totalSlots),
+                                            })
+                                          : t('admin.design.qsort.grid.too_few', {
+                                                count: Math.abs(totalStatements - totalSlots),
+                                            })}
                                 </span>
                             </div>
                         </div>

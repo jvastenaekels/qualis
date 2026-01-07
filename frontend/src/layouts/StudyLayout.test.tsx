@@ -85,7 +85,7 @@ describe('StudyLayout Language Sync', () => {
         renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
 
         // Open Language Menu (Button with Globe)
-        const globeBtn = screen.getByTitle('Change language'); // Based on title attribute I saw in code
+        const globeBtn = screen.getByTitle('layout.change_lang_title');
         fireEvent.click(globeBtn);
 
         // Click French
@@ -203,8 +203,8 @@ describe('Layout Loading & Error States', () => {
         renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
 
         // Check for loading text
-        expect(screen.getByText(/common.loading/i)).toBeInTheDocument();
-        expect(screen.getByText(/preparing your study session/i)).toBeInTheDocument();
+        expect(screen.getByText('common.loading')).toBeInTheDocument();
+        expect(screen.getByText('layout.preparing')).toBeInTheDocument();
     });
 
     it('Renders StudyNotFound when error is common.errors.not_found', () => {
@@ -233,7 +233,7 @@ describe('Layout Loading & Error States', () => {
         expect(screen.getByText('common.errors.network')).toBeInTheDocument();
 
         // Test Retry Button
-        const retryBtn = screen.getByRole('button', { name: /retry/i });
+        const retryBtn = screen.getByRole('button', { name: 'common.errors.retry' });
         fireEvent.click(retryBtn);
         expect(retryMock).toHaveBeenCalled();
     });
@@ -300,6 +300,7 @@ describe('Layout Route Protection', () => {
             config: {
                 slug: 'test',
                 presort_config: { enabled: false, fields: {} },
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
             } as any,
             isLoading: false,
             error: null,

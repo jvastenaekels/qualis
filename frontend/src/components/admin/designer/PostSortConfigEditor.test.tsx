@@ -21,6 +21,10 @@ vi.mock('react-i18next', () => ({
                 'admin.design.postsort.missing.desc': 'Ask if topics were missing',
                 'admin.design.postsort.general.title': 'Ask for general feedback',
                 'admin.design.postsort.general.desc': 'General comments at the end',
+                'admin.design.postsort.email.title': 'Email Collection',
+                'admin.design.postsort.email.desc': 'Collect emails',
+                'admin.design.postsort.email.interview': 'Interview Consent',
+                'admin.design.postsort.email.results': 'Results Consent',
             };
             return translations[key] || key;
         },
@@ -49,7 +53,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         render(<PostSortConfigEditor />);
 
-        expect(screen.getByText("Collecte d'Email")).toBeInTheDocument();
+        expect(screen.getByText('Email Collection')).toBeInTheDocument();
     });
 
     it('shows sub-toggles when email collection is enabled', () => {
@@ -69,8 +73,8 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         render(<PostSortConfigEditor />);
 
-        expect(screen.getByText('Demander accord entretien')).toBeInTheDocument();
-        expect(screen.getByText('Demander accord résultats (Newsletter)')).toBeInTheDocument();
+        expect(screen.getByText('Interview Consent')).toBeInTheDocument();
+        expect(screen.getByText('Results Consent')).toBeInTheDocument();
     });
 
     it('hides sub-toggles when email collection is disabled', () => {
@@ -90,10 +94,8 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         render(<PostSortConfigEditor />);
 
-        expect(screen.queryByText('Demander accord entretien')).not.toBeInTheDocument();
-        expect(
-            screen.queryByText('Demander accord résultats (Newsletter)')
-        ).not.toBeInTheDocument();
+        expect(screen.queryByText('Interview Consent')).not.toBeInTheDocument();
+        expect(screen.queryByText('Results Consent')).not.toBeInTheDocument();
     });
 
     it('toggles email_collection_enabled with defensive check', () => {
@@ -115,7 +117,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         const switches = screen.getAllByRole('switch');
         const emailToggle = switches.find((s) =>
-            s.closest('.flex')?.textContent?.includes("Collecte d'Email")
+            s.closest('.flex')?.textContent?.includes('Email Collection')
         );
 
         if (emailToggle) {
@@ -181,7 +183,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         const switches = screen.getAllByRole('switch');
         const interviewSwitch = switches.find((s) =>
-            s.closest('.flex')?.textContent?.includes('Demander accord entretien')
+            s.closest('.flex')?.textContent?.includes('Interview Consent')
         );
 
         // Should be checked by default (via ?? true)
@@ -208,7 +210,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         const switches = screen.getAllByRole('switch');
         const newsletterSwitch = switches.find((s) =>
-            s.closest('.flex')?.textContent?.includes('Demander accord résultats')
+            s.closest('.flex')?.textContent?.includes('Results Consent')
         );
 
         // Should be checked by default (via ?? true)
@@ -235,7 +237,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
 
         const switches = screen.getAllByRole('switch');
         const interviewSwitch = switches.find((s) =>
-            s.closest('.flex')?.textContent?.includes('Demander accord entretien')
+            s.closest('.flex')?.textContent?.includes('Interview Consent')
         );
 
         if (interviewSwitch) {

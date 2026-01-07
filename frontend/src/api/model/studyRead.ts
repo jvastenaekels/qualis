@@ -10,6 +10,8 @@ import type { StudyReadPresortConfig } from './studyReadPresortConfig';
 import type { StudyReadPostsortConfig } from './studyReadPostsortConfig';
 import type { StudyReadBranding } from './studyReadBranding';
 import type { StudyReadDefaultLanguage } from './studyReadDefaultLanguage';
+import type { StudyReadStartDate } from './studyReadStartDate';
+import type { StudyReadEndDate } from './studyReadEndDate';
 import type { StudyTranslationRead } from './studyTranslationRead';
 import type { StatementRead } from './statementRead';
 import type { RecruitmentLinkRead } from './recruitmentLinkRead';
@@ -32,6 +34,8 @@ export interface StudyRead {
     default_language?: StudyReadDefaultLanguage;
     show_statement_codes?: boolean;
     randomize_statements?: boolean;
+    start_date?: StudyReadStartDate;
+    end_date?: StudyReadEndDate;
     id: number;
     workspace_id: number;
     created_at: string;

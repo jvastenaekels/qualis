@@ -56,7 +56,7 @@ describe('WelcomePage', () => {
     it('renders instructions markdown', () => {
         renderWithProviders(<WelcomePage />);
         // Label
-        expect(screen.getByText('Instructions')).toBeInTheDocument();
+        expect(screen.getByText('How it works')).toBeInTheDocument();
 
         // Markdown Content - split check to be resilient to formatting/newlines
         expect(screen.getByText('Content')).toBeInTheDocument();

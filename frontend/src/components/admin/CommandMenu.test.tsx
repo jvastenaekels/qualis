@@ -83,13 +83,17 @@ describe('CommandMenu', () => {
             renderWithRouter(<CommandMenu />);
 
             // Menu should be closed initially
-            expect(screen.queryByPlaceholderText(/type a command/i)).not.toBeInTheDocument();
+            expect(
+                screen.queryByPlaceholderText('admin.command_menu.placeholder')
+            ).not.toBeInTheDocument();
 
             // Trigger Cmd+K
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
 
             // Menu should be open
-            expect(screen.getByPlaceholderText(/type a command/i)).toBeInTheDocument();
+            expect(
+                screen.getByPlaceholderText('admin.command_menu.placeholder')
+            ).toBeInTheDocument();
         });
 
         it('opens on Ctrl+K', () => {
@@ -97,7 +101,9 @@ describe('CommandMenu', () => {
 
             fireEvent.keyDown(document, { key: 'k', ctrlKey: true });
 
-            expect(screen.getByPlaceholderText(/type a command/i)).toBeInTheDocument();
+            expect(
+                screen.getByPlaceholderText('admin.command_menu.placeholder')
+            ).toBeInTheDocument();
         });
 
         it('toggles closed on second Cmd+K', () => {
@@ -105,11 +111,15 @@ describe('CommandMenu', () => {
 
             // Open
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
-            expect(screen.getByPlaceholderText(/type a command/i)).toBeInTheDocument();
+            expect(
+                screen.getByPlaceholderText('admin.command_menu.placeholder')
+            ).toBeInTheDocument();
 
             // Close
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
-            expect(screen.queryByPlaceholderText(/type a command/i)).not.toBeInTheDocument();
+            expect(
+                screen.queryByPlaceholderText('admin.command_menu.placeholder')
+            ).not.toBeInTheDocument();
         });
     });
 
@@ -141,10 +151,10 @@ describe('CommandMenu', () => {
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
 
             await waitFor(() => {
-                expect(screen.getByText('Open Dashboard')).toBeInTheDocument();
-                expect(screen.getByText('Study Design')).toBeInTheDocument();
-                expect(screen.getByText('Collaborators')).toBeInTheDocument();
-                expect(screen.getByText('Copy Public Link')).toBeInTheDocument();
+                expect(screen.getByText('admin.sidebar.dashboard')).toBeInTheDocument();
+                expect(screen.getByText('admin.sidebar.design')).toBeInTheDocument();
+                expect(screen.getByText('admin.sidebar.team')).toBeInTheDocument();
+                expect(screen.getByText('admin.command_menu.copy_link')).toBeInTheDocument();
             });
         });
 
@@ -153,7 +163,7 @@ describe('CommandMenu', () => {
             renderWithRouter(<CommandMenu />);
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
 
-            const copyAction = await screen.findByText('Copy Public Link');
+            const copyAction = await screen.findByText('admin.command_menu.copy_link');
             fireEvent.click(copyAction);
 
             expect(mockWriteText).toHaveBeenCalledWith(
@@ -168,14 +178,14 @@ describe('CommandMenu', () => {
             renderWithRouter(<CommandMenu />);
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
 
-            expect(screen.getByText('Toggle Theme')).toBeInTheDocument();
+            expect(screen.getByText('admin.command_menu.toggle_theme')).toBeInTheDocument();
         });
 
         it('shows logout option', async () => {
             renderWithRouter(<CommandMenu />);
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
 
-            expect(screen.getByText('Logout')).toBeInTheDocument();
+            expect(screen.getByText('admin.command_menu.logout')).toBeInTheDocument();
         });
 
         it('navigates to login and logs out on logout click', async () => {
@@ -183,7 +193,7 @@ describe('CommandMenu', () => {
             renderWithRouter(<CommandMenu />);
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
 
-            const logoutAction = await screen.findByText('Logout');
+            const logoutAction = await screen.findByText('admin.command_menu.logout');
             fireEvent.click(logoutAction);
 
             expect(mockNavigate).toHaveBeenCalledWith('/login');
@@ -196,7 +206,7 @@ describe('CommandMenu', () => {
             renderWithRouter(<CommandMenu />);
             fireEvent.keyDown(document, { key: 'k', metaKey: true });
 
-            const input = screen.getByPlaceholderText(/type a command/i);
+            const input = screen.getByPlaceholderText('admin.command_menu.placeholder');
             fireEvent.change(input, { target: { value: 'study-1' } });
 
             await waitFor(() => {

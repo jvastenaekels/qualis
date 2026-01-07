@@ -7,11 +7,14 @@
 import type { StudyTranslationReadInstructions } from './studyTranslationReadInstructions';
 import type { StudyTranslationReadSubtitle } from './studyTranslationReadSubtitle';
 import type { StudyTranslationReadObjective } from './studyTranslationReadObjective';
+import type { StudyTranslationReadConditionOfInstruction } from './studyTranslationReadConditionOfInstruction';
+import type { StudyTranslationReadPreInstruction } from './studyTranslationReadPreInstruction';
 import type { StudyTranslationReadConsentTitle } from './studyTranslationReadConsentTitle';
 import type { StudyTranslationReadConsentDescription } from './studyTranslationReadConsentDescription';
 import type { StudyTranslationReadConsentAccept } from './studyTranslationReadConsentAccept';
 import type { StudyTranslationReadConsentDecline } from './studyTranslationReadConsentDecline';
 import type { StudyTranslationReadUiLabels } from './studyTranslationReadUiLabels';
+import type { ProcessStep } from './processStep';
 
 /**
  * Schema for reading a study translation.
@@ -31,13 +34,14 @@ export interface StudyTranslationRead {
     instructions?: StudyTranslationReadInstructions;
     subtitle?: StudyTranslationReadSubtitle;
     objective?: StudyTranslationReadObjective;
+    condition_of_instruction?: StudyTranslationReadConditionOfInstruction;
+    pre_instruction?: StudyTranslationReadPreInstruction;
     consent_title?: StudyTranslationReadConsentTitle;
     consent_description?: StudyTranslationReadConsentDescription;
     consent_accept?: StudyTranslationReadConsentAccept;
     consent_decline?: StudyTranslationReadConsentDecline;
     ui_labels?: StudyTranslationReadUiLabels;
-    condition_of_instruction?: string;
-    pre_instruction?: string;
+    process_steps?: ProcessStep[];
     id: number;
     study_id: number;
 }

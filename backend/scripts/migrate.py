@@ -234,6 +234,24 @@ async def migrate_translations_table():
             )
             migrations_applied = True
 
+        # process_steps
+        if not await check_column_exists(conn, "study_translations", "process_steps"):
+            logger.info("  Adding 'process_steps' column...")
+            dialect = conn.dialect.name
+            if dialect == "postgresql":
+                await conn.execute(
+                    text(
+                        "ALTER TABLE study_translations ADD COLUMN process_steps JSON DEFAULT '[]'::json"
+                    )
+                )
+            else:
+                await conn.execute(
+                    text(
+                        "ALTER TABLE study_translations ADD COLUMN process_steps JSON DEFAULT '[]'"
+                    )
+                )
+            migrations_applied = True
+
         if migrations_applied:
             await conn.commit()
             logger.info("✓ Translations table updated")

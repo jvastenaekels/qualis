@@ -1,14 +1,10 @@
-import { type Page, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class ConsentPage extends BasePage {
     readonly checkbox = this.page.getByTestId('consent-checkbox');
     readonly acceptButton = this.page.getByTestId('consent-accept-btn');
     readonly loadingSpinner = this.page.locator('[data-testid="loading-spinner"]');
-
-    constructor(page: Page) {
-        super(page);
-    }
 
     async waitForLoad() {
         await this.loadingSpinner.waitFor({ state: 'hidden', timeout: 10000 }).catch(() => {});
