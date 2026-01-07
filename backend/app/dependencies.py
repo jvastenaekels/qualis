@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, cast
 
 import jwt
-from fastapi import Depends, HTTPException, Path, status
+from fastapi import Depends, HTTPException, Path, status, Header
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
@@ -70,9 +70,58 @@ async def get_current_active_user(
     return current_user
 
 
+async def get_current_workspace(
+    x_workspace_id: str | None = Header(None, alias="X-Workspace-ID"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> "Workspace":
+    """Validate workspace context from header."""
+    if not x_workspace_id:
+        # Fallback or strict? Plan implies strict isolation.
+        # But for transition, maybe optional?
+        # User plan says: "Raise 403 Forbidden if access denied".
+        # If header checks are enforced, then missing header is 400 or 401.
+        # Let's assume strict for now, or allow path override in future.
+        # For now, if no header, we can't context switch.
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="X-Workspace-ID header is required",
+        )
+
+    try:
+        workspace_id = int(x_workspace_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Workspace ID"
+        )
+
+    from app.models import Workspace
+
+    # Check permission
+    # Query membership
+    query = (
+        select(Workspace)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
+        .where(Workspace.id == workspace_id)
+        .where(WorkspaceMember.user_id == current_user.id)
+    )
+
+    result = await db.execute(query)
+    workspace = result.scalar_one_or_none()
+
+    if not workspace:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access to this workspace is denied",
+        )
+
+    return cast(Workspace, workspace)
+
+
 # --- RBAC Logic ---
 
 ROLE_MAP = {
+    WorkspaceRole.owner: StudyRole.owner,
     WorkspaceRole.admin: StudyRole.owner,
     WorkspaceRole.researcher: StudyRole.editor,
     WorkspaceRole.viewer: StudyRole.viewer,
@@ -86,6 +135,7 @@ STUDY_ROLE_HIERARCHY = {
 
 
 WORKSPACE_ROLE_HIERARCHY = {
+    WorkspaceRole.owner: 40,
     WorkspaceRole.admin: 30,
     WorkspaceRole.researcher: 20,
     WorkspaceRole.viewer: 10,
