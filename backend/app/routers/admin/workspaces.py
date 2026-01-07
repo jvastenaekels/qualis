@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.dependencies import (
@@ -14,7 +14,13 @@ from app.schemas import (
     WorkspaceMemberUpdate,
     WorkspaceRead,
     WorkspaceUpdate,
+    WorkspaceInvitationCreate,
+    InvitationLink,
 )
+from app.utils.security import create_invitation_token
+from app.utils.email import send_invitation_email
+from app.core.config import settings
+from fastapi import BackgroundTasks
 
 router = APIRouter()
 
@@ -68,7 +74,7 @@ async def create_workspace(
     member = WorkspaceMember(
         workspace_id=workspace.id,
         user_id=current_user.id,
-        role=WorkspaceRole.admin,
+        role=WorkspaceRole.owner,
     )
     db.add(member)
     await db.commit()
@@ -193,3 +199,61 @@ async def remove_workspace_member(
 
     await db.delete(member)
     await db.commit()
+
+
+@router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_workspace(
+    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete a workspace (Owner only).
+    """
+    # Check for active studies
+    # We can't delete if there are studies? Plan says: "impossible si des études sont actives".
+    # Let's count studies.
+    # Note: Studies are cascade deleted in DB usually if configured, but plan requests safety check.
+
+    # Query count of studies
+    from app.models import Study
+
+    stmt = select(func.count(Study.id)).where(Study.workspace_id == workspace.id)
+    result = await db.execute(stmt)
+    study_count = result.scalar() or 0
+
+    if study_count > 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot delete workspace with {study_count} existing studies. Please delete them first.",
+        )
+
+    await db.delete(workspace)
+    await db.commit()
+
+
+@router.post("/{slug}/invitations", response_model=InvitationLink)
+async def create_invitation(
+    invitation_in: WorkspaceInvitationCreate,
+    background_tasks: BackgroundTasks,
+    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.admin)),
+):
+    """
+    Invite a user to the workspace.
+    """
+    token = create_invitation_token(
+        email=invitation_in.email,
+        workspace_id=workspace.id,
+        role=invitation_in.role.value,
+    )
+
+    invite_url = f"{settings.FRONTEND_URL}/register?token={token}"
+
+    background_tasks.add_task(
+        send_invitation_email,
+        email_to=invitation_in.email,
+        context_name=workspace.title,
+        invite_url=invite_url,
+        context_type="workspace",
+    )
+
+    return InvitationLink(invite_url=invite_url, token=token)
