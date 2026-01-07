@@ -6,7 +6,6 @@ import {
     Wand2,
     Save,
     Eye,
-    RotateCcw,
     Loader2,
     Lock,
     AlertTriangle,
@@ -185,8 +184,8 @@ const StudyDesignPage = () => {
                         </span>
                     </div>
                     <div className="h-4 w-px bg-border hidden sm:block" />
-                    <h2 className="text-xs sm:text-sm font-medium truncate font-mono min-w-0">
-                        {draft.slug}
+                    <h2 className="text-xs sm:text-sm font-medium truncate min-w-0">
+                        {draft.translations?.find((t) => t.language_code === activeLocale)?.title || draft.slug}
                     </h2>
                     {/* Status Badge */}
                     <div
@@ -285,17 +284,6 @@ const StudyDesignPage = () => {
                         isOpen={isLangModalOpen}
                         onClose={() => setIsLangModalOpen(false)}
                     />
-
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={resetDraft}
-                        title={t('admin.design.toolbar.discard')}
-                        disabled={draft.state !== 'draft'}
-                        className="h-8"
-                    >
-                        <RotateCcw className="h-4 w-4" />
-                    </Button>
 
                     <Button
                         variant="secondary"
