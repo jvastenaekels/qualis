@@ -36,5 +36,23 @@ test:
 e2e:
 	cd frontend && npm run e2e
 
-ci: lint check test e2e
-	@echo "\n--- All CI checks passed locally! ---"
+ci: lint check test
+	@echo "\n--- Fast CI checks passed locally! (Skipped E2E) ---"
+
+ci-full: ci e2e
+	@echo "\n--- All CI (Full) checks passed locally! ---"
+
+cleanup:
+	@echo "Cleaning up temporary files..."
+	@find . -type d -name "__pycache__" -exec rm -rf {} +
+	@find . -type d -name ".pytest_cache" -exec rm -rf {} +
+	@find . -type d -name ".ruff_cache" -exec rm -rf {} +
+	@find . -type d -name ".mypy_cache" -exec rm -rf {} +
+	@find . -type d -name ".vulture_cache" -exec rm -rf {} +
+	@rm -rf backend/.coverage
+	@rm -rf backend/htmlcov
+	@rm -rf frontend/dist
+	@rm -rf frontend/coverage
+	@rm -rf frontend/playwright-report
+	@rm -rf frontend/test-results
+	@echo "Cleanup complete."

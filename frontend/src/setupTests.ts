@@ -16,7 +16,6 @@ import { useResponseStore } from './store/useResponseStore';
 import { useSessionStore } from './store/useSessionStore';
 import { useUIStore } from './store/useUIStore';
 import { server } from './test-utils/server';
-
 // Mock react-i18next globally
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({

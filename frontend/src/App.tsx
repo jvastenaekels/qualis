@@ -53,7 +53,12 @@ import { dataExportsPageLoader } from './pages/admin/DataExportsPage.loader';
 import { generalSettingsPageLoader } from './pages/admin/GeneralSettingsPage.loader';
 import { workspaceSettingsPageLoader } from './pages/admin/WorkspaceSettingsPage.loader';
 
-import { AdminDashboard } from '@/components/admin/AdminDashboard';
+// Lazy load Admin Dashboard to prevent heavy libs leak
+const AdminDashboard = lazy(() =>
+    import('@/components/admin/AdminDashboard').then((module) => ({
+        default: module.AdminDashboard,
+    }))
+);
 
 const AdminIndex = () => {
     const { activeStudyId } = useAdminStore();

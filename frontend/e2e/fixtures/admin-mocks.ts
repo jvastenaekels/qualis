@@ -25,6 +25,7 @@ export function resetStores() {
                 { id: 2, text: 'Statement 2' },
             ],
             grid_config: [],
+            postsort_config: { questions: [], email_collection_enabled: false },
             translations: [{ language_code: 'en', title: 'Example Study' }],
         },
     ];
@@ -102,6 +103,7 @@ export async function setupAdminMocks(page: Page) {
                 collaborators: [{ user_id: 1, role: 'owner', user: { email: MOCK_USER.email } }],
                 statements: [],
                 grid_config: [],
+                postsort_config: { questions: [], email_collection_enabled: false },
                 translations: [{ language_code: 'en', title: body.title }],
             };
             studiesStore.push(newStudy);
@@ -139,7 +141,7 @@ export async function setupAdminMocks(page: Page) {
                 },
             ],
         });
-
+    });
     await page.route(/\/api\/admin\/studies\/[a-zA-Z0-9_-]+/, async (route) => {
         const url = route.request().url();
         console.log(`[Mock Single] ${route.request().method()} ${url}`);
@@ -176,7 +178,32 @@ export async function setupAdminMocks(page: Page) {
         }
 
         if (url.includes('/dump')) {
-            return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ mock: 'dump' }) });
+            const slug = url.match(/studies\/([\w-]+)\/dump/)?.[1];
+            const study = studiesStore.find((s) => s.slug === slug);
+            if (!study) return route.fulfill({ status: 404 });
+
+            const dumpResponse = {
+                study: {
+                    slug: study.slug,
+                    statements: study.statements.map((s: any) => ({
+                        id: s.id,
+                        translations: study.translations.map((t: any) => ({ lang: t.language_code, text: s.text })),
+                    })),
+                    translations: study.translations.map((t: any) => ({ lang: t.language_code, title: t.title })),
+                    grid_config: study.grid_config,
+                    postsort_config: study.postsort_config || { questions: [], email_collection_enabled: false },
+                },
+                participants: participantsStore.map((p) => ({
+                    ...p,
+                    scores: [],
+                    placements: {},
+                    presort: {},
+                    postsort: { email: 'test@example.com', newsletter_consent: true, interview_consent: false },
+                    discard_reason: null,
+                })),
+                statement_id_to_index: {},
+            };
+            return route.fulfill({ status: 200, json: dumpResponse });
         }
 
         // Fallback: Get Single Study
