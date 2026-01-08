@@ -40,6 +40,7 @@ import {
     AccordionItem,
     AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Card, CardContent } from '@/components/ui/card';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { useTranslation } from 'react-i18next';
 
@@ -105,17 +106,17 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
             ref={setNodeRef}
             style={style}
             className={cn(
-                'group relative bg-background border rounded-lg shadow-sm transition-all mb-3',
-                isDragging && 'opacity-50 z-50 shadow-xl border-primary/50'
+                'group relative bg-white border-none shadow-sm rounded-2xl overflow-hidden transition-all mb-4',
+                isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20'
             )}
         >
-            <div className="flex items-start p-3 gap-3">
+            <div className="flex items-start p-4 gap-4">
                 <div
                     {...attributes}
                     {...listeners}
-                    className="mt-2 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-primary transition-colors"
+                    className="mt-1 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-600 transition-colors p-1 hover:bg-indigo-50 rounded-lg"
                 >
-                    <GripVertical className="h-4 w-4" />
+                    <GripVertical className="h-5 w-5" />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -123,42 +124,42 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                         <AccordionItem value="item-1" className="border-none">
                             <div className="flex items-center justify-between w-full pr-2">
                                 <div className="flex items-center gap-3 overflow-hidden">
-                                    <div className="p-1.5 bg-muted rounded">
-                                        {question.type === 'text' && <Type className="h-3 w-3" />}
-                                        {question.type === 'number' && <Hash className="h-3 w-3" />}
+                                    <div className="p-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-600">
+                                        {question.type === 'text' && <Type className="h-4 w-4" />}
+                                        {question.type === 'number' && <Hash className="h-4 w-4" />}
                                         {question.type === 'select' && (
-                                            <ListCircle className="h-3 w-3" />
+                                            <ListCircle className="h-4 w-4" />
                                         )}
                                         {question.type === 'checkbox' && (
-                                            <CheckSquare className="h-3 w-3" />
+                                            <CheckSquare className="h-4 w-4" />
                                         )}
                                         {question.type === 'radio' && (
-                                            <Circle className="h-3 w-3" />
+                                            <Circle className="h-4 w-4" />
                                         )}
                                         {question.type === 'date' && (
-                                            <Calendar className="h-3 w-3" />
+                                            <Calendar className="h-4 w-4" />
                                         )}
-                                        {question.type === 'email' && <Mail className="h-3 w-3" />}
+                                        {question.type === 'email' && <Mail className="h-4 w-4" />}
                                         {question.type === 'textarea' && (
-                                            <AlignLeft className="h-3 w-3" />
+                                            <AlignLeft className="h-4 w-4" />
                                         )}
                                     </div>
-                                    <span className="text-sm font-medium truncate">
+                                    <span className="text-sm font-bold text-slate-900 truncate tracking-tight">
                                         {label || (
-                                            <span className="text-muted-foreground italic">
+                                            <span className="text-slate-400 italic font-medium">
                                                 {t('admin.design.questions.defaults.untitled')}
                                             </span>
                                         )}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <AccordionTrigger className="py-2 hover:no-underline">
+                                <div className="flex items-center gap-2">
+                                    <AccordionTrigger className="py-2 hover:no-underline p-2 hover:bg-slate-50 rounded-xl transition-colors">
                                         <span className="sr-only">Toggle</span>
                                     </AccordionTrigger>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                        className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onDelete();
@@ -169,9 +170,9 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                 </div>
                             </div>
 
-                            <AccordionContent className="pt-2 pb-4 px-1 space-y-4">
-                                <div className="grid gap-2">
-                                    <Label className="text-xs">
+                            <AccordionContent className="pt-6 pb-2 space-y-6">
+                                <div className="grid gap-2.5">
+                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                         {t('admin.design.questions.labels.question')}
                                     </Label>
                                     <Input
@@ -180,11 +181,12 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                             handleLabelChange(e.target.value)
                                         }
                                         placeholder={t('admin.design.questions.labels.placeholder')}
+                                        className="font-bold text-sm h-11 rounded-xl bg-slate-50/30"
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between py-2 border-t border-dashed">
-                                    <div className="flex items-center gap-2">
+                                <div className="flex items-center justify-between py-4 border-t border-slate-100">
+                                    <div className="flex items-center gap-3">
                                         <Switch
                                             id={`req-${id}`}
                                             checked={question.required}
@@ -194,36 +196,37 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                         />
                                         <Label
                                             htmlFor={`req-${id}`}
-                                            className="text-xs cursor-pointer"
+                                            className="text-xs font-bold text-slate-700 cursor-pointer"
                                         >
                                             {t('admin.design.questions.labels.required')}
                                         </Label>
                                     </div>
 
-                                    <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold">
-                                        Type: {question.type}
+                                    <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black bg-slate-50 px-2 py-1 rounded-lg">
+                                        {question.type}
                                     </div>
                                 </div>
 
                                 {(question.type === 'select' ||
                                     question.type === 'radio' ||
                                     question.type === 'checkbox') && (
-                                    <div className="space-y-3 pt-2 border-t border-dashed">
-                                        <Label className="text-xs">
+                                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                                        <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                             {t('admin.design.questions.labels.options')}
                                             {question.type === 'checkbox' &&
-                                                ` ${t('admin.design.questions.labels.multiple')}`}
+                                                ` (${t('admin.design.questions.labels.multiple')})`}
                                             {question.type === 'radio' &&
-                                                ` ${t('admin.design.questions.labels.single')}`}
+                                                ` (${t('admin.design.questions.labels.single')})`}
                                         </Label>
-                                        <div className="space-y-2">
+                                        <div className="space-y-3">
                                             {(question.options || []).map((opt, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className="flex gap-2 items-center group/opt"
+                                                    className="flex gap-3 items-center group/opt"
                                                 >
+                                                    <div className="size-1.5 rounded-full bg-slate-300 group-hover/opt:bg-indigo-400 transition-colors" />
                                                     <Input
-                                                        className="h-8 text-sm"
+                                                        className="h-10 text-sm font-medium rounded-xl border-slate-200 focus:border-indigo-500 transition-all bg-white"
                                                         value={
                                                             typeof opt === 'string'
                                                                 ? opt
@@ -248,7 +251,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                                             e.target.value,
                                                                     },
                                                                     value:
-                                                                        opt.value || e.target.value, // Fallback value
+                                                                        opt.value || e.target.value,
                                                                 };
                                                             }
                                                             onUpdate({
@@ -260,7 +263,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                     <Button
                                                         variant="ghost"
                                                         size="icon"
-                                                        className="h-8 w-8 opacity-0 group-hover/opt:opacity-100"
+                                                        className="h-10 w-10 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
                                                         onClick={() => {
                                                             const newOpts =
                                                                 question.options?.filter(
@@ -272,14 +275,14 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                             } as QuestionConfig);
                                                         }}
                                                     >
-                                                        <Trash2 className="h-3 w-3" />
+                                                        <Trash2 className="h-4 w-4" />
                                                     </Button>
                                                 </div>
                                             ))}
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                className="w-full h-8 border-dashed"
+                                                className="w-full h-11 border-dashed border-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all font-bold"
                                                 onClick={() => {
                                                     const newOpts = [
                                                         ...(question.options || []),
@@ -288,7 +291,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                                     onUpdate({ ...question, options: newOpts });
                                                 }}
                                             >
-                                                <PlusCircle className="h-3 w-3 mr-2" />{' '}
+                                                <PlusCircle className="h-4 w-4 mr-2" />
                                                 {t('admin.design.questions.actions.add_option')}
                                             </Button>
                                         </div>
@@ -454,113 +457,83 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-10">
             {type === 'pre' && (
-                <div className="bg-card p-4 rounded-lg border shadow-sm flex items-center justify-between">
-                    <div className="space-y-0.5">
-                        <Label className="text-base font-medium">
-                            {t('admin.design.questions.enable_presort')}
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                            {t('admin.design.questions.enable_presort_desc')}
-                        </p>
-                    </div>
-                    <Switch checked={!!isPresortEnabled} onCheckedChange={handlePresortToggle} />
-                </div>
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                    <CardContent className="p-6 flex items-center justify-between">
+                        <div className="space-y-1">
+                            <Label className="text-base font-bold text-slate-900 tracking-tight">
+                                {t('admin.design.questions.enable_presort')}
+                            </Label>
+                            <p className="text-sm font-medium text-slate-500">
+                                {t('admin.design.questions.enable_presort_desc')}
+                            </p>
+                        </div>
+                        <Switch
+                            checked={!!isPresortEnabled}
+                            onCheckedChange={handlePresortToggle}
+                        />
+                    </CardContent>
+                </Card>
             )}
 
-            {/* Only show builder if enabled (or if it's post-sort which we assume enabled or handled elsewhere? user request is about Pre-sort) */}
+            {/* Only show builder if enabled */}
             {(type !== 'pre' || !!isPresortEnabled) && (
-                <div className="bg-muted/20 p-4 rounded-lg border border-dashed space-y-3">
-                    <span className="text-sm font-medium text-muted-foreground">
-                        {t('admin.design.questions.add_field')}
-                    </span>
+                <div className="bg-slate-50/60 p-6 rounded-2xl border border-dashed border-slate-200 space-y-6">
+                    <div className="flex items-center gap-2">
+                        <PlusCircle className="size-4 text-indigo-500" />
+                        <span className="text-sm font-bold text-slate-900 tracking-tight">
+                            {t('admin.design.questions.add_field')}
+                        </span>
+                    </div>
 
-                    <div className="space-y-2">
-                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <div className="space-y-4">
+                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                             {t('admin.design.questions.basic_fields')}
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addQuestion('text')}
-                                className="bg-background"
-                            >
-                                <Type className="h-3.5 w-3.5 mr-1.5" />{' '}
-                                {t('admin.design.questions.types.text')}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addQuestion('textarea')}
-                                className="bg-background"
-                            >
-                                <AlignLeft className="h-3.5 w-3.5 mr-1.5" />{' '}
-                                {t('admin.design.questions.types.long_text')}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addQuestion('number')}
-                                className="bg-background"
-                            >
-                                <Hash className="h-3.5 w-3.5 mr-1.5" />{' '}
-                                {t('admin.design.questions.types.number')}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addQuestion('date')}
-                                className="bg-background"
-                            >
-                                <Calendar className="h-3.5 w-3.5 mr-1.5" />{' '}
-                                {t('admin.design.questions.types.date')}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addQuestion('email')}
-                                className="bg-background"
-                            >
-                                <Mail className="h-3.5 w-3.5 mr-1.5" />{' '}
-                                {t('admin.design.questions.types.email')}
-                            </Button>
+                        <div className="flex flex-wrap gap-3">
+                            {[
+                                { type: 'text', icon: Type, label: 'text' },
+                                { type: 'textarea', icon: AlignLeft, label: 'long_text' },
+                                { type: 'number', icon: Hash, label: 'number' },
+                                { type: 'date', icon: Calendar, label: 'date' },
+                                { type: 'email', icon: Mail, label: 'email' },
+                            ].map((field) => (
+                                <Button
+                                    key={field.type}
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => addQuestion(field.type as QuestionType)}
+                                    className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
+                                >
+                                    <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                    {t(`admin.design.questions.types.${field.label}`)}
+                                </Button>
+                            ))}
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <div className="space-y-4">
+                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                             {t('admin.design.questions.choice_fields')}
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addQuestion('select')}
-                                className="bg-background"
-                            >
-                                <ListCircle className="h-3.5 w-3.5 mr-1.5" />{' '}
-                                {t('admin.design.questions.types.dropdown')}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addQuestion('radio')}
-                                className="bg-background"
-                            >
-                                <Circle className="h-3.5 w-3.5 mr-1.5" />{' '}
-                                {t('admin.design.questions.types.radio')}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => addQuestion('checkbox')}
-                                className="bg-background"
-                            >
-                                <CheckSquare className="h-3.5 w-3.5 mr-1.5" />{' '}
-                                {t('admin.design.questions.types.checkboxes')}
-                            </Button>
+                        <div className="flex flex-wrap gap-3">
+                            {[
+                                { type: 'select', icon: ListCircle, label: 'dropdown' },
+                                { type: 'radio', icon: Circle, label: 'radio' },
+                                { type: 'checkbox', icon: CheckSquare, label: 'checkboxes' },
+                            ].map((field) => (
+                                <Button
+                                    key={field.type}
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => addQuestion(field.type as QuestionType)}
+                                    className="bg-white rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold h-10 px-4 shadow-sm active:scale-95"
+                                >
+                                    <field.icon className="h-4 w-4 mr-2 text-slate-400 group-hover:text-indigo-500" />
+                                    {t(`admin.design.questions.types.${field.label}`)}
+                                </Button>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -576,12 +549,14 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                     strategy={verticalListSortingStrategy}
                 >
                     {questions.length === 0 ? (
-                        <div className="py-12 flex flex-col items-center justify-center border-2 border-dashed rounded-xl opacity-60">
-                            <Plus className="h-12 w-12 text-muted-foreground mb-4" />
-                            <p className="text-sm font-medium">
+                        <div className="py-16 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/30 transition-all hover:bg-slate-50/50">
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6">
+                                <Plus className="h-8 w-8 text-slate-300" />
+                            </div>
+                            <p className="text-base font-bold text-slate-900 tracking-tight">
                                 {t('admin.design.questions.empty.title')}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-1">
+                            <p className="text-sm font-medium text-slate-500 mt-2 max-w-[280px] text-center leading-relaxed">
                                 {t('admin.design.questions.empty.desc')}
                             </p>
                         </div>

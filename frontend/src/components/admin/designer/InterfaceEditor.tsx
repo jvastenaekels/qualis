@@ -50,7 +50,7 @@ const InterfaceEditor = () => {
     const getLabel = (key: string) => (uiLabels[key] || tStudy(key)) as string;
 
     return (
-        <div className="space-y-8">
+        <div className="space-y-12 pb-12">
             <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
                 <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
                     <MousePointerClick className="h-5 w-5 text-indigo-600" />
@@ -59,18 +59,20 @@ const InterfaceEditor = () => {
             </div>
 
             {/* Navigation & Actions */}
-            <Card className="border border-white/20 shadow-xl bg-white/40 backdrop-blur-xl rounded-2xl overflow-hidden">
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader className="pb-4">
-                    <CardTitle className="text-sm font-bold flex items-center gap-2">
-                        <ArrowRight className="h-4 w-4 text-indigo-500" />{' '}
-                        {t('admin.design.interface.nav.title')}
-                    </CardTitle>
-                    <CardDescription className="text-xs font-medium text-slate-400">
+                    <div className="flex items-center gap-2">
+                        <ArrowRight className="h-4 w-4 text-indigo-500" />
+                        <CardTitle className="text-sm font-bold">
+                            {t('admin.design.interface.nav.title')}
+                        </CardTitle>
+                    </div>
+                    <CardDescription className="text-xs font-medium text-slate-500">
                         {t('admin.design.interface.desc')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-8">
                         <div className="space-y-2.5">
                             <div className="flex items-center gap-2">
                                 <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
@@ -92,7 +94,7 @@ const InterfaceEditor = () => {
                                 onChange={(e) => updateLabel('welcome.start', e.target.value)}
                                 onFocus={() => setActiveSubStep('welcome.start')}
                                 placeholder={tStudy('welcome.start')}
-                                className="font-bold text-sm h-10 rounded-xl"
+                                className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
                         <div className="space-y-2.5">
@@ -116,12 +118,12 @@ const InterfaceEditor = () => {
                                 onChange={(e) => updateLabel('common.next', e.target.value)}
                                 onFocus={() => setActiveSubStep('common.next')}
                                 placeholder={tStudy('common.next')}
-                                className="font-bold text-sm h-10 rounded-xl"
+                                className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-8">
                         <div className="space-y-2.5">
                             <div className="flex items-center gap-2">
                                 <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
@@ -143,7 +145,7 @@ const InterfaceEditor = () => {
                                 onChange={(e) => updateLabel('post.submit', e.target.value)}
                                 onFocus={() => setActiveSubStep('post.submit')}
                                 placeholder={tStudy('post.submit')}
-                                className="font-bold text-sm h-10 rounded-xl"
+                                className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
                         <div className="space-y-2.5">
@@ -169,7 +171,7 @@ const InterfaceEditor = () => {
                                 }
                                 onFocus={() => setActiveSubStep('fine.actions.validate')}
                                 placeholder={tStudy('fine.actions.validate')}
-                                className="font-bold text-sm h-10 rounded-xl"
+                                className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
                     </div>
@@ -177,26 +179,28 @@ const InterfaceEditor = () => {
             </Card>
 
             {/* Sorting Terminology */}
-            <Card className="border border-white/20 shadow-xl bg-white/40 backdrop-blur-xl rounded-2xl overflow-hidden">
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader className="pb-4">
-                    <CardTitle className="text-sm font-bold flex items-center gap-2">
-                        <RefreshCcw className="h-4 w-4 text-indigo-500" />{' '}
-                        {t('admin.design.interface.terms.title')}
-                    </CardTitle>
-                    <CardDescription className="text-xs font-medium text-slate-400">
+                    <div className="flex items-center gap-2">
+                        <RefreshCcw className="h-4 w-4 text-indigo-500" />
+                        <CardTitle className="text-sm font-bold">
+                            {t('admin.design.interface.terms.title')}
+                        </CardTitle>
+                    </div>
+                    <CardDescription className="text-xs font-medium text-slate-500">
                         {t('admin.design.interface.terms.desc')}
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-8">
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2 py-1 px-3 bg-slate-100 rounded-lg w-fit">
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 border border-slate-100 rounded-xl w-fit">
                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
                                 {t('admin.design.interface.terms.rough')}
                             </span>
                         </div>
                         <div className="grid grid-cols-3 gap-6">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-bold text-slate-500">
+                            <div className="space-y-2.5">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                     {t('admin.design.interface.terms.agree')}
                                 </Label>
                                 <Input
@@ -207,8 +211,8 @@ const InterfaceEditor = () => {
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-bold text-slate-500">
+                            <div className="space-y-2.5">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                     {t('admin.design.interface.terms.neutral')}
                                 </Label>
                                 <Input
@@ -219,8 +223,8 @@ const InterfaceEditor = () => {
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-bold text-slate-500">
+                            <div className="space-y-2.5">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                     {t('admin.design.interface.terms.disagree')}
                                 </Label>
                                 <Input
@@ -233,17 +237,17 @@ const InterfaceEditor = () => {
                             </div>
                         </div>
 
-                        <Separator className="bg-slate-200/50" />
+                        <Separator className="bg-slate-100" />
 
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 py-1 px-3 bg-slate-100 rounded-lg w-fit">
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 border border-slate-100 rounded-xl w-fit">
                                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
                                     {t('admin.design.interface.terms.grid')}
                                 </span>
                             </div>
                             <div className="grid grid-cols-3 gap-6">
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-bold text-slate-500">
+                                <div className="space-y-2.5">
+                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                         {t('admin.design.interface.terms.most_agree')}
                                     </Label>
                                     <Input
@@ -256,8 +260,8 @@ const InterfaceEditor = () => {
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-bold text-slate-500">
+                                <div className="space-y-2.5">
+                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                         {t('admin.design.interface.terms.neutral')}
                                     </Label>
                                     <Input
@@ -270,8 +274,8 @@ const InterfaceEditor = () => {
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-bold text-slate-500">
+                                <div className="space-y-2.5">
+                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                         {t('admin.design.interface.terms.most_disagree')}
                                     </Label>
                                     <Input
@@ -291,13 +295,15 @@ const InterfaceEditor = () => {
             </Card>
 
             {/* Methodology Hints */}
-            <Card className="border border-white/20 shadow-xl bg-white/40 backdrop-blur-xl rounded-2xl overflow-hidden">
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader className="pb-4">
-                    <CardTitle className="text-sm font-bold flex items-center gap-2">
-                        <Lightbulb className="h-4 w-4 text-amber-500" />{' '}
-                        {t('admin.design.interface.hints.title')}
-                    </CardTitle>
-                    <CardDescription className="text-xs font-medium text-slate-400">
+                    <div className="flex items-center gap-2">
+                        <Lightbulb className="h-4 w-4 text-amber-500" />
+                        <CardTitle className="text-sm font-bold">
+                            {t('admin.design.interface.hints.title')}
+                        </CardTitle>
+                    </div>
+                    <CardDescription className="text-xs font-medium text-slate-500">
                         {t('admin.design.interface.hints.desc')}
                     </CardDescription>
                 </CardHeader>
@@ -305,9 +311,9 @@ const InterfaceEditor = () => {
                     <div className="space-y-4">
                         {(translation as any)?.methodology_tips?.map(
                             (tip: string, index: number) => (
-                                <div key={index} className="flex gap-3 items-start group">
-                                    <div className="mt-2.5 size-1.5 rounded-full bg-amber-400 shrink-0" />
-                                    <div className="flex-1 space-y-2">
+                                <div key={index} className="flex gap-4 items-center group">
+                                    <div className="size-2 rounded-full bg-amber-400 shrink-0 shadow-sm shadow-amber-200" />
+                                    <div className="flex-1">
                                         <Input
                                             value={tip}
                                             onChange={(e) => {
@@ -320,7 +326,7 @@ const InterfaceEditor = () => {
                                             placeholder={t(
                                                 'admin.design.interface.hints.placeholder'
                                             )}
-                                            className="font-medium text-sm rounded-xl"
+                                            className="font-medium text-sm rounded-xl h-10 bg-slate-50/30"
                                         />
                                     </div>
                                     <Button
@@ -331,7 +337,7 @@ const InterfaceEditor = () => {
                                                 t.methodology_tips.splice(index, 1);
                                             });
                                         }}
-                                        className="text-slate-400 hover:text-red-500 hover:bg-red-50 h-10 w-10 flex-shrink-0"
+                                        className="text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl h-10 w-10 transition-all border border-transparent hover:border-red-100 shadow-none hover:shadow-sm"
                                     >
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -339,7 +345,7 @@ const InterfaceEditor = () => {
                             )
                         )}
 
-                        <div className="flex gap-4 pt-2">
+                        <div className="flex gap-4 pt-4">
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -349,9 +355,9 @@ const InterfaceEditor = () => {
                                         t.methodology_tips.push('');
                                     });
                                 }}
-                                className="rounded-xl border-dashed border-2 hover:border-indigo-500 hover:bg-slate-50/50"
+                                className="rounded-xl border-dashed border-2 hover:border-indigo-500 hover:bg-indigo-50/30 font-bold transition-all px-6 py-5"
                             >
-                                <Plus className="h-4 w-4 mr-2" />
+                                <Plus className="size-4 mr-2" />
                                 {t('admin.design.interface.hints.add')}
                             </Button>
 
@@ -370,9 +376,9 @@ const InterfaceEditor = () => {
                                         ];
                                     });
                                 }}
-                                className="text-slate-500 hover:text-indigo-600 rounded-xl"
+                                className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold px-4"
                             >
-                                <RefreshCcw className="h-4 w-4 mr-2" />
+                                <RefreshCcw className="size-4 mr-2" />
                                 {t('admin.design.interface.hints.reset')}
                             </Button>
                         </div>
@@ -381,31 +387,33 @@ const InterfaceEditor = () => {
             </Card>
 
             {/* Step Guidance (What/Why) */}
-            <Card className="border border-white/20 shadow-xl bg-white/40 backdrop-blur-xl rounded-2xl overflow-hidden">
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader className="pb-4">
-                    <CardTitle className="text-sm font-bold flex items-center gap-2">
-                        <Info className="h-4 w-4 text-indigo-500" />{' '}
-                        {t('admin.design.interface.help.title')}
-                    </CardTitle>
-                    <CardDescription className="text-xs font-medium text-slate-400">
+                    <div className="flex items-center gap-2">
+                        <Info className="h-4 w-4 text-indigo-500" />
+                        <CardTitle className="text-sm font-bold">
+                            {t('admin.design.interface.help.title')}
+                        </CardTitle>
+                    </div>
+                    <CardDescription className="text-xs font-medium text-slate-500">
                         {t('admin.design.interface.help.desc')}
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-8">
+                <CardContent className="space-y-10">
                     {visibleSteps.map((step, index) => {
                         const stepHelp =
                             (translation as any)?.step_help?.[step.id.toString()] || {};
 
                         return (
-                            <div key={step.id} className="space-y-4">
-                                <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-100/80 rounded-lg w-fit">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                            <div key={step.id} className="space-y-6">
+                                <div className="flex items-center gap-2 py-1.5 px-3 bg-indigo-50/50 border border-indigo-100 rounded-xl w-fit">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-900">
                                         Step {index + 1}: {t(step.labelKey)}
                                     </span>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pl-4 border-l-2 border-slate-100">
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pl-6 border-l-2 border-slate-100">
+                                    <div className="space-y-2.5">
+                                        <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                             {t('study.help.what')}
                                         </Label>
                                         <Input
@@ -423,11 +431,11 @@ const InterfaceEditor = () => {
                                                 });
                                             }}
                                             placeholder={tStudy(`study.help.step_${step.id}.what`)}
-                                            className="font-medium text-sm h-10 rounded-xl bg-white/50"
+                                            className="font-medium text-sm h-11 rounded-xl bg-slate-50/30"
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-tight">
+                                    <div className="space-y-2.5">
+                                        <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                                             {t('study.help.why')}
                                         </Label>
                                         <Input
@@ -445,7 +453,7 @@ const InterfaceEditor = () => {
                                                 });
                                             }}
                                             placeholder={tStudy(`study.help.step_${step.id}.why`)}
-                                            className="font-medium text-sm h-10 rounded-xl bg-white/50"
+                                            className="font-medium text-sm h-11 rounded-xl bg-slate-50/30"
                                         />
                                     </div>
                                 </div>

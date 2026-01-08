@@ -47,19 +47,23 @@ const IntroductionEditor = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <section className="space-y-4">
-                <div className="flex items-center gap-2 text-indigo-600 font-semibold text-lg">
-                    <span className="bg-indigo-50 p-1 rounded-lg border border-indigo-100 shadow-sm">
-                        <Hand className="h-5 w-5" />
-                    </span>
+        <div className="space-y-12 pb-12">
+            {/* Welcome Section */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
+                    <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                        <Hand className="h-5 w-5 text-indigo-600" />
+                    </div>
                     {t('admin.design.intro.welcome_title')}
                 </div>
 
-                <Card className="shadow-sm">
-                    <CardContent className="pt-6 space-y-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="title" className="text-sm font-semibold">
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                    <CardContent className="pt-6 space-y-6">
+                        <div className="grid gap-2.5">
+                            <Label
+                                htmlFor="title"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                            >
                                 {t('admin.design.intro.fields.title')}
                             </Label>
                             <Input
@@ -69,13 +73,13 @@ const IntroductionEditor = () => {
                                     handleChange('title', e.target.value)
                                 }
                                 placeholder={t('admin.design.intro.fields.title_placeholder')}
-                                className="font-semibold text-lg"
+                                className="font-bold text-lg h-11 rounded-xl"
                             />
                         </div>
-                        <div className="grid gap-2">
+                        <div className="grid gap-2.5">
                             <Label
                                 htmlFor="subtitle"
-                                className="text-sm font-semibold text-slate-500"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
                             >
                                 {t('admin.design.intro.fields.subtitle')}
                             </Label>
@@ -86,9 +90,10 @@ const IntroductionEditor = () => {
                                     handleChange('subtitle', e.target.value)
                                 }
                                 placeholder={t('admin.design.intro.fields.subtitle_placeholder')}
+                                className="font-medium h-10 rounded-xl"
                             />
                         </div>
-                        <div className="grid gap-2">
+                        <div className="grid gap-2.5">
                             <MarkdownEditor
                                 id="objective"
                                 label={t('admin.design.intro.fields.objective')}
@@ -101,12 +106,13 @@ const IntroductionEditor = () => {
                 </Card>
             </section>
 
-            <section className="space-y-4">
+            {/* Process Overview Section */}
+            <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-amber-600 font-semibold text-lg">
-                        <span className="bg-amber-50 p-1 rounded-lg border border-amber-100 shadow-sm">
-                            <Clipboard className="h-5 w-5" />
-                        </span>
+                    <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
+                        <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                            <Clipboard className="h-5 w-5 text-indigo-600" />
+                        </div>
                         {t('admin.design.intro.process_title')}
                     </div>
                     <Switch
@@ -120,12 +126,10 @@ const IntroductionEditor = () => {
                             const currentlyEnabled =
                                 translation?.instructions !== null &&
                                 translation?.instructions !== undefined;
-                            // Defensive check to prevent infinite loops
                             if (checked === currentlyEnabled) return;
                             if (checked) {
                                 handleChange('instructions', '');
                             } else {
-                                // biome-ignore lint/suspicious/noExplicitAny: nulling field
                                 handleChange('instructions', null as any);
                             }
                         }}
@@ -133,9 +137,9 @@ const IntroductionEditor = () => {
                 </div>
 
                 {translation?.instructions !== undefined && translation?.instructions !== null && (
-                    <Card className="shadow-sm">
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardContent className="pt-6">
-                            <div className="grid gap-2">
+                            <div className="grid gap-2.5">
                                 <MarkdownEditor
                                     id="instructions"
                                     label={t('admin.design.intro.fields.task_overview')}
@@ -151,12 +155,13 @@ const IntroductionEditor = () => {
                 <ProcessStepEditor />
             </section>
 
-            <section className="space-y-4 pb-12">
+            {/* Consent Section */}
+            <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-emerald-600 font-semibold text-lg">
-                        <span className="bg-emerald-50 p-1 rounded-lg border border-emerald-100 shadow-sm">
-                            <ShieldCheck className="h-5 w-5" />
-                        </span>
+                    <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
+                        <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                            <ShieldCheck className="h-5 w-5 text-indigo-600" />
+                        </div>
                         {t('admin.design.intro.consent_title')}
                     </div>
                     <Switch
@@ -164,10 +169,8 @@ const IntroductionEditor = () => {
                         aria-label={t('admin.design.intro.consent_title')}
                         checked={hasConsent}
                         onCheckedChange={(checked: boolean) => {
-                            // Defensive check to prevent infinite loops
                             if (checked === hasConsent) return;
                             if (checked) {
-                                // biome-ignore lint/suspicious/noExplicitAny: complex state update
                                 updateTranslation(activeLocale, (t_trans: any) => {
                                     t_trans.consent_title =
                                         t_trans.consent_title || t('consent.title');
@@ -175,7 +178,6 @@ const IntroductionEditor = () => {
                                         t_trans.consent_description || t('consent.default_text');
                                 });
                             } else {
-                                // biome-ignore lint/suspicious/noExplicitAny: complex state update
                                 updateTranslation(activeLocale, (t_trans: any) => {
                                     t_trans.consent_title = null;
                                     t_trans.consent_description = null;
@@ -186,18 +188,21 @@ const IntroductionEditor = () => {
                 </div>
 
                 {hasConsent && (
-                    <Card className="shadow-sm border-primary/20 bg-primary/5">
-                        <CardHeader>
-                            <CardTitle className="text-sm">
+                    <Card className="border-none shadow-sm bg-slate-50/50 rounded-2xl overflow-hidden border border-slate-200/60">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-sm font-bold">
                                 {t('admin.design.intro.consent_details')}
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-xs font-medium text-slate-500">
                                 {t('admin.design.intro.consent_desc')}
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="consent-title">
+                        <CardContent className="space-y-6">
+                            <div className="grid gap-2.5">
+                                <Label
+                                    htmlFor="consent-title"
+                                    className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                >
                                     {t('admin.design.intro.fields.consent_title_label')}
                                 </Label>
                                 <Input
@@ -206,9 +211,10 @@ const IntroductionEditor = () => {
                                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                         handleChange('consent_title', e.target.value)
                                     }
+                                    className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
-                            <div className="grid gap-2">
+                            <div className="grid gap-2.5">
                                 <MarkdownEditor
                                     id="consent-description"
                                     label={t('admin.design.intro.fields.legal_text')}

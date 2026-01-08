@@ -208,9 +208,9 @@ const StudyDesignPage = () => {
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                     {/* Language Switcher - Study Content Language */}
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 text-muted-foreground text-xs hidden sm:flex">
+                        <div className="flex items-center gap-1 text-slate-400 text-xs hidden sm:flex">
                             <Languages className="h-3.5 w-3.5" />
-                            <span className="hidden lg:inline">
+                            <span className="font-bold uppercase tracking-wider text-[10px]">
                                 {t('admin.design.toolbar.editing_language')}
                             </span>
                         </div>
@@ -221,7 +221,7 @@ const StudyDesignPage = () => {
                                     variant="outline"
                                     size="sm"
                                     data-testid="language-switcher"
-                                    className="h-8 gap-2 font-bold bg-white/50 border-slate-200"
+                                    className="h-8 gap-2 font-black bg-white/50 border-slate-200 rounded-lg hover:border-indigo-500 hover:text-indigo-600 transition-all shadow-sm"
                                 >
                                     <Globe className="h-3.5 w-3.5 text-indigo-500" />
                                     {activeLocale.toUpperCase()}
@@ -230,12 +230,12 @@ const StudyDesignPage = () => {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                                 align="end"
-                                className="w-48 rounded-xl shadow-xl border-slate-200"
+                                className="w-56 rounded-2xl shadow-2xl border-slate-200 p-2"
                             >
-                                <DropdownMenuLabel className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70">
+                                <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
                                     {t('admin.design.toolbar.select_lang', 'Select language')}
                                 </DropdownMenuLabel>
-                                <DropdownMenuSeparator />
+                                <DropdownMenuSeparator className="bg-slate-100 mb-1" />
                                 {(() => {
                                     const activeLangs = (draft.translations || [])
                                         // biome-ignore lint/suspicious/noExplicitAny: duck typing translation
@@ -248,27 +248,28 @@ const StudyDesignPage = () => {
                                             key={lang}
                                             onSelect={() => setActiveLocale(lang)}
                                             className={cn(
-                                                'flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg',
-                                                activeLocale === lang &&
-                                                    'bg-indigo-50 text-indigo-700 font-bold'
+                                                'flex items-center justify-between cursor-pointer py-2.5 px-3 rounded-xl transition-all font-bold',
+                                                activeLocale === lang
+                                                    ? 'bg-indigo-50 text-indigo-700 font-black'
+                                                    : 'hover:bg-slate-50 text-slate-600'
                                             )}
                                         >
                                             <span className="flex items-center gap-2 uppercase tracking-wide">
                                                 {lang}
                                             </span>
                                             {activeLocale === lang && (
-                                                <Check className="h-3.5 w-3.5" />
+                                                <Check className="h-4 w-4 stroke-[3px]" />
                                             )}
                                         </DropdownMenuItem>
                                     ));
                                 })()}
-                                <DropdownMenuSeparator />
+                                <DropdownMenuSeparator className="bg-slate-100 my-1" />
                                 <DropdownMenuItem
                                     onSelect={() => setIsLangModalOpen(true)}
-                                    className="gap-2 cursor-pointer py-2 px-3 rounded-lg text-indigo-600 focus:text-indigo-700 focus:bg-indigo-50"
+                                    className="gap-2 cursor-pointer py-2.5 px-3 rounded-xl text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-bold transition-all"
                                 >
-                                    <Settings2 className="h-3.5 w-3.5" />
-                                    <span className="font-semibold">
+                                    <Settings2 className="h-4 w-4" />
+                                    <span>
                                         {t('admin.design.toolbar.manage_langs', 'Manage Languages')}
                                     </span>
                                 </DropdownMenuItem>
@@ -285,9 +286,9 @@ const StudyDesignPage = () => {
                         variant="secondary"
                         size="sm"
                         onClick={handleTestRun}
-                        className="gap-1 sm:gap-2 h-8"
+                        className="gap-2 h-8 font-bold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg shadow-sm transition-all"
                     >
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-4 w-4 text-indigo-500" />
                         <span className="hidden sm:inline">
                             {t('admin.design.toolbar.test_run')}
                         </span>
@@ -298,7 +299,7 @@ const StudyDesignPage = () => {
                         onClick={handleSave}
                         disabled={updateMutation.isPending || isFullyReadOnly}
                         className={cn(
-                            'transition-all h-8',
+                            'transition-all h-8 font-bold rounded-lg shadow-sm',
                             isDirty &&
                                 !isFullyReadOnly &&
                                 'ring-2 ring-primary ring-offset-2 shadow-lg animate-pulse'
@@ -324,43 +325,42 @@ const StudyDesignPage = () => {
             <div className="flex flex-1 overflow-hidden relative">
                 {/* Read-only Overlay - For non-draft studies */}
                 {isFullyReadOnly && (
-                    <div className="absolute inset-0 z-50 bg-background/40 backdrop-blur-sm flex items-center justify-center p-4 sm:p-8 pointer-events-none">
-                        <div className="bg-background border shadow-lg rounded-xl p-6 max-w-md text-center pointer-events-auto">
+                    <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-8 pointer-events-none">
+                        <div className="bg-white border-none shadow-2xl rounded-3xl p-10 max-w-lg text-center pointer-events-auto animate-in zoom-in duration-500">
                             <div
                                 className={cn(
-                                    'w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4',
+                                    'w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner border',
                                     draft.state === 'active'
-                                        ? 'bg-blue-100'
+                                        ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
                                         : draft.state === 'paused'
-                                          ? 'bg-amber-100'
-                                          : 'bg-red-100'
+                                          ? 'bg-amber-50 border-amber-100 text-amber-600'
+                                          : 'bg-rose-50 border-rose-100 text-rose-600'
                                 )}
                             >
                                 {draft.state === 'active' ? (
-                                    <Globe className="h-6 w-6 text-blue-600" />
-                                ) : draft.state === 'paused' ? (
-                                    <Lock className="h-6 w-6 text-amber-600" />
+                                    <Globe className="h-10 w-10" />
                                 ) : (
-                                    <Lock className="h-6 w-6 text-red-600" />
+                                    <Lock className="h-10 w-10" />
                                 )}
                             </div>
-                            <h3 className="text-lg font-semibold">
+                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">
                                 {draft.state === 'active'
                                     ? t('admin.design.qsort.grid.locked_active')
                                     : draft.state === 'paused'
                                       ? t('admin.design.qsort.grid.locked_paused')
                                       : t('admin.design.qsort.grid.locked_closed')}
                             </h3>
-                            <p className="text-sm text-muted-foreground mt-2 mb-6 text-pretty">
+                            <p className="text-base font-medium text-slate-500 mt-4 mb-10 text-pretty leading-relaxed">
                                 {draft.state === 'active'
                                     ? t('admin.design.qsort.grid.locked_active_desc')
                                     : draft.state === 'paused'
                                       ? t('admin.design.qsort.grid.locked_paused_desc')
                                       : t('admin.design.qsort.grid.locked_closed_desc')}
                             </p>
-                            <div className="flex gap-3 justify-center">
+                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Button
                                     variant="outline"
+                                    className="h-12 px-8 rounded-xl font-bold border-slate-200 hover:bg-slate-50 text-slate-600"
                                     onClick={() => navigate(`/admin/studies/${draft.slug}`)}
                                 >
                                     {t('admin.design.toolbar.back_to_study', 'Back to Study')}
@@ -368,6 +368,7 @@ const StudyDesignPage = () => {
                                 {draft.state === 'active' && (
                                     <Button
                                         variant="default"
+                                        className="h-12 px-8 rounded-xl font-bold shadow-lg shadow-primary/20"
                                         onClick={() => navigate(`/admin/studies/${draft.slug}`)}
                                     >
                                         {t('admin.study.state.manage')}
@@ -385,30 +386,30 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <TabsList className="bg-slate-100/50 backdrop-blur-sm border border-slate-200/60 p-1 flex flex-nowrap overflow-x-auto w-full max-w-4xl mx-auto shadow-sm mb-10 scrollbar-none snap-x snap-mandatory rounded-xl h-11">
+                        <TabsList className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap overflow-x-auto w-full max-w-4xl mx-auto shadow-sm mb-12 scrollbar-none snap-x snap-mandatory rounded-2xl h-14">
                             <TabsTrigger
                                 value="intro"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-indigo-100"
+                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-indigo-100 text-slate-500 hover:text-slate-900"
                             >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
                                     👋
                                 </span>{' '}
                                 {t('admin.design.tabs.welcome')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="pre-sort"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-amber-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-amber-100"
+                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-amber-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-amber-100 text-slate-500 hover:text-slate-900"
                             >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
                                     📋
                                 </span>{' '}
                                 {t('admin.design.tabs.presort')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="condition"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-rose-100"
+                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-rose-100 text-slate-500 hover:text-slate-900"
                             >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
                                     🎯
                                 </span>{' '}
                                 {t('admin.design.tabs.condition')}
@@ -416,39 +417,39 @@ const StudyDesignPage = () => {
                             <TabsTrigger
                                 value="q-sort"
                                 data-testid="tab-q-sort"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-purple-100"
+                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-purple-100 text-slate-500 hover:text-slate-900"
                             >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
                                     🧩
                                 </span>{' '}
                                 {t('admin.design.tabs.qsort')}
                                 {isStructureLocked && (
-                                    <Lock size={12} className="text-muted-foreground/60 ml-1" />
+                                    <Lock size={12} className="text-slate-400 ml-1" />
                                 )}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="post-sort"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-emerald-100"
+                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-emerald-100 text-slate-500 hover:text-slate-900"
                             >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
                                     🏁
                                 </span>{' '}
                                 {t('admin.design.tabs.postsort')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="branding"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-pink-100"
+                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-pink-100 text-slate-500 hover:text-slate-900"
                             >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
                                     🎨
                                 </span>{' '}
                                 {t('admin.design.tabs.theme')}
                             </TabsTrigger>
                             <TabsTrigger
                                 value="interface"
-                                className="gap-2 min-w-fit px-5 flex-none snap-start rounded-lg data-[state=active]:bg-white data-[state=active]:text-cyan-600 data-[state=active]:shadow-sm font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-cyan-100"
+                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-cyan-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-cyan-100 text-slate-500 hover:text-slate-900"
                             >
-                                <span className="opacity-80 group-data-[state=active]:opacity-100">
+                                <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
                                     ✨
                                 </span>{' '}
                                 {t('admin.design.tabs.interface')}
@@ -464,15 +465,18 @@ const StudyDesignPage = () => {
                             if (!isCopy) return null;
 
                             return (
-                                <div className="max-w-4xl mx-auto mb-6 bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-center gap-4 text-amber-900 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500">
-                                    <div className="h-10 w-10 bg-amber-100 rounded-full flex items-center justify-center shrink-0">
-                                        <AlertTriangle className="h-6 w-6 text-amber-600" />
+                                <div className="max-w-4xl mx-auto mb-10 bg-rose-50 border border-rose-100 p-6 rounded-2xl flex items-center gap-6 text-rose-900 shadow-sm animate-in fade-in slide-in-from-top-4 duration-700">
+                                    <div className="h-12 w-12 bg-white rounded-xl shadow-sm border border-rose-100 flex items-center justify-center shrink-0">
+                                        <AlertTriangle className="h-6 w-6 text-rose-500" />
                                     </div>
-                                    <div>
-                                        <h4 className="font-black text-sm uppercase tracking-tight">
-                                            {t('admin.design.translation_needed')}
+                                    <div className="space-y-1">
+                                        <h4 className="font-black text-sm uppercase tracking-widest text-rose-500">
+                                            {t(
+                                                'admin.design.translation_needed',
+                                                'Translation Required'
+                                            )}
                                         </h4>
-                                        <p className="text-sm text-amber-800/80 font-medium">
+                                        <p className="text-sm text-rose-900/70 font-bold leading-relaxed">
                                             {t('admin.design.translation_needed_desc')}
                                         </p>
                                     </div>
@@ -505,26 +509,30 @@ const StudyDesignPage = () => {
 
                             <TabsContent value="q-sort" className="mt-0 outline-none space-y-6">
                                 {isStructureLocked && (
-                                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
-                                        <Lock className="h-5 w-5 text-blue-600 mt-0.5 shrink-0" />
-                                        <div className="flex-1">
-                                            <h4 className="text-sm font-semibold text-blue-900">
+                                    <div className="p-6 bg-indigo-50/50 border border-indigo-100 rounded-2xl flex items-start gap-4 shadow-sm mb-6 animate-in fade-in duration-500 translate-y-0 text-indigo-900 font-bold">
+                                        <div className="bg-white p-2 rounded-xl border border-indigo-100 shadow-sm shrink-0">
+                                            <Lock className="h-5 w-5 text-indigo-600" />
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                            <h4 className="text-base font-black tracking-tight">
                                                 {t('admin.design.qsort.grid.locked')}
                                             </h4>
-                                            <p className="text-sm text-blue-700 mt-1">
+                                            <p className="text-sm font-medium opacity-70 leading-relaxed">
                                                 {t('admin.design.qsort.grid.locked_desc')}
                                             </p>
                                         </div>
                                     </div>
                                 )}
                                 {!isGridValid && (
-                                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
-                                        <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
-                                        <div className="flex-1">
-                                            <h4 className="text-sm font-semibold text-amber-900">
+                                    <div className="p-6 bg-rose-50/50 border border-rose-100 rounded-2xl flex items-start gap-4 shadow-sm mb-6 animate-in shake-1 duration-500 text-rose-900 font-bold">
+                                        <div className="bg-white p-2 rounded-xl border border-rose-100 shadow-sm shrink-0">
+                                            <AlertTriangle className="h-5 w-5 text-rose-500" />
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                            <h4 className="text-base font-black tracking-tight">
                                                 {t('admin.design.qsort.grid.mismatch_title')}
                                             </h4>
-                                            <p className="text-sm text-amber-700 mt-1">
+                                            <p className="text-sm font-medium opacity-70 leading-relaxed">
                                                 {t('admin.design.qsort.grid.mismatch_desc', {
                                                     statements: statementsCount,
                                                     slots: gridCapacity,

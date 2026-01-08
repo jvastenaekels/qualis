@@ -60,15 +60,15 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
             ref={setNodeRef}
             style={style}
             className={cn(
-                'group relative bg-background border rounded-lg shadow-sm transition-all mb-3',
-                isDragging && 'opacity-50 z-50 shadow-xl border-primary/50'
+                'group relative bg-white border-none shadow-sm rounded-2xl overflow-hidden transition-all mb-4',
+                isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20'
             )}
         >
-            <div className="flex items-start p-3 gap-3">
+            <div className="flex items-start p-4 gap-4">
                 <div
                     {...attributes}
                     {...listeners}
-                    className="mt-2 cursor-grab active:cursor-grabbing text-muted-foreground hover:text-primary transition-colors"
+                    className="mt-2.5 cursor-grab active:cursor-grabbing text-slate-300 hover:text-indigo-500 transition-colors"
                 >
                     <GripVertical className="h-4 w-4" />
                 </div>
@@ -77,13 +77,13 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                     <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value="item-1" className="border-none">
                             <div className="flex items-center justify-between w-full pr-2">
-                                <div className="flex items-center gap-3 overflow-hidden">
-                                    <div className="p-1.5 bg-muted rounded text-primary">
-                                        <IconComponent className="h-4 w-4" />
+                                <div className="flex items-center gap-4 overflow-hidden">
+                                    <div className="p-2 bg-indigo-50 rounded-xl border border-indigo-100 shadow-sm transition-colors group-hover:bg-white group-hover:border-indigo-200">
+                                        <IconComponent className="h-4 w-4 text-indigo-600" />
                                     </div>
-                                    <span className="text-sm font-medium truncate">
+                                    <span className="text-sm font-bold text-slate-700 truncate tracking-tight">
                                         {step.title || (
-                                            <span className="text-muted-foreground italic">
+                                            <span className="text-slate-400 font-medium italic">
                                                 {t(
                                                     'admin.design.intro.process_steps.defaults.new_step'
                                                 )}
@@ -91,14 +91,14 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                         )}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <AccordionTrigger className="py-2 hover:no-underline">
+                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                    <AccordionTrigger className="py-2 hover:no-underline text-slate-400 hover:text-indigo-600">
                                         <span className="sr-only">Toggle</span>
                                     </AccordionTrigger>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                        className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all border border-transparent hover:border-red-100"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             onDelete();
@@ -109,15 +109,16 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                 </div>
                             </div>
 
-                            <AccordionContent className="pt-2 pb-4 px-1 space-y-4">
-                                <div className="grid gap-4 sm:grid-cols-2">
-                                    <div className="space-y-4">
+                            <AccordionContent className="pt-6 pb-2 px-1 space-y-6">
+                                <div className="grid gap-6 sm:grid-cols-2">
+                                    <div className="space-y-6">
                                         <div className="grid gap-2">
-                                            <Label className="text-xs">
+                                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                                 {t('admin.design.intro.process_steps.fields.title')}
                                             </Label>
                                             <Input
                                                 value={step.title}
+                                                className="h-11 rounded-xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-medium"
                                                 onChange={(e) =>
                                                     onUpdate({ ...step, title: e.target.value })
                                                 }
@@ -128,7 +129,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label className="text-xs">
+                                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                                 {t(
                                                     'admin.design.intro.process_steps.fields.description'
                                                 )}
@@ -141,7 +142,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                                         description: e.target.value,
                                                     })
                                                 }
-                                                className="min-h-[80px] resize-none"
+                                                className="min-h-[100px] resize-none rounded-2xl border-slate-200 bg-slate-50/50 focus:bg-white transition-all font-medium leading-relaxed"
                                                 placeholder={t(
                                                     'admin.design.intro.process_steps.fields.description'
                                                 )}
@@ -149,41 +150,48 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete }: ProcessStepItemProps)
                                         </div>
                                     </div>
 
-                                    <div className="grid gap-2">
-                                        <Label className="text-xs">
-                                            {t('admin.design.intro.process_steps.fields.icon')}
-                                        </Label>
-                                        <IconPicker
-                                            selectedIcon={step.icon}
-                                            onChange={(icon) => onUpdate({ ...step, icon })}
-                                        />
-                                    </div>
+                                    <div className="space-y-6">
+                                        <div className="grid gap-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                                {t('admin.design.intro.process_steps.fields.icon')}
+                                            </Label>
+                                            <IconPicker
+                                                selectedIcon={step.icon}
+                                                onChange={(icon) => onUpdate({ ...step, icon })}
+                                            />
+                                        </div>
 
-                                    <div className="grid gap-2">
-                                        <Label className="text-xs">
-                                            {t(
-                                                'admin.design.intro.process_steps.fields.color',
-                                                'Color'
-                                            )}
-                                        </Label>
-                                        <div className="flex items-center gap-3">
-                                            <Input
-                                                type="color"
-                                                value={step.color || '#3b82f6'}
-                                                onChange={(e) =>
-                                                    onUpdate({ ...step, color: e.target.value })
-                                                }
-                                                className="w-12 h-10 p-1 cursor-pointer"
-                                            />
-                                            <Input
-                                                type="text"
-                                                value={step.color || ''}
-                                                onChange={(e) =>
-                                                    onUpdate({ ...step, color: e.target.value })
-                                                }
-                                                placeholder="#000000"
-                                                className="font-mono text-xs"
-                                            />
+                                        <div className="grid gap-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                                {t(
+                                                    'admin.design.intro.process_steps.fields.color',
+                                                    'Color'
+                                                )}
+                                            </Label>
+                                            <div className="flex items-center gap-3">
+                                                <div className="relative group/color">
+                                                    <Input
+                                                        type="color"
+                                                        value={step.color || '#3b82f6'}
+                                                        onChange={(e) =>
+                                                            onUpdate({
+                                                                ...step,
+                                                                color: e.target.value,
+                                                            })
+                                                        }
+                                                        className="w-14 h-12 p-1.5 rounded-xl border-slate-200 cursor-pointer shadow-sm transition-all hover:border-indigo-500"
+                                                    />
+                                                </div>
+                                                <Input
+                                                    type="text"
+                                                    value={step.color || ''}
+                                                    onChange={(e) =>
+                                                        onUpdate({ ...step, color: e.target.value })
+                                                    }
+                                                    placeholder="#000000"
+                                                    className="font-mono text-xs h-12 rounded-xl border-slate-200 bg-slate-50/30 text-slate-500 focus:text-indigo-600 transition-all font-bold tracking-wider"
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -279,9 +287,14 @@ export function ProcessStepEditor() {
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             <div className="flex items-center justify-end">
-                <Button variant="outline" size="sm" onClick={addStep}>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={addStep}
+                    className="h-11 rounded-xl border-dashed border-2 px-6 font-bold text-slate-500 hover:text-indigo-600 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all shadow-sm active:scale-95"
+                >
                     <Plus className="h-4 w-4 mr-2" />
                     {t('admin.design.intro.process_steps.add_step')}
                 </Button>
@@ -297,12 +310,14 @@ export function ProcessStepEditor() {
                     strategy={verticalListSortingStrategy}
                 >
                     {steps.length === 0 ? (
-                        <div className="py-8 flex flex-col items-center justify-center border-2 border-dashed rounded-xl opacity-60 bg-muted/5">
-                            <Plus className="h-8 w-8 text-muted-foreground mb-3" />
-                            <p className="text-xs font-medium">
+                        <div className="py-16 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/20 transition-all hover:bg-slate-50/40">
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6">
+                                <Plus className="h-8 w-8 text-slate-300" />
+                            </div>
+                            <p className="text-base font-bold text-slate-900 tracking-tight">
                                 {t('admin.design.intro.process_steps.empty.title')}
                             </p>
-                            <p className="text-[10px] text-muted-foreground mt-1 max-w-[200px] text-center">
+                            <p className="text-sm font-medium text-slate-500 mt-2 max-w-[280px] text-center leading-relaxed">
                                 {t('admin.design.intro.process_steps.empty.desc')}
                             </p>
                         </div>

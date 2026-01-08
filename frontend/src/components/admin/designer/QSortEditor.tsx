@@ -163,46 +163,65 @@ const QSortEditor = () => {
                     </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="statements" className="space-y-6 pt-4">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-sm">
-                                {t('admin.design.qsort.bulk.title')}
-                            </CardTitle>
-                            <CardDescription className="text-xs">
+                <TabsContent value="statements" className="space-y-8 pt-6">
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                        <CardHeader className="pb-4">
+                            <div className="flex items-center gap-3 mb-1">
+                                <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                                    <Plus className="h-4 w-4 text-indigo-600" />
+                                </div>
+                                <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                                    {t('admin.design.qsort.bulk.title')}
+                                </CardTitle>
+                            </div>
+                            <CardDescription className="text-sm font-medium text-slate-500">
                                 {t('admin.design.qsort.bulk.desc')}
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-6">
                             <RadioGroup
                                 defaultValue="replace"
                                 value={importMode}
                                 onValueChange={(v) => setImportMode(v as 'replace' | 'append')}
-                                className="flex gap-4"
+                                className="flex gap-6"
                             >
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="replace" id="r1" />
-                                    <Label htmlFor="r1">
+                                <div className="flex items-center space-x-2.5">
+                                    <RadioGroupItem
+                                        value="replace"
+                                        id="r1"
+                                        className="text-indigo-600"
+                                    />
+                                    <Label
+                                        htmlFor="r1"
+                                        className="text-sm font-bold text-slate-700 cursor-pointer"
+                                    >
                                         {t('admin.design.qsort.bulk.replace_all')}
                                     </Label>
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="append" id="r2" />
-                                    <Label htmlFor="r2">
+                                <div className="flex items-center space-x-2.5">
+                                    <RadioGroupItem
+                                        value="append"
+                                        id="r2"
+                                        className="text-indigo-600"
+                                    />
+                                    <Label
+                                        htmlFor="r2"
+                                        className="text-sm font-bold text-slate-700 cursor-pointer"
+                                    >
                                         {t('admin.design.qsort.bulk.append')}
                                     </Label>
                                 </div>
                             </RadioGroup>
                             <Textarea
                                 placeholder={t('admin.design.qsort.bulk.placeholder')}
-                                className="min-h-[200px] font-serif text-base leading-relaxed"
+                                className="min-h-[200px] font-serif text-base leading-relaxed rounded-xl border-slate-200 focus:ring-indigo-500/20 transition-all bg-slate-50/30"
                                 value={bulkText}
                                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                                     setBulkText(e.target.value)
                                 }
                             />
-                            <div className="flex justify-between items-center">
-                                <p className="text-xs text-muted-foreground">
+                            <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <p className="text-xs font-black uppercase tracking-widest text-slate-400 px-1">
                                     {t('admin.design.qsort.bulk.detected', {
                                         count: bulkText.split('\n').filter((l) => l.trim() !== '')
                                             .length,
@@ -212,6 +231,7 @@ const QSortEditor = () => {
                                     size="sm"
                                     onClick={handleBulkSave}
                                     disabled={!bulkText.trim()}
+                                    className="rounded-lg font-bold shadow-sm"
                                 >
                                     {importMode === 'replace'
                                         ? t('admin.design.qsort.bulk.process_replace')
@@ -221,17 +241,22 @@ const QSortEditor = () => {
                         </CardContent>
                     </Card>
 
-                    <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-semibold flex items-center gap-2">
-                            <Quote className="h-4 w-4 text-muted-foreground" />
-                            {t('admin.design.qsort.set.title')} ({statements.length})
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-4">
+                        <h3 className="text-base font-bold text-slate-900 flex items-center gap-3 tracking-tight">
+                            <div className="bg-slate-100 p-1.5 rounded-lg">
+                                <Quote className="h-4 w-4 text-slate-500" />
+                            </div>
+                            {t('admin.design.qsort.set.title')}
+                            <span className="text-slate-400 font-medium ml-1">
+                                ({statements.length})
+                            </span>
                         </h3>
                         {statements.length > 0 && (
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={handleClearAll}
-                                className="text-destructive hover:bg-destructive/5 h-8 gap-2"
+                                className="text-red-500 hover:text-red-600 hover:bg-red-50 h-9 px-4 gap-2 rounded-xl font-bold transition-all"
                             >
                                 <Trash2 className="h-4 w-4" />
                                 {t('admin.design.qsort.set.clear')}
@@ -239,16 +264,16 @@ const QSortEditor = () => {
                         )}
                     </div>
 
-                    <div className="grid grid-cols-1 gap-2">
+                    <div className="grid grid-cols-1 gap-3">
                         {localizedStatements.map((item, idx) => {
                             const isEditing = editingIndex === idx;
 
                             return (
                                 <div
                                     key={idx}
-                                    className="flex items-center gap-3 p-3 bg-background border rounded-lg text-sm group"
+                                    className="flex items-center gap-4 p-4 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100"
                                 >
-                                    <span className="text-[10px] font-bold text-muted-foreground bg-muted px-1.5 py-0.5 rounded min-w-[32px] text-center font-mono">
+                                    <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg min-w-[36px] text-center font-mono border border-indigo-100">
                                         {item.code}
                                     </span>
 
@@ -257,40 +282,41 @@ const QSortEditor = () => {
                                             <Input
                                                 value={editingText}
                                                 onChange={(e) => setEditingText(e.target.value)}
-                                                className="flex-1"
+                                                className="flex-1 font-medium rounded-xl h-10"
                                                 autoFocus
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter') {
                                                         handleSaveStatement();
                                                     } else if (e.key === 'Escape') {
-                                                        // Cancel on Escape
                                                         setEditingIndex(null);
                                                     }
                                                 }}
                                             />
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={handleSaveStatement}
-                                                className="h-6 w-6 text-green-600 hover:bg-green-50"
-                                            >
-                                                <CheckCircle2 className="h-3 w-3" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => setEditingIndex(null)}
-                                                className="h-6 w-6"
-                                            >
-                                                <AlertCircle className="h-3 w-3" />
-                                            </Button>
+                                            <div className="flex items-center gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={handleSaveStatement}
+                                                    className="h-8 w-8 text-green-600 hover:bg-green-50 rounded-lg"
+                                                >
+                                                    <CheckCircle2 className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => setEditingIndex(null)}
+                                                    className="h-8 w-8 text-slate-400 hover:bg-slate-50 rounded-lg"
+                                                >
+                                                    <AlertCircle className="h-4 w-4" />
+                                                </Button>
+                                            </div>
                                         </>
                                     ) : (
                                         <>
                                             <div
                                                 role="button"
                                                 tabIndex={0}
-                                                className="flex-1 cursor-text hover:bg-muted/50 px-2 py-1 rounded transition-colors"
+                                                className="flex-1 cursor-text hover:bg-slate-50 px-3 py-2 rounded-xl transition-all font-medium text-slate-700 leading-relaxed"
                                                 onClick={() => {
                                                     setEditingIndex(idx);
                                                     setEditingText(item.text);
@@ -310,16 +336,15 @@ const QSortEditor = () => {
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => {
-                                                    // biome-ignore lint/suspicious/noExplicitAny: complex types
                                                     updateDraft((d: any) => {
                                                         if (d.statements) {
                                                             d.statements.splice(idx, 1);
                                                         }
                                                     });
                                                 }}
-                                                className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 transition-all"
                                             >
-                                                <Trash2 className="h-3 w-3" />
+                                                <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </>
                                     )}
@@ -329,22 +354,25 @@ const QSortEditor = () => {
                     </div>
 
                     {/* Research Settings */}
-                    <Card className="shadow-sm mt-8">
-                        <CardHeader>
-                            <CardTitle className="text-base font-bold">
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-10">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-sm font-bold text-slate-900 tracking-tight">
                                 {t('admin.design.qsort.settings.title')}
                             </CardTitle>
-                            <CardDescription>
+                            <CardDescription className="text-xs font-medium text-slate-500">
                                 {t('admin.design.qsort.settings.desc')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="flex items-center justify-between py-2 border-t">
+                            <div className="flex items-center justify-between py-4 border-t border-slate-100">
                                 <div className="space-y-1">
-                                    <Label htmlFor="show-codes" className="text-sm font-medium">
+                                    <Label
+                                        htmlFor="show-codes"
+                                        className="text-sm font-bold text-slate-700"
+                                    >
                                         {t('admin.design.qsort.settings.show_codes')}
                                     </Label>
-                                    <p className="text-xs text-muted-foreground max-w-md">
+                                    <p className="text-xs font-medium text-slate-500 max-w-md leading-relaxed">
                                         {t('admin.design.qsort.settings.show_codes_desc')}
                                     </p>
                                 </div>
@@ -362,35 +390,39 @@ const QSortEditor = () => {
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="grid" className="space-y-6 pt-4">
+                <TabsContent value="grid" className="space-y-8 pt-6">
                     {/* Methodological Context */}
                     <TooltipProvider>
-                        <div className="flex items-center gap-4 p-4 bg-indigo-50/50 border border-indigo-100 rounded-lg">
+                        <div className="flex items-center gap-4 p-5 bg-indigo-50/50 border border-indigo-100/60 rounded-2xl shadow-sm">
+                            <div className="size-10 rounded-xl bg-white border border-indigo-100 flex items-center justify-center shadow-sm">
+                                <Grid3X3 className="h-5 w-5 text-indigo-600" />
+                            </div>
                             <div className="flex-1">
-                                <p className="text-sm font-medium text-indigo-900">
+                                <p className="text-sm font-bold text-indigo-950 tracking-tight">
                                     {t('admin.design.qsort.grid.title')}
                                 </p>
-                                <p className="text-xs text-indigo-600 mt-1">
+                                <p className="text-[13px] font-medium text-indigo-600 mt-0.5 leading-relaxed">
                                     {t('admin.design.qsort.grid.desc')}
                                 </p>
                             </div>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
-                                        variant="ghost"
+                                        variant="outline"
                                         size="icon"
-                                        className="h-8 w-8 text-indigo-400 hover:text-indigo-600"
+                                        className="h-9 w-9 text-indigo-400 hover:text-indigo-600 border-indigo-200/50 bg-white rounded-xl shadow-sm hover:bg-indigo-50"
                                     >
                                         <HelpCircle className="h-5 w-5" />
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent className="max-w-xs text-xs" side="left">
-                                    <p>
-                                        <strong>
-                                            {t('admin.design.qsort.grid.tooltip_title')}
-                                        </strong>
+                                <TooltipContent
+                                    className="max-w-xs text-xs p-3 rounded-xl border-indigo-100 shadow-xl"
+                                    side="left"
+                                >
+                                    <p className="font-bold text-indigo-950">
+                                        {t('admin.design.qsort.grid.tooltip_title')}
                                     </p>
-                                    <p className="mt-1">
+                                    <p className="mt-1.5 text-indigo-800/80 leading-relaxed font-medium">
                                         {t('admin.design.qsort.grid.tooltip_desc')}
                                     </p>
                                 </TooltipContent>
@@ -399,47 +431,47 @@ const QSortEditor = () => {
                     </TooltipProvider>
 
                     {/* Visual Grid Representative */}
-                    <div className="bg-muted/30 border border-dashed rounded-xl p-8 flex flex-col items-center">
-                        <div className="flex items-end gap-1 mb-8 overflow-x-auto max-w-full pb-4 px-4 h-[250px]">
+                    <div className="bg-slate-50/50 border-2 border-dashed border-slate-200 rounded-3xl p-10 flex flex-col items-center shadow-inner group/grid transition-all hover:bg-slate-50/80">
+                        <div className="flex items-end gap-2 mb-10 overflow-x-auto max-w-full pb-6 px-6 h-[280px]">
                             {grid.map((col, idx) => (
-                                <div key={idx} className="flex flex-col items-center gap-2">
+                                <div key={idx} className="flex flex-col items-center gap-3">
                                     <Button
-                                        variant="ghost"
+                                        variant="outline"
                                         size="icon"
-                                        className="h-6 w-6 hover:bg-primary/10 hover:text-primary rounded-full shadow-sm border bg-background"
+                                        className="h-7 w-7 hover:bg-indigo-600 hover:text-white rounded-lg shadow-sm border-slate-200 bg-white transition-all transform active:scale-95"
                                         onClick={() => updateGridCapacity(idx, 1)}
                                         aria-label={`Increase capacity for column ${idx}`}
                                     >
-                                        <Plus className="h-3 w-3" />
+                                        <Plus className="h-3.5 w-3.5" />
                                     </Button>
 
-                                    <div className="flex flex-col-reverse gap-1">
+                                    <div className="flex flex-col-reverse gap-1.5 group/col">
                                         {Array.from({ length: col.capacity || 0 }).map((_, i) => (
                                             <div
                                                 key={i}
                                                 className={cn(
-                                                    'w-8 h-4 rounded-sm border shadow-[0_1px_0_rgba(0,0,0,0.1)]',
+                                                    'w-10 h-3.5 rounded-sm border shadow-[0_1px_0_rgba(0,0,0,0.05)] transition-all',
                                                     isValid
-                                                        ? 'bg-primary/20 border-primary/30'
-                                                        : 'bg-muted-foreground/20 border-muted-foreground/30'
+                                                        ? 'bg-indigo-500/20 border-indigo-500/30'
+                                                        : 'bg-slate-300 border-slate-400/30'
                                                 )}
                                             />
                                         ))}
                                     </div>
 
-                                    <div className="mt-2 text-[10px] font-black w-8 h-8 rounded-full border bg-background flex items-center justify-center shadow-inner">
+                                    <div className="mt-2 text-[11px] font-black w-9 h-9 rounded-xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter">
                                         {col.score > 0 ? `+${col.score}` : col.score}
                                     </div>
 
                                     <Button
-                                        variant="ghost"
+                                        variant="outline"
                                         size="icon"
-                                        className="h-6 w-6 hover:bg-destructive/10 hover:text-destructive rounded-full shadow-sm border bg-background"
+                                        className="h-7 w-7 hover:bg-red-500 hover:text-white rounded-lg shadow-sm border-slate-200 bg-white transition-all transform active:scale-95"
                                         onClick={() => updateGridCapacity(idx, -1)}
                                         disabled={(col.capacity || 0) <= 0}
                                         aria-label={`Decrease capacity for column ${idx}`}
                                     >
-                                        <Minus className="h-3 w-3" />
+                                        <Minus className="h-3.5 w-3.5" />
                                     </Button>
                                 </div>
                             ))}
@@ -448,37 +480,53 @@ const QSortEditor = () => {
                         {/* Validation Footer */}
                         <div
                             className={cn(
-                                'flex items-center gap-4 px-6 py-3 rounded-full border shadow-sm transition-colors',
+                                'flex items-center gap-6 px-8 py-4 rounded-3xl border shadow-xl transition-all duration-300 transform',
                                 isValid
-                                    ? 'bg-green-50 border-green-200'
-                                    : 'bg-amber-50 border-amber-200'
+                                    ? 'bg-white border-green-200 ring-4 ring-green-500/5'
+                                    : 'bg-white border-amber-200 ring-4 ring-amber-500/5'
                             )}
                         >
-                            <div className="flex items-center gap-2">
-                                <Quote className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm font-semibold">
-                                    {t('admin.design.qsort.grid.stat_count', {
-                                        count: totalStatements,
-                                    })}
-                                </span>
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                                    <Quote className="h-4 w-4 text-slate-500" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        Statements
+                                    </span>
+                                    <span className="text-sm font-bold text-slate-900">
+                                        {totalStatements}
+                                    </span>
+                                </div>
                             </div>
-                            <div className="w-px h-4 bg-border" />
-                            <div className="flex items-center gap-2">
-                                <Grid3X3 className="h-4 w-4 text-muted-foreground" />
-                                <span className="text-sm font-semibold">
-                                    {t('admin.design.qsort.grid.slot_count', { count: totalSlots })}
-                                </span>
+                            <div className="w-px h-8 bg-slate-100" />
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                                    <Grid3X3 className="h-4 w-4 text-slate-500" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        Grid slots
+                                    </span>
+                                    <span className="text-sm font-bold text-slate-900">
+                                        {totalSlots}
+                                    </span>
+                                </div>
                             </div>
-                            <div className="w-px h-4 bg-border" />
-                            <div className="flex items-center gap-2">
+                            <div className="w-px h-8 bg-slate-100" />
+                            <div className="flex items-center gap-4">
                                 {isValid ? (
-                                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                    <div className="size-9 rounded-full bg-green-50 border border-green-100 flex items-center justify-center">
+                                        <CheckCircle2 className="h-5 w-5 text-green-600" />
+                                    </div>
                                 ) : (
-                                    <AlertCircle className="h-4 w-4 text-amber-600" />
+                                    <div className="size-9 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center">
+                                        <AlertCircle className="h-5 w-5 text-amber-600" />
+                                    </div>
                                 )}
                                 <span
                                     className={cn(
-                                        'text-sm font-bold',
+                                        'text-sm font-bold tracking-tight',
                                         isValid ? 'text-green-600' : 'text-amber-600'
                                     )}
                                 >

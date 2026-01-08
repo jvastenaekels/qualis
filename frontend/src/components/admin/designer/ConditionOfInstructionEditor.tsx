@@ -28,29 +28,29 @@ const ConditionOfInstructionEditor = () => {
     };
 
     return (
-        <div className="space-y-8">
-            <section className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                    <span className="bg-primary/10 p-1 rounded">
-                        <Target className="h-5 w-5" />
-                    </span>
+        <div className="space-y-12 min-h-[500px]">
+            <section className="space-y-6">
+                <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
+                    <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                        <Target className="h-5 w-5 text-indigo-600" />
+                    </div>
                     {t('admin.design.condition.title')}
                 </div>
 
-                <Card className="shadow-sm border-blue-200 bg-blue-50/50">
-                    <CardHeader>
-                        <CardTitle className="text-sm font-bold text-blue-900">
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                    <CardHeader className="pb-4">
+                        <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
                             {t('admin.design.condition.label')}
                         </CardTitle>
-                        <CardDescription className="text-blue-800">
+                        <CardDescription className="text-sm font-medium text-slate-500 italic">
                             {t('admin.design.condition.desc')}
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid gap-2">
+                    <CardContent className="space-y-6">
+                        <div className="grid gap-3">
                             <Label
                                 htmlFor="condition_of_instruction"
-                                className="text-sm font-semibold text-blue-900"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
                             >
                                 {t('admin.design.condition.field_label')}
                             </Label>
@@ -61,26 +61,25 @@ const ConditionOfInstructionEditor = () => {
                                     handleChange('condition_of_instruction', e.target.value)
                                 }
                                 placeholder={t('admin.design.condition.placeholder')}
-                                className="font-bold text-lg bg-white border-blue-200 focus-visible:ring-blue-500"
+                                className="font-bold text-lg h-12 rounded-xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-indigo-500/20 transition-all px-4"
                             />
                         </div>
                     </CardContent>
                 </Card>
             </section>
 
-            <section className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                        <span className="bg-primary/10 p-1 rounded">
-                            <Info className="h-5 w-5" />
-                        </span>
+            <section className="space-y-6">
+                <div className="flex items-center justify-between bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 shadow-sm transition-all hover:bg-indigo-50">
+                    <div className="flex items-center gap-4 text-slate-900 font-bold text-lg tracking-tight">
+                        <div className="bg-white p-2 rounded-xl border border-indigo-100 shadow-sm">
+                            <Info className="h-5 w-5 text-indigo-600" />
+                        </div>
                         {t('admin.design.condition.enable_pre')}
                     </div>
                     <Switch
                         id="enable-pre-instruction"
                         checked={hasPreInstruction}
                         onCheckedChange={(checked: boolean) => {
-                            // Defensive check to prevent infinite loops
                             if (checked === hasPreInstruction) return;
                             if (checked) {
                                 handleChange('pre_instruction', '');
@@ -92,16 +91,16 @@ const ConditionOfInstructionEditor = () => {
                 </div>
 
                 {hasPreInstruction && (
-                    <Card className="shadow-sm">
-                        <CardContent className="pt-6">
-                            <div className="grid gap-2">
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden animate-in slide-in-from-top-4 duration-500">
+                        <CardContent className="pt-8">
+                            <div className="grid gap-3">
                                 <MarkdownEditor
                                     id="pre_instruction"
                                     label={t('admin.design.condition.pre_label')}
                                     value={translation?.pre_instruction || ''}
                                     onChange={(val: string) => handleChange('pre_instruction', val)}
                                     placeholder={t('admin.design.condition.pre_desc')}
-                                    className="min-h-[200px]"
+                                    className="min-h-[250px]"
                                 />
                             </div>
                         </CardContent>
@@ -109,11 +108,16 @@ const ConditionOfInstructionEditor = () => {
                 )}
             </section>
 
-            <section className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                <h4 className="text-sm font-semibold text-amber-900 mb-2 flex items-center gap-2">
-                    <Target className="h-4 w-4" /> {t('admin.design.condition.tips.title')}
+            <section className="bg-amber-50/50 border border-amber-100 rounded-2xl p-8 shadow-sm">
+                <h4 className="text-base font-black text-amber-900 mb-3 flex items-center gap-3 tracking-tight">
+                    <div className="bg-white p-2 rounded-xl border border-amber-200 shadow-sm">
+                        <Target className="h-5 w-5 text-amber-600" />
+                    </div>
+                    {t('admin.design.condition.tips.title')}
                 </h4>
-                <p className="text-sm text-amber-700">{t('admin.design.condition.tips.desc')}</p>
+                <p className="text-sm font-bold text-amber-800/70 leading-relaxed max-w-2xl">
+                    {t('admin.design.condition.tips.desc')}
+                </p>
             </section>
         </div>
     );

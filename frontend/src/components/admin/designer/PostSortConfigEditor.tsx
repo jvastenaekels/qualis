@@ -96,37 +96,41 @@ const PostSortConfigEditor = () => {
 
     return (
         <div className="space-y-6">
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <span className="bg-primary/10 p-1 rounded">
-                            <Info className="h-5 w-5 text-primary" />
-                        </span>
-                        {t('admin.design.postsort.extreme.title')}
-                    </CardTitle>
-                    <CardDescription>{t('admin.design.postsort.extreme.desc')}</CardDescription>
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                <CardHeader className="pb-4">
+                    <div className="flex items-center gap-3 mb-1">
+                        <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                            <Info className="h-4 w-4 text-indigo-600" />
+                        </div>
+                        <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                            {t('admin.design.postsort.extreme.title')}
+                        </CardTitle>
+                    </div>
+                    <CardDescription className="text-sm font-medium text-slate-500">
+                        {t('admin.design.postsort.extreme.desc')}
+                    </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="flex flex-wrap gap-2">
+                <CardContent className="space-y-6">
+                    <div className="flex flex-wrap gap-3">
                         {extremeColumns.length === 0 ? (
-                            <p className="text-sm text-muted-foreground italic">
+                            <div className="py-2 text-sm text-slate-400 font-medium italic">
                                 {t('admin.design.postsort.extreme.no_columns')}
-                            </p>
+                            </div>
                         ) : (
                             extremeColumns.map((score: number) => (
                                 <Badge
                                     key={score}
                                     variant="secondary"
-                                    className="px-3 py-1.5 text-sm font-mono flex items-center gap-2"
+                                    className="px-4 py-2 text-sm font-bold font-mono bg-slate-100 text-slate-700 border-none rounded-xl flex items-center gap-2 group/badge transition-all hover:bg-slate-200"
                                 >
                                     {score > 0 ? '+' : ''}
                                     {score}
                                     <button
                                         type="button"
                                         onClick={() => removeExtremeColumn(score)}
-                                        className="ml-1 hover:text-destructive transition-colors"
+                                        className="ml-1 text-slate-400 hover:text-red-500 transition-colors"
                                     >
-                                        <X className="h-3 w-3" />
+                                        <X className="h-3.5 w-3.5" />
                                     </button>
                                 </Badge>
                             ))
@@ -134,22 +138,22 @@ const PostSortConfigEditor = () => {
                     </div>
 
                     {unselectedScores.length > 0 && (
-                        <div className="flex items-center gap-2 pt-2 border-t">
-                            <Label className="text-xs text-muted-foreground">
+                        <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
+                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                 {t('admin.design.postsort.extreme.add_label')}
                             </Label>
                             <Select
                                 value={selectedScore?.toString() || ''}
                                 onValueChange={(val) => setSelectedScore(Number(val))}
                             >
-                                <SelectTrigger className="w-32 h-8">
+                                <SelectTrigger className="w-32 h-10 rounded-xl border-slate-200 bg-white font-bold">
                                     <SelectValue
                                         placeholder={t(
                                             'admin.design.postsort.extreme.select_placeholder'
                                         )}
                                     />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="rounded-xl border-slate-200 shadow-xl font-bold">
                                     {unselectedScores.map((score) => (
                                         <SelectItem key={score} value={score.toString()}>
                                             {score > 0 ? '+' : ''}
@@ -165,17 +169,20 @@ const PostSortConfigEditor = () => {
                                     selectedScore !== null && addExtremeColumn(selectedScore)
                                 }
                                 disabled={selectedScore === null}
-                                className="h-8"
+                                className="h-10 px-4 rounded-xl border-slate-200 hover:border-indigo-500 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all font-bold shadow-sm"
                             >
-                                <Plus className="h-3 w-3 mr-1" />{' '}
+                                <Plus className="h-4 w-4 mr-2" />
                                 {t('admin.design.postsort.extreme.add')}
                             </Button>
                         </div>
                     )}
 
                     {extremeColumns.length > 0 && (
-                        <div className="pt-4 border-t space-y-2">
-                            <Label htmlFor="extreme-prompt">
+                        <div className="pt-6 border-t border-slate-100 space-y-4">
+                            <Label
+                                htmlFor="extreme-prompt"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                            >
                                 {t('admin.design.postsort.extreme.prompt_label')}
                             </Label>
                             <Textarea
@@ -183,21 +190,21 @@ const PostSortConfigEditor = () => {
                                 value={getPromptText('extreme')}
                                 onChange={(e) => setPromptText('extreme', e.target.value)}
                                 placeholder={t('admin.design.postsort.extreme.prompt_placeholder')}
-                                className="min-h-[80px]"
+                                className="min-h-[100px] rounded-2xl border-slate-200 focus:ring-indigo-500/20 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
                             />
                         </div>
                     )}
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader>
                     <div className="flex items-center justify-between">
                         <div className="space-y-1">
-                            <CardTitle className="text-base">
+                            <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
                                 {t('admin.design.postsort.random_comments.title')}
                             </CardTitle>
-                            <CardDescription className="text-sm">
+                            <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
                                 {t('admin.design.postsort.random_comments.desc')}
                             </CardDescription>
                         </div>
@@ -212,34 +219,34 @@ const PostSortConfigEditor = () => {
                 </CardHeader>
             </Card>
 
-            <Card>
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader>
                     <div className="space-y-1">
-                        <CardTitle className="text-base">
+                        <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
                             {t('admin.design.postsort.custom.title')}
                         </CardTitle>
-                        <CardDescription className="text-sm">
+                        <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
                             {t('admin.design.postsort.custom.desc')}
                         </CardDescription>
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-8">
                     <QuestionBuilder type="post" />
                 </CardContent>
             </Card>
 
-            <div className="flex items-center justify-between rounded-lg border p-4 bg-blue-50/50 border-blue-100 mt-4 shadow-sm group hover:border-blue-200 transition-colors">
-                <div className="space-y-0.5">
-                    <Label className="text-base flex items-center gap-2 text-blue-900">
+            <div className="flex items-center justify-between rounded-2xl border border-indigo-100 bg-indigo-50/50 p-6 mt-6 shadow-sm group hover:border-indigo-200 hover:shadow-md transition-all">
+                <div className="space-y-1.5 text-indigo-900">
+                    <Label className="text-base font-bold flex items-center gap-3 tracking-tight">
                         {t('admin.design.postsort.email.title')}
                         <Badge
                             variant="outline"
-                            className="text-[10px] font-bold uppercase tracking-wider bg-white/50"
+                            className="text-[10px] font-black uppercase tracking-wider bg-white/80 border-indigo-200 text-indigo-600 px-2 py-0.5 rounded-lg shadow-sm"
                         >
                             {t('common.optional')}
                         </Badge>
                     </Label>
-                    <p className="text-sm text-blue-800/60">
+                    <p className="text-[13px] font-medium text-indigo-600/80 leading-relaxed max-w-lg">
                         {t('admin.design.postsort.email.desc')}
                     </p>
                 </div>
@@ -257,10 +264,10 @@ const PostSortConfigEditor = () => {
                 />
             </div>
             {config?.email_collection_enabled && (
-                <div className="ml-8 mt-2 space-y-3 border-l-2 border-blue-100 pl-6 animate-in slide-in-from-left-2 duration-300">
-                    <div className="rounded-md border border-amber-200 bg-amber-50 p-3">
-                        <div className="flex items-center justify-between group/item mb-1">
-                            <Label className="text-sm font-medium text-amber-900 group-hover/item:text-amber-950 transition-colors">
+                <div className="ml-8 mt-4 space-y-4 border-l-2 border-indigo-100 pl-8 animate-in slide-in-from-left-4 duration-500">
+                    <div className="rounded-2xl border border-amber-200 bg-amber-50/50 p-6 shadow-sm">
+                        <div className="flex items-center justify-between group/item mb-2">
+                            <Label className="text-sm font-bold text-amber-900 group-hover/item:text-amber-950 transition-colors tracking-tight">
                                 {t('admin.design.postsort.email.interview')}
                             </Label>
                             <Switch
@@ -277,17 +284,17 @@ const PostSortConfigEditor = () => {
                                 }}
                             />
                         </div>
-                        <p className="text-xs text-amber-700">
+                        <p className="text-xs font-medium text-amber-700/80 leading-relaxed">
                             {t('admin.design.postsort.email.interview_warning')}
                         </p>
                     </div>
 
-                    <div className="flex items-center justify-between group/item py-2">
-                        <div className="space-y-0.5">
-                            <Label className="text-sm text-slate-600 group-hover/item:text-slate-900 transition-colors">
+                    <div className="flex items-center justify-between group/item py-4 px-6 bg-white rounded-2xl border border-slate-100 shadow-sm">
+                        <div className="space-y-1">
+                            <Label className="text-sm font-bold text-slate-800 group-hover/item:text-indigo-600 transition-all tracking-tight">
                                 {t('admin.design.postsort.email.results')}
                             </Label>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs font-medium text-slate-500">
                                 {t('admin.design.postsort.email.results_hint')}
                             </p>
                         </div>
