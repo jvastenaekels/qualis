@@ -96,10 +96,11 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     // Auto-dismiss tip after 5 cards sorted (all devices)
     useEffect(() => {
+        // Only set to true if we haven't started sorting yet and instruction exists
         if (config?.pre_instruction && roughHistory.length === 0) {
             setIsReadingInstructions(true);
         }
-    }, [config, roughHistory.length]);
+    }, [config?.pre_instruction, roughHistory.length]);
 
     useEffect(() => {
         // Cleanup function to clear the header action when component unmounts

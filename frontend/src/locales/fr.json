@@ -97,25 +97,25 @@
             "trigger": "Aide",
             "what": "Ce que nous demandons",
             "why": "Pourquoi c'est important",
-            "step_1": {
+            "step_welcome": {
                 "what": "Prenez connaissance des objectifs de l'étude et confirmez votre participation volontaire.",
                 "why": "Garantit que vous êtes pleinement informé et que vous avez consenti au processus de recherche."
             },
-            "step_2": {
+            "step_presort": {
                 "what": "Répondez à quelques questions rapides sur votre profil.",
                 "why": "Nous aide à comprendre comment les différentes perspectives sont corrélées aux antécédents des participants."
             },
-            "step_3": {
+            "step_rough": {
                 "what": "Triez spontanément les affirmations en trois catégories : D'accord, Neutre et Pas d'accord.",
                 "why": "Capture votre réaction initiale et intuitive aux thèmes centraux de l'étude."
             },
-            "step_4": {
+            "step_fine": {
                 "what": "Répartissez vos affirmations sur la grille en fonction de votre niveau d'accord.",
                 "why": "Crée une carte structurée et mesurable de votre point de vue spécifique."
             },
-            "step_5": {
-                "what": "Révisez votre tri final et apportez des réflexions complémentaires si vous le souhaitez.",
-                "why": "Vous permet de clarifier votre perspective et d'enrichir les données avec des détails qualitatifs."
+            "step_post": {
+                "what": "Révisez votre classement final et apportez des réflexions complémentaires si vous le souhaitez.",
+                "why": "Permet de préciser votre pensée et d'enrichir les données avec des détails qualitatifs."
             }
         }
     },
@@ -306,6 +306,11 @@
         }
     },
     "admin": {
+        "study": {
+            "state": {
+                "manage": "Gérer le flux de l'étude"
+            }
+        },
         "components": {
             "markdown": {
                 "label": "Markdown",
@@ -697,7 +702,7 @@
             },
             "condition": {
                 "title": "Condition d'instruction",
-                "label": "La question de recherche",
+                "label": "La question de tri",
                 "desc": "C'est la consigne centrale qui guide les participants tout au long du processus de classement.",
                 "field_label": "Texte de la consigne",
                 "placeholder": "Ex: Quel est votre avis sur ces énoncés ?",

@@ -97,23 +97,23 @@
             "trigger": "Help",
             "what": "What we ask",
             "why": "Why it matters",
-            "step_1": {
+            "step_welcome": {
                 "what": "Review the study objectives and confirm your voluntary participation.",
                 "why": "Ensures you are fully informed and have consented to the research process."
             },
-            "step_2": {
+            "step_presort": {
                 "what": "Answer a few quick questions about your profile.",
                 "why": "Helps us understand how different perspectives correlate with participant backgrounds."
             },
-            "step_3": {
+            "step_rough": {
                 "what": "Spontaneously sort the statements into three categories: Agree, Neutral, and Disagree.",
-                "why": "Captures your initial, intuitive reaction to the study s central themes."
+                "why": "Captures your initial, intuitive reaction to the study's central themes."
             },
-            "step_4": {
+            "step_fine": {
                 "what": "Distribute your statements on the grid based on your level of agreement.",
                 "why": "Creates a structured, measurable map of your specific point of view."
             },
-            "step_5": {
+            "step_post": {
                 "what": "Review your final sort and provide additional reflections if you wish.",
                 "why": "Allows you to clarify your perspective and enrich the data with qualitative detail."
             }
@@ -306,6 +306,11 @@
         }
     },
     "admin": {
+        "study": {
+            "state": {
+                "manage": "Manage Study Flow"
+            }
+        },
         "components": {
             "markdown": {
                 "label": "Markdown",
@@ -696,7 +701,7 @@
             },
             "condition": {
                 "title": "Condition of Instruction",
-                "label": "The Research Question",
+                "label": "The Sorting Question",
                 "desc": "This is the core prompt that guides participants throughout the sorting process.",
                 "field_label": "Instruction Text",
                 "placeholder": "e.g., What is your stance on these statements?",

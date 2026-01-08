@@ -98,25 +98,25 @@
             "trigger": "Apua",
             "what": "Mitä kysymme",
             "why": "Miksi se on tärkeää",
-            "step_1": {
+            "step_welcome": {
                 "what": "Tutustu tutkimuksen tavoitteisiin ja vahvista vapaaehtoinen osallistumisesi.",
-                "why": "Varmistaa, että olet täysin tietoinen tutkimusprosessista ja olet antanut suostumuksesi siihen."
+                "why": "Varmistaa, että olet täysin tietoinen ja olet suostunut tutkimusprosessiin."
             },
-            "step_2": {
-                "what": "Vastaa muutamaan lyhyeen profiiliasi koskevaan kysymykseen.",
+            "step_presort": {
+                "what": "Vastaa muutamaan nopeaan kysymykseen profiilistasi.",
                 "why": "Auttaa meitä ymmärtämään, miten eri näkökulmat korreloivat osallistujien taustojen kanssa."
             },
-            "step_3": {
-                "what": "Lajittele väittämät spontaanisti kolmeen luokkaan: Samaa mieltä, Neutraali ja Eri mieltä.",
-                "why": "Tallentaa alustavan, intuitiivisen reaktiosi tutkimuksen keskeisiin teemoihin."
+            "step_rough": {
+                "what": "Lajittele väittämät spontaanisti kolmeen luokkaan: samaa mieltä, neutraali ja eri mieltä.",
+                "why": "Tallentaa välittömän, intuitiivisen reaktiosi tutkimuksen keskeisiin teemoihin."
             },
-            "step_4": {
-                "what": "Jaa väittämät ruudukkoon mieltymyksesi mukaan.",
-                "why": "Luo jäsennellyn ja mitattavissa olevan kartan juuri sinun näkökulmastasi."
+            "step_fine": {
+                "what": "Jaa väittämät ruudukkoon samaa mieltä olemisen tasosi perusteella.",
+                "why": "Luo jäsennellyn, mitattavissa olevan kartan erityisestä näkökulmastasi."
             },
-            "step_5": {
+            "step_post": {
                 "what": "Tarkista lopullinen lajittelusi ja anna halutessasi lisäpohdintoja.",
-                "why": "Mahdollistaa näkökulmasi täsmentämisen ja rikastuttaa tietoa laadullisilla yksityiskohdilla."
+                "why": "Mahdollistaa näkökulmasi selventämisen ja rikastuttaa tietoja laadullisilla yksityiskohdilla."
             }
         }
     },
@@ -307,6 +307,11 @@
         }
     },
     "admin": {
+        "study": {
+            "state": {
+                "manage": "Hallitse tutkimuksen kulkua"
+            }
+        },
         "components": {
             "markdown": {
                 "label": "Markdown",
@@ -697,7 +702,7 @@
             },
             "condition": {
                 "title": "Ohjeistuksen ehto",
-                "label": "Tutkimuskysymys",
+                "label": "Lajittelukysymys",
                 "desc": "Tämä on keskeinen kehote, joka ohjaa osallistujia koko lajitteluprosessin ajan.",
                 "field_label": "Ohjeteksti",
                 "placeholder": "Esim. Mikä on näkemyksesi näistä väittämistä?",
