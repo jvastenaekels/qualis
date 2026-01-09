@@ -97,7 +97,7 @@ test.describe('Labels Flow (Example Study)', () => {
         await expect(page.getByLabel('Custom Agree')).toBeVisible();
         await expect(page.getByLabel('Custom Disagree')).toBeVisible();
         await expect(page.getByLabel('Custom Neutral')).toBeVisible();
-        // Undo might default to icon, so check aria-label or text if visible? 
+        // Undo might default to icon, so check aria-label or text if visible?
         // RoughSort implementation uses aria-label for undo usually, assuming visual is icon + text
         // Let's verify text if it renders text
         await expect(page.getByText('Custom Undo')).toBeVisible();

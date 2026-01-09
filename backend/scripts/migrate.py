@@ -87,14 +87,16 @@ async def migrate_studies_table():
         migrations_applied = False
 
         # randomize_statements
-        if not await check_column_exists(conn, "studies", "randomize_statements"):
-            logger.info("  Adding 'randomize_statements' column...")
+        try:
             await conn.execute(
                 text(
                     "ALTER TABLE studies ADD COLUMN randomize_statements BOOLEAN DEFAULT 0"
                 )
             )
             migrations_applied = True
+            logger.info("  Added 'randomize_statements' column")
+        except Exception as e:
+            logger.info(f"  Column 'randomize_statements' likely exists: {e}")
 
         # show_statement_codes
         if not await check_column_exists(conn, "studies", "show_statement_codes"):
@@ -285,10 +287,7 @@ async def migrate_translations_table():
             migrations_applied = True
 
         # methodology_tips
-        if not await check_column_exists(
-            conn, "study_translations", "methodology_tips"
-        ):
-            logger.info("  Adding 'methodology_tips' column...")
+        try:
             dialect = conn.dialect.name
             if dialect == "postgresql":
                 await conn.execute(
@@ -303,10 +302,12 @@ async def migrate_translations_table():
                     )
                 )
             migrations_applied = True
+            logger.info("  Added 'methodology_tips' column")
+        except Exception as e:
+            logger.info(f"  Column 'methodology_tips' likely exists: {e}")
 
         # step_help
-        if not await check_column_exists(conn, "study_translations", "step_help"):
-            logger.info("  Adding 'step_help' column...")
+        try:
             dialect = conn.dialect.name
             if dialect == "postgresql":
                 await conn.execute(
@@ -321,6 +322,9 @@ async def migrate_translations_table():
                     )
                 )
             migrations_applied = True
+            logger.info("  Added 'step_help' column")
+        except Exception as e:
+            logger.info(f"  Column 'step_help' likely exists: {e}")
 
         if migrations_applied:
             await conn.commit()
@@ -340,12 +344,15 @@ async def migrate_participants_table():
 
         migrations_applied = False
 
-        if not await check_column_exists(conn, "participants", "random_seed"):
-            logger.info("  Adding 'random_seed' column...")
+        # random_seed
+        try:
             await conn.execute(
                 text("ALTER TABLE participants ADD COLUMN random_seed VARCHAR")
             )
             migrations_applied = True
+            logger.info("  Added 'random_seed' column")
+        except Exception as e:
+            logger.info(f"  Column 'random_seed' likely exists: {e}")
 
         # created_at
         if not await check_column_exists(conn, "participants", "created_at"):

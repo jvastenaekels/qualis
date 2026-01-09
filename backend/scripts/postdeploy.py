@@ -51,7 +51,6 @@ def main():
 
     # 1.5. Run Migrations
     run_task("scripts/migrate.py", "Database Schema Migration")
-    run_task("scripts/force_migrate.py", "Force Database Migration (Missing Cols)")
 
     # 2. Sync Study Configuration
     if os.path.exists("data/example-study.json"):
