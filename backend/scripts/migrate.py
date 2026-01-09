@@ -88,22 +88,29 @@ async def migrate_studies_table():
 
         # randomize_statements
         try:
+            dialect = conn.dialect.name
+            default_val = "FALSE" if dialect == "postgresql" else "0"
             await conn.execute(
                 text(
-                    "ALTER TABLE studies ADD COLUMN randomize_statements BOOLEAN DEFAULT 0"
+                    f"ALTER TABLE studies ADD COLUMN randomize_statements BOOLEAN DEFAULT {default_val}"
                 )
             )
             migrations_applied = True
             logger.info("  Added 'randomize_statements' column")
         except Exception as e:
-            logger.info(f"  Column 'randomize_statements' likely exists: {e}")
+            if "already exists" in str(e).lower() or "42701" in str(e):
+                logger.info("  Column 'randomize_statements' already exists")
+            else:
+                logger.error(f"  Error adding 'randomize_statements': {e}")
 
         # show_statement_codes
         if not await check_column_exists(conn, "studies", "show_statement_codes"):
             logger.info("  Adding 'show_statement_codes' column...")
+            dialect = conn.dialect.name
+            default_val = "FALSE" if dialect == "postgresql" else "0"
             await conn.execute(
                 text(
-                    "ALTER TABLE studies ADD COLUMN show_statement_codes BOOLEAN DEFAULT 0"
+                    f"ALTER TABLE studies ADD COLUMN show_statement_codes BOOLEAN DEFAULT {default_val}"
                 )
             )
             migrations_applied = True
@@ -304,7 +311,10 @@ async def migrate_translations_table():
             migrations_applied = True
             logger.info("  Added 'methodology_tips' column")
         except Exception as e:
-            logger.info(f"  Column 'methodology_tips' likely exists: {e}")
+            if "already exists" in str(e).lower() or "42701" in str(e):
+                logger.info("  Column 'methodology_tips' already exists")
+            else:
+                logger.error(f"  Error adding 'methodology_tips': {e}")
 
         # step_help
         try:
@@ -324,7 +334,10 @@ async def migrate_translations_table():
             migrations_applied = True
             logger.info("  Added 'step_help' column")
         except Exception as e:
-            logger.info(f"  Column 'step_help' likely exists: {e}")
+            if "already exists" in str(e).lower() or "42701" in str(e):
+                logger.info("  Column 'step_help' already exists")
+            else:
+                logger.error(f"  Error adding 'step_help': {e}")
 
         if migrations_applied:
             await conn.commit()
@@ -352,7 +365,10 @@ async def migrate_participants_table():
             migrations_applied = True
             logger.info("  Added 'random_seed' column")
         except Exception as e:
-            logger.info(f"  Column 'random_seed' likely exists: {e}")
+            if "already exists" in str(e).lower() or "42701" in str(e):
+                logger.info("  Column 'random_seed' already exists")
+            else:
+                logger.error(f"  Error adding 'random_seed': {e}")
 
         # created_at
         if not await check_column_exists(conn, "participants", "created_at"):
@@ -404,8 +420,12 @@ async def migrate_users_table():
         # is_totp_enabled
         if not await check_column_exists(conn, "users", "is_totp_enabled"):
             logger.info("  Adding 'is_totp_enabled' column...")
+            dialect = conn.dialect.name
+            default_val = "FALSE" if dialect == "postgresql" else "0"
             await conn.execute(
-                text("ALTER TABLE users ADD COLUMN is_totp_enabled BOOLEAN DEFAULT 0")
+                text(
+                    f"ALTER TABLE users ADD COLUMN is_totp_enabled BOOLEAN DEFAULT {default_val}"
+                )
             )
             migrations_applied = True
 
@@ -424,11 +444,13 @@ async def migrate_recruitment_invitation_tables():
         # recruitment_links
         if not await check_table_exists(conn, "recruitment_links"):
             logger.info("  Creating 'recruitment_links' table...")
+            dialect = conn.dialect.name
+            bool_default = "TRUE" if dialect == "postgresql" else "1"
             await conn.execute(
                 text(
-                    """
+                    f"""
                 CREATE TABLE recruitment_links (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY {"AUTOINCREMENT" if dialect != "postgresql" else ""},
                     study_id INTEGER NOT NULL,
                     type VARCHAR(20) NOT NULL,
                     token VARCHAR NOT NULL UNIQUE,
@@ -436,7 +458,7 @@ async def migrate_recruitment_invitation_tables():
                     capacity INTEGER,
                     usage_count INTEGER DEFAULT 0,
                     start_count INTEGER DEFAULT 0,
-                    is_active BOOLEAN DEFAULT 1,
+                    is_active BOOLEAN DEFAULT {bool_default},
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     expires_at TIMESTAMP,
                     FOREIGN KEY(study_id) REFERENCES studies(id) ON DELETE CASCADE
@@ -468,11 +490,12 @@ async def migrate_recruitment_invitation_tables():
         # invitations
         if not await check_table_exists(conn, "invitations"):
             logger.info("  Creating 'invitations' table...")
+            dialect = conn.dialect.name
             await conn.execute(
                 text(
-                    """
+                    f"""
                 CREATE TABLE invitations (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id INTEGER PRIMARY KEY {"AUTOINCREMENT" if dialect != "postgresql" else ""},
                     email VARCHAR NOT NULL,
                     study_id INTEGER NOT NULL,
                     role VARCHAR(20) NOT NULL,
