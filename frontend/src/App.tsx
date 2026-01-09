@@ -26,6 +26,7 @@ import RoughSortPage from './pages/RoughSortPage';
 import WelcomePage from './pages/WelcomePage';
 import { Toaster } from 'sonner';
 import GeneralSettingsPage from '@/pages/admin/GeneralSettingsPage'; // Added import
+import RouteErrorBoundary from './components/RouteErrorBoundary';
 
 // Lazy load heavy interactive components
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));
@@ -151,6 +152,7 @@ const router = createBrowserRouter([
         path: '/study/:slug',
         element: <StudyLayout />,
         loader: studyLayoutLoader,
+        errorElement: <RouteErrorBoundary />,
         children: [
             { path: 'welcome', element: <WelcomePage /> },
             { path: 'consent', element: <ConsentPage /> },

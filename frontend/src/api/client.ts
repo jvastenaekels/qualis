@@ -120,6 +120,21 @@ async function request(
     });
 
     if (!response.ok) {
+        const errorText = await response.text();
+        let message = errorText;
+
+        try {
+            const parsed = JSON.parse(errorText);
+            if (parsed.detail) {
+                message =
+                    typeof parsed.detail === 'string'
+                        ? parsed.detail
+                        : JSON.stringify(parsed.detail);
+            }
+        } catch (_e) {
+            // Keep original errorText if not JSON
+        }
+
         if (response.status === 401) {
             // Handle session expiry for manual fetches too
             useAuthStore.getState().logout();
@@ -127,7 +142,7 @@ async function request(
                 window.location.href = '/login?reason=session_expired';
             }
         }
-        throw new Error(await response.text());
+        throw new ApiError(response.status, message);
     }
     return {
         data: await (options?.responseType === 'blob' ? response.blob() : response.json()),
