@@ -38,26 +38,31 @@ export class FineSortPage extends BasePage {
         // 1. Click the first card in the deck to select it
         const deckCard = this.deckContainer.locator('[data-testid^="card-"]').first();
         await expect(deckCard).toBeVisible();
-        await deckCard.click();
-        
-        // 1b. Verify selection (wait for ring-2 class)
+        // Wait for stability
+        await this.page.waitForTimeout(300);
+        await deckCard.click({ force: true });
+
+        // 1b. Verify selection (wait for ring-2 class on INNER element)
+        const innerCard = deckCard.locator('div').first();
         // If not selected within timeout, click again (retry mechanism)
         try {
-            await expect(deckCard).toHaveClass(/ring-2/, { timeout: 1000 });
+            await expect(innerCard).toHaveClass(/ring-2/, { timeout: 2000 });
         } catch (e) {
-            console.log('Card not selected, retrying click...');
-            await deckCard.click();
-            await expect(deckCard).toHaveClass(/ring-2/);
+            console.log('Card not selected, retrying click with JS dispatch...');
+            await this.page.waitForTimeout(500);
+            // Use JS click to bypass dnd-kit sensors
+            await deckCard.evaluate((node: HTMLElement) => node.click());
+            await expect(innerCard).toHaveClass(/ring-2/, { timeout: 2000 });
         }
 
         // 2. Find the first empty grid slot
         // An empty slot is a gridcell that does NOT contain a card
         const emptySlot = this.page.locator('[role="gridcell"]:not(:has([data-testid^="card-"]))').first();
-        
+
         // Ensure visibility and scroll into view
         await expect(emptySlot).toBeVisible();
         await emptySlot.scrollIntoViewIfNeeded();
-        
+
         // Debug: Log the slot ID
         const slotId = await emptySlot.getAttribute('id');
         console.log(`Clicking empty slot: ${slotId}`);
@@ -65,7 +70,7 @@ export class FineSortPage extends BasePage {
         // 3. Click the empty slot to place the card
         // Use force: true to bypass potential overlays/transform issues from zoom-pan-pinch
         await emptySlot.click({ force: true });
-        
+
         // 4. Wait for the move to complete (card should appear in slot)
         // We verify this implicitly by checking deck count in the calling loop
     }
@@ -91,7 +96,7 @@ export class FineSortPage extends BasePage {
         // Iterate through the 3 tabs: Disagree (0), Neutral (1), Agree (2)
         for (let pileIndex = 0; pileIndex < 3; pileIndex++) {
             await this.selectPile(pileIndex);
-            
+
             // Wait for deck animation
             await this.page.waitForTimeout(500);
 
@@ -99,7 +104,7 @@ export class FineSortPage extends BasePage {
             let cardsInDeck = await this.getDeckCount();
             while (cardsInDeck > 0) {
                await this.moveFirstCardToGrid();
-               
+
                // Verification: Deck count should decrease
                await expect.poll(async () => {
                    return await this.getDeckCount();

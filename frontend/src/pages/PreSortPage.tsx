@@ -119,10 +119,11 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
     // Auto-save form data to store using subscription to avoid render loops
     React.useEffect(() => {
         const subscription = watch((value) => {
+            console.log('FORM UPDATE:', { value, isValid, errors });
             setPresortResponse(value as Record<string, string | number | boolean>);
         });
         return () => subscription.unsubscribe();
-    }, [watch, setPresortResponse]);
+    }, [watch, setPresortResponse, isValid, errors]);
 
     // Set Step 2 on mount
     React.useEffect(() => {

@@ -37,4 +37,7 @@ export class PreSortPage extends BasePage {
         await expect(this.submitButton).toBeEnabled();
         await this.submitButton.click();
     }
+    async submit() {
+        await this.submitButton.click();
+    }
 }

@@ -66,7 +66,7 @@ else:
                 text("""
                     INSERT INTO users (email, hashed_password, is_active, is_superuser, is_totp_enabled)
                     VALUES (:email, :password, true, :is_superuser, false)
-                    ON CONFLICT (email) 
+                    ON CONFLICT (email)
                     DO UPDATE SET hashed_password = EXCLUDED.hashed_password
                     RETURNING id
                 """),
@@ -83,7 +83,7 @@ else:
                 text("""
                     INSERT INTO workspaces (title, slug, created_at, config)
                     VALUES (:title, :slug, NOW(), :config)
-                    ON CONFLICT (slug) 
+                    ON CONFLICT (slug)
                     DO NOTHING
                     RETURNING id
                 """),

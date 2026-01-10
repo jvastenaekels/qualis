@@ -1,5 +1,5 @@
 import { test as base } from '@playwright/test';
-import { customInstance } from '../../src/api/mutator';
+
 
 /**
  * Test Database Manager
@@ -115,6 +115,8 @@ export class TestDatabase {
                         title: config.title || 'Test Study',
                         description: 'Test study description',
                         instructions: 'Test instructions',
+                        objective: 'Test study objective',
+                        condition_of_instruction: 'Condition of instruction',
                     },
                 ],
                 grid_config: config.grid_config || [],
@@ -226,6 +228,8 @@ interface StudyConfig {
         title: string;
         description?: string;
         instructions?: string;
+        objective?: string;
+        condition_of_instruction?: string;
     }>;
     grid_config?: Array<{ score: number; capacity: number }>;
     statements?: Array<{ code: string; translations: Array<{ language_code: string; text: string }> }>;

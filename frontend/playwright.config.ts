@@ -97,6 +97,9 @@ export default defineConfig({
             timeout: 120 * 1000,
             stdout: 'pipe',
             stderr: 'pipe',
+            env: {
+                TESTING: 'true',
+            },
         },
         {
             command: 'npm run dev -- --host 127.0.0.1',

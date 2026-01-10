@@ -25,7 +25,7 @@ export const testDataBuilders = {
                 condition_of_instruction: 'What is your stance on this statement?',
             },
         ],
-        statements: [],
+        statements: testDataBuilders.statements(23),
         grid_config: [
             { score: -3, capacity: 2 },
             { score: -2, capacity: 3 },

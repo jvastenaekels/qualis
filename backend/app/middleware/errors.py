@@ -12,7 +12,7 @@ from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import IntegrityError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 logger = logging.getLogger(__name__)
@@ -34,9 +34,7 @@ def create_error_response(
     return JSONResponse(status_code=status_code, content=content)
 
 
-async def http_exception_handler(
-    request: Request, exc: Exception
-) -> JSONResponse:
+async def http_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Handle standard HTTP exceptions (e.g., 404, 403) with standard schema."""
     # Cast to concrete type for access
     exc = cast(StarletteHTTPException, exc)
@@ -60,8 +58,10 @@ async def validation_exception_handler(
     request: Request, exc: Exception
 ) -> JSONResponse:
     """Handle Pydantic validation errors (422) with standard schema."""
+    from fastapi.encoders import jsonable_encoder
+
     exc = cast(RequestValidationError, exc)
-    details = exc.errors()
+    details = jsonable_encoder(exc.errors())
     # Simplify the details slightly if needed, or pass as is
     return create_error_response(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
