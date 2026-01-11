@@ -5,7 +5,14 @@ import { produce } from 'immer';
 export interface StudyDesignerState {
     draft: StudyUpdate | null;
     original: StudyRead | null;
-    activeStep: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface' | 'branding';
+    activeStep:
+        | 'intro'
+        | 'pre-sort'
+        | 'condition'
+        | 'q-sort'
+        | 'post-sort'
+        | 'interface'
+        | 'branding';
     activeSubStep?: string;
     activeLocale: string;
     syncStatus: 'synced' | 'saving' | 'error' | 'modified';
@@ -17,7 +24,7 @@ export interface StudyDesignerState {
     // biome-ignore lint/suspicious/noExplicitAny: complex translation type
     updateTranslation: (lang: string, fn: (t: any) => void) => void;
     setActiveStep: (
-        step: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface' | 'branding'
+        step: 'intro' | 'pre-sort' | 'condition' | 'q-sort' | 'post-sort' | 'interface' | 'branding'
     ) => void;
     setActiveSubStep: (step: string) => void;
     setActiveLocale: (locale: string) => void;
@@ -153,7 +160,7 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
         }),
 
     setActiveStep: (
-        step: 'intro' | 'pre-sort' | 'q-sort' | 'post-sort' | 'interface' | 'branding'
+        step: 'intro' | 'pre-sort' | 'condition' | 'q-sort' | 'post-sort' | 'interface' | 'branding'
     ) => set({ activeStep: step }),
     setActiveSubStep: (step: string) => set({ activeSubStep: step }),
     setActiveLocale: (locale: string) => set({ activeLocale: locale }),
