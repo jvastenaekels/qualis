@@ -98,6 +98,7 @@ pre-commit run --all-files
 | **Front** | `npm run type-check`        | Run TSC                                 |
 | **Front** | `npm run lint:duplication`  | Check for copy-pasted code (JSCPD)      |
 | **Front** | `npm run lint:architecture` | Check architectural rules (Dep-Cruiser) |
+| **Front** | `npm run e2e`               | Run E2E Tests (Playwright)              |
 
 ## 🏗️ Architecture Checks
 

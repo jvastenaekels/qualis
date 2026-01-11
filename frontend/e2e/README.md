@@ -27,36 +27,58 @@ npx playwright test e2e/admin/configuration/presort-fields.spec.ts
 └─────────────────────────────────────────────────┘
 ```
 
+## Isolation Strategy
+
+Tests use an **"Add-Only"** strategy to support full parallelism:
+
+- Each test creates a **unique user** and **unique workspace** (e.g., `workspace-1736...`).
+- Tests **do not clean up** after themselves to prevent race conditions (one test deleting data needed by another).
+- Global cleanup is handled by creating fresh databases in CI or manual scripts locally.
+
+**Implication for Tests:**
+
+- **Never hardcode slugs** (like `'test-workspace'`). Use `testDb.getWorkspaceSlug()`.
+- **Never hardcode user emails**. Use `testDb.getUserEmail()`.
+
 ## Test Fixtures
 
 ### `testDb` - Database Manager
 
-Automatic setup and cleanup for each test:
+Automatic setup (unique seeding) for each test:
 
 ```typescript
 test("my test", async ({ testDb, authToken }) => {
-  // testDb is ready with base data (user, workspace)
-  // authToken is automatically obtained
+  // testDb is ready with UNIQUE base data (user, workspace)
+  const workspaceSlug = testDb.getWorkspaceSlug();
 
   const study = await testDb.createStudy(
     authToken,
     testDataBuilders.study({ statements: testDataBuilders.statements(10) }),
   );
 
-  // Test your feature
+  // cleanup() is disabled to allow parallel execution
+});
+```
 
-  // Cleanup happens automatically after test
+### `loginToAdminUI` - Fast Authentication
+
+Use the helper to bypass flaky/slow login forms:
+
+```typescript
+test.beforeEach(async ({ page, testDb }) => {
+  // Injects auth token directly into localStorage
+  await testDb.loginToAdminUI(page);
 });
 ```
 
 ### `authToken` - Authenticated Session
 
-Pre-authenticated token for API calls:
+Pre-authenticated token for API calls (automatically logged in as the unique test user):
 
 ```typescript
 test("API test", async ({ testDb, authToken }) => {
-  const study = await testDb.getStudy(authToken, "study-slug");
-  expect(study).toBeDefined();
+  const slug = testDb.getWorkspaceSlug();
+  const study = await testDb.getStudy(authToken, `${slug}/my-study`);
 });
 ```
 

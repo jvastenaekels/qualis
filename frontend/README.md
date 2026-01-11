@@ -20,9 +20,8 @@ frontend/
 │   ├── store/          # Zustand store definitions
 │   ├── hooks/          # Custom React hooks
 │   ├── api/            # API client and communication logic
-│   ├── locales/        # i18n translation files (EN, FR, FI)
 │   └── layouts/        # Shared page layouts
-├── public/             # Static assets
+├── public/             # Static assets (including locales)
 └── scripts/            # Frontend utility scripts
 ```
 
@@ -30,20 +29,21 @@ frontend/
 
 1. **Install Dependencies**:
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
 2. **Run Development Server**:
 
-    ```bash
-    npm run dev
-    ```
+   ```bash
+   npm run dev
+   ```
 
 3. **Run Tests**:
-    ```bash
-    npm test
-    ```
+   ```bash
+   npm test             # Unit & Integration
+   npm run e2e          # End-to-End (requires backend)
+   ```
 
 ## 🧠 State Management: Zustand
 
@@ -56,4 +56,4 @@ The application's state logic is split into atomic, domain-specific stores:
 
 ## 🌍 Internationalization
 
-Translations are managed in `src/locales/`. We use `i18next` for UI labels and dynamic study content (titles, instructions) fetched from the backend. Supported languages: **English (en)**, **French (fr)**, and **Finnish (fi)**.
+Translations are managed in `public/locales/`. We use `i18next` for UI labels and dynamic study content (titles, instructions) fetched from the backend. Supported languages: **English (en)**, **French (fr)**, and **Finnish (fi)**.

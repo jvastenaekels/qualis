@@ -109,25 +109,29 @@ npm run e2e:report
 
 ```
 frontend/e2e/
-├── basic-flow.spec.ts       # Full study flow
-├── visual-regression.spec.ts # Screenshot comparisons
+├── admin/               # Admin dashboard tests
+│   ├── collaboration.spec.ts
+│   └── ...
+├── study/               # Participant flow tests
+│   ├── basic-flow.spec.ts
+│   └── ...
 └── fixtures/
-    └── study-config.ts      # Shared mock data
+    ├── db-setup.ts      # Database & Auth helpers
+    └── test-data.ts     # Data builders
 ```
 
 ### Writing E2E Tests
 
 ```typescript
-import { test, expect } from "@playwright/test";
-import { mockStudyAPI } from "./fixtures/study-config";
+import { test, expect } from "../fixtures/db-setup";
+import { testDataBuilders } from "../fixtures/test-data";
 
 test.describe("Study Flow", () => {
-  test.beforeEach(async ({ page }) => {
-    await mockStudyAPI(page);
-  });
+  test("should complete study", async ({ page, testDb, authToken }) => {
+    // Create study dynamically
+    const study = await testDb.createStudy(authToken, testDataBuilders.study());
 
-  test("should complete study", async ({ page }) => {
-    await page.goto("/study/test/welcome");
+    await page.goto(`/study/${study.slug}/welcome`);
     await page.check('input[type="checkbox"]');
     await page.click('button[type="submit"]');
 

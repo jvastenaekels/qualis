@@ -290,10 +290,13 @@ frontend/src/
 │   ├── useSessionStore.ts
 │   ├── useResponseStore.ts
 │   └── useUIStore.ts
+└── layouts/            # Shared layouts
+
+frontend/public/
 └── locales/            # i18n translations
-    ├── en.json
-    ├── fr.json
-    └── fi.json
+    ├── en/translation.json
+    ├── fr/translation.json
+    └── fi/translation.json
 ```
 
 ---
