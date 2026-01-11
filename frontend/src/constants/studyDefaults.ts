@@ -39,6 +39,14 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
                 color: '#10b981',
             },
         ],
+        methodology_tips: [
+            'Tip: Start with what is most obvious to you (the extremes).',
+            "In the same column, the order from top to bottom doesn't matter.",
+            "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
+            'Reminder: items are sorted relative to each other (relative agreement).',
+            'Feel free to zoom in on different parts of the grid for better visibility.',
+            'Nothing is final: you can move cards or put them back in the deck at any time.',
+        ],
     },
     fr: {
         instructions: 'Veuillez trier les énoncés selon votre propre point de vue.',
@@ -79,6 +87,14 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
                 color: '#10b981',
             },
         ],
+        methodology_tips: [
+            'Astuce : commencez par ce qui est le plus évident pour vous (les extrêmes).',
+            "Dans une même colonne, l'ordre de haut en bas n'a pas d'importance.",
+            "Vous devez tout caser ! C'est parfois un casse-tête, mais c'est ainsi qu'on force la priorisation.",
+            'Rappel : les énoncés sont classés les uns par rapport aux autres (accord relatif).',
+            "N'hésitez pas à zoomer sur différents coins de la grille pour plus de confort (surtout sur mobile).",
+            "Rien n'est définitif : vous pouvez déplacer les cartes ou les remettre dans la pile à tout moment.",
+        ],
     },
     fi: {
         instructions: 'Lajittele väittämät oman näkemyksesi mukaan.',
@@ -118,6 +134,14 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
                 icon: 'MessageSquare',
                 color: '#10b981',
             },
+        ],
+        methodology_tips: [
+            'Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).',
+            'Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä.',
+            'Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida.',
+            'Muistutus: väitteet lajitellaan suhteessa toisiinsa.',
+            'Voit zoomata ruudukon eri osiin nähdäksesi paremmin.',
+            'Mikään ei ole lopullista: voit siirtää kortteja tai palauttaa ne pakkaan milloin tahansa.',
         ],
     },
 };
