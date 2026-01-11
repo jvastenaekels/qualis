@@ -8,6 +8,9 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import ImageUploadInput from './ImageUploadInput';
+import type { PartnerLogo } from '@/api/model/partnerLogo';
+import type { StudyReadBranding } from '@/api/model/studyReadBranding';
+import type { StudyRead } from '@/api/model/studyRead';
 
 const BrandingEditor = () => {
     const { t } = useTranslation();
@@ -15,16 +18,25 @@ const BrandingEditor = () => {
 
     if (!draft) return null;
 
-    // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
-    const branding = (draft as any).branding || { logo_url: null, accent_color: null };
+    // Use StudyRead type for proper casting
+    const studyDraft = draft as unknown as StudyRead;
+    const branding = (studyDraft.branding as StudyReadBranding) || {
+        logo_url: null,
+        accent_color: null,
+        partners: [],
+    };
 
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic field value
-    const updateBranding = (field: 'logo_url' | 'accent_color' | 'partners', value: any) => {
+    const updateBranding = <T extends keyof StudyReadBranding>(
+        field: T,
+        value: StudyReadBranding[T]
+    ) => {
         updateDraft((d) => {
-            // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
-            if (!(d as any).branding) (d as any).branding = { logo_url: null, accent_color: null };
-            // biome-ignore lint/suspicious/noExplicitAny: branding missing in generated type
-            (d as any).branding[field] = value;
+            const draftAny = d as unknown as StudyRead;
+            if (!draftAny.branding) {
+                draftAny.branding = { logo_url: null, accent_color: null, partners: [] };
+            }
+            // @ts-expect-error - dynamic field access on StudyReadBranding
+            draftAny.branding[field] = value;
         });
     };
 
@@ -220,80 +232,78 @@ const BrandingEditor = () => {
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="grid gap-4">
-                                {/* biome-ignore lint/suspicious/noExplicitAny: partner data */}
-                                {(branding.partners || []).map((partner: any, index: number) => (
-                                    <div
-                                        key={partner.id || index}
-                                        className="flex gap-4 items-start p-4 bg-slate-50/50 rounded-2xl border border-slate-200/60 group transition-all hover:bg-white hover:shadow-md"
-                                    >
-                                        <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-1.5 border border-slate-100 shrink-0 shadow-sm">
-                                            {partner.logo_url ? (
-                                                <img
-                                                    src={partner.logo_url}
-                                                    alt={partner.name}
-                                                    className="max-w-full max-h-full object-contain"
-                                                />
-                                            ) : (
-                                                <ImageIcon className="text-slate-300 w-6 h-6" />
-                                            )}
-                                        </div>
-                                        <div className="flex-1 space-y-3">
-                                            <div className="grid gap-1.5">
-                                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                                                    {t(
-                                                        'admin.design.theme.partners.name_placeholder',
-                                                        'Name'
-                                                    )}
-                                                </Label>
-                                                <Input
-                                                    value={partner.name}
-                                                    onChange={(e) => {
+                                {(branding.partners || []).map(
+                                    (partner: PartnerLogo, index: number) => (
+                                        <div
+                                            key={partner.id || index}
+                                            className="flex gap-4 items-start p-4 bg-slate-50/50 rounded-2xl border border-slate-200/60 group transition-all hover:bg-white hover:shadow-md"
+                                        >
+                                            <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center p-1.5 border border-slate-100 shrink-0 shadow-sm">
+                                                {partner.logo_url ? (
+                                                    <img
+                                                        src={partner.logo_url}
+                                                        alt={partner.name}
+                                                        className="max-w-full max-h-full object-contain"
+                                                    />
+                                                ) : (
+                                                    <ImageIcon className="text-slate-300 w-6 h-6" />
+                                                )}
+                                            </div>
+                                            <div className="flex-1 space-y-3">
+                                                <div className="grid gap-1.5">
+                                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                                        {t(
+                                                            'admin.design.theme.partners.name_placeholder',
+                                                            'Name'
+                                                        )}
+                                                    </Label>
+                                                    <Input
+                                                        value={partner.name}
+                                                        onChange={(e) => {
+                                                            const newPartners = [
+                                                                ...(branding.partners || []),
+                                                            ];
+                                                            newPartners[index] = {
+                                                                ...partner,
+                                                                name: e.target.value,
+                                                            };
+                                                            updateBranding('partners', newPartners);
+                                                        }}
+                                                        placeholder="Institution Name"
+                                                        className="h-9 text-sm font-bold rounded-xl"
+                                                    />
+                                                </div>
+                                                <ImageUploadInput
+                                                    value={partner.logo_url}
+                                                    onChange={(value) => {
                                                         const newPartners = [
                                                             ...(branding.partners || []),
                                                         ];
                                                         newPartners[index] = {
                                                             ...partner,
-                                                            name: e.target.value,
+                                                            logo_url: value,
                                                         };
-                                                        updateBranding(
-                                                            'partners',
-                                                            newPartners as any
-                                                        );
+                                                        updateBranding('partners', newPartners);
                                                     }}
-                                                    placeholder="Institution Name"
-                                                    className="h-9 text-sm font-bold rounded-xl"
+                                                    recommendedSize="120x40px"
+                                                    maxFileSize={300 * 1024}
                                                 />
                                             </div>
-                                            <ImageUploadInput
-                                                value={partner.logo_url}
-                                                onChange={(value) => {
-                                                    const newPartners = [
-                                                        ...(branding.partners || []),
-                                                    ];
-                                                    newPartners[index] = {
-                                                        ...partner,
-                                                        logo_url: value,
-                                                    };
-                                                    updateBranding('partners', newPartners as any);
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newPartners = (
+                                                        branding.partners || []
+                                                    ).filter((_, i) => i !== index);
+                                                    updateBranding('partners', newPartners);
                                                 }}
-                                                recommendedSize="120x40px"
-                                                maxFileSize={300 * 1024}
-                                            />
+                                                className="text-slate-300 hover:text-red-500 p-2 transition-colors bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-100"
+                                            >
+                                                <Trash2 className="size-4" />
+                                            </button>
                                         </div>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                const newPartners = (
-                                                    branding.partners || []
-                                                ).filter((_: any, i: number) => i !== index);
-                                                updateBranding('partners', newPartners as any);
-                                            }}
-                                            className="text-slate-300 hover:text-red-500 p-2 transition-colors bg-white rounded-xl shadow-sm border border-slate-100 hover:border-red-100"
-                                        >
-                                            <Trash2 className="size-4" />
-                                        </button>
-                                    </div>
-                                ))}
+                                    )
+                                )}
 
                                 <button
                                     type="button"
@@ -301,13 +311,13 @@ const BrandingEditor = () => {
                                         const newPartners = [
                                             ...(branding.partners || []),
                                             {
-                                                id: crypto.randomUUID() as string,
+                                                id: crypto.randomUUID(),
                                                 name: '',
                                                 logo_url: '',
                                                 url: '',
                                             },
                                         ];
-                                        updateBranding('partners', newPartners as any);
+                                        updateBranding('partners', newPartners);
                                     }}
                                     className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-500 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all font-bold text-sm"
                                 >

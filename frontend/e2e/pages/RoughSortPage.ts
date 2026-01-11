@@ -37,10 +37,13 @@ export class RoughSortPage extends BasePage {
 
         // After sorting, we need to click "Next"
         // Wait for completion screen
-        const nextBtn = this.page
-            .getByRole('button', { name: /Next|Suivant|Seuraava|Jatka/i })
-            .first();
+        const nextBtn = this.page.getByTestId('rough-sort-next-btn');
         await expect(nextBtn).toBeVisible({ timeout: 5000 });
-        await nextBtn.click();
+
+        // Use JS click for robustness against dnd-kit sensors
+        await nextBtn.evaluate((node: HTMLElement) => node.click());
+
+        // Ensure it's hidden before proceeding to prevent locator conflicts
+        await expect(nextBtn).toBeHidden({ timeout: 5000 });
     }
 }

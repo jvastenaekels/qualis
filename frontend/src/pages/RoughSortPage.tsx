@@ -266,6 +266,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                 <div className="flex flex-col gap-4 mt-4 items-center">
                     <button
                         type="button"
+                        data-testid="rough-sort-next-btn"
                         onClick={() => startTransition(() => navigate(`/study/${slug}/fine-sort`))}
                         style={{ backgroundColor: 'var(--brand-accent)' }}
                         className="px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 animate-pulse hover:animate-none w-full sm:w-auto"

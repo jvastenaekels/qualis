@@ -58,10 +58,22 @@
                 "action": "Siirry etusivulle"
             },
             "steps": {
-                "draft": { "label": "Luonnos", "description": "Määritys ja suunnittelu" },
-                "active": { "label": "Aktiivinen", "description": "Vastausten kerääminen" },
-                "paused": { "label": "Tauolla", "description": "Odottaa" },
-                "closed": { "label": "Suljettu", "description": "Analyysi ja vienti" }
+                "draft": {
+                    "label": "Luonnos",
+                    "description": "Määritys ja suunnittelu"
+                },
+                "active": {
+                    "label": "Aktiivinen",
+                    "description": "Vastausten kerääminen"
+                },
+                "paused": {
+                    "label": "Tauolla",
+                    "description": "Odottaa"
+                },
+                "closed": {
+                    "label": "Suljettu",
+                    "description": "Analyysi ja vienti"
+                }
             },
             "paused": {
                 "title": "Huoltotauko",
@@ -81,7 +93,6 @@
         "pilot_mode": "Pilottitila: Muutokset ovat väliaikaisia eikä tietoja tallenneta",
         "default_study_title": "Q-metodologinen tutkimus",
         "loading_content": "Ladataan tutkimuksen sisältöä...",
-
         "change_lang_title": "Vaihda kieli",
         "steps": {
             "welcome": "Tervetuloa",
@@ -198,14 +209,6 @@
             "post": {
                 "title": "Miksi",
                 "description": "Muutama sana perustellaksesi merkittävimmät valintasi."
-            },
-            "contact": {
-                "title": "Tulokset ja yhteystiedot",
-                "email_label": "Sähköpostiosoitteesi (valinnainen)",
-                "email_placeholder": "esimerkki@email.com",
-                "interview_consent": "Suostun siihen, että minuun otetaan tarvittaessa yhteyttä jatkohaastattelua varten.",
-                "newsletter_consent": "Haluan saada tietoa tutkimuksen tuloksista.",
-                "gdpr_note": "Sähköpostiosoitettasi ei koskaan jaeta julkisesti. Sitä säilytetään vain yllä valittuja tarkoituksia varten."
             }
         }
     },
@@ -299,13 +302,20 @@
             "select_placeholder": "Valitse kommentoitava väite...",
             "placeholder": "Kommenttisi tähän..."
         },
-
         "submit": "Lähetä vastaukset",
         "validation_error": "Ole hyvä ja selitä lyhyesti tärkeimmät valintasi jatkaaksesi.",
         "success": {
             "title": "Kiitos osallistumisestasi!",
             "message": "Vastauksesi tutkimukseen on tallennettu.",
             "id_label": "Vahvistuskoodi"
+        },
+        "contact": {
+            "title": "Tulokset ja yhteystiedot",
+            "email_label": "Sähköpostiosoitteesi (valinnainen)",
+            "email_placeholder": "esimerkki@email.com",
+            "interview_consent": "Suostun siihen, että minuun otetaan tarvittaessa yhteyttä jatkohaastattelua varten.",
+            "newsletter_consent": "Haluan saada tietoa tutkimuksen tuloksista.",
+            "gdpr_note": "Sähköpostiosoitettasi ei koskaan jaeta julkisesti. Sitä säilytetään vain yllä valittuja tarkoituksia varten."
         }
     },
     "admin": {

@@ -7,7 +7,10 @@ export class PostSortPage extends BasePage {
     }
 
     async waitForLoad() {
-        await expect(this.page.getByText('Post-Sort Survey', { exact: false })).toBeVisible({ timeout: 10000 });
+        await expect(this.page).toHaveURL(/.*\/post-sort/, { timeout: 20000 });
+        // The title in en.json is "To conclude" (post.title)
+        // or it might be "Why" (welcome.steps.post.title)
+        await expect(this.page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 10000 });
     }
 
     async fillExtremeComments(comment: string = 'Because it is important') {

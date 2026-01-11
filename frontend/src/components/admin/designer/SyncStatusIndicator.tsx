@@ -28,7 +28,6 @@ export function SyncStatusIndicator({ className }: { className?: string }) {
                     text: t('admin.design.sync.modified', 'Unsaved changes'),
                     color: 'text-amber-600',
                 };
-            case 'synced':
             default:
                 return {
                     icon: <Check className="h-3.5 w-3.5 text-emerald-500" />,

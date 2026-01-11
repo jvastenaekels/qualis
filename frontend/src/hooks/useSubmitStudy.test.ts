@@ -64,7 +64,7 @@ describe('useSubmitStudy', () => {
     });
 
     it('submits correctly transformed payload on success', async () => {
-        let capturedRequest: any;
+        let capturedRequest: unknown;
 
         server.use(
             http.post('/api/submit', async ({ request }) => {

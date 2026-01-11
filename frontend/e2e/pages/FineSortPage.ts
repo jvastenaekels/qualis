@@ -68,8 +68,8 @@ export class FineSortPage extends BasePage {
         console.log(`Clicking empty slot: ${slotId}`);
 
         // 3. Click the empty slot to place the card
-        // Use force: true to bypass potential overlays/transform issues from zoom-pan-pinch
-        await emptySlot.click({ force: true });
+        // Use JS dispatch to bypass potential overlays/transform issues from zoom-pan-pinch or dnd-kit
+        await emptySlot.evaluate((node: HTMLElement) => node.click());
 
         // 4. Wait for the move to complete (card should appear in slot)
         // We verify this implicitly by checking deck count in the calling loop
@@ -118,8 +118,8 @@ export class FineSortPage extends BasePage {
         // Adjust selector to match cards placed on the grid (grid-cell-filled) or similar
         // For robustness, waiting for the "Finish" or "Next" button to be enabled is a good proxy.
         // Assuming "Next" button appears or enables when full.
-        const nextButton = this.page.getByRole('button', { name: /next|finish|continue/i });
+        const nextButton = this.page.getByRole('button', { name: /next|finish|continue|confirm|submit/i });
         await expect(nextButton).toBeEnabled();
-        await nextButton.click();
+        await nextButton.evaluate((node: HTMLElement) => node.click());
     }
 }

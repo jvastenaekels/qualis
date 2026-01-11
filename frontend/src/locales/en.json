@@ -209,14 +209,6 @@
             "post": {
                 "title": "Why",
                 "description": "A few words to explain your most significant choices."
-            },
-            "contact": {
-                "title": "Results & Contact",
-                "email_label": "Your email address (Optional)",
-                "email_placeholder": "example@email.com",
-                "interview_consent": "I agree to be potentially contacted for a follow-up interview.",
-                "newsletter_consent": "I wish to be informed about the study results.",
-                "gdpr_note": "Your email will never be publicly shared. It is stored solely for the purposes selected above."
             }
         }
     },
@@ -316,6 +308,14 @@
             "title": "Thank you for your participation!",
             "message": "Your contribution to the study has been saved.",
             "id_label": "Confirmation code"
+        },
+        "contact": {
+            "title": "Results & Contact",
+            "email_label": "Your email address (Optional)",
+            "email_placeholder": "example@email.com",
+            "interview_consent": "I agree to be potentially contacted for a follow-up interview.",
+            "newsletter_consent": "I wish to be informed about the study results.",
+            "gdpr_note": "Your email will never be publicly shared. It is stored solely for the purposes selected above."
         }
     },
     "admin": {

@@ -58,10 +58,22 @@
                 "action": "Retour à l'accueil"
             },
             "steps": {
-                "draft": { "label": "Brouillon", "description": "Configuration et design" },
-                "active": { "label": "Active", "description": "Collecte de réponses" },
-                "paused": { "label": "En pause", "description": "En attente" },
-                "closed": { "label": "Fermée", "description": "Analyse et export" }
+                "draft": {
+                    "label": "Brouillon",
+                    "description": "Configuration et design"
+                },
+                "active": {
+                    "label": "Active",
+                    "description": "Collecte de réponses"
+                },
+                "paused": {
+                    "label": "En pause",
+                    "description": "En attente"
+                },
+                "closed": {
+                    "label": "Fermée",
+                    "description": "Analyse et export"
+                }
             },
             "paused": {
                 "title": "Maintenance en cours",
@@ -197,14 +209,6 @@
             "post": {
                 "title": "Pourquoi",
                 "description": "Quelques mots pour expliquer vos choix les plus significatifs."
-            },
-            "contact": {
-                "title": "Restitutions & Contact",
-                "email_label": "Votre adresse email (optionnel)",
-                "email_placeholder": "exemple@email.com",
-                "interview_consent": "J'accepte d'être potentiellement contacté(e) pour un entretien de suivi.",
-                "newsletter_consent": "Je souhaite être tenu(e) au courant des résultats de l'étude.",
-                "gdpr_note": "Votre email ne sera jamais diffusé publiquement. Il est stocké uniquement pour les finalités cochées ci-dessus."
             }
         }
     },
@@ -298,13 +302,20 @@
             "select_placeholder": "Choisir un énoncé...",
             "placeholder": "Votre commentaire ici..."
         },
-
         "submit": "Partager mon point de vue",
         "validation_error": "Merci d'ajouter une courte explication pour vos choix principaux ci-dessus.",
         "success": {
             "title": "Merci pour votre participation !",
             "message": "Votre contribution à l'étude a bien été enregistrée.",
             "id_label": "Code de confirmation"
+        },
+        "contact": {
+            "title": "Restitutions & Contact",
+            "email_label": "Votre adresse email (optionnel)",
+            "email_placeholder": "exemple@email.com",
+            "interview_consent": "J'accepte d'être potentiellement contacté(e) pour un entretien de suivi.",
+            "newsletter_consent": "Je souhaite être tenu(e) au courant des résultats de l'étude.",
+            "gdpr_note": "Votre email ne sera jamais diffusé publiquement. Il est stocké uniquement pour les finalités cochées ci-dessus."
         }
     },
     "admin": {
@@ -693,7 +704,6 @@
                 "mobile": "Vue mobile",
                 "desktop": "Vue bureau"
             },
-
             "intro": {
                 "welcome_title": "Message de bienvenue",
                 "process_title": "Aperçu du déroulement",
@@ -858,7 +868,6 @@
                     "title": "Questions personnalisées",
                     "desc": "Ajouter des questions personnalisées au questionnaire post-tri."
                 },
-
                 "email": {
                     "title": "Suivi des participants",
                     "desc": "Collecter les adresses email pour un recontact ou l'envoi des résultats.",
@@ -1011,7 +1020,6 @@
                     "restore": "Restaurer le participant"
                 },
                 "sort_config": "Q-tri",
-
                 "survey": {
                     "title": "Réponses au questionnaire",
                     "csv_note": "Réponses complètes disponibles dans l'export CSV."

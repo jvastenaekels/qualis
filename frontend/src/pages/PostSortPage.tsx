@@ -605,8 +605,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 )}
 
                 {/* Email / Contact Section */}
-                {/* biome-ignore lint/suspicious/noExplicitAny: config type stale */}
-                {(config as any)?.email_collection_enabled && (
+
+                {(config?.postsort_config?.email_collection_enabled ||
+                    config?.postsort_config?.interview_consent_enabled ||
+                    config?.postsort_config?.newsletter_consent_enabled) && (
                     <Card className="border-blue-100 bg-blue-50/50 shadow-sm">
                         <CardHeader className="pb-3">
                             <CardTitle className="text-lg text-blue-900 flex items-center gap-2">
@@ -614,25 +616,28 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label
-                                    htmlFor="contact-email"
-                                    className="text-blue-900 font-medium"
-                                >
-                                    {t('post.contact.email_label')}
-                                </Label>
-                                <Input
-                                    id="contact-email"
-                                    type="email"
-                                    placeholder={t('post.contact.email_placeholder')}
-                                    value={responses.postsort.email || ''}
-                                    onChange={(e) => setPostSortResponse('email', e.target.value)}
-                                    className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400"
-                                />
-                            </div>
+                            {config?.postsort_config?.email_collection_enabled && (
+                                <div className="space-y-2">
+                                    <Label
+                                        htmlFor="contact-email"
+                                        className="text-blue-900 font-medium"
+                                    >
+                                        {t('post.contact.email_label')}
+                                    </Label>
+                                    <Input
+                                        id="contact-email"
+                                        type="email"
+                                        placeholder={t('post.contact.email_placeholder')}
+                                        value={responses.postsort.email || ''}
+                                        onChange={(e) =>
+                                            setPostSortResponse('email', e.target.value)
+                                        }
+                                        className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                                    />
+                                </div>
+                            )}
 
-                            {/* biome-ignore lint/suspicious/noExplicitAny: config type stale */}
-                            {((config as any)?.interview_consent_enabled ?? true) && (
+                            {(config?.postsort_config?.interview_consent_enabled ?? true) && (
                                 <div className="flex items-start space-x-3 pt-2">
                                     <Checkbox
                                         id="contact-consent-interview"
@@ -656,8 +661,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                                 </div>
                             )}
 
-                            {/* biome-ignore lint/suspicious/noExplicitAny: config type stale */}
-                            {((config as any)?.newsletter_consent_enabled ?? true) && (
+                            {(config?.postsort_config?.newsletter_consent_enabled ?? true) && (
                                 <div className="flex items-start space-x-3 pt-2">
                                     <Checkbox
                                         id="contact-consent-newsletter"
