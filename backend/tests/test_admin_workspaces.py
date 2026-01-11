@@ -26,7 +26,7 @@ async def test_list_workspaces(
     await db.commit()
 
     headers = auth_token_factory(test_user)
-    response = await client.get("/api/admin/workspaces/", headers=headers)
+    response = await client.get("/api/admin/workspaces", headers=headers)
     assert response.status_code == 200
     data = response.json()
     assert len(data) >= 1
@@ -42,9 +42,7 @@ async def test_create_workspace(
     """Test creating a new workspace."""
     headers = auth_token_factory(test_user)
     payload = {"title": "New Workspace", "slug": "new-workspace-123"}
-    response = await client.post(
-        "/api/admin/workspaces/", headers=headers, json=payload
-    )
+    response = await client.post("/api/admin/workspaces", headers=headers, json=payload)
     assert response.status_code == 201
     data = response.json()
     assert data["slug"] == "new-workspace-123"

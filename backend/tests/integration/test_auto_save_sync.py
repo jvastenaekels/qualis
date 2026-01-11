@@ -39,9 +39,7 @@ async def test_permissive_statement_sync(
         "postsort_config": {},
     }
 
-    resp = await client.post(
-        "/api/admin/studies/", json=create_payload, headers=headers
-    )
+    resp = await client.post("/api/admin/studies", json=create_payload, headers=headers)
     assert resp.status_code == 201
 
     # 2. Add and Update statements via PATCH
@@ -113,7 +111,7 @@ async def test_imbalanced_grid_save(
         "presort_config": {},
         "postsort_config": {},
     }
-    await client.post("/api/admin/studies/", json=create_payload, headers=headers)
+    await client.post("/api/admin/studies", json=create_payload, headers=headers)
 
     # Update to imbalanced grid (capacity 10, but only 1 statement)
     update_payload = {"grid_config": [{"score": 0, "capacity": 10}]}

@@ -144,7 +144,7 @@ class TestStudyAdmin:
             "postsort_config": {},
         }
         response = await client.post(
-            "/api/admin/studies/", json=payload, headers=headers
+            "/api/admin/studies", json=payload, headers=headers
         )
         assert response.status_code == 201
         assert response.json()["slug"] == "new-study-admin"
@@ -161,7 +161,7 @@ class TestStudyAdmin:
             **auth_token_factory(test_user),
             "X-Workspace-ID": str(test_workspace.id),
         }
-        response = await client.get("/api/admin/studies/", headers=headers)
+        response = await client.get("/api/admin/studies", headers=headers)
         assert response.status_code == 200
         assert any(s["slug"] == seed_study.slug for s in response.json())
 

@@ -54,7 +54,7 @@ class APIClient:
 
         # Fetch workspaces to set X-Workspace-ID header automatically
         print("DEBUG: Fetching workspaces for context...")
-        ws_response = await self.client.get("/api/admin/workspaces/")
+        ws_response = await self.client.get("/api/admin/workspaces")
         if ws_response.status_code == 200:
             workspaces = ws_response.json()
             if workspaces and len(workspaces) > 0:
@@ -82,7 +82,7 @@ class APIClient:
 
     async def create_study(self, data: dict[str, Any]) -> dict[str, Any]:
         """Create a new study."""
-        response = await self.client.post("/api/admin/studies/", json=data)
+        response = await self.client.post("/api/admin/studies", json=data)
         if response.status_code != 201:
             raise Exception(f"Failed to create study: {response.text}")
         return response.json()  # type: ignore

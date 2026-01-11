@@ -50,7 +50,7 @@ class TestWorkspaceRBAC:
             "postsort_config": {},
         }
         response = await client.post(
-            "/api/admin/studies/", json=payload, headers=headers_res
+            "/api/admin/studies", json=payload, headers=headers_res
         )
         assert response.status_code == 201
 
@@ -61,7 +61,7 @@ class TestWorkspaceRBAC:
         }
         payload_view = {**payload, "slug": "view-study"}
         response = await client.post(
-            "/api/admin/studies/", json=payload_view, headers=headers_view
+            "/api/admin/studies", json=payload_view, headers=headers_view
         )
         assert response.status_code == 403
 
