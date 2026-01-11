@@ -35,14 +35,14 @@ const PostSortConfigEditor = () => {
     const gridConfig = draft.grid_config as Array<{ score: number; capacity: number }> | undefined;
     const availableScores = gridConfig?.map((col) => col.score) || [];
 
-    const getPromptText = (key: 'extreme'): string => {
+    const getPromptText = (key: string): string => {
         const prompt = prompts[key];
         if (!prompt) return '';
         if (typeof prompt === 'string') return prompt;
         return prompt[activeLocale] || prompt.en || '';
     };
 
-    const setPromptText = (key: 'extreme', value: string) => {
+    const setPromptText = (key: string, value: string) => {
         updateDraft((d) => {
             if (!d.postsort_config) d.postsort_config = {};
             // biome-ignore lint/suspicious/noExplicitAny: cast to any
@@ -93,6 +93,8 @@ const PostSortConfigEditor = () => {
     };
 
     const unselectedScores = availableScores.filter((s) => !extremeColumns.includes(s));
+    const positiveColumns = extremeColumns.filter((s: number) => s > 0);
+    const negativeColumns = extremeColumns.filter((s: number) => s < 0);
 
     return (
         <div className="space-y-6">
@@ -177,20 +179,37 @@ const PostSortConfigEditor = () => {
                         </div>
                     )}
 
-                    {extremeColumns.length > 0 && (
+                    {positiveColumns.length > 0 && (
                         <div className="pt-6 border-t border-slate-100 space-y-4">
                             <Label
-                                htmlFor="extreme-prompt"
-                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                htmlFor="extreme-prompt-positive"
+                                className="text-[10px] font-black uppercase tracking-wider text-green-700"
                             >
-                                {t('admin.design.postsort.extreme.prompt_label')}
+                                {t('admin.design.postsort.extreme.prompt_label')} (+)
                             </Label>
                             <Textarea
-                                id="extreme-prompt"
-                                value={getPromptText('extreme')}
-                                onChange={(e) => setPromptText('extreme', e.target.value)}
+                                id="extreme-prompt-positive"
+                                value={getPromptText('extreme_positive')}
+                                onChange={(e) => setPromptText('extreme_positive', e.target.value)}
                                 placeholder={t('admin.design.postsort.extreme.prompt_placeholder')}
-                                className="min-h-[100px] rounded-2xl border-slate-200 focus:ring-indigo-500/20 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
+                                className="min-h-[80px] rounded-2xl border-green-100 focus:ring-green-500/20 focus:border-green-500 transition-all bg-green-50/10 text-slate-700 leading-relaxed font-medium"
+                            />
+                        </div>
+                    )}
+                    {negativeColumns.length > 0 && (
+                        <div className="pt-6 border-t border-slate-100 space-y-4">
+                            <Label
+                                htmlFor="extreme-prompt-negative"
+                                className="text-[10px] font-black uppercase tracking-wider text-red-700"
+                            >
+                                {t('admin.design.postsort.extreme.prompt_label')} (-)
+                            </Label>
+                            <Textarea
+                                id="extreme-prompt-negative"
+                                value={getPromptText('extreme_negative')}
+                                onChange={(e) => setPromptText('extreme_negative', e.target.value)}
+                                placeholder={t('admin.design.postsort.extreme.prompt_placeholder')}
+                                className="min-h-[80px] rounded-2xl border-red-100 focus:ring-red-500/20 focus:border-red-500 transition-all bg-red-50/10 text-slate-700 leading-relaxed font-medium"
                             />
                         </div>
                     )}

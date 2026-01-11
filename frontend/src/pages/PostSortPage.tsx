@@ -182,18 +182,22 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
     }, [config, responses.qsort.length, navigate, slug, session.isCompleted, submit]);
 
     // Helper to resolve custom prompts
-    const getPrompt = (key: 'extreme' | 'missing' | 'general', defaultText: string) => {
+    const getPrompt = (keys: string | string[], defaultText: string) => {
         const prompts = config?.postsort_config?.prompts;
-        const promptConfig = prompts?.[key];
+        if (!prompts) return defaultText;
 
-        if (!promptConfig) return defaultText;
+        const keyList = Array.isArray(keys) ? keys : [keys];
 
-        if (typeof promptConfig === 'string') {
-            return promptConfig;
+        for (const key of keyList) {
+            const promptConfig = prompts[key];
+            if (promptConfig) {
+                if (typeof promptConfig === 'string') return promptConfig;
+                const currentLang = i18n.language || 'en';
+                const text = promptConfig[currentLang] || promptConfig.en;
+                if (text) return text;
+            }
         }
-
-        const currentLang = i18n.language || 'en';
-        return promptConfig[currentLang] || promptConfig.en || defaultText;
+        return defaultText;
     };
 
     // Helper for multilingual strings
@@ -397,7 +401,12 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                                         htmlFor={`comment-${card.statementId}`}
                                         className="block text-sm font-semibold text-slate-700 mb-2"
                                     >
-                                        {getPrompt('extreme', t('post.extreme.why'))}
+                                        {getPrompt(
+                                            isPositive
+                                                ? ['extreme_positive', 'extreme']
+                                                : ['extreme_negative', 'extreme'],
+                                            t('post.extreme.why')
+                                        )}
                                     </label>
                                     <textarea
                                         id={`comment-${card.statementId}`}

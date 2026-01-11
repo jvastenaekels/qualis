@@ -13,6 +13,8 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './i18n-test';
 
 /**
  * Custom render helper that wraps components with common providers.
@@ -33,16 +35,30 @@ const createTestQueryClient = () =>
         },
     });
 
+import testResources from './i18n-test-resources';
+
 export const AllTheProviders: React.FC<AllTheProvidersProps> = ({
     children,
     initialEntries = ['/'],
 }) => {
     const queryClient = createTestQueryClient();
+
+    // Defensive: Ensure i18n resources are loaded (they can get cleared between tests)
+    if (
+        !i18n.hasResourceBundle('en', 'translation') ||
+        Object.keys(i18n.store.data.en?.translation || {}).length === 0
+    ) {
+        // Resources got cleared, re-add them
+        i18n.addResourceBundle('en', 'translation', testResources, true, true);
+    }
+
     return (
         <QueryClientProvider client={queryClient}>
-            <MemoryRouter initialEntries={initialEntries}>
-                <LayoutProvider>{children}</LayoutProvider>
-            </MemoryRouter>
+            <I18nextProvider i18n={i18n}>
+                <MemoryRouter initialEntries={initialEntries}>
+                    <LayoutProvider>{children}</LayoutProvider>
+                </MemoryRouter>
+            </I18nextProvider>
         </QueryClientProvider>
     );
 };

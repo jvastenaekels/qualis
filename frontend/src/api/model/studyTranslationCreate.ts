@@ -26,10 +26,7 @@ export interface StudyTranslationCreate {
      * @pattern ^[a-z]{2}(-[A-Z]{2})?$
      */
     language_code: string;
-    /**
-     * @minLength 1
-     * @maxLength 200
-     */
+    /** @maxLength 200 */
     title: string;
     description?: string;
     instructions?: StudyTranslationCreateInstructions;

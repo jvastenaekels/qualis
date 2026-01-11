@@ -27,6 +27,7 @@ import type {
     CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
     GetStudyApiStudySlugGetParams,
     HTTPValidationError,
+    InvitationAccept,
     LogEntry,
     ParticipantDiscardUpdate,
     PasswordChange,
@@ -35,6 +36,8 @@ import type {
     StudyUpdate,
     SubmissionInput,
     TOTPVerify,
+    TestMemberData,
+    TestSeedData,
     UnlockStudyApiStudySlugUnlockPostParams,
     UserCreate,
     UserUpdate,
@@ -911,7 +914,7 @@ export const listStudiesApiAdminStudiesGet = (signal?: AbortSignal) => {
 };
 
 export const getListStudiesApiAdminStudiesGetQueryKey = () => {
-    return [`/api/admin/studies/`] as const;
+    return [`/api/admin/studies`] as const;
 };
 
 export const getListStudiesApiAdminStudiesGetQueryOptions = <
@@ -1328,6 +1331,89 @@ export const useDeleteStudyApiAdminStudiesSlugDelete = <
     TContext
 > => {
     const mutationOptions = getDeleteStudyApiAdminStudiesSlugDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Check if study is ready for activation.
+ * @summary Validate Study
+ */
+export const validateStudyApiAdminStudiesSlugValidatePost = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<string[]>({
+        url: `/api/admin/studies/${slug}/validate`,
+        method: 'POST',
+        signal,
+    });
+};
+
+export const getValidateStudyApiAdminStudiesSlugValidatePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['validateStudyApiAdminStudiesSlugValidatePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return validateStudyApiAdminStudiesSlugValidatePost(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ValidateStudyApiAdminStudiesSlugValidatePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>
+>;
+
+export type ValidateStudyApiAdminStudiesSlugValidatePostMutationError = HTTPValidationError;
+
+/**
+ * @summary Validate Study
+ */
+export const useValidateStudyApiAdminStudiesSlugValidatePost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions = getValidateStudyApiAdminStudiesSlugValidatePostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -2771,6 +2857,93 @@ export function useVerifyInvitationApiAdminInvitationsVerifyGet<
 }
 
 /**
+ * Accept an invitation using an existing account.
+The email in the token must match the current user's email.
+ * @summary Accept Invitation
+ */
+export const acceptInvitationApiAdminInvitationsAcceptPost = (
+    invitationAccept: InvitationAccept,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/invitations/accept`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: invitationAccept,
+        signal,
+    });
+};
+
+export const getAcceptInvitationApiAdminInvitationsAcceptPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+        TError,
+        { data: InvitationAccept },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+    TError,
+    { data: InvitationAccept },
+    TContext
+> => {
+    const mutationKey = ['acceptInvitationApiAdminInvitationsAcceptPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+        { data: InvitationAccept }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return acceptInvitationApiAdminInvitationsAcceptPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AcceptInvitationApiAdminInvitationsAcceptPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>
+>;
+export type AcceptInvitationApiAdminInvitationsAcceptPostMutationBody = InvitationAccept;
+export type AcceptInvitationApiAdminInvitationsAcceptPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Accept Invitation
+ */
+export const useAcceptInvitationApiAdminInvitationsAcceptPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+            TError,
+            { data: InvitationAccept },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+    TError,
+    { data: InvitationAccept },
+    TContext
+> => {
+    const mutationOptions =
+        getAcceptInvitationApiAdminInvitationsAcceptPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * List all users in the system.
  * @summary List Users
  */
@@ -2779,7 +2952,7 @@ export const listUsersApiAdminUsersGet = (signal?: AbortSignal) => {
 };
 
 export const getListUsersApiAdminUsersGetQueryKey = () => {
-    return [`/api/admin/users/`] as const;
+    return [`/api/admin/users`] as const;
 };
 
 export const getListUsersApiAdminUsersGetQueryOptions = <
@@ -3398,7 +3571,7 @@ export const listWorkspacesApiAdminWorkspacesGet = (signal?: AbortSignal) => {
 };
 
 export const getListWorkspacesApiAdminWorkspacesGetQueryKey = () => {
-    return [`/api/admin/workspaces/`] as const;
+    return [`/api/admin/workspaces`] as const;
 };
 
 export const getListWorkspacesApiAdminWorkspacesGetQueryOptions = <
@@ -4814,6 +4987,502 @@ export const useReportLogApiLogsPost = <TError = HTTPValidationError, TContext =
 };
 
 /**
+ * Initialize test database - ensure tables exist
+This is typically handled by app startup, but useful for explicit initialization
+ * @summary Init Test Db
+ */
+export const initTestDbApiTestInitPost = (signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/api/test/init`, method: 'POST', signal });
+};
+
+export const getInitTestDbApiTestInitPostMutationOptions = <
+    TError = unknown,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+        TError,
+        void,
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationKey = ['initTestDbApiTestInitPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+        void
+    > = () => {
+        return initTestDbApiTestInitPost();
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type InitTestDbApiTestInitPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof initTestDbApiTestInitPost>>
+>;
+
+export type InitTestDbApiTestInitPostMutationError = unknown;
+
+/**
+ * @summary Init Test Db
+ */
+export const useInitTestDbApiTestInitPost = <TError = unknown, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+            TError,
+            void,
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationOptions = getInitTestDbApiTestInitPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Seed base test data: user and workspace
+Idempotent - won't create duplicates
+ * @summary Seed Test Data
+ */
+export const seedTestDataApiTestSeedPost = (testSeedData: TestSeedData, signal?: AbortSignal) => {
+    return customInstance<unknown>({
+        url: `/api/test/seed`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: testSeedData,
+        signal,
+    });
+};
+
+export const getSeedTestDataApiTestSeedPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+        TError,
+        { data: TestSeedData },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+    TError,
+    { data: TestSeedData },
+    TContext
+> => {
+    const mutationKey = ['seedTestDataApiTestSeedPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+        { data: TestSeedData }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return seedTestDataApiTestSeedPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type SeedTestDataApiTestSeedPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>
+>;
+export type SeedTestDataApiTestSeedPostMutationBody = TestSeedData;
+export type SeedTestDataApiTestSeedPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Seed Test Data
+ */
+export const useSeedTestDataApiTestSeedPost = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+            TError,
+            { data: TestSeedData },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+    TError,
+    { data: TestSeedData },
+    TContext
+> => {
+    const mutationOptions = getSeedTestDataApiTestSeedPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Add a user to a workspace for testing purposes
+ * @summary Add Test Member
+ */
+export const addTestMemberApiTestMembersPost = (
+    testMemberData: TestMemberData,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/test/members`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: testMemberData,
+        signal,
+    });
+};
+
+export const getAddTestMemberApiTestMembersPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+        TError,
+        { data: TestMemberData },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+    TError,
+    { data: TestMemberData },
+    TContext
+> => {
+    const mutationKey = ['addTestMemberApiTestMembersPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+        { data: TestMemberData }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return addTestMemberApiTestMembersPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AddTestMemberApiTestMembersPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>
+>;
+export type AddTestMemberApiTestMembersPostMutationBody = TestMemberData;
+export type AddTestMemberApiTestMembersPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Add Test Member
+ */
+export const useAddTestMemberApiTestMembersPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+            TError,
+            { data: TestMemberData },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+    TError,
+    { data: TestMemberData },
+    TContext
+> => {
+    const mutationOptions = getAddTestMemberApiTestMembersPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Cleanup test data between tests
+Removes all data except the base test user and workspace
+ * @summary Cleanup Test Data
+ */
+export const cleanupTestDataApiTestCleanupPost = (signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/api/test/cleanup`, method: 'POST', signal });
+};
+
+export const getCleanupTestDataApiTestCleanupPostMutationOptions = <
+    TError = unknown,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+        TError,
+        void,
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationKey = ['cleanupTestDataApiTestCleanupPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+        void
+    > = () => {
+        return cleanupTestDataApiTestCleanupPost();
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CleanupTestDataApiTestCleanupPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>
+>;
+
+export type CleanupTestDataApiTestCleanupPostMutationError = unknown;
+
+/**
+ * @summary Cleanup Test Data
+ */
+export const useCleanupTestDataApiTestCleanupPost = <TError = unknown, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+            TError,
+            void,
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationOptions = getCleanupTestDataApiTestCleanupPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Full cleanup including users and workspaces
+Use at end of test suite
+ * @summary Cleanup All Test Data
+ */
+export const cleanupAllTestDataApiTestCleanupAllPost = (signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/api/test/cleanup-all`, method: 'POST', signal });
+};
+
+export const getCleanupAllTestDataApiTestCleanupAllPostMutationOptions = <
+    TError = unknown,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+        TError,
+        void,
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationKey = ['cleanupAllTestDataApiTestCleanupAllPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+        void
+    > = () => {
+        return cleanupAllTestDataApiTestCleanupAllPost();
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CleanupAllTestDataApiTestCleanupAllPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>
+>;
+
+export type CleanupAllTestDataApiTestCleanupAllPostMutationError = unknown;
+
+/**
+ * @summary Cleanup All Test Data
+ */
+export const useCleanupAllTestDataApiTestCleanupAllPost = <TError = unknown, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+            TError,
+            void,
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationOptions = getCleanupAllTestDataApiTestCleanupAllPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Simple health check for test router
+ * @summary Test Health
+ */
+export const testHealthApiTestHealthGet = (signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/api/test/health`, method: 'GET', signal });
+};
+
+export const getTestHealthApiTestHealthGetQueryKey = () => {
+    return [`/api/test/health`] as const;
+};
+
+export const getTestHealthApiTestHealthGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+    >;
+}) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey = queryOptions?.queryKey ?? getTestHealthApiTestHealthGetQueryKey();
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>> = ({
+        signal,
+    }) => testHealthApiTestHealthGet(signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type TestHealthApiTestHealthGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>
+>;
+export type TestHealthApiTestHealthGetQueryError = unknown;
+
+export function useTestHealthApiTestHealthGet<
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTestHealthApiTestHealthGet<
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTestHealthApiTestHealthGet<
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Test Health
+ */
+
+export function useTestHealthApiTestHealthGet<
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getTestHealthApiTestHealthGetQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * Health check endpoint to verify API availability.
  * @summary Health Check
  */
@@ -5233,7 +5902,7 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
     translations: faker.helpers.arrayElement([
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-            title: faker.string.alpha({ length: { min: 1, max: 200 } }),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
             description: faker.helpers.arrayElement([
                 faker.string.alpha({ length: { min: 10, max: 20 } }),
                 undefined,
@@ -5306,7 +5975,7 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
                         id: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                        title: faker.string.alpha({ length: { min: 1, max: 100 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
                         description: faker.string.alpha({ length: { min: 10, max: 500 } }),
                         icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
                         color: faker.helpers.arrayElement([
@@ -5349,7 +6018,7 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
                         language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-                        text: faker.string.alpha({ length: { min: 1, max: 20 } }),
+                        text: faker.string.alpha({ length: { min: 10, max: 20 } }),
                         id: faker.number.int({ min: undefined, max: undefined }),
                         statement_id: faker.number.int({ min: undefined, max: undefined }),
                     })
@@ -5514,7 +6183,7 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
             Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                 () => ({
                     language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-                    title: faker.string.alpha({ length: { min: 1, max: 200 } }),
+                    title: faker.string.alpha({ length: { min: 10, max: 200 } }),
                     description: faker.helpers.arrayElement([
                         faker.string.alpha({ length: { min: 10, max: 20 } }),
                         undefined,
@@ -5589,7 +6258,7 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                             (_, i) => i + 1
                         ).map(() => ({
                             id: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            title: faker.string.alpha({ length: { min: 1, max: 100 } }),
+                            title: faker.string.alpha({ length: { min: 10, max: 100 } }),
                             description: faker.string.alpha({ length: { min: 10, max: 500 } }),
                             icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
                             color: faker.helpers.arrayElement([
@@ -5636,7 +6305,7 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                             (_, i) => i + 1
                         ).map(() => ({
                             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-                            text: faker.string.alpha({ length: { min: 1, max: 20 } }),
+                            text: faker.string.alpha({ length: { min: 10, max: 20 } }),
                             id: faker.number.int({ min: undefined, max: undefined }),
                             statement_id: faker.number.int({ min: undefined, max: undefined }),
                         })),
@@ -5801,7 +6470,7 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
     translations: faker.helpers.arrayElement([
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-            title: faker.string.alpha({ length: { min: 1, max: 200 } }),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
             description: faker.helpers.arrayElement([
                 faker.string.alpha({ length: { min: 10, max: 20 } }),
                 undefined,
@@ -5874,7 +6543,7 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
                         id: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                        title: faker.string.alpha({ length: { min: 1, max: 100 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
                         description: faker.string.alpha({ length: { min: 10, max: 500 } }),
                         icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
                         color: faker.helpers.arrayElement([
@@ -5917,7 +6586,7 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
                         language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-                        text: faker.string.alpha({ length: { min: 1, max: 20 } }),
+                        text: faker.string.alpha({ length: { min: 10, max: 20 } }),
                         id: faker.number.int({ min: undefined, max: undefined }),
                         statement_id: faker.number.int({ min: undefined, max: undefined }),
                     })
@@ -6081,7 +6750,7 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     translations: faker.helpers.arrayElement([
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-            title: faker.string.alpha({ length: { min: 1, max: 200 } }),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
             description: faker.helpers.arrayElement([
                 faker.string.alpha({ length: { min: 10, max: 20 } }),
                 undefined,
@@ -6154,7 +6823,7 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
                         id: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                        title: faker.string.alpha({ length: { min: 1, max: 100 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
                         description: faker.string.alpha({ length: { min: 10, max: 500 } }),
                         icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
                         color: faker.helpers.arrayElement([
@@ -6197,7 +6866,7 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
                         language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-                        text: faker.string.alpha({ length: { min: 1, max: 20 } }),
+                        text: faker.string.alpha({ length: { min: 10, max: 20 } }),
                         id: faker.number.int({ min: undefined, max: undefined }),
                         statement_id: faker.number.int({ min: undefined, max: undefined }),
                     })
@@ -6247,6 +6916,9 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     ...overrideResponse,
 });
+
+export const getValidateStudyApiAdminStudiesSlugValidatePostResponseMock = (): string[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, () => faker.word.sample());
 
 export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
     overrideResponse: Partial<StudyRead> = {}
@@ -6361,7 +7033,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
     translations: faker.helpers.arrayElement([
         Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
             language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-            title: faker.string.alpha({ length: { min: 1, max: 200 } }),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
             description: faker.helpers.arrayElement([
                 faker.string.alpha({ length: { min: 10, max: 20 } }),
                 undefined,
@@ -6434,7 +7106,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
                         id: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                        title: faker.string.alpha({ length: { min: 1, max: 100 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
                         description: faker.string.alpha({ length: { min: 10, max: 500 } }),
                         icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
                         color: faker.helpers.arrayElement([
@@ -6477,7 +7149,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
                 Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
                     () => ({
                         language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
-                        text: faker.string.alpha({ length: { min: 1, max: 20 } }),
+                        text: faker.string.alpha({ length: { min: 10, max: 20 } }),
                         id: faker.number.int({ min: undefined, max: undefined }),
                         statement_id: faker.number.int({ min: undefined, max: undefined }),
                     })
@@ -7121,7 +7793,7 @@ export const getCreateStudyApiAdminStudiesPostMockHandler = (
     options?: RequestHandlerOptions
 ) => {
     return http.post(
-        '*/api/admin/studies/',
+        '*/api/admin/studies',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -7147,7 +7819,7 @@ export const getListStudiesApiAdminStudiesGetMockHandler = (
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/api/admin/studies/',
+        '*/api/admin/studies',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -7227,6 +7899,30 @@ export const getDeleteStudyApiAdminStudiesSlugDeleteMockHandler = (
                 await overrideResponse(info);
             }
             return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getValidateStudyApiAdminStudiesSlugValidatePostMockHandler = (
+    overrideResponse?:
+        | string[]
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<string[]> | string[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:slug/validate',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getValidateStudyApiAdminStudiesSlugValidatePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -7453,6 +8149,24 @@ export const getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler = (
     );
 };
 
+export const getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/invitations/accept',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
 export const getListUsersApiAdminUsersGetMockHandler = (
     overrideResponse?:
         | UserRead[]
@@ -7462,7 +8176,7 @@ export const getListUsersApiAdminUsersGetMockHandler = (
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/api/admin/users/',
+        '*/api/admin/users',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -7486,7 +8200,7 @@ export const getCreateUserApiAdminUsersPostMockHandler = (
     options?: RequestHandlerOptions
 ) => {
     return http.post(
-        '*/api/admin/users/',
+        '*/api/admin/users',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -7600,7 +8314,7 @@ export const getListWorkspacesApiAdminWorkspacesGetMockHandler = (
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/api/admin/workspaces/',
+        '*/api/admin/workspaces',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -7626,7 +8340,7 @@ export const getCreateWorkspaceApiAdminWorkspacesPostMockHandler = (
     options?: RequestHandlerOptions
 ) => {
     return http.post(
-        '*/api/admin/workspaces/',
+        '*/api/admin/workspaces',
         async (info) => {
             return new HttpResponse(
                 JSON.stringify(
@@ -7899,6 +8613,114 @@ export const getReportLogApiLogsPostMockHandler = (
     );
 };
 
+export const getInitTestDbApiTestInitPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/init',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getSeedTestDataApiTestSeedPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/seed',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getAddTestMemberApiTestMembersPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/members',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getCleanupTestDataApiTestCleanupPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/cleanup',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getCleanupAllTestDataApiTestCleanupAllPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/cleanup-all',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getTestHealthApiTestHealthGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/test/health',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
 export const getHealthCheckHealthGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -7948,6 +8770,7 @@ export const getOpenQAPIMock = () => [
     getGetStudyApiAdminStudiesSlugGetMockHandler(),
     getUpdateStudyApiAdminStudiesSlugPatchMockHandler(),
     getDeleteStudyApiAdminStudiesSlugDeleteMockHandler(),
+    getValidateStudyApiAdminStudiesSlugValidatePostMockHandler(),
     getChangeStudyStateApiAdminStudiesSlugStatePostMockHandler(),
     getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler(),
     getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),
@@ -7958,6 +8781,7 @@ export const getOpenQAPIMock = () => [
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),
     getGetStudyDumpApiAdminStudiesSlugDumpGetMockHandler(),
     getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler(),
+    getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler(),
     getListUsersApiAdminUsersGetMockHandler(),
     getCreateUserApiAdminUsersPostMockHandler(),
     getDeleteUserApiAdminUsersUserIdDeleteMockHandler(),
@@ -7978,6 +8802,12 @@ export const getOpenQAPIMock = () => [
     getUnlockStudyApiStudySlugUnlockPostMockHandler(),
     getRecordConsentApiStudySlugConsentPostMockHandler(),
     getReportLogApiLogsPostMockHandler(),
+    getInitTestDbApiTestInitPostMockHandler(),
+    getSeedTestDataApiTestSeedPostMockHandler(),
+    getAddTestMemberApiTestMembersPostMockHandler(),
+    getCleanupTestDataApiTestCleanupPostMockHandler(),
+    getCleanupAllTestDataApiTestCleanupAllPostMockHandler(),
+    getTestHealthApiTestHealthGetMockHandler(),
     getHealthCheckHealthGetMockHandler(),
     getServeSpaFullPathGetMockHandler(),
 ];

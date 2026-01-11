@@ -14,6 +14,5 @@ export interface StatementTranslationCreate {
      * @pattern ^[a-z]{2}(-[A-Z]{2})?$
      */
     language_code: string;
-    /** @minLength 1 */
     text: string;
 }

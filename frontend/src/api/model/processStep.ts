@@ -12,10 +12,7 @@ import type { ProcessStepColor } from './processStepColor';
 export interface ProcessStep {
     /** Unique ID for DND and tracking */
     id: string;
-    /**
-     * @minLength 1
-     * @maxLength 100
-     */
+    /** @maxLength 100 */
     title: string;
     /** @maxLength 500 */
     description: string;

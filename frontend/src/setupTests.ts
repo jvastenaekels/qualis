@@ -15,41 +15,18 @@ import { useConfigStore } from './store/useConfigStore';
 import { useResponseStore } from './store/useResponseStore';
 import { useSessionStore } from './store/useSessionStore';
 import { useUIStore } from './store/useUIStore';
+import { useStudyDesigner } from './store/useStudyDesigner';
 import { server } from './test-utils/server';
-// Mock react-i18next globally
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => key,
-        i18n: {
-            changeLanguage: () => new Promise(() => {}),
-            language: 'en',
-            addResourceBundle: vi.fn(),
-            t: (key: string) => key,
-        },
-    }),
-    initReactI18next: {
-        type: '3rdParty',
-        init: () => {},
-    },
-    Trans: ({ children }: React.PropsWithChildren) => {
-        return children || null;
-    },
-}));
+// Initialize i18n for tests (side effect - this sets up the singleton)
+import './test-utils/i18n-test';
 
-// Mock local i18n module
-vi.mock('./i18n', () => ({
-    default: {
-        changeLanguage: vi.fn().mockImplementation(() => Promise.resolve()),
-        language: 'en',
-        addResourceBundle: vi.fn().mockReturnThis(),
-        removeResourceBundle: vi.fn().mockReturnThis(),
-        reloadResources: vi.fn().mockImplementation(() => Promise.resolve()),
-        init: vi.fn().mockReturnValue(Promise.resolve()),
-        use: vi.fn().mockReturnThis(),
-        t: (key: string) => key,
-    },
-    t: (key: string) => key,
-}));
+// Mock the app's i18n module to prevent the real i18n.ts from running
+// This is crucial because i18n.ts uses HttpBackend which fails in tests
+vi.mock('./i18n', async () => {
+    // This runs lazily when ./i18n is first imported
+    const testI18n = await import('./test-utils/i18n-test');
+    return { default: testI18n.default };
+});
 
 // Polyfill ResizeObserver
 vi.stubGlobal(
@@ -87,6 +64,16 @@ afterEach(() => {
     useResponseStore.getState().resetResponses();
     useSessionStore.getState().resetSession();
     useUIStore.getState().setHoveredCard(null);
+    // Reset StudyDesigner store
+    useStudyDesigner.setState({
+        draft: null,
+        original: null,
+        activeStep: 'intro',
+        activeSubStep: 'statements',
+        activeLocale: 'en',
+        syncStatus: 'synced',
+        lastSavedAt: null,
+    });
 });
 afterAll(() => server.close());
 
