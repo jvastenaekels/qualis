@@ -26,10 +26,12 @@ def main():
     # Write to root openapi.json
     with open('openapi.json', 'w') as f:
         json.dump(schema, f, indent=2)
+        f.write('\n')
 
     # Write to frontend openapi.json
     with open('frontend/openapi.json', 'w') as f:
         json.dump(schema, f, indent=2)
+        f.write('\n')
 
     print("OpenAPI schema exported successfully to openapi.json and frontend/openapi.json")
 
