@@ -4,32 +4,40 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { render, screen, fireEvent } from '@/test-utils/test-utils';
 import { ApiError } from '../api/client';
 import ErrorPage from './ErrorPage';
 
-const mockResetSession = vi.fn();
-const mockResetConfig = vi.fn();
-const mockResetResponses = vi.fn();
-const mockNavigate = vi.fn();
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+    }),
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+const mocks = vi.hoisted(() => ({
+    resetSession: vi.fn(),
+    resetConfig: vi.fn(),
+    resetResponses: vi.fn(),
+    navigate: vi.fn(),
+}));
 
 // Mocks
-
 vi.mock('../store/useSessionStore', () => ({
     useSessionStore: {
-        getState: () => ({ resetSession: mockResetSession }),
+        getState: () => ({ resetSession: mocks.resetSession }),
     },
 }));
 vi.mock('../store/useConfigStore', () => ({
     useConfigStore: {
-        getState: () => ({ resetConfig: mockResetConfig }),
+        getState: () => ({ resetConfig: mocks.resetConfig }),
     },
 }));
 vi.mock('../store/useResponseStore', () => ({
     useResponseStore: {
-        getState: () => ({ resetResponses: mockResetResponses }),
+        getState: () => ({ resetResponses: mocks.resetResponses }),
     },
 }));
 
@@ -37,7 +45,7 @@ vi.mock('react-router-dom', async () => {
     const actual = await vi.importActual('react-router-dom');
     return {
         ...actual,
-        useNavigate: () => mockNavigate,
+        useNavigate: () => mocks.navigate,
     };
 });
 
@@ -65,8 +73,10 @@ describe('ErrorPage', () => {
             </MemoryRouter>
         );
         // "common.errors.default_title" matches mock translation key
-        expect(screen.getByText('Oops! Something went wrong.')).toBeInTheDocument();
-        expect(screen.getByText('An unexpected error occurred.')).toBeInTheDocument();
+        expect(screen.getByText('common.errors.default_title')).toBeInTheDocument();
+        expect(screen.getByText('common.errors.unknown')).toBeInTheDocument();
+        expect(screen.getByText('common.errors.reset')).toBeInTheDocument();
+        expect(screen.getByText('common.errors.home')).toBeInTheDocument();
     });
 
     it('renders specific 404 UI', () => {
@@ -75,7 +85,8 @@ describe('ErrorPage', () => {
                 <ErrorPage error={new ApiError(404, 'Not found')} />
             </MemoryRouter>
         );
-        expect(screen.getByText('Page Not Found')).toBeInTheDocument();
+        expect(screen.getByText('common.errors.404.title')).toBeInTheDocument();
+        expect(screen.queryByText('common.errors.retry')).not.toBeInTheDocument();
         expect(screen.queryByText('Oops! Something went wrong.')).not.toBeInTheDocument();
     });
 
@@ -87,12 +98,12 @@ describe('ErrorPage', () => {
         );
 
         // Button text is now from translation keys
-        const resetButton = screen.getByRole('button', { name: 'Reset Session' });
+        const resetButton = screen.getByRole('button', { name: 'common.errors.reset' });
         fireEvent.click(resetButton);
 
-        expect(mockResetSession).toHaveBeenCalled();
-        expect(mockResetConfig).toHaveBeenCalled();
-        expect(mockResetResponses).toHaveBeenCalled();
+        expect(mocks.resetSession).toHaveBeenCalled();
+        expect(mocks.resetConfig).toHaveBeenCalled();
+        expect(mocks.resetResponses).toHaveBeenCalled();
         expect(window.location.href).toBe('/');
     });
 
@@ -104,7 +115,7 @@ describe('ErrorPage', () => {
             </MemoryRouter>
         );
 
-        const retryButton = screen.getByRole('button', { name: 'Retry' });
+        const retryButton = screen.getByRole('button', { name: 'common.errors.retry' });
         fireEvent.click(retryButton);
         expect(onRetry).toHaveBeenCalled();
     });

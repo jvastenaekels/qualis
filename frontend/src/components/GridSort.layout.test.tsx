@@ -43,6 +43,10 @@ vi.mock('./ReadingZone', () => ({
     ),
 }));
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+}));
+
 describe('GridSort Detailed UI Verification', () => {
     const defaultProps = {
         agreeCards: [],

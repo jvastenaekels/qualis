@@ -14,20 +14,40 @@ import { renderWithProviders } from '../test-utils/test-utils';
 import StudyLayout from './StudyLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
 
+const mocks = vi.hoisted(() => ({
+    changeLanguage: vi.fn(),
+    navigate: vi.fn(),
+    retry: vi.fn(),
+}));
+
 // Mock dependencies
 // i18n is already being mocked globally in setupTests.ts for some things, but here we mock specifically.
 vi.mock('../i18n', () => ({
     default: {
-        changeLanguage: vi.fn(),
+        changeLanguage: mocks.changeLanguage,
         language: 'en',
     },
-    // Adding named export for useTranslation if needed, but it's mocked in layout
     t: (key: string) => key,
+}));
+
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+        i18n: {
+            changeLanguage: mocks.changeLanguage,
+            language: 'en',
+        },
+    }),
+    initReactI18next: {
+        type: '3rdParty',
+        init: () => {},
+    },
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock useStudyConfig since it's used in StudyLayout
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() })),
+    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: mocks.retry })),
 }));
 
 describe('StudyLayout Language Sync', () => {

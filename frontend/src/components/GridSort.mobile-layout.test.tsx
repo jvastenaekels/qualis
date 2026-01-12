@@ -16,6 +16,11 @@ vi.mock('@dnd-kit/sortable', () => ({
     rectSortingStrategy: {},
 }));
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 // Mock SortableCard to check props passed to it
 // Define the expected props for SortableCard
 interface SortableCardProps {
@@ -44,7 +49,6 @@ vi.mock('./DroppableSlot', () => ({
 }));
 
 // Mock ResizeObserver
-// Mock ResizeObserver
 class ResizeObserverMock {
     observe = vi.fn();
     unobserve = vi.fn();
@@ -52,7 +56,7 @@ class ResizeObserverMock {
 }
 vi.stubGlobal('ResizeObserver', ResizeObserverMock);
 
-describe('GridSort Mobile Layout Refinements', () => {
+describe('FineSortPage Mobile Interaction (Integration)', () => {
     const defaultProps = {
         agreeCards: [],
         disagreeCards: [{ id: 1, text: 'Card 1' }],

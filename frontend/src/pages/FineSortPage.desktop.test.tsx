@@ -42,6 +42,7 @@ describe('FineSortPage Desktop Layout (Integration)', () => {
                 { score: 0, capacity: 1 },
                 { score: 1, capacity: 1 },
             ],
+            // biome-ignore lint/suspicious/noExplicitAny: partial mock
         } as any);
 
         renderWithProviders(

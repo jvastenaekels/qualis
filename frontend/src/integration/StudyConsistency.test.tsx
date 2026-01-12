@@ -27,6 +27,7 @@ vi.mock('react-i18next', () => ({
             language: 'en',
         },
     }),
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock Router params

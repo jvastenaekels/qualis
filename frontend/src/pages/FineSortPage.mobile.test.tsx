@@ -14,6 +14,11 @@ import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test-utils/test-utils';
 import FineSortPage from './FineSortPage';
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 describe('FineSortPage Mobile Interaction (Integration)', () => {
     beforeEach(() => {
         // Setup initial session state for the test

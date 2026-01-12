@@ -9,6 +9,14 @@ import type { StudyConfig } from '../schemas/study';
 import { renderWithProviders, screen, setupStoreMocks } from '../test-utils/test-utils';
 import FineSortPage from './FineSortPage';
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+    Trans: ({ children, i18nKey }: { children: React.ReactNode; i18nKey?: string }) =>
+        children || i18nKey,
+    initReactI18next: { type: '3rdParty', init: () => {} },
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 const mockConfig: StudyConfig = {
     slug: 'demo',
     title: 'Test',
@@ -38,12 +46,6 @@ vi.mock('../hooks/useStudyConfig', () => ({
 }));
 
 // Mock translation
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
-    Trans: ({ children, i18nKey }: { children: React.ReactNode; i18nKey?: string }) =>
-        children || i18nKey,
-    initReactI18next: { type: '3rdParty', init: () => {} },
-}));
 
 // Mock GridSort
 vi.mock('../components/GridSort', () => ({

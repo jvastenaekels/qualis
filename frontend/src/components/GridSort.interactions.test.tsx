@@ -16,6 +16,11 @@ vi.mock('@dnd-kit/sortable', () => ({
     rectSortingStrategy: {},
 }));
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 vi.mock('./SortableCard', () => ({
     default: ({
         text,

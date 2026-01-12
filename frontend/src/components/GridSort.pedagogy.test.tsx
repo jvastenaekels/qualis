@@ -32,6 +32,7 @@ vi.mock('./DroppableSlot', () => ({
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
     initReactI18next: { type: '3rdParty', init: () => {} },
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock useUIStore
