@@ -187,7 +187,7 @@ describe('ConditionOfInstructionEditor', () => {
             fireEvent.click(toggle);
 
             // Add content
-            const textarea = screen.getByRole('textbox');
+            const textarea = screen.getByLabelText(/Pre-instruction Content/i);
             fireEvent.change(textarea, { target: { value: 'My instruction' } });
 
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure
