@@ -1,4 +1,3 @@
-
 import sys
 import os
 import json
@@ -12,7 +11,12 @@ os.environ["SECRET_KEY"] = "dummy"
 
 from app.main import app
 
-openapi_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "..", "frontend", "openapi.json")
+openapi_path = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "..",
+    "frontend",
+    "openapi.json",
+)
 
 print(f"Dumping OpenAPI schema to {openapi_path}...")
 with open(openapi_path, "w") as f:

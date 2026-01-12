@@ -45,12 +45,25 @@ async def http_exception_handler(request: Request, exc: Exception) -> JSONRespon
         code = "unauthorized"
     elif exc.status_code == 403:
         code = "forbidden"
+    elif exc.status_code == 409:
+        code = "conflict"
+
+    message = str(exc.detail)
+    details = None
+
+    if isinstance(exc.detail, dict):
+        message = exc.detail.get("message", message)
+        details = exc.detail.get("details", None)
+        # If 'details' was not explicitly provided but we have other keys, 
+        # use the whole dict as details (minus message if redundant)
+        if details is None:
+            details = {k: v for k, v in exc.detail.items() if k != "message"}
 
     return create_error_response(
         status_code=exc.status_code,
         code=code,
-        message=str(exc.detail),
-        details=None,
+        message=message,
+        details=details,
     )
 
 

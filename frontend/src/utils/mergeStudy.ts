@@ -1,6 +1,4 @@
-
 import type { StudyUpdate } from '@/api/model';
-
 
 export interface MergeResult {
     success: boolean;
@@ -28,10 +26,10 @@ export function mergeStudyUpdates(
 
     // Fields to ignore or handle specially
     const ignoredFields = ['last_updated_at', 'translations', 'statements', 'grid_config'];
-    
+
     // 1. Simple Fields
     const keys = Object.keys(local) as (keyof StudyUpdate)[];
-    
+
     for (const key of keys) {
         if (ignoredFields.includes(key)) continue;
 
@@ -45,7 +43,7 @@ export function mergeStudyUpdates(
         if (serverChanged) {
             if (!localChanged) {
                 // Safe update: Server changed, Local didn't. Accept Server.
-                // @ts-ignore
+                // @ts-expect-error
                 merged[key] = server[key];
             } else if (localVal !== serverVal) {
                 // Conflict: Both changed to different values
@@ -62,7 +60,7 @@ export function mergeStudyUpdates(
                 conflicts.push('grid_config');
             }
         } else {
-             merged.grid_config = server.grid_config;
+            merged.grid_config = server.grid_config;
         }
     }
 
@@ -71,20 +69,20 @@ export function mergeStudyUpdates(
     // If server added/removed, and local added/removed...
     // Strategy: Union of codes.
     // If conflict on content (text) for same code -> Flag conflict.
-    
+
     // TODO: Complex array merging logic.
     // For "Super Friendly" v1, let's be conservative:
     // If BOTH touched the statements list, flag conflict.
     // Ideally we dive deep, but let's see.
-    
+
     const localStatementsJson = JSON.stringify(local.statements);
     const baseStatementsJson = JSON.stringify(baseline.statements);
     const serverStatementsJson = JSON.stringify(server.statements);
-    
+
     if (serverStatementsJson !== baseStatementsJson) {
         if (localStatementsJson !== baseStatementsJson) {
             if (localStatementsJson !== serverStatementsJson) {
-                conflicts.push('statements'); 
+                conflicts.push('statements');
                 // We could implement smarter merge here later
             }
         } else {
@@ -98,15 +96,15 @@ export function mergeStudyUpdates(
     const serverTransJson = JSON.stringify(server.translations);
 
     if (serverTransJson !== baseTransJson) {
-         if (localTransJson !== baseTransJson) {
-             if (localTransJson !== serverTransJson) {
-                 conflicts.push('translations'); 
-             }
-         } else {
-             merged.translations = server.translations;
-         }
+        if (localTransJson !== baseTransJson) {
+            if (localTransJson !== serverTransJson) {
+                conflicts.push('translations');
+            }
+        } else {
+            merged.translations = server.translations;
+        }
     }
-    
+
     // Always take the server's timestamp
     merged.last_updated_at = server.last_updated_at;
 

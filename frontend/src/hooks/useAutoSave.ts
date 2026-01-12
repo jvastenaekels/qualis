@@ -11,8 +11,15 @@ import { toast } from 'sonner';
  */
 export function useAutoSave(debounceMs = 2000) {
     const { slug } = useParams<{ slug: string }>();
-    const { draft, original, syncStatus, setSyncStatus, setLastSavedAt, updateOriginal, updateDraft } =
-        useStudyDesigner();
+    const {
+        draft,
+        original,
+        syncStatus,
+        setSyncStatus,
+        setLastSavedAt,
+        updateOriginal,
+        updateDraft,
+    } = useStudyDesigner();
 
     const updateMutation = useUpdateStudyApiAdminStudiesSlugPatch();
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -106,27 +113,34 @@ export function useAutoSave(debounceMs = 2000) {
                     }
 
                     // Optimistic Locking: 409 Conflict
-                    if (error?.response?.status === 409 && error.response.data?.detail?.server_state) {
+                    if (
+                        error?.response?.status === 409 &&
+                        error.response.data?.details?.server_state
+                    ) {
                         try {
-                            const serverRead = error.response.data.detail.server_state;
+                            const serverRead = error.response.data.details.server_state;
                             const serverUpdate = projectStudyToUpdate(serverRead);
                             const originalUpdate = original ? projectStudyToUpdate(original) : null;
 
-                            const mergeResult = mergeStudyUpdates(draft, serverUpdate, originalUpdate);
+                            const mergeResult = mergeStudyUpdates(
+                                draft,
+                                serverUpdate,
+                                originalUpdate
+                            );
 
                             if (mergeResult.success && mergeResult.merged) {
                                 toast.info('Synced with concurrent changes from another user');
-                                
+
                                 // 1. Update Baseline
                                 updateOriginal(serverRead);
-                                
+
                                 // 2. Update Draft with Merged Content
                                 // We use a special update to replace everything
                                 updateDraft((d) => {
                                     // Clear existing keys to ensure removal works
                                     // Though Immer might prefer just setting properties
-                                    Object.keys(d).forEach(k => {
-                                        // @ts-ignore
+                                    Object.keys(d).forEach((k) => {
+                                        // @ts-expect-error
                                         if (mergeResult.merged[k] === undefined) delete d[k];
                                     });
                                     Object.assign(d, mergeResult.merged);
@@ -145,7 +159,7 @@ export function useAutoSave(debounceMs = 2000) {
                                 return;
                             }
                         } catch (mergeError) {
-                            console.error("Auto-merge failed", mergeError);
+                            console.error('Auto-merge failed', mergeError);
                         }
                     }
 

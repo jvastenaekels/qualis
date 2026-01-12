@@ -226,6 +226,7 @@ async def update_study(
         # We subtract a small buffer (e.g. 1 second) might be unsafe, strict is better.
         if study.updated_at > study_update.last_updated_at:
             from app.services.study_service import StudyService
+
             # Fetch full fresh state to return to client
             fresh_study = await StudyService.get_study_by_slug(db, study.slug)
             if fresh_study:
@@ -233,8 +234,10 @@ async def update_study(
                     status_code=status.HTTP_409_CONFLICT,
                     detail={
                         "message": "Study has been modified by another user.",
-                        "server_state": jsonable_encoder(StudyRead.model_validate(fresh_study))
-                    }
+                        "server_state": jsonable_encoder(
+                            StudyRead.model_validate(fresh_study)
+                        ),
+                    },
                 )
 
     # 1. Update basic fields
