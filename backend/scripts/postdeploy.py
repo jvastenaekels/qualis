@@ -46,11 +46,11 @@ def main():
     os.chdir(backend_dir)
     print(f"[PostDeploy] CWD set to: {os.getcwd()}")
 
-    # 1. Initialize Database
-    run_task("init_db.py", "Infrastructure Initialization")
-
-    # 1.5. Run Migrations
+    # 1. Run Migrations (Safe to run first now)
     run_task("scripts/migrate.py", "Database Schema Migration")
+
+    # 2. Initialize Database (Create missing tables)
+    run_task("init_db.py", "Infrastructure Initialization")
 
     # 2. Sync Study Configuration
     if os.path.exists("data/example-study.json"):

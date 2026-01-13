@@ -526,11 +526,11 @@ async def verify_workspace_tables():
 
         for table in required_tables:
             if not await check_table_exists(conn, table):
-                logger.error(f"✗ Missing required table: {table}")
-                logger.error("  Run 'uv run python init_db.py' to initialize database")
-                sys.exit(1)
+                logger.warning(f"  Missing required table: {table}")
+                return False
 
         logger.info("✓ Workspace tables verified")
+        return True
 
 
 async def run_all_migrations():
@@ -542,7 +542,11 @@ async def run_all_migrations():
     try:
         async with MigrationEngine(engine):
             # First verify core tables exist
-            await verify_workspace_tables()
+            if not await verify_workspace_tables():
+                logger.warning(
+                    "Skipping migrations: Workspace tables missing (init_db will create them)."
+                )
+                return
 
             # Then apply column migrations
             await migrate_studies_table()
