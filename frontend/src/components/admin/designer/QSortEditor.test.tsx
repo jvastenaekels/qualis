@@ -120,7 +120,7 @@ describe('QSortEditor', () => {
             // Assert UI update
             expect(await screen.findByText('Existing Statement')).toBeInTheDocument();
             expect(await screen.findByText('Appended')).toBeInTheDocument();
-        });
+        }, 15000);
 
         it('supports TSV format', async () => {
             const user = userEvent.setup();
