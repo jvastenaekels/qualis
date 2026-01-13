@@ -290,12 +290,14 @@ const StudyDesignPage = () => {
 
     const checklist = [
         {
-            label: t('admin.design.checklist.welcome', 'Welcome & Consent defined'),
+            label: t('admin.design.checklist.title', 'Study Title defined'),
+            isComplete: !!currentTranslation?.title,
+            required: true,
+        },
+        {
+            label: t('admin.design.checklist.consent', 'Consent Form defined'),
             isComplete: !!(
-                currentTranslation?.title &&
-                currentTranslation?.objective &&
-                currentTranslation?.consent_title &&
-                currentTranslation?.consent_description
+                currentTranslation?.consent_title && currentTranslation?.consent_description
             ),
             required: true,
         },
@@ -325,7 +327,6 @@ const StudyDesignPage = () => {
         .map((tr: any) => {
             const isTranslationComplete = !!(
                 tr.title &&
-                tr.objective &&
                 tr.consent_title &&
                 tr.consent_description &&
                 tr.condition_of_instruction
