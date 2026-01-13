@@ -300,6 +300,11 @@ const StudyDesignPage = () => {
             required: true,
         },
         {
+            label: t('admin.design.checklist.instructions', 'Instructions set'),
+            isComplete: !!currentTranslation?.condition_of_instruction,
+            required: true,
+        },
+        {
             label: t('admin.design.checklist.statements', 'Statements defined'),
             isComplete: (draft.statements?.length || 0) > 0,
             required: true,
@@ -309,12 +314,27 @@ const StudyDesignPage = () => {
             isComplete: isGridValid,
             required: true,
         },
-        {
-            label: t('admin.design.checklist.instructions', 'Instructions set'),
-            isComplete: !!currentTranslation?.condition_of_instruction,
-            required: true,
-        },
     ];
+
+    // Calculate readiness for all languages for the global indicator
+    const globalRequirementsMet = (draft.statements?.length || 0) > 0 && isGridValid;
+    const languageReadiness = (draft.translations || [])
+        // biome-ignore lint/suspicious/noExplicitAny: duck typing
+        .filter((t: any) => !t.is_disabled)
+        // biome-ignore lint/suspicious/noExplicitAny: duck typing
+        .map((tr: any) => {
+            const isTranslationComplete = !!(
+                tr.title &&
+                tr.objective &&
+                tr.consent_title &&
+                tr.consent_description &&
+                tr.condition_of_instruction
+            );
+            return {
+                code: tr.language_code,
+                isReady: globalRequirementsMet && isTranslationComplete,
+            };
+        });
 
     const completedRequiredCount = checklist.filter(
         (item) => item.required && item.isComplete
@@ -872,6 +892,41 @@ const StudyDesignPage = () => {
                                               'Complete the required steps above to enable study activation.'
                                           )}
                                 </p>
+                            </div>
+                        </div>
+
+                        <div className="pt-6 border-t border-slate-100">
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">
+                                {t('admin.design.checklist.languages', 'Languages')}
+                            </h4>
+                            <div className="space-y-2">
+                                {languageReadiness.map((lang) => (
+                                    <div
+                                        key={lang.code}
+                                        className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs font-black uppercase text-slate-700">
+                                                {lang.code}
+                                            </span>
+                                        </div>
+                                        {lang.isReady ? (
+                                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md">
+                                                <CheckCircle className="h-3 w-3" />
+                                                <span className="text-[10px] font-bold uppercase tracking-wide">
+                                                    Ready
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md">
+                                                <CircleDashed className="h-3 w-3" />
+                                                <span className="text-[10px] font-bold uppercase tracking-wide">
+                                                    Pending
+                                                </span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
 
