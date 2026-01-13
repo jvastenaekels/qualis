@@ -1,236 +1,242 @@
 # Testing Guide
 
-Open-Q uses a comprehensive testing strategy covering unit tests, integration tests, and end-to-end tests.
+Open-Q uses a comprehensive testing strategy covering unit tests, integration tests, and end-to-end (E2E) tests. We prioritize **automation** and **reliability** to ensure the platform remains stable as it evolves.
 
 ---
 
-## Test Stack
+## 🛠️ Test Stack
 
-| Layer           | Tool                     | Purpose                    |
-| --------------- | ------------------------ | -------------------------- |
-| **Unit**        | Vitest                   | Component and hook testing |
-| **Integration** | Vitest + Testing Library | Page-level testing         |
-| **E2E**         | Playwright               | Full browser automation    |
-| **Backend**     | pytest                   | API and database testing   |
+| Layer           | Tool                     | Purpose                                    |
+| --------------- | ------------------------ | ------------------------------------------ |
+| **Unit**        | Vitest                   | Component, hook, and utility logic testing |
+| **Integration** | Vitest + Testing Library | Page-level and complex flow testing        |
+| **E2E**         | Playwright               | Full browser automation and critical paths |
+| **Backend**     | pytest                   | API endpoints, database models, and logic  |
+| **Static**      | Biome / Ruff / Mypy      | Linting, formatting, and type checking     |
 
 ---
 
-## Frontend Tests
+## 🚀 Quick Start (Make Commands)
 
-### Running Tests
+The easiest way to run tests is via the project's `Makefile`.
+
+```bash
+# Run backend and frontend unit/integration tests
+make test
+
+# Run full E2E suite (requires backend running?) - No, `make e2e` spins up its own environment
+make e2e
+
+# Run Fast CI checks (Lint, Types, Unit Tests) - Recommended before push
+make ci
+
+# Run Full CI checks (Fast CI + E2E)
+make ci-full
+```
+
+---
+
+## ⚛️ Frontend Tests
+
+### Directory Structure
+
+```
+frontend/src/
+├── pages/                  # Page components
+│   └── __tests__/          # (Optional) specific unit tests
+├── components/             # Reusable components
+│   └── __tests__/          # (Optional) specific unit tests
+├── integration/            # Integration tests (Page flows, complex interactions)
+│   ├── StudyFlow.test.tsx
+│   └── ...
+├── test-utils/             # Test utilities and providers
+│   ├── test-utils.tsx      # Main export
+│   └── handlers.ts         # MSW Handlers
+└── ...
+```
+
+### Running Frontend Tests Manually
 
 ```bash
 cd frontend
 
-# Run all unit/integration tests
+# Run all tests
 npm test
 
-# Run in watch mode
+# Run in watch mode (interactive)
 npm run test -- --watch
 
-# Run with coverage
+# Run with coverage report
 npm run test -- --coverage
 ```
 
-### Test Structure
+### Writing Integration Tests
 
-```
-frontend/src/
-├── pages/
-│   ├── WelcomePage.test.tsx
-│   ├── PreSortPage.test.tsx
-│   ├── RoughSortPage.test.tsx
-│   ├── FineSortPage.test.tsx
-│   └── PostSortPage.test.tsx
-├── components/
-│   ├── GridSort.test.tsx
-│   ├── GridSort.tips.test.tsx
-│   ├── SortableCard.test.tsx
-│   └── CardPile.test.tsx
-├── hooks/
-│   └── useStudyConfig.test.tsx
-└── store/
-    └── useStudyStore.test.ts
-```
-
-### Writing Tests
+Use the provided utilities in `src/test-utils/test-utils.tsx` to wrap components with necessary providers (Router, QueryClient, Store).
 
 ```tsx
-import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
-import { useConfigStore } from "../store/useConfigStore";
+import { describe, it, expect } from "vitest";
+import {
+  renderWithProviders,
+  setupStoreMocks,
+  screen,
+} from "../test-utils/test-utils";
+import { MyComponent } from "./MyComponent";
 
-describe("MyComponent", () => {
-  beforeEach(() => {
-    // Reset stores before each test
-    useConfigStore.getState().reset();
-  });
+describe("MyComponent Integration", () => {
+  it("renders with specific store state", () => {
+    // 1. Setup Mock State
+    setupStoreMocks({
+      useConfigStore: { config: { title: "Test Study" } },
+      useResponseStore: { rough: { history: [] } },
+    });
 
-  it("renders correctly", () => {
-    render(<MyComponent />);
-    expect(screen.getByText("Expected Text")).toBeInTheDocument();
+    // 2. Render with Providers
+    renderWithProviders(<MyComponent />);
+
+    // 3. Assert
+    expect(screen.getByText("Test Study")).toBeInTheDocument();
   });
 });
 ```
 
+**Best Practices:**
+
+1.  **Prefer Integration over Unit**: Test page flows and component interactions rather than implementation details.
+2.  **Mock specific slices**: Use `setupStoreMocks` to isolate the state you are testing.
+3.  **Avoid testing libraries internals**: Don't test that `zustand` works; test that your component reacts to state changes.
+
 ---
 
-## E2E Tests (Playwright)
+## 🎭 E2E Tests (Playwright)
+
+End-to-End tests run against a **real backend** and a **real database**.
 
 ### Running E2E Tests
 
+The robust way is via `make`:
+
 ```bash
-cd frontend
-
-# Run all E2E tests (headless)
-npm run e2e
-
-# Run with browser visible
-npm run e2e:headed
-
-# Run in debug mode
-npm run e2e:debug
-
-# Open HTML report
-npm run e2e:report
+make e2e
 ```
 
-### Browser Coverage
+Or manually (crucial: set `ENVIRONMENT=test`):
 
-| Browser       | Device           |
-| ------------- | ---------------- |
-| Chromium      | Desktop          |
-| Firefox       | Desktop          |
-| WebKit        | Desktop (Safari) |
-| Mobile Chrome | Pixel 5          |
-| Mobile Safari | iPhone 13        |
+```bash
+cd frontend
+ENVIRONMENT=test npm run e2e
+```
 
-### E2E Test Structure
+**Debug Mode:**
+
+```bash
+cd frontend
+ENVIRONMENT=test npm run e2e:debug
+```
+
+### E2E Structure
 
 ```
 frontend/e2e/
-├── admin/               # Admin dashboard tests
-│   ├── collaboration.spec.ts
+├── fixtures/
+│   ├── db-setup.ts         # Database setup/teardown & Auth helpers
+│   ├── test-data.ts        # Data builders (Studies, Participants)
+│   └── global-setup.ts     # Global environment config
+├── integration/
+│   ├── admin-participant-consistency.spec.ts
+│   ├── study-happy-path.spec.ts
 │   └── ...
-├── study/               # Participant flow tests
-│   ├── basic-flow.spec.ts
-│   └── ...
-└── fixtures/
-    ├── db-setup.ts      # Database & Auth helpers
-    └── test-data.ts     # Data builders
+└── ...
 ```
 
 ### Writing E2E Tests
+
+We use a "Test Data Builder" pattern to generate dynamic, isolated test data for each run.
 
 ```typescript
 import { test, expect } from "../fixtures/db-setup";
 import { testDataBuilders } from "../fixtures/test-data";
 
 test.describe("Study Flow", () => {
-  test("should complete study", async ({ page, testDb, authToken }) => {
-    // Create study dynamically
-    const study = await testDb.createStudy(authToken, testDataBuilders.study());
+    test("participant can complete a study", async ({ page, testDb, authToken }) => {
+        // 1. Arrange: Create a study in the DB
+        const study = await testDb.createStudy(authToken, testDataBuilders.study({
+            state: 'active',
+            presort_config: testDataBuilders.presortConfig({ ... })
+        }));
 
-    await page.goto(`/study/${study.slug}/welcome`);
-    await page.check('input[type="checkbox"]');
-    await page.click('button[type="submit"]');
+        // 2. Act: Navigate as participant
+        await page.goto(`/study/${study.slug}/welcome`);
+        await page.getByTestId('start-btn').click();
 
-    await expect(page).toHaveURL(/\/presort/);
-  });
+        // 3. Assert
+        await expect(page).toHaveURL(/consent/);
+    });
 });
 ```
 
 ---
 
-## Backend Tests (pytest)
+## 🐍 Backend Tests (pytest)
 
-### Running Tests
+### Running Backend Tests
 
 ```bash
-cd backend
-pytest
-
-# With coverage
-pytest --cov=app
-
-# Verbose output
-pytest -v
+make test
+# OR
+cd backend && pytest
 ```
 
-### Test Structure
+### Structure
 
 ```
-backend/
-├── tests/
-│   ├── test_api.py        # API endpoint tests
-│   ├── test_models.py     # Database model tests
-│   └── conftest.py        # Fixtures
+backend/tests/
+├── conftest.py             # Global fixtures (DB session, async client)
+├── test_api_study.py       # API Endpoint tests
+├── test_models.py          # SQLAlchemy Model logic
+└── ...
 ```
+
+**Key Concept: `conftest.py`**
+The `conftest.py` file handles:
+
+- **Database Isolation**: Creates a temporary SQLite database for the test session.
+- **Async Client**: Provides an `async_client` fixture for making API calls.
+- **Seeding**: Can seed basic data (like admin users) for tests.
 
 ---
 
-## CI/CD Integration
+## ✅ API Consistency (`check-api`)
 
-Open-Q uses **GitHub Actions** to ensure code quality through automated testing.
+We use **Orval** to generate the frontend API client from the backend OpenAPI spec. To ensure they are in sync:
 
-### E2E Workflow (`.github/workflows/e2e.yml`)
+```bash
+# Check if frontend client matches backend code
+make check-api
 
-To optimize resource usage, Playwright E2E tests are configured with the following rules:
-
-- **Triggers**:
-  - Automatically runs on **Pull Requests** targeting `main` or `develop`.
-  - Only triggers if files in the `frontend/` directory or the workflow itself are modified.
-  - Can be triggered **manually** via the "Actions" tab in GitHub.
-- **Concurrency**:
-  - If a new commit is pushed to an active Pull Request, any previous pending or running test for that PR is **automatically cancelled** to save CI minutes.
-
-### Deployment Integration
-
-Upon successful deployment to **Scalingo**, a `postdeploy` hook automatically:
-
-1.  Verifies and updates the database schema (`ensure_schema.py`).
-2.  Synchronizes study data from JSON configurations (`update_study.py`).
-
-Verification of these steps can be found in the Scalingo deployment logs.
-
----
-
-## Best Practices
-
-1.  **Avoid `any`**: Use proper types for mocks. If necessary, use `unknown as any` for store implementation details inside utilities, but keep test files type-safe.
-2.  **Isolate State Interaction**: Components should subscribe to specific store slices to minimize re-renders and make testing store interactions easier.
-3.  **Verify DOM Existence over Class Names**: Assert that elements are in the document and have correct content rather than checking specific CSS classes whenever possible.
-4.  **Mock Heavily-Animated Elements**: Use the provided `framer-motion` mock in utilities to avoid timing issues with `AnimatePresence`.
-5.  **Use `vi.useFakeTimers()`**: For time-dependent logic (e.g., auto-rotating tips or fading backgrounds).
-
----
-
-## Integration Patterns
-
-Always use the provided utilities in `frontend/src/test/test-utils.tsx` to ensure consistency:
-
-```tsx
-import {
-  renderWithProviders,
-  setupStoreMocks,
-  screen,
-} from "../test/test-utils";
-
-it("demonstrates the pattern", () => {
-  // 1. Define the state for the specific test scenario
-  setupStoreMocks({
-    useConfigStore: { config: mockConfig },
-    useResponseStore: { rough: { history: [1] } },
-  });
-
-  // 2. Wrap the component with necessary providers (Router, Store, etc.)
-  renderWithProviders(<MyComponent />);
-
-  // 3. Perform assertions
-  expect(screen.getByText("Expected Text")).toBeInTheDocument();
-});
+# Regenerate frontend client (if check fails)
+make generate-api
 ```
 
-### Error Scenarios
+Runs automatically during `make ci`.
 
-Mock the store to return error states (e.g., `configError: 'common.errors.not_found'`) and assert that the correct Error Component (e.g., `<StudyNotFound />`) is rendered.
+---
+
+## 🔄 CI/CD Pipeline
+
+The project uses GitHub Actions.
+
+| Workflow       | Trigger        | Description                                                       |
+| :------------- | :------------- | :---------------------------------------------------------------- |
+| **CI (Fast)**  | PRs, Push      | Runs Lint, Types, Unit/Integration Tests. Blocks merge if failed. |
+| **E2E (Slow)** | PRs (Frontend) | Runs full Playwright suite.                                       |
+| **Deploy**     | Push to `main` | Deploys to Scalingo.                                              |
+
+### Post-Deploy Verification
+
+After deployment, Scalingo runs a `postdeploy` hook that:
+
+1.  Migrates the database (`alembic upgrade head`).
+2.  Updates seed data (`update_study_from_file`).
+
+---

@@ -1,17 +1,34 @@
 /**
- * Test Data Builders
- * Factory functions for creating test data with sensible defaults
+ * Common Grid Configurations
  */
+export const gridConfig10 = [
+    { score: -3, capacity: 1 },
+    { score: -2, capacity: 1 },
+    { score: -1, capacity: 2 },
+    { score: 0, capacity: 2 },
+    { score: 1, capacity: 2 },
+    { score: 2, capacity: 1 },
+    { score: 3, capacity: 1 },
+];
+
+export const gridConfig23 = [
+    { score: -3, capacity: 2 },
+    { score: -2, capacity: 3 },
+    { score: -1, capacity: 4 },
+    { score: 0, capacity: 5 },
+    { score: 1, capacity: 4 },
+    { score: 2, capacity: 3 },
+    { score: 3, capacity: 2 },
+];
 
 export const testDataBuilders = {
     /**
      * Create a study configuration
      */
     study: (overrides?: Partial<StudyData>): StudyData => ({
-        slug: `test-study-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
+        slug: `test-study-${crypto.randomUUID()}`,
         title: 'Test Study',
         state: 'draft',
-        workspace_id: 1,
         default_language: 'en',
         show_statement_codes: false,
         randomize_statements: false,
@@ -26,15 +43,7 @@ export const testDataBuilders = {
             },
         ],
         statements: testDataBuilders.statements(23),
-        grid_config: [
-            { score: -3, capacity: 2 },
-            { score: -2, capacity: 3 },
-            { score: -1, capacity: 4 },
-            { score: 0, capacity: 5 },
-            { score: 1, capacity: 4 },
-            { score: 2, capacity: 3 },
-            { score: 3, capacity: 2 },
-        ],
+        grid_config: gridConfig23,
         presort_config: { enabled: false, fields: {} },
         postsort_config: {
             email_collection_enabled: false,
@@ -224,7 +233,7 @@ export interface StudyData {
     slug: string;
     title: string;
     state: string;
-    workspace_id: number;
+    workspace_id?: number;
     default_language: string;
     show_statement_codes: boolean;
     randomize_statements: boolean;

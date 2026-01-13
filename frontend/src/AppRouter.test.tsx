@@ -48,13 +48,11 @@ describe('App Routing Protection', () => {
             <Routes>
                 <Route path="/study/:slug" element={<StudyLayout />}>
                     <Route path="welcome" element={<MockWelcome />} />
-                    <Route path="sort">
-                        <Route path="fine" element={<MockFineSort />} />
-                    </Route>
+                    <Route path="fine-sort" element={<MockFineSort />} />
                     <Route path="*" element={<div data-testid="page-error">Error</div>} />
                 </Route>
             </Routes>,
-            { initialEntries: ['/study/demo/sort/fine'] }
+            { initialEntries: ['/study/demo/fine-sort'] }
         );
 
         // Should NOT show Fine Page
@@ -70,10 +68,10 @@ describe('App Routing Protection', () => {
         renderWithProviders(
             <Routes>
                 <Route path="/study/:slug" element={<StudyLayout />}>
-                    <Route path="sort/fine" element={<MockFineSort />} />
+                    <Route path="fine-sort" element={<MockFineSort />} />
                 </Route>
             </Routes>,
-            { initialEntries: ['/study/demo/sort/fine'] }
+            { initialEntries: ['/study/demo/fine-sort'] }
         );
 
         expect(screen.getByTestId('page-fine')).toBeTruthy();

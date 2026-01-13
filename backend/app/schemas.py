@@ -251,6 +251,7 @@ class BrandingBase(BaseModel):
 
     logo_url: str | None = None
     accent_color: str | None = None
+    primary_color: str | None = None
     partners: list[PartnerLogo] = []
 
 
@@ -269,6 +270,7 @@ class StudyBase(BaseModel):
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool = False
     randomize_statements: bool = False
+    symmetry_lock: bool = True
     start_date: datetime | None = None
     end_date: datetime | None = None
 
@@ -302,6 +304,7 @@ class StudyUpdate(BaseModel):
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool | None = None
     randomize_statements: bool | None = None
+    symmetry_lock: bool | None = None
     translations: list[StudyTranslationCreate] | None = None
     statements: list[StatementUpdate] | None = None
     access_password: str | None = None

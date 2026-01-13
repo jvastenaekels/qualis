@@ -122,6 +122,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                 onDragEnd={handleDragEnd}
                 animate={controls}
                 style={{ x, y, rotate }}
+                data-testid={`card-${statement.id}`}
                 className="absolute w-full h-full bg-white rounded-3xl border border-gray-200 shadow-xl z-10 flex flex-col items-center justify-center p-6 sm:p-8 cursor-pointer active:cursor-grabbing touch-none overflow-hidden"
             >
                 {/* Color Overlays */}

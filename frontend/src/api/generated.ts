@@ -5597,85 +5597,116 @@ export function useHealthCheckHealthGet<
 }
 
 /**
- * Root endpoint when frontend is not mounted.
- * @summary Read Root
+ * Serve the Single Page Application (SPA) static files and handle client-side routing.
+ * @summary Serve Spa
  */
-export const readRootGet = (signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/`, method: 'GET', signal });
+export const serveSpaFullPathGet = (fullPath: string, signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/${fullPath}`, method: 'GET', signal });
 };
 
-export const getReadRootGetQueryKey = () => {
-    return [`/`] as const;
+export const getServeSpaFullPathGetQueryKey = (fullPath?: string) => {
+    return [`/${fullPath}`] as const;
 };
 
-export const getReadRootGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof readRootGet>>,
-    TError = unknown,
->(options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>>;
-}) => {
+export const getServeSpaFullPathGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+    TError = HTTPValidationError,
+>(
+    fullPath: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
+        >;
+    }
+) => {
     const { query: queryOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getReadRootGetQueryKey();
+    const queryKey = queryOptions?.queryKey ?? getServeSpaFullPathGetQueryKey(fullPath);
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof readRootGet>>> = ({ signal }) =>
-        readRootGet(signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof serveSpaFullPathGet>>> = ({ signal }) =>
+        serveSpaFullPathGet(fullPath, signal);
 
-    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof readRootGet>>,
+    return { queryKey, queryFn, enabled: !!fullPath, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof serveSpaFullPathGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type ReadRootGetQueryResult = NonNullable<Awaited<ReturnType<typeof readRootGet>>>;
-export type ReadRootGetQueryError = unknown;
+export type ServeSpaFullPathGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof serveSpaFullPathGet>>
+>;
+export type ServeSpaFullPathGetQueryError = HTTPValidationError;
 
-export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
+export function useServeSpaFullPathGet<
+    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+    TError = HTTPValidationError,
+>(
+    fullPath: string,
     options: {
-        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>> &
+        query: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
+        > &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof readRootGet>>,
+                    Awaited<ReturnType<typeof serveSpaFullPathGet>>,
                     TError,
-                    Awaited<ReturnType<typeof readRootGet>>
+                    Awaited<ReturnType<typeof serveSpaFullPathGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
+export function useServeSpaFullPathGet<
+    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+    TError = HTTPValidationError,
+>(
+    fullPath: string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>> &
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
+        > &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof readRootGet>>,
+                    Awaited<ReturnType<typeof serveSpaFullPathGet>>,
                     TError,
-                    Awaited<ReturnType<typeof readRootGet>>
+                    Awaited<ReturnType<typeof serveSpaFullPathGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
+export function useServeSpaFullPathGet<
+    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+    TError = HTTPValidationError,
+>(
+    fullPath: string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>>;
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
+        >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary Read Root
+ * @summary Serve Spa
  */
 
-export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
+export function useServeSpaFullPathGet<
+    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+    TError = HTTPValidationError,
+>(
+    fullPath: string,
     options?: {
-        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>>;
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
+        >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getReadRootGetQueryOptions(options);
+    const queryOptions = getServeSpaFullPathGetQueryOptions(fullPath, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -5791,6 +5822,13 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
                     ]),
                     undefined,
                 ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
                 partners: faker.helpers.arrayElement([
                     Array.from(
                         { length: faker.number.int({ min: 1, max: 10 }) },
@@ -5820,6 +5858,7 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
     ]),
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -6072,6 +6111,13 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                         ]),
                         undefined,
                     ]),
+                    primary_color: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
                     partners: faker.helpers.arrayElement([
                         Array.from(
                             { length: faker.number.int({ min: 1, max: 10 }) },
@@ -6101,6 +6147,7 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
         ]),
         show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
         randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
         start_date: faker.helpers.arrayElement([
             faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
             undefined,
@@ -6361,6 +6408,13 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
                     ]),
                     undefined,
                 ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
                 partners: faker.helpers.arrayElement([
                     Array.from(
                         { length: faker.number.int({ min: 1, max: 10 }) },
@@ -6390,6 +6444,7 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
     ]),
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -6642,6 +6697,13 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
                     ]),
                     undefined,
                 ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
                 partners: faker.helpers.arrayElement([
                     Array.from(
                         { length: faker.number.int({ min: 1, max: 10 }) },
@@ -6671,6 +6733,7 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     ]),
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -6926,6 +6989,13 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
                     ]),
                     undefined,
                 ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
                 partners: faker.helpers.arrayElement([
                     Array.from(
                         { length: faker.number.int({ min: 1, max: 10 }) },
@@ -6955,6 +7025,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
     ]),
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
@@ -8713,14 +8784,14 @@ export const getHealthCheckHealthGetMockHandler = (
     );
 };
 
-export const getReadRootGetMockHandler = (
+export const getServeSpaFullPathGetMockHandler = (
     overrideResponse?:
         | unknown
         | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/',
+        '*/:fullPath',
         async (info) => {
             if (typeof overrideResponse === 'function') {
                 await overrideResponse(info);
@@ -8783,5 +8854,5 @@ export const getOpenQAPIMock = () => [
     getCleanupAllTestDataApiTestCleanupAllPostMockHandler(),
     getTestHealthApiTestHealthGetMockHandler(),
     getHealthCheckHealthGetMockHandler(),
-    getReadRootGetMockHandler(),
+    getServeSpaFullPathGetMockHandler(),
 ];

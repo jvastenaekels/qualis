@@ -16,10 +16,13 @@ export const studyLayoutLoader = async ({ params, request }: LoaderFunctionArgs)
     };
 
     // Fetch and cache the data
-    const study = await queryClient.fetchQuery({
+    const response = await queryClient.fetchQuery({
         queryKey: getGetStudyApiStudySlugGetQueryKey(slug, queryParams),
         queryFn: () => getStudyApiStudySlugGet(slug, queryParams),
     });
+
+    // biome-ignore lint/suspicious/noExplicitAny: Unwrap Orval response
+    const study = (response as any).data || response;
 
     return {
         study,

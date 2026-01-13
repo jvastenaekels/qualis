@@ -138,11 +138,20 @@ const StudyLayoutContent: React.FC = () => {
 
     // Sync loader data to config store
     useEffect(() => {
+        console.log('[StudyLayout] Loader data type:', typeof study, Array.isArray(study));
+        console.log('[StudyLayout] Loader data keys:', study ? Object.keys(study) : 'null');
         if (study) {
+            console.log('[StudyLayout] Setting config', study);
             // biome-ignore lint/suspicious/noExplicitAny: API type definition mismatch
             setConfig(study as any);
+        } else {
+            console.error('[StudyLayout] Loader data is falsy!');
         }
     }, [study, setConfig]);
+
+    useEffect(() => {
+        console.log('[StudyLayout] ConfigStore:', config);
+    }, [config]);
 
     // Full Page Error State (if we have no config at all)
     if (configError && !config) {
@@ -150,7 +159,7 @@ const StudyLayoutContent: React.FC = () => {
         if (configError === 'common.errors.not_found') {
             return <StudyStatusPage type="not_found" />;
         }
-
+        // ... (truncated for brevity, keep existing logic)
         // Map known error keys to ApiErrors for better UI
         let errorObj: Error | ApiError | null = null;
 
@@ -216,14 +225,13 @@ const StudyLayoutContent: React.FC = () => {
     }
 
     // Basic Protection Check
-    const isProtected = ['presort', 'sort', 'review'].some((path) =>
-        location.pathname.includes(path)
-    );
+    const protectedPaths = ['/presort', '/rough-sort', '/fine-sort', '/post-sort'];
+    const isProtected = protectedPaths.some((path) => location.pathname.includes(path));
+
     if (isProtected && !hasConsented) {
         return <Navigate to={`/study/${slug}/welcome${location.search}`} replace />;
     }
 
-    // Redirect study base URL to current/welcome step
     // Redirect study base URL to current/welcome step
     const isStudyBase =
         location.pathname === `/study/${slug}` || location.pathname === `/study/${slug}/`;
@@ -264,7 +272,7 @@ const StudyLayoutContent: React.FC = () => {
 
     return (
         <div
-            className="h-dvh bg-gray-50 flex flex-col overflow-hidden"
+            className="min-h-screen bg-gray-50 flex flex-col overflow-hidden"
             style={{ '--brand-accent': accentColor } as React.CSSProperties}
         >
             {/* Pilot Mode Banner */}
@@ -300,41 +308,50 @@ const StudyLayoutContent: React.FC = () => {
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
-                        {/* biome-ignore lint/suspicious/noExplicitAny: branding partners data */}
-                        {Array.isArray((branding as any)?.partners) &&
-                        // biome-ignore lint/suspicious/noExplicitAny: branding partners data
-                        (branding as any).partners.length > 0 ? (
-                            <div className="flex items-center gap-4">
-                                {/* biome-ignore lint/suspicious/noExplicitAny: partner data */}
-                                {(branding as any).partners.map(
-                                    // biome-ignore lint/suspicious/noExplicitAny: partner data
-                                    (partner: any) =>
-                                        partner.logo_url && (
-                                            <img
-                                                key={partner.id || partner.logo_url}
-                                                src={partner.logo_url}
-                                                alt={partner.name || ''}
-                                                title={partner.name || ''}
-                                                className="h-8 w-auto object-contain"
-                                            />
-                                        )
-                                )}
-                            </div>
-                        ) : branding?.logo_url ? (
+                        {/* Show Main Logo if available */}
+                        {branding?.logo_url && (
                             <img
                                 src={branding.logo_url}
                                 alt={config?.title || t('layout.default_study_title')}
-                                className="h-8 w-auto object-contain"
+                                className="h-8 w-auto object-contain mr-4"
                             />
-                        ) : currentStep === 1 ? (
-                            <img
-                                src="/open-q-logo.svg"
-                                alt={t('layout.title')}
-                                className="h-8 w-auto object-contain"
-                            />
-                        ) : (
-                            config?.title || t('layout.default_study_title')
                         )}
+
+                        {/* Show Partner Logos */}
+                        {/* biome-ignore lint/suspicious/noExplicitAny: branding partners data */}
+                        {Array.isArray((branding as any)?.partners) &&
+                            // biome-ignore lint/suspicious/noExplicitAny: branding partners data
+                            (branding as any).partners.length > 0 && (
+                                <div className="flex items-center gap-4 border-l border-slate-200 pl-4">
+                                    {/* biome-ignore lint/suspicious/noExplicitAny: partner data */}
+                                    {(branding as any).partners.map(
+                                        // biome-ignore lint/suspicious/noExplicitAny: partner data
+                                        (partner: any) =>
+                                            partner.logo_url && (
+                                                <img
+                                                    key={partner.id || partner.logo_url}
+                                                    src={partner.logo_url}
+                                                    alt={partner.name || ''}
+                                                    title={partner.name || ''}
+                                                    className="h-6 w-auto object-contain opacity-80"
+                                                />
+                                            )
+                                    )}
+                                </div>
+                            )}
+
+                        {/* Fallback to Title if no logos */}
+                        {!branding?.logo_url &&
+                            !((branding as any)?.partners?.length > 0) &&
+                            (currentStep === 1 ? (
+                                <img
+                                    src="/open-q-logo.svg"
+                                    alt={t('layout.title')}
+                                    className="h-8 w-auto object-contain"
+                                />
+                            ) : (
+                                config?.title || t('layout.default_study_title')
+                            ))}
                     </div>
 
                     {/* Mobile Step Counter & Menu */}

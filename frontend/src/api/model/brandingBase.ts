@@ -6,6 +6,7 @@
  */
 import type { BrandingBaseLogoUrl } from './brandingBaseLogoUrl';
 import type { BrandingBaseAccentColor } from './brandingBaseAccentColor';
+import type { BrandingBasePrimaryColor } from './brandingBasePrimaryColor';
 import type { PartnerLogo } from './partnerLogo';
 
 /**
@@ -14,5 +15,6 @@ import type { PartnerLogo } from './partnerLogo';
 export interface BrandingBase {
     logo_url?: BrandingBaseLogoUrl;
     accent_color?: BrandingBaseAccentColor;
+    primary_color?: BrandingBasePrimaryColor;
     partners?: PartnerLogo[];
 }

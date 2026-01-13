@@ -82,7 +82,7 @@ else:
             result = await db.execute(
                 text("""
                     INSERT INTO workspaces (title, slug, created_at, config)
-                    VALUES (:title, :slug, NOW(), :config)
+                    VALUES (:title, :slug, CURRENT_TIMESTAMP, :config)
                     ON CONFLICT (slug)
                     DO NOTHING
                     RETURNING id

@@ -4,9 +4,10 @@ This guide covers how to set up your local environment to contribute to Open-Q.
 
 ## Prerequisites
 
-- **Node.js**: v18 or higher
-- **Python**: v3.10 or higher
-- **Make** (optional, for shortcut commands)
+- **Node.js**: v24.x (see `.nvmrc`)
+- **Python**: v3.12+ (managed by `uv`)
+- **uv**: [Installation Guide](https://docs.astral.sh/uv/) (Required for Python dependency management)
+- **Make**: (Recommended for shortcut commands)
 
 ## 📥 Installation
 
@@ -17,59 +18,51 @@ git clone https://github.com/jvastenaekels/open-q.git
 cd open-q
 ```
 
-### 2. Backend Setup
+### 2. Install Dependencies
 
-The backend is built with FastAPI. We recommend using `venv`.
+We use a unified `Makefile` to handle installation for both frontend and backend.
 
 ```bash
-cd backend
-python3 -m venv venv
-source venv/bin/activate
-
-# Install application dependencies
-pip install -r requirements.txt
-
-# Install development dependencies (linters, testing, etc.)
-pip install -r requirements-dev.txt
-
-# Initialize database (SQLite by default)
-python init_db.py
-python seed.py  # Loads example-study.json
+make install
 ```
 
-### 3. Frontend Setup
+This will:
 
-The frontend is a React application built with Vite.
+- Set up the Python virtual environment via `uv sync`.
+- Install Node.js dependencies via `npm install`.
+
+### 3. Initialize Database
+
+Initialize the SQLite database (`q_method.db`) with the schema and default seed data (Admin user, Workspace).
 
 ```bash
-cd frontend
-npm install
+# Initialize DB
+cd backend && uv run python init_db.py
+
+# Seed example study (ensure backend is NOT running, or use make seed if it checks api)
+# Note: seed.py typically uses the API, so run the backend first.
 ```
 
 ## 🚀 Running Locally
 
-You can run both services in separate terminals:
+You can run both services in separate terminals using `make`:
 
 **Terminal 1 (Backend):**
 
 ```bash
-cd backend
-source venv/bin/activate
-uvicorn app.main:app --reload
+make run-backend
 ```
 
 _API available at http://localhost:8000_
+_Docs available at http://localhost:8000/docs_
 
 **Terminal 2 (Frontend):**
 
 ```bash
-cd frontend
-npm run dev
+make run-frontend
 ```
 
 _App available at http://localhost:5173_
-
----
 
 ## 🛠️ Daily Workflow Tools
 
@@ -87,27 +80,27 @@ pre-commit install
 pre-commit run --all-files
 ```
 
-### Code Quality Commands
+### Code Quality Commands (Make)
 
-| Scope     | Command (from root)         | Description                             |
-| --------- | --------------------------- | --------------------------------------- |
-| **All**   | `make generate-api`         | Sync Frontend Client with Backend API   |
-| **Back**  | `make lint-back`            | Run Ruff (Lint & Format)                |
-| **Back**  | `make type-back`            | Run Mypy (Types)                        |
-| **Back**  | `make test-back`            | Run Pytest                              |
-| **Front** | `npm run lint`              | Run ESLint                              |
-| **Front** | `npm run type-check`        | Run TSC                                 |
-| **Front** | `npm run lint:duplication`  | Check for copy-pasted code (JSCPD)      |
-| **Front** | `npm run lint:architecture` | Check architectural rules (Dep-Cruiser) |
-| **Front** | `npm run e2e`               | Run E2E Tests (Playwright)              |
+| Scope    | Command             | Description                             |
+| -------- | ------------------- | --------------------------------------- |
+| **All**  | `make install`      | Install all dependencies                |
+| **Back** | `make lint`         | Run Ruff (Back) & ESLint (Front)        |
+| **Back** | `make check`        | Run Deep static analysis (Mypy, Bandie) |
+| **Back** | `make test`         | Run Unit Tests (Front & Back)           |
+| **API**  | `make check-api`    | Verify Frontend Client matches Backend  |
+| **API**  | `make generate-api` | Regenerate Frontend Client              |
+| **E2E**  | `make e2e`          | Run Playwright E2E Tests                |
+| **CI**   | `make ci`           | Run Fast CI (Lint + Check + Test)       |
+| **CI**   | `make ci-full`      | Run Full CI (Fast CI + E2E)             |
 
 ### API Client Synchronization
 
 If you modify Backend Routes (e.g., `backend/app/routers/...`):
 
-1. Run **`make generate-api`** to regeneration the frontend client.
-2. This ensures `frontend/src/api/generated.ts` matches the backend (OpenAPI spec).
-3. Commit the updated client files.
+1.  Run **`make generate-api`** to regenerate the frontend client.
+2.  This ensures `frontend/src/api/generated.ts` matches the backend (OpenAPI spec).
+3.  Commit the updated client files.
 
 > **Note:** The CI pipeline runs `make check-api` and will fail if the client is out of sync.
 
@@ -118,13 +111,11 @@ We use **Architectural Fitness Functions** to prevent spaghetti code.
 - **Backend**: `import-linter` ensures `routers` -> `services` -> `schemas` -> `models`.
 - **Frontend**: `dependency-cruiser` banishes circular dependencies and orphan files.
 
-If your build fails on "Architecture", check the relevant config files (`.importlinter` or `frontend/.dependency-cruiser.js`).
+These are run via `make check`.
 
 ## 🗄️ Database Maintenance
 
-The project includes scripts to manage the database schema and study configurations.
-
-- **Sync Study Config**: `python backend/update_study.py`
-  Updates the database to match the JSON definition in `backend/data/example-study.json`.
-- **Verify Schema**: `python backend/scripts/ensure_schema.py`
-  Checks for missing columns or tables without data loss.
+- **Sync Study Config**: `cd backend && uv run python seed.py data/example-study.json`
+  Updates/Creates a study from JSON definition. Requires backend running.
+- **Verify Schema**: `cd backend && uv run python scripts/migrate.py`
+  Runs database migrations and verifies schema state.

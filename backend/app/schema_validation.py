@@ -41,7 +41,7 @@ async def validate_schema() -> None:
                 "workspaces",
                 "workspace_members",
                 "studies",
-                "study_collaborators",
+                # "study_collaborators", # Removed
                 "study_translations",
                 "statements",
                 "statement_translations",

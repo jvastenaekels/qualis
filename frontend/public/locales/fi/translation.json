@@ -231,7 +231,8 @@
         },
         "complete": {
             "title": "Ensimmäinen vaihe valmis",
-            "subtitle": "Nyt tarkennetaan nyansseja."
+            "subtitle": "Nyt tarkennetaan nyansseja.",
+            "button": "Jatka Q-lajitteluun"
         },
         "instructions": {
             "desktop_tip": "Vedä, paina tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"

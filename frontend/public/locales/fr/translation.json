@@ -231,7 +231,8 @@
         },
         "complete": {
             "title": "Première étape validée",
-            "subtitle": "Nous allons maintenant affiner les nuances."
+            "subtitle": "Nous allons maintenant affiner les nuances.",
+            "button": "Continuer vers le Q-sort"
         },
         "instructions": {
             "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour trier"

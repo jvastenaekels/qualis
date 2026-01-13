@@ -14,7 +14,7 @@ from pathlib import Path
 # Add backend to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from sqlalchemy import text, inspect, event
+from sqlalchemy import text, inspect
 from app.database import engine
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -87,7 +87,8 @@ async def migrate_studies_table():
         migrations_applied = False
 
         # randomize_statements
-        try:
+        if not await check_column_exists(conn, "studies", "randomize_statements"):
+            logger.info("  Adding 'randomize_statements' column...")
             dialect = conn.dialect.name
             default_val = "FALSE" if dialect == "postgresql" else "0"
             await conn.execute(
@@ -97,11 +98,6 @@ async def migrate_studies_table():
             )
             migrations_applied = True
             logger.info("  Added 'randomize_statements' column")
-        except Exception as e:
-            if "already exists" in str(e).lower() or "42701" in str(e):
-                logger.info("  Column 'randomize_statements' already exists")
-            else:
-                logger.error(f"  Error adding 'randomize_statements': {e}")
 
         # show_statement_codes
         if not await check_column_exists(conn, "studies", "show_statement_codes"):
@@ -169,6 +165,18 @@ async def migrate_studies_table():
                 await conn.execute(
                     text("ALTER TABLE studies ADD COLUMN end_date TIMESTAMP")
                 )
+            migrations_applied = True
+
+        # symmetry_lock
+        if not await check_column_exists(conn, "studies", "symmetry_lock"):
+            logger.info("  Adding 'symmetry_lock' column...")
+            dialect = conn.dialect.name
+            default_val = "TRUE" if dialect == "postgresql" else "1"
+            await conn.execute(
+                text(
+                    f"ALTER TABLE studies ADD COLUMN symmetry_lock BOOLEAN DEFAULT {default_val}"
+                )
+            )
             migrations_applied = True
 
         if migrations_applied:
@@ -294,7 +302,10 @@ async def migrate_translations_table():
             migrations_applied = True
 
         # methodology_tips
-        try:
+        if not await check_column_exists(
+            conn, "study_translations", "methodology_tips"
+        ):
+            logger.info("  Adding 'methodology_tips' column...")
             dialect = conn.dialect.name
             if dialect == "postgresql":
                 await conn.execute(
@@ -310,14 +321,10 @@ async def migrate_translations_table():
                 )
             migrations_applied = True
             logger.info("  Added 'methodology_tips' column")
-        except Exception as e:
-            if "already exists" in str(e).lower() or "42701" in str(e):
-                logger.info("  Column 'methodology_tips' already exists")
-            else:
-                logger.error(f"  Error adding 'methodology_tips': {e}")
 
         # step_help
-        try:
+        if not await check_column_exists(conn, "study_translations", "step_help"):
+            logger.info("  Adding 'step_help' column...")
             dialect = conn.dialect.name
             if dialect == "postgresql":
                 await conn.execute(
@@ -333,11 +340,6 @@ async def migrate_translations_table():
                 )
             migrations_applied = True
             logger.info("  Added 'step_help' column")
-        except Exception as e:
-            if "already exists" in str(e).lower() or "42701" in str(e):
-                logger.info("  Column 'step_help' already exists")
-            else:
-                logger.error(f"  Error adding 'step_help': {e}")
 
         if migrations_applied:
             await conn.commit()
@@ -358,17 +360,13 @@ async def migrate_participants_table():
         migrations_applied = False
 
         # random_seed
-        try:
+        if not await check_column_exists(conn, "participants", "random_seed"):
+            logger.info("  Adding 'random_seed' column...")
             await conn.execute(
                 text("ALTER TABLE participants ADD COLUMN random_seed VARCHAR")
             )
             migrations_applied = True
             logger.info("  Added 'random_seed' column")
-        except Exception as e:
-            if "already exists" in str(e).lower() or "42701" in str(e):
-                logger.info("  Column 'random_seed' already exists")
-            else:
-                logger.error(f"  Error adding 'random_seed': {e}")
 
         # created_at
         if not await check_column_exists(conn, "participants", "created_at"):
@@ -524,7 +522,7 @@ async def verify_workspace_tables():
     logger.info("Verifying workspace architecture...")
 
     async with engine.connect() as conn:
-        required_tables = ["workspaces", "workspace_members", "study_collaborators"]
+        required_tables = ["workspaces", "workspace_members"]
 
         for table in required_tables:
             if not await check_table_exists(conn, table):
@@ -533,14 +531,6 @@ async def verify_workspace_tables():
                 sys.exit(1)
 
         logger.info("✓ Workspace tables verified")
-
-
-@event.listens_for(engine.sync_engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    """Set busy_timeout for SQLite to prevent 'database is locked' errors."""
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA busy_timeout=30000")  # 30 seconds
-    cursor.close()
 
 
 async def run_all_migrations():

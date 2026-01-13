@@ -33,6 +33,7 @@ export interface StudyCreate {
     default_language?: StudyCreateDefaultLanguage;
     show_statement_codes?: boolean;
     randomize_statements?: boolean;
+    symmetry_lock?: boolean;
     start_date?: StudyCreateStartDate;
     end_date?: StudyCreateEndDate;
     translations: StudyTranslationCreate[];

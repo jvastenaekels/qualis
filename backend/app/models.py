@@ -164,6 +164,9 @@ class Study(Base):
     randomize_statements: Mapped[bool] = mapped_column(
         Boolean, default=False
     )  # Randomize statement order per participant (Q methodology best practice)
+    symmetry_lock: Mapped[bool] = mapped_column(
+        Boolean, default=True
+    )  # Enforce grid symmetry in designer
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )

@@ -39,7 +39,7 @@ export default defineConfig({
         headless: true,
 
         /* Base URL for navigation */
-        baseURL: 'http://127.0.0.1:5173',
+        baseURL: 'http://localhost:5173',
 
         /* Collect trace when retrying the failed test */
         trace: 'on-first-retry',
@@ -92,8 +92,8 @@ export default defineConfig({
     webServer: [
         {
             command: 'cd ../backend && uv run uvicorn app.main:app --port 8000',
-            url: 'http://localhost:8000/health',
-            reuseExistingServer: !process.env.CI,
+            url: 'http://127.0.0.1:8000/health',
+            reuseExistingServer: true,
             timeout: 120 * 1000,
             stdout: 'pipe',
             stderr: 'pipe',
@@ -102,10 +102,13 @@ export default defineConfig({
             },
         },
         {
-            command: 'npm run dev -- --host 127.0.0.1',
-            url: 'http://127.0.0.1:5173',
-            reuseExistingServer: !process.env.CI,
+            command: 'npm run dev -- --host localhost',
+            url: 'http://localhost:5173',
+            reuseExistingServer: true,
             timeout: 120 * 1000,
+            env: {
+                VITE_API_URL: 'http://127.0.0.1:8000',
+            },
         },
     ],
 });

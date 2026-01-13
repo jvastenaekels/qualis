@@ -231,7 +231,8 @@
         },
         "complete": {
             "title": "First Step Complete",
-            "subtitle": "We will now refine the nuances."
+            "subtitle": "We will now refine the nuances.",
+            "button": "Continue to Fine Sort"
         },
         "instructions": {
             "desktop_tip": "Drag, press, or use keyboard ( ← ↓ → ) to sort"

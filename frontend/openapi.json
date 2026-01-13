@@ -2438,17 +2438,38 @@
         }
       }
     },
-    "/": {
+    "/{full_path}": {
       "get": {
-        "summary": "Read Root",
-        "description": "Root endpoint when frontend is not mounted.",
-        "operationId": "read_root__get",
+        "summary": "Serve Spa",
+        "description": "Serve the Single Page Application (SPA) static files and handle client-side routing.",
+        "operationId": "serve_spa__full_path__get",
+        "parameters": [
+          {
+            "name": "full_path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Full Path"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -2540,6 +2561,17 @@
               }
             ],
             "title": "Accent Color"
+          },
+          "primary_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Color"
           },
           "partners": {
             "items": {
@@ -3424,6 +3456,11 @@
             "title": "Randomize Statements",
             "default": false
           },
+          "symmetry_lock": {
+            "type": "boolean",
+            "title": "Symmetry Lock",
+            "default": true
+          },
           "start_date": {
             "anyOf": [
               {
@@ -3536,6 +3573,11 @@
             "type": "boolean",
             "title": "Randomize Statements",
             "default": false
+          },
+          "symmetry_lock": {
+            "type": "boolean",
+            "title": "Symmetry Lock",
+            "default": true
           },
           "start_date": {
             "anyOf": [
@@ -4124,6 +4166,17 @@
               }
             ],
             "title": "Randomize Statements"
+          },
+          "symmetry_lock": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Symmetry Lock"
           },
           "translations": {
             "anyOf": [

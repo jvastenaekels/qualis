@@ -13,6 +13,7 @@ import type { StudyUpdateBranding } from './studyUpdateBranding';
 import type { StudyUpdateDefaultLanguage } from './studyUpdateDefaultLanguage';
 import type { StudyUpdateShowStatementCodes } from './studyUpdateShowStatementCodes';
 import type { StudyUpdateRandomizeStatements } from './studyUpdateRandomizeStatements';
+import type { StudyUpdateSymmetryLock } from './studyUpdateSymmetryLock';
 import type { StudyUpdateTranslations } from './studyUpdateTranslations';
 import type { StudyUpdateStatements } from './studyUpdateStatements';
 import type { StudyUpdateAccessPassword } from './studyUpdateAccessPassword';
@@ -33,6 +34,7 @@ export interface StudyUpdate {
     default_language?: StudyUpdateDefaultLanguage;
     show_statement_codes?: StudyUpdateShowStatementCodes;
     randomize_statements?: StudyUpdateRandomizeStatements;
+    symmetry_lock?: StudyUpdateSymmetryLock;
     translations?: StudyUpdateTranslations;
     statements?: StudyUpdateStatements;
     access_password?: StudyUpdateAccessPassword;

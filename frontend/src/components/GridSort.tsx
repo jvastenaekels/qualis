@@ -37,6 +37,7 @@ const DroppablePile: React.FC<
         <button
             ref={setNodeRef}
             type="button"
+            data-testid={id}
             onClick={onClick}
             className={cn(
                 className,
@@ -58,6 +59,7 @@ const DroppableDeckArea: React.FC<{
     return (
         <div
             ref={setNodeRef}
+            data-testid={id}
             className={cn(className, isOver && 'ring-2 ring-indigo-400 bg-indigo-50/10')}
         >
             {children}
@@ -323,6 +325,7 @@ const ValidationFooter: React.FC<{
         {isAllPlaced ? (
             <button
                 type="button"
+                data-testid="fine-sort-validate-btn"
                 onClick={onValidate}
                 style={{ backgroundColor: 'var(--brand-accent)' }}
                 className={cn(
