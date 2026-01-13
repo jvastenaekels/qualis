@@ -286,7 +286,19 @@ const StudyDesignPage = () => {
     const prevStep = DESIGN_STEPS[currentStepIndex - 1];
 
     // Design Checklist logic - in logical/chronological order
+    const currentTranslation = draft.translations?.find((t) => t.language_code === activeLocale);
+
     const checklist = [
+        {
+            label: t('admin.design.checklist.welcome', 'Welcome & Consent defined'),
+            isComplete: !!(
+                currentTranslation?.title &&
+                currentTranslation?.objective &&
+                currentTranslation?.consent_title &&
+                currentTranslation?.consent_description
+            ),
+            required: true,
+        },
         {
             label: t('admin.design.checklist.statements', 'Statements defined'),
             isComplete: (draft.statements?.length || 0) > 0,
@@ -299,8 +311,7 @@ const StudyDesignPage = () => {
         },
         {
             label: t('admin.design.checklist.instructions', 'Instructions set'),
-            isComplete: !!draft.translations?.find((t) => t.language_code === activeLocale)
-                ?.condition_of_instruction,
+            isComplete: !!currentTranslation?.condition_of_instruction,
             required: true,
         },
     ];
@@ -577,7 +588,7 @@ const StudyDesignPage = () => {
                                 className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-emerald-100 text-slate-500 hover:text-slate-900"
                             >
                                 <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
-                                    🏁
+                                    💬
                                 </span>{' '}
                                 {t('admin.design.tabs.postsort')}
                             </TabsTrigger>
