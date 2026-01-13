@@ -69,6 +69,15 @@ export function useAutoSave(debounceMs = 2000) {
             return;
         }
 
+        // DEBUG: Log why we think it's different
+        if (process.env.NODE_ENV === 'development') {
+            console.log('[AutoSave] Draft not synced:', {
+                isSyncedWithOriginal,
+                isSyncedWithLastSave,
+                hasLastSaved: !!lastSavedDraftRef.current,
+            });
+        }
+
         // 2. Mark as modified (only if not already modified or saving)
         if (syncStatus !== 'modified' && syncStatus !== 'saving') {
             setSyncStatus('modified');

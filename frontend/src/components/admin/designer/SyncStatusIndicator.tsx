@@ -42,13 +42,14 @@ export function SyncStatusIndicator({ className }: { className?: string }) {
     const { icon, text, color } = getStatusContent();
 
     return (
-        <div className={cn('flex items-center gap-1.5 px-2 py-1', className)}>
+        <div
+            className={cn('flex items-center gap-1.5 px-2 py-1', className)}
+            data-testid="sync-status"
+        >
             {icon}
-            {syncStatus !== 'synced' && syncStatus !== 'modified' && syncStatus !== 'saving' && (
-                <span className={cn('text-[10px] font-black uppercase tracking-widest', color)}>
-                    {text}
-                </span>
-            )}
+            <span className={cn('text-[10px] font-black uppercase tracking-widest', color)}>
+                {text}
+            </span>
         </div>
     );
 }

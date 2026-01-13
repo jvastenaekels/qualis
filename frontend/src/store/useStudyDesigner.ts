@@ -82,8 +82,7 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
 }
 
 /**
- * Deeply strips any keys starting with an underscore (e.g. _is_copy)
- * to allow for accurate content comparison.
+ * Deeply strips internal fields AND sorts keys to ensure deterministic JSON stringification.
  */
 // biome-ignore lint/suspicious/noExplicitAny: generic object cleaner
 function stripInternalFields(obj: any): any {
@@ -93,9 +92,13 @@ function stripInternalFields(obj: any): any {
     if (obj !== null && typeof obj === 'object') {
         // biome-ignore lint/suspicious/noExplicitAny: generic object construction
         const newObj: any = {};
-        for (const [key, value] of Object.entries(obj)) {
-            if (!key.startsWith('_')) {
-                newObj[key] = stripInternalFields(value);
+        // Sort keys to ensure deterministic order
+        const sortedKeys = Object.keys(obj).sort();
+
+        for (const key of sortedKeys) {
+            // Skip underscore-prefixed fields and last_updated_at (changes on every save)
+            if (!key.startsWith('_') && key !== 'last_updated_at') {
+                newObj[key] = stripInternalFields(obj[key]);
             }
         }
         return newObj;
@@ -109,7 +112,22 @@ function stripInternalFields(obj: any): any {
 export function areStudiesEqual(a: StudyUpdate | null, b: StudyUpdate | null): boolean {
     if (a === b) return true;
     if (!a || !b) return false;
-    return JSON.stringify(stripInternalFields(a)) === JSON.stringify(stripInternalFields(b));
+
+    // With stripInternalFields sorting keys, JSON.stringify becomes deterministic
+    const processedA = stripInternalFields(a);
+    const processedB = stripInternalFields(b);
+
+    const jsonA = JSON.stringify(processedA);
+    const jsonB = JSON.stringify(processedB);
+
+    if (jsonA !== jsonB) {
+        if (process.env.NODE_ENV === 'development') {
+            console.log('[areStudiesEqual] Mismatch detected');
+            // Logic to log differences if needed
+        }
+        return false;
+    }
+    return true;
 }
 
 export const useStudyDesigner = create<StudyDesignerState>((set) => ({

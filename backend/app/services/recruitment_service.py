@@ -86,7 +86,6 @@ class RecruitmentService:
         link = await db.get(RecruitmentLink, link_id)
         if link:
             link.usage_count += 1
-            await db.commit()
 
     @staticmethod
     async def record_start(db: AsyncSession, link_id: int):
@@ -94,7 +93,6 @@ class RecruitmentService:
         link = await db.get(RecruitmentLink, link_id)
         if link:
             link.start_count += 1
-            await db.commit()
 
     @staticmethod
     async def validate_link_token(

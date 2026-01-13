@@ -158,7 +158,8 @@ export class TestDatabase {
         if (!this.workspaceId) {
             throw new Error('Workspace ID not initialized. Did setup() run?');
         }
-        const response = await fetch(`${this.baseUrl}/api/admin/studies/`, {
+        const cleanBaseUrl = this.baseUrl.replace(/\/$/, '');
+        const response = await fetch(`${cleanBaseUrl}/api/admin/studies`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -257,16 +258,54 @@ export class TestDatabase {
     }
 
     /**
-     * Create participant session
+     * Create participant session and submit data
      */
     async createParticipant(token: string, studySlug: string, overrides: any = {}) {
-        const response = await fetch(`${this.baseUrl}/api/study/${studySlug}/start`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+        // Generate a session token for this participant
+        const sessionToken = crypto.randomUUID();
+
+        // Fetch the public study config to get valid statement IDs
+        const publicConfigRes = await fetch(`${this.baseUrl}/api/study/${studySlug}`);
+        if (!publicConfigRes.ok) {
+             throw new Error(`Failed to fetch public study config: ${await publicConfigRes.text()}`);
+        }
+        const publicConfig = await publicConfigRes.json();
+        const statements = publicConfig.statements || [];
+
+        if (statements.length < 7) {
+            // We need at least 7 statements for our mock qsort
+            console.warn(`Warning: Study has only ${statements.length} statements, mock qsort might fail.`);
+        }
+
+        // Build qsort as list of QSortEntryInput objects using REAL statement IDs
+        const qsortEntries = overrides.qsort || statements.map((s: any, index: number) => {
+            // Map first 7 statements to our distribution, others to 0 or ignored
+            const scores = [-3, -2, -1, 0, 1, 2, 3];
+            const score = index < scores.length ? scores[index] : 0;
+            return { statement_id: s.id, grid_score: score };
         });
+
+        // Build a complete submission with the study's expected format
+        const submission = {
+            study_slug: studySlug,
+            session_token: sessionToken,
+            language_used: 'en',
+            qsort: qsortEntries,
+            presort_answers: overrides.presort_answers || {},
+            postsort_answers: overrides.postsort_answers || {},
+            status: 'completed',
+            ...overrides,
+        };
+
+        const response = await fetch(`${this.baseUrl}/api/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(submission),
+        });
+
         if (!response.ok) {
-             const txt = await response.text();
-             throw new Error(`Failed to start participant: ${txt}`);
+            const txt = await response.text();
+            throw new Error(`Failed to submit participant data: ${txt}`);
         }
         return response.json();
     }

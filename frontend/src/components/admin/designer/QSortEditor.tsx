@@ -344,10 +344,14 @@ const QSortEditor = () => {
                 onValueChange={(v) => setActiveSubTab(v as 'statements' | 'grid')}
             >
                 <TabsList className="grid grid-cols-2 w-full max-w-[400px]">
-                    <TabsTrigger value="statements" className="gap-2">
+                    <TabsTrigger
+                        value="statements"
+                        className="gap-2"
+                        data-testid="subtab-statements"
+                    >
                         <Quote className="h-4 w-4" /> {t('admin.design.qsort.tabs.statements')}
                     </TabsTrigger>
-                    <TabsTrigger value="grid" className="gap-2">
+                    <TabsTrigger value="grid" className="gap-2" data-testid="subtab-grid">
                         <Grid3X3 className="h-4 w-4" /> {t('admin.design.qsort.tabs.distribution')}
                     </TabsTrigger>
                 </TabsList>
@@ -750,7 +754,10 @@ const QSortEditor = () => {
                                         ))}
                                     </div>
 
-                                    <div className="mt-2 text-[11px] font-black w-9 h-9 rounded-xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter">
+                                    <div
+                                        className="mt-2 text-[11px] font-black w-9 h-9 rounded-xl border-2 bg-white flex items-center justify-center shadow-sm text-slate-700 tracking-tighter"
+                                        data-testid={`grid-column-${idx}-score`}
+                                    >
                                         {col.score === Infinity || col.score === -Infinity
                                             ? '?'
                                             : col.score > 0
@@ -784,6 +791,7 @@ const QSortEditor = () => {
                                         'admin.design.qsort.grid.remove_extreme_columns',
                                         'Remove extreme columns'
                                     )}
+                                    data-testid="reduce-grid-button"
                                 >
                                     <Minus className="h-4 w-4" />
                                     {t('common.reduce', 'Reduce')}
@@ -797,6 +805,7 @@ const QSortEditor = () => {
                                         'admin.design.qsort.grid.add_extreme_columns',
                                         'Add extreme columns'
                                     )}
+                                    data-testid="expand-grid-button"
                                 >
                                     <Plus className="h-4 w-4" />
                                     {t('common.expand', 'Expand')}
@@ -814,6 +823,7 @@ const QSortEditor = () => {
                                     'admin.design.qsort.grid.auto_balance_desc',
                                     'Reshape grid to a balanced semi-normal distribution'
                                 )}
+                                data-testid="auto-balance-button"
                             >
                                 <Wand2 className="h-4 w-4" />
                                 {t('admin.design.qsort.grid.auto_balance', 'Auto-Balance')}

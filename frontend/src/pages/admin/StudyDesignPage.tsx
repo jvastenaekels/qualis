@@ -90,7 +90,7 @@ const StudyDesignPage = () => {
     } = useStudyDesigner();
 
     // Enable auto-save
-    useAutoSave();
+    useAutoSave(1000);
 
     const [isLangModalOpen, setIsLangModalOpen] = useState(false);
 
@@ -339,6 +339,8 @@ const StudyDesignPage = () => {
                     </h2>
                     {/* Status Badge */}
                     <div
+                        role="status"
+                        data-testid="study-status"
                         className={cn(
                             'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border shrink-0',
                             draft.state === 'active'
@@ -541,6 +543,7 @@ const StudyDesignPage = () => {
                         <TabsList className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap overflow-x-auto w-full max-w-5xl mx-auto shadow-sm mb-12 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory rounded-2xl h-14">
                             <TabsTrigger
                                 value="intro"
+                                data-testid="tab-intro"
                                 className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-indigo-100 text-slate-500 hover:text-slate-900"
                             >
                                 <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
@@ -550,6 +553,7 @@ const StudyDesignPage = () => {
                             </TabsTrigger>
                             <TabsTrigger
                                 value="pre-sort"
+                                data-testid="tab-pre-sort"
                                 className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-amber-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-amber-100 text-slate-500 hover:text-slate-900"
                             >
                                 <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
@@ -559,6 +563,7 @@ const StudyDesignPage = () => {
                             </TabsTrigger>
                             <TabsTrigger
                                 value="condition"
+                                data-testid="tab-condition"
                                 className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-rose-100 text-slate-500 hover:text-slate-900"
                             >
                                 <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
@@ -581,6 +586,7 @@ const StudyDesignPage = () => {
                             </TabsTrigger>
                             <TabsTrigger
                                 value="post-sort"
+                                data-testid="tab-post-sort"
                                 className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-emerald-100 text-slate-500 hover:text-slate-900"
                             >
                                 <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
@@ -590,6 +596,7 @@ const StudyDesignPage = () => {
                             </TabsTrigger>
                             <TabsTrigger
                                 value="branding"
+                                data-testid="tab-branding"
                                 className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-pink-100 text-slate-500 hover:text-slate-900"
                             >
                                 <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
@@ -599,7 +606,8 @@ const StudyDesignPage = () => {
                             </TabsTrigger>
                             <TabsTrigger
                                 value="interface"
-                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-cyan-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-cyan-100 text-slate-500 hover:text-slate-900"
+                                data-testid="tab-interface"
+                                className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-slate-100 text-slate-500 hover:text-slate-900"
                             >
                                 <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
                                     ✨
@@ -771,6 +779,7 @@ const StudyDesignPage = () => {
                                         onClick={handleActivate}
                                         disabled={isActivating || isFullyReadOnly || !isLaunchReady}
                                         className="gap-2 h-12 px-8 rounded-xl font-black bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-200 transition-all"
+                                        data-testid="activate-button"
                                     >
                                         <Rocket className="h-5 w-5" />
                                         {t('admin.study_status.state.activate', 'Activate Study')}
@@ -782,10 +791,7 @@ const StudyDesignPage = () => {
                 </div>
 
                 {/* Design Checklist Sidebar/Widget */}
-                <div
-                    className="xl:block w-80 shrink-0 border-l bg-white p-6 overflow-y-auto"
-                    data-testid="readiness-checklist"
-                >
+                <div className="xl:block w-80 shrink-0 border-l bg-white p-6 overflow-y-auto">
                     <div className="sticky top-0 space-y-8">
                         <div>
                             <div className="flex items-center gap-3 mb-6">
@@ -797,7 +803,7 @@ const StudyDesignPage = () => {
                                 </h3>
                             </div>
 
-                            <div className="space-y-4">
+                            <div className="space-y-4" data-testid="readiness-checklist">
                                 {checklist.map((item, idx) => (
                                     <div
                                         key={idx}

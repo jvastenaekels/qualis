@@ -35,6 +35,7 @@ async def submit_study(
         confirmation_code = await StudyService.process_submission(
             db, data, client_ip, user_agent
         )
+        await db.commit()
         return {"status": "success", "confirmation_code": confirmation_code}
     except HTTPException:
         # Re-raise HTTP exceptions (they're already properly formatted)
@@ -80,6 +81,7 @@ async def get_study(
             )
         # Record start (participant accessed the study layout)
         await RecruitmentService.record_start(db, link.id)
+        await db.commit()
 
     # 4. Password Protection
     if study.access_password and not verify_password(

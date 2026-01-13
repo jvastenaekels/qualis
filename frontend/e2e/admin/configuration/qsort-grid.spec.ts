@@ -41,14 +41,18 @@ test.describe('Q-Sort Grid Configuration Testing', () => {
                 await page.click('button[type="submit"]');
 
                 // Navigate to Q-Sort configuration
-                await page.click(`text=${studySlug}`);
-                await page.click('text=Q-Sort');
+                await page.getByText(studySlug).click();
+                await page.getByTestId('tab-q-sort').click();
+                await page.getByTestId('subtab-grid').click();
 
                 // Verify grid columns are displayed
                 const gridConfig = testDataBuilders.gridConfig(distribution);
-                for (const column of gridConfig) {
-                    await expect(page.locator(`text=Score ${column.score}`)).toBeVisible();
-                    await expect(page.locator(`text=${column.capacity} cards`)).toBeVisible();
+                for (let i = 0; i < gridConfig.length; i++) {
+                    const column = gridConfig[i];
+                    const scoreText = column.score > 0 ? `+${column.score}` : `${column.score}`;
+                    await expect(page.getByTestId(`grid-column-${i}-score`)).toHaveText(scoreText);
+                    // Capacity is in a tooltip or hidden until hover, but we can check data-testid
+                    await expect(page.getByTestId(`grid-column-${i}-slots`)).toBeVisible();
                 }
             });
 
@@ -171,44 +175,36 @@ test.describe('Q-Sort Grid Configuration Testing', () => {
             studySlug = study.slug;
         });
 
-        test('Admin: Can add grid column', async ({ page }) => {
-            await page.goto('/admin');
-            await page.fill('input[name="username"]', 'test@example.com');
-            await page.fill('input[name="password"]', 'testpassword');
-            await page.click('button[type="submit"]');
+        test('Admin: Can expand grid', async ({ page, testDb }) => {
+            await testDb.loginToAdminUI(page);
+            await page.getByText(studySlug).click();
+            await page.getByTestId('tab-q-sort').click();
+            await page.getByTestId('subtab-grid').click();
 
-            await page.click(`text=${studySlug}`);
-            await page.click('text=Q-Sort');
+            // Initial column count
+            const initialCount = await page.locator('[data-testid^="grid-column-"]').count();
 
-            // Add a new column
-            await page.click('button:has-text("Add Column")');
-            await page.fill('input[name="score"]', '4');
-            await page.fill('input[name="capacity"]', '2');
-            await page.click('button:has-text("Save")');
+            // Expand grid
+            await page.getByTestId('expand-grid-button').click();
 
-            // Verify column appears
-            await expect(page.locator('text=Score 4')).toBeVisible();
-            await expect(page.locator('text=2 cards')).toBeVisible();
+            // Verify column count increased
+            const finalCount = await page.locator('[data-testid^="grid-column-"]').count();
+            expect(finalCount).toBe(initialCount + 2);
         });
 
-        test('Admin: Can remove grid column', async ({ page }) => {
-            await page.goto('/admin');
-            await page.fill('input[name="username"]', 'test@example.com');
-            await page.fill('input[name="password"]', 'testpassword');
-            await page.click('button[type="submit"]');
+        test('Admin: Can reduce grid', async ({ page, testDb }) => {
+            await testDb.loginToAdminUI(page);
+            await page.getByText(studySlug).click();
+            await page.getByTestId('tab-q-sort').click();
+            await page.getByTestId('subtab-grid').click();
 
-            await page.click(`text=${studySlug}`);
-            await page.click('text=Q-Sort');
+            const initialCount = await page.locator('[data-testid^="grid-column-"]').count();
 
-            // Remove a column (if any exist)
-            const deleteBtn = page.locator('button[aria-label="Delete column"]').first();
-            if (await deleteBtn.isVisible()) {
-                await deleteBtn.click();
-                await page.click('button:has-text("Confirm")');
+            // Reduce grid
+            await page.getByTestId('reduce-grid-button').click();
 
-                // Verify column is removed
-                // (Implementation-specific assertion)
-            }
+            const finalCount = await page.locator('[data-testid^="grid-column-"]').count();
+            expect(finalCount).toBe(initialCount - 2);
         });
 
         test('Admin: Can modify column capacity', async ({ page, testDb, authToken }) => {
@@ -217,21 +213,18 @@ test.describe('Q-Sort Grid Configuration Testing', () => {
                 grid_config: testDataBuilders.gridConfig('minimal'),
             });
 
-            await page.goto('/admin');
-            await page.fill('input[name="username"]', 'test@example.com');
-            await page.fill('input[name="password"]', 'testpassword');
-            await page.click('button[type="submit"]');
+            await testDb.loginToAdminUI(page);
 
-            await page.click(`text=${studySlug}`);
-            await page.click('text=Q-Sort');
+            await page.getByText(studySlug).click();
+            await page.getByTestId('tab-q-sort').click();
+            await page.getByTestId('subtab-grid').click();
 
-            // Edit first column
-            await page.click('button[aria-label="Edit column"]').first();
-            await page.fill('input[name="capacity"]', '5');
-            await page.click('button:has-text("Save")');
+            // Increase capacity of first column
+            const initialSlots = await page.getByTestId('grid-column-0-slots').locator('div').count();
+            await page.locator('button[aria-label^="Increase capacity"]').first().click();
 
-            // Verify update
-            await expect(page.locator('text=5 cards')).toBeVisible();
+            const finalSlots = await page.getByTestId('grid-column-0-slots').locator('div').count();
+            expect(finalSlots).toBe(initialSlots + 1);
         });
     });
 });

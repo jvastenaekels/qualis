@@ -592,6 +592,7 @@ class StudyService:
         )
         participant_result = await db.execute(participant_stmt)
         participant = participant_result.scalar_one_or_none()
+        is_newly_created = False
 
         if not participant:
             try:
@@ -612,9 +613,11 @@ class StudyService:
                 )
                 db.add(participant)
                 await db.flush()
+                is_newly_created = True
 
                 # Increment link usage if link was used
                 if link:
+                    # Persist the token in presort_answers for admin tracking
                     # Persist the token in presort_answers for admin tracking
                     # We modify the local 'participant' object's presort_answers so it gets saved on flush?
                     # Actually, we passed 'presort_answers' dict to constructor. We should update it before constructor or update object after.
@@ -655,7 +658,8 @@ class StudyService:
                 )
 
         # If we fell through (either from 'else' or after catching exception), participant exists.
-        if participant and participant not in db.new:
+        # Ensure we don't treat a newly created participant as an existing one we need to skip/update.
+        if participant and participant not in db.new and not is_newly_created:
             # Update existing participant
             if participant.status == ParticipantStatus.completed:
                 return str(participant.session_token)[:8].upper()
@@ -697,7 +701,7 @@ class StudyService:
                 for entry in data.qsort
             ]
             db.add_all(new_entries)
-            await db.commit()
+            # await db.commit() -> Handled by router
         except Exception as e:
             # Edge case: Handle commit failures
             await db.rollback()

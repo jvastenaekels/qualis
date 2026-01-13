@@ -54,7 +54,7 @@ async def http_exception_handler(request: Request, exc: Exception) -> JSONRespon
     if isinstance(exc.detail, dict):
         message = exc.detail.get("message", message)
         details = exc.detail.get("details", None)
-        # If 'details' was not explicitly provided but we have other keys, 
+        # If 'details' was not explicitly provided but we have other keys,
         # use the whole dict as details (minus message if redundant)
         if details is None:
             details = {k: v for k, v in exc.detail.items() if k != "message"}
