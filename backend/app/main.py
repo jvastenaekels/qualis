@@ -182,11 +182,39 @@ if os.path.exists(FRONTEND_DIST):
         # 2. Check if it's a specific static file (e.g. favicon.ico, manifest.json) in the root
         file_path = os.path.join(FRONTEND_DIST, full_path)
         if full_path and os.path.isfile(file_path):
-            return FileResponse(file_path)
+            # Cache assets (js, css, images) for 1 year, but not HTML
+            if full_path.endswith(
+                (
+                    ".js",
+                    ".css",
+                    ".png",
+                    ".jpg",
+                    ".jpeg",
+                    ".svg",
+                    ".ico",
+                    ".woff",
+                    ".woff2",
+                )
+            ):
+                return FileResponse(
+                    file_path,
+                    headers={"Cache-Control": "public, max-age=31536000, immutable"},
+                )
+            else:
+                return FileResponse(
+                    file_path, headers={"Cache-Control": "no-cache, must-revalidate"}
+                )
 
-        # 3. Otherwise serve index.html for CSR navigation
+        # 3. Otherwise serve index.html for CSR navigation (never cache HTML)
         index_path = os.path.join(FRONTEND_DIST, "index.html")
-        return FileResponse(index_path)
+        return FileResponse(
+            index_path,
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
+        )
 else:
 
     @app.get("/")
