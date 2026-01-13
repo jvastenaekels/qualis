@@ -140,14 +140,12 @@ export function useAutoSave(debounceMs = 2000) {
                             if (mergeResult.success && mergeResult.merged) {
                                 toast.info('Synced with concurrent changes from another user');
 
-                                // 1. Update Baseline
+                                // 1. Update Baseline (server state becomes new original)
                                 updateOriginal(serverRead);
 
                                 // 2. Update Draft with Merged Content
-                                // We use a special update to replace everything
                                 updateDraft((d) => {
                                     // Clear existing keys to ensure removal works
-                                    // Though Immer might prefer just setting properties
                                     Object.keys(d).forEach((k) => {
                                         // @ts-expect-error
                                         if (mergeResult.merged[k] === undefined) delete d[k];
@@ -155,11 +153,16 @@ export function useAutoSave(debounceMs = 2000) {
                                     Object.assign(d, mergeResult.merged);
                                 });
 
-                                // 3. Retry save immediately with new timestamp
-                                if (retry < 5) {
-                                    attemptSave(retry + 1);
-                                    return;
-                                }
+                                // 3. Mark as synced - the merged content is now in sync
+                                // We track it as the last saved to prevent re-triggering
+                                lastSavedDraftRef.current = JSON.stringify(mergeResult.merged);
+                                setSyncStatus('synced');
+                                setLastSavedAt(new Date());
+                                retryCountRef.current = 0;
+
+                                // DO NOT retry save here - the merge resolved the conflict
+                                // If there are new changes, the useEffect will trigger another save
+                                return;
                             } else {
                                 // Hard Conflict
                                 toast.error('Conflict detected. Some changes could not be merged.');
