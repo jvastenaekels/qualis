@@ -15,6 +15,7 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { ApiError } from './api/client';
 import ErrorBoundary from './components/ErrorBoundary';
 import { useAdminStore } from './store/useAdminStore';
+import { useAuthStore } from './store/useAuthStore';
 import StudyLayout from './layouts/StudyLayout';
 import ConsentPage from './pages/ConsentPage';
 import ErrorPage from './pages/ErrorPage';
@@ -63,6 +64,12 @@ const AdminDashboard = lazy(() =>
 
 const AdminIndex = () => {
     const { activeStudyId } = useAdminStore();
+    const { user, workspaces } = useAuthStore();
+
+    // If superuser has no workspaces, redirect to create workspace page
+    if (user?.is_superuser && (!workspaces || workspaces.length === 0)) {
+        return <Navigate to="/admin/workspaces/new" replace />;
+    }
 
     if (activeStudyId) {
         return <Navigate to={`/admin/studies/${activeStudyId}`} replace />;
