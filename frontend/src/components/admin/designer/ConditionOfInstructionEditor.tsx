@@ -3,11 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Target, Info } from 'lucide-react';
+import { Target } from 'lucide-react';
 import type React from 'react';
-import MarkdownEditor from './MarkdownEditor';
 
 const ConditionOfInstructionEditor = () => {
     const { t } = useTranslation();
@@ -16,8 +14,6 @@ const ConditionOfInstructionEditor = () => {
     if (!draft) return null;
 
     const translation = draft.translations?.find((t) => t.language_code === activeLocale);
-    const hasPreInstruction =
-        translation?.pre_instruction !== null && translation?.pre_instruction !== undefined;
 
     const handleChange = (field: keyof StudyTranslation, value: string | null) => {
         // biome-ignore lint/suspicious/noExplicitAny: dynamic field update on translation object
@@ -40,10 +36,13 @@ const ConditionOfInstructionEditor = () => {
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardHeader className="pb-4">
                         <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
-                            {t('admin.design.condition.label')}
+                            {t('admin.design.condition.grid_title', 'Grid Sort Instruction')}
                         </CardTitle>
                         <CardDescription className="text-sm font-medium text-slate-500 italic">
-                            {t('admin.design.condition.desc')}
+                            {t(
+                                'admin.design.condition.grid_desc',
+                                'This is the core instruction guiding participants during the grid sorting process.'
+                            )}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
@@ -52,7 +51,7 @@ const ConditionOfInstructionEditor = () => {
                                 htmlFor="condition_of_instruction"
                                 className="text-[10px] font-black uppercase tracking-wider text-slate-500"
                             >
-                                {t('admin.design.condition.field_label')}
+                                {t('admin.design.condition.field_label', 'Instruction Text')}
                             </Label>
                             <Input
                                 id="condition_of_instruction"
@@ -60,7 +59,10 @@ const ConditionOfInstructionEditor = () => {
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                     handleChange('condition_of_instruction', e.target.value)
                                 }
-                                placeholder={t('admin.design.condition.placeholder')}
+                                placeholder={t(
+                                    'admin.design.condition.placeholder',
+                                    'e.g. Please rank the following statements...'
+                                )}
                                 className="font-bold text-lg h-12 rounded-xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-indigo-500/20 transition-all px-4"
                             />
                         </div>
@@ -68,45 +70,41 @@ const ConditionOfInstructionEditor = () => {
                 </Card>
             </section>
 
-            <section className="space-y-6">
-                <div className="flex items-center justify-between bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 shadow-sm transition-all hover:bg-indigo-50">
-                    <div className="flex items-center gap-4 text-slate-900 font-bold text-lg tracking-tight">
-                        <div className="bg-white p-2 rounded-xl border border-indigo-100 shadow-sm">
-                            <Info className="h-5 w-5 text-indigo-600" />
-                        </div>
-                        {t('admin.design.condition.enable_pre')}
-                    </div>
-                    <Switch
-                        id="enable-pre-instruction"
-                        checked={hasPreInstruction}
-                        onCheckedChange={(checked: boolean) => {
-                            if (checked === hasPreInstruction) return;
-                            if (checked) {
-                                handleChange('pre_instruction', '');
-                            } else {
-                                handleChange('pre_instruction', null);
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-6">
+                <CardHeader className="pb-4">
+                    <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
+                        {t('admin.design.condition.pre_title', 'Preliminary Sort Instruction')}
+                    </CardTitle>
+                    <CardDescription className="text-sm font-medium text-slate-500 italic">
+                        {t(
+                            'admin.design.condition.pre_desc',
+                            'Instruction given to participants during the initial grouping into three piles.'
+                        )}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="grid gap-3">
+                        <Label
+                            htmlFor="pre_instruction"
+                            className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                        >
+                            {t('admin.design.condition.pre_field_label', 'Instruction Text')}
+                        </Label>
+                        <Input
+                            id="pre_instruction"
+                            value={translation?.pre_instruction || ''}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                handleChange('pre_instruction', e.target.value)
                             }
-                        }}
-                    />
-                </div>
-
-                {hasPreInstruction && (
-                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden animate-in slide-in-from-top-4 duration-500">
-                        <CardContent className="pt-8">
-                            <div className="grid gap-3">
-                                <MarkdownEditor
-                                    id="pre_instruction"
-                                    label={t('admin.design.condition.pre_label')}
-                                    value={translation?.pre_instruction || ''}
-                                    onChange={(val: string) => handleChange('pre_instruction', val)}
-                                    placeholder={t('admin.design.condition.pre_desc')}
-                                    className="min-h-[250px]"
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
-            </section>
+                            placeholder={t(
+                                'admin.design.condition.pre_placeholder',
+                                'e.g. Based on your personal point of view...'
+                            )}
+                            className="font-bold text-lg h-12 rounded-xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-indigo-500/20 transition-all px-4"
+                        />
+                    </div>
+                </CardContent>
+            </Card>
 
             <section className="bg-amber-50/50 border border-amber-100 rounded-2xl p-8 shadow-sm">
                 <h4 className="text-base font-black text-amber-900 mb-3 flex items-center gap-3 tracking-tight">

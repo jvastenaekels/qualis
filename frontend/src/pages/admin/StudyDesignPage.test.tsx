@@ -59,6 +59,9 @@ describe('StudyDesignPage Feature Tests', () => {
                 language_code: 'en',
                 title: 'Draft Study',
                 condition_of_instruction: 'Test instruction',
+                pre_instruction: 'Test pre-instruction',
+                consent_title: 'Test Consent',
+                consent_description: 'Test Description',
             },
         ],
     };
@@ -92,7 +95,7 @@ describe('StudyDesignPage Feature Tests', () => {
         expect(await screen.findByTestId('readiness-checklist')).toBeInTheDocument();
 
         // Check for specific checklist items
-        expect(screen.getByText(/Statements defined/i)).toBeInTheDocument();
+        expect(screen.getAllByText(/^Statements$/i)[0]).toBeInTheDocument();
         expect(screen.getByText(/Grid balanced/i)).toBeInTheDocument();
     });
 

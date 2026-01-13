@@ -23,6 +23,13 @@ const InterfaceEditor = () => {
         useStudyDesigner();
     const { t, i18n } = useTranslation();
 
+    // Ensure resources for the active editing language are loaded
+    useEffect(() => {
+        if (activeLocale && !i18n.hasResourceBundle(activeLocale, 'translation')) {
+            i18n.loadLanguages(activeLocale);
+        }
+    }, [activeLocale, i18n]);
+
     // Ensure structural consistency for methodology tips
     // If one language has more tips, pad others with empty strings
     // biome-ignore lint/correctness/useExhaustiveDependencies: updateDraft stable

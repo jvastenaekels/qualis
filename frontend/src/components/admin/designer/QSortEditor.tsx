@@ -308,7 +308,7 @@ const QSortEditor = () => {
             // Ensure no capacity is below 1 if N >= K
             for (let i = 0; i < numColumns; i++) {
                 if (newCapacities[i] <= 0 && N >= numColumns) newCapacities[i] = 1;
-                if (d.grid_config && d.grid_config[i]) {
+                if (d.grid_config?.[i]) {
                     d.grid_config[i].capacity = newCapacities[i];
                 }
             }

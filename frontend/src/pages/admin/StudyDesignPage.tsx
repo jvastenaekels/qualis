@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import type { StudyUpdate, StudyRead } from '@/api/model';
+import type { StudyUpdate, StudyRead, StudyTranslationRead } from '@/api/model';
 import {
     Wand2,
     Eye,
@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/dialog';
 import { DesignerSkeleton } from '@/components/admin/DashboardSkeleton';
 import { useStudyDesigner, projectStudyToUpdate, areStudiesEqual } from '@/store/useStudyDesigner';
+import { DEFAULT_STUDY_CONTENT } from '@/constants/studyDefaults';
 import IntroductionEditor from '@/components/admin/designer/IntroductionEditor';
 import QuestionBuilder from '@/components/admin/designer/QuestionBuilder';
 import QSortEditor from '@/components/admin/designer/QSortEditor';
@@ -101,11 +102,25 @@ const StudyDesignPage = () => {
     // Initialize designer state when study is loaded
     useEffect(() => {
         if (study) {
+            // Deep clone to allow mutation for defaults
+            const studyWithDefaults = JSON.parse(JSON.stringify(study));
+
+            // Ensure defaults for methodology tips if missing
+            studyWithDefaults.translations?.forEach((tr: StudyTranslationRead) => {
+                if (!tr.methodology_tips || tr.methodology_tips.length === 0) {
+                    const defaults =
+                        DEFAULT_STUDY_CONTENT[tr.language_code] || DEFAULT_STUDY_CONTENT.en;
+                    if (defaults?.methodology_tips) {
+                        tr.methodology_tips = [...defaults.methodology_tips];
+                    }
+                }
+            });
+
             const currentDraft = useStudyDesigner.getState().draft;
 
             if (!currentDraft) {
                 // First time load: initialize both original and draft
-                setStudy(study);
+                setStudy(studyWithDefaults);
             } else {
                 // Background update (e.g., after state change in dashboard)
                 // Update original first
@@ -290,24 +305,26 @@ const StudyDesignPage = () => {
 
     const checklist = [
         {
-            label: t('admin.design.checklist.study_title', 'Study Title defined'),
+            label: t('admin.design.checklist.study_title', 'Study Title'),
             isComplete: !!currentTranslation?.title,
             required: true,
         },
         {
-            label: t('admin.design.checklist.consent_defined', 'Consent Form defined'),
+            label: t('admin.design.checklist.consent_defined', 'Consent Form'),
             isComplete: !!(
                 currentTranslation?.consent_title && currentTranslation?.consent_description
             ),
             required: true,
         },
         {
-            label: t('admin.design.checklist.instructions', 'Instructions set'),
-            isComplete: !!currentTranslation?.condition_of_instruction,
+            label: t('admin.design.checklist.instructions', 'Instructions'),
+            isComplete: !!(
+                currentTranslation?.condition_of_instruction && currentTranslation?.pre_instruction
+            ),
             required: true,
         },
         {
-            label: t('admin.design.checklist.statements', 'Statements defined'),
+            label: t('admin.design.checklist.statements', 'Statements'),
             isComplete: (draft.statements?.length || 0) > 0,
             required: true,
         },
@@ -329,7 +346,8 @@ const StudyDesignPage = () => {
                 tr.title &&
                 tr.consent_title &&
                 tr.consent_description &&
-                tr.condition_of_instruction
+                tr.condition_of_instruction &&
+                tr.pre_instruction
             );
             return {
                 code: tr.language_code,
@@ -552,7 +570,7 @@ const StudyDesignPage = () => {
                     </div>
                 )}
                 {/* Left Pane: Editor */}
-                <div className="flex-1 overflow-y-auto bg-muted/30 p-6 min-w-0">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-6 min-w-0">
                     <Tabs
                         value={activeStep}
                         // biome-ignore lint/suspicious/noExplicitAny: enum cast
