@@ -52,15 +52,16 @@ def main():
     # 2. Initialize Database (Create missing tables)
     run_task("init_db.py", "Infrastructure Initialization")
 
-    # 2. Sync Study Configuration
-    if os.path.exists("data/example-study.json"):
-        run_task(
-            "seed.py",
-            "Study Configuration Sync",
-            ["data/example-study.json"],
-        )
-    else:
-        print("[PostDeploy] Skipping Study Tasks: data/example-study.json not found.")
+    # 3. Sync Study Configuration
+    # (Disabled per user request: "don't install example study")
+    # if os.path.exists("data/example-study.json"):
+    #     run_task(
+    #         "seed.py",
+    #         "Study Configuration Sync",
+    #         ["data/example-study.json"],
+    #     )
+    # else:
+    #     print("[PostDeploy] Skipping Study Tasks: data/example-study.json not found.")
 
     print("\n--- All Tasks Completed Successfully ---")
 

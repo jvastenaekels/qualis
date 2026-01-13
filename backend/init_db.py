@@ -71,27 +71,28 @@ async def init_db(reset: bool = False):
         session.add(owner)
         await session.flush()  # get ID
 
-        # 2. Create Default Workspace
-        from app.models import Workspace, WorkspaceMember, WorkspaceRole
-
-        default_workspace = Workspace(
-            title="Example Workspace",
-            slug="example-workspace",
-        )
-        session.add(default_workspace)
-        await session.flush()  # get ID
-
-        # 3. Add Admin to Workspace
-        member = WorkspaceMember(
-            workspace_id=default_workspace.id,
-            user_id=owner.id,
-            role=WorkspaceRole.admin,
-        )
-        session.add(member)
+        # 2. Defaults (Workspaces)
+        # (Disabled per user request: "don't install example workspace")
+        # from app.models import Workspace, WorkspaceMember, WorkspaceRole
+        #
+        # default_workspace = Workspace(
+        #     title="Example Workspace",
+        #     slug="example-workspace",
+        # )
+        # session.add(default_workspace)
+        # await session.flush()  # get ID
+        #
+        # # 3. Add Admin to Workspace
+        # member = WorkspaceMember(
+        #     workspace_id=default_workspace.id,
+        #     user_id=owner.id,
+        #     role=WorkspaceRole.admin,
+        # )
+        # session.add(member)
 
         await session.commit()
         print(f"3. Admin user created: {admin_email}")
-        print(f"4. Default workspace created: {default_workspace.title}")
+        # print(f"4. Default workspace created: {default_workspace.title}")
         print("\nNote: To seed a study, use: python seed.py data/example-study.json")
         print("--- Initialization Complete ---")
     await engine.dispose()
