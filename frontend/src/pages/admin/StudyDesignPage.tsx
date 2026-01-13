@@ -12,7 +12,6 @@ import {
     Globe,
     Check,
     ChevronDown,
-    Languages,
     Settings2,
     History,
     Rocket,
@@ -318,15 +317,15 @@ const StudyDesignPage = () => {
             style={{ animationFillMode: 'forwards' }}
         >
             {/* Toolbar */}
-            <div className="border-b bg-background px-4 sm:px-6 py-2 flex flex-col sm:flex-row gap-2 sm:gap-4 sm:items-center justify-between shrink-0">
-                <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-                    <div className="flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-100 rounded-lg shrink-0">
+            <div className="border-b bg-background px-4 py-2 flex flex-col lg:flex-row gap-3 lg:items-center justify-between shrink-0">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div
+                        className="flex items-center justify-center h-8 w-8 bg-indigo-50 border border-indigo-100 rounded-lg shrink-0"
+                        title={t('admin.design.toolbar.title')}
+                    >
                         <Wand2 className="h-4 w-4 text-indigo-600" />
-                        <span className="text-xs sm:text-sm font-black text-indigo-900 uppercase tracking-wider hidden sm:inline">
-                            {t('admin.design.toolbar.title')}
-                        </span>
                     </div>
-                    <div className="h-4 w-px bg-border hidden sm:block" />
+                    <div className="h-4 w-px bg-border hidden lg:block" />
                     <h2 className="text-xs sm:text-sm font-black text-slate-900 truncate min-w-0">
                         {draft.translations?.find((t) => t.language_code === activeLocale)?.title ||
                             draft.slug}
@@ -355,16 +354,9 @@ const StudyDesignPage = () => {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap">
                     {/* Language Switcher - Study Content Language */}
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 text-slate-400 text-xs hidden sm:flex">
-                            <Languages className="h-3.5 w-3.5" />
-                            <span className="font-bold uppercase tracking-wider text-[10px]">
-                                {t('admin.design.toolbar.editing_language')}
-                            </span>
-                        </div>
-
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
@@ -785,9 +777,10 @@ const StudyDesignPage = () => {
                     </Tabs>
                 </div>
 
-                {/* Design Checklist Sidebar/Widget */}{/* Hidden on smaller screens for responsiveness */}
-                <div className="hidden xl:block w-80 shrink-0 border-l bg-white p-6 overflow-y-auto">
-                    <div className="sticky top-0 space-y-8">
+                {/* Design Checklist Sidebar/Widget */}
+                {/* Hidden on smaller screens for responsiveness */}
+                <div className="hidden xl:block w-64 shrink-0 border-l bg-white p-4 overflow-y-auto">
+                    <div className="sticky top-0 space-y-6">
                         <div>
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="p-2 bg-indigo-50 rounded-xl">
@@ -798,18 +791,18 @@ const StudyDesignPage = () => {
                                 </h3>
                             </div>
 
-                            <div className="space-y-4" data-testid="readiness-checklist">
+                            <div className="space-y-3" data-testid="readiness-checklist">
                                 {checklist.map((item, idx) => (
                                     <div
                                         key={idx}
-                                        className="flex items-start gap-3 p-3 rounded-xl border border-transparent transition-all hover:bg-slate-50"
+                                        className="flex items-start gap-2.5 p-2 rounded-lg border border-transparent transition-all hover:bg-slate-50"
                                     >
                                         {item.isComplete ? (
-                                            <CircleCheck className="h-5 w-5 text-green-500 shrink-0" />
+                                            <CircleCheck className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
                                         ) : item.required ? (
-                                            <CircleDashed className="h-5 w-5 text-slate-300 shrink-0" />
+                                            <CircleDashed className="h-4 w-4 text-slate-300 shrink-0 mt-0.5" />
                                         ) : (
-                                            <CircleDashed className="h-5 w-5 text-slate-200 shrink-0" />
+                                            <CircleDashed className="h-4 w-4 text-slate-200 shrink-0 mt-0.5" />
                                         )}
                                         <div className="space-y-0.5">
                                             <p
@@ -823,7 +816,7 @@ const StudyDesignPage = () => {
                                                 {item.label}
                                             </p>
                                             {item.required && !item.isComplete && (
-                                                <p className="text-[10px] font-medium text-rose-500 uppercase tracking-tighter">
+                                                <p className="text-[9px] font-medium text-rose-500 uppercase tracking-tighter">
                                                     Required
                                                 </p>
                                             )}
