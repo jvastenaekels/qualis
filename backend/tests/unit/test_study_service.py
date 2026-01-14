@@ -13,8 +13,8 @@ from app.services.study_service import StudyService
 
 
 @pytest.mark.asyncio
-async def test_validate_distribution_valid(seed_study):
-    # seed_study has capacity: -1:1, 0:2, 1:1 (Total 4)
+async def test_validate_distribution_valid(active_study):
+    # active_study has capacity: -1:1, 0:2, 1:1 (Total 4)
     qsort = [
         QSortEntryInput(statement_id=1, grid_score=-1),
         QSortEntryInput(statement_id=2, grid_score=0),
@@ -22,20 +22,20 @@ async def test_validate_distribution_valid(seed_study):
         QSortEntryInput(statement_id=4, grid_score=1),
     ]
     # Should not raise
-    StudyService.validate_distribution(seed_study, qsort)
+    StudyService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
-async def test_validate_distribution_incomplete(seed_study):
+async def test_validate_distribution_incomplete(active_study):
     qsort = [QSortEntryInput(statement_id=1, grid_score=0)]
     with pytest.raises(HTTPException) as excinfo:
-        StudyService.validate_distribution(seed_study, qsort)
+        StudyService.validate_distribution(active_study, qsort)
     assert excinfo.value.status_code == 400
     assert "Submission incomplete" in excinfo.value.detail
 
 
 @pytest.mark.asyncio
-async def test_validate_distribution_wrong_counts(seed_study):
+async def test_validate_distribution_wrong_counts(active_study):
     # All in column 0
     qsort = [
         QSortEntryInput(statement_id=1, grid_score=0),
@@ -44,13 +44,13 @@ async def test_validate_distribution_wrong_counts(seed_study):
         QSortEntryInput(statement_id=4, grid_score=0),
     ]
     with pytest.raises(HTTPException) as excinfo:
-        StudyService.validate_distribution(seed_study, qsort)
+        StudyService.validate_distribution(active_study, qsort)
     assert excinfo.value.status_code == 400
     assert "incorrect number of cards" in excinfo.value.detail
 
 
 @pytest.mark.asyncio
-async def test_validate_distribution_invalid_score(seed_study):
+async def test_validate_distribution_invalid_score(active_study):
     qsort = [
         QSortEntryInput(statement_id=1, grid_score=-1),
         QSortEntryInput(statement_id=2, grid_score=0),
@@ -58,7 +58,7 @@ async def test_validate_distribution_invalid_score(seed_study):
         QSortEntryInput(statement_id=4, grid_score=99),  # Invalid
     ]
     with pytest.raises(HTTPException) as excinfo:
-        StudyService.validate_distribution(seed_study, qsort)
+        StudyService.validate_distribution(active_study, qsort)
     assert excinfo.value.status_code == 400
     # It hits the "incorrect number of cards" for column 1 first, because 4 cards are expected
     # and column 1 has 0.
@@ -66,14 +66,16 @@ async def test_validate_distribution_invalid_score(seed_study):
 
 
 @pytest.mark.asyncio
-async def test_process_submission_new_participant(db, seed_study):
+async def test_process_submission_new_participant(db, active_study):
     session_token = uuid.uuid4()
     data = SubmissionInput(
         session_token=session_token,
-        study_slug=seed_study.slug,
+        study_slug=active_study.slug,
         language_used="en",
         status=ParticipantStatus.started,
-        qsort=[QSortEntryInput(statement_id=seed_study.statements[0].id, grid_score=0)],
+        qsort=[
+            QSortEntryInput(statement_id=active_study.statements[0].id, grid_score=0)
+        ],
     )
 
     code = await StudyService.process_submission(db, data, "127.0.0.1")
@@ -91,27 +93,29 @@ async def test_process_submission_new_participant(db, seed_study):
 
 
 @pytest.mark.asyncio
-async def test_process_submission_update_existing(db, seed_study):
+async def test_process_submission_update_existing(db, active_study):
     session_token = uuid.uuid4()
     # 1. First submission
     data1 = SubmissionInput(
         session_token=session_token,
-        study_slug=seed_study.slug,
+        study_slug=active_study.slug,
         language_used="en",
         status=ParticipantStatus.started,
-        qsort=[QSortEntryInput(statement_id=seed_study.statements[0].id, grid_score=0)],
+        qsort=[
+            QSortEntryInput(statement_id=active_study.statements[0].id, grid_score=0)
+        ],
     )
     await StudyService.process_submission(db, data1, "1.1.1.1")
 
     # 2. Update
     data2 = SubmissionInput(
         session_token=session_token,
-        study_slug=seed_study.slug,
+        study_slug=active_study.slug,
         language_used="en",
         status=ParticipantStatus.started,
         qsort=[
-            QSortEntryInput(statement_id=seed_study.statements[0].id, grid_score=1),
-            QSortEntryInput(statement_id=seed_study.statements[1].id, grid_score=-1),
+            QSortEntryInput(statement_id=active_study.statements[0].id, grid_score=1),
+            QSortEntryInput(statement_id=active_study.statements[1].id, grid_score=-1),
         ],
     )
     await StudyService.process_submission(db, data2, "2.2.2.2")
@@ -129,11 +133,11 @@ async def test_process_submission_update_existing(db, seed_study):
 
 
 @pytest.mark.asyncio
-async def test_process_submission_completed_early_return(db, seed_study):
+async def test_process_submission_completed_early_return(db, active_study):
     session_token = uuid.uuid4()
     # Create already completed participant
     p = Participant(
-        study_id=seed_study.id,
+        study_id=active_study.id,
         session_token=session_token,
         language_used="en",
         status=ParticipantStatus.completed,
@@ -144,7 +148,7 @@ async def test_process_submission_completed_early_return(db, seed_study):
 
     data = SubmissionInput(
         session_token=session_token,
-        study_slug=seed_study.slug,
+        study_slug=active_study.slug,
         language_used="en",
         status=ParticipantStatus.started,  # Trying to change back to started?
         qsort=[],
@@ -164,10 +168,10 @@ async def test_process_submission_completed_early_return(db, seed_study):
 
 
 @pytest.mark.asyncio
-async def test_validate_distribution_legacy_dict(seed_study):
+async def test_validate_distribution_legacy_dict(active_study):
     """Test validation with dict-based grid config (legacy format)."""
     # Manually change grid_config to dict: score -> capacity
-    seed_study.grid_config = {"-1": 1, "0": 2, "1": 1}
+    active_study.grid_config = {"-1": 1, "0": 2, "1": 1}
     qsort = [
         QSortEntryInput(statement_id=1, grid_score=-1),
         QSortEntryInput(statement_id=2, grid_score=0),
@@ -175,17 +179,17 @@ async def test_validate_distribution_legacy_dict(seed_study):
         QSortEntryInput(statement_id=4, grid_score=1),
     ]
     # Should not raise
-    StudyService.validate_distribution(seed_study, qsort)
+    StudyService.validate_distribution(active_study, qsort)
 
 
 @pytest.mark.asyncio
-async def test_get_study_stats(db, seed_study):
+async def test_get_study_stats(db, active_study):
     """Test statistics calculation."""
     from datetime import datetime, timedelta
 
     # 1. Ongoing participant
     p1 = Participant(
-        study_id=seed_study.id,
+        study_id=active_study.id,
         session_token=uuid.uuid4(),
         status=ParticipantStatus.started,
         language_used="en",
@@ -194,7 +198,7 @@ async def test_get_study_stats(db, seed_study):
     # 2. Completed participant (Duration 100s)
     now = datetime.now()
     p2 = Participant(
-        study_id=seed_study.id,
+        study_id=active_study.id,
         session_token=uuid.uuid4(),
         status=ParticipantStatus.completed,
         language_used="en",
@@ -204,7 +208,7 @@ async def test_get_study_stats(db, seed_study):
     )
     # 3. Discarded participant (Should be ignored)
     p3 = Participant(
-        study_id=seed_study.id,
+        study_id=active_study.id,
         session_token=uuid.uuid4(),
         status=ParticipantStatus.completed,
         language_used="en",
@@ -214,7 +218,7 @@ async def test_get_study_stats(db, seed_study):
     db.add_all([p1, p2, p3])
     await db.commit()
 
-    stats = await StudyService.get_study_stats(db, seed_study.id)
+    stats = await StudyService.get_study_stats(db, active_study.id)
 
     assert stats["started_count"] == 2  # p1 + p2 (p3 discarded)
     assert stats["completed_count"] == 1  # p2 only
@@ -228,14 +232,14 @@ async def test_get_study_stats(db, seed_study):
 
 
 @pytest.mark.asyncio
-async def test_get_study_full_dump(db, seed_study):
+async def test_get_study_full_dump(db, active_study):
     """Test full data dump for export."""
     from datetime import datetime
     from app.models import QSortEntry
 
     # Create completed participant with sorts
     p = Participant(
-        study_id=seed_study.id,
+        study_id=active_study.id,
         session_token=uuid.uuid4(),
         status=ParticipantStatus.completed,
         language_used="en",
@@ -249,31 +253,31 @@ async def test_get_study_full_dump(db, seed_study):
     entries = [
         QSortEntry(
             participant_id=p.id,
-            statement_id=seed_study.statements[0].id,
+            statement_id=active_study.statements[0].id,
             grid_score=-1,
         ),
         QSortEntry(
             participant_id=p.id,
-            statement_id=seed_study.statements[1].id,
+            statement_id=active_study.statements[1].id,
             grid_score=0,
         ),
         QSortEntry(
             participant_id=p.id,
-            statement_id=seed_study.statements[2].id,
+            statement_id=active_study.statements[2].id,
             grid_score=0,
         ),
         QSortEntry(
             participant_id=p.id,
-            statement_id=seed_study.statements[3].id,
+            statement_id=active_study.statements[3].id,
             grid_score=1,
         ),
     ]
     db.add_all(entries)
     await db.commit()
 
-    dump = await StudyService.get_study_full_dump(db, seed_study.id)
+    dump = await StudyService.get_study_full_dump(db, active_study.id)
 
-    assert dump["study"]["slug"] == seed_study.slug
+    assert dump["study"]["slug"] == active_study.slug
     assert len(dump["study"]["statements"]) == 4
     assert len(dump["participants"]) == 1
 

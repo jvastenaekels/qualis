@@ -136,7 +136,7 @@ async def seed_study(db, test_user, test_workspace):
     study = Study(
         slug="test-study",
         workspace_id=test_workspace.id,
-        state=StudyState.active,
+        state=StudyState.draft,  # Use draft for update tests
         grid_config=grid_config,
         presort_config={
             "age": {"type": "number", "label": {"en": "Age"}, "required": True},
@@ -253,7 +253,7 @@ async def study_factory(db: AsyncSession):
         study = Study(
             slug=slug,
             workspace_id=workspace.id,
-            state=StudyState.active,
+            state=StudyState.draft,  # Use draft for update tests
             grid_config=[{"score": 0, "capacity": 1}],
             presort_config={},
             postsort_config={},
@@ -314,3 +314,12 @@ async def workspace_member_factory(db: AsyncSession):
         await db.commit()
 
     return _add_member
+
+
+@pytest_asyncio.fixture
+async def active_study(db, seed_study):
+    """Convert seed_study to active state for submission tests."""
+    seed_study.state = StudyState.active
+    await db.commit()
+    await db.refresh(seed_study)
+    return seed_study

@@ -12,9 +12,9 @@ from app.models import Study, StudyState, Statement
 class TestParticipantFlow:
     """Tests for the overall participant lifecycle."""
 
-    async def test_full_submission_flow(self, client: AsyncClient, seed_study: Study):
+    async def test_full_submission_flow(self, client: AsyncClient, active_study: Study):
         """Test a complete valid submission from start to finish."""
-        statements = seed_study.statements
+        statements = active_study.statements
         qsort = [
             {"statement_id": statements[0].id, "grid_score": -1, "col": 0, "row": 0},
             {"statement_id": statements[1].id, "grid_score": 0, "col": 1, "row": 0},
@@ -24,7 +24,7 @@ class TestParticipantFlow:
 
         payload = {
             "session_token": str(uuid.uuid4()),
-            "study_slug": seed_study.slug,
+            "study_slug": active_study.slug,
             "language_used": "en",
             "status": "completed",
             "presort_answers": {"age": 25},
@@ -38,12 +38,12 @@ class TestParticipantFlow:
         assert data["status"] == "success"
         assert "confirmation_code" in data
 
-    async def test_draft_submission(self, client: AsyncClient, seed_study: Study):
+    async def test_draft_submission(self, client: AsyncClient, active_study: Study):
         """Test saving a partial (started) submission."""
-        statements = seed_study.statements
+        statements = active_study.statements
         payload = {
             "session_token": str(uuid.uuid4()),
-            "study_slug": seed_study.slug,
+            "study_slug": active_study.slug,
             "language_used": "en",
             "status": "started",
             "qsort": [{"statement_id": statements[0].id, "grid_score": 0}],
@@ -86,10 +86,10 @@ class TestSubmissionValidation:
         assert "not active" in response.json()["message"]
 
     async def test_invalid_grid_distribution(
-        self, client: AsyncClient, seed_study: Study
+        self, client: AsyncClient, active_study: Study
     ):
         """Submitting 'completed' status with wrong column counts should fail."""
-        statements = seed_study.statements
+        statements = active_study.statements
         # Put 4 cards in column 1 (capacity is 2)
         qsort = [
             {"statement_id": s.id, "grid_score": 0, "col": 1, "row": i}
@@ -98,7 +98,7 @@ class TestSubmissionValidation:
 
         payload = {
             "session_token": str(uuid.uuid4()),
-            "study_slug": seed_study.slug,
+            "study_slug": active_study.slug,
             "language_used": "en",
             "status": "completed",
             "qsort": qsort,
@@ -111,7 +111,7 @@ class TestSubmissionValidation:
         self,
         client: AsyncClient,
         db: AsyncSession,
-        seed_study: Study,
+        active_study: Study,
         user_factory,
         workspace_factory,
     ):
@@ -133,7 +133,7 @@ class TestSubmissionValidation:
 
         payload = {
             "session_token": str(uuid.uuid4()),
-            "study_slug": seed_study.slug,
+            "study_slug": active_study.slug,
             "language_used": "en",
             "status": "started",
             "qsort": [{"statement_id": alien_stmt.id, "grid_score": 0}],
@@ -148,7 +148,7 @@ class TestParticipantData:
     """Tests for participant metadata and consent."""
 
     async def test_consent_logging(
-        self, client: AsyncClient, db: AsyncSession, seed_study: Study
+        self, client: AsyncClient, db: AsyncSession, active_study: Study
     ):
         # We need a participant ID and session for the /consent endpoint usually,
         # but the API allows posting consent. Actually, let's check the endpoint.
