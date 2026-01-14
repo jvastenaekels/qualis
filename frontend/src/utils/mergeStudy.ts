@@ -1,9 +1,12 @@
 import type { StudyUpdate } from '@/api/model';
 
+type ResolutionStrategy = 'manual' | 'local-wins' | 'server-wins';
+
 interface MergeResult {
     success: boolean;
     merged?: StudyUpdate;
     conflicts?: string[];
+    warnings?: string[];
 }
 
 /**
@@ -13,16 +16,26 @@ interface MergeResult {
 export function mergeStudyUpdates(
     local: StudyUpdate,
     server: StudyUpdate,
-    baseline: StudyUpdate | null
+    baseline: StudyUpdate | null,
+    strategy: ResolutionStrategy = 'manual'
 ): MergeResult {
     if (!baseline) {
         // No baseline means we can't do a 3-way merge correctly without assume everything is a conflict or everything is overwrite.
-        // Safer to fail.
+        // Safer to fail unless allowed to overwrite.
+        if (strategy === 'local-wins') {
+            const merged = { ...local, last_updated_at: server.last_updated_at };
+            return {
+                success: true,
+                merged,
+                warnings: ['Baselineless merge (Local Wins)'],
+            };
+        }
         return { success: false, conflicts: ['Full Study (No Baseline)'] };
     }
 
     const merged: StudyUpdate = { ...local };
     const conflicts: string[] = [];
+    const warnings: string[] = [];
 
     // Fields to ignore or handle specially
     const ignoredFields = ['last_updated_at', 'translations', 'statements', 'grid_config'];
@@ -47,7 +60,17 @@ export function mergeStudyUpdates(
                 merged[key] = server[key];
             } else if (localVal !== serverVal) {
                 // Conflict: Both changed to different values
-                conflicts.push(key);
+                if (strategy === 'local-wins') {
+                    // Keep local value (already in merged), add warning
+                    warnings.push(key);
+                } else if (strategy === 'server-wins') {
+                    // Take server value
+                    // @ts-expect-error
+                    merged[key] = server[key];
+                    warnings.push(key);
+                } else {
+                    conflicts.push(key);
+                }
             }
         }
     }
@@ -57,7 +80,14 @@ export function mergeStudyUpdates(
     if (JSON.stringify(server.grid_config) !== JSON.stringify(baseline.grid_config)) {
         if (JSON.stringify(local.grid_config) !== JSON.stringify(baseline.grid_config)) {
             if (JSON.stringify(local.grid_config) !== JSON.stringify(server.grid_config)) {
-                conflicts.push('grid_config');
+                if (strategy === 'local-wins') {
+                    warnings.push('grid_config');
+                } else if (strategy === 'server-wins') {
+                    merged.grid_config = server.grid_config;
+                    warnings.push('grid_config');
+                } else {
+                    conflicts.push('grid_config');
+                }
             }
         } else {
             merged.grid_config = server.grid_config;
@@ -70,11 +100,6 @@ export function mergeStudyUpdates(
     // Strategy: Union of codes.
     // If conflict on content (text) for same code -> Flag conflict.
 
-    // TODO: Complex array merging logic.
-    // For "Super Friendly" v1, let's be conservative:
-    // If BOTH touched the statements list, flag conflict.
-    // Ideally we dive deep, but let's see.
-
     const localStatementsJson = JSON.stringify(local.statements);
     const baseStatementsJson = JSON.stringify(baseline.statements);
     const serverStatementsJson = JSON.stringify(server.statements);
@@ -82,8 +107,14 @@ export function mergeStudyUpdates(
     if (serverStatementsJson !== baseStatementsJson) {
         if (localStatementsJson !== baseStatementsJson) {
             if (localStatementsJson !== serverStatementsJson) {
-                conflicts.push('statements');
-                // We could implement smarter merge here later
+                if (strategy === 'local-wins') {
+                    warnings.push('statements');
+                } else if (strategy === 'server-wins') {
+                    merged.statements = server.statements;
+                    warnings.push('statements');
+                } else {
+                    conflicts.push('statements');
+                }
             }
         } else {
             merged.statements = server.statements;
@@ -98,7 +129,14 @@ export function mergeStudyUpdates(
     if (serverTransJson !== baseTransJson) {
         if (localTransJson !== baseTransJson) {
             if (localTransJson !== serverTransJson) {
-                conflicts.push('translations');
+                if (strategy === 'local-wins') {
+                    warnings.push('translations');
+                } else if (strategy === 'server-wins') {
+                    merged.translations = server.translations;
+                    warnings.push('translations');
+                } else {
+                    conflicts.push('translations');
+                }
             }
         } else {
             merged.translations = server.translations;
@@ -112,5 +150,5 @@ export function mergeStudyUpdates(
         return { success: false, conflicts };
     }
 
-    return { success: true, merged };
+    return { success: true, merged, warnings };
 }

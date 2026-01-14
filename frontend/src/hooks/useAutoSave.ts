@@ -155,11 +155,18 @@ export function useAutoSave(debounceMs = 2000) {
                             const mergeResult = mergeStudyUpdates(
                                 draft,
                                 serverUpdate,
-                                originalUpdate
+                                originalUpdate,
+                                'local-wins'
                             );
 
                             if (mergeResult.success && mergeResult.merged) {
-                                toast.info('Synced with concurrent changes from another user');
+                                if (mergeResult.warnings && mergeResult.warnings.length > 0) {
+                                    toast.info(
+                                        `Synced with server. Kept your changes in: ${mergeResult.warnings.join(', ')}`
+                                    );
+                                } else {
+                                    toast.info('Synced with concurrent changes from another user');
+                                }
 
                                 // 1. Update Baseline (server state becomes new original)
                                 updateOriginal(serverRead);
