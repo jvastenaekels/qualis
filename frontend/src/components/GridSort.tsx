@@ -19,6 +19,7 @@ import type { InteractionUtils } from '../types/grid';
 import DroppableSlot from './DroppableSlot';
 import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 
 // Sub-component: Droppable Pile
@@ -441,16 +442,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
     }) => {
         const { t } = useTranslation();
 
-        const [isMobile, setIsMobile] = useState(
-            typeof window !== 'undefined' ? window.innerWidth < 1024 : false
-        );
-
-        useEffect(() => {
-            const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-            checkMobile();
-            window.addEventListener('resize', checkMobile);
-            return () => window.removeEventListener('resize', checkMobile);
-        }, []);
+        const isMobile = useIsMobile();
 
         // Deck Management Hook
         const {

@@ -96,7 +96,8 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
     }));
 
     const handleDragEnd = async (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-        const threshold = 100;
+        const threshold =
+            typeof window !== 'undefined' ? Math.min(100, window.innerWidth * 0.25) : 100;
         const { x: offsetX, y: offsetY } = info.offset;
 
         if (offsetX > threshold) {

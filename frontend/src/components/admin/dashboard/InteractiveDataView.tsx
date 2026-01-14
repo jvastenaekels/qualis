@@ -140,6 +140,7 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
                         </span>
                     </div>
                 ),
+                meta: { className: 'hidden md:table-cell' },
             }),
             columnHelper.display({
                 id: 'flags',
@@ -170,6 +171,7 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
                         </div>
                     );
                 },
+                meta: { className: 'hidden md:table-cell' },
             }),
             columnHelper.accessor('duration_seconds', {
                 header: ({ column }) => (
@@ -197,6 +199,7 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
                         </div>
                     );
                 },
+                meta: { className: 'hidden md:table-cell' },
             }),
             columnHelper.display({
                 id: 'actions',
@@ -385,7 +388,11 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
                                 {headerGroup.headers.map((header) => (
                                     <TableHead
                                         key={header.id}
-                                        className="h-10 text-xs font-bold uppercase tracking-wider text-slate-500"
+                                        className={cn(
+                                            'h-10 text-xs font-bold uppercase tracking-wider text-slate-500',
+                                            // @ts-expect-error
+                                            header.column.columnDef.meta?.className
+                                        )}
                                     >
                                         {header.isPlaceholder
                                             ? null
@@ -411,7 +418,14 @@ export default function InteractiveDataView({ slug }: InteractiveDataViewProps) 
                                     onClick={() => handleViewParticipant(row.original)}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="py-2.5">
+                                        <TableCell
+                                            key={cell.id}
+                                            className={cn(
+                                                'py-2.5',
+                                                // @ts-expect-error
+                                                cell.column.columnDef.meta?.className
+                                            )}
+                                        >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
