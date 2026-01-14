@@ -51,7 +51,7 @@ check:
 	cd frontend && npm run i18n-check
 
 test:
-	cd backend && uv run pytest -n auto tests/
+	cd backend && uv run pytest tests/
 	cd frontend && npm run test -- --run --coverage
 
 e2e:
