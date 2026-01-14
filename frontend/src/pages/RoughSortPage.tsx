@@ -49,7 +49,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     const cardStackRef = useRef<CardStackHandle>(null);
 
     // 2. State & Hooks - Continuous
-    const [isReadingInstructions, setIsReadingInstructions] = useState(false);
     const [showTip, setShowTip] = useState(true);
 
     // Motion Values lifted from CardStack
@@ -93,14 +92,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
             unsubscribeY();
         };
     }, [showTip, x, y]);
-
-    // Auto-dismiss tip after 5 cards sorted (all devices)
-    useEffect(() => {
-        // Only set to true if we haven't started sorting yet and instruction exists
-        if (config?.pre_instruction && roughHistory.length === 0) {
-            setIsReadingInstructions(true);
-        }
-    }, [config?.pre_instruction, roughHistory.length]);
 
     useEffect(() => {
         // Cleanup function to clear the header action when component unmounts
@@ -218,40 +209,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     if (!config) return null;
 
     // Pre-instruction screen
-    if (isReadingInstructions && config.pre_instruction) {
-        return (
-            <div className="flex flex-col h-full overflow-hidden bg-slate-50 animate-in fade-in duration-500">
-                {/* Minimal Header */}
-                <div className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-4 px-4 z-20 gap-3">
-                    <Target size={18} className="text-indigo-400 opacity-60 flex-none" />
-                    <h2 className="text-xl font-bold text-slate-800 tracking-tight">
-                        {t('admin.design.condition.title')}
-                    </h2>
-                </div>
-
-                {/* Content Area */}
-                <div className="flex-1 overflow-y-auto px-6 py-12">
-                    <div className="max-w-2xl mx-auto space-y-8">
-                        <div className="prose prose-slate lg:prose-lg mx-auto bg-white p-8 sm:p-12 rounded-2xl shadow-sm border border-slate-200/60">
-                            <ReactMarkdown>{config.pre_instruction}</ReactMarkdown>
-                        </div>
-
-                        <div className="flex justify-center pt-4">
-                            <button
-                                type="button"
-                                onClick={() => setIsReadingInstructions(false)}
-                                style={{ backgroundColor: 'var(--brand-accent)' }}
-                                className="px-12 py-5 text-white rounded-full font-bold text-xl hover:brightness-110 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-center gap-3 animate-pulse hover:animate-none"
-                            >
-                                {config.ui_labels?.['common.next'] || t('common.start')}{' '}
-                                <ArrowRight size={24} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     // Completed State
     if (!currentCard) {

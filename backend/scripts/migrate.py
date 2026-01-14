@@ -246,16 +246,6 @@ async def migrate_translations_table():
             )
             migrations_applied = True
 
-        # pre_instruction
-        if not await check_column_exists(conn, "study_translations", "pre_instruction"):
-            logger.info("  Adding 'pre_instruction' column...")
-            await conn.execute(
-                text(
-                    "ALTER TABLE study_translations ADD COLUMN pre_instruction VARCHAR"
-                )
-            )
-            migrations_applied = True
-
         # instructions
         if not await check_column_exists(conn, "study_translations", "instructions"):
             logger.info("  Adding 'instructions' column...")

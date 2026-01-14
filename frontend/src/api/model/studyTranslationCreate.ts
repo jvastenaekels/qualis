@@ -33,7 +33,7 @@ export interface StudyTranslationCreate {
     subtitle?: StudyTranslationCreateSubtitle;
     objective?: StudyTranslationCreateObjective;
     condition_of_instruction?: StudyTranslationCreateConditionOfInstruction;
-    pre_instruction?: StudyTranslationCreatePreInstruction;
+
     consent_title?: StudyTranslationCreateConsentTitle;
     consent_description?: StudyTranslationCreateConsentDescription;
     consent_accept?: StudyTranslationCreateConsentAccept;

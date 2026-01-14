@@ -154,7 +154,7 @@
             "subtitle": "Experience Q-Methodology Simple and Easy",
             "objective": "Welcome!\n\nThe goal of this study is to capture the nuance of your opinion, going beyond simple \"yes\" or \"no\" answers.\n\nBy ranking statements relative to one another, you allow us to map your unique perspective in detail. This approach is designed to respect the complexity of your point of view, rather than forcing it into rigid boxes.",
             "condition_of_instruction": "What is your stance on this statement?",
-            "pre_instruction": "### Spontaneous Sorting\n\nIn this first phase, you will be presented with statements one by one. You should trust your **first instinct**.\n\n*   **Right** for statements you Agree with\n*   **Left** for statements you Disagree with\n*   **Down** for statements you are Neutral about",
+
             "instructions": null,
             "ui_labels": {
                 "start_button": "Start Study"
@@ -196,7 +196,7 @@
             "subtitle": "La méthodologie Q en toute simplicité",
             "objective": "Bienvenue !\n\nL'objectif de cette étude est de saisir toute la nuance de votre opinion, au-delà des simples réponses \"oui\" ou \"non\".\n\nEn classant les énoncés les uns par rapport aux autres, vous nous permettez de cartographier votre perspective unique. Cette approche est conçue pour respecter la complexité de votre point de vue, plutôt que de le forcer dans des cases rigides.",
             "condition_of_instruction": "Quel est votre avis sur cet énoncé ?",
-            "pre_instruction": "### Classement Spontané\n\nDans cette première phase, les énoncés vous seront présentés un par un. Fiez-vous à votre **premier instinct**.\n\n*   **Droite** pour les énoncés avec lesquels vous êtes d'Accord\n*   **Gauche** pour ceux avec lesquels vous n'êtes Pas d'accord\n*   **Bas** pour ceux vis-à-vis desquels vous êtes Neutre",
+
             "instructions": null,
             "ui_labels": {
                 "start_button": "Commencer l'étude"
@@ -238,7 +238,7 @@
             "subtitle": "Q-metodologia helposti ja sujuvasti",
             "objective": "Tervetuloa!\n\nTämän tutkimuksen tavoitteena on tavoittaa mielipiteesi vivahteet, ylittäen pelkät \"kyllä\" tai \"ei\" -vastaukset.\n\nJärjestämällä väittämät suhteessa toisiinsa autat meitä kartoittamaan ainutlaatuisen näkökulmasi. Tämä menetelmä on suunniteltu kunnioittamaan näkemyksesi monimuotoisuutta sen sijaan, että se pakotettaisiin valmiisiin raameihin.",
             "condition_of_instruction": "Mikä on näkemyksesi tästä väittämästä?",
-            "pre_instruction": "### Spontaani lajittelu\n\nTässä ensimmäisessä vaiheessa sinulle näytetään väittämiä yksi kerrallaan. Luota **ensivaistoosi**.\n\n*   **Oikealle** väittämät, joista olet Samaa mieltä\n*   **Vasemmalle** väittämät, joista olet Eri mieltä\n*   **Alas** väittämät, joihin suhtaudut Neutraalisti",
+
             "instructions": null,
             "ui_labels": {
                 "start_button": "Aloita tutkimus"

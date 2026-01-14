@@ -111,7 +111,7 @@ temp_token
 qr_code_uri
 recruitment_token
 condition_of_instruction
-pre_instruction
+
 get_workspace
 update_workspace
 list_workspace_members

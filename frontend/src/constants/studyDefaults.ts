@@ -9,8 +9,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
         consent_decline: 'I Decline',
         condition_of_instruction:
             'Please rank the following statements from those you most agree with to those you most disagree with',
-        pre_instruction:
-            'Based on your personal point of view, divide the cards into three piles: agree, neutral, and disagree.',
+
         process_steps: [
             {
                 id: 'profile',
@@ -61,8 +60,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
         consent_decline: 'Je refuse',
         condition_of_instruction:
             'Veuillez classer les énoncés suivants de celui avec lequel vous êtes le plus d’accord à celui avec lequel vous êtes le plus en désaccord',
-        pre_instruction:
-            'Selon votre point de vue personnel, répartissez les cartes en trois piles : en accord, neutre, et en désaccord.',
+
         process_steps: [
             {
                 id: 'profile',
@@ -113,8 +111,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
         consent_decline: 'En hyväksy',
         condition_of_instruction:
             'Ole hyvä ja järjestä seuraavat väittämät siitä, minkä kanssa olet eniten samaa mieltä, siihen, minkä kanssa olet eniten eri mieltä',
-        pre_instruction:
-            'Oman näkemyksesi perusteella, jaa kortit kolmeen pinoon: samaa mieltä, neutraali ja eri mieltä.',
+
         process_steps: [
             {
                 id: 'profile',

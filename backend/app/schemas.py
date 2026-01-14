@@ -163,7 +163,7 @@ class StudyTranslationBase(BaseModel):
     subtitle: str | None = None
     objective: str | None = None
     condition_of_instruction: str | None = None
-    pre_instruction: str | None = None
+
     consent_title: str | None = None
     consent_description: str | None = None
     consent_accept: str | None = "Accept"

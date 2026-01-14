@@ -75,7 +75,7 @@ export const StudyConfigSchema = z.object({
     description: z.string(),
     objective: z.string().optional().nullable(),
     condition_of_instruction: z.string().optional().nullable(),
-    pre_instruction: z.string().optional().nullable(),
+
     instructions: z.string(),
     presort_config: z.union([
         z.record(PreSortFieldSchema),

@@ -14,7 +14,6 @@ describe('ConditionOfInstructionEditor', () => {
                 {
                     language_code: 'en',
                     condition_of_instruction: '',
-                    pre_instruction: '',
                 },
             ],
             ...(initialStateOverrides.draft || {}),
@@ -33,21 +32,20 @@ describe('ConditionOfInstructionEditor', () => {
         vi.clearAllMocks();
     });
 
-    it('renders both instruction inputs', () => {
+    it('renders instruction input', () => {
         renderEditor();
 
         expect(screen.getByText('Condition of Instruction (Grid Sort)')).toBeInTheDocument();
-        expect(screen.getByText('Instruction for preliminary sort')).toBeInTheDocument();
 
-        // There are two "Instruction Text" labels now
+        // There is one "Instruction Text" label now
         const labels = screen.getAllByText('Instruction Text');
-        expect(labels).toHaveLength(2);
+        expect(labels).toHaveLength(1);
     });
 
     it('updates grid sort instruction field', () => {
         renderEditor();
 
-        const input = screen.getAllByLabelText('Instruction Text')[0];
+        const input = screen.getByLabelText('Instruction Text');
         fireEvent.change(input, { target: { value: 'Test grid instruction' } });
 
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
@@ -57,19 +55,6 @@ describe('ConditionOfInstructionEditor', () => {
         expect(enTranslation.condition_of_instruction).toBe('Test grid instruction');
     });
 
-    it('updates preliminary sort instruction field', () => {
-        renderEditor();
-
-        const input = screen.getAllByLabelText('Instruction Text')[1];
-        fireEvent.change(input, { target: { value: 'Test pre-instruction' } });
-
-        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
-        const currentDraft: any = useStudyDesigner.getState().draft;
-        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
-        const enTranslation = currentDraft.translations.find((t: any) => t.language_code === 'en');
-        expect(enTranslation.pre_instruction).toBe('Test pre-instruction');
-    });
-
     it('displays existing values from draft', () => {
         renderEditor({
             draft: {
@@ -77,15 +62,13 @@ describe('ConditionOfInstructionEditor', () => {
                     {
                         language_code: 'en',
                         condition_of_instruction: 'Existing grid instruction',
-                        pre_instruction: 'Existing pre-instruction',
                     },
                 ],
             },
         });
 
-        const inputs = screen.getAllByLabelText('Instruction Text') as HTMLInputElement[];
-        expect(inputs[0].value).toBe('Existing grid instruction');
-        expect(inputs[1].value).toBe('Existing pre-instruction');
+        const input = screen.getByLabelText('Instruction Text') as HTMLInputElement;
+        expect(input.value).toBe('Existing grid instruction');
     });
 
     it('returns null when draft is missing', () => {

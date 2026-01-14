@@ -7,7 +7,7 @@ import { RoughSortPage } from "../pages/RoughSortPage";
 import { FineSortPage } from "../pages/FineSortPage";
 
 test.describe("UI Consistency & Logic Verification", () => {
-  test("Case A: Maximal Study (Pre-Sort + Pre-Instruction + Post-Questions)", async ({
+  test("Case A: Maximal Study (Pre-Sort + Post-Questions)", async ({
     page,
     testDb,
     authToken,

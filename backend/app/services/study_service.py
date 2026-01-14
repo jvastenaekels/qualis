@@ -259,8 +259,6 @@ class StudyService:
         if not condition_of_instruction:
             condition_of_instruction = "What is your stance on this statement?"
 
-        pre_instruction = getattr(translation, "pre_instruction", None)
-
         subtitle = getattr(translation, "subtitle", None)
         objective = getattr(translation, "objective", None)
 
@@ -334,7 +332,6 @@ class StudyService:
                 "decline": get_t_attr("consent_decline"),
             },
             "condition_of_instruction": condition_of_instruction,
-            "pre_instruction": pre_instruction,
             "available_languages": [t.language_code for t in study.translations],
             "language": resolved_lang,
             "default_language": study.default_language,
@@ -410,11 +407,6 @@ class StudyService:
                 ):
                     errors.append(
                         f"Grid sort instructions are missing for language '{t.language_code}'."
-                    )
-
-                if not t.pre_instruction or t.pre_instruction.strip() == "":
-                    errors.append(
-                        f"Preliminary sort instructions are missing for language '{t.language_code}'."
                     )
 
                 # Check process steps

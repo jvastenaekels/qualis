@@ -233,7 +233,7 @@ class StudyTranslation(Base):
     description: Mapped[str] = mapped_column(String)
     objective: Mapped[str | None] = mapped_column(String, nullable=True)
     condition_of_instruction: Mapped[str | None] = mapped_column(String, nullable=True)
-    pre_instruction: Mapped[str | None] = mapped_column(String, nullable=True)
+
     instructions: Mapped[str | None] = mapped_column(String, nullable=True)  # HTML/MD
     ui_labels: Mapped[dict[str, str]] = mapped_column(
         JSON, default=dict

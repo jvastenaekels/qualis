@@ -70,42 +70,6 @@ const ConditionOfInstructionEditor = () => {
                 </Card>
             </section>
 
-            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-6">
-                <CardHeader className="pb-4">
-                    <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
-                        {t('admin.design.condition.pre_title', 'Preliminary Sort Instruction')}
-                    </CardTitle>
-                    <CardDescription className="text-sm font-medium text-slate-500 italic">
-                        {t(
-                            'admin.design.condition.pre_desc',
-                            'Instruction given to participants during the initial grouping into three piles.'
-                        )}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="grid gap-3">
-                        <Label
-                            htmlFor="pre_instruction"
-                            className="text-[10px] font-black uppercase tracking-wider text-slate-500"
-                        >
-                            {t('admin.design.condition.pre_field_label', 'Instruction Text')}
-                        </Label>
-                        <Input
-                            id="pre_instruction"
-                            value={translation?.pre_instruction || ''}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                handleChange('pre_instruction', e.target.value)
-                            }
-                            placeholder={t(
-                                'admin.design.condition.pre_placeholder',
-                                'e.g. Based on your personal point of view...'
-                            )}
-                            className="font-bold text-lg h-12 rounded-xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-indigo-500/20 transition-all px-4"
-                        />
-                    </div>
-                </CardContent>
-            </Card>
-
             <section className="bg-amber-50/50 border border-amber-100 rounded-2xl p-8 shadow-sm">
                 <h4 className="text-base font-black text-amber-900 mb-3 flex items-center gap-3 tracking-tight">
                     <div className="bg-white p-2 rounded-xl border border-amber-200 shadow-sm">

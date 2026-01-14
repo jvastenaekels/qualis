@@ -278,7 +278,7 @@ const StudyDesignPage = () => {
                 decline: translation?.consent_decline,
             },
             condition_of_instruction: translation?.condition_of_instruction,
-            pre_instruction: translation?.pre_instruction,
+
             ui_labels: translation?.ui_labels || {},
             language: activeLocale,
             // biome-ignore lint/suspicious/noExplicitAny: complex draft type
@@ -330,9 +330,7 @@ const StudyDesignPage = () => {
         },
         {
             label: t('admin.design.checklist.instructions', 'Instructions'),
-            isComplete: !!(
-                currentTranslation?.condition_of_instruction && currentTranslation?.pre_instruction
-            ),
+            isComplete: !!currentTranslation?.condition_of_instruction,
             required: true,
         },
         {
@@ -356,8 +354,7 @@ const StudyDesignPage = () => {
                 tr.title &&
                 tr.consent_title &&
                 tr.consent_description &&
-                tr.condition_of_instruction &&
-                tr.pre_instruction
+                tr.condition_of_instruction
             );
             return {
                 code: tr.language_code,

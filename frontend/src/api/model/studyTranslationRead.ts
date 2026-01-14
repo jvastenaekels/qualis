@@ -33,7 +33,7 @@ export interface StudyTranslationRead {
     subtitle?: StudyTranslationReadSubtitle;
     objective?: StudyTranslationReadObjective;
     condition_of_instruction?: StudyTranslationReadConditionOfInstruction;
-    pre_instruction?: StudyTranslationReadPreInstruction;
+
     consent_title?: StudyTranslationReadConsentTitle;
     consent_description?: StudyTranslationReadConsentDescription;
     consent_accept?: StudyTranslationReadConsentAccept;

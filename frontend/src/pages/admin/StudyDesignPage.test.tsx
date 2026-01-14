@@ -59,7 +59,7 @@ describe('StudyDesignPage Feature Tests', () => {
                 language_code: 'en',
                 title: 'Draft Study',
                 condition_of_instruction: 'Test instruction',
-                pre_instruction: 'Test pre-instruction',
+
                 consent_title: 'Test Consent',
                 consent_description: 'Test Description',
             },
