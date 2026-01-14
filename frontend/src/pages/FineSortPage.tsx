@@ -36,6 +36,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { SEMANTIC_BREAKPOINTS } from '@/constants/breakpoints';
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';
 import { useFineSortDrag } from '../hooks/useFineSortDrag';
@@ -293,7 +294,8 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                         dimensions={dimensions}
                         disableHoverZoom={
                             activeId !== null ||
-                            (typeof window !== 'undefined' && window.innerWidth < 1024)
+                            (typeof window !== 'undefined' &&
+                                window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP)
                         }
                     />
                 );

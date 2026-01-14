@@ -5,6 +5,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { SEMANTIC_BREAKPOINTS } from '@/constants/breakpoints';
 
 interface GridColumn {
     score: number;
@@ -33,7 +34,8 @@ export const useGridCalculations = ({
 
         // Grid Anchoring: Do not resize cards when in Mobile Focus Mode (Deck Collapsed)
         // This prevents "Layout Thrashing" / Chaos.
-        if (selectedCardId && window.innerWidth < 1024) return;
+        // Use DESKTOP breakpoint (1024px) for focus mode detection
+        if (selectedCardId && window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP) return;
 
         const wrapper = wrapperRef.current;
         const W = wrapper.clientWidth;
@@ -100,7 +102,8 @@ export const useGridCalculations = ({
     // Initial Calculation and responsive trigger
     useEffect(() => {
         // Only calculate if NOT in focus mode (anchoring)
-        if (!selectedCardId || window.innerWidth >= 1024) {
+        // Use DESKTOP breakpoint (1024px) for focus mode detection
+        if (!selectedCardId || window.innerWidth >= SEMANTIC_BREAKPOINTS.DESKTOP) {
             calculateOptimalSize();
         }
     }, [selectedCardId, calculateOptimalSize]);

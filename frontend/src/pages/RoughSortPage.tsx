@@ -6,6 +6,7 @@
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
 import { ArrowRight, Check, Frown, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
+import { BREAKPOINTS, SEMANTIC_BREAKPOINTS } from '@/constants/breakpoints';
 import React, { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
@@ -73,7 +74,12 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     // Auto-dismiss tip on first interaction (mobile only)
     useEffect(() => {
-        if (!showTip || typeof window === 'undefined' || window.innerWidth >= 1024) return;
+        if (
+            !showTip ||
+            typeof window === 'undefined' ||
+            window.innerWidth >= SEMANTIC_BREAKPOINTS.DESKTOP
+        )
+            return;
 
         const unsubscribeX = x.on('change', (latest) => {
             if (Math.abs(latest) > 5) {
@@ -143,7 +149,11 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     const handleVote = (direction: 'agree' | 'disagree' | 'neutral') => {
         // Auto-dismiss tip on button click (mobile only)
-        if (showTip && typeof window !== 'undefined' && window.innerWidth < 1024) {
+        if (
+            showTip &&
+            typeof window !== 'undefined' &&
+            window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP
+        ) {
             setShowTip(false);
         }
         // We now delegate to the card stack to animate first
@@ -195,7 +205,8 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     // Memoized font scale advisor
     const sharedFontSize = React.useMemo(() => {
-        if (typeof window === 'undefined' || window.innerWidth >= 1024) return 'text-sm';
+        if (typeof window === 'undefined' || window.innerWidth >= SEMANTIC_BREAKPOINTS.DESKTOP)
+            return 'text-sm';
 
         const labels = [t('common.disagree'), t('common.agree'), t('common.neutral')];
         const words = labels.flatMap((l) => l.split(/[\s/]+/));
@@ -526,7 +537,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
     }, [type]);
 
     // Adaptive stack effect values
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < BREAKPOINTS.SM;
     const rotate1 =
         type === 'agree'
             ? isMobile
