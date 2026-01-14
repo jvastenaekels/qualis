@@ -8,7 +8,7 @@ import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-mo
 import { ArrowRight, Check, Frown, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
 import React, { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from '../components/SafeMarkdown';
 import { useNavigate, useParams } from 'react-router-dom';
 import CardStack, { type CardStackHandle } from '../components/CardStack';
 import { useLayoutAction } from '../hooks/useLayout';
@@ -262,13 +262,13 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
             <div className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
                 <Target size={14} className="text-indigo-400 opacity-60 flex-none" />
                 <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900 flex items-center gap-2">
-                    <ReactMarkdown
+                    <SafeMarkdown
                         components={{
                             p: ({ children }) => <span>{children}</span>,
                         }}
                     >
                         {config.condition_of_instruction}
-                    </ReactMarkdown>
+                    </SafeMarkdown>
                     <span className="text-slate-400 text-[10px] sm:text-xs font-medium bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200/50">
                         {config &&
                             `${config.statements.length - unsortedCards.length + 1}/${config.statements.length}`}
@@ -288,13 +288,13 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2.5 flex items-center justify-center gap-2.5 relative mx-auto text-center shadow-md max-w-sm pointer-events-auto">
                                 <span className="text-lg">💡</span>
                                 <div className="text-xs text-yellow-800 font-medium leading-tight text-left [&_strong]:font-bold">
-                                    <ReactMarkdown
+                                    <SafeMarkdown
                                         components={{
                                             p: ({ children }) => <span>{children}</span>,
                                         }}
                                     >
                                         {t('rough.header.hint')}
-                                    </ReactMarkdown>
+                                    </SafeMarkdown>
                                 </div>
                                 <button
                                     type="button"
@@ -424,7 +424,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                                     {hoveredCard.code && <span>• {hoveredCard.code}</span>}
                                 </h3>
                                 <div className="text-xl sm:text-2xl font-medium text-gray-800 leading-relaxed">
-                                    <ReactMarkdown
+                                    <SafeMarkdown
                                         components={{
                                             p: ({ children }) => (
                                                 <p className="mb-4 last:mb-0">{children}</p>
@@ -432,7 +432,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                                         }}
                                     >
                                         {hoveredCard.text}
-                                    </ReactMarkdown>
+                                    </SafeMarkdown>
                                 </div>
                             </div>
                             <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">

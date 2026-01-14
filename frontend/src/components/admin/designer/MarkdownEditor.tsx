@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from '@/components/SafeMarkdown';
 import { Bold, Italic, List, Link, Eye, Edit3, Info } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
@@ -145,7 +145,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                     ) : (
                         <div className="p-4 prose prose-sm max-w-none prose-slate min-h-[120px] bg-slate-50/30">
                             {value ? (
-                                <ReactMarkdown>{value}</ReactMarkdown>
+                                <SafeMarkdown>{value}</SafeMarkdown>
                             ) : (
                                 <span className="text-muted-foreground italic text-xs">
                                     {t('admin.components.markdown.empty')}

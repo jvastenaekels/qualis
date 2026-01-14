@@ -17,7 +17,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { motion } from 'framer-motion';
 import { Eye } from 'lucide-react';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from './SafeMarkdown';
 import { useUIStore } from '../store/useUIStore';
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
@@ -269,13 +269,14 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                     >
                         <div className={textStyles({ variant, allowScroll })}>
                             {/[*_~#]/.test(text) ? (
-                                <ReactMarkdown
+                                <SafeMarkdown
                                     components={{
                                         p: ({ children }) => <span>{children}</span>,
                                     }}
+                                    className="!prose-none text-inherit"
                                 >
                                     {text}
-                                </ReactMarkdown>
+                                </SafeMarkdown>
                             ) : (
                                 <span>{text}</span>
                             )}

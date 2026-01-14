@@ -8,7 +8,7 @@ import { type MotionValue, motion, type PanInfo, useAnimation, useTransform } fr
 import { Eye } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from './SafeMarkdown';
 import { useUIStore } from '../store/useUIStore';
 
 interface CardStackProps {
@@ -182,11 +182,9 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                         ref={textRef}
                         className={`${fontSizeClass} font-medium text-gray-800 text-center select-none m-auto leading-relaxed line-clamp-[10] sm:line-clamp-none`}
                     >
-                        <ReactMarkdown
-                            components={{ p: ({ children }) => <span>{children}</span> }}
-                        >
+                        <SafeMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
                             {statement.text}
-                        </ReactMarkdown>
+                        </SafeMarkdown>
                     </div>
                 </div>
 

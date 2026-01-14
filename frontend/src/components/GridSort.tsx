@@ -10,7 +10,7 @@ import { cva } from 'class-variance-authority';
 import { Check, Frown, Meh, RotateCcw, Smile, Target, ZoomIn, ZoomOut } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from './SafeMarkdown';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { useDeckManagement } from '../hooks/useDeckManagement';
 import { useGridCalculations } from '../hooks/useGridCalculations';
@@ -129,9 +129,9 @@ const InstructionHeader: React.FC<{
     >
         <Target size={14} className="text-indigo-400 opacity-60 flex-none" aria-hidden="true" />
         <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900">
-            <ReactMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+            <SafeMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
                 {instruction || defaultText}
-            </ReactMarkdown>
+            </SafeMarkdown>
         </div>
     </div>
 ));

@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from '../components/SafeMarkdown';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLayoutAction } from '../hooks/useLayout';
 import { useSubmitStudy } from '../hooks/useSubmitStudy';
@@ -388,13 +388,13 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                                 </div>
 
                                 <blockquote className="text-lg font-medium text-slate-800 mb-4 pl-4 border-l-4 border-slate-300 italic break-words">
-                                    <ReactMarkdown
+                                    <SafeMarkdown
                                         components={{
                                             p: ({ children }) => <span>{children}</span>,
                                         }}
                                     >
                                         {getCardText(card.statementId)}
-                                    </ReactMarkdown>
+                                    </SafeMarkdown>
                                 </blockquote>
 
                                 <div className="relative">
@@ -551,13 +551,13 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                                         </div>
 
                                         <blockquote className="text-lg font-medium text-slate-800 mb-4 pl-4 border-l-4 border-slate-300 italic break-words">
-                                            <ReactMarkdown
+                                            <SafeMarkdown
                                                 components={{
                                                     p: ({ children }) => <span>{children}</span>,
                                                 }}
                                             >
                                                 {getCardText(id)}
-                                            </ReactMarkdown>
+                                            </SafeMarkdown>
                                         </blockquote>
 
                                         <textarea

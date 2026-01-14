@@ -14,7 +14,7 @@
 import { ArrowRight, Target } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from '../components/SafeMarkdown';
 import { useNavigate, useParams } from 'react-router-dom';
 import SortingAnimation from '../components/SortingAnimation';
 import { useConfigStore } from '../store/useConfigStore';
@@ -112,7 +112,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             {t('welcome.objective_label', 'Objective of the study')}
                         </h4>
                         <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
-                            <ReactMarkdown>{study.objective}</ReactMarkdown>
+                            <SafeMarkdown>{study.objective}</SafeMarkdown>
                         </div>
 
                         {/* Institutional Signature */}
@@ -179,7 +179,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
 
                         {study.instructions && (
                             <div className="prose prose-blue prose-base max-w-none text-slate-800 font-medium mb-4">
-                                <ReactMarkdown>{study.instructions}</ReactMarkdown>
+                                <SafeMarkdown>{study.instructions}</SafeMarkdown>
                             </div>
                         )}
 

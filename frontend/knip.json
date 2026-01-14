@@ -19,6 +19,7 @@
     "@radix-ui/react-collapsible",
     "next-themes",
     "recharts",
-    "vaul"
+    "vaul",
+    "@types/dompurify"
   ]
 }
