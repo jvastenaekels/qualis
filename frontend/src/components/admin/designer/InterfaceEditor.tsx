@@ -67,7 +67,11 @@ const InterfaceEditor = () => {
     const uiLabels = translation?.ui_labels || {};
 
     // Helper to get translations in the active study locale (not the admin UI locale)
+    // We force a key change/re-render when activeLocale changes to ensure placeholders update instantly
     const tStudy = (key: string) => i18n.t(key, { lng: activeLocale }) as string;
+
+    // Explicitly used for Input placeholders to ensure they re-render on locale change
+    const tPlaceHolder = (key: string) => i18n.t(key, { lng: activeLocale }) as string;
 
     const visibleSteps = [
         { id: 'presort', labelKey: 'study.steps.presort' },
@@ -137,7 +141,7 @@ const InterfaceEditor = () => {
                                 value={getLabel('welcome.start')}
                                 onChange={(e) => updateLabel('welcome.start', e.target.value)}
                                 onFocus={() => setActiveSubStep('welcome.start')}
-                                placeholder={tStudy('welcome.start')}
+                                placeholder={tPlaceHolder('welcome.start')}
                                 className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
@@ -161,7 +165,7 @@ const InterfaceEditor = () => {
                                 value={getLabel('common.next')}
                                 onChange={(e) => updateLabel('common.next', e.target.value)}
                                 onFocus={() => setActiveSubStep('common.next')}
-                                placeholder={tStudy('common.next')}
+                                placeholder={tPlaceHolder('common.next')}
                                 className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
@@ -188,7 +192,7 @@ const InterfaceEditor = () => {
                                 value={getLabel('post.submit')}
                                 onChange={(e) => updateLabel('post.submit', e.target.value)}
                                 onFocus={() => setActiveSubStep('post.submit')}
-                                placeholder={tStudy('post.submit')}
+                                placeholder={tPlaceHolder('post.submit')}
                                 className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
@@ -214,7 +218,7 @@ const InterfaceEditor = () => {
                                     updateLabel('fine.actions.validate', e.target.value)
                                 }
                                 onFocus={() => setActiveSubStep('fine.actions.validate')}
-                                placeholder={tStudy('fine.actions.validate')}
+                                placeholder={tPlaceHolder('fine.actions.validate')}
                                 className="font-bold text-sm h-11 rounded-xl"
                             />
                         </div>
@@ -251,7 +255,7 @@ const InterfaceEditor = () => {
                                     value={getLabel('common.agree')}
                                     onChange={(e) => updateLabel('common.agree', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.agree')}
-                                    placeholder={tStudy('common.agree')}
+                                    placeholder={tPlaceHolder('common.agree')}
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
@@ -263,7 +267,7 @@ const InterfaceEditor = () => {
                                     value={getLabel('common.neutral')}
                                     onChange={(e) => updateLabel('common.neutral', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.neutral')}
-                                    placeholder={tStudy('common.neutral')}
+                                    placeholder={tPlaceHolder('common.neutral')}
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
@@ -275,7 +279,7 @@ const InterfaceEditor = () => {
                                     value={getLabel('common.disagree')}
                                     onChange={(e) => updateLabel('common.disagree', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.disagree')}
-                                    placeholder={tStudy('common.disagree')}
+                                    placeholder={tPlaceHolder('common.disagree')}
                                     className="font-bold text-sm h-10 rounded-xl"
                                 />
                             </div>
@@ -300,7 +304,7 @@ const InterfaceEditor = () => {
                                             updateLabel('fine.legend.agree', e.target.value)
                                         }
                                         onFocus={() => setActiveSubStep('fine.legend.agree')}
-                                        placeholder={tStudy('fine.legend.agree')}
+                                        placeholder={tPlaceHolder('fine.legend.agree')}
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
@@ -314,7 +318,7 @@ const InterfaceEditor = () => {
                                             updateLabel('fine.legend.neutral', e.target.value)
                                         }
                                         onFocus={() => setActiveSubStep('fine.legend.neutral')}
-                                        placeholder={tStudy('fine.legend.neutral')}
+                                        placeholder={tPlaceHolder('fine.legend.neutral')}
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
@@ -328,7 +332,7 @@ const InterfaceEditor = () => {
                                             updateLabel('fine.legend.disagree', e.target.value)
                                         }
                                         onFocus={() => setActiveSubStep('fine.legend.disagree')}
-                                        placeholder={tStudy('fine.legend.disagree')}
+                                        placeholder={tPlaceHolder('fine.legend.disagree')}
                                         className="font-bold text-sm h-10 rounded-xl"
                                     />
                                 </div>
@@ -506,7 +510,9 @@ const InterfaceEditor = () => {
                                                         e.target.value;
                                                 });
                                             }}
-                                            placeholder={tStudy(`study.help.step_${step.id}.what`)}
+                                            placeholder={tPlaceHolder(
+                                                `study.help.step_${step.id}.what`
+                                            )}
                                             className="font-medium text-sm h-11 rounded-xl bg-slate-50/30"
                                         />
                                     </div>
@@ -529,7 +535,9 @@ const InterfaceEditor = () => {
                                                         e.target.value;
                                                 });
                                             }}
-                                            placeholder={tStudy(`study.help.step_${step.id}.why`)}
+                                            placeholder={tPlaceHolder(
+                                                `study.help.step_${step.id}.why`
+                                            )}
                                             className="font-medium text-sm h-11 rounded-xl bg-slate-50/30"
                                         />
                                     </div>
