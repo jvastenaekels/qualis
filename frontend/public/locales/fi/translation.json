@@ -20,6 +20,8 @@
     "step": "Vaihe",
     "back": "Takaisin",
     "cancel": "Peruuta",
+    "slots": "paikkaa",
+    "workspace_label": "Työtila",
     "reduce": "Vähennä",
     "expand": "Laajenna",
     "errors": {

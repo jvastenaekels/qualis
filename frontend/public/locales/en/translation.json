@@ -20,6 +20,8 @@
     "step": "Step",
     "back": "Back",
     "cancel": "Cancel",
+    "slots": "slots",
+    "workspace_label": "Workspace",
     "reduce": "Reduce",
     "expand": "Expand",
     "errors": {
