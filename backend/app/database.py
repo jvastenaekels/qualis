@@ -15,31 +15,13 @@ SQLALCHEMY_DATABASE_URL = cast(str, settings.DATABASE_URL)
 
 engine_kwargs: dict[str, Any] = {
     "echo": False,
+    "pool_size": 10,
+    "max_overflow": 20,
+    "pool_timeout": 30,
+    "pool_recycle": 1800,
 }
 
-# SQLite doesn't support these pool settings
-if not SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
-    engine_kwargs.update(
-        {
-            "pool_size": 10,
-            "max_overflow": 20,
-            "pool_timeout": 30,
-            "pool_recycle": 1800,
-        }
-    )
-
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, **engine_kwargs)
-
-
-if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
-    from sqlalchemy import event
-
-    @event.listens_for(engine.sync_engine, "connect")
-    def set_sqlite_pragma(dbapi_connection, connection_record):
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA journal_mode=WAL")
-        cursor.execute("PRAGMA synchronous=NORMAL")
-        cursor.close()
 
 
 SessionLocal = async_sessionmaker(

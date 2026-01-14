@@ -38,12 +38,9 @@ class Settings(BaseSettings):
     def assemble_db_url(cls, v: str | None) -> str:
         """Assembles and validates the database URL."""
         if not v:
-            # Fallback for local development if not in env
-            import os
-
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            db_path = os.path.join(base_dir, "..", "q_method.db")
-            return f"sqlite+aiosqlite:///{db_path}"
+            raise ValueError(
+                "DATABASE_URL must be configured. Open-Q now requires PostgreSQL."
+            )
 
         # 1. Handle postgres/postgresql prefix for asyncpg
         if v.startswith("postgres://"):

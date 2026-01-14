@@ -145,5 +145,4 @@ cleanup_test_data
 cleanup_all_test_data
 symmetry_lock
 primary_color
-set_sqlite_pragma
-connection_record
+# End of file

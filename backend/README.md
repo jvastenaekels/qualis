@@ -27,7 +27,7 @@ backend/
    ```
 
 2. **Database Initialization**:
-   By default, the app uses **SQLite** (`q_method.db`). This script creates the database schema, an initial admin user (`admin@example.com`), and a default **Example Workspace** for that user.
+   By default, the app uses **PostgreSQL**. Ensure your `DATABASE_URL` is configured in `.env`. This script creates the database schema (via Alembic) and an initial admin user (`admin@example.com`).
 
    ```bash
    python init_db.py

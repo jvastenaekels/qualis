@@ -14,7 +14,6 @@ from sqlalchemy import select
 os.environ["TESTING"] = "true"
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import selectinload
-from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 
@@ -37,8 +36,12 @@ from app.utils.security import get_password_hash
 TEST_EMAIL = "test@example.com"
 TEST_PASSWORD = "testpassword"
 
-# Use in-memory SQLite for testing
-TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+# Use PostgreSQL for testing
+# Fallback to local dev DB if not specified, but usually set via environment
+TEST_DATABASE_URL = os.getenv(
+    "TEST_DATABASE_URL",
+    "postgresql+asyncpg://open_q_user:open-q-pwd@127.0.0.1:5432/open_q_test",
+)
 
 
 @pytest_asyncio.fixture
@@ -47,8 +50,6 @@ async def db_engine():
     engine = create_async_engine(
         TEST_DATABASE_URL,
         echo=False,
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
     )
     yield engine
     await engine.dispose()

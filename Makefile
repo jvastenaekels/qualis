@@ -13,6 +13,13 @@ run-frontend:
 seed:
 	@echo "Usage: cd backend && uv run python seed.py <path-to-study-json>"
 
+migrate:
+	cd backend && uv run python scripts/migrate.py
+
+migration-new:
+	@read -p "Enter migration name: " name; \
+	cd backend && uv run alembic revision --autogenerate -m "$$name"
+
 generate-api:
 	cd backend && uv run python ../export_openapi.py
 	cd frontend && npm run generate:api
