@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
+import { SEMANTIC_BREAKPOINTS } from '@/constants/breakpoints';
 
 interface UseGridZoomProps {
     wrapperRef: React.RefObject<HTMLDivElement | null>;
@@ -46,7 +47,7 @@ export const useGridZoom = ({
         const contentH = content.offsetHeight;
         if (contentW === 0 || contentH === 0) return;
 
-        const isMobile = window.innerWidth < 1024;
+        const isMobile = window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP;
 
         let scale: number, x: number, y: number;
 
@@ -184,7 +185,7 @@ export const useGridZoom = ({
             const minScore = Math.min(...scores);
             const maxScore = Math.max(...scores);
 
-            const isMobile = window.innerWidth < 1024;
+            const isMobile = window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP;
             let targetScore: number;
 
             if (isMobile) {

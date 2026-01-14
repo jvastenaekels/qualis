@@ -20,6 +20,7 @@ import DroppableSlot from './DroppableSlot';
 import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { SEMANTIC_BREAKPOINTS } from '@/constants/breakpoints';
 import { cn } from '@/lib/utils';
 
 // Sub-component: Droppable Pile
@@ -567,7 +568,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
         // Responsive: Disable autofit on mobile selection
         useEffect(() => {
-            if (selectedCardId && window.innerWidth < 1024) {
+            if (selectedCardId && window.innerWidth < SEMANTIC_BREAKPOINTS.DESKTOP) {
                 setAutoFitEnabled(false);
             }
         }, [selectedCardId]);
