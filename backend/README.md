@@ -46,7 +46,7 @@ backend/
 4. **Utility Scripts**:
    Additional management scripts are located in `scripts/`:
    - `scripts/create_user.py`: Create admin users interactively.
-   - `scripts/ensure_schema.py`: Verify database schema consistency.
+   - `scripts/migrate.py`: Run Alembic migrations to update schema.
 
 5. **Running Locally**:
    ```bash

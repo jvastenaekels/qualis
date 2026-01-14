@@ -200,9 +200,9 @@ backend/tests/
 **Key Concept: `conftest.py`**
 The `conftest.py` file handles:
 
-- **Database Isolation**: Creates a temporary SQLite database for the test session.
-- **Async Client**: Provides an `async_client` fixture for making API calls.
-- **Seeding**: Can seed basic data (like admin users) for tests.
+- **Database Isolation**: Uses a dedicated PostgreSQL test database and handles schema setup/teardown via Alembic or direct metadata calls.
+- **Async Client**: Provides an `client` fixture for making API calls.
+- **Factories**: Provides factories for creating workspaces, studies, and users dynamically within tests.
 
 ---
 
@@ -232,11 +232,11 @@ The project uses GitHub Actions.
 | **E2E (Slow)** | PRs (Frontend) | Runs full Playwright suite.                                       |
 | **Deploy**     | Push to `main` | Deploys to Scalingo.                                              |
 
-### Post-Deploy Verification
+### Deployment Verification
 
-After deployment, Scalingo runs a `postdeploy` hook that:
+After deployment, Scalingo runs a `release` phase defined in the `Procfile` that:
 
-1.  Migrates the database (`alembic upgrade head`).
-2.  Updates seed data (`update_study_from_file`).
+1.  Migrates the database (`python scripts/migrate.py` which calls `alembic upgrade head`).
+2.  Ensures basic infrastructure is initialized (`python init_db.py`).
 
 ---

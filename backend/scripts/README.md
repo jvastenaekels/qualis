@@ -1,77 +1,44 @@
-# Database Migration System
+# Database Scripts
 
-This directory contains database migration scripts to keep the schema in sync with application models.
+This directory contains utility scripts for database maintenance, migrations, and user management.
 
-## Quick Start
+## 🚀 Database Migrations (Alembic)
 
-### Local Development
+We use **Alembic** to manage database schema versions. The legacy manual migration scripts are preserved for reference but are now superseded by the Alembic workflow.
 
-```bash
-# Run all migrations
-uv run python backend/scripts/migrate.py
-```
+- **`migrate.py`**: A wrapper that runs `alembic upgrade head`. This is used by the `release` phase in production.
+- **`backend/migrations/`**: Contains the actual Alembic migration versions and configuration.
 
-### Production (Scalingo)
+### Managing Schema Changes
 
-Migrations run automatically on every deployment via the `postdeploy` hook in the `Procfile`.
+1. **Modify Models**: Update `backend/app/models.py`.
+2. **Generate Migration**:
+   ```bash
+   make migration-new
+   ```
+   (This runs `alembic revision --autogenerate`)
+3. **Review**: Check the generated file in `backend/migrations/versions/`.
+4. **Apply**:
+   ```bash
+   make migrate
+   ```
 
-## Migration Scripts
+---
 
-### `migrate.py` - Consolidated Migration Runner
+## 🛠️ Utility Scripts
 
-The main entry point that runs all migrations in the correct order. This script is:
+- **`init_db.py`**: (Located in `backend/`) Initializes the database from scratch. **WARNING**: Use `--reset` with caution as it wipes all data.
+- **`create_user.py`**: Manually creates a new user in the database.
+- **`check_relationships.py`**: Validates that all SQLAlchemy relationships use async-safe loading strategies (preventing implicit IO errors).
+- **`dump_openapi.py`**: Generates the `openapi.json` file from the FastAPI app.
 
-- **Idempotent**: Safe to run multiple times
-- **Self-checking**: Verifies table existence before attempting migrations
-- **Verbose**: Provides clear logging of what's being changed
+---
 
-### Individual Migration Scripts
+## 🛰️ Production (Scalingo)
 
-- `migrate_missing_columns.py` - Adds `randomize_statements`, `show_statement_codes`, `ui_labels`
-- `migrate_participants.py` - Adds `random_seed` column to participants table
-- `migrate_branding.py` - Adds branding-related columns
-- `migrate_ui_labels.py` - Migrates UI label data
-
-## Schema Validation
-
-The application now validates the database schema on startup (`app/schema_validation.py`). If the schema is out of sync, you'll see a clear error message with instructions to run migrations.
-
-## Creating New Migrations
-
-When you add new columns or tables to the models:
-
-1. Add migration logic to `scripts/migrate.py` in the appropriate function
-2. Test locally: `uv run python backend/scripts/migrate.py`
-3. Commit and push - Scalingo will run migrations automatically via `postdeploy`
-
-## Troubleshooting
-
-### "Schema validation failed" on startup
+Migrations run automatically on every deployment via the `release` phase in the `Procfile`.
 
 ```bash
-# Run migrations
-uv run python backend/scripts/migrate.py
-
-# If that fails, check logs for specific missing tables/columns
+# To run migrations manually on Scalingo:
+scalingo --app your-app run -- python backend/scripts/migrate.py
 ```
-
-### First-time database setup
-
-```bash
-# Initialize the database with all tables
-uv run python backend/init_db.py
-```
-
-### Scalingo Deployment
-
-Migrations run automatically during deployment. Check deployment logs:
-
-```bash
-scalingo --app your-app logs --lines 100 | grep -A 10 "postdeploy"
-```
-
-## Architecture Notes
-
-- **Workspace Tables**: `workspaces`, `workspace_members`, `study_collaborators` must exist before other migrations
-- **Column Migrations**: Applied after table verification
-- **Postdeploy Hook**: Runs migrations + study sync in sequence on Scalingo

@@ -67,8 +67,8 @@ graph LR
 
 Open-Q uses the `release` phase in `Procfile` to automate critical tasks after every successful build:
 
-- **Schema Creation**: Ensures all database tables exist.
-- **Study Sync**: Updates your study configuration and statements based on `backend/data/example-study.json`.
+- **Schema Migration**: Executes `alembic upgrade head` to ensure all database tables are up to date.
+- **Admin Setup**: Creates the initial admin account if the database is empty.
 
 You can monitor these tasks in the deployment logs:
 
@@ -82,7 +82,7 @@ scalingo --app open-q logs --n 100
 
 | Variable            | Description                                           | Required |
 | ------------------- | ----------------------------------------------------- | -------- |
-| `DATABASE_URL`      | Connection string (PostgreSQL or SQLite)              | ✅       |
+| `DATABASE_URL`      | Connection string (PostgreSQL)                        | ✅       |
 | `SECRET_KEY`        | Application secret for session security               | ✅       |
 | `ALLOWED_ORIGINS`   | Comma-separated list of allowed CORS origins          | ✅       |
 | `SMTP_HOST`         | SMTP server hostname for invitations                  | ❌       |
@@ -100,10 +100,10 @@ scalingo --app open-q logs --n 100
 
 Use `--` to separate Scalingo CLI flags from the command arguments.
 
-### Check Schema Status
+### Run Database Migrations
 
 ```bash
-scalingo --app open-q run -- python backend/scripts/ensure_schema.py
+scalingo --app open-q run -- python backend/scripts/migrate.py
 ```
 
 ### Sync Study Configuration

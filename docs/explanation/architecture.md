@@ -23,7 +23,7 @@ graph LR
     end
 
     subgraph "Storage"
-        DB[(PostgreSQL<br/>or SQLite)]
+        DB[(PostgreSQL)]
     end
 
     UI <--> State
@@ -99,12 +99,12 @@ flowchart TD
 
 ### Backend
 
-| Technology              | Purpose                           |
-| ----------------------- | --------------------------------- |
-| **FastAPI**             | Async REST API with OpenAPI docs  |
-| **SQLAlchemy**          | ORM with async support            |
-| **Pydantic**            | Data validation and serialization |
-| **SQLite / PostgreSQL** | Flexible database options         |
+| Technology     | Purpose                           |
+| -------------- | --------------------------------- |
+| **FastAPI**    | Async REST API with OpenAPI docs  |
+| **SQLAlchemy** | ORM with async support            |
+| **Pydantic**   | Data validation and serialization |
+| **PostgreSQL** | Scalable system database          |
 
 ---
 

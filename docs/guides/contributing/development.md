@@ -5,7 +5,7 @@ This guide covers how to set up your local environment to contribute to Open-Q.
 ## Prerequisites
 
 - **Node.js**: v24.x (see `.nvmrc`)
-- **Python**: v3.12+ (managed by `uv`)
+- **Python**: v3.13+ (managed by `uv`)
 - **uv**: [Installation Guide](https://docs.astral.sh/uv/) (Required for Python dependency management)
 - **Make**: (Recommended for shortcut commands)
 
@@ -33,15 +33,15 @@ This will:
 
 ### 3. Initialize Database
 
-Initialize the SQLite database (`q_method.db`) with the schema and default seed data (Admin user, Workspace).
+Initialize the PostgreSQL database with the schema and the default admin user.
 
 ```bash
-# Initialize DB
+# Initialize DB (Creates schema via Alembic + Admin user)
 cd backend && uv run python init_db.py
-
-# Seed example study (ensure backend is NOT running, or use make seed if it checks api)
-# Note: seed.py typically uses the API, so run the backend first.
 ```
+
+> [!IMPORTANT]
+> Ensure your `DATABASE_URL` is set in `backend/.env` before running this. See [Configuration Reference](../reference/configuration.md).
 
 ## 🚀 Running Locally
 
@@ -117,5 +117,7 @@ These are run via `make check`.
 
 - **Sync Study Config**: `cd backend && uv run python seed.py data/example-study.json`
   Updates/Creates a study from JSON definition. Requires backend running.
-- **Verify Schema**: `cd backend && uv run python scripts/migrate.py`
-  Runs database migrations and verifies schema state.
+- **Run Migrations**: `cd backend && uv run python scripts/migrate.py`
+  Executes `alembic upgrade head` to ensure your local database is up to date.
+- **Create New Migration**: `make migration-new`
+  Generates a new Alembic revision after you modify models in `backend/app/models.py`.
