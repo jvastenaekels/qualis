@@ -1,19 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, test } from "@playwright/test";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { exampleStudyData as rawStudy } from "./fixtures/example-study-data";
 import { mockSubmitAPI } from "./fixtures/study-config";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// 1. Load and Transform example-study.json
-const studyJsonPath = path.resolve(
-  __dirname,
-  "../../backend/data/example-study.json",
-);
-const rawStudy = JSON.parse(fs.readFileSync(studyJsonPath, "utf-8"));
 
 // Synthesize ID for statements as the frontend requires them (normally DB assigns them)
 const statements = rawStudy.statements.map((s: any, index: number) => ({

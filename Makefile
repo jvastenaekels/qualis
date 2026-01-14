@@ -11,7 +11,7 @@ run-frontend:
 	cd frontend && npm run dev
 
 seed:
-	cd backend && uv run python seed.py data/example-study.json
+	@echo "Usage: cd backend && uv run python seed.py <path-to-study-json>"
 
 generate-api:
 	cd backend && uv run python ../export_openapi.py

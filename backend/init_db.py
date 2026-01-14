@@ -92,8 +92,6 @@ async def init_db(reset: bool = False):
 
         await session.commit()
         print(f"3. Admin user created: {admin_email}")
-        # print(f"4. Default workspace created: {default_workspace.title}")
-        print("\nNote: To seed a study, use: python seed.py data/example-study.json")
         print("--- Initialization Complete ---")
     await engine.dispose()
 

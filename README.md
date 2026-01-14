@@ -108,7 +108,7 @@ make ci
 make ci-full
 ```
 
-3. **Visit**: [http://localhost:5173/study/example-study/welcome](http://localhost:5173/study/example-study/welcome)
+3. **Visit**: [http://localhost:5173/study/my-study/welcome](http://localhost:5173/study/my-study/welcome)
 
 ---
 

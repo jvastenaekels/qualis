@@ -1,18 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect, test } from "@playwright/test";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load mock data
-const studyJsonPath = path.resolve(
-  __dirname,
-  "../../backend/data/example-study.json",
-);
-const rawStudy = JSON.parse(fs.readFileSync(studyJsonPath, "utf-8"));
+import { exampleStudyData as rawStudy } from "./fixtures/example-study-data";
 
 // Synthesize ID for statements
 const statements = rawStudy.statements.map((s: any, index: number) => ({

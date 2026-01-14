@@ -40,7 +40,7 @@ backend/
 
    ```bash
    # Create or Update a study
-   python seed.py data/example-study.json
+   python seed.py your-study.json
    ```
 
 4. **Utility Scripts**:

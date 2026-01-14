@@ -62,16 +62,9 @@ def main():
     # 2. Initialize Database (Create missing tables)
     run_task("init_db.py", "Infrastructure Initialization")
 
-    # 3. Sync Study Configuration
-    # (Disabled per user request: "don't install example study")
-    # if os.path.exists("data/example-study.json"):
-    #     run_task(
-    #         "seed.py",
-    #         "Study Configuration Sync",
-    #         ["data/example-study.json"],
-    #     )
-    # else:
-    #     print("[PostDeploy] Skipping Study Tasks: data/example-study.json not found.")
+    # 3. Sync Study Configuration (User Managed)
+    # Automatic seeding is disabled to respect researcher-controlled environments.
+    # To seed a study manually: python seed.py data/your-study.json
 
     print("\n--- All Tasks Completed Successfully ---")
 
