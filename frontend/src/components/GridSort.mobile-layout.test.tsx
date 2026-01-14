@@ -124,8 +124,8 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         // Find the specific instruction text
         const instruction = screen.getByText('fine.workbench.initial_instruction');
 
-        // Traverse up to find the footer container (min-h-[150px])
-        const footer = instruction.closest('.min-h-\\[150px\\]');
+        // Traverse up to find the footer container (min-h-[88px])
+        const footer = instruction.closest('.min-h-\\[88px\\]');
 
         expect(footer).toBeInTheDocument();
         expect(footer?.className).toContain('flex-none');

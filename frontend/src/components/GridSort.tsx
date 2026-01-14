@@ -71,7 +71,7 @@ const DroppableDeckArea: React.FC<{
 // --- UI Variants ---
 
 const pileTabVariants = cva(
-    'relative flex-1 basis-0 w-full h-full flex flex-col items-center justify-center p-2 min-h-[70px] sm:min-h-[85px] lg:min-h-[95px] rounded-xl border transition-all duration-200 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-indigo-400',
+    'relative flex-1 basis-0 w-full h-full flex flex-col items-center justify-center p-1.5 sm:p-2 min-h-[60px] sm:min-h-[75px] lg:min-h-[90px] rounded-xl border transition-all duration-200 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-indigo-400',
     {
         variants: {
             variant: {
@@ -325,7 +325,7 @@ const ValidationFooter: React.FC<{
     };
     highlightKey?: string | null;
 }> = React.memo(({ isAllPlaced, selectedCardId, onValidate, labels, highlightKey }) => (
-    <div className="w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[150px] flex-none pb-[calc(1rem+env(safe-area-inset-bottom))]">
+    <div className="w-full lg:w-[360px] p-3 lg:p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[88px] lg:min-h-[100px] flex-none pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         {isAllPlaced ? (
             <button
                 type="button"
@@ -788,7 +788,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     )}
 
                     {/* Category selector (Piles) */}
-                    <div className="flex-none p-4 pb-2">
+                    <div className="flex-none p-3 pb-1.5 lg:p-4 lg:pb-2">
                         <div className="flex w-full gap-2 lg:grid lg:grid-cols-3" role="tablist">
                             {(['disagree', 'neutral', 'agree'] as const).map((pile) => (
                                 <PileTab
@@ -817,7 +817,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         id={`deck-area-${activePile}`}
                         className={cn(
                             'flex-col overflow-hidden relative',
-                            isMobile ? 'h-[150px] flex-none' : 'flex-1 min-h-0 flex'
+                            isMobile ? 'h-[120px] flex-none' : 'flex-1 min-h-0 flex'
                         )}
                     >
                         <div
