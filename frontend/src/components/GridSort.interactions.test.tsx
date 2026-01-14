@@ -99,8 +99,12 @@ describe('GridSort Interactions', () => {
         // Find pile tabs
         // Find pile tabs by exact aria-label construction from the mock
         // Mock t returns key. Format is `${key}: ${count} ${key}`
-        const neutralTab = screen.getByRole('tab', { name: `common.neutral: 1 common.cards` });
-        const agreeTab = screen.getByRole('tab', { name: `common.agree: 1 common.cards` });
+        const neutralTab = screen.getByRole('tab', {
+            name: `common.neutral: 1 common.cards`,
+        });
+        const agreeTab = screen.getByRole('tab', {
+            name: `common.agree: 1 common.cards`,
+        });
 
         // Switch to Neutral
         fireEvent.click(neutralTab);

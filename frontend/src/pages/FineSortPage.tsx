@@ -72,9 +72,10 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
 
     // 2. State & Hooks - Continuous
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
-    const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number } | null>(
-        null
-    );
+    const [cardDimensions, setCardDimensions] = useState<{
+        width: number;
+        height: number;
+    } | null>(null);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [interactionUtils, setInteractionUtils] = useState<InteractionUtils | null>(null);
 
@@ -256,7 +257,12 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                 const placed = qsort.find((p) => p.statementId === cardId);
                 if (placed) {
                     // Return a synthetic collision with the slot ID
-                    return [{ id: `slot_${placed.col}_${placed.row}`, data: cardCollision.data }];
+                    return [
+                        {
+                            id: `slot_${placed.col}_${placed.row}`,
+                            data: cardCollision.data,
+                        },
+                    ];
                 }
             }
 
@@ -395,12 +401,18 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
             </div>
             {createPortal(
                 <DragOverlay
-                    dropAnimation={{ duration: 250, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}
+                    dropAnimation={{
+                        duration: 250,
+                        easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+                    }}
                 >
                     {activeCardData ? (
                         <div
                             className="pointer-events-none"
-                            style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center' }}
+                            style={{
+                                transform: `scale(${zoomLevel})`,
+                                transformOrigin: 'center',
+                            }}
                         >
                             <SortableCard
                                 id={activeCardData.id}

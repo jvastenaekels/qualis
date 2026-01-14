@@ -31,7 +31,11 @@ const BrandingEditor = () => {
         updateDraft((d) => {
             const draftAny = d as unknown as StudyRead;
             if (!draftAny.branding) {
-                draftAny.branding = { logo_url: null, accent_color: null, partners: [] };
+                draftAny.branding = {
+                    logo_url: null,
+                    accent_color: null,
+                    partners: [],
+                };
             }
             draftAny.branding[field] = value;
         });
@@ -73,7 +77,9 @@ const BrandingEditor = () => {
                             <div className="flex items-center gap-6">
                                 <div
                                     className="w-16 h-16 rounded-2xl border-4 border-white shadow-xl shrink-0 ring-1 ring-slate-200"
-                                    style={{ backgroundColor: branding.accent_color || '#4f46e5' }}
+                                    style={{
+                                        backgroundColor: branding.accent_color || '#4f46e5',
+                                    }}
                                 />
                                 <div className="flex-1 space-y-3">
                                     <Label

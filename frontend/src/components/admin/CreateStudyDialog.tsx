@@ -92,7 +92,10 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
                     }),
                     grid_config: [], // Empty grid for new studies - will be configured later
                     presort_config: { enabled: true },
-                    postsort_config: { email: { enabled: false }, consent: { enabled: false } },
+                    postsort_config: {
+                        email: { enabled: false },
+                        consent: { enabled: false },
+                    },
                     state: 'draft',
                     show_statement_codes: false,
                     statements: [],
@@ -102,7 +105,9 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
             toast.success(t('admin.dialogs.create_study.success', 'Study created successfully'));
 
             // Invalidate and refetch studies list to show the new study
-            await queryClient.invalidateQueries({ queryKey: ['/api/admin/studies/'] });
+            await queryClient.invalidateQueries({
+                queryKey: ['/api/admin/studies/'],
+            });
 
             setActiveStudy(newStudy.slug);
             navigate(`/admin/studies/${newStudy.slug}`);
@@ -116,7 +121,9 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
 
             if (error && typeof error === 'object') {
                 // Check for axios-style error response
-                const axiosError = error as { response?: { data?: { detail?: unknown } } };
+                const axiosError = error as {
+                    response?: { data?: { detail?: unknown } };
+                };
                 if (axiosError.response?.data?.detail) {
                     const detail = axiosError.response.data.detail;
 

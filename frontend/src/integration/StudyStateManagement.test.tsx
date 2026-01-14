@@ -91,7 +91,10 @@ describe('Study State Management Integration Tests', () => {
                 http.post('/api/admin/studies/test-study/validate', () => {
                     return HttpResponse.json({
                         errors: [
-                            { field: 'statements', message: 'At least one statement required' },
+                            {
+                                field: 'statements',
+                                message: 'At least one statement required',
+                            },
                         ],
                     });
                 })
@@ -301,7 +304,9 @@ describe('Study State Management Integration Tests', () => {
                     }
 
                     return HttpResponse.json(
-                        { detail: `Invalid transition from ${currentState} to ${newState}` },
+                        {
+                            detail: `Invalid transition from ${currentState} to ${newState}`,
+                        },
                         { status: 400 }
                     );
                 })

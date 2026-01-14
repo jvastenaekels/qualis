@@ -13,7 +13,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 
 export default function ParticipantDetailsPage() {
-    const { slug, participantId } = useParams<{ slug: string; participantId: string }>();
+    const { slug, participantId } = useParams<{
+        slug: string;
+        participantId: string;
+    }>();
     const navigate = useNavigate();
     const { t } = useTranslation();
 

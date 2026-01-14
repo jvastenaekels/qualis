@@ -42,7 +42,11 @@ vi.mock('../store/useUIStore', () => ({ useUIStore: vi.fn() }));
 
 // Mock useStudyConfig
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() })),
+    useStudyConfig: vi.fn(() => ({
+        isLoading: false,
+        error: null,
+        retry: vi.fn(),
+    })),
 }));
 
 // Mock translation
@@ -103,7 +107,9 @@ describe('FineSortPage Integration', () => {
         });
 
         expect(screen.getAllByText(/fine.actions.validate/i).length).toBeGreaterThan(0);
-        const btns = screen.getAllByRole('button', { name: /fine.actions.validate/i });
+        const btns = screen.getAllByRole('button', {
+            name: /fine.actions.validate/i,
+        });
         for (const btn of btns) {
             expect((btn as HTMLButtonElement).disabled).toBe(false);
         }

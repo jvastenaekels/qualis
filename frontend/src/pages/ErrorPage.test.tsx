@@ -98,7 +98,9 @@ describe('ErrorPage', () => {
         );
 
         // Button text is now from translation keys
-        const resetButton = screen.getByRole('button', { name: 'common.errors.reset' });
+        const resetButton = screen.getByRole('button', {
+            name: 'common.errors.reset',
+        });
         fireEvent.click(resetButton);
 
         expect(mocks.resetSession).toHaveBeenCalled();
@@ -115,7 +117,9 @@ describe('ErrorPage', () => {
             </MemoryRouter>
         );
 
-        const retryButton = screen.getByRole('button', { name: 'common.errors.retry' });
+        const retryButton = screen.getByRole('button', {
+            name: 'common.errors.retry',
+        });
         fireEvent.click(retryButton);
         expect(onRetry).toHaveBeenCalled();
     });

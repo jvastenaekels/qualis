@@ -164,15 +164,12 @@ const StudyDesignPage = () => {
     const [backupToRestore, setBackupToRestore] = useState<StudyUpdate | null>(null);
 
     useEffect(() => {
-        if (!study || !slug) return;
-
         const backupJson = localStorage.getItem(`open-q-draft-backup-${slug}`);
-        if (backupJson) {
+        if (backupJson && draft) {
             try {
                 const backup = JSON.parse(backupJson);
-                // Compare normalized server version with backup to avoid false positives
-                const serverDraft = projectStudyToUpdate(study);
-                if (!areStudiesEqual(backup, serverDraft)) {
+                // Compare current live draft (with defaults/normalizations) with backup
+                if (!areStudiesEqual(backup, draft)) {
                     setBackupToRestore(backup);
                     setIsRecoveryModalOpen(true);
                 }
@@ -180,7 +177,7 @@ const StudyDesignPage = () => {
                 console.error('Failed to parse backup:', e);
             }
         }
-    }, [study, slug]);
+    }, [slug, draft]);
 
     const handleRestoreBackup = () => {
         if (backupToRestore) {
@@ -366,7 +363,7 @@ const StudyDesignPage = () => {
 
     return (
         <div
-            className="flex flex-col h-[calc(100vh-theme(spacing.16))] animate-in fade-in duration-500 overflow-hidden max-w-full"
+            className="flex flex-col h-full animate-in fade-in duration-500 overflow-hidden max-w-full"
             style={{ animationFillMode: 'forwards' }}
         >
             {/* Toolbar */}
@@ -379,10 +376,12 @@ const StudyDesignPage = () => {
                         <Wand2 className="h-4 w-4 text-indigo-600" />
                     </div>
                     <div className="h-4 w-px bg-border hidden lg:block" />
-                    <h2 className="text-xs sm:text-sm font-black text-slate-900 truncate min-w-0">
-                        {draft.translations?.find((t) => t.language_code === activeLocale)?.title ||
-                            draft.slug}
-                    </h2>
+                    <div className="flex-1 min-w-0">
+                        <h2 className="text-xs sm:text-sm font-black text-slate-900 truncate">
+                            {draft.translations?.find((t) => t.language_code === activeLocale)
+                                ?.title || draft.slug}
+                        </h2>
+                    </div>
                     {/* Status Badge */}
                     <div
                         role="status"

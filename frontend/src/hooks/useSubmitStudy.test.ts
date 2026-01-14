@@ -69,11 +69,16 @@ describe('useSubmitStudy', () => {
         server.use(
             http.post('/api/submit', async ({ request }) => {
                 capturedRequest = await request.json();
-                return HttpResponse.json({ success: true, confirmation_code: 'CONF123' });
+                return HttpResponse.json({
+                    success: true,
+                    confirmation_code: 'CONF123',
+                });
             })
         );
 
-        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
+        const { result } = renderHook(() => useSubmitStudy(), {
+            wrapper: AllTheProviders,
+        });
 
         await act(async () => {
             await result.current.submit();
@@ -110,7 +115,9 @@ describe('useSubmitStudy', () => {
             })
         );
 
-        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
+        const { result } = renderHook(() => useSubmitStudy(), {
+            wrapper: AllTheProviders,
+        });
 
         await act(async () => {
             await result.current.submit();
@@ -132,7 +139,9 @@ describe('useSubmitStudy', () => {
             })
         );
 
-        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
+        const { result } = renderHook(() => useSubmitStudy(), {
+            wrapper: AllTheProviders,
+        });
 
         await act(async () => {
             await result.current.submit();
@@ -147,7 +156,9 @@ describe('useSubmitStudy', () => {
     it('handles missing config error', async () => {
         useConfigStore.getState().setConfig(null as unknown as StudyConfig);
 
-        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
+        const { result } = renderHook(() => useSubmitStudy(), {
+            wrapper: AllTheProviders,
+        });
 
         await act(async () => {
             await result.current.submit();
@@ -162,7 +173,9 @@ describe('useSubmitStudy', () => {
     it('handles missing session token error', async () => {
         useSessionStore.getState().setToken(null as unknown as string);
 
-        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
+        const { result } = renderHook(() => useSubmitStudy(), {
+            wrapper: AllTheProviders,
+        });
 
         await act(async () => {
             await result.current.submit();
@@ -175,11 +188,16 @@ describe('useSubmitStudy', () => {
     it('respects silent option (no loading state)', async () => {
         server.use(
             http.post('/api/submit', () => {
-                return HttpResponse.json({ success: true, confirmation_code: 'SilentCode' });
+                return HttpResponse.json({
+                    success: true,
+                    confirmation_code: 'SilentCode',
+                });
             })
         );
 
-        const { result } = renderHook(() => useSubmitStudy(), { wrapper: AllTheProviders });
+        const { result } = renderHook(() => useSubmitStudy(), {
+            wrapper: AllTheProviders,
+        });
 
         await act(async () => {
             // We pass silent: true. The hook should NOT set isLoading to true.

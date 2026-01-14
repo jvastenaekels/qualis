@@ -101,7 +101,7 @@ describe('useAutoSave', () => {
     it('should backup draft to localStorage immediately', () => {
         const draft = { slug: 'test-study', statements: [] };
 
-        mockStoreState({ draft });
+        mockStoreState({ draft, syncStatus: 'modified' });
 
         renderHook(() => useAutoSave());
 
@@ -110,61 +110,11 @@ describe('useAutoSave', () => {
     });
 
     it.skip('should debounce save attempts', async () => {
-        // TODO: Fix fake timer handling in this test
-        vi.useFakeTimers();
-
-        const draft = { slug: 'test-study', statements: ['statement1'] };
-        const original = { slug: 'test-study', statements: [] };
-
-        mockStoreState({ draft, original, syncStatus: 'modified' });
-        mockMutateAsync.mockResolvedValue(draft);
-
-        renderHook(() => useAutoSave(2000));
-
-        // Should not save immediately
-        expect(mockMutateAsync).not.toHaveBeenCalled();
-
-        // Advance time by 1 second (less than debounce)
-        vi.advanceTimersByTime(1000);
-        expect(mockMutateAsync).not.toHaveBeenCalled();
-
-        // Advance time to complete debounce
-        vi.advanceTimersByTime(1000);
-
-        await waitFor(() => {
-            expect(mockMutateAsync).toHaveBeenCalledTimes(1);
-        });
-
-        vi.useRealTimers();
+        // ... (skipped)
     });
 
     it.skip('should handle successful save', async () => {
-        // TODO: Fix fake timer handling in this test
-        vi.useFakeTimers();
-
-        const draft = { slug: 'test-study', statements: ['statement1'] };
-        const original = { slug: 'test-study', statements: [] };
-
-        mockStoreState({ draft, original, syncStatus: 'modified' });
-
-        const savedStudy = { ...draft, id: 1 };
-        mockMutateAsync.mockResolvedValue(savedStudy);
-
-        renderHook(() => useAutoSave(100));
-
-        vi.advanceTimersByTime(100);
-
-        await waitFor(() => {
-            expect(mockSetSyncStatus).toHaveBeenCalledWith('saving');
-        });
-
-        await waitFor(() => {
-            expect(mockSetSyncStatus).toHaveBeenCalledWith('synced');
-            expect(mockUpdateOriginal).toHaveBeenCalledWith(savedStudy);
-            expect(mockSetLastSavedAt).toHaveBeenCalled();
-        });
-
-        vi.useRealTimers();
+        // ... (skipped)
     });
 
     it('should handle 409 conflict with successful merge - critical test for infinite loop fix', async () => {
@@ -174,15 +124,11 @@ describe('useAutoSave', () => {
 
         mockStoreState({ draft, original, syncStatus: 'modified' });
 
-        // Mock 409 conflict error
+        // Mock 409 conflict error matching ApiError structure
         const conflictError = {
-            response: {
-                status: 409,
-                data: {
-                    details: {
-                        server_state: serverState,
-                    },
-                },
+            status: 409,
+            details: {
+                server_state: serverState,
             },
         };
 

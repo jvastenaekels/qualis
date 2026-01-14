@@ -47,7 +47,11 @@ vi.mock('react-i18next', () => ({
 
 // Mock useStudyConfig since it's used in StudyLayout
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: mocks.retry })),
+    useStudyConfig: vi.fn(() => ({
+        isLoading: false,
+        error: null,
+        retry: mocks.retry,
+    })),
 }));
 
 describe('StudyLayout Language Sync', () => {
@@ -90,7 +94,9 @@ describe('StudyLayout Language Sync', () => {
 
         // Render Layout
         // Render Layout
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // Change Store Language DIRECTLY (Simulating State Change)
         act(() => {
@@ -102,7 +108,9 @@ describe('StudyLayout Language Sync', () => {
     });
 
     it('Updates Store when UI Language Button is clicked', () => {
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // Open Language Menu (Button with Globe)
         const globeBtn = screen.getByTitle('layout.change_lang_title');
@@ -220,7 +228,9 @@ describe('Layout Loading & Error States', () => {
         // Mock hook to reflect loading (though store drives it mostly, hook might be used for retry)
         vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() });
 
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // Check for loading text
         expect(screen.getByText('common.loading')).toBeInTheDocument();
@@ -228,10 +238,15 @@ describe('Layout Loading & Error States', () => {
     });
 
     it('Renders StudyNotFound when error is common.errors.not_found', () => {
-        useConfigStore.setState({ error: 'common.errors.not_found', isLoading: false });
+        useConfigStore.setState({
+            error: 'common.errors.not_found',
+            isLoading: false,
+        });
         vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() });
 
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // Check for StudyNotFound component content (it usually renders a generic 404 message or specific text)
         // Since StudyNotFound is likely not mocked, we check for its content.
@@ -243,17 +258,24 @@ describe('Layout Loading & Error States', () => {
 
     it('Renders ErrorPage for generic errors', () => {
         const retryMock = vi.fn();
-        useConfigStore.setState({ error: 'common.errors.network', isLoading: false });
+        useConfigStore.setState({
+            error: 'common.errors.network',
+            isLoading: false,
+        });
         vi.mocked(useStudyConfig).mockReturnValue({ retry: retryMock });
 
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // ErrorPage renders title and message
         expect(screen.getByText('common.errors.network_title')).toBeInTheDocument();
         expect(screen.getByText('common.errors.network')).toBeInTheDocument();
 
         // Test Retry Button
-        const retryBtn = screen.getByRole('button', { name: 'common.errors.retry' });
+        const retryBtn = screen.getByRole('button', {
+            name: 'common.errors.retry',
+        });
         fireEvent.click(retryBtn);
         expect(retryMock).toHaveBeenCalled();
     });

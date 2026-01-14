@@ -110,7 +110,9 @@ describe('StudyDesignPage Responsive Layout', () => {
             screen.getByRole('tab', { name: /(Q-sort|admin\.design\.tabs\.qsort)/i })
         ).toBeTruthy();
         expect(
-            screen.getByRole('tab', { name: /(Interface|admin\.design\.tabs\.interface)/i })
+            screen.getByRole('tab', {
+                name: /(Interface|admin\.design\.tabs\.interface)/i,
+            })
         ).toBeTruthy();
     });
 

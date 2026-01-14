@@ -326,7 +326,11 @@ export function ProcessStepEditor() {
                         translation.process_steps[index].icon = data.icon;
                     } else {
                         // This should technically not happen if they are always synced
-                        translation.process_steps[index] = { ...data, title: '', description: '' };
+                        translation.process_steps[index] = {
+                            ...data,
+                            title: '',
+                            description: '',
+                        };
                     }
                 }
             });

@@ -68,7 +68,11 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
             // Trigger animation matching gestures
             switch (direction) {
                 case 'agree':
-                    await controls.start({ x: 500, opacity: 0, transition: { duration: 0.2 } });
+                    await controls.start({
+                        x: 500,
+                        opacity: 0,
+                        transition: { duration: 0.2 },
+                    });
                     break;
                 case 'disagree':
                     await controls.start({
@@ -78,7 +82,11 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                     });
                     break;
                 case 'neutral':
-                    await controls.start({ y: 500, opacity: 0, transition: { duration: 0.2 } });
+                    await controls.start({
+                        y: 500,
+                        opacity: 0,
+                        transition: { duration: 0.2 },
+                    });
                     break;
             }
             onVote(direction);
@@ -92,13 +100,25 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
         const { x: offsetX, y: offsetY } = info.offset;
 
         if (offsetX > threshold) {
-            await controls.start({ x: 500, opacity: 0, transition: { duration: 0.2 } });
+            await controls.start({
+                x: 500,
+                opacity: 0,
+                transition: { duration: 0.2 },
+            });
             onVote('agree');
         } else if (offsetX < -threshold) {
-            await controls.start({ x: -500, opacity: 0, transition: { duration: 0.2 } });
+            await controls.start({
+                x: -500,
+                opacity: 0,
+                transition: { duration: 0.2 },
+            });
             onVote('disagree');
         } else if (offsetY > threshold) {
-            await controls.start({ y: 500, opacity: 0, transition: { duration: 0.2 } });
+            await controls.start({
+                y: 500,
+                opacity: 0,
+                transition: { duration: 0.2 },
+            });
             onVote('neutral');
         } else {
             controls.start({ x: 0, y: 0, transition: { type: 'spring' } });

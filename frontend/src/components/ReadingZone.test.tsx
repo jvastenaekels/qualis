@@ -19,7 +19,11 @@ describe('ReadingZone', () => {
     it('shows methodology tips when idle (no card selected or hovered)', () => {
         // Arrange: Ensure store is clean
         act(() => {
-            useUIStore.setState({ hoveredCard: null, activeCard: null, selectedCard: null });
+            useUIStore.setState({
+                hoveredCard: null,
+                activeCard: null,
+                selectedCard: null,
+            });
         });
 
         // Act

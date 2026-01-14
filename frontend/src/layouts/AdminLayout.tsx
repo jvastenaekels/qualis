@@ -16,6 +16,7 @@ import { useGetStudyApiAdminStudiesSlugGet } from '@/api/generated';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 
 export default function AdminLayout() {
     const location = useLocation();
@@ -122,7 +123,12 @@ export default function AdminLayout() {
                         </div>
                     </div>
                 </header>
-                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                <div
+                    className={cn(
+                        'flex flex-1 flex-col transition-all duration-300 min-w-0',
+                        !location.pathname.includes('/design') && 'gap-4 p-4 pt-0'
+                    )}
+                >
                     <Outlet />
                 </div>
             </SidebarInset>

@@ -23,7 +23,10 @@ export const useGridCalculations = ({
     onDimensionsChange,
 }: UseGridCalculationsProps) => {
     const wrapperRef = useRef<HTMLDivElement>(null);
-    const [cardDimensions, setCardDimensions] = useState({ width: 160, height: 96 });
+    const [cardDimensions, setCardDimensions] = useState({
+        width: 160,
+        height: 96,
+    });
 
     const calculateOptimalSize = useCallback(() => {
         if (!wrapperRef.current) return;

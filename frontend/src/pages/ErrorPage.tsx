@@ -139,7 +139,9 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
 
     const Container = isFullPage ? 'div' : React.Fragment;
     const containerProps = isFullPage
-        ? { className: 'min-h-screen bg-gray-50 flex items-center justify-center p-4' }
+        ? {
+              className: 'min-h-screen bg-gray-50 flex items-center justify-center p-4',
+          }
         : {};
 
     // Helper type (can be inferred but good for clarity)

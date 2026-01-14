@@ -294,7 +294,10 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
             <div className="w-full h-1 bg-gray-100 flex-none z-30">
                 <div
                     className="h-full transition-all duration-300 ease-out"
-                    style={{ width: `${progress}%`, backgroundColor: 'var(--brand-accent)' }}
+                    style={{
+                        width: `${progress}%`,
+                        backgroundColor: 'var(--brand-accent)',
+                    }}
                 />
             </div>
 

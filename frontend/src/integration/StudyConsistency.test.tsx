@@ -171,7 +171,9 @@ describe('Study Consistency (Admin -> Participant)', () => {
         };
 
         useConfigStore.setState({ config: participantConfig });
-        useResponseStore.setState({ rough: { history: [], agree: [], disagree: [], neutral: [] } });
+        useResponseStore.setState({
+            rough: { history: [], agree: [], disagree: [], neutral: [] },
+        });
 
         unmount();
 

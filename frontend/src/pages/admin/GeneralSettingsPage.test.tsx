@@ -133,7 +133,9 @@ describe('GeneralSettingsPage', () => {
 
         renderPage();
 
-        const archiveButton = screen.getByRole('button', { name: /Archive Study/i });
+        const archiveButton = screen.getByRole('button', {
+            name: /Archive Study/i,
+        });
 
         // Check if enabled
         expect(archiveButton).toBeEnabled();

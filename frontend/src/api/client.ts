@@ -74,7 +74,10 @@ import { useSessionStore } from '../store/useSessionStore';
 export default {
     get: async (
         url: string,
-        options?: RequestInit & { headers?: Record<string, string>; responseType?: string }
+        options?: RequestInit & {
+            headers?: Record<string, string>;
+            responseType?: string;
+        }
     ) => request(url, { ...options, method: 'GET' }),
 
     post: async (
@@ -95,7 +98,10 @@ export default {
 
 async function request(
     url: string,
-    options: RequestInit & { headers?: Record<string, string>; responseType?: string }
+    options: RequestInit & {
+        headers?: Record<string, string>;
+        responseType?: string;
+    }
 ) {
     const fullUrl =
         url.startsWith('http') || url.startsWith('/api')

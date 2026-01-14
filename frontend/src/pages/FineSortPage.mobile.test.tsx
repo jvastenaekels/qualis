@@ -87,7 +87,9 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         );
 
         // 2. Ensure we are on the 'disagree' pile
-        const disagreeTab = await screen.findByRole('tab', { name: /common.disagree/i });
+        const disagreeTab = await screen.findByRole('tab', {
+            name: /common.disagree/i,
+        });
         fireEvent.click(disagreeTab);
 
         // 3. Wait for Card 1 to appear in the deck
@@ -131,7 +133,9 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         );
 
         // Ensure we are on 'disagree'
-        const disagreeTab = await screen.findByRole('tab', { name: /common.disagree/i });
+        const disagreeTab = await screen.findByRole('tab', {
+            name: /common.disagree/i,
+        });
         fireEvent.click(disagreeTab);
 
         // Check for precise "all placed" label
@@ -155,7 +159,9 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         );
 
         // 2. Ensure we are on the 'disagree' pile
-        const disagreeTab = await screen.findByRole('tab', { name: /common.disagree/i });
+        const disagreeTab = await screen.findByRole('tab', {
+            name: /common.disagree/i,
+        });
         fireEvent.click(disagreeTab);
 
         // 3. Select Card 2 (in Deck)

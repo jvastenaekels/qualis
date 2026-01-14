@@ -414,7 +414,9 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
         const id = `q_${Date.now()}`;
         const newQuestion: QuestionConfig = {
             type: qType,
-            label: { [activeLocale]: t('admin.design.questions.defaults.new_question') },
+            label: {
+                [activeLocale]: t('admin.design.questions.defaults.new_question'),
+            },
             required: false,
             options:
                 qType === 'select' || qType === 'checkbox' || qType === 'radio'
@@ -425,7 +427,9 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                     : undefined,
             placeholder:
                 qType === 'text' || qType === 'email' || qType === 'textarea'
-                    ? { [activeLocale]: t('admin.design.questions.defaults.enter_answer') }
+                    ? {
+                          [activeLocale]: t('admin.design.questions.defaults.enter_answer'),
+                      }
                     : undefined,
             rows: qType === 'textarea' ? 4 : undefined,
         };

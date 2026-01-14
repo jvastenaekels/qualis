@@ -68,7 +68,9 @@ describe('QSortEditor', () => {
             const user = userEvent.setup();
             renderEditor();
 
-            const distributionTab = screen.getByRole('tab', { name: /Distribution/i });
+            const distributionTab = screen.getByRole('tab', {
+                name: /Distribution/i,
+            });
             await user.click(distributionTab);
 
             // UI should switch to grid config
@@ -198,8 +200,14 @@ describe('QSortEditor', () => {
                 draft: {
                     ...mockDraft,
                     statements: [
-                        { code: 'custom-1', translations: [{ language_code: 'en', text: 'S1' }] },
-                        { code: 'gap-5', translations: [{ language_code: 'en', text: 'S2' }] },
+                        {
+                            code: 'custom-1',
+                            translations: [{ language_code: 'en', text: 'S1' }],
+                        },
+                        {
+                            code: 'gap-5',
+                            translations: [{ language_code: 'en', text: 'S2' }],
+                        },
                     ],
                 },
             });
@@ -258,7 +266,10 @@ describe('QSortEditor', () => {
 
         it('allows independent adjustment when symmetry lock is disabled', async () => {
             const user = userEvent.setup();
-            renderEditor({ activeSubStep: 'grid', draft: { ...mockDraft, symmetry_lock: false } });
+            renderEditor({
+                activeSubStep: 'grid',
+                draft: { ...mockDraft, symmetry_lock: false },
+            });
 
             const increaseButtons = screen.getAllByLabelText(/Increase capacity for column/i);
 

@@ -101,9 +101,13 @@ describe('mergeStudyUpdates', () => {
         // Currently we flag conflict if ANYONE touched statements while another touched them
         const base = createBase({ statements: [] });
         // @ts-expect-error
-        const local = createBase({ statements: [{ code: 'S1', translations: [] }] });
+        const local = createBase({
+            statements: [{ code: 'S1', translations: [] }],
+        });
         // @ts-expect-error
-        const server = createBase({ statements: [{ code: 'S2', translations: [] }] });
+        const server = createBase({
+            statements: [{ code: 'S2', translations: [] }],
+        });
 
         const result = mergeStudyUpdates(local, server, base);
 

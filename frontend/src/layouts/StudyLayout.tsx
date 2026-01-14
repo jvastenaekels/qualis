@@ -186,7 +186,10 @@ const StudyLayoutContent: React.FC = () => {
                 <div
                     data-testid="loading-spinner"
                     className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin"
-                    style={{ borderColor: 'var(--brand-accent)', borderTopColor: 'transparent' }}
+                    style={{
+                        borderColor: 'var(--brand-accent)',
+                        borderTopColor: 'transparent',
+                    }}
                 ></div>
                 <div className="space-y-2 text-center animate-pulse">
                     <p className="text-slate-500 font-bold text-xl">{t('common.loading')}</p>

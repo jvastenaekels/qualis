@@ -390,7 +390,10 @@ describe('RoughSortPage', () => {
     it('calculates shared font size on small screens for long labels', () => {
         // Mock innerWidth
         const originalWidth = window.innerWidth;
-        Object.defineProperty(window, 'innerWidth', { value: 375, configurable: true });
+        Object.defineProperty(window, 'innerWidth', {
+            value: 375,
+            configurable: true,
+        });
         window.dispatchEvent(new Event('resize'));
 
         // Use long labels via store
@@ -416,6 +419,9 @@ describe('RoughSortPage', () => {
         expect(screen.getByText('ExtremelyLongAgreeLabel')).toBeTruthy();
 
         // Cleanup
-        Object.defineProperty(window, 'innerWidth', { value: originalWidth, configurable: true });
+        Object.defineProperty(window, 'innerWidth', {
+            value: originalWidth,
+            configurable: true,
+        });
     });
 });

@@ -33,9 +33,9 @@ export function useAutoSave(debounceMs = 2000) {
 
     // 1. Immediate Persistence Layer: LocalStorage Backup (zero debounce)
     useEffect(() => {
-        if (!draft || !slug) return;
+        if (!draft || !slug || syncStatus === 'synced') return;
         localStorage.setItem(`open-q-draft-backup-${slug}`, JSON.stringify(draft));
-    }, [draft, slug]);
+    }, [draft, slug, syncStatus]);
 
     // 2. BeforeUnload Guard
     useEffect(() => {
@@ -121,7 +121,9 @@ export function useAutoSave(debounceMs = 2000) {
                         return;
                     }
 
-                    const apiError = error as ApiError & { details: { server_state: StudyRead } };
+                    const apiError = error as ApiError & {
+                        details: { server_state: StudyRead };
+                    };
 
                     // Optimistic Locking: 409 Conflict
                     if (apiError?.status === 409 && apiError.details?.server_state) {

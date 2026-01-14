@@ -1,7 +1,7 @@
 {
-    "extends": "../tsconfig.node.json",
-    "include": ["./**/*.ts", "./**/*.tsx"],
-    "compilerOptions": {
-        "types": ["node", "@playwright/test"]
-    }
+  "extends": "../tsconfig.node.json",
+  "include": ["./**/*.ts", "./**/*.tsx"],
+  "compilerOptions": {
+    "types": ["node", "@playwright/test"]
+  }
 }

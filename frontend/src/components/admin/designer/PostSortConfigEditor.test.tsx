@@ -202,7 +202,9 @@ describe('PostSortConfigEditor - Extreme Columns Prompts', () => {
         const negativeInput = screen.getByLabelText(/Prompt for extreme cards \(-\)/);
 
         fireEvent.change(positiveInput, { target: { value: 'Why do you agree?' } });
-        fireEvent.change(negativeInput, { target: { value: 'Why do you disagree?' } });
+        fireEvent.change(negativeInput, {
+            target: { value: 'Why do you disagree?' },
+        });
 
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const currentDraft: any = useStudyDesigner.getState().draft;

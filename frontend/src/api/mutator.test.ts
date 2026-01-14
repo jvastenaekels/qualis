@@ -69,7 +69,9 @@ describe('customInstance', () => {
             expect.anything(),
             expect.objectContaining({
                 body: JSON.stringify(data),
-                headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+                headers: expect.objectContaining({
+                    'Content-Type': 'application/json',
+                }),
             })
         );
     });

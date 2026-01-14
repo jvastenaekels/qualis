@@ -33,7 +33,13 @@ export const useAuthStore = create<AuthState>()(
             setAuth: (token, user) => set({ token, user }),
             setWorkspaces: (workspaces) => set({ workspaces }),
             setCurrentWorkspace: (currentWorkspace) => set({ currentWorkspace }),
-            logout: () => set({ token: null, user: null, workspaces: [], currentWorkspace: null }),
+            logout: () =>
+                set({
+                    token: null,
+                    user: null,
+                    workspaces: [],
+                    currentWorkspace: null,
+                }),
         }),
         {
             name: 'admin-auth-storage',

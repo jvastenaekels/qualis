@@ -71,7 +71,6 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
-
   * {
     @apply border-border;
   }
@@ -83,61 +82,69 @@
 
 /* Base Styles */
 @font-face {
-    font-family: "Google Sans Flex Local";
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url("/fonts/GoogleSansFlex-Regular.woff2") format("woff2");
-    unicode-range:
-        U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
-        U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  font-family: "Google Sans Flex Local";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/GoogleSansFlex-Regular.woff2") format("woff2");
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
 }
 
 html {
-    font-size: 16px;
-    font-family: "Google Sans Flex", "Google Sans Flex Local", sans-serif;
+  font-size: 16px;
+  font-family: "Google Sans Flex", "Google Sans Flex Local", sans-serif;
 }
 
 @layer utilities {
-    @keyframes loading-line {
-        0% {
-            transform: translateX(-100%);
-        }
-        100% {
-            transform: translateX(300%);
-        }
+  @keyframes loading-line {
+    0% {
+      transform: translateX(-100%);
     }
-    .animate-loading-line {
-        animation: loading-line 1.5s infinite linear;
+    100% {
+      transform: translateX(300%);
     }
-    @keyframes pulse-slow {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.6; transform: scale(1.1); }
+  }
+  .animate-loading-line {
+    animation: loading-line 1.5s infinite linear;
+  }
+  @keyframes pulse-slow {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
     }
-    .animate-pulse-slow {
-        animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    50% {
+      opacity: 0.6;
+      transform: scale(1.1);
     }
-    .glass {
-        @apply bg-white/40 backdrop-blur-xl border-white/20 shadow-xl;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-    }
-    .scrollbar-hide {
-        -ms-overflow-style: none; /* IE and Edge */
-        scrollbar-width: none; /* Firefox */
-    }
-    .scrollbar-hide::-webkit-scrollbar {
-        display: none; /* Chrome, Safari and Opera */
-    }
+  }
+  .animate-pulse-slow {
+    animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  .glass {
+    @apply bg-white/40 backdrop-blur-xl border-white/20 shadow-xl;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
 }

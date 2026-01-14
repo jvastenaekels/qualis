@@ -46,6 +46,16 @@ def main():
     os.chdir(backend_dir)
     print(f"[PostDeploy] CWD set to: {os.getcwd()}")
 
+    # 0. Safety Check
+    if os.getenv("SCALINGO_APP_NAME") or os.getenv("DYNO"):
+        db_url = os.getenv("DATABASE_URL", "")
+        if not db_url or "sqlite" in db_url:
+            print(
+                "[PostDeploy] CRITICAL: Running in production environment but DATABASE_URL is missing or using SQLite."
+            )
+            print("[PostDeploy] Aborting to prevent data loss/ephemeral storage.")
+            sys.exit(1)
+
     # 1. Run Migrations (Safe to run first now)
     run_task("scripts/migrate.py", "Database Schema Migration")
 

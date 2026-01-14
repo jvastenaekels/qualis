@@ -17,7 +17,12 @@ import PreSortPage from './PreSortPage';
 const mockConfig = {
     presort_config: {
         age: { type: 'number', label: 'Age', required: true, min: 18, max: 99 },
-        gender: { type: 'select', label: 'Gender', required: true, options: ['Male', 'Female'] },
+        gender: {
+            type: 'select',
+            label: 'Gender',
+            required: true,
+            options: ['Male', 'Female'],
+        },
         job: { type: 'text', label: 'Job Title', required: false },
     },
     statements: [],
@@ -67,7 +72,9 @@ describe('PreSortPage', () => {
         );
 
         fireEvent.input(screen.getByLabelText(/Age/), { target: { value: '30' } });
-        fireEvent.change(screen.getByLabelText(/Gender/), { target: { value: 'Female' } });
+        fireEvent.change(screen.getByLabelText(/Gender/), {
+            target: { value: 'Female' },
+        });
 
         const button = screen.getByRole('button');
         await waitFor(() => expect(button).not.toBeDisabled());

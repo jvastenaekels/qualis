@@ -267,7 +267,10 @@ const PileTab: React.FC<{
     return (
         <DroppablePile
             id={`deck-${pile}`}
-            className={pileTabVariants({ variant: isActive ? pile : 'inactive', active: isActive })}
+            className={pileTabVariants({
+                variant: isActive ? pile : 'inactive',
+                active: isActive,
+            })}
             onClick={onClick}
             active={isActive}
             role="tab"

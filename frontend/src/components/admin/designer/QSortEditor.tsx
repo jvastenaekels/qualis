@@ -88,7 +88,10 @@ const QSortEditor = () => {
             // Check for TSV (Tab separated): "Code\tText"
             if (line.includes('\t')) {
                 const parts = line.split('\t');
-                return { code: parts[0].trim(), text: parts.slice(1).join('\t').trim() };
+                return {
+                    code: parts[0].trim(),
+                    text: parts.slice(1).join('\t').trim(),
+                };
             }
 
             // Check for CSV-like with quotes: "Code","Text"

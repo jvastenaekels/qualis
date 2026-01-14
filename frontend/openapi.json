@@ -7,9 +7,7 @@
   "paths": {
     "/api/me": {
       "get": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Read Users Me",
         "description": "Get current active user.",
         "operationId": "read_users_me_api_me_get",
@@ -32,9 +30,7 @@
         ]
       },
       "patch": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Update User Me",
         "description": "Update current user profile.",
         "operationId": "update_user_me_api_me_patch",
@@ -79,9 +75,7 @@
     },
     "/api/token": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Login For Access Token",
         "description": "OAuth2 compatible token login, getting an access token for future requests.\n\nValidation Flow:\n1. Verify username (email) and password.\n2. If the user has 2FA enabled:\n   - Check for `x-totp-token` header.\n   - If missing, return a special Token response indicating `requires_2fa=True`.\n   - If present, verify the TOTP token.\n3. If all checks pass, issue a Bearer access token.",
         "operationId": "login_for_access_token_api_token_post",
@@ -139,9 +133,7 @@
     },
     "/api/register": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Register User",
         "description": "Register a new user, optionally via an invitation token.\n\nIf an `invitation_token` is provided:\n1. Decodes and verifies the token.\n2. Ensures the token's subject matches the provided email.\n2. Ensures the token's subject matches the provided email.\n3. Automatically adds the new user as a member of the workspace specified in the token.",
         "operationId": "register_user_api_register_post",
@@ -181,9 +173,7 @@
     },
     "/api/me/password": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Change Password",
         "description": "Change current user password.",
         "operationId": "change_password_api_me_password_post",
@@ -226,9 +216,7 @@
     },
     "/api/me/2fa/setup": {
       "get": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Setup Totp",
         "description": "Start 2FA setup by generating a secret and QR code URI.",
         "operationId": "setup_totp_api_me_2fa_setup_get",
@@ -253,9 +241,7 @@
     },
     "/api/me/2fa/enable": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Enable Totp",
         "description": "Enable 2FA after verifying a token.",
         "operationId": "enable_totp_api_me_2fa_enable_post",
@@ -298,9 +284,7 @@
     },
     "/api/me/2fa/disable": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Disable Totp",
         "description": "Disable 2FA after verifying current password.",
         "operationId": "disable_totp_api_me_2fa_disable_post",
@@ -343,9 +327,7 @@
     },
     "/api/admin/studies": {
       "post": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "Create Study",
         "description": "Create a new study in the active workspace.",
         "operationId": "create_study_api_admin_studies_post",
@@ -406,9 +388,7 @@
         }
       },
       "get": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "List Studies",
         "description": "List studies in the active workspace.",
         "operationId": "list_studies_api_admin_studies_get",
@@ -465,9 +445,7 @@
     },
     "/api/admin/studies/{slug}": {
       "get": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "Get Study",
         "description": "Get study details.",
         "operationId": "get_study_api_admin_studies__slug__get",
@@ -513,9 +491,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "Update Study",
         "description": "Update study configuration.",
         "operationId": "update_study_api_admin_studies__slug__patch",
@@ -571,9 +547,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "Delete Study",
         "description": "Delete a study (Superuser only, and must be Archived).",
         "operationId": "delete_study_api_admin_studies__slug__delete",
@@ -614,9 +588,7 @@
     },
     "/api/admin/studies/{slug}/validate": {
       "post": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "Validate Study",
         "description": "Check if study is ready for activation.",
         "operationId": "validate_study_api_admin_studies__slug__validate_post",
@@ -668,9 +640,7 @@
     },
     "/api/admin/studies/{slug}/state": {
       "post": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "Change Study State",
         "description": "Change study state (Draft <-> Active <-> Closed <-> Archived).",
         "operationId": "change_study_state_api_admin_studies__slug__state_post",
@@ -726,9 +696,7 @@
     },
     "/api/admin/studies/{slug}/stats": {
       "get": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "Get Study Stats",
         "description": "Get aggregated study statistics.",
         "operationId": "get_study_stats_api_admin_studies__slug__stats_get",
@@ -776,9 +744,7 @@
     },
     "/api/admin/studies/participants/{participant_id}": {
       "get": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "Get Participant",
         "description": "Get detailed participant info including responses.",
         "operationId": "get_participant_api_admin_studies_participants__participant_id__get",
@@ -824,9 +790,7 @@
     },
     "/api/admin/studies/participants/{participant_id}/discard": {
       "patch": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "Discard Participant",
         "description": "Flag or unflag a participant for exclusion from stats/exports.",
         "operationId": "discard_participant_api_admin_studies_participants__participant_id__discard_patch",
@@ -882,9 +846,7 @@
     },
     "/api/admin/studies/{slug}/participants": {
       "get": {
-        "tags": [
-          "admin-studies"
-        ],
+        "tags": ["admin-studies"],
         "summary": "List Study Participants",
         "description": "List all participants for a specific study.",
         "operationId": "list_study_participants_api_admin_studies__slug__participants_get",
@@ -936,10 +898,7 @@
     },
     "/api/admin/studies/{slug}/export/csv": {
       "get": {
-        "tags": [
-          "admin-exports",
-          "Admin Exports"
-        ],
+        "tags": ["admin-exports", "Admin Exports"],
         "summary": "Export Csv",
         "description": "Export study results as CSV.",
         "operationId": "export_csv_api_admin_studies__slug__export_csv_get",
@@ -985,10 +944,7 @@
     },
     "/api/admin/studies/{slug}/export/pqmethod": {
       "get": {
-        "tags": [
-          "admin-exports",
-          "Admin Exports"
-        ],
+        "tags": ["admin-exports", "Admin Exports"],
         "summary": "Export Pqmethod",
         "description": "Export study results in PQMethod format (ZIP).",
         "operationId": "export_pqmethod_api_admin_studies__slug__export_pqmethod_get",
@@ -1034,10 +990,7 @@
     },
     "/api/admin/studies/{slug}/export/r-kit": {
       "get": {
-        "tags": [
-          "admin-exports",
-          "Admin Exports"
-        ],
+        "tags": ["admin-exports", "Admin Exports"],
         "summary": "Export R Kit",
         "description": "Export study results as R-Kit (ZIP with CSV + R Script).",
         "operationId": "export_r_kit_api_admin_studies__slug__export_r_kit_get",
@@ -1083,10 +1036,7 @@
     },
     "/api/admin/studies/{slug}/dump": {
       "get": {
-        "tags": [
-          "admin-exports",
-          "Admin Exports"
-        ],
+        "tags": ["admin-exports", "Admin Exports"],
         "summary": "Get Study Dump",
         "description": "Get complete study data and participant placements for client-side export generation.",
         "operationId": "get_study_dump_api_admin_studies__slug__dump_get",
@@ -1132,10 +1082,7 @@
     },
     "/api/admin/invitations/verify": {
       "get": {
-        "tags": [
-          "admin-invites",
-          "Admin Invitations"
-        ],
+        "tags": ["admin-invites", "Admin Invitations"],
         "summary": "Verify Invitation",
         "description": "Verify an invitation token and return details.",
         "operationId": "verify_invitation_api_admin_invitations_verify_get",
@@ -1174,10 +1121,7 @@
     },
     "/api/admin/invitations/accept": {
       "post": {
-        "tags": [
-          "admin-invites",
-          "Admin Invitations"
-        ],
+        "tags": ["admin-invites", "Admin Invitations"],
         "summary": "Accept Invitation",
         "description": "Accept an invitation using an existing account.\nThe email in the token must match the current user's email.",
         "operationId": "accept_invitation_api_admin_invitations_accept_post",
@@ -1220,10 +1164,7 @@
     },
     "/api/admin/users": {
       "get": {
-        "tags": [
-          "admin-users",
-          "Admin Users"
-        ],
+        "tags": ["admin-users", "Admin Users"],
         "summary": "List Users",
         "description": "List all users in the system.",
         "operationId": "list_users_api_admin_users_get",
@@ -1250,10 +1191,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "admin-users",
-          "Admin Users"
-        ],
+        "tags": ["admin-users", "Admin Users"],
         "summary": "Create User",
         "description": "Create a new user.",
         "operationId": "create_user_api_admin_users_post",
@@ -1298,10 +1236,7 @@
     },
     "/api/admin/users/{user_id}": {
       "delete": {
-        "tags": [
-          "admin-users",
-          "Admin Users"
-        ],
+        "tags": ["admin-users", "Admin Users"],
         "summary": "Delete User",
         "description": "Delete a user. Cannot delete self.",
         "operationId": "delete_user_api_admin_users__user_id__delete",
@@ -1340,10 +1275,7 @@
     },
     "/api/admin/recruitment/{slug}/links": {
       "get": {
-        "tags": [
-          "admin-recruitment",
-          "Admin Recruitment"
-        ],
+        "tags": ["admin-recruitment", "Admin Recruitment"],
         "summary": "List Study Links",
         "description": "List all recruitment links for a specific study.",
         "operationId": "list_study_links_api_admin_recruitment__slug__links_get",
@@ -1393,10 +1325,7 @@
         }
       },
       "post": {
-        "tags": [
-          "admin-recruitment",
-          "Admin Recruitment"
-        ],
+        "tags": ["admin-recruitment", "Admin Recruitment"],
         "summary": "Create Recruitment Links",
         "description": "Create one or more recruitment links.",
         "operationId": "create_recruitment_links_api_admin_recruitment__slug__links_post",
@@ -1468,10 +1397,7 @@
     },
     "/api/admin/recruitment/links/{link_id}": {
       "delete": {
-        "tags": [
-          "admin-recruitment",
-          "Admin Recruitment"
-        ],
+        "tags": ["admin-recruitment", "Admin Recruitment"],
         "summary": "Revoke Recruitment Link",
         "description": "Revoke a recruitment link.",
         "operationId": "revoke_recruitment_link_api_admin_recruitment_links__link_id__delete",
@@ -1510,9 +1436,7 @@
     },
     "/api/admin/workspaces": {
       "get": {
-        "tags": [
-          "admin-workspaces"
-        ],
+        "tags": ["admin-workspaces"],
         "summary": "List Workspaces",
         "description": "List all workspaces the current user is a member of, with their role.",
         "operationId": "list_workspaces_api_admin_workspaces_get",
@@ -1539,9 +1463,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "admin-workspaces"
-        ],
+        "tags": ["admin-workspaces"],
         "summary": "Create Workspace",
         "description": "Create a new workspace and assign the current user as Admin.",
         "operationId": "create_workspace_api_admin_workspaces_post",
@@ -1586,9 +1508,7 @@
     },
     "/api/admin/workspaces/{slug}": {
       "get": {
-        "tags": [
-          "admin-workspaces"
-        ],
+        "tags": ["admin-workspaces"],
         "summary": "Get Workspace",
         "description": "Get workspace details.",
         "operationId": "get_workspace_api_admin_workspaces__slug__get",
@@ -1634,9 +1554,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "admin-workspaces"
-        ],
+        "tags": ["admin-workspaces"],
         "summary": "Update Workspace",
         "description": "Update workspace details.",
         "operationId": "update_workspace_api_admin_workspaces__slug__patch",
@@ -1692,9 +1610,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "admin-workspaces"
-        ],
+        "tags": ["admin-workspaces"],
         "summary": "Delete Workspace",
         "description": "Delete a workspace (Owner only).",
         "operationId": "delete_workspace_api_admin_workspaces__slug__delete",
@@ -1735,9 +1651,7 @@
     },
     "/api/admin/workspaces/{slug}/members": {
       "get": {
-        "tags": [
-          "admin-workspaces"
-        ],
+        "tags": ["admin-workspaces"],
         "summary": "List Workspace Members",
         "description": "List all members of a workspace.",
         "operationId": "list_workspace_members_api_admin_workspaces__slug__members_get",
@@ -1789,9 +1703,7 @@
     },
     "/api/admin/workspaces/{slug}/members/{user_id}": {
       "patch": {
-        "tags": [
-          "admin-workspaces"
-        ],
+        "tags": ["admin-workspaces"],
         "summary": "Update Workspace Member",
         "description": "Update a workspace member's role.",
         "operationId": "update_workspace_member_api_admin_workspaces__slug__members__user_id__patch",
@@ -1856,9 +1768,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "admin-workspaces"
-        ],
+        "tags": ["admin-workspaces"],
         "summary": "Remove Workspace Member",
         "description": "Remove a member from the workspace.",
         "operationId": "remove_workspace_member_api_admin_workspaces__slug__members__user_id__delete",
@@ -1908,9 +1818,7 @@
     },
     "/api/admin/workspaces/{slug}/invitations": {
       "post": {
-        "tags": [
-          "admin-workspaces"
-        ],
+        "tags": ["admin-workspaces"],
         "summary": "Create Invitation",
         "description": "Invite a user to the workspace.",
         "operationId": "create_invitation_api_admin_workspaces__slug__invitations_post",
@@ -1968,9 +1876,7 @@
     },
     "/api/submit": {
       "post": {
-        "tags": [
-          "submissions"
-        ],
+        "tags": ["submissions"],
         "summary": "Submit Study",
         "description": "Submits or updates a study participation.\n\nLogic moved to StudyService for maintainability.",
         "operationId": "submit_study_api_submit_post",
@@ -2008,9 +1914,7 @@
     },
     "/api/study/{slug}": {
       "get": {
-        "tags": [
-          "submissions"
-        ],
+        "tags": ["submissions"],
         "summary": "Get Study",
         "description": "Fetches study configuration for the frontend, including language resolution.\n\nIf the study has randomize_statements=True and a session_token is provided,\nstatements will be shuffled deterministically using the token as seed.\nThis ensures the same participant always sees statements in the same order.",
         "operationId": "get_study_api_study__slug__get",
@@ -2119,9 +2023,7 @@
     },
     "/api/study/{slug}/unlock": {
       "post": {
-        "tags": [
-          "submissions"
-        ],
+        "tags": ["submissions"],
         "summary": "Unlock Study",
         "description": "Validate study access password.",
         "operationId": "unlock_study_api_study__slug__unlock_post",
@@ -2170,9 +2072,7 @@
     },
     "/api/study/{slug}/consent": {
       "post": {
-        "tags": [
-          "participants"
-        ],
+        "tags": ["participants"],
         "summary": "Record Consent",
         "description": "Records participant consent with timestamp and version.",
         "operationId": "record_consent_api_study__slug__consent_post",
@@ -2223,9 +2123,7 @@
     },
     "/api/logs": {
       "post": {
-        "tags": [
-          "logs"
-        ],
+        "tags": ["logs"],
         "summary": "Report Log",
         "description": "Receives logging/error data from the frontend.",
         "operationId": "report_log_api_logs_post",
@@ -2263,9 +2161,7 @@
     },
     "/api/test/init": {
       "post": {
-        "tags": [
-          "test"
-        ],
+        "tags": ["test"],
         "summary": "Init Test Db",
         "description": "Initialize test database - ensure tables exist\nThis is typically handled by app startup, but useful for explicit initialization",
         "operationId": "init_test_db_api_test_init_post",
@@ -2283,9 +2179,7 @@
     },
     "/api/test/seed": {
       "post": {
-        "tags": [
-          "test"
-        ],
+        "tags": ["test"],
         "summary": "Seed Test Data",
         "description": "Seed base test data: user and workspace\nIdempotent - won't create duplicates",
         "operationId": "seed_test_data_api_test_seed_post",
@@ -2323,9 +2217,7 @@
     },
     "/api/test/members": {
       "post": {
-        "tags": [
-          "test"
-        ],
+        "tags": ["test"],
         "summary": "Add Test Member",
         "description": "Add a user to a workspace for testing purposes",
         "operationId": "add_test_member_api_test_members_post",
@@ -2363,9 +2255,7 @@
     },
     "/api/test/cleanup": {
       "post": {
-        "tags": [
-          "test"
-        ],
+        "tags": ["test"],
         "summary": "Cleanup Test Data",
         "description": "Cleanup test data between tests\nRemoves all data except the base test user and workspace",
         "operationId": "cleanup_test_data_api_test_cleanup_post",
@@ -2383,9 +2273,7 @@
     },
     "/api/test/cleanup-all": {
       "post": {
-        "tags": [
-          "test"
-        ],
+        "tags": ["test"],
         "summary": "Cleanup All Test Data",
         "description": "Full cleanup including users and workspaces\nUse at end of test suite",
         "operationId": "cleanup_all_test_data_api_test_cleanup_all_post",
@@ -2403,9 +2291,7 @@
     },
     "/api/test/health": {
       "get": {
-        "tags": [
-          "test"
-        ],
+        "tags": ["test"],
         "summary": "Test Health",
         "description": "Simple health check for test router",
         "operationId": "test_health_api_test_health_get",
@@ -2532,10 +2418,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "username",
-          "password"
-        ],
+        "required": ["username", "password"],
         "title": "Body_login_for_access_token_api_token_post"
       },
       "BrandingBase": {
@@ -2616,11 +2499,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "study_slug",
-          "session_token",
-          "language_code"
-        ],
+        "required": ["study_slug", "session_token", "language_code"],
         "title": "ConsentInput",
         "description": "Schema for recording participant consent."
       },
@@ -2636,10 +2515,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "score",
-          "capacity"
-        ],
+        "required": ["score", "capacity"],
         "title": "GridColumn",
         "description": "Schema defining a column in the sorting grid."
       },
@@ -2664,9 +2540,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "token"
-        ],
+        "required": ["token"],
         "title": "InvitationAccept"
       },
       "InvitationLink": {
@@ -2681,10 +2555,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "invite_url",
-          "token"
-        ],
+        "required": ["invite_url", "token"],
         "title": "InvitationLink",
         "description": "Schema for returning a generated invitation link."
       },
@@ -2692,12 +2563,7 @@
         "properties": {
           "level": {
             "type": "string",
-            "enum": [
-              "error",
-              "warn",
-              "info",
-              "debug"
-            ],
+            "enum": ["error", "warn", "info", "debug"],
             "title": "Level"
           },
           "message": {
@@ -2751,10 +2617,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "level",
-          "message"
-        ],
+        "required": ["level", "message"],
         "title": "LogEntry",
         "description": "Schema for frontend log entries."
       },
@@ -2890,9 +2753,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "is_discarded"
-        ],
+        "required": ["is_discarded"],
         "title": "ParticipantDiscardUpdate",
         "description": "Schema for discarding/flagging a participant."
       },
@@ -2991,10 +2852,7 @@
       },
       "ParticipantStatus": {
         "type": "string",
-        "enum": [
-          "started",
-          "completed"
-        ],
+        "enum": ["started", "completed"],
         "title": "ParticipantStatus",
         "description": "Enum for participant progress status."
       },
@@ -3025,11 +2883,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "name",
-          "logo_url"
-        ],
+        "required": ["id", "name", "logo_url"],
         "title": "PartnerLogo",
         "description": "Schema for a partner institution logo."
       },
@@ -3046,10 +2900,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "current_password",
-          "new_password"
-        ],
+        "required": ["current_password", "new_password"],
         "title": "PasswordChange",
         "description": "Schema for changing password."
       },
@@ -3089,12 +2940,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "title",
-          "description",
-          "icon"
-        ],
+        "required": ["id", "title", "description", "icon"],
         "title": "ProcessStep",
         "description": "Schema for a dynamic study process step."
       },
@@ -3121,10 +2967,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "statement_id",
-          "grid_score"
-        ],
+        "required": ["statement_id", "grid_score"],
         "title": "QSortEntryInput",
         "description": "Schema for individual statement placement during submission."
       },
@@ -3263,11 +3106,7 @@
       },
       "RecruitmentLinkType": {
         "type": "string",
-        "enum": [
-          "public",
-          "individual",
-          "limited"
-        ],
+        "enum": ["public", "individual", "limited"],
         "title": "RecruitmentLinkType",
         "description": "Enum for types of recruitment links."
       },
@@ -3286,10 +3125,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "code",
-          "translations"
-        ],
+        "required": ["code", "translations"],
         "title": "StatementCreate",
         "description": "Schema for creating a statement."
       },
@@ -3313,10 +3149,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "code",
-          "id"
-        ],
+        "required": ["code", "id"],
         "title": "StatementRead",
         "description": "Schema for reading a statement."
       },
@@ -3334,10 +3167,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "language_code",
-          "text"
-        ],
+        "required": ["language_code", "text"],
         "title": "StatementTranslationCreate",
         "description": "Schema for creating a statement translation."
       },
@@ -3363,12 +3193,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "language_code",
-          "text",
-          "id",
-          "statement_id"
-        ],
+        "required": ["language_code", "text", "id", "statement_id"],
         "title": "StatementTranslationRead",
         "description": "Schema for reading a statement translation."
       },
@@ -3387,10 +3212,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "code",
-          "translations"
-        ],
+        "required": ["code", "translations"],
         "title": "StatementUpdate",
         "description": "Schema for updating a statement text (by code)."
       },
@@ -3677,13 +3499,7 @@
       },
       "StudyState": {
         "type": "string",
-        "enum": [
-          "draft",
-          "active",
-          "paused",
-          "closed",
-          "archived"
-        ],
+        "enum": ["draft", "active", "paused", "closed", "archived"],
         "title": "StudyState",
         "description": "Enum for study lifecycle states."
       },
@@ -3883,10 +3699,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "language_code",
-          "title"
-        ],
+        "required": ["language_code", "title"],
         "title": "StudyTranslationCreate",
         "description": "Schema for creating a study translation."
       },
@@ -4050,12 +3863,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "language_code",
-          "title",
-          "id",
-          "study_id"
-        ],
+        "required": ["language_code", "title", "id", "study_id"],
         "title": "StudyTranslationRead",
         "description": "Schema for reading a study translation."
       },
@@ -4332,12 +4140,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "study_slug",
-          "session_token",
-          "language_used",
-          "qsort"
-        ],
+        "required": ["study_slug", "session_token", "language_used", "qsort"],
         "title": "SubmissionInput",
         "description": "Schema for the full study submission/completion."
       },
@@ -4353,10 +4156,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "secret",
-          "qr_code_uri"
-        ],
+        "required": ["secret", "qr_code_uri"],
         "title": "TOTPSetup",
         "description": "Schema for TOTP setup response."
       },
@@ -4368,9 +4168,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "token"
-        ],
+        "required": ["token"],
         "title": "TOTPVerify",
         "description": "Schema for TOTP verification."
       },
@@ -4390,11 +4188,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "email",
-          "workspace_slug",
-          "role"
-        ],
+        "required": ["email", "workspace_slug", "role"],
         "title": "TestMemberData"
       },
       "TestSeedData": {
@@ -4407,10 +4201,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "user",
-          "workspace"
-        ],
+        "required": ["user", "workspace"],
         "title": "TestSeedData"
       },
       "TestUserData": {
@@ -4430,10 +4221,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "title": "TestUserData"
       },
       "TestWorkspaceData": {
@@ -4448,10 +4236,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "name",
-          "slug"
-        ],
+        "required": ["name", "slug"],
         "title": "TestWorkspaceData"
       },
       "Token": {
@@ -4543,10 +4328,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "title": "UserCreate",
         "description": "Schema for creating a new user."
       },
@@ -4650,11 +4432,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
+        "required": ["loc", "msg", "type"],
         "title": "ValidationError"
       },
       "WorkspaceCreate": {
@@ -4672,10 +4450,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "title",
-          "slug"
-        ],
+        "required": ["title", "slug"],
         "title": "WorkspaceCreate",
         "description": "Schema for creating a workspace."
       },
@@ -4691,9 +4466,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "email"
-        ],
+        "required": ["email"],
         "title": "WorkspaceInvitationCreate",
         "description": "Schema for creating a workspace invitation."
       },
@@ -4716,12 +4489,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "user_id",
-          "user",
-          "role",
-          "joined_at"
-        ],
+        "required": ["user_id", "user", "role", "joined_at"],
         "title": "WorkspaceMemberRead",
         "description": "Schema for reading workspace member details."
       },
@@ -4732,9 +4500,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "role"
-        ],
+        "required": ["role"],
         "title": "WorkspaceMemberUpdate",
         "description": "Schema for updating a workspace member."
       },
@@ -4767,23 +4533,13 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "title",
-          "slug",
-          "created_at"
-        ],
+        "required": ["id", "title", "slug", "created_at"],
         "title": "WorkspaceRead",
         "description": "Schema for reading a workspace."
       },
       "WorkspaceRole": {
         "type": "string",
-        "enum": [
-          "owner",
-          "admin",
-          "researcher",
-          "viewer"
-        ],
+        "enum": ["owner", "admin", "researcher", "viewer"],
         "title": "WorkspaceRole",
         "description": "Enum for workspace roles."
       },
@@ -4851,13 +4607,7 @@
           }
         },
         "type": "object",
-        "required": [
-          "id",
-          "title",
-          "slug",
-          "created_at",
-          "user_role"
-        ],
+        "required": ["id", "title", "slug", "created_at", "user_role"],
         "title": "WorkspaceWithRole",
         "description": "Schema for reading a workspace with the current user's role."
       }
