@@ -109,7 +109,8 @@ export const LinkPerformanceChart = ({ links, className }: LinkPerformanceChartP
                                     boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                                     fontSize: '12px',
                                 }}
-                                formatter={(value: number | undefined) => [
+                                // biome-ignore lint/suspicious/noExplicitAny: Recharts type looseness
+                                formatter={(value: any) => [
                                     metric === 'conversion' ? `${value ?? 0}%` : (value ?? 0),
                                     metric === 'conversion'
                                         ? t(

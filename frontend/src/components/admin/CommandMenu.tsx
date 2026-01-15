@@ -80,7 +80,7 @@ export const CommandMenu = () => {
             open={open}
             onOpenChange={setOpen}
             label={t('admin.command_menu.title', 'Global Command Menu')}
-            className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-slate-950/20 backdrop-blur-md transition-all duration-300"
+            className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4 bg-slate-950/20 backdrop-blur-md transition-all duration-300"
         >
             <div className="w-full max-w-[640px] rounded-2xl border border-white/20 bg-white/80 dark:bg-slate-900/80 shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 backdrop-saturate-150">
                 <div className="flex items-center border-b border-border/50 px-4">

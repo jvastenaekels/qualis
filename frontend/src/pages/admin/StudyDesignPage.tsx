@@ -584,14 +584,14 @@ const StudyDesignPage = () => {
                     </div>
                 )}
                 {/* Left Pane: Editor */}
-                <div className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-6 min-w-0">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-4 sm:p-6 min-w-0">
                     <Tabs
                         value={activeStep}
                         // biome-ignore lint/suspicious/noExplicitAny: enum cast
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <TabsList className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap overflow-x-auto w-full max-w-5xl mx-auto shadow-sm mb-12 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory scroll-smooth rounded-2xl h-14">
+                        <TabsList className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap justify-start overflow-x-auto w-full max-w-5xl mx-auto shadow-sm mb-12 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory scroll-smooth rounded-2xl h-14">
                             <TabsTrigger
                                 value="intro"
                                 data-testid="tab-intro"

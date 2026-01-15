@@ -46,7 +46,7 @@ export const ParticipantGridView = ({
                 score,
                 statements: placements[score] || [],
                 // biome-ignore lint/suspicious/noExplicitAny: API type mismatch
-                maxAllowed: (gridConfig as any)[String(score)],
+                maxAllowed: (gridConfig as Record<string, number>)[String(score)],
             })),
             // biome-ignore lint/suspicious/noExplicitAny: API type mismatch
             maxHeight: Math.max(...Object.values(gridConfig as any).map((v) => Number(v))),
