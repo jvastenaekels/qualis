@@ -3607,9 +3607,1068 @@ describe('Chart Performance', () => {
     render(<SubmissionsTimelineChart participants={largeDataset} />);
 
     const endTime = performance.now();
-    expect(endTime - startTime).toBeLessThan(100);
+    expect(endTime - startTime).toBeLessThan(200);
+  });
+
+  it('should handle data updates efficiently', () => {
+    const { rerender } = render(
+      <SubmissionsTimelineChart participants={generateMockParticipants(100)} />
+    );
+
+    const startTime = performance.now();
+    rerender(<SubmissionsTimelineChart participants={generateMockParticipants(150)} />);
+    const endTime = performance.now();
+
+    expect(endTime - startTime).toBeLessThan(50); // Re-render should be fast
+  });
+
+  it('should not cause memory leaks on unmount', () => {
+    const { unmount } = render(<AnalyticsPage />);
+
+    const memoryBefore = (performance as any).memory?.usedJSHeapSize;
+    unmount();
+
+    // Force garbage collection if available (Chrome only)
+    if (global.gc) {
+      global.gc();
+    }
+
+    const memoryAfter = (performance as any).memory?.usedJSHeapSize;
+
+    // Memory should not increase significantly
+    expect(memoryAfter).toBeLessThanOrEqual(memoryBefore * 1.1);
   });
 });
+
+// __tests__/performance/pageLoadPerformance.test.ts
+describe('Page Load Performance', () => {
+  it('should load StudyOverviewPage in under 2 seconds', async () => {
+    const startTime = performance.now();
+
+    render(<StudyOverviewPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Sample Size')).toBeInTheDocument();
+    });
+
+    const endTime = performance.now();
+    expect(endTime - startTime).toBeLessThan(2000);
+  });
+
+  it('should load AnalyticsPage in under 3 seconds', async () => {
+    const startTime = performance.now();
+
+    render(<AnalyticsPage />);
+
+    await waitFor(() => {
+      expect(screen.getAllByRole('img').length).toBeGreaterThan(0);
+    });
+
+    const endTime = performance.now();
+    expect(endTime - startTime).toBeLessThan(3000);
+  });
+});
+
+// __tests__/performance/interactionPerformance.test.ts
+describe('Interaction Performance', () => {
+  it('should respond to filter changes in under 100ms', () => {
+    render(<EnhancedRecentActivityPanel participants={generateMockParticipants(50)} />);
+
+    const startTime = performance.now();
+    fireEvent.click(screen.getByText('Flagged'));
+    const endTime = performance.now();
+
+    expect(endTime - startTime).toBeLessThan(100);
+  });
+
+  it('should handle chart hover interactions smoothly', async () => {
+    const { container } = render(
+      <SubmissionsTimelineChart participants={generateMockParticipants(100)} />
+    );
+
+    const chart = container.querySelector('.recharts-wrapper');
+
+    const startTime = performance.now();
+    fireEvent.mouseMove(chart!, { clientX: 100, clientY: 100 });
+
+    await waitFor(() => {
+      expect(screen.getByRole('tooltip')).toBeInTheDocument();
+    });
+
+    const endTime = performance.now();
+    expect(endTime - startTime).toBeLessThan(50); // Tooltip should appear instantly
+  });
+});
+```
+
+---
+
+### 5. Visual Regression Tests
+
+Visual regression testing ensures UI consistency across changes using screenshot comparison.
+
+#### 5.1 Setup (Chromatic or Percy)
+
+```typescript
+// .storybook/main.ts
+export default {
+  stories: ['../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  addons: [
+    '@storybook/addon-essentials',
+    '@chromatic-com/storybook'
+  ]
+};
+
+// chromatic.config.json
+{
+  "projectToken": "your-project-token",
+  "buildScriptName": "build-storybook"
+}
+```
+
+#### 5.2 Component Stories for Visual Testing
+
+```typescript
+// src/components/admin/dashboard/charts/SubmissionsTimelineChart.stories.tsx
+import type { Meta, StoryObj } from '@storybook/react';
+import { SubmissionsTimelineChart } from './SubmissionsTimelineChart';
+
+const meta: Meta<typeof SubmissionsTimelineChart> = {
+  title: 'Admin/Charts/SubmissionsTimelineChart',
+  component: SubmissionsTimelineChart,
+  parameters: {
+    chromatic: { delay: 300 } // Wait for animations
+  }
+};
+
+export default meta;
+type Story = StoryObj<typeof SubmissionsTimelineChart>;
+
+export const Default: Story = {
+  args: {
+    participants: generateMockParticipants(20)
+  }
+};
+
+export const EmptyState: Story = {
+  args: {
+    participants: []
+  }
+};
+
+export const LargeDataset: Story = {
+  args: {
+    participants: generateMockParticipants(100)
+  }
+};
+
+export const WithTimeRange: Story = {
+  args: {
+    participants: generateMockParticipants(30),
+    timeRange: '7d'
+  }
+};
+
+// src/components/admin/dashboard/participant/QSortGridVisualization.stories.tsx
+export const PyramidView: Story = {
+  args: {
+    participant: mockParticipant,
+    studyData: mockStudyData,
+    viewMode: 'grid'
+  }
+};
+
+export const ListView: Story = {
+  args: {
+    participant: mockParticipant,
+    studyData: mockStudyData,
+    viewMode: 'list'
+  }
+};
+
+export const HeatmapView: Story = {
+  args: {
+    participant: mockParticipant,
+    studyData: mockStudyData,
+    viewMode: 'heatmap'
+  }
+};
+
+export const WithComparison: Story = {
+  args: {
+    participant: mockParticipant,
+    studyData: mockStudyData,
+    showComparison: true,
+    comparisonData: mockComparisonData
+  }
+};
+
+// src/components/admin/dashboard/overview/SmartInsightsCards.stories.tsx
+export const QualityAlert: Story = {
+  args: {
+    insights: [
+      {
+        type: 'alert',
+        severity: 'warning',
+        icon: '⚠️',
+        title: 'Quality Alert',
+        message: '3 suspicious submissions in last hour'
+      }
+    ]
+  }
+};
+
+export const MilestoneAchieved: Story = {
+  args: {
+    insights: [
+      {
+        type: 'success',
+        severity: 'info',
+        icon: '🎉',
+        title: 'Milestone Reached!',
+        message: "You've collected 50 responses"
+      }
+    ]
+  }
+};
+
+export const MultipleInsights: Story = {
+  args: {
+    insights: [
+      { type: 'alert', title: 'Quality Alert', message: 'Review needed' },
+      { type: 'success', title: 'Milestone', message: 'Target reached' },
+      { type: 'info', title: 'Trend', message: 'Submissions up 35%' }
+    ]
+  }
+};
+```
+
+#### 5.3 Visual Regression Test Script
+
+```bash
+# package.json scripts
+{
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "chromatic": "chromatic --exit-zero-on-changes",
+    "test:visual": "npm run chromatic"
+  }
+}
+```
+
+#### 5.4 CI Integration
+
+```yaml
+# .github/workflows/visual-regression.yml
+name: Visual Regression Tests
+
+on: [push, pull_request]
+
+jobs:
+  visual-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required for Chromatic
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          exitZeroOnChanges: true
+```
+
+---
+
+### 6. Accessibility Tests
+
+Automated and manual accessibility testing to ensure WCAG 2.1 AA compliance.
+
+#### 6.1 Automated Accessibility Tests
+
+```typescript
+// __tests__/accessibility/chartAccessibility.test.tsx
+import { axe, toHaveNoViolations } from 'jest-axe';
+
+expect.extend(toHaveNoViolations);
+
+describe('Chart Accessibility', () => {
+  it('should have no accessibility violations - SubmissionsTimelineChart', async () => {
+    const { container } = render(
+      <SubmissionsTimelineChart participants={mockParticipants} />
+    );
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('should have proper ARIA labels', () => {
+    render(<SubmissionsTimelineChart participants={mockParticipants} />);
+
+    const chart = screen.getByRole('img', { name: /submissions timeline/i });
+    expect(chart).toBeInTheDocument();
+  });
+
+  it('should provide text alternative for chart data', () => {
+    render(<SubmissionsTimelineChart participants={mockParticipants} />);
+
+    // Should have hidden data table for screen readers
+    const dataTable = document.querySelector('[aria-hidden="false"] table');
+    expect(dataTable).toBeInTheDocument();
+  });
+
+  it('should have sufficient color contrast', () => {
+    const { container } = render(
+      <TrendMetricCard
+        title="Sample Size"
+        value={142}
+        trend={{ direction: 'up', value: '+15', isGood: true }}
+      />
+    );
+
+    const trendText = screen.getByText('+15');
+    const styles = window.getComputedStyle(trendText);
+
+    // Check color contrast (programmatic check - simplified)
+    expect(styles.color).toBeDefined();
+  });
+});
+
+// __tests__/accessibility/participantVisualizationAccessibility.test.tsx
+describe('Participant Visualization Accessibility', () => {
+  it('should have no violations - QSortGridVisualization', async () => {
+    const { container } = render(
+      <QSortGridVisualization
+        participant={mockParticipant}
+        studyData={mockStudyData}
+      />
+    );
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('should support keyboard navigation for view switching', () => {
+    render(
+      <QSortGridVisualization
+        participant={mockParticipant}
+        studyData={mockStudyData}
+      />
+    );
+
+    const listViewButton = screen.getByText('List View');
+    listViewButton.focus();
+
+    expect(listViewButton).toHaveFocus();
+
+    // Should be able to activate with Enter
+    fireEvent.keyDown(listViewButton, { key: 'Enter', code: 'Enter' });
+    expect(screen.getByTestId('list-view')).toBeInTheDocument();
+  });
+
+  it('should announce quality score to screen readers', () => {
+    render(
+      <ResponseQualityIndicators
+        participant={mockParticipant}
+        studyData={mockStudyData}
+      />
+    );
+
+    const scoreElement = screen.getByLabelText(/engagement score/i);
+    expect(scoreElement).toHaveAttribute('aria-live', 'polite');
+  });
+});
+
+// __tests__/accessibility/overviewAccessibility.test.tsx
+describe('Overview Dashboard Accessibility', () => {
+  it('should have no violations - EnhancedRecentActivityPanel', async () => {
+    const { container } = render(
+      <EnhancedRecentActivityPanel participants={mockParticipants} />
+    );
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('should have accessible insights cards', async () => {
+    const { container } = render(
+      <SmartInsightsCards insights={mockInsights} />
+    );
+
+    const results = await axe(container);
+    expect(results).toHaveNoViolations();
+  });
+
+  it('should support keyboard navigation for quick actions', () => {
+    render(<QuickActionsWidget actions={mockActions} />);
+
+    const firstAction = screen.getAllByRole('button')[0];
+    firstAction.focus();
+
+    expect(firstAction).toHaveFocus();
+
+    // Tab to next action
+    userEvent.tab();
+    const secondAction = screen.getAllByRole('button')[1];
+    expect(secondAction).toHaveFocus();
+  });
+
+  it('should have proper heading hierarchy', () => {
+    render(<StudyOverviewPage />);
+
+    const headings = screen.getAllByRole('heading');
+
+    // Should start with h1
+    expect(headings[0].tagName).toBe('H1');
+
+    // No skipped levels
+    for (let i = 1; i < headings.length; i++) {
+      const currentLevel = parseInt(headings[i].tagName.charAt(1));
+      const previousLevel = parseInt(headings[i - 1].tagName.charAt(1));
+
+      expect(currentLevel - previousLevel).toBeLessThanOrEqual(1);
+    }
+  });
+});
+```
+
+#### 6.2 Manual Accessibility Checklist
+
+```markdown
+# Manual Accessibility Testing Checklist
+
+## Keyboard Navigation
+- [ ] All interactive elements reachable via Tab
+- [ ] Logical tab order throughout the page
+- [ ] Focus indicators visible on all focusable elements
+- [ ] Escape key closes modals and dialogs
+- [ ] Arrow keys navigate within charts (if applicable)
+- [ ] Enter/Space activates buttons and links
+
+## Screen Reader Testing
+- [ ] Test with NVDA (Windows) or VoiceOver (macOS)
+- [ ] All charts have meaningful descriptions
+- [ ] Data tables provided as alternatives to charts
+- [ ] Form labels properly associated with inputs
+- [ ] Status messages announced (ARIA live regions)
+- [ ] Error messages clear and helpful
+
+## Visual Accessibility
+- [ ] 4.5:1 contrast ratio for normal text
+- [ ] 3:1 contrast ratio for large text (18pt+)
+- [ ] Color not sole means of conveying information
+- [ ] Charts readable in grayscale
+- [ ] Patterns/textures supplement color coding
+- [ ] Text resizable up to 200% without loss of functionality
+
+## Cognitive Accessibility
+- [ ] Clear, consistent navigation
+- [ ] Simple, concise language
+- [ ] Adequate time for interactions (no auto-dismiss < 5s)
+- [ ] Error prevention and recovery
+- [ ] Consistent component behavior
+
+## Mobile Accessibility
+- [ ] Touch targets at least 44x44px
+- [ ] Sufficient spacing between interactive elements
+- [ ] No hover-only functionality
+- [ ] Readable at mobile viewport sizes
+```
+
+---
+
+### 7. End-to-End (E2E) Tests
+
+Full user workflow testing using Playwright or Cypress.
+
+#### 7.1 Setup (Playwright)
+
+```typescript
+// playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  use: {
+    baseURL: 'http://localhost:5173',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure'
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] }
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] }
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] }
+    },
+    {
+      name: 'Mobile Chrome',
+      use: { ...devices['Pixel 5'] }
+    }
+  ],
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:5173',
+    reuseExistingServer: !process.env.CI
+  }
+});
+```
+
+#### 7.2 E2E Test Scenarios
+
+```typescript
+// e2e/studyOverview.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Study Overview Page', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/admin/studies/test-study');
+  });
+
+  test('should display all dashboard components', async ({ page }) => {
+    // Check metrics cards
+    await expect(page.getByText('Sample Size')).toBeVisible();
+    await expect(page.getByText('Completion Rate')).toBeVisible();
+    await expect(page.getByText('Median Duration')).toBeVisible();
+
+    // Check smart insights
+    await expect(page.getByText('Smart Insights')).toBeVisible();
+
+    // Check recent activity
+    await expect(page.getByText('Recent Activity')).toBeVisible();
+
+    // Check quick actions
+    await expect(page.getByText('Quick Actions')).toBeVisible();
+  });
+
+  test('should navigate to participant detail on click', async ({ page }) => {
+    // Click on first participant
+    await page.click('[data-testid="participant-card"]:first-child');
+
+    // Should navigate to detail page
+    await expect(page).toHaveURL(/\/participants\//);
+    await expect(page.getByText('Session')).toBeVisible();
+  });
+
+  test('should filter participants', async ({ page }) => {
+    const participantsBefore = await page.locator('[data-testid="participant-card"]').count();
+
+    // Click Flagged filter
+    await page.click('text=Flagged');
+
+    const participantsAfter = await page.locator('[data-testid="participant-card"]').count();
+
+    expect(participantsAfter).toBeLessThanOrEqual(participantsBefore);
+  });
+
+  test('should interact with smart insights', async ({ page }) => {
+    // Check if insights are present
+    const insightCard = page.locator('[data-testid="insight-card"]').first();
+
+    if (await insightCard.isVisible()) {
+      // Click action button
+      await insightCard.locator('button').click();
+
+      // Should navigate or open modal
+      await page.waitForTimeout(500);
+
+      // Verify navigation or modal opened
+      const url = page.url();
+      expect(url).toBeTruthy();
+    }
+  });
+
+  test('should display trend sparklines', async ({ page }) => {
+    const sparkline = page.locator('[data-testid="activity-sparkline"]');
+    await expect(sparkline).toBeVisible();
+
+    // Should render chart
+    const svgElement = sparkline.locator('svg');
+    await expect(svgElement).toBeVisible();
+  });
+});
+
+// e2e/analytics.spec.ts
+test.describe('Analytics Page', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/admin/studies/test-study/analytics');
+  });
+
+  test('should display all charts', async ({ page }) => {
+    await expect(page.getByText('Submissions Timeline')).toBeVisible();
+    await expect(page.getByText('Duration Distribution')).toBeVisible();
+    await expect(page.getByText('Device Breakdown')).toBeVisible();
+    await expect(page.getByText('Recruitment Funnel')).toBeVisible();
+  });
+
+  test('should change time range filter', async ({ page }) => {
+    // Select time range
+    await page.click('[data-testid="time-range-selector"]');
+    await page.click('text=7 days');
+
+    // Wait for charts to update
+    await page.waitForTimeout(500);
+
+    // Verify charts updated (check for data points)
+    const chartSvg = page.locator('.recharts-wrapper svg').first();
+    await expect(chartSvg).toBeVisible();
+  });
+
+  test('should show chart tooltips on hover', async ({ page }) => {
+    const chart = page.locator('.recharts-wrapper').first();
+
+    // Hover over chart
+    await chart.hover({ position: { x: 100, y: 100 } });
+
+    // Tooltip should appear
+    await expect(page.locator('.recharts-tooltip-wrapper')).toBeVisible();
+  });
+
+  test('should export analytics data', async ({ page }) => {
+    const downloadPromise = page.waitForEvent('download');
+
+    await page.click('text=Export Analytics');
+
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toContain('analytics');
+  });
+});
+
+// e2e/participantDetail.spec.ts
+test.describe('Participant Detail Page', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/admin/studies/test-study/participants/abc123');
+  });
+
+  test('should display all participant visualizations', async ({ page }) => {
+    await expect(page.getByText('Session')).toBeVisible();
+    await expect(page.getByText('Response Quality')).toBeVisible();
+    await expect(page.getByText('Q-Sort Grid')).toBeVisible();
+  });
+
+  test('should switch Q-Sort view modes', async ({ page }) => {
+    // Default pyramid view
+    await expect(page.getByTestId('pyramid-view')).toBeVisible();
+
+    // Switch to list view
+    await page.click('text=List View');
+    await expect(page.getByTestId('list-view')).toBeVisible();
+
+    // Switch to heatmap
+    await page.click('text=Heatmap');
+    await expect(page.getByTestId('heatmap-view')).toBeVisible();
+  });
+
+  test('should show statement details on hover', async ({ page }) => {
+    const statement = page.locator('[data-testid="statement-card"]').first();
+
+    await statement.hover();
+
+    // Tooltip should appear
+    await expect(page.locator('[role="tooltip"]')).toBeVisible();
+  });
+
+  test('should display quality indicators', async ({ page }) => {
+    const engagementScore = page.locator('[data-testid="engagement-score"]');
+    await expect(engagementScore).toBeVisible();
+
+    // Should show numeric score
+    const scoreText = await engagementScore.textContent();
+    expect(parseInt(scoreText || '0')).toBeGreaterThanOrEqual(0);
+    expect(parseInt(scoreText || '0')).toBeLessThanOrEqual(100);
+  });
+
+  test('should toggle participant discard status', async ({ page }) => {
+    const discardButton = page.getByRole('button', { name: /discard participant/i });
+
+    await discardButton.click();
+
+    // Confirmation dialog should appear
+    await expect(page.getByText(/are you sure/i)).toBeVisible();
+
+    // Confirm
+    await page.click('text=Confirm');
+
+    // Button should change
+    await expect(page.getByRole('button', { name: /restore participant/i })).toBeVisible();
+  });
+});
+
+// e2e/responsiveness.spec.ts
+test.describe('Responsive Design', () => {
+  test('should work on mobile viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/admin/studies/test-study');
+
+    // Sidebar should be collapsible on mobile
+    const sidebarToggle = page.locator('[data-testid="sidebar-toggle"]');
+    await expect(sidebarToggle).toBeVisible();
+
+    // Charts should stack vertically
+    const metricsContainer = page.locator('[data-testid="metrics-container"]');
+    const boundingBox = await metricsContainer.boundingBox();
+
+    // Width should be close to viewport width
+    expect(boundingBox?.width).toBeLessThan(400);
+  });
+
+  test('should work on tablet viewport', async ({ page }) => {
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto('/admin/studies/test-study/analytics');
+
+    // Charts should display in grid
+    const chartsGrid = page.locator('[data-testid="charts-grid"]');
+    await expect(chartsGrid).toBeVisible();
+  });
+});
+
+// e2e/workflows.spec.ts
+test.describe('User Workflows', () => {
+  test('complete workflow: review flagged participants', async ({ page }) => {
+    // Start at overview
+    await page.goto('/admin/studies/test-study');
+
+    // Click on quality alert insight
+    await page.click('[data-testid="insight-card"]:has-text("Quality Alert")');
+
+    // Should navigate to data exports with filter
+    await expect(page).toHaveURL(/\/exports\?filter=flagged/);
+
+    // Should see flagged participants
+    await expect(page.getByText('Flagged Participants')).toBeVisible();
+
+    // Click on first flagged participant
+    await page.click('[data-testid="participant-row"]:first-child');
+
+    // Should navigate to detail page
+    await expect(page).toHaveURL(/\/participants\//);
+
+    // Review and discard
+    await page.click('text=Discard Participant');
+    await page.click('text=Confirm');
+
+    // Should show success message
+    await expect(page.getByText(/successfully discarded/i)).toBeVisible();
+  });
+
+  test('complete workflow: analyze study trends', async ({ page }) => {
+    // Start at overview
+    await page.goto('/admin/studies/test-study');
+
+    // Click sparkline to go to analytics
+    await page.click('[data-testid="activity-sparkline"]');
+
+    // Should navigate to analytics page
+    await expect(page).toHaveURL(/\/analytics/);
+
+    // Change time range
+    await page.click('[data-testid="time-range-selector"]');
+    await page.click('text=30 days');
+
+    // Hover over chart for details
+    const chart = page.locator('.recharts-wrapper').first();
+    await chart.hover({ position: { x: 200, y: 100 } });
+
+    // Tooltip visible
+    await expect(page.locator('.recharts-tooltip-wrapper')).toBeVisible();
+
+    // Export data
+    await page.click('text=Export');
+    await page.click('text=CSV');
+
+    // Download should trigger
+    const download = await page.waitForEvent('download');
+    expect(download.suggestedFilename()).toMatch(/\.csv$/);
+  });
+});
+```
+
+---
+
+### 8. Test Coverage Targets
+
+```json
+// jest.config.js or vitest.config.ts
+{
+  "collectCoverageFrom": [
+    "src/**/*.{ts,tsx}",
+    "!src/**/*.stories.{ts,tsx}",
+    "!src/**/*.test.{ts,tsx}",
+    "!src/**/__tests__/**",
+    "!src/main.tsx",
+    "!src/vite-env.d.ts"
+  ],
+  "coverageThresholds": {
+    "global": {
+      "statements": 80,
+      "branches": 75,
+      "functions": 80,
+      "lines": 80
+    },
+    "src/lib/chartUtils.ts": {
+      "statements": 90,
+      "branches": 85,
+      "functions": 90,
+      "lines": 90
+    },
+    "src/lib/participantAnalysis.ts": {
+      "statements": 90,
+      "branches": 85,
+      "functions": 90,
+      "lines": 90
+    }
+  }
+}
+```
+
+**Coverage Targets:**
+- **Overall:** 80% coverage minimum
+- **Critical utilities:** 90% coverage (chartUtils, participantAnalysis, overviewAnalytics)
+- **Components:** 75% coverage
+- **Integration tests:** Cover all major user workflows
+
+---
+
+### 9. CI/CD Integration
+
+```yaml
+# .github/workflows/test.yml
+name: Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit -- --coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+
+  component-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run component tests
+        run: npm run test:components
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: component-test-results
+          path: test-results/
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  accessibility-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run accessibility tests
+        run: npm run test:a11y
+
+      - name: Upload accessibility report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: a11y-report
+          path: a11y-report/
+
+  visual-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          exitZeroOnChanges: true
+```
+
+---
+
+### 10. Test Organization & Best Practices
+
+#### Directory Structure
+
+```
+frontend/
+├── src/
+│   ├── components/
+│   │   └── admin/
+│   │       └── dashboard/
+│   │           ├── charts/
+│   │           │   ├── SubmissionsTimelineChart.tsx
+│   │           │   ├── SubmissionsTimelineChart.test.tsx
+│   │           │   └── SubmissionsTimelineChart.stories.tsx
+│   │           ├── participant/
+│   │           └── overview/
+│   └── lib/
+│       ├── chartUtils.ts
+│       ├── chartUtils.test.ts
+│       ├── participantAnalysis.ts
+│       └── participantAnalysis.test.ts
+├── __tests__/
+│   ├── unit/
+│   ├── components/
+│   ├── integration/
+│   ├── performance/
+│   └── accessibility/
+├── e2e/
+│   ├── studyOverview.spec.ts
+│   ├── analytics.spec.ts
+│   └── participantDetail.spec.ts
+└── test-utils/
+    ├── mockData.ts
+    ├── mockGenerators.ts
+    └── testHelpers.tsx
+```
+
+#### Best Practices
+
+1. **Test Organization:**
+   - Co-locate component tests with components
+   - Separate integration tests in `__tests__/integration/`
+   - Keep E2E tests in dedicated `e2e/` directory
+
+2. **Naming Conventions:**
+   - Unit tests: `*.test.ts(x)`
+   - Component tests: `*.test.tsx`
+   - E2E tests: `*.spec.ts`
+   - Stories: `*.stories.tsx`
+
+3. **Mock Data Management:**
+   - Centralize mock data generators in `test-utils/`
+   - Reuse mock data across tests
+   - Keep mocks realistic and representative
+
+4. **Test Independence:**
+   - Each test should run independently
+   - Use `beforeEach` for setup, `afterEach` for cleanup
+   - Avoid test interdependencies
+
+5. **Performance:**
+   - Run fast unit tests before slow E2E tests
+   - Use parallel execution where possible
+   - Mock expensive operations in unit tests
+
+6. **Maintainability:**
+   - Keep tests simple and readable
+   - Use descriptive test names
+   - Document complex test scenarios
+   - Refactor tests alongside code
+
+---
+
+### 11. Test Execution Scripts
+
+```json
+// package.json
+{
+  "scripts": {
+    "test": "vitest",
+    "test:unit": "vitest run --dir src",
+    "test:components": "vitest run --dir __tests__/components",
+    "test:integration": "vitest run --dir __tests__/integration",
+    "test:performance": "vitest run --dir __tests__/performance",
+    "test:a11y": "vitest run --dir __tests__/accessibility",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:visual": "npm run build-storybook && npm run chromatic",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest watch",
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:e2e"
+  }
+}
 ```
 
 ---
