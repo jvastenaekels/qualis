@@ -61,6 +61,19 @@ A researcher can export results via the Administrative API (requires authenticat
    - Returns a ZIP containing `.dat` and `.sta` files.
    - Specifically formatted for **PQMethod** and **Ken-Q Analysis** software.
 
+3. **KenQ JSON** (`GET /api/admin/studies/{slug}/dump`)
+   - Complete JSON structure used by the Open-Q frontend and compatible with modern web analytics tools.
+
+---
+
+## 🔍 Interactive Data Inspection
+
+Before performing full factor analysis, researchers can audit individual results directly in the Open-Q dashboard.
+
+1. **Grid Reconstruction**: Clicking on any participant ID in the exports table opens a high-fidelity visual of their final Q-sort grid.
+2. **Quality Audit**: The dashboard automatically flags participants with suspicious completion times (under 2 minutes) or incomplete sorts.
+3. **Qualitative Context**: View participant-level comments side-by-side with their grid placements to understand the "why" behind their rankings.
+
 ---
 
 ## 🔒 Data Privacy

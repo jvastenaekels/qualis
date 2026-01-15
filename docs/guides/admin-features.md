@@ -8,11 +8,12 @@ This guide provides a comprehensive overview of all administrative features avai
 
 The Admin Dashboard is organized into dedicated pages for each study:
 
-- **Overview**: Study statistics, participant counts, and quick actions.
+- **Overview**: Study statistics, participation trends, and quick actions.
+- **Analytics**: Deep dive into consensus analysis, duration patterns, and data quality.
 - **Design**: Configure grid shape, statements, translations, and study behavior.
 - **Team**: Manage collaborators and invite new researchers.
-- **Recruitment**: Create access links, track conversions, and monitor success rates.
-- **Exports**: Download participant data in multiple formats.
+- **Recruitment**: Create access links, track conversion funnels, and monitor success rates.
+- **Exports**: Download participant data and explore individual grid reconstructions.
 - **Profile**: Manage your account security and enable 2FA.
 
 ---
@@ -128,17 +129,25 @@ Monitor your recruitment funnel in real-time:
 > [!TIP]
 > A low success rate often indicates usability issues. Review your instructions, grid complexity, or mobile experience.
 
-### Link Management
+### Visual Analytics
 
-- **Revoke Links**: Disable a link if it's been compromised or is no longer needed.
-- **QR Codes**: Generate scannable QR codes for in-person recruitment.
-- **Capacity Monitoring**: Visual progress bars show usage vs. capacity for limited links.
+The recruitment page now includes interactive charts to help you optimize your outreach:
+
+- **Recruitment Funnel**: A visual pipeline showing the conversion from Link Visit → Study Start → Submission.
+- **Link Comparison**: Benchmarking chart comparing performance metrics across different recruitment channels.
 
 ---
 
 ## 📦 Data Exports
 
 **Location**: `/admin/studies/{slug}/exports`
+
+### Interactive Inspection
+
+Before exporting raw data, use the **Interactive Data View** to audit your results:
+
+- **Participant ID**: Click any ID to view that participant's specific grid reconstruction and survey responses.
+- **Audit Tooltips**: Identify why a participant was flagged as suspect or see their qualitative comments at a glance.
 
 ### Export Formats
 
@@ -154,12 +163,51 @@ Monitor your recruitment funnel in real-time:
    - `.dat` and `.sta` files formatted for PQMethod software.
    - Industry-standard format for Q-methodology factor analysis.
 
-4. **R-Kit ZIP** (Experimental)
-   - Pre-formatted datasets for R-based Q analysis packages.
+4. **KenQ JSON**
+   - Optimized for the Web-KenQ analysis tool. Contains study definition and sorts.
 
 ### Data Privacy
 
 All exports are available only to users with at least **Viewer** permissions on the study. IP addresses are hashed by default to protect participant anonymity.
+
+---
+
+## 📈 Study Analytics
+
+**Location**: `/admin/studies/{slug}/analytics`
+
+The Analytics module provides advanced research insights beyond simple counts:
+
+### Participation Trends
+
+- **Submissions Timeline**: Track participation velocity with daily "Started vs. Completed" comparisons.
+- **Completion Rate Evolution**: Monitor how your conversion rate changes over time to identify engagement drops.
+
+### Data Quality & Distribution
+
+- **Duration Distribution**: A histogram of completion times.
+  - 🚩 **Suspect Flag**: Participants who complete the study in under 2 minutes are automatically flagged as "Suspect" (speeders).
+- **Device Breakdown**: Analysis of the hardware used by participants (Desktop vs. Mobile).
+
+### Content Analysis (Consensus & Controversy)
+
+Identify the most significant patterns in your Q-set:
+
+- **Consensus Analysis**: Statements with the lowest standard deviation (where participants agree the most).
+- **Controversy Analysis**: Statements with the highest variance (where views are most polarized).
+- **Research Strength**: Real-time confidence indicator based on your current sample size.
+
+---
+
+## 🔍 Individual Participant Detail
+
+**Location**: `/admin/studies/{slug}/exports` (Click any participant ID)
+
+Inspect individual perspectives with high-fidelity visualizations:
+
+- **Grid Reconstruction**: See the participant's exact sorting layout in a 2D pyramid grid matching the study design.
+- **Interactive Tooltips**: Hover over statements in the grid to read their full text and see their original code.
+- **Metadata Inspection**: View duration, user agent, and survey responses alongside the visual sort.
 
 ---
 

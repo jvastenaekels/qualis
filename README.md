@@ -53,9 +53,11 @@ _Solves the validity problems of standard drag-and-drop tools._
 
 _Solves the "Black Box" of data collection._
 
-- **Live Analytics Dashboard**: Monitor recruitment progress, completion rates, and flag anomalies (e.g., speed-runners) in real-time.
+- **Enhanced Research Analytics**: Deep-dive into participant behavior with time-series trends, duration distributions, and device breakdown charts.
+- **Content Insight Engine**: Automatically identify **Consensus** and **Controversy** patterns across statements using real-time statistical variance analysis.
+- **Visual Grid Reconstruction**: Audit individual sessions with high-fidelity grid visualizations that match your study design.
 - **Collaborative Workspaces**: Invite colleagues with specific roles (Owner, Editor, Viewer) to collaborate securely.
-- **One-Click Analysis Export**: Download data in ready-to-use formats for **PQMethod**, **KADE**, or **R** (qmethod package).
+- **One-Click Analysis Export**: Download data in ready-to-use formats for **PQMethod**, **KADE**, or **R**.
 
 ### 4. Native Multi-Language Support
 

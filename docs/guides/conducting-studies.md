@@ -22,7 +22,15 @@ Track your participant conversion funnel in real-time on the **Recruitment** pag
 - **Success Rate**: The percentage of starts that resulted in a submission.
 
 > [!TIP]
-> A high drop-off rate (low success rate) often indicates that your instructions or statements are too complex, or that the Sorting Grid is too large for mobile participants.
+> Use the **Recruitment Funnel** chart to identify exactly where participants are dropping off (e.g., after the welcome page vs. during the fine sort).
+
+### Data Analysis & Quality Control
+
+Access the **Analytics** and **Exports** tabs for deeper insights:
+
+1.  **Consensus & Controversy**: Identify which statements show high agreement vs. high polarization across your cohort.
+2.  **Duration Auditing**: Identify "suspect" participants who completed the task too quickly (speeders) to ensure your factor analysis is based on high-quality engagement.
+3.  **Visual Audit**: Reconstruct individual Q-sorts visually to look for patterns or anomalies before exporting for factor analysis.
 
 ### Study Access Security
 
