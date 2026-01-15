@@ -305,7 +305,7 @@ const StudyLayoutContent: React.FC = () => {
             {/* Header */}
             <header
                 data-testid="layout-header"
-                className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-50 flex items-center justify-between relative shadow-sm"
+                className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-header flex items-center justify-between relative shadow-sm"
             >
                 {/* Subtle Loading Line (Background Re-validation) */}
                 {configLoading && (
@@ -553,7 +553,7 @@ const StudyLayoutContent: React.FC = () => {
 
                         {/* Dropdown (Simplified) */}
                         {isLangMenuOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-50 animate-in fade-in zoom-in-95">
+                            <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-dropdown animate-in fade-in zoom-in-95">
                                 {['en', 'fr', 'fi']
                                     .filter(
                                         (lang) =>
@@ -620,7 +620,7 @@ const StudyLayoutContent: React.FC = () => {
 
             {/* Mobile Footer (Primary Action) */}
             {showMobileFooter && (
-                <div className="md:hidden flex-none bg-white border-t border-slate-200 p-4 sticky bottom-0 z-50 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div className="md:hidden flex-none bg-white border-t border-slate-200 p-4 sticky bottom-0 z-sticky pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                     {headerAction}
                 </div>
             )}

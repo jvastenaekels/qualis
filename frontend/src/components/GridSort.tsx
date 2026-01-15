@@ -145,7 +145,7 @@ const GridToolbar: React.FC<{
     labels: { in: string; out: string; fit: string };
 }> = React.memo(({ onZoomIn, onZoomOut, onReset, labels }) => (
     <div
-        className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md"
+        className="absolute top-4 right-4 z-toolbar flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md"
         role="toolbar"
         aria-label="Grid controls"
     >
