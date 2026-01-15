@@ -400,13 +400,8 @@ class StudyUpdate(BaseModel):
     end_date: datetime | None = None
     last_updated_at: datetime | None = None
 
-    @model_validator(mode="after")
-    def check_grid_symmetry(self) -> "StudyUpdate":
-        """
-        Validate symmetry is now handled at the service layer for activation.
-        We keep this as a no-op or remove it to allow permissive drafts.
-        """
-        return self
+    # Note: Symmetry validation is skipped for drafts/updates to allow partial saves.
+    # It is enforced only when transitioning state to 'active' in the service layer.
 
 
 class StudyRead(StudyBase):
