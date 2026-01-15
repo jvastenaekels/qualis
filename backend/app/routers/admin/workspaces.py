@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+import logging
 
 from app.dependencies import (
     check_workspace_permission,
@@ -24,6 +26,7 @@ from app.core.config import settings
 from fastapi import BackgroundTasks
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.get("", response_model=list[WorkspaceWithRole])
@@ -68,22 +71,39 @@ async def create_workspace(
             detail="Workspace with this slug already exists",
         )
 
-    # Create Workspace
-    workspace = Workspace(
-        title=workspace_in.title,
-        slug=workspace_in.slug,
-    )
-    db.add(workspace)
-    await db.flush()  # To get ID
+    try:
+        # Create Workspace
+        workspace = Workspace(
+            title=workspace_in.title,
+            slug=workspace_in.slug,
+        )
+        db.add(workspace)
+        await db.flush()  # To get ID
 
-    # Create Member (Admin)
-    member = WorkspaceMember(
-        workspace_id=workspace.id,
-        user_id=current_user.id,
-        role=WorkspaceRole.owner,
-    )
-    db.add(member)
-    await db.commit()
+        # Create Member (Admin)
+        member = WorkspaceMember(
+            workspace_id=workspace.id,
+            user_id=current_user.id,
+            role=WorkspaceRole.owner,
+        )
+        db.add(member)
+        await db.commit()
+    except IntegrityError as e:
+        await db.rollback()
+        logger.error(
+            f"Integrity check failed during workspace creation: {e}", exc_info=True
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Workspace with this slug likely already exists",
+        )
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during workspace creation: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while creating the workspace",
+        )
     await db.refresh(workspace)
 
     return workspace
@@ -108,20 +128,37 @@ async def update_workspace(
     """
     Update workspace details.
     """
-    if workspace_in.title is not None:
-        workspace.title = workspace_in.title
-    if workspace_in.slug is not None and workspace_in.slug != workspace.slug:
-        # Check if new slug exists
-        query = select(Workspace).where(Workspace.slug == workspace_in.slug)
-        result = await db.execute(query)
-        if result.scalar_one_or_none():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Workspace with this slug already exists",
-            )
-        workspace.slug = workspace_in.slug
+    try:
+        if workspace_in.title is not None:
+            workspace.title = workspace_in.title
+        if workspace_in.slug is not None and workspace_in.slug != workspace.slug:
+            # Check if new slug exists
+            query = select(Workspace).where(Workspace.slug == workspace_in.slug)
+            result = await db.execute(query)
+            if result.scalar_one_or_none():
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Workspace with this slug already exists",
+                )
+            workspace.slug = workspace_in.slug
 
-    await db.commit()
+        await db.commit()
+    except IntegrityError as e:
+        await db.rollback()
+        logger.error(
+            f"Integrity check failed during workspace update: {e}", exc_info=True
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Database integrity check failed",
+        )
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during workspace update: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while updating the workspace",
+        )
     await db.refresh(workspace)
     return workspace
 
@@ -170,8 +207,16 @@ async def update_workspace_member(
             status_code=status.HTTP_404_NOT_FOUND, detail="Member not found"
         )
 
-    member.role = member_in.role
-    await db.commit()
+    try:
+        member.role = member_in.role
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during member update: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while updating member role",
+        )
     await db.refresh(member)
     return member
 
@@ -203,8 +248,16 @@ async def remove_workspace_member(
             status_code=status.HTTP_404_NOT_FOUND, detail="Member not found"
         )
 
-    await db.delete(member)
-    await db.commit()
+    try:
+        await db.delete(member)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during member removal: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while removing the member",
+        )
 
 
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
@@ -233,8 +286,16 @@ async def delete_workspace(
             detail=f"Cannot delete workspace with {study_count} existing studies. Please delete them first.",
         )
 
-    await db.delete(workspace)
-    await db.commit()
+    try:
+        await db.delete(workspace)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during workspace deletion: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while deleting the workspace",
+        )
 
 
 @router.post("/{slug}/invitations", response_model=InvitationLink)

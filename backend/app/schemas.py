@@ -16,6 +16,16 @@ from app.models import (
 # Auth Schemas
 
 
+# Helper Validator
+def validate_non_empty_string(v: str | None) -> str | None:
+    """Validator to ensure string is not empty or whitespace-only."""
+    if v is None:
+        return None
+    if not v.strip():
+        raise ValueError("String cannot be empty or whitespace only")
+    return v.strip()
+
+
 class Token(BaseModel):
     """Schema for returning an access token or 2FA requirement."""
 
@@ -38,13 +48,18 @@ class UserBase(BaseModel):
     """Base schema for users."""
 
     email: str
-    full_name: str | None = None
+    full_name: str | None = Field(None, max_length=100)
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name(cls, v: str | None) -> str | None:
+        return validate_non_empty_string(v)
 
 
 class UserCreate(UserBase):
     """Schema for creating a new user."""
 
-    password: str
+    password: str = Field(..., min_length=8)
     is_active: bool = True
     is_superuser: bool = False
     invitation_token: str | None = None
@@ -64,7 +79,12 @@ class UserUpdate(BaseModel):
     """Schema for updating user profile."""
 
     email: str | None = None
-    full_name: str | None = None
+    full_name: str | None = Field(None, max_length=100)
+
+    @field_validator("full_name")
+    @classmethod
+    def validate_full_name(cls, v: str | None) -> str | None:
+        return validate_non_empty_string(v)
 
 
 class PasswordChange(BaseModel):
@@ -107,15 +127,31 @@ class WorkspaceWithRole(WorkspaceRead):
 class WorkspaceCreate(BaseModel):
     """Schema for creating a workspace."""
 
-    title: str
+    title: str = Field(..., max_length=100)
     slug: str = Field(..., pattern="^[a-z0-9-]+$", min_length=3, max_length=50)
+
+    @field_validator("title")
+    @classmethod
+    def validate_title(cls, v: str) -> str:
+        # We can't return None here because the field is required (str)
+        # validate_non_empty_string returns str | None
+        # We know v is str per type hint
+        res = validate_non_empty_string(v)
+        if res is None:
+            raise ValueError("String cannot be empty")
+        return res
 
 
 class WorkspaceUpdate(BaseModel):
     """Schema for updating a workspace."""
 
-    title: str | None = None
+    title: str | None = Field(None, max_length=100)
     slug: str | None = Field(None, pattern="^[a-z0-9-]+$", min_length=3, max_length=50)
+
+    @field_validator("title")
+    @classmethod
+    def validate_title(cls, v: str | None) -> str | None:
+        return validate_non_empty_string(v)
 
 
 class WorkspaceMemberUpdate(BaseModel):
@@ -152,26 +188,54 @@ class ProcessStep(BaseModel):
     icon: str = Field(..., description="Lucide icon name")
     color: str | None = Field(None, description="Hex color code or CSS variable")
 
+    @field_validator("title", "description", "icon")
+    @classmethod
+    def validate_strings(cls, v: str) -> str:
+        res = validate_non_empty_string(v)
+        if res is None:
+            raise ValueError("Field cannot be empty or whitespace only")
+        return res
+
 
 class StudyTranslationBase(BaseModel):
     """Base schema for study translations."""
 
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
     title: str = Field(..., max_length=200)
-    description: str = ""
-    instructions: str | None = None
-    subtitle: str | None = None
-    objective: str | None = None
-    condition_of_instruction: str | None = None
+    description: str | None = Field(None, max_length=2000)
+    instructions: str | None = Field(None, max_length=2000)
+    subtitle: str | None = Field(None, max_length=200)
+    objective: str | None = Field(None, max_length=1000)
+    condition_of_instruction: str | None = Field(None, max_length=500)
 
-    consent_title: str | None = None
-    consent_description: str | None = None
-    consent_accept: str | None = "Accept"
-    consent_decline: str | None = "Decline"
+    consent_title: str | None = Field(None, max_length=200)
+    consent_description: str | None = Field(None, max_length=5000)
+    consent_accept: str | None = Field("Accept", max_length=50)
+    consent_decline: str | None = Field("Decline", max_length=50)
     ui_labels: dict[str, Any] = {}
     process_steps: list[ProcessStep] = []
     methodology_tips: list[str] = []
     step_help: dict[str, dict[str, str]] = {}
+
+    @field_validator(
+        "title",
+        "description",
+        "instructions",
+        "subtitle",
+        "objective",
+        "condition_of_instruction",
+        "consent_title",
+        "consent_description",
+        "consent_accept",
+        "consent_decline",
+    )
+    @classmethod
+    def validate_trans_strings(cls, v: str | None) -> str | None:
+        # Note: Description corresponds to "description" field which defaults to empty string
+        # But here we type hint as str | None because default could be None for others?
+        # Actually description is str = ""
+        # Let's rely on validate_non_empty_string logic
+        return validate_non_empty_string(v)
 
 
 class StudyTranslationCreate(StudyTranslationBase):
@@ -192,7 +256,15 @@ class StatementTranslationBase(BaseModel):
     """Base schema for statement translations."""
 
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
-    text: str
+    text: str = Field(..., max_length=1000)
+
+    @field_validator("text")
+    @classmethod
+    def validate_text(cls, v: str) -> str:
+        res = validate_non_empty_string(v)
+        if res is None:
+            raise ValueError("Statement text cannot be empty")
+        return res
 
 
 class StatementTranslationCreate(StatementTranslationBase):
@@ -215,7 +287,15 @@ class StatementTranslationRead(StatementTranslationBase):
 class StatementBase(BaseModel):
     """Base schema for statements."""
 
-    code: str
+    code: str = Field(..., max_length=50)
+
+    @field_validator("code")
+    @classmethod
+    def validate_code(cls, v: str) -> str:
+        res = validate_non_empty_string(v)
+        if res is None:
+            raise ValueError("Statement code cannot be empty")
+        return res
 
 
 class StatementCreate(StatementBase):
@@ -235,8 +315,16 @@ class StatementRead(StatementBase):
 class StatementUpdate(BaseModel):
     """Schema for updating a statement text (by code)."""
 
-    code: str
+    code: str = Field(..., max_length=50)
     translations: list[StatementTranslationCreate]
+
+    @field_validator("code")
+    @classmethod
+    def validate_code(cls, v: str) -> str:
+        res = validate_non_empty_string(v)
+        if res is None:
+            raise ValueError("Statement code cannot be empty")
+        return res
 
 
 class GridColumn(BaseModel):
@@ -249,9 +337,9 @@ class GridColumn(BaseModel):
 class BrandingBase(BaseModel):
     """Schema for study branding."""
 
-    logo_url: str | None = None
-    accent_color: str | None = None
-    primary_color: str | None = None
+    logo_url: str | None = Field(None, max_length=500)
+    accent_color: str | None = Field(None, max_length=50)
+    primary_color: str | None = Field(None, max_length=50)
     partners: list[PartnerLogo] = []
 
 
@@ -356,7 +444,12 @@ class QSortEntryInput(BaseModel):
 
     statement_id: int
     grid_score: int
-    card_comment: str | None = None
+    card_comment: str | None = Field(None, max_length=2000)
+
+    @field_validator("card_comment")
+    @classmethod
+    def validate_comment(cls, v: str | None) -> str | None:
+        return validate_non_empty_string(v)
 
 
 class ConsentInput(BaseModel):
@@ -470,7 +563,12 @@ class ParticipantDiscardUpdate(BaseModel):
     """Schema for discarding/flagging a participant."""
 
     is_discarded: bool
-    discard_reason: str | None = None
+    discard_reason: str | None = Field(None, max_length=500)
+
+    @field_validator("discard_reason")
+    @classmethod
+    def validate_reason(cls, v: str | None) -> str | None:
+        return validate_non_empty_string(v)
 
 
 # Collaboration & Invitation Schemas
@@ -496,11 +594,16 @@ class InvitationLink(BaseModel):
 class RecruitmentLinkBase(BaseModel):
     """Base schema for recruitment links."""
 
-    name: str | None = None
+    name: str | None = Field(None, max_length=100)
     type: RecruitmentLinkType = RecruitmentLinkType.public
     capacity: int | None = None
     expires_at: datetime | None = None
     is_active: bool = True
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: str | None) -> str | None:
+        return validate_non_empty_string(v)
 
 
 class RecruitmentLinkCreate(RecruitmentLinkBase):

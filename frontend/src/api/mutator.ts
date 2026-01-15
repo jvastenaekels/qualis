@@ -1,3 +1,4 @@
+import { toast } from 'sonner';
 import { ApiError, reportBug } from './client';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -102,11 +103,26 @@ export const customInstance = async <T>({
                 }
             }
 
-            // 403 Forbidden: Show error toast but don't logout immediately
-            // (Handled by React Mutation/Query error states usually, but unexpected 403s should be visible)
+            // 403 Forbidden: Show error toast
             if (response.status === 403) {
-                // We can let the UI handle specific 403s, but logging it is good.
                 console.warn('Access Forbidden:', url);
+                toast.error('Access Denied', {
+                    description: 'You do not have permission to perform this action.',
+                });
+            }
+
+            // 429 Too Many Requests
+            if (response.status === 429) {
+                toast.error('Too Many Requests', {
+                    description: 'Please wait a moment before trying again.',
+                });
+            }
+
+            // 409 Conflict
+            if (response.status === 409) {
+                toast.error('Conflict', {
+                    description: message || 'The resource has been modified or already exists.',
+                });
             }
 
             // Auto-report 500 Server Errors
@@ -129,11 +145,6 @@ export const customInstance = async <T>({
         if (error instanceof Error && error.name === 'AbortError') {
             // Check if it was our timeout or the external signal
             if (signal?.aborted) {
-                // Re-throw if it wasn't a timeout (user cancellation)
-                // However, Orval/ReactQuery often expects just an error.
-                // We can distinguish by checking if timeout fired.
-                // But wait, we can't easily check if timeout fired vs signal fired sharing the same controller..
-                // Actually, if signal.aborted is true, it's likely the cause/precedence.
                 throw error;
             }
             throw new ApiError(408, 'Request timed out', 'timeout');

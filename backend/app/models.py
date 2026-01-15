@@ -17,6 +17,7 @@ from sqlalchemy import (
     Integer,
     String,
     UniqueConstraint,
+    CheckConstraint,
 )
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -272,6 +273,8 @@ class Statement(Base):
         back_populates="statement", cascade="all, delete-orphan", lazy="selectin"
     )
 
+    __table_args__ = (UniqueConstraint("study_id", "code", name="uq_statement_code"),)
+
 
 class StatementTranslation(Base):
     """SQLAlchemy model for statement translations."""
@@ -375,6 +378,9 @@ class QSortEntry(Base):
     __table_args__ = (
         UniqueConstraint(
             "participant_id", "statement_id", name="uq_participant_statement"
+        ),
+        CheckConstraint(
+            "grid_score >= -10 AND grid_score <= 10", name="chk_grid_score_range"
         ),
     )
 

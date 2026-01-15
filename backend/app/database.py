@@ -15,11 +15,21 @@ SQLALCHEMY_DATABASE_URL = cast(str, settings.DATABASE_URL)
 
 engine_kwargs: dict[str, Any] = {
     "echo": False,
-    "pool_size": 10,
-    "max_overflow": 20,
+    "pool_size": 20,
+    "max_overflow": 40,
     "pool_timeout": 30,
     "pool_recycle": 1800,
+    "pool_pre_ping": True,  # Detect disconnected connections
 }
+
+# Add strict statement timeout for production
+if "postgre" in SQLALCHEMY_DATABASE_URL:
+    engine_kwargs["connect_args"] = {
+        "server_settings": {
+            "statement_timeout": "30000",  # 30s timeout per query
+            "idle_in_transaction_session_timeout": "60000",  # 60s max idle tx
+        }
+    }
 
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, **engine_kwargs)
 

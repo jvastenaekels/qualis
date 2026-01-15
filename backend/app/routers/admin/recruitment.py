@@ -6,10 +6,16 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import check_study_permission
-from app.models import Study, StudyRole
+from app.dependencies import (
+    check_study_permission,
+    get_current_user,
+    ROLE_MAP,
+    STUDY_ROLE_HIERARCHY,
+)
+from app.models import Study, StudyRole, RecruitmentLink, WorkspaceMember, User
 from app.schemas import RecruitmentLinkCreate, RecruitmentLinkRead
 from app.services.recruitment_service import RecruitmentService
+from sqlalchemy import select
 
 router = APIRouter(tags=["Admin Recruitment"])
 
@@ -52,12 +58,39 @@ async def create_recruitment_links(
 async def revoke_recruitment_link(
     link_id: int,
     db: AsyncSession = Depends(get_db),
-    # Note: We should ideally check permission on the associated study
+    current_user: User = Depends(get_current_user),
 ):
     """Revoke a recruitment link."""
-    # Simplified permission check: active user (more specific check recommended in production)
-    success = await RecruitmentService.delete_link(db, link_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Link not found")
+    # 1. Fetch Link + Permissions
+    # We require Editor permission on the study
+    stmt = (
+        select(RecruitmentLink, Study, WorkspaceMember)
+        .join(Study, Study.id == RecruitmentLink.study_id)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .where(
+            RecruitmentLink.id == link_id,
+            WorkspaceMember.user_id == current_user.id,
+        )
+    )
+    result = await db.execute(stmt)
+    row = result.one_or_none()
+
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Link not found or access denied",
+        )
+
+    link, study, member = row
+
+    # Check Permission (Editor required)
+    effective_role = ROLE_MAP.get(member.role, StudyRole.viewer)
+    if STUDY_ROLE_HIERARCHY[effective_role] < STUDY_ROLE_HIERARCHY[StudyRole.editor]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions"
+        )
+
+    await db.delete(link)
+    await db.commit()
 
     return {"status": "revoked"}

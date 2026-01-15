@@ -11,6 +11,8 @@
  * Wrapper for fetch API to handle standard HTTP methods, error parsing, and automated bug reporting.
  */
 
+import { toast } from 'sonner';
+
 export class ApiError extends Error {
     status: number;
     code?: string;
@@ -188,6 +190,21 @@ async function request(
                 window.location.href = '/login?reason=session_expired';
             }
         }
+
+        // 429 Too Many Requests
+        if (response.status === 429) {
+            toast.error('Too Many Requests', {
+                description: 'Please wait a moment before trying again.',
+            });
+        }
+
+        // 409 Conflict
+        if (response.status === 409) {
+            toast.error('Conflict', {
+                description: message || 'The resource has been modified or already exists.',
+            });
+        }
+
         throw new ApiError(response.status, message, code, details);
     }
     return {

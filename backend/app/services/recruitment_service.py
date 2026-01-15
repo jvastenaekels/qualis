@@ -83,16 +83,33 @@ class RecruitmentService:
     @staticmethod
     async def increment_usage(db: AsyncSession, link_id: int):
         """Increment usage count for an individual or limited link."""
-        link = await db.get(RecruitmentLink, link_id)
+        # Use row-level lock to prevent lost updates
+        stmt = (
+            select(RecruitmentLink)
+            .where(RecruitmentLink.id == link_id)
+            .with_for_update()
+        )
+        result = await db.execute(stmt)
+        link = result.scalar_one_or_none()
+
         if link:
             link.usage_count += 1
+            await db.flush()
 
     @staticmethod
     async def record_start(db: AsyncSession, link_id: int):
         """Increment start count for an individual or limited link."""
-        link = await db.get(RecruitmentLink, link_id)
+        stmt = (
+            select(RecruitmentLink)
+            .where(RecruitmentLink.id == link_id)
+            .with_for_update()
+        )
+        result = await db.execute(stmt)
+        link = result.scalar_one_or_none()
+
         if link:
             link.start_count += 1
+            await db.flush()
 
     @staticmethod
     async def validate_link_token(

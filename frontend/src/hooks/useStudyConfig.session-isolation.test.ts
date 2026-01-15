@@ -5,9 +5,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { useStudyConfig } from './useStudyConfig';
+
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -243,7 +241,7 @@ describe('Session Isolation Tests', () => {
             // Set production data
             sessionStorage.removeItem('open-q-pilot-mode');
             useSessionStore.getState().setToken('prod-token');
-            const prodToken = useSessionStore.getState().token;
+            const _prodToken = useSessionStore.getState().token;
 
             // Switch to pilot mode
             sessionStorage.setItem('open-q-pilot-mode', 'true');

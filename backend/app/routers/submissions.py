@@ -1,6 +1,7 @@
 """API router for study submissions."""
 
 from uuid import UUID
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,12 +14,13 @@ from app.services.recruitment_service import RecruitmentService
 from app.utils.security import verify_password
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/submit")
 @limiter.limit("60/minute")
 async def submit_study(
-    data: SubmissionInput, request: Request, db: AsyncSession = Depends(get_db)
+    request: Request, data: SubmissionInput, db: AsyncSession = Depends(get_db)
 ):
     """Submits or updates a study participation.
 
@@ -41,7 +43,11 @@ async def submit_study(
         # Re-raise HTTP exceptions (they're already properly formatted)
         raise
     except Exception as e:
-        # Edge case: Catch any unexpected errors and return proper HTTP error
+        await db.rollback()
+        logger.error(
+            f"Unexpected error during submission (study={data.study_slug}): {e}",
+            exc_info=True,
+        )
         raise HTTPException(
             status_code=500,
             detail=f"Unexpected error during submission: {str(e)}",

@@ -1,9 +1,11 @@
 """Admin routes for study management."""
 
 from typing import cast
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -35,6 +37,7 @@ from app.schemas import (
 )
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("", response_model=StudyRead, status_code=status.HTTP_201_CREATED)
@@ -69,54 +72,71 @@ async def create_study(
             detail="Study with this slug already exists",
         )
 
-    # 3. Create Study
-    db_study = Study(
-        slug=study.slug,
-        workspace_id=workspace.id,
-        state=StudyState.draft,  # Always draft initially
-        grid_config=[col.model_dump() for col in study.grid_config],
-        presort_config=study.presort_config,
-        postsort_config=study.postsort_config,
-        default_language=study.default_language or "en",
-        show_statement_codes=study.show_statement_codes,
-        branding=study.branding.model_dump() if study.branding else None,
-        start_date=study.start_date,
-        end_date=study.end_date,
-    )
-    db.add(db_study)
-    await db.flush()  # to get ID
+    try:
+        # 3. Create Study
+        db_study = Study(
+            slug=study.slug,
+            workspace_id=workspace.id,
+            state=StudyState.draft,  # Always draft initially
+            grid_config=[col.model_dump() for col in study.grid_config],
+            presort_config=study.presort_config,
+            postsort_config=study.postsort_config,
+            default_language=study.default_language or "en",
+            show_statement_codes=study.show_statement_codes,
+            branding=study.branding.model_dump() if study.branding else None,
+            start_date=study.start_date,
+            end_date=study.end_date,
+        )
+        db.add(db_study)
+        await db.flush()  # to get ID
 
-    # 4. Add creator as Study Owner -> No longer needed, Workspace roles apply
-    # Check if we should enforce that creator is at least Admin/Owner?
-    # Already checked in permission block above.
+        from app.models import Statement, StatementTranslation, StudyTranslation
+        from app.services.study_service import DEFAULT_PROCESS_STEPS
 
-    from app.models import Statement, StatementTranslation, StudyTranslation
-    from app.services.study_service import DEFAULT_PROCESS_STEPS
-
-    for t_in in study.translations:
-        t_data = t_in.model_dump()
-        # Inject default process steps if not provided
-        if not t_data.get("process_steps"):
-            t_data["process_steps"] = DEFAULT_PROCESS_STEPS.get(
-                t_data.get("language_code", "en"), DEFAULT_PROCESS_STEPS["en"]
-            )
-        db.add(StudyTranslation(study_id=db_study.id, **t_data))
-
-    # 4. Add Statements and their translations
-    for s_in in study.statements:
-        stmt = Statement(study_id=db_study.id, code=s_in.code)
-        db.add(stmt)
-        await db.flush()  # get stmt ID
-        for st_in in s_in.translations:
-            db.add(
-                StatementTranslation(
-                    statement_id=stmt.id,
-                    language_code=st_in.language_code,
-                    text=st_in.text,
+        logger.error(
+            f"DEBUG: creating study with translations: {len(study.translations)}"
+        )
+        for t_in in study.translations:
+            t_data = t_in.model_dump()
+            # Inject default process steps if not provided
+            if not t_data.get("process_steps"):
+                t_data["process_steps"] = DEFAULT_PROCESS_STEPS.get(
+                    t_data.get("language_code", "en"), DEFAULT_PROCESS_STEPS["en"]
                 )
-            )
+            db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
-    await db.commit()
+        # 4. Add Statements and their translations
+        for s_in in study.statements:
+            stmt = Statement(study_id=db_study.id, code=s_in.code)
+            db.add(stmt)
+            await db.flush()  # get stmt ID
+            for st_in in s_in.translations:
+                db.add(
+                    StatementTranslation(
+                        statement_id=stmt.id,
+                        language_code=st_in.language_code,
+                        text=st_in.text,
+                    )
+                )
+
+        await db.commit()
+    except IntegrityError as e:
+        await db.rollback()
+        logger.error(
+            f"Integrity check failed during study creation: {e}", exc_info=True
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Database integrity check failed: {str(e)}",
+        )
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during study creation: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while creating the study",
+        )
+
     # Re-fetch with relationships for Response Serialization
     from app.services.study_service import StudyService
 
@@ -197,6 +217,12 @@ async def update_study(
             res_part = await db.execute(stmt_part)
             has_participants = (res_part.scalar() or 0) > 0
 
+            if has_participants:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot modify grid configuration because participants have already started the study.",
+                )
+
     # Block ALL updates if not in DRAFT state.
     # State transitions must happen via the dedicated /state endpoint.
     if study.state != StudyState.draft:
@@ -231,101 +257,116 @@ async def update_study(
                         },
                     )
 
-    # 1. Update basic fields
-    update_data = study_update.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        if field in ["translations", "statements", "grid_config"]:
-            continue
-        setattr(study, field, value)
+    try:
+        # 1. Update basic fields
+        update_data = study_update.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            if field in ["translations", "statements", "grid_config"]:
+                continue
+            setattr(study, field, value)
 
-    # 2. Update grid_config (DRAFT only)
-    if study_update.grid_config is not None:
-        study.grid_config = [col.model_dump() for col in study_update.grid_config]
+        # 2. Update grid_config (DRAFT only)
+        if study_update.grid_config is not None:
+            study.grid_config = [col.model_dump() for col in study_update.grid_config]
 
-    # 3. Update translations
-    if study_update.translations is not None:
-        from app.models import StudyTranslation
+        # 3. Update translations
+        if study_update.translations is not None:
+            from app.models import StudyTranslation
 
-        # Replace all translations for simplicity or update existing?
-        # For now, we'll implement a "sync" logic: update existing, add new, remove old.
-        current_trans = {t.language_code: t for t in study.translations}
-        new_trans_list = []
-        for t_in in study_update.translations:
-            if t_in.language_code in current_trans:
-                t_obj = current_trans[t_in.language_code]
-                for k, v in t_in.model_dump().items():
-                    setattr(t_obj, k, v)
-                new_trans_list.append(t_obj)
-            else:
-                new_trans_list.append(StudyTranslation(**t_in.model_dump()))
-        study.translations = new_trans_list
+            # Replace all translations for simplicity or update existing?
+            # For now, we'll implement a "sync" logic: update existing, add new, remove old.
+            current_trans = {t.language_code: t for t in study.translations}
+            new_trans_list = []
+            for t_in in study_update.translations:
+                if t_in.language_code in current_trans:
+                    t_obj = current_trans[t_in.language_code]
+                    for k, v in t_in.model_dump().items():
+                        setattr(t_obj, k, v)
+                    new_trans_list.append(t_obj)
+                else:
+                    new_trans_list.append(StudyTranslation(**t_in.model_dump()))
+            study.translations = new_trans_list
 
-    # 4. Update statements
-    if study_update.statements is not None:
-        from app.models import (
-            Statement,
-            StatementTranslation,
-        )
+        # 4. Update statements
+        if study_update.statements is not None:
+            from app.models import (
+                Statement,
+                StatementTranslation,
+            )
 
-        current_statements = {s.code: s for s in study.statements}
-        updated_codes = {s.code for s in study_update.statements}
+            current_statements = {s.code: s for s in study.statements}
+            updated_codes = {s.code for s in study_update.statements}
 
-        # Determine if we can do destructive changes (remove statements)
-        # Structural changes are allowed in DRAFT or if NO participants exist
-        stmt_count = select(func.count(Participant.id)).where(
-            Participant.study_id == study.id
-        )
-        res = await db.execute(stmt_count)
-        has_participants = (cast(int, res.scalar()) or 0) > 0
+            # Determine if we can do destructive changes (remove statements)
+            # Structural changes are allowed in DRAFT or if NO participants exist
+            stmt_count = select(func.count(Participant.id)).where(
+                Participant.study_id == study.id
+            )
+            res = await db.execute(stmt_count)
+            has_participants = (cast(int, res.scalar()) or 0) > 0
 
-        can_sync_structure = study.state == StudyState.draft or not has_participants
+            can_sync_structure = study.state == StudyState.draft or not has_participants
 
-        # A. Remove statements not in the update (only if allowed)
-        if can_sync_structure:
-            for code, s_obj in list(current_statements.items()):
-                if code not in updated_codes:
-                    study.statements.remove(s_obj)
-                    await db.delete(s_obj)
-                    del current_statements[code]
+            # A. Remove statements not in the update (only if allowed)
+            if can_sync_structure:
+                for code, s_obj in list(current_statements.items()):
+                    if code not in updated_codes:
+                        study.statements.remove(s_obj)
+                        await db.delete(s_obj)
+                        del current_statements[code]
 
-        # B. Sync existing and add new
-        for s_up in study_update.statements:
-            if s_up.code in current_statements:
-                # Update existing
-                target_s = current_statements[s_up.code]
-                curr_s_trans = {t.language_code: t for t in target_s.translations}
-                new_s_trans_list = []
-                for st_in in s_up.translations:
-                    if st_in.language_code in curr_s_trans:
-                        st_obj = curr_s_trans[st_in.language_code]
-                        st_obj.text = st_in.text
-                        new_s_trans_list.append(st_obj)
-                    else:
-                        new_s_trans_list.append(
-                            StatementTranslation(
-                                statement_id=target_s.id, **st_in.model_dump()
+            # B. Sync existing and add new
+            for s_up in study_update.statements:
+                if s_up.code in current_statements:
+                    # Update existing
+                    target_s = current_statements[s_up.code]
+                    curr_s_trans = {t.language_code: t for t in target_s.translations}
+                    new_s_trans_list = []
+                    for st_in in s_up.translations:
+                        if st_in.language_code in curr_s_trans:
+                            st_obj = curr_s_trans[st_in.language_code]
+                            st_obj.text = st_in.text
+                            new_s_trans_list.append(st_obj)
+                        else:
+                            new_s_trans_list.append(
+                                StatementTranslation(
+                                    statement_id=target_s.id, **st_in.model_dump()
+                                )
                             )
+                    target_s.translations = new_s_trans_list
+                elif can_sync_structure:
+                    # Add new
+                    new_s = Statement(study_id=study.id, code=s_up.code)
+                    db.add(new_s)
+                    # Link to study relationships so re-fetch/serialization see it
+                    study.statements.append(new_s)
+
+                    await db.flush()  # Get ID
+
+                    # Create translations and relate them
+                    for st_in in s_up.translations:
+                        new_st = StatementTranslation(
+                            statement_id=new_s.id,
+                            language_code=st_in.language_code,
+                            text=st_in.text,
                         )
-                target_s.translations = new_s_trans_list
-            elif can_sync_structure:
-                # Add new
-                new_s = Statement(study_id=study.id, code=s_up.code)
-                db.add(new_s)
-                # Link to study relationships so re-fetch/serialization see it
-                study.statements.append(new_s)
+                        db.add(new_st)
 
-                await db.flush()  # Get ID
-
-                # Create translations and relate them
-                for st_in in s_up.translations:
-                    new_st = StatementTranslation(
-                        statement_id=new_s.id,
-                        language_code=st_in.language_code,
-                        text=st_in.text,
-                    )
-                    db.add(new_st)
-
-    await db.commit()
+        await db.commit()
+    except IntegrityError as e:
+        await db.rollback()
+        logger.error(f"Integrity check failed during study update: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Database integrity check failed (possibly duplicate statement codes)",
+        )
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during study update: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while updating the study",
+        )
     from app.services.study_service import StudyService
 
     updated_study = await StudyService.get_study_by_slug(db, study.slug)
@@ -376,8 +417,16 @@ async def change_study_state(
                 },
             )
 
-    study.state = new_state
-    await db.commit()
+    try:
+        study.state = new_state
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during study state change: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while changing study state",
+        )
     # Re-fetch with relationships for Response Serialization
     from app.services.study_service import StudyService
 
@@ -492,10 +541,18 @@ async def discard_participant(
             status_code=404, detail="Participant not found or access denied"
         )
 
-    participant.is_discarded = discard_data.is_discarded
-    participant.discard_reason = discard_data.discard_reason
+    try:
+        participant.is_discarded = discard_data.is_discarded
+        participant.discard_reason = discard_data.discard_reason
 
-    await db.commit()
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during participant discard: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while updating participant status",
+        )
     await db.refresh(participant)
     return participant
 
