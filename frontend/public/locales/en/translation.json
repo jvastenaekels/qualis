@@ -406,7 +406,38 @@
     },
     "analytics": {
       "title": "Study Analytics",
-      "description": "Deep dive into participation patterns, consensus analysis, and statistical distributions."
+      "description": "Deep dive into participation patterns, consensus analysis, and statistical distributions.",
+      "charts": {
+        "research_strength": "Research Strength",
+        "valid_samples": "Valid samples reached",
+        "target_confidence": "Target Confidence",
+        "momentum": "Participation Momentum",
+        "momentum_desc": "Study activity is healthy across all sources.",
+        "broad_viewpoint": "Broad Viewpoint",
+        "broad_viewpoint_desc": "Statements show a diverse set of opinions.",
+        "quick_insights": "Quick Insights",
+        "participant_grid": {
+          "title": "Distribution Overview",
+          "statement_code": "Statement {{code}}",
+          "no_text": "No text"
+        },
+        "link_performance": {
+          "title": "Link Comparison",
+          "subtitle": "Top performing recruitment channels",
+          "volume": "Volume",
+          "yield": "Yield %",
+          "conversion_rate": "Conversion Rate",
+          "total_responses": "Total Responses"
+        },
+        "duration": {
+          "title": "Duration Distribution",
+          "subtitle": "Time spent to complete the study",
+          "suspect": "{{count}} Suspect",
+          "high_risk": "High risk (< 2m)",
+          "medium_risk": "Medium risk (2-5m)",
+          "normal": "Normal (> 5m)"
+        }
+      }
     },
     "recruitment": {
       "title": "Recruitment",

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     BarChart,
     Bar,
@@ -21,6 +22,7 @@ interface LinkPerformanceChartProps {
 type SortMetric = 'responses' | 'conversion';
 
 export const LinkPerformanceChart = ({ links, className }: LinkPerformanceChartProps) => {
+    const { t } = useTranslation();
     const [metric, setMetric] = useState<SortMetric>('responses');
 
     const data = useMemo(() => {
@@ -53,8 +55,12 @@ export const LinkPerformanceChart = ({ links, className }: LinkPerformanceChartP
         <Card className={className}>
             <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-6">
                 <div>
-                    <CardTitle className="text-base font-bold">Link Comparison</CardTitle>
-                    <CardDescription>Top performing recruitment channels</CardDescription>
+                    <CardTitle className="text-base font-bold">
+                        {t('admin.analytics.charts.link_performance.title')}
+                    </CardTitle>
+                    <CardDescription>
+                        {t('admin.analytics.charts.link_performance.subtitle')}
+                    </CardDescription>
                 </div>
                 <Tabs
                     value={metric}
@@ -63,10 +69,10 @@ export const LinkPerformanceChart = ({ links, className }: LinkPerformanceChartP
                 >
                     <TabsList className="grid grid-cols-2 w-full sm:w-[200px]">
                         <TabsTrigger value="responses" className="text-[10px] font-bold">
-                            Volume
+                            {t('admin.analytics.charts.link_performance.volume')}
                         </TabsTrigger>
                         <TabsTrigger value="conversion" className="text-[10px] font-bold">
-                            Yield %
+                            {t('admin.analytics.charts.link_performance.yield')}
                         </TabsTrigger>
                     </TabsList>
                 </Tabs>
@@ -105,7 +111,13 @@ export const LinkPerformanceChart = ({ links, className }: LinkPerformanceChartP
                                 }}
                                 formatter={(value: number | undefined) => [
                                     metric === 'conversion' ? `${value ?? 0}%` : (value ?? 0),
-                                    metric === 'conversion' ? 'Conversion Rate' : 'Total Responses',
+                                    metric === 'conversion'
+                                        ? t(
+                                              'admin.analytics.charts.link_performance.conversion_rate'
+                                          )
+                                        : t(
+                                              'admin.analytics.charts.link_performance.total_responses'
+                                          ),
                                 ]}
                             />
                             <Bar

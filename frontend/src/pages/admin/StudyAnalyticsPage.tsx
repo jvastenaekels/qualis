@@ -103,17 +103,17 @@ const StudyAnalyticsPage = () => {
                         </div>
                         <CardHeader>
                             <CardTitle className="text-white/70 text-[10px] uppercase font-black tracking-widest">
-                                Research Strength
+                                {t('admin.analytics.charts.research_strength')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-5xl font-black mb-2">{participants.length}</div>
                             <p className="text-sm text-white/60 font-medium">
-                                Valid samples reached
+                                {t('admin.analytics.charts.valid_samples')}
                             </p>
                             <div className="mt-6 pt-6 border-t border-white/10">
                                 <div className="flex items-center justify-between text-xs font-bold mb-2">
-                                    <span>Target Confidence</span>
+                                    <span>{t('admin.analytics.charts.target_confidence')}</span>
                                     <span>
                                         {Math.min(100, (participants.length / 40) * 100).toFixed(0)}
                                         %
@@ -133,17 +133,19 @@ const StudyAnalyticsPage = () => {
 
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden flex-1">
                         <CardHeader>
-                            <CardTitle className="text-base font-bold">Quick Insights</CardTitle>
+                            <CardTitle className="text-base font-bold">
+                                {t('admin.analytics.charts.quick_insights')}
+                            </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
                                 <TrendingUp className="h-5 w-5 text-emerald-500 mt-0.5" />
                                 <div>
                                     <p className="text-xs font-bold text-slate-900">
-                                        Participation Momentum
+                                        {t('admin.analytics.charts.momentum')}
                                     </p>
                                     <p className="text-[11px] text-slate-500">
-                                        Study activity is healthy across all sources.
+                                        {t('admin.analytics.charts.momentum_desc')}
                                     </p>
                                 </div>
                             </div>
@@ -151,10 +153,10 @@ const StudyAnalyticsPage = () => {
                                 <Users className="h-5 w-5 text-indigo-500 mt-0.5" />
                                 <div>
                                     <p className="text-xs font-bold text-slate-900">
-                                        Broad Viewpoint
+                                        {t('admin.analytics.charts.broad_viewpoint')}
                                     </p>
                                     <p className="text-[11px] text-slate-500">
-                                        Statements show a diverse set of opinions.
+                                        {t('admin.analytics.charts.broad_viewpoint_desc')}
                                     </p>
                                 </div>
                             </div>

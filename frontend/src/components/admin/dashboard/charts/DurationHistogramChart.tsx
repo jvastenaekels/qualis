@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     BarChart,
     Bar,
@@ -23,6 +24,7 @@ export const DurationHistogramChart = ({
     participants,
     className,
 }: DurationHistogramChartProps) => {
+    const { t } = useTranslation();
     const { chartData, suspectCount } = useMemo(() => {
         if (!participants || participants.length === 0) {
             return { chartData: [], median: 0, suspectCount: 0 };
@@ -93,13 +95,17 @@ export const DurationHistogramChart = ({
             <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                     <div>
-                        <CardTitle className="text-base font-bold">Duration Distribution</CardTitle>
-                        <CardDescription>Time spent to complete the study</CardDescription>
+                        <CardTitle className="text-base font-bold">
+                            {t('admin.analytics.charts.duration.title')}
+                        </CardTitle>
+                        <CardDescription>
+                            {t('admin.analytics.charts.duration.subtitle')}
+                        </CardDescription>
                     </div>
                     {suspectCount > 0 && (
                         <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-red-50 text-red-700 text-[10px] font-black uppercase tracking-wider border border-red-100">
                             <Info size={12} />
-                            {suspectCount} Suspect
+                            {t('admin.analytics.charts.duration.suspect', { count: suspectCount })}
                         </div>
                     )}
                 </div>
@@ -148,15 +154,15 @@ export const DurationHistogramChart = ({
                 <div className="mt-4 flex items-center justify-between text-[10px] font-medium text-slate-400 border-t border-slate-50 pt-3">
                     <div className="flex items-center gap-1">
                         <div className="w-2 h-2 rounded-full bg-red-500" />
-                        <span>High risk (&lt; 2m)</span>
+                        <span>{t('admin.analytics.charts.duration.high_risk')}</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <div className="w-2 h-2 rounded-full bg-amber-500" />
-                        <span>Medium risk (2-5m)</span>
+                        <span>{t('admin.analytics.charts.duration.medium_risk')}</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <div className="w-2 h-2 rounded-full bg-indigo-500" />
-                        <span>Normal (&gt; 5m)</span>
+                        <span>{t('admin.analytics.charts.duration.normal')}</span>
                     </div>
                 </div>
             </CardContent>

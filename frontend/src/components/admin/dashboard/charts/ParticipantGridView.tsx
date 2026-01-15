@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type {
     DumpParticipant,
     DumpResponse,
@@ -18,6 +19,7 @@ export const ParticipantGridView = ({
     studyData,
     className,
 }: ParticipantGridViewProps) => {
+    const { t } = useTranslation();
     const gridData = useMemo(() => {
         if (!studyData?.study?.grid_config || !participant.scores) return null;
 
@@ -57,7 +59,7 @@ export const ParticipantGridView = ({
         <Card className={cn('overflow-hidden border-none shadow-none bg-transparent', className)}>
             <CardHeader className="px-0 pt-0">
                 <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">
-                    Distribution Overview
+                    {t('admin.analytics.charts.participant_grid.title')}
                 </CardTitle>
             </CardHeader>
             <CardContent className="px-0 pb-0">
@@ -103,11 +105,16 @@ export const ParticipantGridView = ({
                                                     className="max-w-xs p-3 bg-slate-900 border-slate-800 text-white rounded-xl shadow-2xl"
                                                 >
                                                     <p className="text-[10px] font-black uppercase text-indigo-400 mb-1">
-                                                        Statement {statement.code}
+                                                        {t(
+                                                            'admin.analytics.charts.participant_grid.statement_code',
+                                                            { code: statement.code }
+                                                        )}
                                                     </p>
                                                     <p className="text-xs font-medium leading-relaxed">
                                                         {statement.translations?.[0]?.text ||
-                                                            'No text'}
+                                                            t(
+                                                                'admin.analytics.charts.participant_grid.no_text'
+                                                            )}
                                                     </p>
                                                 </TooltipContent>
                                             )}
