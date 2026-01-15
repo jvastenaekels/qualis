@@ -106,8 +106,9 @@ export const useStudyConfig = () => {
         if (slug && config && config.slug !== slug) {
             resetSession();
             resetConfig();
+            resetResponses();
         }
-    }, [slug, config, resetSession, resetConfig]);
+    }, [slug, config, resetSession, resetConfig, resetResponses]);
 
     // --- Effect: Sync Loading State ---
     useEffect(() => {
