@@ -1302,6 +1302,896 @@ Add "Statements" to AppSidebar (below "Data")
 
 ---
 
+### Phase 5.5: Overview Dashboard Data Vignettes Refactor
+
+#### Overview
+The current StudyOverviewPage shows basic recent activity as a simple list of participants. This phase transforms these data vignettes into rich, visual mini-insights that provide researchers with at-a-glance understanding of their study health and trends without leaving the overview page.
+
+**Current Limitations of Overview Page:**
+- Recent Activity is just a list of last 5 participants
+- Metric cards show static numbers without trends
+- No visual indicators of data quality or study health
+- No quick insights about participant behavior patterns
+- Missing quick-action visualizations
+- No at-a-glance problem detection
+
+---
+
+#### 5.5.1 Enhanced Recent Activity Panel
+**Component:** `EnhancedRecentActivityPanel.tsx`
+**Location:** `/components/admin/dashboard/`
+
+**Description:**
+Transform the basic participant list into an interactive, information-rich activity feed with mini visualizations.
+
+**Features:**
+
+**Visual Enhancements:**
+
+1. **Participant Cards with Mini Stats**
+   - Replace plain list items with rich cards
+   - Show mini sparkline of their journey duration
+   - Quality score badge (color-coded: green/amber/red)
+   - Visual indicators for flags (⚠️ fast completion, 💬 has comments, 📊 outlier)
+
+2. **Activity Timeline Mini-Chart**
+   - Small line chart showing submissions over last 7 days
+   - Embedded above the participant list
+   - Hover to see exact counts per day
+   - Click to navigate to full Analytics page
+
+3. **Real-time Quality Indicators**
+   - Visual gauge showing % of high-quality responses today
+   - Trend indicator (↑ improving, ↓ declining, → stable)
+   - Color coding based on thresholds
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────────┐
+│ 📊 Recent Activity                      │
+│                                         │
+│ Last 7 Days: [mini sparkline chart]    │
+│ ┌─────────────────────────────────────┐ │
+│ │ Today: 12 submissions  ↑ +25%      │ │
+│ │ Quality Score: 87/100  [gauge]     │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ Recently Completed (5)                  │
+│ ┌───────────────────────────────────┐   │
+│ │ [Avatar] abc123def  ✓ 92          │   │
+│ │ Duration: [mini bar] 12m 34s      │   │
+│ │ 2 hours ago                       │   │
+│ └───────────────────────────────────┘   │
+│ ┌───────────────────────────────────┐   │
+│ │ [Avatar] def456ghi  ⚠️ 45          │   │
+│ │ Duration: [mini bar] 2m 15s ⚠️    │   │
+│ │ 3 hours ago                       │   │
+│ └───────────────────────────────────┘   │
+│                                         │
+│ [View All Participants →]              │
+└─────────────────────────────────────────┘
+```
+
+**Mini Visualizations:**
+
+```typescript
+// Mini sparkline for 7-day trend
+<Sparklines data={last7DaysData} width={100} height={20}>
+  <SparklinesLine color="#4f46e5" style={{ strokeWidth: 2 }} />
+  <SparklinesSpots />
+</Sparklines>
+
+// Or using recharts for consistency
+<LineChart width={150} height={40} data={last7DaysData}>
+  <Line
+    type="monotone"
+    dataKey="count"
+    stroke="#4f46e5"
+    strokeWidth={2}
+    dot={false}
+  />
+</LineChart>
+
+// Duration mini bar
+<div className="w-20 h-1 bg-slate-200 rounded-full overflow-hidden">
+  <div
+    className={cn(
+      "h-full transition-all",
+      duration < 120 ? "bg-red-500" : duration < 300 ? "bg-amber-500" : "bg-emerald-500"
+    )}
+    style={{ width: `${Math.min((duration / 1200) * 100, 100)}%` }}
+  />
+</div>
+
+// Quality score badge
+<Badge className={cn(
+  "font-bold",
+  score >= 80 ? "bg-emerald-100 text-emerald-700" :
+  score >= 60 ? "bg-amber-100 text-amber-700" :
+  "bg-red-100 text-red-700"
+)}>
+  {score}
+</Badge>
+```
+
+**Interactive Features:**
+- Hover on participant card to see quick preview of Q-sort
+- Click participant to navigate to detail page
+- Click sparkline to navigate to Analytics page
+- Filter buttons: All / Completed / In Progress / Flagged
+
+**Data Source:**
+- Recent participants (last 24 hours or last 10)
+- Calculated quality scores
+- 7-day submission trend data
+- Study statistics
+
+**Integration Point:**
+- Replace current Recent Activity section in StudyOverviewPage
+
+---
+
+#### 5.5.2 Smart Insights Cards
+**Component:** `SmartInsightsCards.tsx`
+
+**Description:**
+Automatic detection and display of noteworthy patterns, issues, or achievements in study data.
+
+**Features:**
+
+**Insight Types:**
+
+1. **Quality Alerts** 🚨
+   - "⚠️ 3 suspicious submissions in last hour (< 2 min duration)"
+   - "✅ Quality improving: 92% high-quality responses today"
+   - "📊 2 outlier participants detected - review recommended"
+
+2. **Milestone Achievements** 🎯
+   - "🎉 Reached 50% of target sample size!"
+   - "✨ Completion rate improved by 15% this week"
+   - "📈 Best recruitment day: 25 submissions today"
+
+3. **Trend Notifications** 📊
+   - "↗️ Submissions trending up (+35% vs. last week)"
+   - "⏰ Peak activity time: 2-4 PM (45% of submissions)"
+   - "🌍 New language detected: 15% now using FR"
+
+4. **Action Recommendations** 💡
+   - "💡 Review 5 flagged participants from yesterday"
+   - "🔗 Link 'social-media' has 85% completion - consider promoting"
+   - "📧 12 participants opted in for follow-up interviews"
+
+**Visual Design:**
+```
+┌─────────────────────────────────────────┐
+│ 💡 Smart Insights                       │
+├─────────────────────────────────────────┤
+│ ┌─────────────────────────────────────┐ │
+│ │ 🎉 Milestone Reached!               │ │
+│ │ You've collected 50 responses       │ │
+│ │ [Progress bar: 50/100] ────●────    │ │
+│ │ Keep going! → View Analytics        │ │
+│ └─────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────┐ │
+│ │ ⚠️ Quality Alert                    │ │
+│ │ 3 rapid submissions detected        │ │
+│ │ Avg duration: 1m 45s (⚠️ suspect)   │ │
+│ │ [Review Now →]                      │ │
+│ └─────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────┐ │
+│ │ 📈 Trend                            │ │
+│ │ Submissions up 35% this week!       │ │
+│ │ [mini chart] ↗️                     │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+**Intelligence Engine:**
+```typescript
+// lib/insightsEngine.ts
+
+export function generateInsights(
+  studyData: StudyRead,
+  stats: StudyStatsRead,
+  participants: ParticipantRead[],
+  historicalData?: HistoricalStats
+): Insight[] {
+  const insights: Insight[] = [];
+
+  // Quality alerts
+  const recentSuspicious = participants.filter(
+    p => p.duration_seconds && p.duration_seconds < 120 &&
+    isRecent(p.submitted_at, 1) // Last hour
+  );
+  if (recentSuspicious.length >= 3) {
+    insights.push({
+      type: 'alert',
+      severity: 'warning',
+      icon: '⚠️',
+      title: 'Quality Alert',
+      message: `${recentSuspicious.length} suspicious submissions in last hour`,
+      action: { label: 'Review Now', route: '/exports?filter=suspect' }
+    });
+  }
+
+  // Milestone detection
+  const targetSize = 100; // Could be from study config
+  if (stats.completed_count >= targetSize * 0.5 &&
+      stats.completed_count < targetSize * 0.5 + 5) {
+    insights.push({
+      type: 'success',
+      severity: 'info',
+      icon: '🎉',
+      title: 'Milestone Reached!',
+      message: `You've collected ${stats.completed_count} responses`,
+      progress: (stats.completed_count / targetSize) * 100
+    });
+  }
+
+  // Trend analysis
+  if (historicalData) {
+    const weeklyTrend = calculateWeeklyTrend(participants, historicalData);
+    if (weeklyTrend.percentChange > 25) {
+      insights.push({
+        type: 'info',
+        severity: 'info',
+        icon: '📈',
+        title: 'Trend',
+        message: `Submissions up ${weeklyTrend.percentChange}% this week!`,
+        miniChart: weeklyTrend.dailyCounts
+      });
+    }
+  }
+
+  return insights.slice(0, 3); // Show top 3 insights
+}
+```
+
+**Interactive Features:**
+- Click insight card to navigate to relevant page
+- Dismiss button (with "Don't show again" option)
+- Refresh insights manually
+- Configure which insights to show in settings
+
+**Integration Point:**
+- New section in StudyOverviewPage (below metrics, above recent activity)
+- Optional: Notification bell in header showing insight count
+
+---
+
+#### 5.5.3 Enhanced Metric Cards with Trends
+**Component:** `TrendMetricCard.tsx`
+
+**Description:**
+Upgrade the static metric cards (Sample Size, Completion Rate, Median Duration) with trend indicators and mini charts.
+
+**Features:**
+
+**Visual Enhancements:**
+
+1. **Trend Indicators**
+   - Show change compared to previous period (↑ +15%, ↓ -5%, → stable)
+   - Color coding: green for improvement, red for decline
+   - Sparkline showing last 7 days
+
+2. **Comparison Context**
+   - "15% above your average" or "On track"
+   - Percentile ranking if multiple studies
+
+3. **Interactive Tooltips**
+   - Hover to see detailed breakdown
+   - Historical data graph
+   - Benchmark comparisons
+
+**Enhanced Metric Card Layout:**
+```
+┌─────────────────────────────────────────┐
+│ 👥 Sample Size (N)                      │
+│                                         │
+│     142                                 │
+│     ↑ +15 this week  [sparkline]       │
+│                                         │
+│ Target: 200 (71% complete)              │
+│ [Progress bar ─────●──]                 │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ ✅ Completion Rate                      │
+│                                         │
+│     78%                                 │
+│     ↑ +5% vs last week  [sparkline]    │
+│                                         │
+│ 112 of 144 started   [mini chart]      │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ ⏱️ Median Duration                      │
+│                                         │
+│     12m 34s                             │
+│     ↓ -2m from avg  [sparkline]        │
+│                                         │
+│ Distribution: [mini histogram]          │
+│ Most common: 10-15 min (45%)           │
+└─────────────────────────────────────────┘
+```
+
+**Implementation:**
+```typescript
+interface TrendMetricCardProps {
+  title: string;
+  value: string | number;
+  icon: LucideIcon;
+  trend?: {
+    direction: 'up' | 'down' | 'stable';
+    value: string;
+    isGood: boolean; // Is this direction positive?
+  };
+  sparklineData?: number[];
+  target?: {
+    value: number;
+    current: number;
+  };
+  miniChart?: {
+    type: 'histogram' | 'line' | 'bar';
+    data: any[];
+  };
+  tooltip?: string;
+}
+
+export function TrendMetricCard({
+  title,
+  value,
+  icon: Icon,
+  trend,
+  sparklineData,
+  target,
+  miniChart
+}: TrendMetricCardProps) {
+  return (
+    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+      <CardContent className="pt-4 pb-4">
+        {/* Header with icon and title */}
+        <div className="flex items-center gap-2 mb-2">
+          <Icon className="h-4 w-4 text-indigo-600" />
+          <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+            {title}
+          </div>
+        </div>
+
+        {/* Main value */}
+        <div className="flex items-baseline gap-3 mb-2">
+          <div className="text-4xl font-bold text-slate-900">
+            {value}
+          </div>
+
+          {/* Trend indicator */}
+          {trend && (
+            <div className={cn(
+              "flex items-center gap-1 text-xs font-bold",
+              trend.isGood ? "text-emerald-600" : "text-red-600"
+            )}>
+              {trend.direction === 'up' && <ArrowUp className="h-3 w-3" />}
+              {trend.direction === 'down' && <ArrowDown className="h-3 w-3" />}
+              {trend.direction === 'stable' && <Minus className="h-3 w-3" />}
+              {trend.value}
+            </div>
+          )}
+        </div>
+
+        {/* Sparkline */}
+        {sparklineData && (
+          <div className="mb-2">
+            <ResponsiveContainer width="100%" height={30}>
+              <LineChart data={sparklineData.map((val, idx) => ({ value: val, day: idx }))}>
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#4f46e5"
+                  strokeWidth={2}
+                  dot={false}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+
+        {/* Target progress */}
+        {target && (
+          <div className="space-y-1">
+            <div className="flex justify-between text-[10px] text-slate-400">
+              <span>Target: {target.value}</span>
+              <span>{Math.round((target.current / target.value) * 100)}%</span>
+            </div>
+            <Progress
+              value={(target.current / target.value) * 100}
+              className="h-1.5 bg-slate-100"
+            />
+          </div>
+        )}
+
+        {/* Mini chart */}
+        {miniChart && (
+          <div className="mt-3 pt-3 border-t border-slate-100">
+            <MiniChartRenderer type={miniChart.type} data={miniChart.data} />
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+**Data Source:**
+- Current study statistics
+- Historical data (last 7 days, last 30 days)
+- Comparative benchmarks
+- Study configuration (targets)
+
+**Integration Point:**
+- Replace existing metric cards in StudyOverviewPage
+
+---
+
+#### 5.5.4 Quick Actions Widget
+**Component:** `QuickActionsWidget.tsx`
+
+**Description:**
+Contextual quick actions based on current study state and data patterns.
+
+**Features:**
+
+**Action Recommendations:**
+
+1. **Study State-Based Actions**
+   - Draft: "Complete study design", "Test with sample data"
+   - Active: "Monitor quality", "Check recruitment links"
+   - Paused: "Resume recruitment", "Review pause reasons"
+   - Closed: "Export final data", "Generate report"
+
+2. **Data-Driven Actions**
+   - Low completion rate: "Review study difficulty", "Check dropout points"
+   - High quality scores: "Increase sample size", "Close recruitment early"
+   - Suspicious patterns: "Review flagged participants", "Check attention checks"
+
+3. **Time-Sensitive Actions**
+   - New submissions: "Review 5 recent participants"
+   - Old in-progress: "Send reminder to incomplete participants"
+   - Milestone reached: "Celebrate & share progress"
+
+**Visual Design:**
+```
+┌─────────────────────────────────────────┐
+│ ⚡ Quick Actions                        │
+├─────────────────────────────────────────┤
+│ ┌─────────────────────────────────────┐ │
+│ │ 📊 Review Data Quality              │ │
+│ │ 5 flagged participants              │ │
+│ │ [Review →]                          │ │
+│ └─────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────┐ │
+│ │ 📈 View Analytics Dashboard         │ │
+│ │ See detailed trends & patterns      │ │
+│ │ [Open Analytics →]                  │ │
+│ └─────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────┐ │
+│ │ 💾 Export Data                      │ │
+│ │ Download CSV, PQMethod, or R-Kit   │ │
+│ │ [Export →]                          │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+```
+
+**Implementation:**
+```typescript
+interface QuickAction {
+  id: string;
+  icon: string;
+  title: string;
+  description: string;
+  action: {
+    label: string;
+    route?: string;
+    onClick?: () => void;
+  };
+  badge?: {
+    count: number;
+    variant: 'default' | 'success' | 'warning' | 'error';
+  };
+  priority: number; // Higher = show first
+}
+
+export function generateQuickActions(
+  study: StudyRead,
+  stats: StudyStatsRead,
+  flags: DataQualityFlags
+): QuickAction[] {
+  const actions: QuickAction[] = [];
+
+  // Quality review action
+  if (flags.suspiciousCount > 0) {
+    actions.push({
+      id: 'review-quality',
+      icon: '📊',
+      title: 'Review Data Quality',
+      description: `${flags.suspiciousCount} flagged participants`,
+      action: {
+        label: 'Review',
+        route: `/admin/studies/${study.slug}/exports?filter=flagged`
+      },
+      badge: { count: flags.suspiciousCount, variant: 'warning' },
+      priority: 90
+    });
+  }
+
+  // Analytics navigation
+  actions.push({
+    id: 'view-analytics',
+    icon: '📈',
+    title: 'View Analytics Dashboard',
+    description: 'See detailed trends & patterns',
+    action: {
+      label: 'Open Analytics',
+      route: `/admin/studies/${study.slug}/analytics`
+    },
+    priority: 70
+  });
+
+  // Export action
+  if (stats.completed_count > 0) {
+    actions.push({
+      id: 'export-data',
+      icon: '💾',
+      title: 'Export Data',
+      description: 'Download CSV, PQMethod, or R-Kit',
+      action: {
+        label: 'Export',
+        route: `/admin/studies/${study.slug}/exports`
+      },
+      priority: 60
+    });
+  }
+
+  // Sort by priority and return top 3-5
+  return actions.sort((a, b) => b.priority - a.priority).slice(0, 5);
+}
+```
+
+**Integration Point:**
+- Right sidebar in StudyOverviewPage (alongside RecruitmentModule)
+- Or as a collapsible section below metrics
+
+---
+
+#### 5.5.5 Live Activity Indicator
+**Component:** `LiveActivityIndicator.tsx`
+
+**Description:**
+Real-time indicator showing current active participants and study engagement.
+
+**Features:**
+
+**Real-Time Indicators:**
+
+1. **Active Now**
+   - Show count of participants currently taking study
+   - Live pulse animation
+   - Updates every 30 seconds (via polling or WebSocket)
+
+2. **Today's Summary**
+   - Started today: X
+   - Completed today: Y
+   - Conversion: Z%
+   - Mini bar chart comparing to yesterday
+
+3. **Peak Hours**
+   - Visual timeline showing submission times
+   - Highlight current hour
+   - Indicate peak hours
+
+**Visual Design:**
+```
+┌─────────────────────────────────────────┐
+│ 🟢 Live Activity                        │
+├─────────────────────────────────────────┤
+│ 3 participants active now ●             │
+│                                         │
+│ Today:                                  │
+│ Started:    24  [bar]  ↑ +5 vs yesterday│
+│ Completed:  18  [bar]  ↑ +3             │
+│ Rate:       75% [gauge] ↑ +2%           │
+│                                         │
+│ Peak hours: 10am-12pm, 2pm-4pm         │
+│ [timeline visualization]                │
+└─────────────────────────────────────────┘
+```
+
+**Implementation:**
+```typescript
+export function LiveActivityIndicator({ slug }: { slug: string }) {
+  const [liveStats, setLiveStats] = useState<LiveStats | null>(null);
+
+  // Poll for updates every 30 seconds
+  useEffect(() => {
+    const fetchLiveStats = async () => {
+      const stats = await fetchLiveActivityStats(slug);
+      setLiveStats(stats);
+    };
+
+    fetchLiveStats();
+    const interval = setInterval(fetchLiveStats, 30000);
+
+    return () => clearInterval(interval);
+  }, [slug]);
+
+  if (!liveStats) return <Skeleton className="h-48" />;
+
+  return (
+    <Card className="border-none shadow-sm bg-gradient-to-br from-emerald-50 to-white">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-sm">
+          <div className="relative">
+            <div className="h-2 w-2 bg-emerald-500 rounded-full" />
+            <div className="absolute inset-0 h-2 w-2 bg-emerald-500 rounded-full animate-ping" />
+          </div>
+          Live Activity
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="text-2xl font-bold mb-4">
+          {liveStats.activeNow} {liveStats.activeNow === 1 ? 'participant' : 'participants'} active now
+        </div>
+
+        <div className="space-y-2">
+          <MetricRow
+            label="Started today"
+            value={liveStats.todayStarted}
+            trend={liveStats.todayStarted - liveStats.yesterdayStarted}
+          />
+          <MetricRow
+            label="Completed today"
+            value={liveStats.todayCompleted}
+            trend={liveStats.todayCompleted - liveStats.yesterdayCompleted}
+          />
+        </div>
+
+        {/* Peak hours visualization */}
+        <div className="mt-4 pt-4 border-t border-emerald-100">
+          <div className="text-xs font-bold text-slate-500 mb-2">
+            Peak Hours
+          </div>
+          <HourlyActivityTimeline data={liveStats.hourlyBreakdown} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+**Data Source:**
+- Real-time participant session tracking (if available)
+- Submission timestamps for today/yesterday
+- Historical hourly patterns
+
+**Integration Point:**
+- Top of StudyOverviewPage (alert banner style)
+- Or within metrics section as an additional card
+
+---
+
+#### 5.5.6 Data Health Score
+**Component:** `DataHealthScore.tsx`
+
+**Description:**
+Composite score (0-100) indicating overall study data quality and health.
+
+**Features:**
+
+**Score Components:**
+1. **Sample Quality** (40%)
+   - % of high-quality responses (duration appropriate, patterns normal)
+   - Attention check pass rate
+
+2. **Completion Health** (30%)
+   - Completion rate
+   - Dropout rate
+   - Time to completion appropriateness
+
+3. **Recruitment Effectiveness** (20%)
+   - Link conversion rates
+   - Source diversity
+   - Steady flow vs. spikes
+
+4. **Response Diversity** (10%)
+   - Score range usage
+   - Statement distribution variety
+   - Demographic spread (if tracked)
+
+**Visual Design:**
+```
+┌─────────────────────────────────────────┐
+│ Data Health Score                       │
+├─────────────────────────────────────────┤
+│          ┌────────┐                     │
+│          │   87   │                     │
+│          │ Excellent│                   │
+│          └────────┘                     │
+│     [radial gauge visualization]        │
+│                                         │
+│ Breakdown:                              │
+│ Sample Quality      ████████░░  92%     │
+│ Completion Health   ███████░░░  85%     │
+│ Recruitment         ████████░░  88%     │
+│ Response Diversity  ███████░░░  78%     │
+│                                         │
+│ 💡 Tip: Your data health is excellent!  │
+│    Continue current recruitment pace.   │
+└─────────────────────────────────────────┘
+```
+
+**Score Calculation:**
+```typescript
+export function calculateDataHealthScore(
+  participants: DumpParticipant[],
+  stats: StudyStatsRead,
+  recruitmentLinks: RecruitmentLinkRead[]
+): DataHealthScore {
+  // Sample quality (40%)
+  const qualityScores = participants.map(p => calculateEngagementScore(p, studyData));
+  const avgQuality = mean(qualityScores);
+  const sampleQuality = (avgQuality / 100) * 40;
+
+  // Completion health (30%)
+  const completionRate = stats.completion_rate || 0;
+  const completionHealth = (completionRate / 100) * 30;
+
+  // Recruitment effectiveness (20%)
+  const avgConversion = mean(
+    recruitmentLinks.map(l => l.usage_count / Math.max(l.start_count, 1))
+  );
+  const recruitmentEffectiveness = avgConversion * 20;
+
+  // Response diversity (10%)
+  const diversityScore = calculateDiversityScore(participants);
+  const responseDiversity = (diversityScore / 100) * 10;
+
+  const totalScore = Math.round(
+    sampleQuality + completionHealth + recruitmentEffectiveness + responseDiversity
+  );
+
+  return {
+    total: totalScore,
+    grade: getGrade(totalScore),
+    breakdown: {
+      sampleQuality: (sampleQuality / 40) * 100,
+      completionHealth: (completionHealth / 30) * 100,
+      recruitmentEffectiveness: (recruitmentEffectiveness / 20) * 100,
+      responseDiversity: (responseDiversity / 10) * 100
+    },
+    recommendation: getRecommendation(totalScore, breakdown)
+  };
+}
+
+function getGrade(score: number): string {
+  if (score >= 90) return 'Excellent';
+  if (score >= 80) return 'Very Good';
+  if (score >= 70) return 'Good';
+  if (score >= 60) return 'Fair';
+  return 'Needs Improvement';
+}
+```
+
+**Integration Point:**
+- Prominent position in StudyOverviewPage (near top)
+- Link to detailed breakdown page
+
+---
+
+#### Implementation Priority
+
+**High Priority (Sprint 2):**
+1. Enhanced Recent Activity Panel (5.5.1)
+2. Enhanced Metric Cards with Trends (5.5.3)
+3. Quick Actions Widget (5.5.4)
+
+**Medium Priority (Sprint 3):**
+4. Smart Insights Cards (5.5.2)
+5. Data Health Score (5.5.6)
+
+**Low Priority (Sprint 4):**
+6. Live Activity Indicator (5.5.5) - requires real-time backend
+
+---
+
+#### Technical Considerations
+
+**Component Architecture:**
+```
+/components/admin/dashboard/overview/
+├── EnhancedRecentActivityPanel.tsx
+├── SmartInsightsCards.tsx
+├── TrendMetricCard.tsx
+├── QuickActionsWidget.tsx
+├── LiveActivityIndicator.tsx
+├── DataHealthScore.tsx
+└── shared/
+    ├── MiniSparkline.tsx
+    ├── MiniHistogram.tsx
+    ├── TrendBadge.tsx
+    └── QualityIndicator.tsx
+```
+
+**Data Utilities:**
+```typescript
+// lib/overviewAnalytics.ts
+
+export function calculateTrends(
+  currentPeriod: ParticipantRead[],
+  previousPeriod: ParticipantRead[]
+): TrendData {
+  const currentCount = currentPeriod.length;
+  const previousCount = previousPeriod.length;
+  const percentChange = ((currentCount - previousCount) / previousCount) * 100;
+
+  return {
+    current: currentCount,
+    previous: previousCount,
+    change: currentCount - previousCount,
+    percentChange: Math.round(percentChange),
+    direction: percentChange > 0 ? 'up' : percentChange < 0 ? 'down' : 'stable'
+  };
+}
+
+export function getSparklineData(
+  participants: ParticipantRead[],
+  days: number = 7
+): number[] {
+  const endDate = new Date();
+  const startDate = subDays(endDate, days);
+
+  const dailyCounts = Array.from({ length: days }, (_, i) => {
+    const date = addDays(startDate, i);
+    return participants.filter(p =>
+      isSameDay(parseISO(p.submitted_at || p.created_at), date)
+    ).length;
+  });
+
+  return dailyCounts;
+}
+```
+
+**Performance Optimization:**
+- Cache insights calculations (refresh every 5 minutes)
+- Lazy load non-critical widgets
+- Optimize sparkline rendering with canvas for large datasets
+- Debounce real-time updates
+
+**Accessibility:**
+- All mini charts have text alternatives
+- Color coding supplemented with icons/patterns
+- Keyboard navigation for action buttons
+- Screen reader announcements for live updates
+
+---
+
+#### Success Metrics
+
+**User Engagement:**
+- Time spent on Overview page
+- Click-through rate on insights and quick actions
+- Frequency of returning to overview vs. diving into details
+
+**Research Efficiency:**
+- Time to identify issues (with vs. without insights)
+- Number of quality issues caught early
+- User satisfaction with overview information density
+
+**Actionability:**
+- % of insights that lead to action
+- Most-used quick actions
+- Reduction in "lost" or missed issues
+
+---
+
 ### Phase 6: Interactive Features & UX Enhancements
 
 #### 6.1 Chart Interaction Patterns
