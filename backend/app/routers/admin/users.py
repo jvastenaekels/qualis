@@ -23,7 +23,7 @@ async def check_superuser(current_user: User = Depends(get_current_user)) -> Use
     return current_user
 
 
-@router.get("/", response_model=list[UserRead])
+@router.get("", response_model=list[UserRead])
 async def list_users(
     db: AsyncSession = Depends(get_db),
     _admin: User = Depends(check_superuser),
@@ -33,7 +33,7 @@ async def list_users(
     return result.scalars().all()
 
 
-@router.post("/", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
 async def create_user(
     user_in: UserCreate,
     db: AsyncSession = Depends(get_db),

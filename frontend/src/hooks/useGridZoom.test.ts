@@ -90,9 +90,9 @@ describe('useGridZoom', () => {
         expect(mockTransformRef.setTransform).toHaveBeenCalled();
         const [_x, _y, scale] = mockTransformRef.setTransform.mock.calls[0];
 
-        // Desktop scale logic: min(scaleX, scaleY, 1.1)
-        // expected scale = 1.1 (clamped)
-        expect(scale).toBe(0.95);
+        // Desktop scale logic: min(scaleX, scaleY, 1.0)
+        // expected scale = 1.0 (clamped)
+        expect(scale).toBe(1.0);
     });
 
     it('performs auto-fit on mobile correctly', () => {

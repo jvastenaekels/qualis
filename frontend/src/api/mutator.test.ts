@@ -5,17 +5,9 @@
  */
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import * as Client from './client';
 import { customInstance } from './mutator';
 
-// Mock client.reportBug
-vi.mock('./client', async (importOriginal) => {
-    const actual = await importOriginal();
-    return {
-        ...(actual as object),
-        reportBug: vi.fn(),
-    };
-});
+// No mock for ./client here, we will verify reportBug via its fetch calls
 
 describe('customInstance', () => {
     afterEach(() => {
@@ -77,7 +69,9 @@ describe('customInstance', () => {
             expect.anything(),
             expect.objectContaining({
                 body: JSON.stringify(data),
-                headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+                headers: expect.objectContaining({
+                    'Content-Type': 'application/json',
+                }),
             })
         );
     });
@@ -113,7 +107,13 @@ describe('customInstance', () => {
             // Expected
         }
 
-        expect(Client.reportBug).toHaveBeenCalled();
+        expect(fetch).toHaveBeenCalledWith(
+            expect.stringContaining('/api/logs'),
+            expect.objectContaining({
+                method: 'POST',
+                body: expect.stringContaining('Server Error 500'),
+            })
+        );
     });
 
     it('should return empty object for 204 No Content', async () => {

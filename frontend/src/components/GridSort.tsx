@@ -6,10 +6,11 @@
 
 import { useDroppable } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
+import { cva } from 'class-variance-authority';
 import { Check, Frown, Meh, RotateCcw, Smile, Target, ZoomIn, ZoomOut } from 'lucide-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from './SafeMarkdown';
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch';
 import { useDeckManagement } from '../hooks/useDeckManagement';
 import { useGridCalculations } from '../hooks/useGridCalculations';
@@ -18,6 +19,9 @@ import type { InteractionUtils } from '../types/grid';
 import DroppableSlot from './DroppableSlot';
 import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
+import { useViewport } from '@/contexts/ViewportContext';
+
+import { cn } from '@/lib/utils';
 
 // Sub-component: Droppable Pile
 const DroppablePile: React.FC<
@@ -35,8 +39,12 @@ const DroppablePile: React.FC<
         <button
             ref={setNodeRef}
             type="button"
+            data-testid={id}
             onClick={onClick}
-            className={`${className} ${isOver && !active ? 'ring-2 ring-blue-400 bg-blue-50/80 scale-105' : ''}`}
+            className={cn(
+                className,
+                isOver && !active && 'ring-2 ring-blue-400 bg-blue-50/80 scale-105'
+            )}
             {...props}
         >
             {children}
@@ -53,12 +61,319 @@ const DroppableDeckArea: React.FC<{
     return (
         <div
             ref={setNodeRef}
-            className={`${className} ${isOver ? 'ring-2 ring-indigo-400 bg-indigo-50/10' : ''}`}
+            data-testid={id}
+            className={cn(className, isOver && 'ring-2 ring-indigo-400 bg-indigo-50/10')}
         >
             {children}
         </div>
     );
 });
+
+// --- UI Variants ---
+
+const pileTabVariants = cva(
+    'relative flex-1 basis-0 w-full h-full flex flex-col items-center justify-center p-1.5 sm:p-2 min-h-[60px] sm:min-h-[75px] lg:min-h-[90px] rounded-xl border transition-all duration-200 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-indigo-400',
+    {
+        variants: {
+            variant: {
+                disagree: 'bg-red-50 border-red-300 text-red-700',
+                neutral: 'bg-blue-50 border-blue-300 text-blue-700',
+                agree: 'bg-green-50 border-green-300 text-green-700',
+                inactive:
+                    'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-600 shadow-none',
+            },
+            active: {
+                true: 'scale-[1.02] z-10',
+                false: '',
+            },
+        },
+        defaultVariants: {
+            variant: 'inactive',
+            active: false,
+        },
+    }
+);
+
+const pileIconVariants = cva('', {
+    variants: {
+        type: {
+            disagree: 'text-red-500',
+            neutral: 'text-blue-500',
+            agree: 'text-green-500',
+        },
+    },
+});
+
+const pileBadgeVariants = cva(
+    'absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-20',
+    {
+        variants: {
+            variant: {
+                disagree: 'bg-red-600 text-white border-white',
+                neutral: 'bg-blue-600 text-white border-white',
+                agree: 'bg-green-600 text-white border-white',
+                inactive: 'bg-slate-200 text-slate-700 border-white',
+            },
+        },
+    }
+);
+
+// --- Sub-components ---
+
+const InstructionHeader: React.FC<{
+    instruction: string | null;
+    defaultText: string;
+}> = React.memo(({ instruction, defaultText }) => (
+    <div
+        className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3"
+        role="status"
+        aria-live="polite"
+    >
+        <Target size={14} className="text-indigo-400 opacity-60 flex-none" aria-hidden="true" />
+        <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900">
+            <SafeMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                {instruction || defaultText}
+            </SafeMarkdown>
+        </div>
+    </div>
+));
+
+const GridToolbar: React.FC<{
+    onZoomIn: () => void;
+    onZoomOut: () => void;
+    onReset: () => void;
+    labels: { in: string; out: string; fit: string };
+}> = React.memo(({ onZoomIn, onZoomOut, onReset, labels }) => (
+    <div
+        className="absolute top-4 right-4 z-toolbar flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md"
+        role="toolbar"
+        aria-label="Grid controls"
+    >
+        <button
+            type="button"
+            onClick={onZoomIn}
+            className="p-3 min-w-[44px] min-h-[44px] hover:bg-slate-100 rounded text-slate-600 touch-manipulation"
+            aria-label={labels.in}
+        >
+            <ZoomIn size={20} />
+        </button>
+        <button
+            type="button"
+            onClick={onZoomOut}
+            className="p-3 min-w-[44px] min-h-[44px] hover:bg-slate-100 rounded text-slate-600 touch-manipulation"
+            aria-label={labels.out}
+        >
+            <ZoomOut size={20} />
+        </button>
+        <div className="h-px bg-slate-200 my-0.5" />
+        <button
+            type="button"
+            onClick={onReset}
+            className="p-3 min-w-[44px] min-h-[44px] hover:bg-slate-100 rounded text-slate-600 touch-manipulation"
+            aria-label={labels.fit}
+        >
+            <RotateCcw size={20} />
+        </button>
+    </div>
+));
+
+const ScoreLabel: React.FC<{ score: number; className?: string; id?: string }> = React.memo(
+    ({ score, className, id }) => (
+        <div id={id} className={cn('text-slate-400 font-bold leading-none', className)}>
+            <span className="text-3xl">{score > 0 ? `+${score}` : score}</span>
+        </div>
+    )
+);
+
+const LegendLabel: React.FC<{
+    label: string;
+    type: 'disagree' | 'neutral' | 'agree';
+    highlight: boolean;
+    fontSize: string;
+    testId?: string;
+}> = React.memo(({ label, type, highlight, fontSize, testId }) => {
+    const typeStyles = {
+        disagree: 'text-red-600 text-left',
+        neutral: 'text-blue-600 text-center',
+        agree: 'text-green-600 text-right',
+    };
+
+    return (
+        <span
+            data-testid={testId}
+            className={cn(
+                'flex-1 whitespace-nowrap overflow-hidden text-ellipsis transition-all',
+                typeStyles[type],
+                fontSize,
+                highlight &&
+                    'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative rounded px-1 shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+            )}
+        >
+            {label}
+        </span>
+    );
+});
+
+const GridLegend: React.FC<{
+    highlightKey?: string | null;
+    // biome-ignore lint/suspicious/noExplicitAny: translation function
+    t: any;
+    getLegendFontSize: (maxLen: number) => string;
+    uiLabels?: Record<string, string>;
+}> = React.memo(({ highlightKey, t, getLegendFontSize, uiLabels }) => {
+    const legends = ['disagree', 'neutral', 'agree'] as const;
+    const fs = getLegendFontSize(Math.max(...legends.map((key) => t(`fine.legend.${key}`).length)));
+
+    return (
+        <div className="w-full h-auto flex flex-col gap-3 pt-4 border-t border-slate-200/50">
+            <div
+                className="flex justify-between items-end w-full font-bold uppercase tracking-widest opacity-60 px-2 gap-4"
+                role="group"
+                aria-label="Grid legend"
+            >
+                {legends.map((key) => (
+                    <LegendLabel
+                        key={key}
+                        type={key}
+                        label={uiLabels?.[`fine.legend.${key}`] || t(`fine.legend.${key}`)}
+                        fontSize={fs}
+                        highlight={highlightKey === `fine.legend.${key}`}
+                        testId={`legend-${key}`}
+                    />
+                ))}
+            </div>
+            <div
+                className="w-full h-5 bg-gradient-to-r from-red-500/30 via-slate-200 to-green-500/30 rounded-md relative backdrop-blur-sm overflow-hidden ring-1 ring-slate-200/50"
+                aria-hidden="true"
+            >
+                <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-400/50 -translate-x-1/2" />
+            </div>
+        </div>
+    );
+});
+
+const PileTab: React.FC<{
+    pile: PileType;
+    isActive: boolean;
+    count: number;
+    label: string;
+    cardsLabel: string;
+    onClick: () => void;
+}> = React.memo(({ pile, isActive, count, label, cardsLabel, onClick }) => {
+    const Icon = {
+        disagree: Frown,
+        neutral: Meh,
+        agree: Smile,
+    }[pile];
+
+    return (
+        <DroppablePile
+            id={`deck-${pile}`}
+            className={pileTabVariants({
+                variant: isActive ? pile : 'inactive',
+                active: isActive,
+            })}
+            onClick={onClick}
+            active={isActive}
+            role="tab"
+            aria-selected={isActive}
+            aria-label={`${label}: ${count} ${cardsLabel}`}
+        >
+            <Icon
+                size={isActive ? 28 : 24}
+                strokeWidth={2.5}
+                className={cn(
+                    'mb-1 lg:mb-2 opacity-80 transition-transform',
+                    pileIconVariants({ type: pile })
+                )}
+            />
+            <span className="hidden lg:block text-[10px] font-bold uppercase tracking-wider mb-1 line-clamp-2 text-center px-1 leading-tight">
+                {label}
+            </span>
+            <div
+                className={cn(
+                    'hidden lg:block w-8 h-1 rounded-full mb-1 sm:opacity-40',
+                    isActive ? 'bg-current' : 'bg-slate-200'
+                )}
+            />
+            <div
+                className={cn(
+                    'hidden lg:block w-6 h-1 rounded-full sm:opacity-40',
+                    isActive ? 'bg-current' : 'bg-slate-200'
+                )}
+            />
+            <motion.span
+                key={count}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className={pileBadgeVariants({ variant: isActive ? pile : 'inactive' })}
+            >
+                {count}
+            </motion.span>
+        </DroppablePile>
+    );
+});
+
+const ValidationFooter: React.FC<{
+    isAllPlaced: boolean;
+    selectedCardId?: number | null;
+    onValidate: () => void;
+    labels: {
+        validate: string;
+        place: string;
+        initial: string;
+        finish: string;
+    };
+    highlightKey?: string | null;
+}> = React.memo(({ isAllPlaced, selectedCardId, onValidate, labels, highlightKey }) => (
+    <div className="w-full lg:w-[360px] p-3 lg:p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[88px] lg:min-h-[100px] flex-none pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        {isAllPlaced ? (
+            <button
+                type="button"
+                data-testid="fine-sort-validate-btn"
+                onClick={onValidate}
+                style={{ backgroundColor: 'var(--brand-accent)' }}
+                className={cn(
+                    'w-full flex items-center justify-center gap-2 py-4 text-white rounded-full font-bold text-base shadow-lg hover:brightness-110 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500',
+                    highlightKey === 'fine.actions.validate' &&
+                        'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                )}
+            >
+                {labels.validate} <Check size={18} strokeWidth={3} />
+            </button>
+        ) : (
+            <div className="flex items-center justify-center min-h-[48px] bg-indigo-50 border border-indigo-100 rounded-xl px-4 w-full">
+                <div className="flex items-center gap-3 text-slate-500">
+                    {selectedCardId ? (
+                        <>
+                            <span
+                                className="flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] text-white font-black"
+                                style={{ backgroundColor: 'var(--brand-accent)' }}
+                            >
+                                2
+                            </span>
+                            <span
+                                className="text-xs font-bold uppercase tracking-wide animate-pulse"
+                                style={{ color: 'var(--brand-accent)' }}
+                            >
+                                {labels.place}
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500 font-black">
+                                1
+                            </span>
+                            <span className="text-xs font-bold uppercase tracking-wide">
+                                {isAllPlaced ? labels.finish : labels.initial}
+                            </span>
+                        </>
+                    )}
+                </div>
+            </div>
+        )}
+    </div>
+));
 
 interface GridSortProps {
     agreeCards: { id: number; text: string; code?: string }[];
@@ -82,9 +397,27 @@ interface GridSortProps {
     isAllPlaced?: boolean;
     onValidate?: () => void;
     showCodes?: boolean;
+    highlightKey?: string | null;
+    conditionOfInstruction?: string | null;
+    uiLabels?: Record<string, string>;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
+
+const getColumnTint = (score: number) => {
+    if (score <= -3) return 'bg-red-50/50';
+    if (score < 0) return 'bg-orange-50/30';
+    if (score === 0) return 'bg-slate-50/50';
+    if (score < 3) return 'bg-green-50/30';
+    if (score <= 4) return 'bg-green-50/50';
+    return 'bg-transparent';
+};
+
+const getLegendFontSize = (maxLen: number) => {
+    if (maxLen < 12) return 'text-xl sm:text-2xl';
+    if (maxLen < 25) return 'text-lg sm:text-xl';
+    return 'text-base sm:text-lg';
+};
 
 const GridSort: React.FC<GridSortProps> = React.memo(
     ({
@@ -104,15 +437,19 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         isAllPlaced = false,
         onValidate,
         showCodes,
+        highlightKey,
+        conditionOfInstruction,
+        uiLabels,
     }) => {
         const { t } = useTranslation();
+
+        const { isMobile, isDesktop } = useViewport();
 
         // Deck Management Hook
         const {
             activePile,
             setActivePile,
             activeCards,
-            deckHeight,
             hasPerformedZonalFocus,
             setHasPerformedZonalFocus,
         } = useDeckManagement({
@@ -129,17 +466,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             selectedCardId,
             onDimensionsChange,
         });
-
-        const [isMobile, setIsMobile] = useState(
-            typeof window !== 'undefined' ? window.innerWidth < 1024 : false
-        );
-
-        useEffect(() => {
-            const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-            checkMobile();
-            window.addEventListener('resize', checkMobile);
-            return () => window.removeEventListener('resize', checkMobile);
-        }, []);
 
         // Refs for Zoom Hook (wrapperRef is now provided by useGridCalculations)
         const contentRef = useRef<HTMLDivElement>(null);
@@ -172,15 +498,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 });
             }
         }, [onInteractionUtils, zoomIn, zoomOut, performAutoFit, transformRef, wrapperRef]);
-
-        const getColumnTint = useCallback((score: number) => {
-            if (score <= -3) return 'bg-red-50/50';
-            if (score < 0) return 'bg-orange-50/30';
-            if (score === 0) return 'bg-slate-50/50';
-            if (score < 3) return 'bg-green-50/30';
-            if (score <= 4) return 'bg-green-50/50';
-            return 'bg-transparent';
-        }, []);
 
         // --- Keyboard Focus Management (Roving-like) ---
         const handleGridKeyDown = useCallback(
@@ -243,12 +560,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             [gridColumns]
         );
 
-        const getLegendFontSize = useCallback((maxLen: number) => {
-            if (maxLen < 12) return 'text-xl sm:text-2xl';
-            if (maxLen < 25) return 'text-lg sm:text-xl';
-            return 'text-base sm:text-lg';
-        }, []);
-
         useEffect(() => {
             // Perform initial auto-fit
             const tFit = setTimeout(() => performAutoFit(), 100);
@@ -257,7 +568,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
         // Responsive: Disable autofit on mobile selection
         useEffect(() => {
-            if (selectedCardId && window.innerWidth < 1024) {
+            if (selectedCardId && !isDesktop) {
                 setAutoFitEnabled(false);
             }
         }, [selectedCardId]);
@@ -272,89 +583,103 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             return () => clearTimeout(t);
         }, [autoFitEnabled, performAutoFit]);
 
+        const inventoryLabels = useMemo(
+            () => ({
+                validate: uiLabels?.['fine.actions.validate'] || t('fine.actions.validate'),
+                place:
+                    uiLabels?.['fine.workbench.place_on_grid'] || t('fine.workbench.place_on_grid'),
+                initial:
+                    uiLabels?.['fine.workbench.initial_instruction'] ||
+                    t('fine.workbench.initial_instruction'),
+                finish: uiLabels?.['fine.actions.finish'] || t('fine.actions.finish'),
+            }),
+            [t, uiLabels]
+        );
+
+        const toolbarLabels = useMemo(
+            () => ({
+                in: t('fine.toolbar.zoom_in'),
+                out: t('fine.toolbar.zoom_out'),
+                fit: t('fine.toolbar.fit_screen'),
+            }),
+            [t]
+        );
+
         const renderDeckCards = useCallback(() => {
-            return activeCards.length > 0 ? (
-                activeCards.map((card) => (
-                    <div
-                        key={card.id}
-                        className="flex-none h-full w-[130px] sm:w-[140px] lg:w-full lg:flex-none lg:h-auto"
-                    >
-                        <SortableCard
-                            id={card.id}
-                            text={card.text}
-                            code={showCodes ? card.code : undefined}
-                            variant="compact"
-                            isSelected={selectedCardId === card.id}
-                            onClick={() => onCardClick?.(card.id)}
-                            aspectRatio="auto"
-                            disableHoverZoom={disableHoverZoom || isMobile}
-                        />
-                    </div>
-                ))
-            ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-8 lg:col-span-2 lg:h-full lg:place-self-center">
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="p-4 bg-green-50 rounded-full border border-green-100 shadow-sm animate-in zoom-in duration-300">
-                            <Check size={32} className="text-green-500" strokeWidth={3} />
+            const mobileRatio = 1.5;
+            const gridRatio =
+                cardDimensions && cardDimensions.height > 0
+                    ? cardDimensions.width / cardDimensions.height
+                    : 1.5;
+
+            if (activeCards.length === 0) {
+                return (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-4 lg:col-span-2 lg:h-full lg:place-self-center">
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="p-2 bg-green-50 rounded-full border border-green-100 shadow-sm animate-in zoom-in duration-300">
+                                <Check size={20} className="text-green-500" strokeWidth={2.5} />
+                            </div>
+                            <span className="text-xs font-bold text-slate-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
+                                {t('fine.deck.all_placed')}
+                            </span>
                         </div>
-                        <span className="text-sm font-bold text-slate-500 animate-in fade-in slide-in-from-bottom-2 duration-500 delay-100">
-                            {t('fine.deck.all_placed')}
-                        </span>
                     </div>
+                );
+            }
+
+            return activeCards.map((card) => (
+                <div
+                    key={card.id}
+                    className={cn(
+                        'flex-none lg:w-full lg:flex-none',
+                        isMobile ? 'h-[100px]' : 'h-full w-[130px] sm:w-[140px]'
+                    )}
+                    style={{ aspectRatio: isMobile ? mobileRatio : gridRatio }}
+                >
+                    <SortableCard
+                        id={card.id}
+                        text={card.text}
+                        code={showCodes ? card.code : undefined}
+                        variant="compact"
+                        isSelected={selectedCardId === card.id}
+                        onAction={onCardClick}
+                        aspectRatio={isMobile ? mobileRatio : gridRatio}
+                        disableHoverZoom={disableHoverZoom || isMobile}
+                    />
                 </div>
-            );
-        }, [activeCards, selectedCardId, onCardClick, isMobile, disableHoverZoom, t, showCodes]);
+            ));
+        }, [
+            activeCards,
+            selectedCardId,
+            onCardClick,
+            isMobile,
+            disableHoverZoom,
+            t,
+            showCodes,
+            cardDimensions,
+        ]);
 
         return (
             <div className="flex flex-col lg:flex-row h-[100dvh] bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">
                 {/* PANEL: THE GRID (Canvas) */}
                 <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300">
-                    {/* Condition of Instruction - Persistent Research Question */}
-                    <div className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
-                        <Target size={14} className="text-indigo-400 opacity-60 flex-none" />
-                        <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900">
-                            <ReactMarkdown
-                                components={{ p: ({ children }) => <span>{children}</span> }}
-                            >
-                                {t('fine.header.title')}
-                            </ReactMarkdown>
-                        </div>
-                    </div>
+                    <InstructionHeader
+                        instruction={conditionOfInstruction || null}
+                        defaultText={t('fine.header.title')}
+                    />
 
-                    {/* Reading Zone - Responsive Placement */}
                     {isMobile && <ReadingZone variant="mobile" />}
 
                     <div
                         className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing"
                         ref={wrapperRef}
                     >
-                        <div className="absolute top-4 right-4 z-50 flex flex-col gap-1 bg-white/90 backdrop-blur p-1.5 rounded-lg border border-slate-200 shadow-md">
-                            <button
-                                type="button"
-                                onClick={zoomIn}
-                                className="p-2 hover:bg-slate-100 rounded text-slate-600"
-                                aria-label={t('fine.toolbar.zoom_in')}
-                            >
-                                <ZoomIn size={20} />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={zoomOut}
-                                className="p-2 hover:bg-slate-100 rounded text-slate-600"
-                                aria-label={t('fine.toolbar.zoom_out')}
-                            >
-                                <ZoomOut size={20} />
-                            </button>
-                            <div className="h-px bg-slate-200 my-0.5"></div>
-                            <button
-                                type="button"
-                                onClick={performAutoFit}
-                                className="p-2 hover:bg-slate-100 rounded text-slate-600"
-                                aria-label={t('fine.toolbar.fit_screen')}
-                            >
-                                <RotateCcw size={20} />
-                            </button>
-                        </div>
+                        <GridToolbar
+                            onZoomIn={zoomIn}
+                            onZoomOut={zoomOut}
+                            onReset={performAutoFit}
+                            labels={toolbarLabels}
+                        />
 
                         <TransformWrapper
                             ref={transformRef}
@@ -378,7 +703,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                         ref={pyramidRef}
                                         className="flex flex-row gap-2 items-end flex-nowrap outline-none"
                                         role="grid"
-                                        tabIndex={-1} // Container not focusable, slots are
+                                        tabIndex={-1}
                                         onKeyDown={handleGridKeyDown}
                                     >
                                         {gridColumns.map((col, colIndex) => (
@@ -387,17 +712,11 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                 id={`column-${col.score}`}
                                                 className="flex flex-col gap-2 items-center flex-shrink-0"
                                             >
-                                                {/* Top Column Score Label */}
-                                                <div
+                                                <ScoreLabel
+                                                    score={col.score}
                                                     id={`header-score-${col.score}`}
-                                                    className="text-slate-400 mb-1"
-                                                >
-                                                    <span className="text-3xl font-bold leading-none">
-                                                        {col.score > 0
-                                                            ? `+${col.score}`
-                                                            : col.score}
-                                                    </span>
-                                                </div>
+                                                    className="mb-1"
+                                                />
 
                                                 <div
                                                     className="flex flex-col gap-2"
@@ -420,7 +739,12 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                                     width: cardDimensions.width,
                                                                     height: cardDimensions.height,
                                                                 }}
-                                                                className={`border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center ${getColumnTint(col.score)} bg-opacity-40 transition-all duration-300 shadow-sm ${selectedCardId ? 'ring-2 ring-indigo-400/50 bg-indigo-50/30 cursor-pointer hover:bg-indigo-100/50 hover:ring-indigo-500 hover:scale-[1.02]' : ''}`}
+                                                                className={cn(
+                                                                    'border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center bg-opacity-40 transition-all duration-300 shadow-sm',
+                                                                    getColumnTint(col.score),
+                                                                    selectedCardId &&
+                                                                        'ring-2 ring-[var(--brand-accent)] ring-opacity-50 bg-[color-mix(in_srgb,var(--brand-accent),transparent_95%)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--brand-accent),transparent_90%)] hover:ring-opacity-80 hover:scale-[1.02]'
+                                                                )}
                                                             >
                                                                 {renderSlotContent(
                                                                     colIndex,
@@ -431,54 +755,20 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                         )
                                                     )}
                                                 </div>
-                                                <div
+                                                <ScoreLabel
+                                                    score={col.score}
                                                     id={`footer-${col.score}`}
-                                                    className="text-slate-400 mt-1"
-                                                >
-                                                    <span className="text-3xl font-bold leading-none">
-                                                        {col.score > 0
-                                                            ? `+${col.score}`
-                                                            : col.score}
-                                                    </span>
-                                                </div>
+                                                    className="mt-1"
+                                                />
                                             </div>
                                         ))}
                                     </div>
-                                    <div className="w-full flex flex-col gap-3 pt-4 border-t border-slate-200/50">
-                                        <div className="flex justify-between items-end w-full font-bold uppercase tracking-widest opacity-60 px-2 gap-4">
-                                            {(() => {
-                                                const l1 = t('fine.legend.disagree');
-                                                const l2 = t('fine.legend.neutral');
-                                                const l3 = t('fine.legend.agree');
-                                                const fs = getLegendFontSize(
-                                                    Math.max(l1.length, l2.length, l3.length)
-                                                );
-                                                return (
-                                                    <>
-                                                        <span
-                                                            className={`text-red-600 flex-1 text-left whitespace-nowrap overflow-hidden text-ellipsis ${fs}`}
-                                                        >
-                                                            {l1}
-                                                        </span>
-                                                        <span
-                                                            className={`text-slate-400 flex-1 text-center whitespace-nowrap overflow-hidden text-ellipsis ${fs}`}
-                                                        >
-                                                            {l2}
-                                                        </span>
-                                                        <span
-                                                            className={`text-green-600 flex-1 text-right whitespace-nowrap overflow-hidden text-ellipsis ${fs}`}
-                                                        >
-                                                            {l3}
-                                                        </span>
-                                                    </>
-                                                );
-                                            })()}
-                                        </div>
-                                        <div className="w-full h-5 bg-gradient-to-r from-red-500/30 via-slate-200 to-green-500/30 rounded-md relative backdrop-blur-sm overflow-hidden ring-1 ring-slate-200/50">
-                                            <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-slate-400/50 -translate-x-1/2"></div>
-                                            {/* Removed side dividers to prevent glitches at corners */}
-                                        </div>
-                                    </div>
+                                    <GridLegend
+                                        highlightKey={highlightKey}
+                                        t={t}
+                                        getLegendFontSize={getLegendFontSize}
+                                        uiLabels={uiLabels}
+                                    />
                                 </div>
                             </TransformComponent>
                         </TransformWrapper>
@@ -487,18 +777,11 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
                 {/* PANEL: SOURCE INVENTORY (Deck) */}
                 <div
-                    className={`
-          w-full lg:w-[360px] flex-none
-          bg-white lg:border-r border-t lg:border-t-0 border-gray-200
-          z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md
-          flex flex-col lg:h-full transition-all duration-300
-          overflow-hidden pb-24
-        `}
-                    style={{
-                        height: isMobile ? `${Math.max(deckHeight, 180)}px` : '100%',
-                    }}
+                    className={cn(
+                        'w-full lg:w-[360px] flex-none bg-white lg:border-r border-t lg:border-t-0 border-gray-200 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md flex flex-col lg:h-full transition-all duration-300 overflow-hidden',
+                        isMobile ? 'h-auto' : 'h-full'
+                    )}
                 >
-                    {/* Reading Zone - Desktop Sidebar version */}
                     {!isMobile && (
                         <div className="flex-none p-4 pb-0">
                             <ReadingZone variant="desktop" />
@@ -506,143 +789,57 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     )}
 
                     {/* Category selector (Piles) */}
-                    <div className="flex-none p-4 pb-2">
-                        <div className="flex lg:grid lg:grid-cols-3 gap-2" role="tablist">
-                            {(['disagree', 'neutral', 'agree'] as const).map((pile) => {
-                                const isActive = activePile === pile;
-                                const cards =
-                                    pile === 'disagree'
-                                        ? disagreeCards
-                                        : pile === 'agree'
-                                          ? agreeCards
-                                          : neutralCards;
-                                const Icon =
-                                    pile === 'disagree' ? Frown : pile === 'agree' ? Smile : Meh;
-
-                                const pileStyles = {
-                                    disagree: {
-                                        icon: 'text-red-500',
-                                        activeBg: 'bg-red-50 border-red-300',
-                                        activeText: 'text-red-700',
-                                        activeBadge: 'bg-red-600 text-white border-white',
-                                        activeBar: 'bg-red-200',
-                                    },
-                                    neutral: {
-                                        icon: 'text-gray-500',
-                                        activeBg: 'bg-gray-100 border-gray-300',
-                                        activeText: 'text-gray-700',
-                                        activeBadge: 'bg-gray-600 text-white border-white',
-                                        activeBar: 'bg-gray-200',
-                                    },
-                                    agree: {
-                                        icon: 'text-green-500',
-                                        activeBg: 'bg-green-50 border-green-300',
-                                        activeText: 'text-green-700',
-                                        activeBadge: 'bg-green-600 text-white border-white',
-                                        activeBar: 'bg-green-200',
-                                    },
-                                };
-                                const style = pileStyles[pile as PileType];
-
-                                return (
-                                    <DroppablePile
-                                        key={pile}
-                                        id={`deck-${pile}`}
-                                        className={`
-                                            relative flex-1 flex flex-col items-center justify-center p-2 rounded-xl border transition-all duration-200
-                                            ${isActive ? style.activeBg : 'bg-slate-50 border-slate-200 hover:bg-slate-100'}
-                                            ${isActive ? 'shadow-sm scale-[1.02]' : ''}
-                                        `}
-                                        onClick={() => {
-                                            setActivePile(pile as PileType);
-                                            if (isMobile) {
-                                                setHasPerformedZonalFocus(true);
-                                            }
-                                        }}
-                                        active={isActive}
-                                        role="tab"
-                                        aria-selected={isActive}
-                                        aria-label={`${t(`common.${pile}`)}: ${cards.length} ${t('common.cards')}`}
-                                    >
-                                        <Icon size={24} className={`lg:hidden ${style.icon}`} />
-                                        <span
-                                            className={`hidden lg:block text-[10px] font-bold uppercase tracking-wider mb-1 ${isActive ? style.activeText : 'text-slate-600'}`}
-                                        >
-                                            {t(`common.${pile}`)}
-                                        </span>
-                                        <div
-                                            className={`hidden lg:block w-8 h-1 rounded-full mb-1 ${isActive ? style.activeBar : 'bg-slate-100'}`}
-                                        ></div>
-                                        <div
-                                            className={`hidden lg:block w-6 h-1 rounded-full ${isActive ? style.activeBar : 'bg-slate-100'}`}
-                                        ></div>
-                                        <motion.span
-                                            key={cards.length}
-                                            className={`absolute -top-2 -right-2 w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold border-2 shadow-sm z-20 ${isActive ? style.activeBadge : 'bg-slate-200 text-slate-700 border-white'}`}
-                                        >
-                                            {cards.length}
-                                        </motion.span>
-                                    </DroppablePile>
-                                );
-                            })}
+                    <div className="flex-none p-3 pb-1.5 lg:p-4 lg:pb-2">
+                        <div className="flex w-full gap-2 lg:grid lg:grid-cols-3" role="tablist">
+                            {(['disagree', 'neutral', 'agree'] as const).map((pile) => (
+                                <PileTab
+                                    key={pile}
+                                    pile={pile}
+                                    isActive={activePile === pile}
+                                    count={
+                                        pile === 'disagree'
+                                            ? disagreeCards.length
+                                            : pile === 'agree'
+                                              ? agreeCards.length
+                                              : neutralCards.length
+                                    }
+                                    label={t(`common.${pile}`)}
+                                    cardsLabel={t('common.cards')}
+                                    onClick={() => {
+                                        setActivePile(pile);
+                                        if (isMobile) setHasPerformedZonalFocus(true);
+                                    }}
+                                />
+                            ))}
                         </div>
                     </div>
 
                     <DroppableDeckArea
                         id={`deck-area-${activePile}`}
-                        className="flex-1 min-h-0 flex flex-col overflow-hidden relative"
+                        className={cn(
+                            'flex-col overflow-hidden relative',
+                            isMobile ? 'h-[120px] flex-none' : 'flex-1 min-h-0 flex'
+                        )}
                     >
                         <div
                             key={activePile}
-                            className={`
-                        flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-stretch justify-start custom-scrollbar
-                        ${activeCards.length === 0 ? 'justify-center' : ''}
-                        lg:grid lg:grid-cols-2 lg:gap-2 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:p-3
-                        ${activeCards.length === 0 ? 'lg:place-content-center' : ''}
-                    `}
+                            className={cn(
+                                'flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-stretch justify-start custom-scrollbar lg:grid lg:grid-cols-2 lg:gap-2 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:p-3',
+                                activeCards.length === 0 && 'justify-center lg:place-content-center'
+                            )}
                             data-testid="deck-cards-container"
                         >
                             {renderDeckCards()}
                         </div>
                     </DroppableDeckArea>
-                    {/* PANEL FOOTER: Guidance or Validation */}
-                    <div className="fixed bottom-0 right-0 w-full lg:w-[360px] p-4 border-t-2 border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100]">
-                        {isAllPlaced ? (
-                            <button
-                                type="button"
-                                onClick={onValidate}
-                                className="w-full flex items-center justify-center gap-2 py-3 bg-green-600 text-white rounded-xl font-bold text-sm shadow-md hover:bg-green-700 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500"
-                            >
-                                {t('fine.actions.validate')} <Check size={18} strokeWidth={3} />
-                            </button>
-                        ) : (
-                            <div className="flex items-center justify-center min-h-[48px] bg-indigo-50 border border-indigo-100 rounded-xl px-4">
-                                <div className="flex items-center gap-3 text-slate-500">
-                                    {selectedCardId ? (
-                                        <>
-                                            <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-indigo-500 text-[10px] text-white font-black">
-                                                2
-                                            </span>
-                                            <span className="text-xs font-bold uppercase tracking-wide animate-pulse">
-                                                {t('fine.workbench.place_on_grid')}
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500 font-black">
-                                                1
-                                            </span>
-                                            <span className="text-xs font-bold uppercase tracking-wide">
-                                                {isAllPlaced // Fallback if selectedId prevents button
-                                                    ? t('fine.actions.finish')
-                                                    : t('fine.workbench.initial_instruction')}
-                                            </span>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+
+                    <ValidationFooter
+                        isAllPlaced={isAllPlaced}
+                        selectedCardId={selectedCardId}
+                        onValidate={onValidate || (() => {})}
+                        labels={inventoryLabels}
+                        highlightKey={highlightKey}
+                    />
                 </div>
             </div>
         );

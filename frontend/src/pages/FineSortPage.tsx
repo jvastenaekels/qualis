@@ -26,6 +26,7 @@ import {
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
+import { useViewport } from '@/contexts/ViewportContext';
 import {
     rectSortingStrategy,
     SortableContext,
@@ -36,6 +37,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';
 import { useFineSortDrag } from '../hooks/useFineSortDrag';
@@ -47,9 +49,14 @@ import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
 import type { InteractionUtils } from '../types/grid';
 
-const FineSortPage: React.FC = () => {
+interface FineSortPageProps {
+    highlightKey?: string | null;
+}
+
+const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
     // 1. Hooks (Store / Router) - Top Level
     const config = useConfigStore((state) => state.config);
+    const { isDesktop } = useViewport();
     const rough = useResponseStore((state) => state.rough);
     const qsort = useResponseStore((state) => state.qsort);
 
@@ -68,9 +75,10 @@ const FineSortPage: React.FC = () => {
 
     // 2. State & Hooks - Continuous
     const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
-    const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number } | null>(
-        null
-    );
+    const [cardDimensions, setCardDimensions] = useState<{
+        width: number;
+        height: number;
+    } | null>(null);
     const [zoomLevel, setZoomLevel] = useState(1);
     const [interactionUtils, setInteractionUtils] = useState<InteractionUtils | null>(null);
 
@@ -252,7 +260,12 @@ const FineSortPage: React.FC = () => {
                 const placed = qsort.find((p) => p.statementId === cardId);
                 if (placed) {
                     // Return a synthetic collision with the slot ID
-                    return [{ id: `slot_${placed.col}_${placed.row}`, data: cardCollision.data }];
+                    return [
+                        {
+                            id: `slot_${placed.col}_${placed.row}`,
+                            data: cardCollision.data,
+                        },
+                    ];
                 }
             }
 
@@ -279,12 +292,9 @@ const FineSortPage: React.FC = () => {
                         text={statement.text}
                         code={showCodes ? statement.code : undefined}
                         isSelected={selectedCardId === statement.id}
-                        onClick={() => handleCardClick(statement.id)}
+                        onAction={handleCardClick}
                         dimensions={dimensions}
-                        disableHoverZoom={
-                            activeId !== null ||
-                            (typeof window !== 'undefined' && window.innerWidth < 1024)
-                        }
+                        disableHoverZoom={activeId !== null || !isDesktop}
                     />
                 );
             }
@@ -371,6 +381,7 @@ const FineSortPage: React.FC = () => {
                         neutralCards={unplacedNeutral}
                         gridColumns={gridColumns}
                         renderSlotContent={renderSlotContent}
+                        conditionOfInstruction={config.condition_of_instruction}
                         disableHoverZoom={activeId !== null}
                         selectedCardId={selectedCardId}
                         onCardClick={handleCardClick}
@@ -383,17 +394,25 @@ const FineSortPage: React.FC = () => {
                         isAllPlaced={isAllPlaced}
                         onValidate={handleValidate}
                         showCodes={showCodes}
+                        highlightKey={highlightKey}
+                        uiLabels={config.ui_labels}
                     />
                 </SortableContext>
             </div>
             {createPortal(
                 <DragOverlay
-                    dropAnimation={{ duration: 250, easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)' }}
+                    dropAnimation={{
+                        duration: 250,
+                        easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+                    }}
                 >
                     {activeCardData ? (
                         <div
                             className="pointer-events-none"
-                            style={{ transform: `scale(${zoomLevel})`, transformOrigin: 'center' }}
+                            style={{
+                                transform: `scale(${zoomLevel})`,
+                                transformOrigin: 'center',
+                            }}
                         >
                             <SortableCard
                                 id={activeCardData.id}

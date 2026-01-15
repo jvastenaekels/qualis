@@ -1,0 +1,30 @@
+
+> open-q@0.0.0 build
+> tsc -b && vite build
+
+src/api/generated.ts(3153,9): error TS2322: Type 'GetStudyApiStudySlugGetParams | undefined' is not assignable to type 'Record<string, string | number | boolean | undefined> | undefined'.
+  Type 'GetStudyApiStudySlugGetParams' is not assignable to type 'Record<string, string | number | boolean | undefined>'.
+    Property 'session_token' is incompatible with index signature.
+      Type 'string | null' is not assignable to type 'string | number | boolean | undefined'.
+        Type 'null' is not assignable to type 'string | number | boolean | undefined'.
+src/components/GridSort.tsx(662,25): error TS2322: Type 'string | null | undefined' is not assignable to type 'string | null'.
+  Type 'undefined' is not assignable to type 'string | null'.
+src/components/GridSort.tsx(712,53): error TS2322: Type '{ score: number; id: string; className: string; }' is not assignable to type 'IntrinsicAttributes & { score: number; className?: string | undefined; }'.
+  Property 'id' does not exist on type 'IntrinsicAttributes & { score: number; className?: string | undefined; }'.
+src/components/GridSort.tsx(755,53): error TS2322: Type '{ score: number; id: string; className: string; }' is not assignable to type 'IntrinsicAttributes & { score: number; className?: string | undefined; }'.
+  Property 'id' does not exist on type 'IntrinsicAttributes & { score: number; className?: string | undefined; }'.
+src/components/GridSort.tsx(833,25): error TS2322: Type '(() => void) | undefined' is not assignable to type '() => void'.
+  Type 'undefined' is not assignable to type '() => void'.
+src/components/admin/AppSidebar.tsx(253,51): error TS2339: Property 'badge' does not exist on type '{ title: string; url: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; }'.
+src/components/admin/AppSidebar.tsx(255,59): error TS2339: Property 'badge' does not exist on type '{ title: string; url: string; icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; }'.
+src/components/admin/designer/IntroductionEditor.tsx(11,15): error TS2724: '"@/api/model"' has no exported member named 'StudyTranslation'. Did you mean 'StudyTranslationRead'?
+src/components/admin/designer/IntroductionEditor.tsx(145,37): error TS2322: Type '{ id: string; label: string; value: string; onChange: (val: string) => void; placeholder: string; minRows: number; maxRows: number; }' is not assignable to type 'IntrinsicAttributes & MarkdownEditorProps'.
+  Property 'minRows' does not exist on type 'IntrinsicAttributes & MarkdownEditorProps'.
+src/components/admin/designer/QuestionBuilder.tsx(472,13): error TS2322: Type 'unknown' is not assignable to type 'string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<...> | null | undefined'.
+src/layouts/StudyLayout.tsx(302,36): error TS2339: Property 'partners' does not exist on type '{ logo_url?: string | null | undefined; accent_color?: string | null | undefined; }'.
+src/layouts/StudyLayout.tsx(302,57): error TS2339: Property 'partners' does not exist on type '{ logo_url?: string | null | undefined; accent_color?: string | null | undefined; }'.
+src/layouts/StudyLayout.tsx(305,43): error TS2339: Property 'partners' does not exist on type '{ logo_url?: string | null | undefined; accent_color?: string | null | undefined; }'.
+src/pages/WelcomePage.tsx(82,25): error TS2339: Property 'process_steps' does not exist on type '{ statements: { id: number; text: string; code?: string | undefined; }[]; title: string; description: string; slug: string; instructions: string; presort_config: Record<string, { type: "number" | "text" | ... 5 more ... | "textarea"; ... 8 more ...; rows?: number | undefined; }> | { ...; }; ... 13 more ...; requires...'.
+src/pages/WelcomePage.tsx(119,42): error TS2339: Property 'partners' does not exist on type '{ logo_url?: string | null | undefined; accent_color?: string | null | undefined; }'.
+src/pages/WelcomePage.tsx(119,69): error TS2339: Property 'partners' does not exist on type '{ logo_url?: string | null | undefined; accent_color?: string | null | undefined; }'.
+src/pages/WelcomePage.tsx(126,53): error TS2339: Property 'partners' does not exist on type '{ logo_url?: string | null | undefined; accent_color?: string | null | undefined; }'.

@@ -11,4 +11,16 @@ export type GetStudyApiStudySlugGetParams = {
      * @pattern ^[a-z]{2}(-[A-Z]{2})?$
      */
     lang?: string;
+    /**
+     * Participant session token for deterministic randomization
+     */
+    session_token?: string | null;
+    /**
+     * Recruitment link token
+     */
+    link_token?: string | null;
+    /**
+     * Study access password
+     */
+    password?: string | null;
 };

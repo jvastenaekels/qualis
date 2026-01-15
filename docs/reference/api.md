@@ -117,14 +117,33 @@ Authenticate with email and password to receive an access token.
 
 - `username`: User email
 - `password`: User password
+- `x-totp-token` (Header, optional): 6-digit TOTP token if 2FA is enabled
 
-**Response:**
+**Response (2FA Not Enabled):**
 
 ```json
 {
   "access_token": "eyJhbG...",
   "token_type": "bearer"
 }
+```
+
+**Response (2FA Required):**
+
+If the account has 2FA enabled and no TOTP token was provided:
+
+```json
+{
+  "requires_2fa": true
+}
+```
+
+On the second attempt, include the `X-TOTP-Token` header with a valid 6-digit code:
+
+```bash
+curl -X POST "http://localhost:8000/api/token" \
+  -H "X-TOTP-Token: 123456" \
+  -d "username=user@example.com&password=secret"
 ```
 
 ### 2. Use the Token
@@ -137,6 +156,22 @@ Include the token in the `Authorization` header for all requests to `/api/admin/
 ## Administrative API
 
 The Administrative API allows researchers to manage studies, users, and data.
+
+### Two-Factor Authentication (2FA)
+
+- `GET /api/me/2fa/setup`: Generate a new TOTP secret and provisioning URI (QR code).
+- `POST /api/me/2fa/enable`: Enable 2FA by verifying a TOTP token.
+- `POST /api/me/2fa/disable`: Disable 2FA (requires password confirmation).
+
+### Recruitment
+
+- `GET /api/admin/recruitment/{slug}/links`: List all recruitment links for a study.
+- `POST /api/admin/recruitment/{slug}/links`: Create new access links (public, individual, or limited).
+- `DELETE /api/admin/recruitment/links/{link_id}`: Revoke a recruitment link.
+
+### Invitations
+
+- `POST /api/admin/studies/{slug}/invite`: Send a collaborator invitation via email (or log the URL if SMTP is not configured).
 
 ### Study Management
 
@@ -161,7 +196,11 @@ The Administrative API allows researchers to manage studies, users, and data.
 
 ---
 
-## Data Exports
+### Data Exports
+
+#### `GET /api/admin/studies/{slug}/dump`
+
+Download the full study data as a JSON object (Study config + All participants).
 
 #### `GET /api/admin/studies/{slug}/export/csv`
 
@@ -170,6 +209,10 @@ Download results as a wide-format CSV file.
 #### `GET /api/admin/studies/{slug}/export/pqmethod`
 
 Download a ZIP file containing `.dat` and `.sta` files for PQMethod.
+
+#### `GET /api/admin/studies/{slug}/export/rkit`
+
+Download a ZIP file formatted for R analysis (experimental).
 
 ## Rate Limiting
 

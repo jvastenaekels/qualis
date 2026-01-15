@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
-import { renderWithProviders, screen, setupStoreMocks, fireEvent } from '../test/test-utils';
+import { renderWithProviders, screen, setupStoreMocks, fireEvent } from '../test-utils/test-utils';
 import FineSortPage from './FineSortPage';
 
 // --- Mocks ---
@@ -120,10 +120,7 @@ vi.mock('../components/GridSort', () => ({
 }));
 
 // Mock Translation
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
-    initReactI18next: { type: '3rdParty', init: () => {} },
-}));
+// Mock Translation removed
 
 describe('FineSortPage Integration', () => {
     beforeEach(() => {

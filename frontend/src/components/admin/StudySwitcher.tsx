@@ -1,5 +1,7 @@
 import * as React from 'react';
 import { ChevronsUpDown, Plus } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 import {
     DropdownMenu,
@@ -22,12 +24,40 @@ import { CreateStudyDialog } from './CreateStudyDialog';
 
 export function StudySwitcher() {
     const { isMobile } = useSidebar();
+    const { t } = useTranslation();
     const { data: studies, isLoading } = useListStudiesApiAdminStudiesGet();
     const { activeStudyId, setActiveStudy, activeWorkspaceId } = useAdminStore();
     const [showCreateDialog, setShowCreateDialog] = React.useState(false);
 
     const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
     const activeStudy = filteredStudies?.find((s) => s.slug === activeStudyId);
+
+    const _getStatusColor = (state: string) => {
+        switch (state) {
+            case 'active':
+                return 'bg-emerald-500';
+            case 'draft':
+                return 'bg-slate-400';
+            case 'closed':
+                return 'bg-red-500';
+            case 'paused':
+                return 'bg-amber-500';
+            default:
+                return 'bg-slate-300';
+        }
+    };
+
+    const getAvatarColor = (slug: string) => {
+        const colors = [
+            'from-indigo-500 to-purple-500',
+            'from-emerald-500 to-teal-500',
+            'from-blue-500 to-indigo-500',
+            'from-rose-500 to-pink-500',
+            'from-amber-500 to-orange-500',
+        ];
+        const hash = slug.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        return colors[hash % colors.length];
+    };
 
     if (isLoading) {
         return (
@@ -47,57 +77,89 @@ export function StudySwitcher() {
                         <DropdownMenuTrigger asChild>
                             <SidebarMenuButton
                                 size="lg"
-                                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                                data-testid="study-switcher"
+                                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground transition-all duration-300 hover:bg-sidebar-accent/50"
                             >
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                                <div
+                                    className={cn(
+                                        'flex aspect-square size-8 items-center justify-center rounded-lg bg-gradient-to-br text-white shadow-lg shadow-indigo-500/10 font-black tracking-tighter text-xs',
+                                        activeStudy
+                                            ? getAvatarColor(activeStudy.slug)
+                                            : 'from-slate-600 to-slate-800'
+                                    )}
+                                >
                                     {activeStudy
-                                        ? activeStudy.slug.substring(0, 2).toUpperCase()
+                                        ? activeStudy.slug.substring(0, 1).toUpperCase()
                                         : 'OQ'}
                                 </div>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">
-                                        {activeStudy ? activeStudy.slug : 'Select Study'}
-                                    </span>
-                                    <span className="truncate text-xs">
-                                        {activeStudy ? activeStudy.state : 'No study selected'}
+                                <div className="grid flex-1 text-left text-sm leading-tight ml-1">
+                                    <span className="truncate font-bold tracking-tight text-slate-900 leading-none">
+                                        {activeStudy
+                                            ? activeStudy.translations?.[0]?.title ||
+                                              activeStudy.slug
+                                            : 'Select Study'}
                                     </span>
                                 </div>
-                                <ChevronsUpDown className="ml-auto" />
+                                <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
                             </SidebarMenuButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
-                            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                            className="w-[--radix-dropdown-menu-trigger-width] min-w-64 rounded-xl border-white/20 bg-white/80 backdrop-blur-xl shadow-2xl p-2 animate-in fade-in-0 zoom-in-95"
                             align="start"
                             side={isMobile ? 'bottom' : 'right'}
                             sideOffset={4}
                         >
-                            <DropdownMenuLabel className="text-xs text-muted-foreground">
-                                Studies
+                            <DropdownMenuLabel className="px-2 py-1.5 text-[10px] font-black uppercase text-slate-500 tracking-[0.2em]">
+                                {t('admin.sidebar.studies')}
                             </DropdownMenuLabel>
-                            {filteredStudies?.map((study) => (
-                                <DropdownMenuItem
-                                    key={study.id}
-                                    onClick={() => setActiveStudy(study.slug)}
-                                    className="gap-2 p-2"
-                                >
-                                    <div className="flex size-6 items-center justify-center rounded-sm border">
-                                        {study.slug.substring(0, 1).toUpperCase()}
-                                    </div>
-                                    {study.slug}
-                                    {study.slug === activeStudyId && (
-                                        <div className="ml-auto text-xs">Active</div>
-                                    )}
-                                </DropdownMenuItem>
-                            ))}
-                            <DropdownMenuSeparator />
+                            <div className="space-y-1 my-1">
+                                {filteredStudies?.map((study) => {
+                                    const isActive = study.slug === activeStudyId;
+                                    return (
+                                        <DropdownMenuItem
+                                            key={study.id}
+                                            onClick={() => setActiveStudy(study.slug)}
+                                            className={cn(
+                                                'flex items-center gap-3 px-2 py-2.5 rounded-lg cursor-pointer transition-all duration-200 outline-none',
+                                                isActive
+                                                    ? 'bg-indigo-50 text-indigo-700 shadow-sm border-indigo-100'
+                                                    : 'hover:bg-slate-50 text-slate-600'
+                                            )}
+                                        >
+                                            <div
+                                                className={cn(
+                                                    'flex size-8 items-center justify-center rounded-md bg-gradient-to-br text-white font-black tracking-tighter text-xs shadow-sm transition-transform duration-300',
+                                                    getAvatarColor(study.slug),
+                                                    isActive && 'scale-105'
+                                                )}
+                                            >
+                                                {study.slug.substring(0, 1).toUpperCase()}
+                                            </div>
+                                            <div className="flex flex-col flex-1 min-w-0">
+                                                <span className="text-sm font-bold truncate">
+                                                    {study.translations?.[0]?.title || study.slug}
+                                                </span>
+                                            </div>
+                                        </DropdownMenuItem>
+                                    );
+                                })}
+                            </div>
+                            <DropdownMenuSeparator className="bg-slate-100 my-1" />
                             <DropdownMenuItem
-                                className="gap-2 p-2"
+                                className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 group"
                                 onClick={() => setShowCreateDialog(true)}
                             >
-                                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                                <div className="flex size-8 items-center justify-center rounded-md border border-dashed border-slate-200 bg-slate-50 transition-colors group-hover:border-slate-300 group-hover:bg-white shadow-sm">
                                     <Plus className="size-4" />
                                 </div>
-                                <div className="font-medium text-muted-foreground">Add Study</div>
+                                <div className="flex flex-col">
+                                    <span className="text-sm font-bold">
+                                        {t('admin.sidebar.add_study')}
+                                    </span>
+                                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">
+                                        {t('admin.sidebar.create_project')}
+                                    </span>
+                                </div>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

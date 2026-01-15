@@ -4,13 +4,16 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { UserReadFullName } from './userReadFullName';
 
 /**
  * Schema for reading user details.
  */
 export interface UserRead {
     email: string;
+    full_name?: UserReadFullName;
     id: number;
     is_active: boolean;
     is_superuser: boolean;
+    is_totp_enabled: boolean;
 }

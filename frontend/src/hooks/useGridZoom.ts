@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import type { ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
+import { useViewport } from '@/contexts/ViewportContext';
 
 interface UseGridZoomProps {
     wrapperRef: React.RefObject<HTMLDivElement | null>;
@@ -26,6 +27,7 @@ export const useGridZoom = ({
     onZoomChange,
     onTransformChange,
 }: UseGridZoomProps) => {
+    const { width, height, isDesktop } = useViewport();
     const transformRef = useRef<ReactZoomPanPinchRef>(null);
 
     const onTransformed = useCallback(
@@ -46,7 +48,7 @@ export const useGridZoom = ({
         const contentH = content.offsetHeight;
         if (contentW === 0 || contentH === 0) return;
 
-        const isMobile = window.innerWidth < 1024;
+        const isMobile = !isDesktop;
 
         let scale: number, x: number, y: number;
 
@@ -65,14 +67,14 @@ export const useGridZoom = ({
             // But ensure we don't push it *too* far down if it's small
             y = wrapperH - contentH * scale - 10;
         } else {
-            // Desktop: Fit both, with generous padding to encompass Spectrum Bar
-            const padding = 160; // Increased to 160px to guarantee bottom visibility
+            // Desktop: Fit both, with padding to encompass Spectrum Bar
+            const padding = 70; // Reduced to 70px to increase default zoom for better readability
             const availableW = wrapperW - padding;
             const availableH = wrapperH - padding;
             const scaleX = availableW / contentW;
             const scaleY = availableH / contentH;
 
-            scale = Math.min(scaleX, scaleY, 0.95); // Slight cap to prevent edge-touching
+            scale = Math.min(scaleX, scaleY, 1.0); // Slight cap to prevent edge-touching
 
             // Center Horizontally
             x = (wrapperW - contentW * scale) / 2;
@@ -82,7 +84,7 @@ export const useGridZoom = ({
         }
 
         transformRef.current.setTransform(x, y, scale, 400, 'easeOutQuad');
-    }, [wrapperRef, contentRef]);
+    }, [wrapperRef, contentRef, isDesktop]);
 
     const zoomIn = useCallback(() => {
         if (!transformRef.current || !wrapperRef.current) return;
@@ -129,32 +131,27 @@ export const useGridZoom = ({
     }, [wrapperRef]);
 
     // Auto-fit on significant window resize (debounced)
+    // Using refs to track last values across renders without re-triggering effect loop
+    const lastSizeRef = useRef({ width, height });
+
     useEffect(() => {
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
-        let lastWidth = window.innerWidth;
-        let lastHeight = window.innerHeight;
 
-        const handleResize = () => {
-            const widthChange = Math.abs(window.innerWidth - lastWidth);
-            const heightChange = Math.abs(window.innerHeight - lastHeight);
+        const widthChange = Math.abs(width - lastSizeRef.current.width);
+        const heightChange = Math.abs(height - lastSizeRef.current.height);
 
-            // Only trigger for significant changes (> 50px)
-            if (widthChange > 50 || heightChange > 50) {
-                if (timeoutId) clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    performAutoFit();
-                    lastWidth = window.innerWidth;
-                    lastHeight = window.innerHeight;
-                }, 300);
-            }
-        };
+        // Only trigger for significant changes (> 50px)
+        if (widthChange > 50 || heightChange > 50) {
+            timeoutId = setTimeout(() => {
+                performAutoFit();
+                lastSizeRef.current = { width, height };
+            }, 300);
+        }
 
-        window.addEventListener('resize', handleResize);
         return () => {
-            window.removeEventListener('resize', handleResize);
             if (timeoutId) clearTimeout(timeoutId);
         };
-    }, [performAutoFit]);
+    }, [performAutoFit, width, height]);
 
     // Zonal Focus Logic (Anti-Bias: Sector Panning)
     // 2-step animation: First show entire pyramid, then zoom to zone
@@ -184,7 +181,7 @@ export const useGridZoom = ({
             const minScore = Math.min(...scores);
             const maxScore = Math.max(...scores);
 
-            const isMobile = window.innerWidth < 1024;
+            const isMobile = !isDesktop;
             let targetScore: number;
 
             if (isMobile) {

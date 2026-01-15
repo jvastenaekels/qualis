@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { server } from '../test/server';
+import { server } from '../test-utils/server';
 import { ApiError, reportBug } from './client';
 
 // Mock global fetch

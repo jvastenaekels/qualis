@@ -1,15 +1,23 @@
 """Admin routes for study management."""
 
+from typing import cast
+import logging
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.dependencies import check_study_permission, get_current_user
+from app.dependencies import (
+    check_study_permission,
+    get_current_user,
+    get_current_workspace,
+)
 from app.models import (
+    Participant,
     Study,
-    StudyCollaborator,
     StudyRole,
     StudyState,
     User,
@@ -17,6 +25,7 @@ from app.models import (
     WorkspaceMember,
     WorkspaceRole,
 )
+from sqlalchemy import func
 from app.schemas import (
     ParticipantDiscardUpdate,
     ParticipantRead,
@@ -28,15 +37,32 @@ from app.schemas import (
 )
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
-@router.post("/", response_model=StudyRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=StudyRead, status_code=status.HTTP_201_CREATED)
 async def create_study(
     study: StudyCreate,
     current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
-    """Create a new study in the user's active workspace."""
+    """Create a new study in the active workspace."""
+    workspace, member = workspace_ctx
+
+    # Check permission (Researcher or Admin)
+    # Check Role Hierarchy
+    # We could import WORKSPACE_ROLE_HIERARCHY but we can also just check role value for now
+    if member.role not in [
+        WorkspaceRole.owner,
+        WorkspaceRole.researcher,
+        WorkspaceRole.owner,
+    ]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You need to be an Admin or Researcher in this Workspace to create a study.",
+        )
+
     # 1. Check slug uniqueness
     query = select(Study).where(Study.slug == study.slug)
     result = await db.execute(query)
@@ -46,68 +72,71 @@ async def create_study(
             detail="Study with this slug already exists",
         )
 
-    # 2. Find a valid workspace for the user (Owner or Researcher)
-    # In a real app, workspace_id might be passed in headers or body.
-    # Here we pick the first workspace where user has create permissions.
-    ws_query = (
-        select(Workspace)
-        .join(WorkspaceMember)
-        .where(WorkspaceMember.user_id == current_user.id)
-        .where(
-            WorkspaceMember.role.in_([WorkspaceRole.owner, WorkspaceRole.researcher])
+    try:
+        # 2. Create Study
+        db_study = Study(
+            slug=study.slug,
+            workspace_id=workspace.id,
+            state=StudyState.draft,  # Always draft initially
+            grid_config=[col.model_dump() for col in study.grid_config],
+            presort_config=study.presort_config,
+            postsort_config=study.postsort_config,
+            default_language=study.default_language or "en",
+            show_statement_codes=study.show_statement_codes,
+            branding=study.branding.model_dump() if study.branding else None,
+            start_date=study.start_date,
+            end_date=study.end_date,
         )
-        .limit(1)
-    )
-    ws_res = await db.execute(ws_query)
-    workspace = ws_res.scalar_one_or_none()
+        db.add(db_study)
+        await db.flush()  # to get ID
 
-    if not workspace:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You need to be an Owner or Researcher in a Workspace to create a study.",
+        from app.models import Statement, StatementTranslation, StudyTranslation
+        from app.services.study_service import DEFAULT_PROCESS_STEPS
+
+        logger.error(
+            f"DEBUG: creating study with translations: {len(study.translations)}"
         )
-
-    # 3. Create Study
-    db_study = Study(
-        slug=study.slug,
-        workspace_id=workspace.id,
-        state=StudyState.draft,  # Always draft initially
-        grid_config=[col.model_dump() for col in study.grid_config],
-        presort_config=study.presort_config,
-        postsort_config=study.postsort_config,
-        default_language=study.default_language or "en",
-        show_statement_codes=study.show_statement_codes,
-    )
-    db.add(db_study)
-    await db.flush()  # to get ID
-
-    # 4. Add creator as Study Owner
-    db.add(
-        StudyCollaborator(
-            study_id=db_study.id, user_id=current_user.id, role=StudyRole.owner
-        )
-    )
-
-    from app.models import Statement, StatementTranslation, StudyTranslation
-
-    for t_in in study.translations:
-        db.add(StudyTranslation(study_id=db_study.id, **t_in.model_dump()))
-
-    # 4. Add Statements and their translations
-    for s_in in study.statements:
-        stmt = Statement(study_id=db_study.id, code=s_in.code)
-        db.add(stmt)
-        await db.flush()  # get stmt ID
-        for st_in in s_in.translations:
-            db.add(
-                StatementTranslation(
-                    statement_id=stmt.id,
-                    language_code=st_in.language_code,
-                    text=st_in.text,
+        for t_in in study.translations:
+            t_data = t_in.model_dump()
+            # Inject default process steps if not provided
+            if not t_data.get("process_steps"):
+                t_data["process_steps"] = DEFAULT_PROCESS_STEPS.get(
+                    t_data.get("language_code", "en"), DEFAULT_PROCESS_STEPS["en"]
                 )
-            )
+            db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
-    await db.commit()
+        # 3. Add Statements and their translations
+        for s_in in study.statements:
+            stmt = Statement(study_id=db_study.id, code=s_in.code)
+            db.add(stmt)
+            await db.flush()  # get stmt ID
+            for st_in in s_in.translations:
+                db.add(
+                    StatementTranslation(
+                        statement_id=stmt.id,
+                        language_code=st_in.language_code,
+                        text=st_in.text,
+                    )
+                )
+
+        await db.commit()
+    except IntegrityError as e:
+        await db.rollback()
+        logger.error(
+            f"Integrity check failed during study creation: {e}", exc_info=True
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Database integrity check failed: {str(e)}",
+        )
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during study creation: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while creating the study",
+        )
+
     # Re-fetch with relationships for Response Serialization
     from app.services.study_service import StudyService
 
@@ -117,24 +146,34 @@ async def create_study(
     return updated_study
 
 
-@router.get("/", response_model=list[StudyRead])
+@router.get("", response_model=list[StudyRead])
 async def list_studies(
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> list[Study]:
-    """List studies accessible to the current user (via Workspace membership)."""
+    """List studies in the active workspace."""
+    workspace, _ = workspace_ctx
+
+    # Simple filter by workspace. Isolation secured.
     query = (
         select(Study)
-        .outerjoin(StudyCollaborator, StudyCollaborator.study_id == Study.id)
-        .outerjoin(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .where(Workspace.id == workspace.id)
         .where(
-            (StudyCollaborator.user_id == current_user.id)
-            | (
-                (WorkspaceMember.user_id == current_user.id)
-                & (WorkspaceMember.role == WorkspaceRole.owner)
+            (WorkspaceMember.user_id == current_user.id)
+            & (
+                WorkspaceMember.role.in_(
+                    [
+                        WorkspaceRole.owner,
+                        WorkspaceRole.researcher,
+                        WorkspaceRole.viewer,
+                    ]
+                )
             )
         )
         .distinct()
+        .order_by(Study.created_at.desc())
     )
     result = await db.execute(query)
     return list(result.scalars().all())
@@ -158,86 +197,191 @@ async def update_study(
 ) -> Study:
     """Update study configuration."""
     # Ensure relationships are loaded for logic below
-    await db.refresh(study, attribute_names=["translations", "statements"])
+    # We use a comprehensive selectinload query to avoid MissingGreenlet errors during synchronization
+    from app.models import Statement, StudyTranslation
 
-    # Structural changes only allowed in DRAFT
-    is_structural_edit = any(
-        f in study_update.model_dump(exclude_unset=True) for f in ["grid_config"]
+    stmt = (
+        select(Study)
+        .where(Study.id == study.id)
+        .options(
+            selectinload(Study.translations),
+            selectinload(Study.statements).selectinload(Statement.translations),
+        )
     )
+    res = await db.execute(stmt)
+    study = res.scalar_one_or_none()  # type: ignore[assignment]
 
-    if is_structural_edit and study.state != StudyState.draft:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot modify grid structure of an active, paused, or closed study.",
-        )
+    if study is None:
+        raise HTTPException(status_code=404, detail="Study not found")
 
-    if study.state == StudyState.closed:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot update a closed study.",
-        )
+    # Pre-fetch all statement translations to ensure they are in identity map
+    for s in study.statements:
+        _ = s.translations
 
-    # 1. Update basic fields
-    update_data = study_update.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        if field in ["translations", "statements", "grid_config"]:
-            continue
-        setattr(study, field, value)
-
-    # 2. Update grid_config (DRAFT only)
+    # Relax structural checks in update_study if study is in DRAFT
+    # The frontend will hit this endpoint for auto-save.
+    # We only block grid modification if there are ALREADY participants.
     if study_update.grid_config is not None:
-        study.grid_config = [col.model_dump() for col in study_update.grid_config]
+        new_grid = [col.model_dump() for col in study_update.grid_config]
+        current_grid = study.grid_config
 
-    # 3. Update translations
-    if study_update.translations is not None:
-        from app.models import StudyTranslation
+        if new_grid != current_grid:
+            stmt_part = select(func.count(Participant.id)).where(
+                Participant.study_id == study.id
+            )
+            res_part = await db.execute(stmt_part)
+            has_participants = (res_part.scalar() or 0) > 0
 
-        # Replace all translations for simplicity or update existing?
-        # For now, we'll implement a "sync" logic: update existing, add new, remove old.
-        current_trans = {t.language_code: t for t in study.translations}
-        new_trans_list = []
-        for t_in in study_update.translations:
-            if t_in.language_code in current_trans:
-                t_obj = current_trans[t_in.language_code]
-                for k, v in t_in.model_dump().items():
-                    setattr(t_obj, k, v)
-                new_trans_list.append(t_obj)
+            if has_participants:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot modify grid configuration because participants have already started the study.",
+                )
+
+    # Block ALL updates if not in DRAFT state.
+    # State transitions must happen via the dedicated /state endpoint.
+    if study.state != StudyState.draft:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot update study in {study.state.value} state. Switch it back to draft first.",
+        )
+
+    # Optimistic Locking Check
+    if study_update.last_updated_at and study.updated_at:
+        # Compare timestamps. Note: DB timestamp might have higher precision.
+        # We assume if DB is strictly newer, we have a conflict.
+        # We subtract a small buffer (e.g. 1 second) might be unsafe, strict is better.
+        if study.updated_at > study_update.last_updated_at:
+            # RELAXATION: If study is in DRAFT, we allow overwrites to prevent 409 loops
+            # during frequent auto-saves. Last write wins for drafts.
+            if study.state == StudyState.draft:
+                pass  # validation/concurrency is less strict in draft mode
             else:
-                new_trans_list.append(StudyTranslation(**t_in.model_dump()))
-        study.translations = new_trans_list
+                from app.services.study_service import StudyService
 
-    # 4. Update statements
-    if study_update.statements is not None:
-        from app.models import StatementTranslation
+                # Fetch full fresh state to return to client
+                fresh_study = await StudyService.get_study_by_slug(db, study.slug)
+                if fresh_study:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail={
+                            "message": "Study has been modified by another user.",
+                            "server_state": jsonable_encoder(
+                                StudyRead.model_validate(fresh_study)
+                            ),
+                        },
+                    )
 
-        # We only allow updating translations for existing statements by code
-        # No adding/removing statements here if not in DRAFT (but let's keep it safe for all)
-        current_statements = {s.code: s for s in study.statements}
-        for s_up in study_update.statements:
-            if s_up.code in current_statements:
-                target_s = current_statements[s_up.code]
-                # Update translations for this statement
-                curr_s_trans = {t.language_code: t for t in target_s.translations}
-                new_s_trans_list = []
-                for st_in in s_up.translations:
-                    if st_in.language_code in curr_s_trans:
-                        st_obj = curr_s_trans[st_in.language_code]
-                        st_obj.text = st_in.text
-                        new_s_trans_list.append(st_obj)
-                    else:
-                        new_s_trans_list.append(
-                            StatementTranslation(
-                                statement_id=target_s.id, **st_in.model_dump()
+    try:
+        # 1. Update basic fields
+        update_data = study_update.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            if field in ["translations", "statements", "grid_config"]:
+                continue
+            setattr(study, field, value)
+
+        # 2. Update grid_config (DRAFT only)
+        if study_update.grid_config is not None:
+            study.grid_config = [col.model_dump() for col in study_update.grid_config]
+
+        # 3. Update translations
+        if study_update.translations is not None:
+            from app.models import StudyTranslation
+
+            # Replace all translations for simplicity or update existing?
+            # For now, we'll implement a "sync" logic: update existing, add new, remove old.
+            current_trans = {t.language_code: t for t in study.translations}
+            new_trans_list = []
+            for t_in in study_update.translations:
+                if t_in.language_code in current_trans:
+                    t_obj = current_trans[t_in.language_code]
+                    for k, v in t_in.model_dump().items():
+                        setattr(t_obj, k, v)
+                    new_trans_list.append(t_obj)
+                else:
+                    new_trans_list.append(StudyTranslation(**t_in.model_dump()))
+            study.translations = new_trans_list
+
+        # 4. Update statements
+        if study_update.statements is not None:
+            from app.models import (
+                Statement,
+                StatementTranslation,
+            )
+
+            current_statements = {s.code: s for s in study.statements}
+            updated_codes = {s.code for s in study_update.statements}
+
+            # Determine if we can do destructive changes (remove statements)
+            # Structural changes are allowed in DRAFT or if NO participants exist
+            stmt_count = select(func.count(Participant.id)).where(
+                Participant.study_id == study.id
+            )
+            res = await db.execute(stmt_count)
+            has_participants = (cast(int, res.scalar()) or 0) > 0
+
+            can_sync_structure = study.state == StudyState.draft or not has_participants
+
+            # A. Remove statements not in the update (only if allowed)
+            if can_sync_structure:
+                for code, s_obj in list(current_statements.items()):
+                    if code not in updated_codes:
+                        study.statements.remove(s_obj)
+                        await db.delete(s_obj)
+                        del current_statements[code]
+
+            # B. Sync existing and add new
+            for s_up in study_update.statements:
+                if s_up.code in current_statements:
+                    # Update existing
+                    target_s = current_statements[s_up.code]
+                    curr_s_trans = {t.language_code: t for t in target_s.translations}
+                    new_s_trans_list = []
+                    for st_in in s_up.translations:
+                        if st_in.language_code in curr_s_trans:
+                            st_obj = curr_s_trans[st_in.language_code]
+                            st_obj.text = st_in.text
+                            new_s_trans_list.append(st_obj)
+                        else:
+                            new_s_trans_list.append(
+                                StatementTranslation(
+                                    statement_id=target_s.id, **st_in.model_dump()
+                                )
                             )
-                        )
-                target_s.translations = new_s_trans_list
-            elif study.state == StudyState.draft:
-                # In DRAFT, we could technically allow adding by code, but StudyUpdate is for partials.
-                # Usually creation handles the bulk.
-                pass
+                    target_s.translations = new_s_trans_list
+                elif can_sync_structure:
+                    # Add new
+                    new_s = Statement(study_id=study.id, code=s_up.code)
+                    db.add(new_s)
+                    # Link to study relationships so re-fetch/serialization see it
+                    study.statements.append(new_s)
 
-    await db.commit()
-    # Re-fetch with relationships for Response Serialization
+                    await db.flush()  # Get ID
+
+                    # Create translations and relate them
+                    for st_in in s_up.translations:
+                        new_st = StatementTranslation(
+                            statement_id=new_s.id,
+                            language_code=st_in.language_code,
+                            text=st_in.text,
+                        )
+                        db.add(new_st)
+
+        await db.commit()
+    except IntegrityError as e:
+        await db.rollback()
+        logger.error(f"Integrity check failed during study update: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Database integrity check failed (possibly duplicate statement codes)",
+        )
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during study update: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while updating the study",
+        )
     from app.services.study_service import StudyService
 
     updated_study = await StudyService.get_study_by_slug(db, study.slug)
@@ -246,15 +390,58 @@ async def update_study(
     return updated_study
 
 
+@router.post("/{slug}/validate", response_model=list[str])
+async def validate_study(
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+) -> list[str]:
+    """Check if study is ready for activation."""
+    from app.services.study_service import StudyService
+
+    # Ensure relations are loaded
+    await db.refresh(study, attribute_names=["translations", "statements"])
+    for s in study.statements:
+        await db.refresh(s, attribute_names=["translations"])
+
+    return StudyService.validate_for_activation(study)
+
+
 @router.post("/{slug}/state", response_model=StudyRead)
 async def change_study_state(
     new_state: StudyState,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> Study:
-    """Change study state (Draft <-> Active <-> Closed)."""
-    study.state = new_state
-    await db.commit()
+    """Change study state (Draft <-> Active <-> Closed <-> Archived)."""
+    # Rules for Activation
+    if new_state == StudyState.active:
+        from app.services.study_service import StudyService
+
+        # Ensure relations are loaded for validation
+        await db.refresh(study, attribute_names=["translations", "statements"])
+        for s in study.statements:
+            await db.refresh(s, attribute_names=["translations"])
+
+        errors = StudyService.validate_for_activation(study)
+        if errors:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={
+                    "message": "Study is not ready for activation",
+                    "errors": errors,
+                },
+            )
+
+    try:
+        study.state = new_state
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during study state change: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while changing study state",
+        )
     # Re-fetch with relationships for Response Serialization
     from app.services.study_service import StudyService
 
@@ -269,9 +456,23 @@ async def change_study_state(
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_study(
     study: Study = Depends(check_study_permission(StudyRole.owner)),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Delete a study (Workspace Owner only)."""
+    """Delete a study (Superuser only, and must be Archived)."""
+    # 1. Check Superuser
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only system administrators can delete studies.",
+        )
+
+    # 2. Check Archived
+    if study.state != StudyState.archived:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Study must be ARCHIVED before it can be deleted.",
+        )
     await db.delete(study)
     await db.commit()
     return None
@@ -300,18 +501,13 @@ async def get_participant(
     stmt = (
         select(Participant)
         .join(Participant.study)
-        .outerjoin(StudyCollaborator, StudyCollaborator.study_id == Study.id)
-        .outerjoin(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
         .where(
             Participant.id == participant_id,
-            (
-                (StudyCollaborator.user_id == current_user.id)
-                & (StudyCollaborator.role.in_([StudyRole.owner, StudyRole.editor]))
-            )
-            | (
-                (WorkspaceMember.user_id == current_user.id)
-                & (WorkspaceMember.role == WorkspaceRole.owner)
-            ),
+            WorkspaceMember.user_id == current_user.id,
+            # Role check: Owner/Researcher can view details. Viewers might be restricted?
+            # Assuming Viewer can also view if they have study access.
+            WorkspaceMember.role.in_([WorkspaceRole.owner, WorkspaceRole.researcher]),
         )
         .options(selectinload(Participant.qsort_entries))
     )
@@ -340,18 +536,11 @@ async def discard_participant(
     stmt = (
         select(Participant)
         .join(Participant.study)
-        .outerjoin(StudyCollaborator, StudyCollaborator.study_id == Study.id)
-        .outerjoin(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
         .where(
             Participant.id == participant_id,
-            (
-                (StudyCollaborator.user_id == current_user.id)
-                & (StudyCollaborator.role.in_([StudyRole.owner, StudyRole.editor]))
-            )
-            | (
-                (WorkspaceMember.user_id == current_user.id)
-                & (WorkspaceMember.role == WorkspaceRole.owner)
-            ),
+            WorkspaceMember.user_id == current_user.id,
+            WorkspaceMember.role.in_([WorkspaceRole.owner, WorkspaceRole.researcher]),
         )
     )
     result = await db.execute(stmt)
@@ -362,10 +551,18 @@ async def discard_participant(
             status_code=404, detail="Participant not found or access denied"
         )
 
-    participant.is_discarded = discard_data.is_discarded
-    participant.discard_reason = discard_data.discard_reason
+    try:
+        participant.is_discarded = discard_data.is_discarded
+        participant.discard_reason = discard_data.discard_reason
 
-    await db.commit()
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during participant discard: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while updating participant status",
+        )
     await db.refresh(participant)
     return participant
 

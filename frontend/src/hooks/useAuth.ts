@@ -5,6 +5,7 @@ export const useAuth = () => {
         data: user,
         isLoading,
         error,
+        refetch,
     } = useReadUsersMeApiMeGet({
         query: {
             retry: false,
@@ -21,5 +22,6 @@ export const useAuth = () => {
         error,
         isAuthenticated,
         isAdmin,
+        refetch,
     };
 };

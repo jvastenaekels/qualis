@@ -17,8 +17,10 @@ import { CSS } from '@dnd-kit/utilities';
 import { motion } from 'framer-motion';
 import { Eye } from 'lucide-react';
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from './SafeMarkdown';
 import { useUIStore } from '../store/useUIStore';
+import { cn } from '@/lib/utils';
+import { cva } from 'class-variance-authority';
 
 interface SortableCardProps {
     id: number;
@@ -28,6 +30,7 @@ interface SortableCardProps {
     variant?: 'hand' | 'grid' | 'compact';
     isSelected?: boolean;
     onClick?: () => void;
+    onAction?: (id: number) => void;
     dimensions?: { width: number; height: number };
     aspectRatio?: number | 'auto';
     disableHoverZoom?: boolean;
@@ -52,6 +55,67 @@ const CARD_PULSE_ANIMATION = {
     },
 };
 
+const cardStyles = cva(
+    'relative flex items-center justify-center p-0 cursor-grab active:cursor-grabbing dnd-prevent-pan',
+    {
+        variants: {
+            isDragging: {
+                true: '[touch-action:none]',
+                false: '[touch-action:manipulation]',
+            },
+            isOverlay: {
+                true: 'z-50 cursor-grabbing',
+            },
+        },
+    }
+);
+
+const innerCardStyles = cva(
+    'w-full h-full bg-white rounded-2xl shadow-sm border transition-colors select-none group',
+    {
+        variants: {
+            variant: {
+                hand: 'px-2 py-2',
+                compact: 'p-1.5',
+                grid: 'p-3',
+            },
+            isSelected: {
+                true: 'border-blue-500 ring-2 ring-blue-300 shadow-md scale-[1.02] z-10',
+                false: 'border-slate-200 hover:border-indigo-300 hover:shadow-md hover:scale-[1.05]',
+            },
+            isOverlay: {
+                true: 'shadow-xl ring-2 ring-indigo-500',
+            },
+        },
+        defaultVariants: {
+            variant: 'grid',
+            isSelected: false,
+        },
+    }
+);
+
+const textStyles = cva('w-full text-center font-medium text-slate-800', {
+    variants: {
+        variant: {
+            hand: 'text-sm sm:text-base leading-relaxed',
+            compact: 'text-xs leading-tight text-slate-700',
+            grid: 'text-sm font-medium leading-snug text-slate-800',
+        },
+        allowScroll: {
+            false: '',
+        },
+    },
+    compoundVariants: [
+        { variant: 'hand', allowScroll: false, className: 'line-clamp-5' },
+        { variant: 'compact', allowScroll: false, className: 'line-clamp-4' },
+        { variant: 'grid', allowScroll: false, className: 'line-clamp-4' },
+    ],
+    defaultVariants: {
+        variant: 'grid',
+        allowScroll: false,
+    },
+});
+
 const SortableCard: React.FC<SortableCardProps> = React.memo(
     ({
         id,
@@ -61,6 +125,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
         variant = 'grid',
         isSelected,
         onClick,
+        onAction,
         dimensions,
         aspectRatio,
         disableHoverZoom = false,
@@ -99,28 +164,6 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
             // Add dynamic dimensions if provided
             ...(dimensions && { width: dimensions.width, height: dimensions.height }),
         };
-
-        // Typography Logic
-        let textSizeClass = '';
-        let containerPadding = '';
-
-        switch (variant) {
-            case 'hand':
-                textSizeClass = 'text-sm sm:text-base leading-relaxed';
-                if (!allowScroll) textSizeClass += ' line-clamp-5';
-                containerPadding = 'px-2 py-2';
-                break;
-            case 'compact':
-                textSizeClass = 'text-xs leading-tight text-slate-700';
-                if (!allowScroll) textSizeClass += ' line-clamp-4';
-                containerPadding = 'p-1.5';
-                break;
-            default:
-                textSizeClass = 'text-sm font-medium leading-snug text-slate-800';
-                if (!allowScroll) textSizeClass += ' line-clamp-4';
-                containerPadding = 'p-3';
-                break;
-        }
 
         // Aspect Ratio Logic: Use prop if provided, otherwise default to 3/4
         const aspectStyle =
@@ -162,7 +205,9 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
 
                         // Only trigger click if not dragging
                         // Note: isDragging might not be immediate
-                        if (onClick) {
+                        if (onAction) {
+                            onAction(id);
+                        } else if (onClick) {
                             onClick();
                         }
                     }
@@ -175,30 +220,28 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         clearTimeout(hoverTimerRef.current);
                         hoverTimerRef.current = null;
                     }
-                    if (onClick) {
+                    if (onAction) {
+                        onAction(id);
+                    } else if (onClick) {
                         onClick();
                     }
                 }}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}
-                className={`
-                relative
-                ${!dimensions ? 'w-full' : ''} ${aspectClass}
-                flex items-center justify-center p-0
-                cursor-grab active:cursor-grabbing
-                dnd-prevent-pan
-                ${isDragging ? '[touch-action:none]' : '[touch-action:manipulation]'}
-                ${isOverlay ? 'z-50 cursor-grabbing' : ''}
-            `}
+                className={cn(
+                    cardStyles({ isDragging, isOverlay }),
+                    !dimensions && 'w-full',
+                    aspectClass
+                )}
             >
                 <motion.div
-                    // layoutId={
-                    //     process.env.NODE_ENV === 'test'
-                    //         ? undefined
-                    //         : isOverlay
-                    //           ? undefined
-                    //           : `card-${id}`
-                    // }
+                    layoutId={
+                        process.env.NODE_ENV === 'test'
+                            ? undefined
+                            : isOverlay
+                              ? undefined
+                              : `card-${id}`
+                    }
                     // biome-ignore lint/suspicious/noExplicitAny: framer type mismatch
                     transition={CARD_SPRING_TRANSITION as any}
                     // Trigger a subtle pulse/flash when the card content (id) changes or on mount
@@ -209,19 +252,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                               (CARD_PULSE_ANIMATION as any)
                     }
                     key={id} // Ensure animation re-triggers if ID changes in this slot
-                    className={`
-                    w-full h-full
-                    bg-white rounded-2xl shadow-sm border
-                    ${
-                        isSelected
-                            ? 'border-blue-500 ring-2 ring-blue-300 shadow-md scale-[1.02] z-10'
-                            : 'border-slate-200 hover:border-indigo-300 hover:shadow-md hover:scale-[1.05]'
-                    }
-                    flex items-center justify-center ${containerPadding}
-                    transition-colors
-                    select-none group
-                    ${isOverlay ? 'shadow-xl ring-2 ring-indigo-500' : ''}
-                `}
+                    className={innerCardStyles({ variant, isSelected, isOverlay })}
                 >
                     {/* Statement Code Watermark */}
                     {code && (
@@ -236,17 +267,16 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         ref={scrollRef}
                         className={`w-full h-full flex items-center justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
                     >
-                        <div
-                            className={`w-full text-center font-medium text-slate-800 ${textSizeClass}`}
-                        >
+                        <div className={textStyles({ variant, allowScroll })}>
                             {/[*_~#]/.test(text) ? (
-                                <ReactMarkdown
+                                <SafeMarkdown
                                     components={{
                                         p: ({ children }) => <span>{children}</span>,
                                     }}
+                                    className="!prose-none text-inherit"
                                 >
                                     {text}
-                                </ReactMarkdown>
+                                </SafeMarkdown>
                             ) : (
                                 <span>{text}</span>
                             )}

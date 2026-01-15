@@ -4,30 +4,54 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '../i18n';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import StudyLayout from './StudyLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
+
+const mocks = vi.hoisted(() => ({
+    changeLanguage: vi.fn(),
+    navigate: vi.fn(),
+    retry: vi.fn(),
+}));
 
 // Mock dependencies
 // i18n is already being mocked globally in setupTests.ts for some things, but here we mock specifically.
 vi.mock('../i18n', () => ({
     default: {
-        changeLanguage: vi.fn(),
+        changeLanguage: mocks.changeLanguage,
         language: 'en',
     },
-    // Adding named export for useTranslation if needed, but it's mocked in layout
     t: (key: string) => key,
+}));
+
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+        i18n: {
+            changeLanguage: mocks.changeLanguage,
+            language: 'en',
+        },
+    }),
+    initReactI18next: {
+        type: '3rdParty',
+        init: () => {},
+    },
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock useStudyConfig since it's used in StudyLayout
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() })),
+    useStudyConfig: vi.fn(() => ({
+        isLoading: false,
+        error: null,
+        retry: mocks.retry,
+    })),
 }));
 
 describe('StudyLayout Language Sync', () => {
@@ -70,7 +94,9 @@ describe('StudyLayout Language Sync', () => {
 
         // Render Layout
         // Render Layout
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // Change Store Language DIRECTLY (Simulating State Change)
         act(() => {
@@ -82,10 +108,12 @@ describe('StudyLayout Language Sync', () => {
     });
 
     it('Updates Store when UI Language Button is clicked', () => {
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // Open Language Menu (Button with Globe)
-        const globeBtn = screen.getByTitle('Change language'); // Based on title attribute I saw in code
+        const globeBtn = screen.getByTitle('layout.change_lang_title');
         fireEvent.click(globeBtn);
 
         // Click French
@@ -200,18 +228,25 @@ describe('Layout Loading & Error States', () => {
         // Mock hook to reflect loading (though store drives it mostly, hook might be used for retry)
         vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() });
 
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // Check for loading text
-        expect(screen.getByText(/common.loading/i)).toBeInTheDocument();
-        expect(screen.getByText(/preparing your study session/i)).toBeInTheDocument();
+        expect(screen.getByText('common.loading')).toBeInTheDocument();
+        expect(screen.getByText('layout.preparing')).toBeInTheDocument();
     });
 
     it('Renders StudyNotFound when error is common.errors.not_found', () => {
-        useConfigStore.setState({ error: 'common.errors.not_found', isLoading: false });
+        useConfigStore.setState({
+            error: 'common.errors.not_found',
+            isLoading: false,
+        });
         vi.mocked(useStudyConfig).mockReturnValue({ retry: vi.fn() });
 
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // Check for StudyNotFound component content (it usually renders a generic 404 message or specific text)
         // Since StudyNotFound is likely not mocked, we check for its content.
@@ -223,17 +258,24 @@ describe('Layout Loading & Error States', () => {
 
     it('Renders ErrorPage for generic errors', () => {
         const retryMock = vi.fn();
-        useConfigStore.setState({ error: 'common.errors.network', isLoading: false });
+        useConfigStore.setState({
+            error: 'common.errors.network',
+            isLoading: false,
+        });
         vi.mocked(useStudyConfig).mockReturnValue({ retry: retryMock });
 
-        renderWithProviders(<StudyLayout />, { initialEntries: ['/study/test/welcome'] });
+        renderWithProviders(<StudyLayout />, {
+            initialEntries: ['/study/test/welcome'],
+        });
 
         // ErrorPage renders title and message
         expect(screen.getByText('common.errors.network_title')).toBeInTheDocument();
         expect(screen.getByText('common.errors.network')).toBeInTheDocument();
 
         // Test Retry Button
-        const retryBtn = screen.getByRole('button', { name: /retry/i });
+        const retryBtn = screen.getByRole('button', {
+            name: 'common.errors.retry',
+        });
         fireEvent.click(retryBtn);
         expect(retryMock).toHaveBeenCalled();
     });
@@ -292,5 +334,30 @@ describe('Layout Route Protection', () => {
         );
 
         expect(screen.getByText('Post Sort Page')).toBeInTheDocument();
+    });
+
+    it('Skips rendering Pre-sort step node when disabled', () => {
+        useSessionStore.setState({ hasConsented: true });
+        useConfigStore.setState({
+            config: {
+                slug: 'test',
+                presort_config: { enabled: false, fields: {} },
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
+            } as any,
+            isLoading: false,
+            error: null,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/welcome" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/welcome'] }
+        );
+
+        const stepper = screen.getByTestId('stepper-container');
+        // Within the stepper, we expect 4 buttons (steps 1, 3, 4, 5)
+        const stepButtons = within(stepper).getAllByRole('button');
+        expect(stepButtons).toHaveLength(4);
     });
 });

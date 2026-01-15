@@ -33,22 +33,44 @@ Once you have an account, you can manage users via the API at `GET /api/admin/us
 
 ---
 
+## 🔐 Account Security (2FA)
+
+Researchers are strongly encouraged to enable **Two-Factor Authentication (TOTP)** to protect sensitive research data.
+
+### Enabling 2FA
+
+1. Navigate to your **Profile** page.
+2. Click **Setup 2FA**.
+3. Scan the QR code with an authenticator app (e.g., Google Authenticator, Authy, or Bitwarden).
+4. Enter the 6-digit confirmation code to activate.
+
+### Dual-Step Login
+
+Once enabled, the login flow will require your password first, followed by a valid TOTP token.
+
+> [!IMPORTANT]
+> To disable 2FA, you must provide your current account password as a verification step.
+
+---
+
 ## 👥 Managing Study Teams
 
 Study owners can invite other researchers to collaborate on their work.
 
-### Adding a Collaborator
+### Inviting a Collaborator
 
-Invite a user by their email through the Admin API:
+Invite a user by their email through the **Team** tab in the Study Dashboard.
 
-`POST /api/admin/studies/{slug}/collaborators`
+1.  Enter the collaborator's email.
+2.  Select a role (**Editor** or **Viewer**).
+3.  Click **Send Invitation**.
 
-```json
-{
-  "email": "colleague@example.com",
-  "role": "editor"
-}
-```
+Open-Q will generate a unique registration link. If SMTP is configured, the user will receive an email. If not (e.g., in development), the link is displayed in the dashboard logs.
+
+### Invitation Process
+
+- **Registered Users**: Clicking the invitation link while logged in will immediately grant them access to the study.
+- **New Users**: The link will pre-fill the registration form. Access is granted once the account is created.
 
 ### Roles and Permissions
 

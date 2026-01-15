@@ -6,7 +6,7 @@
 
 import { DndContext } from '@dnd-kit/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { renderWithProviders, screen, setupStoreMocks } from '../test/test-utils';
+import { renderWithProviders, screen, setupStoreMocks } from '../test-utils/test-utils';
 import GridSort from './GridSort';
 
 // Mock dependencies
@@ -32,6 +32,7 @@ vi.mock('./DroppableSlot', () => ({
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({ t: (key: string) => key }),
     initReactI18next: { type: '3rdParty', init: () => {} },
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
 // Mock useUIStore

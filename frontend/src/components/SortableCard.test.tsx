@@ -84,13 +84,14 @@ describe('SortableCard', () => {
         expect(screen.getByText('Test Card Content')).toBeTruthy();
     });
 
-    it('handles click events', () => {
-        const handleClick = vi.fn();
-        render(<SortableCard {...defaultProps} onClick={handleClick} />);
+    it('handles click events via onAction', () => {
+        const handleAction = vi.fn();
+        render(<SortableCard {...defaultProps} onAction={handleAction} />);
 
         fireEvent.click(screen.getByTestId('card-123'));
 
-        expect(handleClick).toHaveBeenCalledTimes(1);
+        expect(handleAction).toHaveBeenCalledTimes(1);
+        expect(handleAction).toHaveBeenCalledWith(123);
     });
 
     it('updates ui store on hover', async () => {

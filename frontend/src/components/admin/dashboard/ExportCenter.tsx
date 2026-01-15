@@ -98,13 +98,13 @@ const ExportCenter: React.FC<ExportCenterProps> = ({ slug }) => {
     ];
 
     return (
-        <Card className="col-span-12 md:col-span-4 shadow-md border-none bg-white overflow-hidden h-fit">
+        <Card className="shadow-md border-none bg-white overflow-hidden">
             <CardHeader className="border-b border-slate-50 bg-slate-50/30">
                 <div className="flex items-center gap-2 mb-1">
                     <FlaskConical className="h-5 w-5 text-indigo-500" />
-                    <CardTitle className="text-lg">Laboratory Export Center</CardTitle>
+                    <CardTitle className="text-lg">Export Data</CardTitle>
                 </div>
-                <CardDescription>Scientific formats for advanced factor analysis.</CardDescription>
+                <CardDescription>Download analysis-ready files in various formats.</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
                 <div className="divide-y divide-slate-50">

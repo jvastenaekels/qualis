@@ -1,9 +1,10 @@
-import type React from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Rocket, PowerOff, AlertCircle, Loader2 } from 'lucide-react';
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Rocket, PowerOff, Sparkles, Loader2, Lock } from 'lucide-react';
 import { useChangeStudyStateApiAdminStudiesSlugStatePost } from '@/api/generated';
+import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -15,6 +16,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { useTranslation } from 'react-i18next';
 
 interface StudyStatusControlProps {
     slug: string;
@@ -27,135 +29,262 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
     currentState,
     onStateChange,
 }) => {
+    const { t } = useTranslation();
     const changeStateMutation = useChangeStudyStateApiAdminStudiesSlugStatePost();
+    const queryClient = useQueryClient();
 
-    const handleStateChange = async (newState: 'active' | 'closed') => {
+    const handleStateChange = async (newState: 'draft' | 'active' | 'closed' | 'paused') => {
         try {
             await changeStateMutation.mutateAsync({
                 slug,
                 params: { new_state: newState },
             });
-            toast.success(`Study ${newState === 'active' ? 'launched' : 'closed'} successfully`);
+
+            toast.success(t(`admin.study_status.notifications.success.${newState}`));
+
+            // Invalidate queries more explicitly to ensure cache refresh
+            // 1. Invalidate the specific study query
+            await queryClient.invalidateQueries({
+                queryKey: [`/api/admin/studies/${slug}`],
+            });
+
+            // 2. Also invalidate the studies list
+            await queryClient.invalidateQueries({
+                queryKey: ['/api/admin/studies/'],
+            });
+
             onStateChange();
         } catch (error) {
-            toast.error(`Failed to change study state`);
+            toast.error(t('admin.study_status.notifications.error'));
             console.error(error);
         }
     };
 
     const isPending = changeStateMutation.isPending;
 
+    const steps = [
+        {
+            id: 'draft',
+            label: t('admin.study_status.steps.draft.label', 'Draft'),
+            icon: Sparkles,
+            description: t('admin.study_status.steps.draft.description', 'Configuration & design'),
+            color: 'text-amber-600',
+            bg: 'bg-amber-100',
+            border: 'border-amber-200',
+            activeClass: 'ring-2 ring-amber-500 bg-amber-50',
+        },
+        {
+            id: 'active',
+            label: t('admin.study_status.steps.active.label', 'Active'),
+            icon: Rocket,
+            description: t('admin.study_status.steps.active.description', 'Collecting responses'),
+            color: 'text-emerald-600',
+            bg: 'bg-emerald-100',
+            border: 'border-emerald-200',
+            activeClass: 'ring-2 ring-emerald-500 bg-emerald-50',
+        },
+        {
+            id: 'paused',
+            label: t('admin.study_status.steps.paused.label', 'Paused'),
+            icon: PowerOff,
+            description: t('admin.study_status.steps.paused.description', 'On hold'),
+            color: 'text-orange-600',
+            bg: 'bg-orange-100',
+            border: 'border-orange-200',
+            activeClass: 'ring-2 ring-orange-500 bg-orange-50',
+        },
+        {
+            id: 'closed',
+            label: t('admin.study_status.steps.closed.label', 'Closed'),
+            icon: Lock,
+            description: t('admin.study_status.steps.closed.description', 'Analysis & export'),
+            color: 'text-slate-600',
+            bg: 'bg-slate-100',
+            border: 'border-slate-200',
+            activeClass: 'ring-2 ring-slate-500 bg-slate-50',
+        },
+    ] as const;
+
+    const renderActionDialog = (
+        targetState: 'draft' | 'active' | 'paused' | 'closed',
+        children: React.ReactNode
+    ) => {
+        const config = {
+            draft: {
+                title: t('admin.study_status.dialog.draft.title', 'Revert to Draft?'),
+                desc: t(
+                    'admin.study_status.dialog.draft.desc',
+                    'This will stop data collection but allow you to modify the study design. Existing data is preserved.'
+                ),
+                action: t('admin.study_status.dialog.draft.action', 'Revert to Draft'),
+                variant: 'default' as const,
+            },
+            active: {
+                title: t('admin.study_status.dialog.active.title', 'Launch Study?'),
+                desc: t(
+                    'admin.study_status.dialog.active.desc',
+                    'Activating the study will open it to participants.'
+                ),
+                action: t('admin.study_status.dialog.active.action', 'Set to Active'),
+                variant: 'default' as const,
+            },
+            paused: {
+                title: t('admin.study_status.dialog.paused.title', 'Pause Study?'),
+                desc: t(
+                    'admin.study_status.dialog.paused.desc',
+                    'Participants will not be able to enter the study while it is paused. You can resume later.'
+                ),
+                action: t('admin.study_status.dialog.paused.action', 'Pause Study'),
+                variant: 'destructive', // Warning color
+            },
+            closed: {
+                title: t('admin.study_status.dialog.closed.title', 'Close Study?'),
+                desc: t(
+                    'admin.study_status.dialog.closed.desc',
+                    'This will prevent new participants from entering. Existing sessions can still finish. You can reopen later.'
+                ),
+                action: t('admin.study_status.dialog.closed.action', 'Close Study'),
+                variant: 'destructive',
+            },
+        }[targetState];
+
+        if (!config) return children;
+
+        return (
+            <AlertDialog>
+                <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
+                <AlertDialogContent className="z-[9999] max-w-[95vw] sm:max-w-lg">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{config.title}</AlertDialogTitle>
+                        <AlertDialogDescription>{config.desc}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => handleStateChange(targetState)}
+                            className={cn(
+                                config.variant === 'destructive' &&
+                                    'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                            )}
+                        >
+                            {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                            {config.action}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        );
+    };
+
     return (
-        <Card className="shadow-md border-none bg-white overflow-hidden h-fit">
-            <CardHeader className="border-b border-slate-50 bg-slate-50/30">
-                <div className="flex items-center gap-2 mb-1">
-                    <Rocket className="h-5 w-5 text-indigo-500" />
-                    <CardTitle className="text-lg">Study Lifecycle</CardTitle>
-                </div>
-                <CardDescription>Control the current state of your fieldwork.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-                <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-100">
-                    <div className="space-y-0.5">
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                            Current Status
-                        </span>
-                        <div className="flex items-center gap-2">
+        <Card className="shadow-sm border border-slate-200 bg-white mb-6">
+            <CardContent className="p-1">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-1">
+                    {steps.map((step) => {
+                        const isActive = currentState === step.id;
+                        // Determine if this step is targetable
+
+                        let isClickable = false;
+                        // Logic matrix (allow most transitions for flexibility)
+                        if (currentState === 'draft' && step.id === 'active') isClickable = true;
+                        if (
+                            currentState === 'active' &&
+                            (step.id === 'paused' || step.id === 'closed')
+                        )
+                            isClickable = true;
+                        if (
+                            currentState === 'paused' &&
+                            (step.id === 'active' || step.id === 'closed' || step.id === 'draft')
+                        )
+                            isClickable = true;
+                        if (
+                            currentState === 'closed' &&
+                            (step.id === 'active' || step.id === 'draft')
+                        )
+                            isClickable = true;
+
+                        // Always allow reverting to draft if not already draft (except maybe from active? warning needed)
+                        if (currentState !== 'draft' && step.id === 'draft') isClickable = true;
+
+                        // Allow clicking current state? No.
+                        if (isActive) isClickable = false;
+
+                        const content = (
                             <div
-                                className={`h-2 w-2 rounded-full animate-pulse ${
-                                    currentState === 'active'
-                                        ? 'bg-emerald-500'
-                                        : currentState === 'completed'
-                                          ? 'bg-slate-400'
-                                          : 'bg-amber-500'
-                                }`}
-                            />
-                            <span className="font-bold text-slate-700 uppercase tracking-tight">
-                                {currentState}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                {currentState === 'draft' && (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button
-                                className="w-full gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200 shadow-lg font-bold"
-                                disabled={isPending}
-                            >
-                                {isPending ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                    <Rocket className="h-4 w-4" />
+                                className={cn(
+                                    'relative flex flex-col items-center justify-center p-4 rounded-lg transition-all border',
+                                    isActive
+                                        ? cn(
+                                              'bg-white shadow-sm z-10',
+                                              step.activeClass,
+                                              step.border
+                                          )
+                                        : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-400 opacity-60 hover:opacity-100',
+                                    isClickable &&
+                                        'cursor-pointer hover:border-slate-200 hover:shadow-sm hover:opacity-100'
                                 )}
-                                Launch Study
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Ready to go live?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Activating the study will allow participants to submit
-                                    responses. Ensure your configuration is final.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Wait, let me check</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleStateChange('active')}>
-                                    Yes, Launch Now
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )}
-
-                {currentState === 'active' && (
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="w-full gap-2 border-slate-200 text-slate-600 hover:bg-slate-50 font-bold"
-                                disabled={isPending}
                             >
-                                {isPending ? (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                    <PowerOff className="h-4 w-4" />
-                                )}
-                                Close Fieldwork
-                            </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Close this study?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    New participants will no longer be able to enter. Existing
-                                    sessions can still be completed.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Keep Active</AlertDialogCancel>
-                                <AlertDialogAction
-                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                    onClick={() => handleStateChange('closed')}
+                                <div
+                                    className={cn(
+                                        'h-8 w-8 rounded-full flex items-center justify-center mb-2 transition-colors',
+                                        isActive ? step.bg : 'bg-slate-100'
+                                    )}
                                 >
-                                    Close Study
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-                )}
+                                    <step.icon
+                                        className={cn(
+                                            'h-4 w-4',
+                                            isActive ? step.color : 'text-slate-400'
+                                        )}
+                                    />
+                                </div>
+                                <div className="text-sm font-bold tracking-tight mb-0.5">
+                                    {step.label}
+                                </div>
+                                <div className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                                    {step.description}
+                                </div>
 
-                {currentState === 'completed' && (
-                    <div className="p-3 bg-slate-50 rounded-lg flex gap-3 items-start border border-slate-100">
-                        <AlertCircle className="h-4 w-4 text-slate-400 mt-0.5" />
-                        <p className="text-[11px] text-slate-500 leading-relaxed">
-                            This study is closed. Data is preserved for export and archival. To
-                            restart, contact the system administrator.
-                        </p>
-                    </div>
-                )}
+                                {isActive && (
+                                    <div className="absolute top-2 right-2">
+                                        <div
+                                            className={cn(
+                                                'h-2 w-2 rounded-full',
+                                                step.id === 'active'
+                                                    ? 'bg-emerald-500 animate-pulse'
+                                                    : 'bg-slate-300'
+                                            )}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        );
+
+                        if (isClickable) {
+                            return (
+                                <React.Fragment key={step.id}>
+                                    {renderActionDialog(
+                                        // biome-ignore lint/suspicious/noExplicitAny: generic ID
+                                        step.id as any,
+                                        <div role="button" tabIndex={0} className="outline-none">
+                                            {content}
+                                        </div>
+                                    )}
+                                </React.Fragment>
+                            );
+                        }
+
+                        return (
+                            <div
+                                key={step.id}
+                                className={
+                                    isActive ? '' : 'pointer-events-none grayscale opacity-40'
+                                }
+                            >
+                                {content}
+                            </div>
+                        );
+                    })}
+                </div>
             </CardContent>
         </Card>
     );

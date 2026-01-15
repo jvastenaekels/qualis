@@ -16,6 +16,10 @@ interface Responses {
         card_comments: Record<number, string>;
         missing_statement: string;
         general_comment: string;
+        questions_answers: Record<string, string | number | boolean>;
+        email?: string;
+        interview_consent?: boolean;
+        newsletter_consent?: boolean;
     };
 }
 
@@ -36,7 +40,7 @@ interface ResponseActions {
     // Post Sort
     setPostSortResponse: (
         field: keyof Responses['postsort'],
-        value: string | Record<number, string>
+        value: string | Record<number, string> | boolean | number
     ) => void;
 
     resetResponses: () => void;
@@ -46,7 +50,12 @@ const initialResponses: Responses = {
     presort: {},
     rough: { agree: [], disagree: [], neutral: [], history: [] },
     qsort: [],
-    postsort: { card_comments: {}, missing_statement: '', general_comment: '' },
+    postsort: {
+        card_comments: {},
+        missing_statement: '',
+        general_comment: '',
+        questions_answers: {},
+    },
 };
 
 // Helper: Trigger Saving Indicator
@@ -55,6 +64,19 @@ const triggerAutoSave = () => {
     setTimeout(() => {
         useSessionStore.getState().setSaving(false);
     }, 800);
+};
+
+const isPilot = () => {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('mode') === 'test') {
+            sessionStorage.setItem('open-q-pilot-mode', 'true');
+            return true;
+        }
+        return sessionStorage.getItem('open-q-pilot-mode') === 'true';
+    } catch {
+        return false;
+    }
 };
 
 export const useResponseStore = create<Responses & ResponseActions>()(
@@ -213,7 +235,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             resetResponses: () => set(initialResponses),
         }),
         {
-            name: 'open-q-responses',
+            name: isPilot() ? 'open-q-pilot-responses' : 'open-q-responses',
             version: 1,
         }
     )

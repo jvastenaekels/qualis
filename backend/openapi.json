@@ -1,0 +1,4859 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Open-Q API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/me": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Read Users Me",
+        "description": "Get current active user.",
+        "operationId": "read_users_me_api_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Update User Me",
+        "description": "Update current user profile.",
+        "operationId": "update_user_me_api_me_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/token": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Login For Access Token",
+        "description": "OAuth2 compatible token login, getting an access token for future requests.\n\nValidation Flow:\n1. Verify username (email) and password.\n2. If the user has 2FA enabled:\n   - Check for `x-totp-token` header.\n   - If missing, return a special Token response indicating `requires_2fa=True`.\n   - If present, verify the TOTP token.\n3. If all checks pass, issue a Bearer access token.",
+        "operationId": "login_for_access_token_api_token_post",
+        "parameters": [
+          {
+            "name": "x-totp-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Totp-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_login_for_access_token_api_token_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/register": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Register User",
+        "description": "Register a new user, optionally via an invitation token.\n\nIf an `invitation_token` is provided:\n1. Decodes and verifies the token.\n2. Ensures the token's subject matches the provided email.\n2. Ensures the token's subject matches the provided email.\n3. Automatically adds the new user as a member of the workspace specified in the token.",
+        "operationId": "register_user_api_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me/password": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Change Password",
+        "description": "Change current user password.",
+        "operationId": "change_password_api_me_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/me/2fa/setup": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Setup Totp",
+        "description": "Start 2FA setup by generating a secret and QR code URI.",
+        "operationId": "setup_totp_api_me_2fa_setup_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TOTPSetup"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/me/2fa/enable": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Enable Totp",
+        "description": "Enable 2FA after verifying a token.",
+        "operationId": "enable_totp_api_me_2fa_enable_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TOTPVerify"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/me/2fa/disable": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Disable Totp",
+        "description": "Disable 2FA after verifying current password.",
+        "operationId": "disable_totp_api_me_2fa_disable_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/studies": {
+      "post": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Create Study",
+        "description": "Create a new study in the active workspace.",
+        "operationId": "create_study_api_admin_studies_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Workspace-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Workspace-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudyCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "List Studies",
+        "description": "List studies in the active workspace.",
+        "operationId": "list_studies_api_admin_studies_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Workspace-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Workspace-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StudyRead"
+                  },
+                  "title": "Response List Studies Api Admin Studies Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}": {
+      "get": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Get Study",
+        "description": "Get study details.",
+        "operationId": "get_study_api_admin_studies__slug__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Update Study",
+        "description": "Update study configuration.",
+        "operationId": "update_study_api_admin_studies__slug__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudyUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Delete Study",
+        "description": "Delete a study (Superuser only, and must be Archived).",
+        "operationId": "delete_study_api_admin_studies__slug__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/validate": {
+      "post": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Validate Study",
+        "description": "Check if study is ready for activation.",
+        "operationId": "validate_study_api_admin_studies__slug__validate_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Validate Study Api Admin Studies  Slug  Validate Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/state": {
+      "post": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Change Study State",
+        "description": "Change study state (Draft <-> Active <-> Closed <-> Archived).",
+        "operationId": "change_study_state_api_admin_studies__slug__state_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "new_state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/StudyState"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/stats": {
+      "get": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Get Study Stats",
+        "description": "Get aggregated study statistics.",
+        "operationId": "get_study_stats_api_admin_studies__slug__stats_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyStatsRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/participants/{participant_id}": {
+      "get": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Get Participant",
+        "description": "Get detailed participant info including responses.",
+        "operationId": "get_participant_api_admin_studies_participants__participant_id__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "participant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Participant Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantDetailRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/participants/{participant_id}/discard": {
+      "patch": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Discard Participant",
+        "description": "Flag or unflag a participant for exclusion from stats/exports.",
+        "operationId": "discard_participant_api_admin_studies_participants__participant_id__discard_patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "participant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Participant Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParticipantDiscardUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/participants": {
+      "get": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "List Study Participants",
+        "description": "List all participants for a specific study.",
+        "operationId": "list_study_participants_api_admin_studies__slug__participants_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ParticipantRead"
+                  },
+                  "title": "Response List Study Participants Api Admin Studies  Slug  Participants Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/export/csv": {
+      "get": {
+        "tags": [
+          "admin-exports",
+          "Admin Exports"
+        ],
+        "summary": "Export Csv",
+        "description": "Export study results as CSV.",
+        "operationId": "export_csv_api_admin_studies__slug__export_csv_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/export/pqmethod": {
+      "get": {
+        "tags": [
+          "admin-exports",
+          "Admin Exports"
+        ],
+        "summary": "Export Pqmethod",
+        "description": "Export study results in PQMethod format (ZIP).",
+        "operationId": "export_pqmethod_api_admin_studies__slug__export_pqmethod_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/export/r-kit": {
+      "get": {
+        "tags": [
+          "admin-exports",
+          "Admin Exports"
+        ],
+        "summary": "Export R Kit",
+        "description": "Export study results as R-Kit (ZIP with CSV + R Script).",
+        "operationId": "export_r_kit_api_admin_studies__slug__export_r_kit_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/dump": {
+      "get": {
+        "tags": [
+          "admin-exports",
+          "Admin Exports"
+        ],
+        "summary": "Get Study Dump",
+        "description": "Get complete study data and participant placements for client-side export generation.",
+        "operationId": "get_study_dump_api_admin_studies__slug__dump_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/invitations/verify": {
+      "get": {
+        "tags": [
+          "admin-invites",
+          "Admin Invitations"
+        ],
+        "summary": "Verify Invitation",
+        "description": "Verify an invitation token and return details including workspace name.",
+        "operationId": "verify_invitation_api_admin_invitations_verify_get",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/invitations/accept": {
+      "post": {
+        "tags": [
+          "admin-invites",
+          "Admin Invitations"
+        ],
+        "summary": "Accept Invitation",
+        "description": "Accept an invitation using an existing account.\nThe email in the token must match the current user's email.",
+        "operationId": "accept_invitation_api_admin_invitations_accept_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationAccept"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/users": {
+      "get": {
+        "tags": [
+          "admin-users",
+          "Admin Users"
+        ],
+        "summary": "List Users",
+        "description": "List all users in the system.",
+        "operationId": "list_users_api_admin_users_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UserRead"
+                  },
+                  "type": "array",
+                  "title": "Response List Users Api Admin Users Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "admin-users",
+          "Admin Users"
+        ],
+        "summary": "Create User",
+        "description": "Create a new user.",
+        "operationId": "create_user_api_admin_users_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/users/{user_id}": {
+      "delete": {
+        "tags": [
+          "admin-users",
+          "Admin Users"
+        ],
+        "summary": "Delete User",
+        "description": "Delete a user. Cannot delete self.",
+        "operationId": "delete_user_api_admin_users__user_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/recruitment/{slug}/links": {
+      "get": {
+        "tags": [
+          "admin-recruitment",
+          "Admin Recruitment"
+        ],
+        "summary": "List Study Links",
+        "description": "List all recruitment links for a specific study.",
+        "operationId": "list_study_links_api_admin_recruitment__slug__links_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecruitmentLinkRead"
+                  },
+                  "title": "Response List Study Links Api Admin Recruitment  Slug  Links Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin-recruitment",
+          "Admin Recruitment"
+        ],
+        "summary": "Create Recruitment Links",
+        "description": "Create one or more recruitment links.",
+        "operationId": "create_recruitment_links_api_admin_recruitment__slug__links_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "title": "Count"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecruitmentLinkCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecruitmentLinkRead"
+                  },
+                  "title": "Response Create Recruitment Links Api Admin Recruitment  Slug  Links Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/recruitment/links/{link_id}": {
+      "delete": {
+        "tags": [
+          "admin-recruitment",
+          "Admin Recruitment"
+        ],
+        "summary": "Revoke Recruitment Link",
+        "description": "Revoke a recruitment link.",
+        "operationId": "revoke_recruitment_link_api_admin_recruitment_links__link_id__delete",
+        "parameters": [
+          {
+            "name": "link_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Link Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/workspaces": {
+      "get": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "List Workspaces",
+        "description": "List all workspaces the current user is a member of, with their role.",
+        "operationId": "list_workspaces_api_admin_workspaces_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WorkspaceWithRole"
+                  },
+                  "type": "array",
+                  "title": "Response List Workspaces Api Admin Workspaces Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Create Workspace",
+        "description": "Create a new workspace and assign the current user as Admin.",
+        "operationId": "create_workspace_api_admin_workspaces_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/workspaces/{slug}": {
+      "get": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Get Workspace",
+        "description": "Get workspace details.",
+        "operationId": "get_workspace_api_admin_workspaces__slug__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Update Workspace",
+        "description": "Update workspace details.",
+        "operationId": "update_workspace_api_admin_workspaces__slug__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Delete Workspace",
+        "description": "Delete a workspace (Owner only).",
+        "operationId": "delete_workspace_api_admin_workspaces__slug__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/workspaces/{slug}/members": {
+      "get": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "List Workspace Members",
+        "description": "List all members of a workspace.",
+        "operationId": "list_workspace_members_api_admin_workspaces__slug__members_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkspaceMemberRead"
+                  },
+                  "title": "Response List Workspace Members Api Admin Workspaces  Slug  Members Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/workspaces/{slug}/members/{user_id}": {
+      "patch": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Update Workspace Member",
+        "description": "Update a workspace member's role.",
+        "operationId": "update_workspace_member_api_admin_workspaces__slug__members__user_id__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceMemberUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceMemberRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Remove Workspace Member",
+        "description": "Remove a member from the workspace.",
+        "operationId": "remove_workspace_member_api_admin_workspaces__slug__members__user_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/workspaces/{slug}/invitations": {
+      "post": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Create Invitation",
+        "description": "Invite a user to the workspace.",
+        "operationId": "create_invitation_api_admin_workspaces__slug__invitations_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceInvitationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationLink"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/submit": {
+      "post": {
+        "tags": [
+          "submissions"
+        ],
+        "summary": "Submit Study",
+        "description": "Submits or updates a study participation.\n\nLogic moved to StudyService for maintainability.",
+        "operationId": "submit_study_api_submit_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmissionInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/study/{slug}": {
+      "get": {
+        "tags": [
+          "submissions"
+        ],
+        "summary": "Get Study",
+        "description": "Fetches study configuration for the frontend, including language resolution.\n\nIf the study has randomize_statements=True and a session_token is provided,\nstatements will be shuffled deterministically using the token as seed.\nThis ensures the same participant always sees statements in the same order.",
+        "operationId": "get_study_api_study__slug__get",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 100,
+              "pattern": "^[a-z0-9-]+$",
+              "title": "Slug"
+            }
+          },
+          {
+            "name": "lang",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "maxLength": 5,
+              "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+              "default": "en",
+              "title": "Lang"
+            }
+          },
+          {
+            "name": "session_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Participant session token for deterministic randomization",
+              "title": "Session Token"
+            },
+            "description": "Participant session token for deterministic randomization"
+          },
+          {
+            "name": "link_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Recruitment link token",
+              "title": "Link Token"
+            },
+            "description": "Recruitment link token"
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Study access password",
+              "title": "Password"
+            },
+            "description": "Study access password"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/study/{slug}/unlock": {
+      "post": {
+        "tags": [
+          "submissions"
+        ],
+        "summary": "Unlock Study",
+        "description": "Validate study access password.",
+        "operationId": "unlock_study_api_study__slug__unlock_post",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+$",
+              "title": "Slug"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Password"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/study/{slug}/consent": {
+      "post": {
+        "tags": [
+          "participants"
+        ],
+        "summary": "Record Consent",
+        "description": "Records participant consent with timestamp and version.",
+        "operationId": "record_consent_api_study__slug__consent_post",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Study Slug",
+              "description": "The distinct slug of the study"
+            },
+            "description": "The distinct slug of the study"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logs": {
+      "post": {
+        "tags": [
+          "logs"
+        ],
+        "summary": "Report Log",
+        "description": "Receives logging/error data from the frontend.",
+        "operationId": "report_log_api_logs_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogEntry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/init": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Init Test Db",
+        "description": "Initialize test database - ensure tables exist\nThis is typically handled by app startup, but useful for explicit initialization",
+        "operationId": "init_test_db_api_test_init_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/seed": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Seed Test Data",
+        "description": "Seed base test data: user and workspace\nIdempotent - won't create duplicates",
+        "operationId": "seed_test_data_api_test_seed_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestSeedData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/members": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Add Test Member",
+        "description": "Add a user to a workspace for testing purposes",
+        "operationId": "add_test_member_api_test_members_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestMemberData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/cleanup": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Cleanup Test Data",
+        "description": "Cleanup test data between tests\nRemoves all data except the base test user and workspace",
+        "operationId": "cleanup_test_data_api_test_cleanup_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/cleanup-all": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Cleanup All Test Data",
+        "description": "Full cleanup including users and workspaces\nUse at end of test suite",
+        "operationId": "cleanup_all_test_data_api_test_cleanup_all_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/health": {
+      "get": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Test Health",
+        "description": "Simple health check for test router",
+        "operationId": "test_health_api_test_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Health check endpoint to verify API availability.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{full_path}": {
+      "get": {
+        "summary": "Serve Spa",
+        "description": "Serve the Single Page Application (SPA) static files and handle client-side routing.",
+        "operationId": "serve_spa__full_path__get",
+        "parameters": [
+          {
+            "name": "full_path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Full Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Body_login_for_access_token_api_token_post": {
+        "properties": {
+          "grant_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^password$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grant Type"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "title": "Password"
+          },
+          "scope": {
+            "type": "string",
+            "title": "Scope",
+            "default": ""
+          },
+          "client_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Client Id"
+          },
+          "client_secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "format": "password",
+            "title": "Client Secret"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "title": "Body_login_for_access_token_api_token_post"
+      },
+      "BrandingBase": {
+        "properties": {
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          },
+          "accent_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accent Color"
+          },
+          "primary_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Color"
+          },
+          "partners": {
+            "items": {
+              "$ref": "#/components/schemas/PartnerLogo"
+            },
+            "type": "array",
+            "title": "Partners",
+            "default": []
+          }
+        },
+        "type": "object",
+        "title": "BrandingBase",
+        "description": "Schema for study branding."
+      },
+      "ConsentInput": {
+        "properties": {
+          "study_slug": {
+            "type": "string",
+            "title": "Study Slug"
+          },
+          "session_token": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Token"
+          },
+          "consent_hash": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Hash"
+          },
+          "language_code": {
+            "type": "string",
+            "maxLength": 5,
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "title": "Language Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "study_slug",
+          "session_token",
+          "language_code"
+        ],
+        "title": "ConsentInput",
+        "description": "Schema for recording participant consent."
+      },
+      "GridColumn": {
+        "properties": {
+          "score": {
+            "type": "integer",
+            "title": "Score"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          }
+        },
+        "type": "object",
+        "required": [
+          "score",
+          "capacity"
+        ],
+        "title": "GridColumn",
+        "description": "Schema defining a column in the sorting grid."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "InvitationAccept": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "InvitationAccept"
+      },
+      "InvitationLink": {
+        "properties": {
+          "invite_url": {
+            "type": "string",
+            "title": "Invite Url"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "invite_url",
+          "token"
+        ],
+        "title": "InvitationLink",
+        "description": "Schema for returning a generated invitation link."
+      },
+      "LogEntry": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "error",
+              "warn",
+              "info",
+              "debug"
+            ],
+            "title": "Level"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "stack": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stack"
+          },
+          "context": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          },
+          "userAgent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Useragent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level",
+          "message"
+        ],
+        "title": "LogEntry",
+        "description": "Schema for frontend log entries."
+      },
+      "ParticipantDetailRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "study_id": {
+            "type": "integer",
+            "title": "Study Id"
+          },
+          "session_token": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Token"
+          },
+          "language_used": {
+            "type": "string",
+            "title": "Language Used"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ParticipantStatus"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "is_discarded": {
+            "type": "boolean",
+            "title": "Is Discarded"
+          },
+          "discard_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discard Reason"
+          },
+          "user_agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Agent"
+          },
+          "recruitment_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recruitment Token"
+          },
+          "presort_answers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Presort Answers"
+          },
+          "postsort_answers": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Postsort Answers"
+          },
+          "qsort_entries": {
+            "items": {
+              "$ref": "#/components/schemas/QSortEntryInput"
+            },
+            "type": "array",
+            "title": "Qsort Entries"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "study_id",
+          "session_token",
+          "language_used",
+          "status",
+          "created_at",
+          "submitted_at",
+          "is_discarded",
+          "discard_reason",
+          "user_agent",
+          "presort_answers",
+          "postsort_answers",
+          "qsort_entries"
+        ],
+        "title": "ParticipantDetailRead",
+        "description": "Schema for detailed participant view including responses."
+      },
+      "ParticipantDiscardUpdate": {
+        "properties": {
+          "is_discarded": {
+            "type": "boolean",
+            "title": "Is Discarded"
+          },
+          "discard_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discard Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "is_discarded"
+        ],
+        "title": "ParticipantDiscardUpdate",
+        "description": "Schema for discarding/flagging a participant."
+      },
+      "ParticipantRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "study_id": {
+            "type": "integer",
+            "title": "Study Id"
+          },
+          "session_token": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Token"
+          },
+          "language_used": {
+            "type": "string",
+            "title": "Language Used"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ParticipantStatus"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "submitted_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Submitted At"
+          },
+          "is_discarded": {
+            "type": "boolean",
+            "title": "Is Discarded"
+          },
+          "discard_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Discard Reason"
+          },
+          "user_agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Agent"
+          },
+          "recruitment_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recruitment Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "study_id",
+          "session_token",
+          "language_used",
+          "status",
+          "created_at",
+          "submitted_at",
+          "is_discarded",
+          "discard_reason",
+          "user_agent"
+        ],
+        "title": "ParticipantRead",
+        "description": "Schema for reading a participant."
+      },
+      "ParticipantStatus": {
+        "type": "string",
+        "enum": [
+          "started",
+          "completed"
+        ],
+        "title": "ParticipantStatus",
+        "description": "Enum for participant progress status."
+      },
+      "PartnerLogo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "logo_url": {
+            "type": "string",
+            "title": "Logo Url"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "logo_url"
+        ],
+        "title": "PartnerLogo",
+        "description": "Schema for a partner institution logo."
+      },
+      "PasswordChange": {
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "title": "Current Password"
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 8,
+            "title": "New Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "title": "PasswordChange",
+        "description": "Schema for changing password."
+      },
+      "ProcessStep": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique ID for DND and tracking"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Description"
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icon",
+            "description": "Lucide icon name"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color",
+            "description": "Hex color code or CSS variable"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "description",
+          "icon"
+        ],
+        "title": "ProcessStep",
+        "description": "Schema for a dynamic study process step."
+      },
+      "QSortEntryInput": {
+        "properties": {
+          "statement_id": {
+            "type": "integer",
+            "title": "Statement Id"
+          },
+          "grid_score": {
+            "type": "integer",
+            "title": "Grid Score"
+          },
+          "card_comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Comment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "statement_id",
+          "grid_score"
+        ],
+        "title": "QSortEntryInput",
+        "description": "Schema for individual statement placement during submission."
+      },
+      "RecruitmentLinkCreate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RecruitmentLinkType",
+            "default": "public"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "RecruitmentLinkCreate",
+        "description": "Schema for creating a recruitment link."
+      },
+      "RecruitmentLinkRead": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RecruitmentLinkType",
+            "default": "public"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "study_id": {
+            "type": "integer",
+            "title": "Study Id"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "usage_count": {
+            "type": "integer",
+            "title": "Usage Count"
+          },
+          "start_count": {
+            "type": "integer",
+            "title": "Start Count"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "study_id",
+          "token",
+          "usage_count",
+          "start_count",
+          "created_at"
+        ],
+        "title": "RecruitmentLinkRead",
+        "description": "Schema for reading a recruitment link."
+      },
+      "RecruitmentLinkType": {
+        "type": "string",
+        "enum": [
+          "public",
+          "individual",
+          "limited"
+        ],
+        "title": "RecruitmentLinkType",
+        "description": "Enum for types of recruitment links."
+      },
+      "StatementCreate": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "translations": {
+            "items": {
+              "$ref": "#/components/schemas/StatementTranslationCreate"
+            },
+            "type": "array",
+            "title": "Translations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "translations"
+        ],
+        "title": "StatementCreate",
+        "description": "Schema for creating a statement."
+      },
+      "StatementRead": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "translations": {
+            "items": {
+              "$ref": "#/components/schemas/StatementTranslationRead"
+            },
+            "type": "array",
+            "title": "Translations",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "id"
+        ],
+        "title": "StatementRead",
+        "description": "Schema for reading a statement."
+      },
+      "StatementTranslationCreate": {
+        "properties": {
+          "language_code": {
+            "type": "string",
+            "maxLength": 5,
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "title": "Language Code"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "language_code",
+          "text"
+        ],
+        "title": "StatementTranslationCreate",
+        "description": "Schema for creating a statement translation."
+      },
+      "StatementTranslationRead": {
+        "properties": {
+          "language_code": {
+            "type": "string",
+            "maxLength": 5,
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "title": "Language Code"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "statement_id": {
+            "type": "integer",
+            "title": "Statement Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "language_code",
+          "text",
+          "id",
+          "statement_id"
+        ],
+        "title": "StatementTranslationRead",
+        "description": "Schema for reading a statement translation."
+      },
+      "StatementUpdate": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "translations": {
+            "items": {
+              "$ref": "#/components/schemas/StatementTranslationCreate"
+            },
+            "type": "array",
+            "title": "Translations"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "translations"
+        ],
+        "title": "StatementUpdate",
+        "description": "Schema for updating a statement text (by code)."
+      },
+      "StudyCreate": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 3,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Slug"
+          },
+          "state": {
+            "$ref": "#/components/schemas/StudyState",
+            "default": "draft"
+          },
+          "grid_config": {
+            "items": {
+              "$ref": "#/components/schemas/GridColumn"
+            },
+            "type": "array",
+            "title": "Grid Config"
+          },
+          "presort_config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Presort Config"
+          },
+          "postsort_config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Postsort Config"
+          },
+          "branding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BrandingBase"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "default_language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Language"
+          },
+          "show_statement_codes": {
+            "type": "boolean",
+            "title": "Show Statement Codes",
+            "default": false
+          },
+          "randomize_statements": {
+            "type": "boolean",
+            "title": "Randomize Statements",
+            "default": false
+          },
+          "symmetry_lock": {
+            "type": "boolean",
+            "title": "Symmetry Lock",
+            "default": true
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "translations": {
+            "items": {
+              "$ref": "#/components/schemas/StudyTranslationCreate"
+            },
+            "type": "array",
+            "title": "Translations"
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/StatementCreate"
+            },
+            "type": "array",
+            "title": "Statements",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "grid_config",
+          "presort_config",
+          "postsort_config",
+          "translations"
+        ],
+        "title": "StudyCreate",
+        "description": "Schema for creating a study."
+      },
+      "StudyRead": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 3,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Slug"
+          },
+          "state": {
+            "$ref": "#/components/schemas/StudyState",
+            "default": "draft"
+          },
+          "grid_config": {
+            "items": {
+              "$ref": "#/components/schemas/GridColumn"
+            },
+            "type": "array",
+            "title": "Grid Config"
+          },
+          "presort_config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Presort Config"
+          },
+          "postsort_config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Postsort Config"
+          },
+          "branding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BrandingBase"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "default_language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Language"
+          },
+          "show_statement_codes": {
+            "type": "boolean",
+            "title": "Show Statement Codes",
+            "default": false
+          },
+          "randomize_statements": {
+            "type": "boolean",
+            "title": "Randomize Statements",
+            "default": false
+          },
+          "symmetry_lock": {
+            "type": "boolean",
+            "title": "Symmetry Lock",
+            "default": true
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "workspace_id": {
+            "type": "integer",
+            "title": "Workspace Id"
+          },
+          "workspace": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkspaceRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "translations": {
+            "items": {
+              "$ref": "#/components/schemas/StudyTranslationRead"
+            },
+            "type": "array",
+            "title": "Translations",
+            "default": []
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/StatementRead"
+            },
+            "type": "array",
+            "title": "Statements",
+            "default": []
+          },
+          "recruitment_links": {
+            "items": {
+              "$ref": "#/components/schemas/RecruitmentLinkRead"
+            },
+            "type": "array",
+            "title": "Recruitment Links",
+            "default": []
+          },
+          "requires_password": {
+            "type": "boolean",
+            "title": "Requires Password",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "grid_config",
+          "presort_config",
+          "postsort_config",
+          "id",
+          "workspace_id",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "StudyRead",
+        "description": "Schema for reading a study."
+      },
+      "StudyState": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "active",
+          "paused",
+          "closed",
+          "archived"
+        ],
+        "title": "StudyState",
+        "description": "Enum for study lifecycle states."
+      },
+      "StudyStatsRead": {
+        "properties": {
+          "started_count": {
+            "type": "integer",
+            "title": "Started Count"
+          },
+          "completed_count": {
+            "type": "integer",
+            "title": "Completed Count"
+          },
+          "completion_rate": {
+            "type": "number",
+            "title": "Completion Rate"
+          },
+          "median_duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Duration Seconds"
+          },
+          "device_breakdown": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Device Breakdown"
+          }
+        },
+        "type": "object",
+        "required": [
+          "started_count",
+          "completed_count",
+          "completion_rate",
+          "median_duration_seconds",
+          "device_breakdown"
+        ],
+        "title": "StudyStatsRead",
+        "description": "Schema for study statistics."
+      },
+      "StudyTranslationCreate": {
+        "properties": {
+          "language_code": {
+            "type": "string",
+            "maxLength": 5,
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "title": "Language Code"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Objective"
+          },
+          "condition_of_instruction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition Of Instruction"
+          },
+          "consent_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Title"
+          },
+          "consent_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Description"
+          },
+          "consent_accept": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Accept",
+            "default": "Accept"
+          },
+          "consent_decline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Decline",
+            "default": "Decline"
+          },
+          "ui_labels": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Ui Labels",
+            "default": {}
+          },
+          "process_steps": {
+            "items": {
+              "$ref": "#/components/schemas/ProcessStep"
+            },
+            "type": "array",
+            "title": "Process Steps",
+            "default": []
+          },
+          "methodology_tips": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Methodology Tips",
+            "default": []
+          },
+          "step_help": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Step Help",
+            "default": {}
+          }
+        },
+        "type": "object",
+        "required": [
+          "language_code",
+          "title"
+        ],
+        "title": "StudyTranslationCreate",
+        "description": "Schema for creating a study translation."
+      },
+      "StudyTranslationRead": {
+        "properties": {
+          "language_code": {
+            "type": "string",
+            "maxLength": 5,
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "title": "Language Code"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Objective"
+          },
+          "condition_of_instruction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition Of Instruction"
+          },
+          "consent_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Title"
+          },
+          "consent_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Description"
+          },
+          "consent_accept": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Accept",
+            "default": "Accept"
+          },
+          "consent_decline": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Decline",
+            "default": "Decline"
+          },
+          "ui_labels": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Ui Labels",
+            "default": {}
+          },
+          "process_steps": {
+            "items": {
+              "$ref": "#/components/schemas/ProcessStep"
+            },
+            "type": "array",
+            "title": "Process Steps",
+            "default": []
+          },
+          "methodology_tips": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Methodology Tips",
+            "default": []
+          },
+          "step_help": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Step Help",
+            "default": {}
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "study_id": {
+            "type": "integer",
+            "title": "Study Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "language_code",
+          "title",
+          "id",
+          "study_id"
+        ],
+        "title": "StudyTranslationRead",
+        "description": "Schema for reading a study translation."
+      },
+      "StudyUpdate": {
+        "properties": {
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 3,
+                "pattern": "^[a-z0-9-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StudyState"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "grid_config": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GridColumn"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grid Config"
+          },
+          "presort_config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presort Config"
+          },
+          "postsort_config": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postsort Config"
+          },
+          "branding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BrandingBase"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "default_language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Default Language"
+          },
+          "show_statement_codes": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Show Statement Codes"
+          },
+          "randomize_statements": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Randomize Statements"
+          },
+          "symmetry_lock": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Symmetry Lock"
+          },
+          "translations": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StudyTranslationCreate"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translations"
+          },
+          "statements": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/StatementUpdate"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statements"
+          },
+          "access_password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access Password"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "last_updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Updated At"
+          }
+        },
+        "type": "object",
+        "title": "StudyUpdate",
+        "description": "Schema for updating a study."
+      },
+      "SubmissionInput": {
+        "properties": {
+          "study_slug": {
+            "type": "string",
+            "title": "Study Slug"
+          },
+          "session_token": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Token"
+          },
+          "language_used": {
+            "type": "string",
+            "maxLength": 5,
+            "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+            "title": "Language Used"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ParticipantStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "completed"
+          },
+          "presort_answers": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presort Answers",
+            "default": {}
+          },
+          "qsort": {
+            "items": {
+              "$ref": "#/components/schemas/QSortEntryInput"
+            },
+            "type": "array",
+            "title": "Qsort"
+          },
+          "postsort_answers": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Postsort Answers",
+            "default": {}
+          },
+          "link_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "study_slug",
+          "session_token",
+          "language_used",
+          "qsort"
+        ],
+        "title": "SubmissionInput",
+        "description": "Schema for the full study submission/completion."
+      },
+      "TOTPSetup": {
+        "properties": {
+          "secret": {
+            "type": "string",
+            "title": "Secret"
+          },
+          "qr_code_uri": {
+            "type": "string",
+            "title": "Qr Code Uri"
+          }
+        },
+        "type": "object",
+        "required": [
+          "secret",
+          "qr_code_uri"
+        ],
+        "title": "TOTPSetup",
+        "description": "Schema for TOTP setup response."
+      },
+      "TOTPVerify": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "TOTPVerify",
+        "description": "Schema for TOTP verification."
+      },
+      "TestMemberData": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "workspace_slug": {
+            "type": "string",
+            "title": "Workspace Slug"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "workspace_slug",
+          "role"
+        ],
+        "title": "TestMemberData"
+      },
+      "TestSeedData": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/TestUserData"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/TestWorkspaceData"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "workspace"
+        ],
+        "title": "TestSeedData"
+      },
+      "TestUserData": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "is_superuser": {
+            "type": "boolean",
+            "title": "Is Superuser",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "TestUserData"
+      },
+      "TestWorkspaceData": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "slug"
+        ],
+        "title": "TestWorkspaceData"
+      },
+      "Token": {
+        "properties": {
+          "access_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access Token"
+          },
+          "token_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Type"
+          },
+          "requires_2fa": {
+            "type": "boolean",
+            "title": "Requires 2Fa",
+            "default": false
+          },
+          "temp_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temp Token"
+          }
+        },
+        "type": "object",
+        "title": "Token",
+        "description": "Schema for returning an access token or 2FA requirement."
+      },
+      "UserCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "is_superuser": {
+            "type": "boolean",
+            "title": "Is Superuser",
+            "default": false
+          },
+          "invitation_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invitation Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "UserCreate",
+        "description": "Schema for creating a new user."
+      },
+      "UserRead": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "is_superuser": {
+            "type": "boolean",
+            "title": "Is Superuser"
+          },
+          "is_totp_enabled": {
+            "type": "boolean",
+            "title": "Is Totp Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "id",
+          "is_active",
+          "is_superuser",
+          "is_totp_enabled"
+        ],
+        "title": "UserRead",
+        "description": "Schema for reading user details."
+      },
+      "UserUpdate": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          }
+        },
+        "type": "object",
+        "title": "UserUpdate",
+        "description": "Schema for updating user profile."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WorkspaceCreate": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 3,
+            "pattern": "^[a-z0-9-]+$",
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "slug"
+        ],
+        "title": "WorkspaceCreate",
+        "description": "Schema for creating a workspace."
+      },
+      "WorkspaceInvitationCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole",
+            "default": "researcher"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "WorkspaceInvitationCreate",
+        "description": "Schema for creating a workspace invitation."
+      },
+      "WorkspaceMemberRead": {
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserRead"
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          },
+          "joined_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Joined At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user_id",
+          "user",
+          "role",
+          "joined_at"
+        ],
+        "title": "WorkspaceMemberRead",
+        "description": "Schema for reading workspace member details."
+      },
+      "WorkspaceMemberUpdate": {
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role"
+        ],
+        "title": "WorkspaceMemberUpdate",
+        "description": "Schema for updating a workspace member."
+      },
+      "WorkspaceRead": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceMemberRead"
+            },
+            "type": "array",
+            "title": "Members",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "created_at"
+        ],
+        "title": "WorkspaceRead",
+        "description": "Schema for reading a workspace."
+      },
+      "WorkspaceRole": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "admin",
+          "researcher",
+          "viewer"
+        ],
+        "title": "WorkspaceRole",
+        "description": "Enum for workspace roles."
+      },
+      "WorkspaceUpdate": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50,
+                "minLength": 3,
+                "pattern": "^[a-z0-9-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "title": "WorkspaceUpdate",
+        "description": "Schema for updating a workspace."
+      },
+      "WorkspaceWithRole": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceMemberRead"
+            },
+            "type": "array",
+            "title": "Members",
+            "default": []
+          },
+          "user_role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "created_at",
+          "user_role"
+        ],
+        "title": "WorkspaceWithRole",
+        "description": "Schema for reading a workspace with the current user's role."
+      }
+    },
+    "securitySchemes": {
+      "OAuth2PasswordBearer": {
+        "type": "oauth2",
+        "flows": {
+          "password": {
+            "scopes": {},
+            "tokenUrl": "api/token"
+          }
+        }
+      }
+    }
+  }
+}

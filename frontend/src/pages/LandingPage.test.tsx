@@ -6,7 +6,7 @@
 
 import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import LandingPage from './LandingPage';
 
 const mockNavigate = vi.fn();
@@ -21,13 +21,13 @@ vi.mock('react-router-dom', async () => {
 describe('LandingPage', () => {
     it('renders landing page inputs', () => {
         renderWithProviders(<LandingPage />);
-        expect(screen.getByPlaceholderText(/e.g. example-study/i)).toBeInTheDocument();
+        expect(screen.getByPlaceholderText(/e.g. my-study/i)).toBeInTheDocument();
         expect(screen.getByRole('button')).toBeDisabled();
     });
 
     it('enables button when input is filled', () => {
         renderWithProviders(<LandingPage />);
-        const input = screen.getByPlaceholderText(/e.g. example-study/i);
+        const input = screen.getByPlaceholderText(/e.g. my-study/i);
         fireEvent.change(input, { target: { value: 'test-study' } });
 
         expect(screen.getByRole('button', { name: /go to study/i })).not.toBeDisabled();
@@ -36,7 +36,7 @@ describe('LandingPage', () => {
     it('navigates to study on submit', () => {
         renderWithProviders(<LandingPage />);
 
-        const input = screen.getByPlaceholderText(/e.g. example-study/i);
+        const input = screen.getByPlaceholderText(/e.g. my-study/i);
         fireEvent.change(input, { target: { value: 'test-study' } });
 
         const button = screen.getByRole('button');

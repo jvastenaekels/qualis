@@ -8,7 +8,10 @@ import type { StudyState } from './studyState';
 import type { GridColumn } from './gridColumn';
 import type { StudyCreatePresortConfig } from './studyCreatePresortConfig';
 import type { StudyCreatePostsortConfig } from './studyCreatePostsortConfig';
+import type { StudyCreateBranding } from './studyCreateBranding';
 import type { StudyCreateDefaultLanguage } from './studyCreateDefaultLanguage';
+import type { StudyCreateStartDate } from './studyCreateStartDate';
+import type { StudyCreateEndDate } from './studyCreateEndDate';
 import type { StudyTranslationCreate } from './studyTranslationCreate';
 import type { StatementCreate } from './statementCreate';
 
@@ -26,8 +29,13 @@ export interface StudyCreate {
     grid_config: GridColumn[];
     presort_config: StudyCreatePresortConfig;
     postsort_config: StudyCreatePostsortConfig;
+    branding?: StudyCreateBranding;
     default_language?: StudyCreateDefaultLanguage;
     show_statement_codes?: boolean;
+    randomize_statements?: boolean;
+    symmetry_lock?: boolean;
+    start_date?: StudyCreateStartDate;
+    end_date?: StudyCreateEndDate;
     translations: StudyTranslationCreate[];
     statements?: StatementCreate[];
 }

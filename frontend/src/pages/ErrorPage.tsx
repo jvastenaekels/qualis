@@ -62,6 +62,22 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
 
         // 2. ApiError Handling
         if (error instanceof ApiError) {
+            // Validation Errors
+            if (error.code === 'validation_error' && Array.isArray(error.details)) {
+                return {
+                    title: t('common.errors.validation_title') || 'Validation Error',
+                    message: t('common.errors.validation_message') || 'Please check your input.',
+                    icon: AlertTriangle,
+                    showReset: false,
+                    showHome: false,
+                    showRetry: true,
+                    validationErrors: error.details as Array<{
+                        loc: (string | number)[];
+                        msg: string;
+                    }>,
+                };
+            }
+
             if (error.status === 404) {
                 return {
                     title: t('common.errors.404.title'),
@@ -77,6 +93,31 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
                     title: t('common.errors.429.title'),
                     message: t('common.errors.429.message'),
                     icon: RefreshCcw,
+                    showReset: false,
+                    showHome: false,
+                    showRetry: true,
+                };
+            }
+
+            if (error.status === 408) {
+                return {
+                    title: t('common.errors.timeout.title', 'Request Timeout'),
+                    message: t(
+                        'common.errors.timeout.message',
+                        'The server took too long to respond. Please check your connection and try again.'
+                    ),
+                    icon: WifiOff,
+                    showReset: false,
+                    showHome: false,
+                    showRetry: true,
+                };
+            }
+
+            if (error.code === 'conflict') {
+                return {
+                    title: t('common.errors.conflict_title') || 'Conflict',
+                    message: error.message || t('common.errors.conflict_message'),
+                    icon: AlertTriangle,
                     showReset: false,
                     showHome: false,
                     showRetry: true,
@@ -102,7 +143,7 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
         // 4. Fallback (Generic Crash)
         return {
             title: t('common.errors.default_title'),
-            message: t('common.errors.unknown'),
+            message: error?.message || t('common.errors.unknown'), // Use error message if available
             icon: AlertTriangle,
             showReset: true, // Only offer hard reset for unknown crashes
             showHome: true,
@@ -112,8 +153,18 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
 
     const Container = isFullPage ? 'div' : React.Fragment;
     const containerProps = isFullPage
-        ? { className: 'min-h-screen bg-gray-50 flex items-center justify-center p-4' }
+        ? {
+              className: 'min-h-screen bg-gray-50 flex items-center justify-center p-4',
+          }
         : {};
+
+    // Helper type (can be inferred but good for clarity)
+    const validationErrors =
+        error instanceof ApiError &&
+        error.code === 'validation_error' &&
+        Array.isArray(error.details)
+            ? (error.details as Array<{ loc: (string | number)[]; msg: string }>)
+            : undefined;
 
     return (
         <Container {...containerProps}>
@@ -131,10 +182,31 @@ const ErrorPage: React.FC<ErrorPageProps> = ({
                     <p className="text-gray-600 leading-relaxed">{message}</p>
                 </div>
 
+                {/* Validation Errors List */}
+                {validationErrors && validationErrors.length > 0 && (
+                    <div className="text-left bg-orange-50 p-4 rounded-lg border border-orange-100 text-sm">
+                        <ul className="list-disc list-inside space-y-1 text-orange-800">
+                            {validationErrors.map((err, idx) => (
+                                <li key={idx}>
+                                    <span className="font-semibold">
+                                        {err.loc[err.loc.length - 1]}:{' '}
+                                    </span>
+                                    {err.msg}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
                 {/* Debug Info (Dev Mode Only) */}
-                {import.meta.env.DEV && error && (
+                {import.meta.env.DEV && error && !validationErrors && (
                     <div className="mt-4 p-3 bg-red-50 rounded text-xs text-red-800 text-left font-mono overflow-auto max-h-32 border border-red-100">
                         {error.toString()}
+                        {error instanceof ApiError && !!error.details && (
+                            <pre className="mt-2 text-[10px]">
+                                {JSON.stringify(error.details, null, 2)}
+                            </pre>
+                        )}
                     </div>
                 )}
 

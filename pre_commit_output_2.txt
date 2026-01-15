@@ -1,0 +1,415 @@
+trim trailing whitespace.................................................Passed
+fix end of files.........................................................Passed
+check yaml...............................................................Passed
+check for added large files..............................................Passed
+check json...............................................................Failed
+- hook id: check-json
+- exit code: 1
+
+frontend/src/locales/fr.json: Failed to json decode (Duplicate key: recruitment)
+frontend/src/locales/fi.json: Failed to json decode (Duplicate key: recruitment)
+
+ruff.....................................................................Passed
+ruff-format..............................................................Passed
+mypy.....................................................................Passed
+Radon (Complexity).......................................................Passed
+Deptry (Check Dependencies)..............................................Passed
+Bandit (Security)........................................................Passed
+Frontend Typecheck (TSC).................................................Passed
+Frontend Lint & Format (Biome)...........................................Failed
+- hook id: frontend-biome
+- exit code: 1
+
+> open-q@0.0.0 lint
+> biome check src
+
+src/components/admin/dashboard/ParticipantDetailContent.tsx:74:52 lint/complexity/useLiteralKeys  FIXABLE  ━━━━━━━━━━
+
+  i The computed expression can be simplified without the use of a string literal.
+
+    72 │     // `DumpParticipant` has `presort` which comes from that.
+    73 │     // So `participant.presort['_recruitment_token']` should exist if it was saved.
+  > 74 │     const recruitmentToken = participant.presort?.['_recruitment_token'];
+       │                                                    ^^^^^^^^^^^^^^^^^^^^
+    75 │
+    76 │     return (
+
+  i Unsafe fix: Use a literal key instead.
+
+    74 │ ····const·recruitmentToken·=·participant.presort?.['_recruitment_token'];
+       │                                                   --                  --
+
+src/components/GridSort.tsx:215:8 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    213 │ const GridLegend: React.FC<{
+    214 │     highlightKey?: string | null;
+  > 215 │     t: any;
+        │        ^^^
+    216 │     getLegendFontSize: (maxLen: number) => string;
+    217 │ }> = React.memo(({ highlightKey, t, getLegendFontSize }) => {
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/AdminDashboard.tsx:25:39 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    23 │     const { t, i18n } = useTranslation();
+    24 │
+  > 25 │     const dateLocales: Record<string, any> = {
+       │                                       ^^^
+    26 │         en: enUS,
+    27 │         fr: fr,
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/dashboard/InteractiveDataView.tsx:113:22 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    111 │                     ...selectedParticipant,
+    112 │                     is_discarded: isDiscarded,
+  > 113 │                 } as any);
+        │                      ^^^
+    114 │             }
+    115 │         } catch (err) {
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/dashboard/InteractiveDataView.tsx:123:21 lint/correctness/useExhaustiveDependencies  FIXABLE  ━━━━━━━━━━
+
+  ! This hook does not specify its dependency on t.
+
+    121 │     const columnHelper = createColumnHelper<DumpParticipant>();
+    122 │
+  > 123 │     const columns = useMemo(
+        │                     ^^^^^^^
+    124 │         () => [
+    125 │             columnHelper.accessor('id', {
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    155 │             columnHelper.display({
+    156 │                 id: 'flags',
+  > 157 │                 header: t('admin.data.table.flags'),
+        │                         ^
+    158 │                 cell: ({ row }) => {
+    159 │                     const p = row.original;
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    143 │             }),
+    144 │             columnHelper.accessor('language', {
+  > 145 │                 header: t('admin.data.table.lang'),
+        │                         ^
+    146 │                 cell: (info) => (
+    147 │                     <div className="flex items-center gap-2">
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    191 │                             className="hover:bg-transparent hover:text-indigo-600 pr-0"
+    192 │                         >
+  > 193 │                             {t('admin.data.table.duration')}
+        │                              ^
+    194 │                             <Clock className="ml-2 h-3 w-3" />
+    195 │                         </Button>
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    173 │                             {hasComments && (
+    174 │                                 <div
+  > 175 │                                     title={t('admin.data.tooltips.has_comments')}
+        │                                            ^
+    176 │                                     className="text-indigo-500"
+    177 │                                 >
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    165 │                             {isSuspect && (
+    166 │                                 <div
+  > 167 │                                     title={t('admin.data.tooltips.suspect')}
+        │                                            ^
+    168 │                                     className="text-amber-500"
+    169 │                                 >
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    131 │                             className="-ml-4 hover:bg-transparent hover:text-indigo-600"
+    132 │                         >
+  > 133 │                             {t('admin.data.table.id_token')}
+        │                              ^
+    134 │                             <ArrowUpDown className="ml-2 h-4 w-4" />
+    135 │                         </Button>
+
+  i React relies on hook dependencies to determine when to re-compute Effects.
+    Failing to specify dependencies can result in Effects not updating correctly when state changes.
+    These "stale closures" are a common source of surprising bugs.
+
+  i Unsafe fix: Add the missing dependency to the list.
+
+    228 │ ········[columnHelper,·t]
+        │                      +++
+
+src/components/admin/designer/ConditionOfInstructionEditor.tsx:23:51 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    22 │     const handleChange = (field: keyof StudyTranslation, value: string | null) => {
+  > 23 │         updateTranslation(activeLocale, (t_trans: any) => {
+       │                                                   ^^^
+    24 │             (t_trans as any)[field] = value;
+    25 │         });
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/designer/ConditionOfInstructionEditor.tsx:24:25 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    22 │     const handleChange = (field: keyof StudyTranslation, value: string | null) => {
+    23 │         updateTranslation(activeLocale, (t_trans: any) => {
+  > 24 │             (t_trans as any)[field] = value;
+       │                         ^^^
+    25 │         });
+    26 │     };
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/designer/QuestionBuilder.presort.test.tsx:171:81 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    170 │         // Simulate the onUpdate handler logic
+  > 171 │         const onUpdateHandler = (d: typeof testDraft, questionId: string, data: any) => {
+        │                                                                                 ^^^
+    172 │             if (d.presort_config && 'enabled' in d.presort_config) {
+    173 │                 if (!d.presort_config.fields) d.presort_config.fields = {};
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/designer/QuestionBuilder.tsx:354:28 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    353 │             // If currently legacy (no enabled flag), migrate to new structure
+  > 354 │             let newConfig: any;
+        │                            ^^^
+    355 │             if (!('enabled' in currentConfig)) {
+    356 │                 newConfig = {
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/ui/calendar.tsx:48:33 lint/correctness/noUnusedFunctionParameters ━━━━━━━━━━━━━━━━━━━
+
+  ! This parameter is unused.
+
+    46 │             }}
+    47 │             components={{
+  > 48 │                 IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
+       │                                 ^^^^^
+    49 │                 IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+    50 │             }}
+
+  i Unused parameters might be the result of an incomplete refactoring.
+
+
+src/components/ui/calendar.tsx:49:34 lint/correctness/noUnusedFunctionParameters ━━━━━━━━━━━━━━━━━━━
+
+  ! This parameter is unused.
+
+    47 │             components={{
+    48 │                 IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
+  > 49 │                 IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+       │                                  ^^^^^
+    50 │             }}
+    51 │             {...props}
+
+  i Unused parameters might be the result of an incomplete refactoring.
+
+
+src/layouts/StudyLayout.test.tsx:303:18 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    301 │                 slug: 'test',
+    302 │                 presort_config: { enabled: false, fields: {} },
+  > 303 │             } as any,
+        │                  ^^^
+    304 │             isLoading: false,
+    305 │             error: null,
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/pages/PostSortPage.tsx:33:54 lint/correctness/noUnusedFunctionParameters ━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This parameter is unused.
+
+    31 │ }
+    32 │
+  > 33 │ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey }) => {
+       │                                                      ^^^^^^^^^^^^
+    34 │     const config = useConfigStore((state) => state.config);
+    35 │     const session = useSessionStore((state) => ({
+
+  i Unused parameters might be the result of an incomplete refactoring.
+
+
+src/components/GridSort.tsx:223:13 lint/a11y/useAriaPropsSupportedByRole ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × The ARIA attribute 'aria-label' is not supported by this element.
+
+    221 │     return (
+    222 │         <div className="w-full h-auto flex flex-col gap-3 pt-4 border-t border-slate-200/50">
+  > 223 │             <div
+        │             ^^^^
+  > 224 │                 className="flex justify-between items-end w-full font-bold uppercase tracking-widest opacity-60 px-2 gap-4"
+  > 225 │                 aria-label="Grid legend"
+  > 226 │             >
+        │             ^
+    227 │                 {legends.map((key) => (
+    228 │                     <LegendLabel
+
+  i Ensure that ARIA attributes are valid for the role of the element.
+
+
+src/components/GridSort.tsx:9:15 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Several of these imports are unused.
+
+     7 │ import { useDroppable } from '@dnd-kit/core';
+     8 │ import { motion } from 'framer-motion';
+   > 9 │ import { cva, type VariantProps } from 'class-variance-authority';
+       │               ^^^^^^^^^^^^^^^^^
+    10 │ import { Check, Frown, Meh, RotateCcw, Smile, Target, ZoomIn, ZoomOut } from 'lucide-react';
+    11 │ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+  i Unused imports might be the result of an incomplete refactoring.
+
+  i Unsafe fix: Remove the unused imports.
+
+    9 │ import·{·cva,·type·VariantProps·}·from·'class-variance-authority';
+      │               ------------------
+
+src/components/SortableCard.tsx:23:15 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━
+
+  × Several of these imports are unused.
+
+    21 │ import { useUIStore } from '../store/useUIStore';
+    22 │ import { cn } from '@/lib/utils';
+  > 23 │ import { cva, type VariantProps } from 'class-variance-authority';
+       │               ^^^^^^^^^^^^^^^^^
+    24 │
+    25 │ interface SortableCardProps {
+
+  i Unused imports might be the result of an incomplete refactoring.
+
+  i Unsafe fix: Remove the unused imports.
+
+    23 │ import·{·cva,·type·VariantProps·}·from·'class-variance-authority';
+       │               ------------------
+
+src/components/admin/designer/QuestionBuilder.presort.test.tsx:1:37 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━
+
+  × Several of these imports are unused.
+
+  > 1 │ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+      │                                     ^^^^^^^
+    2 │ import { describe, it, expect, vi, beforeEach } from 'vitest';
+    3 │ import QuestionBuilder from './QuestionBuilder';
+
+  i Unused imports might be the result of an incomplete refactoring.
+
+  i Unsafe fix: Remove the unused imports.
+
+    1 │ import·{·render,·screen,·fireEvent,·waitFor·}·from·'@testing-library/react';
+      │                                     --------
+
+src/locales/fi.json:274:9 lint/suspicious/noDuplicateObjectKeys ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × The key recruitment was already declared.
+
+    272 │             "select_study_msg": "Valitse tai luo tutkimus aloittaaksesi."
+    273 │         },
+  > 274 │         "recruitment": {
+        │         ^^^^^^^^^^^^^
+    275 │             "title": "Rekrytointi",
+    276 │             "description": "Hallinnoi osallistujien pääsyä, rekrytointikanavia ja seuraa konversiota.",
+
+  i This is where a duplicated key was declared again.
+
+    337 │             }
+    338 │         },
+  > 339 │         "recruitment": {
+        │         ^^^^^^^^^^^^^
+    340 │             "title": "Rekrytointi",
+    341 │             "description": "Generate secure links for your participants and monitor real-time recruitment efficiency.",
+
+  i If a key is defined multiple times, only the last definition takes effect. Previous definitions are ignored.
+
+
+src/locales/fr.json:273:9 lint/suspicious/noDuplicateObjectKeys ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × The key recruitment was already declared.
+
+    271 │             "select_study_msg": "Veuillez sélectionner ou créer une étude pour commencer."
+    272 │         },
+  > 273 │         "recruitment": {
+        │         ^^^^^^^^^^^^^
+    274 │             "title": "Recrutement",
+    275 │             "description": "Gérez l'accès des participants, les canaux de recrutement et suivez les taux de conversion.",
+
+  i This is where a duplicated key was declared again.
+
+    326 │             }
+    327 │         },
+  > 328 │         "recruitment": {
+        │         ^^^^^^^^^^^^^
+    329 │             "title": "Recrutement",
+    330 │             "description": "Générez des liens sécurisés pour vos participants et surveillez l'efficacité du recrutement en temps réel.",
+
+  i If a key is defined multiple times, only the last definition takes effect. Previous definitions are ignored.
+
+
+src/pages/PostSortPage.tsx:26:8 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × This import is unused.
+
+    24 │ import { z } from 'zod';
+    25 │ import type { PreSortField } from '../schemas/study';
+  > 26 │ import { cn } from '@/lib/utils';
+       │        ^^^^^^
+    27 │ import { SurveyField } from '../components/survey/SurveyField';
+    28 │
+
+  i Unused imports might be the result of an incomplete refactoring.
+
+  i Unsafe fix: Remove the unused imports.
+
+     24  24 │   import { z } from 'zod';
+     25  25 │   import type { PreSortField } from '../schemas/study';
+     26     │ - import·{·cn·}·from·'@/lib/utils';
+     27  26 │   import { SurveyField } from '../components/survey/SurveyField';
+     28  27 │
+
+
+The number of diagnostics exceeds the limit allowed. Use --max-diagnostics to increase it.
+Diagnostics not shown: 15.
+Checked 322 files in 219ms. No fixes applied.
+Found 16 errors.
+Found 16 warnings.
+Found 3 infos.
+check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+
+Frontend Dead Code (Knip)................................................Passed

@@ -2,13 +2,28 @@ import { render, screen } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import { describe, expect, it } from 'vitest';
 import ReadingZone from './ReadingZone';
-import { useUIStore } from '../store/useUIStore';
+
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        // biome-ignore lint/suspicious/noExplicitAny: mock options
+        t: (key: string, options?: any) => {
+            if (key === 'study.rough.pushed') return `Card moved to ${options?.deckName}`;
+            return key;
+        },
+    }),
+}));
+
+const { useUIStore } = await vi.importActual('../store/useUIStore');
 
 describe('ReadingZone', () => {
     it('shows methodology tips when idle (no card selected or hovered)', () => {
         // Arrange: Ensure store is clean
         act(() => {
-            useUIStore.setState({ hoveredCard: null, activeCard: null, selectedCard: null });
+            useUIStore.setState({
+                hoveredCard: null,
+                activeCard: null,
+                selectedCard: null,
+            });
         });
 
         // Act

@@ -4,5 +4,6 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { SubmissionInputPresortAnswersAnyOf } from './submissionInputPresortAnswersAnyOf';
 
-export type SubmissionInputPresortAnswers = { [key: string]: unknown };
+export type SubmissionInputPresortAnswers = SubmissionInputPresortAnswersAnyOf | null;

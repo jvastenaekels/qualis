@@ -10,6 +10,7 @@ import type { StatementTranslationCreate } from './statementTranslationCreate';
  * Schema for creating a statement.
  */
 export interface StatementCreate {
+    /** @maxLength 50 */
     code: string;
     translations: StatementTranslationCreate[];
 }

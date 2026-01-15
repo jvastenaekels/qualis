@@ -13,7 +13,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from sqlalchemy import select
 
-from app.database import Base, SessionLocal, engine
+from app.database import SessionLocal, engine
 from app.models import User
 
 
@@ -26,21 +26,25 @@ async def init_db(reset: bool = False):
         print(f"DEBUG: Engine connected. Connection: {conn}")
         if reset:
             print("0. Dropping all existing tables (--reset flag)...")
-            # Use raw SQL with CASCADE for PostgreSQL compatibility
-            dialect = conn.dialect.name
-            if dialect == "postgresql":
-                from sqlalchemy import text
+            from sqlalchemy import text
 
-                # Drop and recreate public schema (must be separate statements for asyncpg)
-                await conn.execute(text("DROP SCHEMA public CASCADE"))
-                await conn.execute(text("CREATE SCHEMA public"))
-            else:
-                # SQLite doesn't need CASCADE
-                await conn.run_sync(Base.metadata.drop_all)
+            # Drop and recreate public schema (required for clean PostgreSQL reset)
+            await conn.execute(text("DROP SCHEMA public CASCADE"))
+            await conn.execute(text("CREATE SCHEMA public"))
             print("   Tables dropped.")
 
-        # Create tables if they don't exist
-        await conn.run_sync(Base.metadata.create_all)
+    import subprocess
+
+    print("1. Running database migrations (Alembic)...")
+    try:
+        cmd = ["alembic", "upgrade", "head"]
+        if os.path.exists("uv.lock"):
+            cmd = ["uv", "run", "alembic", "upgrade", "head"]
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"✗ Migration failed: {e}")
+        sys.exit(1)
+
     print("1. Tables verified/created.")
 
     async with SessionLocal() as session:

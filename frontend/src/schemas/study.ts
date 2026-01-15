@@ -6,11 +6,32 @@
 
 import { z } from 'zod';
 
+export const PartnerLogoSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    logo_url: z.string(),
+    url: z.string().optional().nullable(),
+});
+
+export const ProcessStepSchema = z.object({
+    id: z.string(),
+    title: z.string(),
+    description: z.string(),
+    icon: z.string(),
+    color: z.string().optional().nullable(),
+});
+
 export const ConsentSchema = z.object({
     title: z.string().optional().nullable(),
     description: z.string().optional().nullable(),
     accept: z.string().optional().nullable(),
     decline: z.string().optional().nullable(),
+});
+
+export const BrandingSchema = z.object({
+    logo_url: z.string().optional().nullable(),
+    accent_color: z.string().optional().nullable(),
+    partners: z.array(PartnerLogoSchema).optional(),
 });
 
 export const GridConfigSchema = z.object({
@@ -25,7 +46,7 @@ export const StatementSchema = z.object({
 });
 
 export const PreSortFieldSchema = z.object({
-    type: z.enum(['text', 'number', 'select']),
+    type: z.enum(['text', 'number', 'select', 'checkbox', 'radio', 'date', 'email', 'textarea']),
     label: z.union([z.string(), z.record(z.string())]),
     required: z.boolean().optional(),
     options: z
@@ -39,8 +60,12 @@ export const PreSortFieldSchema = z.object({
             ])
         )
         .optional(),
+    placeholder: z.union([z.string(), z.record(z.string())]).optional(),
     min: z.number().optional(),
     max: z.number().optional(),
+    minLength: z.number().optional(),
+    maxLength: z.number().optional(),
+    rows: z.number().optional(),
 });
 
 export const StudyConfigSchema = z.object({
@@ -49,8 +74,16 @@ export const StudyConfigSchema = z.object({
     subtitle: z.string().optional().nullable(),
     description: z.string(),
     objective: z.string().optional().nullable(),
+    condition_of_instruction: z.string().optional().nullable(),
+
     instructions: z.string(),
-    presort_config: z.record(PreSortFieldSchema),
+    presort_config: z.union([
+        z.record(PreSortFieldSchema),
+        z.object({
+            enabled: z.boolean(),
+            fields: z.record(PreSortFieldSchema),
+        }),
+    ]),
     grid_config: z.array(GridConfigSchema).optional(),
     postsort_config: z
         .object({
@@ -64,6 +97,11 @@ export const StudyConfigSchema = z.object({
                     general: z.union([z.string(), z.record(z.string())]).optional(),
                 })
                 .optional(),
+            questions: z.record(PreSortFieldSchema).optional(),
+            allow_random_comments: z.boolean().optional(),
+            email_collection_enabled: z.boolean().optional(),
+            interview_consent_enabled: z.boolean().optional(),
+            newsletter_consent_enabled: z.boolean().optional(),
         })
         .optional(),
     statements: z.array(StatementSchema),
@@ -73,6 +111,11 @@ export const StudyConfigSchema = z.object({
     language: z.string().optional(),
     show_statement_codes: z.boolean().optional(),
     state: z.enum(['draft', 'active', 'paused', 'closed']).optional(),
+    branding: BrandingSchema.optional(),
+    process_steps: z.array(ProcessStepSchema).optional(),
+    requires_password: z.boolean().optional(),
+    methodology_tips: z.array(z.string()).optional(),
+    step_help: z.record(z.object({ what: z.string(), why: z.string() })).optional(),
 });
 
 export type StudyConfig = z.infer<typeof StudyConfigSchema>;

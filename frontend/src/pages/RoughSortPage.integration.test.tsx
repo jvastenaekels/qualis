@@ -6,7 +6,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
-import { renderWithProviders, screen, setupStoreMocks } from '../test/test-utils';
+import { renderWithProviders, screen, setupStoreMocks } from '../test-utils/test-utils';
 import RoughSortPage from './RoughSortPage';
 
 const mockConfig: StudyConfig = {
@@ -39,14 +39,15 @@ vi.mock('../store/useUIStore', () => ({ useUIStore: vi.fn() }));
 
 // Mock useStudyConfig
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() })),
+    useStudyConfig: vi.fn(() => ({
+        isLoading: false,
+        error: null,
+        retry: vi.fn(),
+    })),
 }));
 
 // Mock translation
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
-    initReactI18next: { type: '3rdParty', init: () => {} },
-}));
+// Mock Translation removed
 
 describe('RoughSortPage Integration', () => {
     beforeEach(() => {
@@ -57,7 +58,7 @@ describe('RoughSortPage Integration', () => {
         setupStoreMocks({
             useConfigStore: { config: mockConfig },
             useResponseStore: {
-                rough: { history: [1] },
+                rough: { history: [1], agree: [], disagree: [], neutral: [] },
                 categorizeCard: vi.fn(),
                 undoRoughSort: vi.fn(),
             },
@@ -75,7 +76,7 @@ describe('RoughSortPage Integration', () => {
             initialEntries: ['/study/demo/sort/rough'],
         });
 
-        const nextBtns = screen.getAllByText('common.next');
+        const nextBtns = screen.getAllByText('Next step');
         expect(nextBtns.length).toBeGreaterThan(0);
     });
 
@@ -83,7 +84,7 @@ describe('RoughSortPage Integration', () => {
         setupStoreMocks({
             useConfigStore: { config: mockConfig },
             useResponseStore: {
-                rough: { history: [] },
+                rough: { history: [], agree: [], disagree: [], neutral: [] },
                 categorizeCard: vi.fn(),
                 undoRoughSort: vi.fn(),
             },
@@ -101,6 +102,6 @@ describe('RoughSortPage Integration', () => {
             initialEntries: ['/study/demo/sort/rough'],
         });
 
-        expect(screen.queryByText('common.next')).toBeNull();
+        expect(screen.queryByText('Next step')).toBeNull();
     });
 });

@@ -20,8 +20,9 @@ vi.mock('react-i18next', () => ({
 const mockCategorizeCard = vi.fn();
 
 vi.mock('../store/useConfigStore', () => ({
-    useConfigStore: (selector: (state: unknown) => unknown) =>
-        selector({
+    // biome-ignore lint/suspicious/noExplicitAny: mock type
+    useConfigStore: (selector: (state: any) => any) => {
+        const state = {
             config: {
                 statements: [
                     { id: 1, text: 'Card 1' },
@@ -30,7 +31,9 @@ vi.mock('../store/useConfigStore', () => ({
                 ],
                 grid_config: [{ score: 0, capacity: 3 }],
             },
-        }),
+        };
+        return selector ? selector(state) : state;
+    },
 }));
 
 vi.mock('../store/useResponseStore', () => ({
@@ -55,17 +58,23 @@ vi.mock('../store/useResponseStore', () => ({
 }));
 
 vi.mock('../store/useSessionStore', () => ({
-    useSessionStore: (selector: (state: unknown) => unknown) =>
-        selector({
+    // biome-ignore lint/suspicious/noExplicitAny: mock type
+    useSessionStore: (selector: (state: any) => any) => {
+        const state = {
             setStep: vi.fn(),
-        }),
+        };
+        return selector ? selector(state) : state;
+    },
 }));
 
 vi.mock('../store/useUIStore', () => ({
-    useUIStore: (selector: (state: unknown) => unknown) =>
-        selector({
+    // biome-ignore lint/suspicious/noExplicitAny: mock type
+    useUIStore: (selector: (state: any) => any) => {
+        const state = {
             setSelectedCard: vi.fn(),
-        }),
+        };
+        return selector ? selector(state) : state;
+    },
 }));
 
 vi.mock('../hooks/useLayout', () => ({

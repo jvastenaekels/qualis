@@ -4,13 +4,17 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { StudyTranslationReadInstructions } from './studyTranslationReadInstructions';
 import type { StudyTranslationReadSubtitle } from './studyTranslationReadSubtitle';
 import type { StudyTranslationReadObjective } from './studyTranslationReadObjective';
+import type { StudyTranslationReadConditionOfInstruction } from './studyTranslationReadConditionOfInstruction';
 import type { StudyTranslationReadConsentTitle } from './studyTranslationReadConsentTitle';
 import type { StudyTranslationReadConsentDescription } from './studyTranslationReadConsentDescription';
 import type { StudyTranslationReadConsentAccept } from './studyTranslationReadConsentAccept';
 import type { StudyTranslationReadConsentDecline } from './studyTranslationReadConsentDecline';
 import type { StudyTranslationReadUiLabels } from './studyTranslationReadUiLabels';
+import type { ProcessStep } from './processStep';
+import type { StudyTranslationReadStepHelp } from './studyTranslationReadStepHelp';
 
 /**
  * Schema for reading a study translation.
@@ -21,20 +25,22 @@ export interface StudyTranslationRead {
      * @pattern ^[a-z]{2}(-[A-Z]{2})?$
      */
     language_code: string;
-    /**
-     * @minLength 1
-     * @maxLength 200
-     */
+    /** @maxLength 200 */
     title: string;
+    /** @maxLength 2000 */
     description?: string;
-    instructions?: string;
+    instructions?: StudyTranslationReadInstructions;
     subtitle?: StudyTranslationReadSubtitle;
     objective?: StudyTranslationReadObjective;
+    condition_of_instruction?: StudyTranslationReadConditionOfInstruction;
     consent_title?: StudyTranslationReadConsentTitle;
     consent_description?: StudyTranslationReadConsentDescription;
     consent_accept?: StudyTranslationReadConsentAccept;
     consent_decline?: StudyTranslationReadConsentDecline;
     ui_labels?: StudyTranslationReadUiLabels;
+    process_steps?: ProcessStep[];
+    methodology_tips?: string[];
+    step_help?: StudyTranslationReadStepHelp;
     id: number;
     study_id: number;
 }

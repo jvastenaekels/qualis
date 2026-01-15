@@ -8,6 +8,7 @@ import type { SubmissionInputStatus } from './submissionInputStatus';
 import type { SubmissionInputPresortAnswers } from './submissionInputPresortAnswers';
 import type { QSortEntryInput } from './qSortEntryInput';
 import type { SubmissionInputPostsortAnswers } from './submissionInputPostsortAnswers';
+import type { SubmissionInputLinkToken } from './submissionInputLinkToken';
 
 /**
  * Schema for the full study submission/completion.
@@ -24,4 +25,5 @@ export interface SubmissionInput {
     presort_answers?: SubmissionInputPresortAnswers;
     qsort: QSortEntryInput[];
     postsort_answers?: SubmissionInputPostsortAnswers;
+    link_token?: SubmissionInputLinkToken;
 }

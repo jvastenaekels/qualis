@@ -72,7 +72,7 @@ Controls the behavior of the final phase of the study.
 
 ---
 
-## 🎨 Miscellaneous Options
+## 🎨 Study Options
 
 ### `show_statement_codes`
 
@@ -88,6 +88,42 @@ A boolean flag to control the display of statement identifiers (e.g., "S1", "S2"
 
 - **true**: Displays a subtle light-gray identifier in the top-left corner of each card and in the zoom overlays. Useful for research analysis and cross-referencing.
 - **false (Default)**: Statement codes are hidden for a cleaner participant experience.
+
+### `randomize_statements`
+
+A boolean flag to control whether statements are shuffled for each participant.
+
+```json
+{
+  "slug": "my-study",
+  "randomize_statements": true,
+  ...
+}
+```
+
+- **true**: Statements are shuffled in a deterministic way based on the participant's session token. This prevents **order effects** (a best practice in Q-methodology).
+- **false (Default)**: Statements appear in the order defined in the database.
+
+> [!NOTE]
+> Randomization is deterministic per session - if a participant refreshes the page, they will see the same order.
+
+### `access_password`
+
+A hashed password to restrict access to the study configuration.
+
+```json
+{
+  "slug": "my-study",
+  "access_password": "hashed_password_here",
+  ...
+}
+```
+
+- **Set**: Participants must enter the correct password before they can view the study content (Consent, Statements, Grid).
+- **Null (Default)**: Study is publicly accessible via its link.
+
+> [!TIP]
+> Use this feature for sensitive or pre-publication research where you want to control who can access the study.
 
 ---
 

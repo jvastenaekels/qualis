@@ -16,9 +16,31 @@ vi.mock('@dnd-kit/sortable', () => ({
     rectSortingStrategy: {},
 }));
 
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
 vi.mock('./SortableCard', () => ({
-    default: ({ text, onClick, id }: { text: string; onClick?: () => void; id: number }) => (
-        <button type="button" data-testid={`card-${id}`} onClick={onClick}>
+    default: ({
+        text,
+        onClick,
+        onAction,
+        id,
+    }: {
+        text: string;
+        onClick?: () => void;
+        onAction?: (id: number) => void;
+        id: number;
+    }) => (
+        <button
+            type="button"
+            data-testid={`card-${id}`}
+            onClick={() => {
+                if (onAction) onAction(id);
+                if (onClick) onClick();
+            }}
+        >
             {text}
         </button>
     ),
@@ -77,8 +99,12 @@ describe('GridSort Interactions', () => {
         // Find pile tabs
         // Find pile tabs by exact aria-label construction from the mock
         // Mock t returns key. Format is `${key}: ${count} ${key}`
-        const neutralTab = screen.getByRole('tab', { name: `common.neutral: 1 common.cards` });
-        const agreeTab = screen.getByRole('tab', { name: `common.agree: 1 common.cards` });
+        const neutralTab = screen.getByRole('tab', {
+            name: `common.neutral: 1 common.cards`,
+        });
+        const agreeTab = screen.getByRole('tab', {
+            name: `common.agree: 1 common.cards`,
+        });
 
         // Switch to Neutral
         fireEvent.click(neutralTab);

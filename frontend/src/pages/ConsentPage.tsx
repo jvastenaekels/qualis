@@ -9,7 +9,7 @@ import { ArrowRight } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import Markdown from 'react-markdown';
+import { SafeMarkdown } from '../components/SafeMarkdown';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { reportBug } from '../api/client';
@@ -98,8 +98,21 @@ const ConsentPage: React.FC = () => {
                 reportBug(err as Error, { context: 'ConsentPage' });
             }
 
-            setStep(2); // Move to Pre-Sort
-            navigate(`/study/${slug}/presort`);
+            // Determine next step
+            let nextStep = 2; // Default to Pre-Sort
+            let nextPath = 'presort';
+
+            if (
+                config.presort_config &&
+                'enabled' in config.presort_config &&
+                !config.presort_config.enabled
+            ) {
+                nextStep = 3;
+                nextPath = 'rough-sort';
+            }
+
+            setStep(nextStep);
+            navigate(`/study/${slug}/${nextPath}`);
         }
     };
 
@@ -123,21 +136,30 @@ const ConsentPage: React.FC = () => {
                 {/* Consent Description/Legal Text */}
                 <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
                     {config.consent?.description ? (
-                        <Markdown>{config.consent.description}</Markdown>
+                        <SafeMarkdown>{config.consent.description}</SafeMarkdown>
                     ) : (
-                        <Markdown>{t('consent.default_text')}</Markdown>
+                        <SafeMarkdown>{t('consent.default_text')}</SafeMarkdown>
                     )}
                 </div>
 
                 <div className="border-t border-gray-100 pt-6">
-                    <div className="flex items-start gap-4 p-4 bg-blue-50/50 rounded-lg border border-blue-100/50">
+                    <div
+                        className="flex items-start gap-4 p-4 rounded-lg border"
+                        style={{
+                            backgroundColor:
+                                'color-mix(in srgb, var(--brand-accent), transparent 95%)',
+                            borderColor: 'color-mix(in srgb, var(--brand-accent), transparent 90%)',
+                        }}
+                    >
                         <div className="flex h-6 items-center">
                             <input
                                 id="consent"
                                 type="checkbox"
                                 data-testid="consent-checkbox"
                                 {...register('consent')}
-                                className="h-6 w-6 rounded border-gray-300 text-blue-600 focus:ring-blue-600 cursor-pointer"
+                                // biome-ignore lint/suspicious/noExplicitAny: style override
+                                style={{ accentColor: 'var(--brand-accent)' } as any}
+                                className="h-6 w-6 rounded border-gray-300 cursor-pointer"
                             />
                         </div>
                         <div className="text-base">
@@ -161,9 +183,10 @@ const ConsentPage: React.FC = () => {
                         type="submit"
                         data-testid="consent-accept-btn"
                         disabled={!isValid && !session.hasConsented}
-                        className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white rounded-md font-bold text-base hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        style={{ backgroundColor: 'var(--brand-accent)' }}
+                        className="w-full sm:w-auto px-8 py-3 text-white rounded-md font-bold text-base hover:brightness-110 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >
-                        {config.ui_labels?.start_button || t('welcome.start')}{' '}
+                        {config.ui_labels?.['welcome.start'] || t('welcome.start', 'Get Started')}{' '}
                         <ArrowRight size={18} />
                     </button>
                 </div>

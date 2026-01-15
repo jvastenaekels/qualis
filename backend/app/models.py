@@ -17,6 +17,7 @@ from sqlalchemy import (
     Integer,
     String,
     UniqueConstraint,
+    CheckConstraint,
 )
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -59,6 +60,14 @@ class StudyRole(str, Enum):
     viewer = "viewer"
 
 
+class RecruitmentLinkType(str, Enum):
+    """Enum for types of recruitment links."""
+
+    public = "public"
+    individual = "individual"
+    limited = "limited"
+
+
 # Workspace Models
 class Workspace(Base):
     """SQLAlchemy model for workspaces."""
@@ -71,10 +80,11 @@ class Workspace(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
+    config: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
     # Relationships
     studies: Mapped[list["Study"]] = relationship(
-        back_populates="workspace", cascade="all, delete-orphan"
+        back_populates="workspace", cascade="all, delete-orphan", lazy="selectin"
     )
     members: Mapped[list["WorkspaceMember"]] = relationship(
         back_populates="workspace", cascade="all, delete-orphan", lazy="selectin"
@@ -99,28 +109,13 @@ class WorkspaceMember(Base):
         DateTime(timezone=True), server_default=func.now()
     )
 
-    workspace: Mapped["Workspace"] = relationship(back_populates="members")
-    user: Mapped["User"] = relationship(back_populates="memberships")
-
-
-class StudyCollaborator(Base):
-    """Association model for study collaborators with roles."""
-
-    __tablename__ = "study_collaborators"
-
-    study_id: Mapped[int] = mapped_column(
-        ForeignKey("studies.id", ondelete="CASCADE"), primary_key=True
+    workspace: Mapped["Workspace"] = relationship(
+        back_populates="members", lazy="selectin"
     )
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
-    )
-    role: Mapped[StudyRole] = mapped_column(SAEnum(StudyRole), default=StudyRole.viewer)
-    added_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    user: Mapped["User"] = relationship(back_populates="memberships", lazy="selectin")
 
-    study: Mapped["Study"] = relationship(back_populates="collaborators")
-    user: Mapped["User"] = relationship(back_populates="study_collaborations")
+
+# StudyCollaborator model removed (RBAC Refactor)
 
 
 # User Model
@@ -131,18 +126,20 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
+    full_name: Mapped[str | None] = mapped_column(String, nullable=True)
     hashed_password: Mapped[str] = mapped_column(String)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # 2FA / TOTP
+    totp_secret: Mapped[str | None] = mapped_column(String, nullable=True)
+    is_totp_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
 
     # Relationships
     memberships: Mapped[list["WorkspaceMember"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
-    )
-    study_collaborations: Mapped[list["StudyCollaborator"]] = relationship(
-        back_populates="user",
-        cascade="all, delete-orphan",
+        lazy="selectin",
     )
 
 
@@ -164,8 +161,23 @@ class Study(Base):
         String(5), nullable=True
     )  # e.g. "en"
     show_statement_codes: Mapped[bool] = mapped_column(Boolean, default=False)
+    randomize_statements: Mapped[bool] = mapped_column(
+        Boolean, default=False
+    )  # Randomize statement order per participant (Q methodology best practice)
+    symmetry_lock: Mapped[bool] = mapped_column(
+        Boolean, default=True
+    )  # Enforce grid symmetry in designer
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
+    )
+    start_date: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    end_date: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
     # JSON Configs
@@ -178,9 +190,15 @@ class Study(Base):
     postsort_config: Mapped[dict[str, Any]] = mapped_column(
         JSON
     )  # e.g. Logic for follow-up
+    branding: Mapped[dict[str, Any] | None] = mapped_column(
+        JSON, nullable=True
+    )  # e.g. {"logo_url": "...", "accent_color": "..."}
+    access_password: Mapped[str | None] = mapped_column(String, nullable=True)
 
     # Relationships
-    workspace: Mapped["Workspace"] = relationship(back_populates="studies")
+    workspace: Mapped["Workspace"] = relationship(
+        back_populates="studies", lazy="selectin"
+    )
     translations: Mapped[list["StudyTranslation"]] = relationship(
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
@@ -188,11 +206,15 @@ class Study(Base):
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
     participants: Mapped[list["Participant"]] = relationship(
-        back_populates="study", cascade="all, delete-orphan"
-    )
-    collaborators: Mapped[list["StudyCollaborator"]] = relationship(
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
+    recruitment_links: Mapped[list["RecruitmentLink"]] = relationship(
+        back_populates="study", cascade="all, delete-orphan", lazy="selectin"
+    )
+
+    @property
+    def requires_password(self) -> bool:
+        return bool(self.access_password)
 
 
 class StudyTranslation(Base):
@@ -210,7 +232,9 @@ class StudyTranslation(Base):
     subtitle: Mapped[str | None] = mapped_column(String, nullable=True)
     description: Mapped[str] = mapped_column(String)
     objective: Mapped[str | None] = mapped_column(String, nullable=True)
-    instructions: Mapped[str] = mapped_column(String)  # HTML/MD
+    condition_of_instruction: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    instructions: Mapped[str | None] = mapped_column(String, nullable=True)  # HTML/MD
     ui_labels: Mapped[dict[str, str]] = mapped_column(
         JSON, default=dict
     )  # Button adjustments
@@ -218,8 +242,13 @@ class StudyTranslation(Base):
     consent_description: Mapped[str | None] = mapped_column(String, nullable=True)
     consent_accept: Mapped[str | None] = mapped_column(String, nullable=True)
     consent_decline: Mapped[str | None] = mapped_column(String, nullable=True)
+    process_steps: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
+    methodology_tips: Mapped[list[str]] = mapped_column(JSON, default=list)
+    step_help: Mapped[dict] = mapped_column(JSON, default=dict)
 
-    study: Mapped["Study"] = relationship(back_populates="translations")
+    study: Mapped["Study"] = relationship(
+        back_populates="translations", lazy="selectin"
+    )
 
     __table_args__ = (
         UniqueConstraint("study_id", "language_code", name="uq_study_lang"),
@@ -238,10 +267,12 @@ class Statement(Base):
     )
     code: Mapped[str] = mapped_column(String)  # "S1", "S2"...
 
-    study: Mapped["Study"] = relationship(back_populates="statements")
+    study: Mapped["Study"] = relationship(back_populates="statements", lazy="selectin")
     translations: Mapped[list["StatementTranslation"]] = relationship(
         back_populates="statement", cascade="all, delete-orphan", lazy="selectin"
     )
+
+    __table_args__ = (UniqueConstraint("study_id", "code", name="uq_statement_code"),)
 
 
 class StatementTranslation(Base):
@@ -256,7 +287,9 @@ class StatementTranslation(Base):
     language_code: Mapped[str] = mapped_column(String(5))
     text: Mapped[str] = mapped_column(String)
 
-    statement: Mapped["Statement"] = relationship(back_populates="translations")
+    statement: Mapped["Statement"] = relationship(
+        back_populates="translations", lazy="selectin"
+    )
 
     __table_args__ = (
         UniqueConstraint("statement_id", "language_code", name="uq_statement_lang"),
@@ -275,6 +308,9 @@ class Participant(Base):
     )
     session_token: Mapped[UUID] = mapped_column(unique=True, index=True, default=uuid4)
     language_used: Mapped[str] = mapped_column(String(5))
+    random_seed: Mapped[str | None] = mapped_column(
+        String(32), nullable=True
+    )  # Seed for reproducible statement randomization
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -302,10 +338,19 @@ class Participant(Base):
     presort_answers: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     postsort_answers: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
-    study: Mapped["Study"] = relationship(back_populates="participants")
-    qsort_entries: Mapped[list["QSortEntry"]] = relationship(
-        back_populates="participant", cascade="all, delete-orphan"
+    study: Mapped["Study"] = relationship(
+        back_populates="participants", lazy="selectin"
     )
+    qsort_entries: Mapped[list["QSortEntry"]] = relationship(
+        back_populates="participant", cascade="all, delete-orphan", lazy="selectin"
+    )
+
+    @property
+    def recruitment_token(self) -> str | None:
+        """Extract recruitment token from presort answers if present."""
+        if self.presort_answers and isinstance(self.presort_answers, dict):
+            return self.presort_answers.get("_recruitment_token")
+        return None
 
 
 class QSortEntry(Base):
@@ -324,11 +369,78 @@ class QSortEntry(Base):
     grid_score: Mapped[int] = mapped_column(Integer)  # -4, 0, 4
     card_comment: Mapped[str | None] = mapped_column(String, nullable=True)
 
-    participant: Mapped["Participant"] = relationship(back_populates="qsort_entries")
-    statement: Mapped["Statement"] = relationship()
+    participant: Mapped["Participant"] = relationship(
+        back_populates="qsort_entries", lazy="selectin"
+    )
+    statement: Mapped["Statement"] = relationship(lazy="selectin")
 
     __table_args__ = (
         UniqueConstraint(
             "participant_id", "statement_id", name="uq_participant_statement"
         ),
+        CheckConstraint(
+            "grid_score >= -10 AND grid_score <= 10", name="chk_grid_score_range"
+        ),
     )
+
+
+class RecruitmentLink(Base):
+    """SQLAlchemy model for recruitment links."""
+
+    __tablename__ = "recruitment_links"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    study_id: Mapped[int] = mapped_column(
+        ForeignKey("studies.id", ondelete="CASCADE"), index=True
+    )
+    type: Mapped[RecruitmentLinkType] = mapped_column(
+        SAEnum(RecruitmentLinkType), default=RecruitmentLinkType.public
+    )
+    token: Mapped[str] = mapped_column(String, unique=True, index=True)
+    name: Mapped[str | None] = mapped_column(
+        String, nullable=True
+    )  # Name for this link/lot
+    capacity: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    usage_count: Mapped[int] = mapped_column(Integer, default=0)
+    start_count: Mapped[int] = mapped_column(Integer, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    study: Mapped["Study"] = relationship(
+        back_populates="recruitment_links", lazy="selectin"
+    )
+
+
+class Invitation(Base):
+    """SQLAlchemy model for researcher/collaborator invitations."""
+
+    __tablename__ = "invitations"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(String, index=True)
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
+    # study_id removed or made nullable if keeping for legacy ref?
+    # Replacing study_id with workspace_id entirely for now.
+    study_id: Mapped[int | None] = mapped_column(
+        ForeignKey("studies.id", ondelete="SET NULL"), nullable=True
+    )
+    role: Mapped[WorkspaceRole] = mapped_column(
+        SAEnum(WorkspaceRole), default=WorkspaceRole.viewer
+    )
+    token: Mapped[str] = mapped_column(String, unique=True, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    accepted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    workspace: Mapped["Workspace"] = relationship(lazy="selectin")

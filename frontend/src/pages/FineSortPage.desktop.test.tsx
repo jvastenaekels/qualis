@@ -5,7 +5,7 @@ import StudyLayout from '../layouts/StudyLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import FineSortPage from './FineSortPage';
 
 describe('FineSortPage Desktop Layout (Integration)', () => {
@@ -29,6 +29,21 @@ describe('FineSortPage Desktop Layout (Integration)', () => {
         useResponseStore.getState().categorizeCard(2, 'disagree');
         useResponseStore.getState().categorizeCard(3, 'disagree');
         useSessionStore.getState().setConsent(true);
+        useConfigStore.getState().setConfig({
+            slug: 'demo-study',
+            title: 'Demo Study',
+            statements: [
+                { id: 1, code: '1', text: 'Statement 1' },
+                { id: 2, code: '2', text: 'Statement 2' },
+                { id: 3, code: '3', text: 'Statement 3' },
+            ],
+            grid_config: [
+                { score: -1, capacity: 1 },
+                { score: 0, capacity: 1 },
+                { score: 1, capacity: 1 },
+            ],
+            // biome-ignore lint/suspicious/noExplicitAny: partial mock
+        } as any);
 
         renderWithProviders(
             <Routes>
@@ -36,7 +51,7 @@ describe('FineSortPage Desktop Layout (Integration)', () => {
                     <Route path="fine-sort" element={<FineSortPage />} />
                 </Route>
             </Routes>,
-            { initialEntries: ['/study/demo/fine-sort'] }
+            { initialEntries: ['/study/demo-study/fine-sort'] }
         );
 
         // 2. Wait for cards to appear

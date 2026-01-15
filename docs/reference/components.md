@@ -66,6 +66,8 @@ A swipeable card deck for the Rough Sort phase. Uses Framer Motion for gestures.
 />
 ```
 
+> **Responsiveness:** This component uses container queries (`@container`) to adjust font size dynamically based on its container's width.
+
 ---
 
 ## GridSort
@@ -191,4 +193,12 @@ const {
   onMoveCard,
   onSwapCards,
 });
+```
+
+### useViewport
+
+Provides centralized viewport dimensions and semantic breakpoints.
+
+```typescript
+const { width, height, isMobile, isDesktop } = useViewport();
 ```

@@ -9,8 +9,15 @@ import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import ConsentPage from './ConsentPage';
+
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+    }),
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 
 // Mocks
 const mockConfig = {
@@ -24,17 +31,9 @@ const mockConfig = {
         description: 'Consent Description',
     },
     ui_labels: {
-        start_button: 'Start Study',
+        'welcome.start': 'Start Study',
     },
 };
-
-// Mock i18next
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string, defaultValue: string) => defaultValue || key,
-        i18n: { language: 'en' },
-    }),
-}));
 
 // Mock useStudyConfig logic if strictly needed, but we mock the store directly
 vi.mock('../hooks/useStudyConfig', () => ({
@@ -53,7 +52,11 @@ describe('ConsentPage', () => {
 
     it('renders consent title and description from config', () => {
         renderWithProviders(<ConsentPage />);
-        expect(screen.getByText('Consent to Participate')).toBeInTheDocument();
+        expect(screen.getByText('consent.title')).toBeInTheDocument();
+        // The mock config.consent.description is 'Consent Description'
+        // But ReactMarkdown might render it.
+        // Wait, does t() apply to config content? No.
+        // But config.consent.description IS 'Consent Description'.
         expect(screen.getByText('Consent Description')).toBeInTheDocument();
         // The title "Consent Title" from config.consent.title is no longer used for the checkbox label
         // It might be used elsewhere if we change the H1, but currently H1 is hardcoded/localized.
@@ -144,5 +147,42 @@ describe('ConsentPage', () => {
         // Note: our mock i18n returns the default value if provided, or the key
         expect(screen.getByText('welcome.consent.label')).toBeInTheDocument();
         expect(screen.getByText('consent.default_text')).toBeInTheDocument(); // Key fallback from mock
+    });
+
+    it('navigates to rough-sort if presort is disabled', async () => {
+        // Mock config with disabled presort
+        const configDisabledPresort = {
+            ...mockConfig,
+            presort_config: { enabled: false, fields: {} },
+        };
+
+        act(() => {
+            useConfigStore
+                .getState()
+                .setConfig(
+                    configDisabledPresort as unknown as import('../schemas/study').StudyConfig
+                );
+            useSessionStore.getState().resetSession();
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/consent" element={<ConsentPage />} />
+                <Route path="/study/:slug/rough-sort" element={<div>Rough Sort Page</div>} />
+            </Routes>,
+            { initialEntries: ['/study/test-study/consent'] }
+        );
+
+        const checkbox = screen.getByRole('checkbox');
+        fireEvent.click(checkbox);
+
+        const button = screen.getByRole('button', { name: /Start Study/i });
+        await waitFor(() => expect(button).not.toBeDisabled());
+        fireEvent.click(button);
+
+        await waitFor(() => {
+            expect(useSessionStore.getState().hasConsented).toBe(true);
+            expect(screen.getByText('Rough Sort Page')).toBeInTheDocument();
+        });
     });
 });

@@ -27,7 +27,7 @@ backend/
    ```
 
 2. **Database Initialization**:
-   By default, the app uses **SQLite** (`q_method.db`). This script creates the database schema, an initial admin user (`admin@example.com`), and a default **Example Workspace** for that user.
+   By default, the app uses **PostgreSQL**. Ensure your `DATABASE_URL` is configured in `.env`. This script creates the database schema (via Alembic) and an initial admin user (`admin@example.com`).
 
    ```bash
    python init_db.py
@@ -40,13 +40,13 @@ backend/
 
    ```bash
    # Create or Update a study
-   python seed.py data/example-study.json
+   python seed.py your-study.json
    ```
 
 4. **Utility Scripts**:
    Additional management scripts are located in `scripts/`:
    - `scripts/create_user.py`: Create admin users interactively.
-   - `scripts/ensure_schema.py`: Verify database schema consistency.
+   - `scripts/migrate.py`: Run Alembic migrations to update schema.
 
 5. **Running Locally**:
    ```bash

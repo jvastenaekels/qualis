@@ -20,12 +20,16 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from 'sonner';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
+import { parseApiErrorSync } from '@/lib/error-utils';
 import { customInstance } from '@/api/mutator';
 
 const RegistrationPage = () => {
+    const { t } = useTranslation();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const token = searchParams.get('token');
@@ -39,7 +43,7 @@ const RegistrationPage = () => {
         data: invite,
         isLoading: isVerifying,
         error: verifyError,
-    } = useQuery<{ email: string; study_id: number; role: string }>({
+    } = useQuery<{ email: string; workspace_name: string; role: string }>({
         queryKey: ['verify-invite', token],
         queryFn: ({ signal }) =>
             customInstance({
@@ -56,7 +60,7 @@ const RegistrationPage = () => {
     const registerMutation = useMutation({
         mutationFn: (data: Record<string, unknown>) =>
             customInstance<unknown>({
-                url: `/api/auth/register`,
+                url: `/api/register`,
                 method: 'POST',
                 data,
             }),
@@ -71,7 +75,7 @@ const RegistrationPage = () => {
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-            toast.error('Passwords do not match');
+            toast.error(t('auth.register.errors.password_mismatch'));
             return;
         }
 
@@ -82,24 +86,12 @@ const RegistrationPage = () => {
                 invitation_token: token || undefined,
             });
             setIsSuccess(true);
-            toast.success('Account created successfully!');
+            toast.success(t('auth.register.success_title'));
         } catch (error: unknown) {
-            // ... existing error handling
-            let message = 'Registration failed';
-            try {
-                // Try to parse JSON error from backend
-                if (error instanceof Error) {
-                    const body = JSON.parse(error.message);
-                    message = body.detail || body.message || message;
-                }
-            } catch (_e) {
-                // Fallback to raw message if not JSON
-                if (error instanceof Error) {
-                    message = error.message || message;
-                }
-            }
-            toast.error(message);
-            console.error(error);
+            const message = parseApiErrorSync(error, t('auth.register.errors.generic_fail'));
+            toast.error(t('auth.register.errors.generic_fail'), {
+                description: message,
+            });
         }
     };
 
@@ -108,11 +100,8 @@ const RegistrationPage = () => {
             <div className="flex h-screen items-center justify-center bg-slate-50 p-6">
                 <Alert variant="destructive" className="max-w-md shadow-xl bg-white">
                     <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Missing Token</AlertTitle>
-                    <AlertDescription>
-                        This page requires a valid invitation token. Please check the link you
-                        received.
-                    </AlertDescription>
+                    <AlertTitle>{t('auth.register.missing_token_title')}</AlertTitle>
+                    <AlertDescription>{t('auth.register.missing_token_desc')}</AlertDescription>
                 </Alert>
             </div>
         );
@@ -124,7 +113,7 @@ const RegistrationPage = () => {
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="h-10 w-10 animate-spin text-primary" />
                     <p className="text-slate-500 font-medium animate-pulse">
-                        Verifying your invitation...
+                        {t('auth.register.verifying')}
                     </p>
                 </div>
             </div>
@@ -139,14 +128,14 @@ const RegistrationPage = () => {
                         <div className="bg-red-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100">
                             <AlertCircle className="h-8 w-8 text-red-500" />
                         </div>
-                        <CardTitle className="text-red-600">Invalid Invitation</CardTitle>
-                        <CardDescription>
-                            This invitation link is invalid or has expired.
-                        </CardDescription>
+                        <CardTitle className="text-red-600">
+                            {t('auth.register.invalid_title')}
+                        </CardTitle>
+                        <CardDescription>{t('auth.register.invalid_desc')}</CardDescription>
                     </CardHeader>
                     <CardFooter>
                         <Button variant="outline" className="w-full" onClick={() => navigate('/')}>
-                            Back to Home
+                            {t('auth.login.back_to_home')}
                         </Button>
                     </CardFooter>
                 </Card>
@@ -162,23 +151,20 @@ const RegistrationPage = () => {
                         <div className="bg-emerald-50 h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-100">
                             <CheckCircle2 className="h-8 w-8 text-emerald-500" />
                         </div>
-                        <CardTitle className="text-emerald-600">Welcome Aboard!</CardTitle>
-                        <CardDescription>
-                            Your account has been created and linked to the study.
-                        </CardDescription>
+                        <CardTitle className="text-emerald-600">
+                            {t('auth.register.success_title')}
+                        </CardTitle>
+                        <CardDescription>{t('auth.register.success_desc')}</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <p className="text-sm text-slate-500">
-                            You can now log in to the administrative dashboard to begin
-                            collaborating.
-                        </p>
+                        <p className="text-sm text-slate-500">{t('auth.register.success_hint')}</p>
                     </CardContent>
                     <CardFooter>
                         <Button
                             className="w-full h-12 text-lg font-semibold"
                             onClick={() => navigate('/admin')}
                         >
-                            Go to Dashboard
+                            {t('auth.register.success_cta')}
                         </Button>
                     </CardFooter>
                 </Card>
@@ -191,30 +177,46 @@ const RegistrationPage = () => {
             <div className="w-full max-w-[420px] space-y-8">
                 <div className="text-center space-y-2">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100 text-[10px] font-bold uppercase tracking-widest mb-4">
-                        <ShieldCheck className="h-3 w-3" /> Secure Invitation
+                        <ShieldCheck className="h-3 w-3" /> {t('auth.register.secure_invitation')}
                     </div>
                     <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 italic">
                         Open<span className="text-primary">-Q</span>
                     </h1>
-                    <p className="text-slate-500 font-medium">Join the research project</p>
+                    <p className="text-slate-500 font-medium">{t('auth.register.subtitle')}</p>
                 </div>
 
-                <Card className="shadow-2xl border-none bg-white/80 backdrop-blur-xl">
-                    <CardHeader>
+                <Card className="shadow-2xl border-none bg-white/90 backdrop-blur-xl ring-1 ring-slate-900/5">
+                    <CardHeader className="pb-2">
                         <CardTitle className="flex items-center justify-between">
-                            <span>Create Account</span>
-                            <UserPlus className="h-5 w-5 text-primary" />
+                            <span className="text-xl tracking-tight">
+                                {t('auth.register.title')}
+                            </span>
+                            <UserPlus className="h-5 w-5 text-indigo-600" />
                         </CardTitle>
-                        <CardDescription className="bg-slate-50 p-3 rounded-lg border mt-2 flex flex-col gap-1">
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                Invitation To:
-                            </span>
-                            <span className="font-semibold text-slate-700">
-                                Study #{invite?.study_id}
-                            </span>
-                            <span className="text-xs text-slate-500 italic">
-                                Role: {invite?.role}
-                            </span>
+                        <CardDescription className="pt-4">
+                            <div className="bg-indigo-50/60 p-4 rounded-xl border border-indigo-100/50 flex flex-col gap-3">
+                                <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
+                                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">
+                                        {t('auth.register.invitation_to')}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-bold text-slate-900">
+                                            {invite?.workspace_name}
+                                        </span>
+                                        <span className="text-xs text-slate-500 font-medium">
+                                            {t('admin.workspace.switcher.new_workspace_desc')}
+                                        </span>
+                                    </div>
+                                    <Badge
+                                        variant="outline"
+                                        className="bg-white text-[10px] font-bold uppercase text-indigo-600 border-indigo-200 px-2 py-1 shadow-sm"
+                                    >
+                                        {invite?.role}
+                                    </Badge>
+                                </div>
+                            </div>
                         </CardDescription>
                     </CardHeader>
                     <form onSubmit={handleRegister}>
@@ -224,7 +226,7 @@ const RegistrationPage = () => {
                                     htmlFor="email"
                                     className="text-xs font-bold uppercase text-slate-400 tracking-wider"
                                 >
-                                    Email Address
+                                    {t('auth.register.email_label')}
                                 </Label>
                                 <div className="relative">
                                     <AtSign className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
@@ -243,14 +245,14 @@ const RegistrationPage = () => {
                                     htmlFor="password"
                                     className="text-xs font-bold uppercase text-slate-400 tracking-wider"
                                 >
-                                    Choose Password
+                                    {t('auth.register.password_label')}
                                 </Label>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                                     <Input
                                         id="password"
                                         type="password"
-                                        placeholder="••••••••"
+                                        placeholder={t('auth.register.placeholder_password')}
                                         className="pl-10 h-11 bg-slate-50/50 border-slate-200 focus:bg-white"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
@@ -263,14 +265,14 @@ const RegistrationPage = () => {
                                     htmlFor="confirm-password"
                                     className="text-xs font-bold uppercase text-slate-400 tracking-wider"
                                 >
-                                    Confirm Password
+                                    {t('auth.register.confirm_password_label')}
                                 </Label>
                                 <div className="relative">
                                     <Lock className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                                     <Input
                                         id="confirm-password"
                                         type="password"
-                                        placeholder="••••••••"
+                                        placeholder={t('auth.register.placeholder_password')}
                                         className="pl-10 h-11 bg-slate-50/50 border-slate-200 focus:bg-white"
                                         value={confirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
@@ -288,16 +290,15 @@ const RegistrationPage = () => {
                                 {registerMutation.isPending ? (
                                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                                 ) : (
-                                    'Complete Registration'
+                                    t('auth.register.submit')
                                 )}
                             </Button>
                         </CardFooter>
                     </form>
                 </Card>
 
-                <p className="text-center text-xs text-slate-400">
-                    By registering, you agree to follow the research ethics guidelines configured
-                    for this study.
+                <p className="text-center text-[10px] text-slate-400 font-medium uppercase tracking-widest opacity-50">
+                    Open-Q
                 </p>
             </div>
         </div>

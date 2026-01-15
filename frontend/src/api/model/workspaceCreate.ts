@@ -9,6 +9,7 @@
  * Schema for creating a workspace.
  */
 export interface WorkspaceCreate {
+    /** @maxLength 100 */
     title: string;
     /**
      * @minLength 3

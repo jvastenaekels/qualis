@@ -1,23 +1,26 @@
 {
-    "entry": ["src/main.tsx", "src/i18n.ts"],
-    "project": ["src/**/*.{ts,tsx}"],
-    "ignore": [
-        "src/**/*.test.{ts,tsx}",
-        "src/test/**",
-        "src/hooks/useFineSortDrag.ts",
-        "src/contexts/LayoutContext.context.ts",
-        "src/schemas/study.ts",
-        "src/api/generated.ts",
-        "src/api/model/**",
-        "src/components/ui/**"
-    ],
-    "ignoreBinaries": ["playwright", "python3"],
-    "ignoreDependencies": [
-        "@fontsource/google-sans-flex",
-        "@dnd-kit/modifiers",
-        "@radix-ui/react-collapsible",
-        "next-themes",
-        "recharts",
-        "vaul"
-    ]
+  "entry": ["src/main.tsx", "src/i18n.ts"],
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignore": [
+    "src/**/*.test.{ts,tsx}",
+    "src/test/**",
+    "src/hooks/useFineSortDrag.ts",
+    "src/contexts/LayoutContext.context.ts",
+    "src/schemas/study.ts",
+    "src/api/generated.ts",
+    "src/api/model/**",
+    "src/components/ui/**",
+    "src/styles/**",
+    "e2e/**"
+  ],
+  "ignoreBinaries": ["playwright", "python3"],
+  "ignoreDependencies": [
+    "@fontsource/google-sans-flex",
+    "@dnd-kit/modifiers",
+    "@radix-ui/react-collapsible",
+    "next-themes",
+    "recharts",
+    "vaul",
+    "@types/dompurify"
+  ]
 }

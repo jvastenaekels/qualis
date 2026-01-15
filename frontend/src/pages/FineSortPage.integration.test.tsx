@@ -6,8 +6,16 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { StudyConfig } from '../schemas/study';
-import { renderWithProviders, screen, setupStoreMocks } from '../test/test-utils';
+import { renderWithProviders, screen, setupStoreMocks } from '../test-utils/test-utils';
 import FineSortPage from './FineSortPage';
+
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+    Trans: ({ children, i18nKey }: { children: React.ReactNode; i18nKey?: string }) =>
+        children || i18nKey,
+    initReactI18next: { type: '3rdParty', init: () => {} },
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 
 const mockConfig: StudyConfig = {
     slug: 'demo',
@@ -34,16 +42,14 @@ vi.mock('../store/useUIStore', () => ({ useUIStore: vi.fn() }));
 
 // Mock useStudyConfig
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() })),
+    useStudyConfig: vi.fn(() => ({
+        isLoading: false,
+        error: null,
+        retry: vi.fn(),
+    })),
 }));
 
 // Mock translation
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
-    Trans: ({ children, i18nKey }: { children: React.ReactNode; i18nKey?: string }) =>
-        children || i18nKey,
-    initReactI18next: { type: '3rdParty', init: () => {} },
-}));
 
 // Mock GridSort
 vi.mock('../components/GridSort', () => ({
@@ -101,7 +107,9 @@ describe('FineSortPage Integration', () => {
         });
 
         expect(screen.getAllByText(/fine.actions.validate/i).length).toBeGreaterThan(0);
-        const btns = screen.getAllByRole('button', { name: /fine.actions.validate/i });
+        const btns = screen.getAllByRole('button', {
+            name: /fine.actions.validate/i,
+        });
         for (const btn of btns) {
             expect((btn as HTMLButtonElement).disabled).toBe(false);
         }

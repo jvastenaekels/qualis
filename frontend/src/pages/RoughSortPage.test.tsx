@@ -12,16 +12,8 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import RoughSortPage from './RoughSortPage';
-
-// Mocks
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => key,
-        i18n: { language: 'en' },
-    }),
-}));
 
 // Mock CardStack to capture ref and simulate behavior
 vi.mock('../components/CardStack', async () => {
@@ -37,14 +29,8 @@ vi.mock('../components/CardStack', async () => {
     };
 });
 
-const navigateMock = vi.fn();
-vi.mock('react-router-dom', async () => {
-    const actual = await import('react-router-dom');
-    return {
-        ...actual,
-        useNavigate: () => navigateMock,
-    };
-});
+// Removed manual react-router-dom mock to avoid conflicts with MemoryRouter
+// navigateMock removed
 
 // Mock ResizeObserver for Framer Motion
 
@@ -59,6 +45,7 @@ const mockConfig = {
         { id: 2, text: 'Card 2' },
         { id: 3, text: 'Card 3' },
     ],
+    condition_of_instruction: 'Test Instruction',
 };
 
 describe('RoughSortPage', () => {
@@ -78,7 +65,7 @@ describe('RoughSortPage', () => {
             </Routes>,
             { initialEntries: ['/study/test-study/sort/rough'] }
         );
-        expect(screen.getByText('rough.complete.title')).toBeTruthy();
+        expect(screen.getByText('First Step Complete')).toBeTruthy();
     });
 
     it('sets the current step to 3 on mount', () => {
@@ -106,9 +93,11 @@ describe('RoughSortPage', () => {
         });
 
         // Check for Hint (now at bottom)
-        expect(screen.getByText('rough.header.hint')).toBeTruthy();
-        // Check for Title
-        expect(screen.getByText('rough.header.title')).toBeTruthy();
+        expect(
+            screen.getByText('This is spontaneous — you can change your mind right after.')
+        ).toBeTruthy();
+        // Check for Instruction
+        expect(screen.getByText('Test Instruction')).toBeTruthy();
 
         vi.useRealTimers();
     });
@@ -121,9 +110,9 @@ describe('RoughSortPage', () => {
             { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
-        expect(screen.getByLabelText('common.disagree')).toBeTruthy();
-        expect(screen.getByLabelText('common.agree')).toBeTruthy();
-        expect(screen.getByLabelText('common.neutral')).toBeTruthy();
+        expect(screen.getByLabelText('Somewhat disagree')).toBeTruthy();
+        expect(screen.getByLabelText('Somewhat agree')).toBeTruthy();
+        expect(screen.getByLabelText('Neutral')).toBeTruthy();
     });
 
     it('completes the sort when all cards are categorized', () => {
@@ -139,8 +128,8 @@ describe('RoughSortPage', () => {
             { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
-        expect(screen.getByText('rough.complete.title')).toBeTruthy();
-        expect(screen.getByText('common.next')).toBeTruthy();
+        expect(screen.getByText('First Step Complete')).toBeTruthy();
+        expect(screen.getByText('Next step')).toBeTruthy();
     });
 
     it('persists progress when re-navigating', () => {
@@ -218,7 +207,7 @@ describe('RoughSortPage', () => {
 
         // Click Agree
         act(() => {
-            const agreeBtn = screen.getByLabelText('common.agree');
+            const agreeBtn = screen.getByLabelText('Somewhat agree');
             agreeBtn.click();
         });
         expect(useResponseStore.getState().rough.agree).toContain(1);
@@ -229,14 +218,14 @@ describe('RoughSortPage', () => {
 
         // Clicks on subsequent cards
         act(() => {
-            const disagreeBtn = screen.getByLabelText('common.disagree');
+            const disagreeBtn = screen.getByLabelText('Somewhat disagree');
             disagreeBtn.click();
         });
         // Card 2 should be in disagree
         expect(useResponseStore.getState().rough.disagree).toContain(2);
 
         act(() => {
-            const neutralBtn = screen.getByLabelText('common.neutral');
+            const neutralBtn = screen.getByLabelText('Neutral');
             neutralBtn.click();
         });
         // Card 3 should be in neutral
@@ -261,7 +250,7 @@ describe('RoughSortPage', () => {
         expect(screen.getByText(/S99/)).toBeTruthy();
 
         // Close Overlay
-        const closeBtn = screen.getByText('common.close');
+        const closeBtn = screen.getByText('Close');
         act(() => {
             closeBtn.click();
         });
@@ -283,7 +272,9 @@ describe('RoughSortPage', () => {
         act(() => {
             vi.advanceTimersByTime(2000);
         });
-        expect(screen.getByText('rough.header.hint')).toBeTruthy();
+        expect(
+            screen.getByText('This is spontaneous — you can change your mind right after.')
+        ).toBeTruthy();
 
         // Simulate 5 sorts
         act(() => {
@@ -294,15 +285,14 @@ describe('RoughSortPage', () => {
         });
 
         // Tip should be gone
-        expect(screen.queryByText('rough.header.hint')).toBeNull();
+        expect(
+            screen.queryByText('This is spontaneous — you can change your mind right after.')
+        ).toBeNull();
 
         vi.useRealTimers();
         unmount();
     });
-    it('navigates to fine sort when Next is clicked', () => {
-        // Clear mock before test
-        navigateMock.mockClear();
-
+    it('navigates to fine sort when Next is clicked', async () => {
         useResponseStore.getState().categorizeCard(1, 'agree');
         useResponseStore.getState().categorizeCard(2, 'agree');
         useResponseStore.getState().categorizeCard(3, 'agree');
@@ -310,16 +300,18 @@ describe('RoughSortPage', () => {
         renderWithProviders(
             <Routes>
                 <Route path="/study/:slug/sort/rough" element={<RoughSortPage />} />
+                <Route path="/study/:slug/fine-sort" element={<div>Fine Sort Page</div>} />
             </Routes>,
             { initialEntries: ['/study/test-study/sort/rough'] }
         );
 
-        const nextBtn = screen.getByText('common.next');
+        const nextBtn = screen.getByText('Next step');
         act(() => {
             nextBtn.click();
         });
 
-        expect(navigateMock).toHaveBeenCalledWith('/study/test-study/fine-sort');
+        // Verify navigation occurred by finding the new page content
+        expect(await screen.findByText('Fine Sort Page')).toBeInTheDocument();
     });
 
     it('closes overlay when backdrop is clicked', () => {
@@ -364,7 +356,7 @@ describe('RoughSortPage', () => {
             vi.advanceTimersByTime(2000); // Trigger tip
         });
 
-        const tip = screen.getByText('rough.header.hint');
+        const tip = screen.getByText('This is spontaneous — you can change your mind right after.');
         expect(tip).toBeTruthy();
 
         const closeBtn = screen.getByLabelText('Close tip');
@@ -398,7 +390,10 @@ describe('RoughSortPage', () => {
     it('calculates shared font size on small screens for long labels', () => {
         // Mock innerWidth
         const originalWidth = window.innerWidth;
-        Object.defineProperty(window, 'innerWidth', { value: 375, configurable: true });
+        Object.defineProperty(window, 'innerWidth', {
+            value: 375,
+            configurable: true,
+        });
         window.dispatchEvent(new Event('resize'));
 
         // Use long labels via store
@@ -421,10 +416,12 @@ describe('RoughSortPage', () => {
         );
 
         // This triggers the useMemo for sharedFontSize
-        // Even with standard labels 'common.agree' (len 12), it hits the > 10 branch
-        expect(screen.getByText('common.agree')).toBeTruthy();
+        expect(screen.getByText('ExtremelyLongAgreeLabel')).toBeTruthy();
 
         // Cleanup
-        Object.defineProperty(window, 'innerWidth', { value: originalWidth, configurable: true });
+        Object.defineProperty(window, 'innerWidth', {
+            value: originalWidth,
+            configurable: true,
+        });
     });
 });

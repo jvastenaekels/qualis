@@ -7,7 +7,7 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useConfigStore } from '../store/useConfigStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import StudyStatusPage from './StudyStatusPage';
 
 // Mock Lucide icons to avoid rendering issues
@@ -24,7 +24,7 @@ describe('StudyStatusPage', () => {
         renderWithProviders(<StudyStatusPage />);
         // Check for default message key (mocked or actual if i18n setup)
         // Since i18n might return keys in test env without setup, assuming keys or partials
-        expect(screen.getByText('common.errors.study_not_found.title')).toBeTruthy();
+        expect(screen.getByText('Study Not Found')).toBeTruthy();
         expect(screen.getByTestId('icon-search-x')).toBeTruthy();
         const link = screen.getByRole('link');
         expect(link.getAttribute('href')).toBe('/');
@@ -33,12 +33,16 @@ describe('StudyStatusPage', () => {
     it('renders inactive status message correctly', () => {
         renderWithProviders(<StudyStatusPage />);
         // Default type is 'not_found'
-        expect(screen.getByText('common.errors.study_not_found.message')).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                "We couldn't find a study with that name. Please check the URL or contact the researcher."
+            )
+        ).toBeInTheDocument();
     });
 
     it('renders draft state correctly', () => {
         renderWithProviders(<StudyStatusPage type="draft" />);
-        expect(screen.getByText('common.status.draft.title')).toBeTruthy();
+        expect(screen.getByText('Study Under Preparation')).toBeTruthy();
         expect(screen.getByTestId('icon-clipboard')).toBeTruthy();
     });
 
@@ -49,14 +53,18 @@ describe('StudyStatusPage', () => {
         // Wait, StudyStatusPage logic is: render config[type].
         // If type is not passed, it defaults to 'not_found'.
         // So it renders study_not_found key.
-        expect(screen.getByText('common.errors.study_not_found.message')).toBeInTheDocument();
+        expect(
+            screen.getByText(
+                "We couldn't find a study with that name. Please check the URL or contact the researcher."
+            )
+        ).toBeInTheDocument();
     });
 
     it('renders paused state with retry button', () => {
         const handleRetry = vi.fn();
         renderWithProviders(<StudyStatusPage type="paused" onRetry={handleRetry} />);
 
-        expect(screen.getByText('common.status.paused.title')).toBeTruthy();
+        expect(screen.getByText('Maintenance in Progress')).toBeTruthy();
         expect(screen.getByTestId('icon-construction')).toBeTruthy();
 
         const button = screen.getByRole('button');
@@ -66,7 +74,7 @@ describe('StudyStatusPage', () => {
 
     it('renders closed state correctly', () => {
         renderWithProviders(<StudyStatusPage type="closed" />);
-        expect(screen.getByText('common.status.closed.title')).toBeTruthy();
+        expect(screen.getByText('Data Collection Closed')).toBeTruthy();
         expect(screen.getByTestId('icon-lock')).toBeTruthy();
     });
 
@@ -84,6 +92,8 @@ describe('StudyStatusPage', () => {
         // But component ignores store state? It uses props.
         // Let's pass type='closed' to simulate completed study.
         renderWithProviders(<StudyStatusPage type="closed" />);
-        expect(screen.getByText('common.status.closed.message')).toBeInTheDocument();
+        expect(
+            screen.getByText('This study is now closed. Participation is no longer possible.')
+        ).toBeInTheDocument();
     });
 });

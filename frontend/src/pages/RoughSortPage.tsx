@@ -5,51 +5,69 @@
  */
 
 import { AnimatePresence, motion, useMotionValue, useTransform } from 'framer-motion';
-import { ArrowRight, Check, Frown, Meh, RotateCcw, Smile, X } from 'lucide-react';
-import type React from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRight, Check, Frown, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
+import { BREAKPOINTS } from '@/constants/breakpoints';
+import React, { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
+import { SafeMarkdown } from '../components/SafeMarkdown';
 import { useNavigate, useParams } from 'react-router-dom';
 import CardStack, { type CardStackHandle } from '../components/CardStack';
+import { useLayoutAction } from '../hooks/useLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
+import { useViewport } from '@/contexts/ViewportContext';
 
-const RoughSortPage: React.FC = () => {
+import { cn } from '@/lib/utils';
+
+interface RoughSortPageProps {
+    highlightKey?: string | null;
+}
+
+const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const { isDesktop } = useViewport();
 
     // Config Store
     const config = useConfigStore((state) => state.config);
     const showCodes = config?.show_statement_codes ?? false;
 
-    // Response Store
-    const responses = useResponseStore((state) => ({ rough: state.rough }));
-    const categorizeCard = useResponseStore((state) => state.categorizeCard);
+    // --- Selectors (Stable) ---
+    const roughHistory = useResponseStore((state) => state.rough?.history ?? []);
+    const agreeCount = useResponseStore((state) => state.rough?.agree?.length ?? 0);
+    const disagreeCount = useResponseStore((state) => state.rough?.disagree?.length ?? 0);
+    const neutralCount = useResponseStore((state) => state.rough?.neutral?.length ?? 0);
     const undoRoughSort = useResponseStore((state) => state.undoRoughSort);
+    const categorizeCard = useResponseStore((state) => state.categorizeCard);
 
-    // Session Store
+    // Other Stores
     const setStep = useSessionStore((state) => state.setStep);
-
-    const cardStackRef = useRef<CardStackHandle>(null);
     const hoveredCard = useUIStore((state) => state.hoveredCard);
     const setHoveredCard = useUIStore((state) => state.setHoveredCard);
-
+    const { setHeaderAction } = useLayoutAction();
     const { t } = useTranslation();
 
-    const [showTip, setShowTip] = useState(false);
+    const cardStackRef = useRef<CardStackHandle>(null);
 
-    // Show tip after 1.5s delay for user orientation
-    useEffect(() => {
-        const timer = setTimeout(() => setShowTip(true), 1500);
-        return () => clearTimeout(timer);
-    }, []);
+    // 2. State & Hooks - Continuous
+    const [showTip, setShowTip] = useState(true);
 
     // Motion Values lifted from CardStack
     const x = useMotionValue(0);
     const y = useMotionValue(0);
+
+    // --- Handlers ---
+    const handleUndo = useCallback(
+        (e?: React.MouseEvent) => {
+            e?.stopPropagation();
+            if (roughHistory.length > 0) {
+                undoRoughSort();
+            }
+        },
+        [undoRoughSort, roughHistory.length]
+    );
 
     // Set Step 3 on mount
     useEffect(() => {
@@ -58,7 +76,7 @@ const RoughSortPage: React.FC = () => {
 
     // Auto-dismiss tip on first interaction (mobile only)
     useEffect(() => {
-        if (!showTip || typeof window === 'undefined' || window.innerWidth >= 1024) return;
+        if (!showTip || isDesktop) return;
 
         const unsubscribeX = x.on('change', (latest) => {
             if (Math.abs(latest) > 5) {
@@ -78,21 +96,26 @@ const RoughSortPage: React.FC = () => {
         };
     }, [showTip, x, y]);
 
-    // Auto-dismiss tip after 5 cards sorted (all devices)
     useEffect(() => {
-        if (showTip && responses.rough.history.length >= 5) {
+        // Cleanup function to clear the header action when component unmounts
+        return () => setHeaderAction(null);
+    }, [setHeaderAction]);
+
+    useEffect(() => {
+        if (showTip && roughHistory.length >= 5) {
             setShowTip(false);
         }
-    }, [responses.rough.history.length, showTip]);
+    }, [roughHistory.length, showTip]);
 
-    const unsortedCards = useMemo(() => {
-        if (!config?.statements) return [];
-        const sortedIds = new Set(responses.rough.history);
-        return config.statements.filter((s) => !sortedIds.has(s.id));
-    }, [config, responses.rough.history]);
+    // Memoize sorted cards set to avoid re-calculating on every render
+    const sortedIds = React.useMemo(() => new Set(roughHistory), [roughHistory]);
+    const unsortedCards = React.useMemo(
+        () => (config?.statements ? config.statements.filter((s) => !sortedIds.has(s.id)) : []),
+        [config, sortedIds]
+    );
 
     const currentCard = unsortedCards[0];
-    const progress = config?.statements
+    const progress = config?.statements?.length
         ? ((config.statements.length - unsortedCards.length) / config.statements.length) * 100
         : 0;
 
@@ -123,7 +146,7 @@ const RoughSortPage: React.FC = () => {
 
     const handleVote = (direction: 'agree' | 'disagree' | 'neutral') => {
         // Auto-dismiss tip on button click (mobile only)
-        if (showTip && typeof window !== 'undefined' && window.innerWidth < 1024) {
+        if (showTip && !isDesktop) {
             setShowTip(false);
         }
         // We now delegate to the card stack to animate first
@@ -135,7 +158,10 @@ const RoughSortPage: React.FC = () => {
     // Called after animation finishes by CardStack
     const onVoteComplete = (direction: 'agree' | 'disagree' | 'neutral') => {
         if (currentCard) {
-            categorizeCard(currentCard.id, direction);
+            // React 19: Use startTransition for state updates that trigger layout shifts
+            startTransition(() => {
+                categorizeCard(currentCard.id, direction);
+            });
             x.set(0);
             y.set(0);
         }
@@ -156,7 +182,9 @@ const RoughSortPage: React.FC = () => {
                     cardStackRef.current.swipe('neutral');
                     break;
                 case 'z':
-                    if (responses.rough.history.length > 0) undoRoughSort();
+                    if (roughHistory.length > 0) {
+                        handleUndo();
+                    }
                     break;
                 case 'Escape':
                     setShowTip(false);
@@ -166,29 +194,29 @@ const RoughSortPage: React.FC = () => {
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentCard, responses.rough.history.length, undoRoughSort, setHoveredCard]);
+    }, [currentCard, roughHistory.length, handleUndo, setHoveredCard]);
 
-    // Calculate shared font size for buttons (Harmonization)
-    const sharedFontSize = useMemo(() => {
-        if (typeof window === 'undefined' || window.innerWidth >= 1024) return 'text-sm';
+    // Memoized font scale advisor
+    const sharedFontSize = React.useMemo(() => {
+        if (isDesktop) return 'text-sm';
 
         const labels = [t('common.disagree'), t('common.agree'), t('common.neutral')];
-        // Extract words and find the longest one
         const words = labels.flatMap((l) => l.split(/[\s/]+/));
         const maxWordLength = Math.max(...words.map((w) => w.length));
 
-        // Thresholds based on w-20 (80px)
         if (maxWordLength > 10) return 'text-[10px]';
         if (maxWordLength > 8) return 'text-xs';
         return 'text-sm';
-    }, [t]);
+    }, [t, isDesktop]);
 
     if (!config) return null;
+
+    // Pre-instruction screen
 
     // Completed State
     if (!currentCard) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-in zoom-in duration-300 px-4">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6 animate-in zoom-in duration-300 px-4 relative z-[60] pointer-events-auto">
                 <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4">
                     <Check size={40} />
                 </div>
@@ -198,19 +226,22 @@ const RoughSortPage: React.FC = () => {
                 <div className="flex flex-col gap-4 mt-4 items-center">
                     <button
                         type="button"
-                        onClick={() => navigate(`/study/${slug}/fine-sort`)}
-                        className="px-8 py-3 bg-blue-600 text-white rounded-md font-bold text-base hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 animate-pulse hover:animate-none transition-all w-full sm:w-auto"
+                        data-testid="rough-sort-next-btn"
+                        onClick={() => startTransition(() => navigate(`/study/${slug}/fine-sort`))}
+                        style={{ backgroundColor: 'var(--brand-accent)' }}
+                        className="px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 animate-pulse hover:animate-none w-full sm:w-auto"
                     >
-                        {t('common.next')} <ArrowRight size={18} />
+                        {config.ui_labels?.['common.next'] || t('common.next')}{' '}
+                        <ArrowRight size={18} />
                     </button>
 
                     <button
                         type="button"
-                        onClick={undoRoughSort}
-                        className="px-6 py-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-colors flex items-center gap-2 text-sm font-medium"
+                        onClick={handleUndo}
+                        className="flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100/50 transition-all text-sm font-bold uppercase tracking-wider active:scale-95 touch-manipulation"
                     >
-                        <RotateCcw size={14} />
-                        {t('common.undo')}
+                        <RotateCcw size={16} />
+                        {config.ui_labels?.['common.undo'] || t('common.undo')}
                     </button>
                 </div>
             </div>
@@ -222,60 +253,64 @@ const RoughSortPage: React.FC = () => {
             {/* 1. Slim Progress Bar (Top) */}
             <div className="w-full h-1 bg-gray-100 flex-none z-30">
                 <div
-                    className="h-full bg-indigo-500 transition-all duration-300 ease-out"
-                    style={{ width: `${progress}%` }}
+                    className="h-full transition-all duration-300 ease-out"
+                    style={{
+                        width: `${progress}%`,
+                        backgroundColor: 'var(--brand-accent)',
+                    }}
                 />
             </div>
 
-            {/* 2. Instruction Bar (Visual Separation) */}
-            <div className="flex-none bg-slate-50 flex items-center justify-between border-b border-gray-100 z-20 shadow-sm relative transition-all duration-500 py-2">
-                <div className="w-12 lg:w-20 hidden sm:block" />
-
-                <div className="flex-1 px-2 flex flex-col items-center justify-center">
-                    <h3 className="font-bold text-slate-700 leading-tight text-center transition-all duration-500 text-base sm:text-lg flex items-center gap-2">
-                        {t('rough.header.title')}
-                        <span className="text-slate-400 text-sm font-medium">
-                            {config &&
-                                `(${config.statements.length - unsortedCards.length + 1}/${config.statements.length})`}
-                        </span>
-                    </h3>
-
-                    {/* INLINE TIP (Attached to Title) */}
-                    <AnimatePresence>
-                        {showTip && (
-                            <motion.div
-                                key="rough-tip-inline"
-                                initial={{ opacity: 0, height: 0, marginTop: 0 }}
-                                animate={{ opacity: 1, height: 'auto', marginTop: 8 }}
-                                exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                                className="w-full max-w-sm overflow-hidden"
-                            >
-                                <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2.5 flex items-center justify-center gap-2.5 relative mx-auto text-center shadow-sm">
-                                    <span className="text-lg">💡</span>
-                                    <div className="text-xs text-yellow-800 font-medium leading-tight text-left [&_strong]:font-bold">
-                                        <ReactMarkdown
-                                            components={{
-                                                p: ({ children }) => <span>{children}</span>,
-                                            }}
-                                        >
-                                            {t('rough.header.hint')}
-                                        </ReactMarkdown>
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowTip(false)}
-                                        aria-label="Close tip"
-                                        className="p-1 text-yellow-600 hover:text-yellow-800 rounded-full hover:bg-yellow-100 transition-colors flex-none"
-                                    >
-                                        <X size={14} />
-                                    </button>
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
+            {/* 2. Instruction Bar (Visual Synchronization with GridSort) */}
+            <div className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
+                <Target size={14} className="text-indigo-400 opacity-60 flex-none" />
+                <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900 flex items-center gap-2">
+                    <SafeMarkdown
+                        components={{
+                            p: ({ children }) => <span>{children}</span>,
+                        }}
+                    >
+                        {config.condition_of_instruction}
+                    </SafeMarkdown>
+                    <span className="text-slate-400 text-[10px] sm:text-xs font-medium bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200/50">
+                        {config &&
+                            `${config.statements.length - unsortedCards.length + 1}/${config.statements.length}`}
+                    </span>
                 </div>
 
-                <div className="w-12 lg:w-20 hidden sm:block" />
+                {/* INLINE TIP (Absolute position to avoid layout shift) */}
+                <AnimatePresence>
+                    {showTip && (
+                        <motion.div
+                            key="rough-tip-inline"
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="absolute top-full left-0 right-0 z-30 flex justify-center pt-2 px-4 pointer-events-none"
+                        >
+                            <div className="bg-yellow-50 border border-yellow-100 rounded-lg p-2.5 flex items-center justify-center gap-2.5 relative mx-auto text-center shadow-md max-w-sm pointer-events-auto">
+                                <span className="text-lg">💡</span>
+                                <div className="text-xs text-yellow-800 font-medium leading-tight text-left [&_strong]:font-bold">
+                                    <SafeMarkdown
+                                        components={{
+                                            p: ({ children }) => <span>{children}</span>,
+                                        }}
+                                    >
+                                        {t('rough.header.hint')}
+                                    </SafeMarkdown>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowTip(false)}
+                                    aria-label="Close tip"
+                                    className="p-1 text-yellow-600 hover:text-yellow-800 rounded-full hover:bg-yellow-100 transition-colors flex-none"
+                                >
+                                    <X size={14} />
+                                </button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* 3. The Control Cluster (Centered Stage) */}
@@ -285,52 +320,21 @@ const RoughSortPage: React.FC = () => {
                 {/* Row A: Horizon (Disagree - Card - Agree) */}
                 <div className="flex flex-row items-center justify-center gap-2 sm:gap-8 md:gap-12 w-full">
                     {/* Left Button (Disagree) */}
-                    <motion.button
-                        style={{ scale: scaleDisagree, opacity: opacityDisagree }}
+                    <DeckButton
+                        type="disagree"
+                        count={disagreeCount}
                         onClick={() => handleVote('disagree')}
-                        data-testid="rough-disagree-btn"
-                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 border-2 border-red-100 shadow-sm transition-colors gap-1 px-1"
-                        aria-label={t('common.disagree')}
-                        aria-keyshortcuts="ArrowLeft"
-                    >
-                        <div className="flex flex-col items-center gap-0.5 sm:gap-1">
-                            <Frown
-                                size={20}
-                                strokeWidth={2.5}
-                                className="sm:w-7 sm:h-7 opacity-80"
-                            />
-                            <span
-                                lang={t('common.lang_code', { defaultValue: 'en' })}
-                                className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight break-words hyphens-auto`}
-                            >
-                                {t('common.disagree')}
-                            </span>
-                        </div>
-                    </motion.button>
+                        scale={scaleDisagree}
+                        opacity={opacityDisagree}
+                        highlightKey={highlightKey}
+                        t={t}
+                        sharedFontSize={sharedFontSize}
+                        uiLabels={config?.ui_labels}
+                    />
 
                     {/* Card Zone */}
-                    <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-sm md:max-w-md">
+                    <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-sm md:max-w-md min-w-[6rem] min-h-[8rem] sm:min-w-[12rem] sm:min-h-[9rem]">
                         <div className="w-full h-full relative">
-                            {/* Desktop/Tablet Hover Tip (Keep absolute for large screens, hidden on mobile) */}
-                            <AnimatePresence>
-                                {showTip && window.innerWidth >= 1024 && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{
-                                            opacity: 0,
-                                            scale: 0.9,
-                                            transition: { duration: 0.2 },
-                                        }}
-                                        className="absolute -top-12 left-1/2 -translate-x-1/2 z-50 w-full max-w-[240px] pointer-events-none"
-                                    >
-                                        <div className="text-slate-500 text-xs font-semibold uppercase tracking-wider py-2 px-4 flex items-center justify-center gap-2 whitespace-nowrap opacity-80">
-                                            {t('rough.instructions.desktop_tip')}
-                                        </div>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-
                             <CardStack
                                 ref={cardStackRef}
                                 key={currentCard.id}
@@ -346,61 +350,58 @@ const RoughSortPage: React.FC = () => {
                     </div>
 
                     {/* Right Button (Agree) */}
-                    <motion.button
-                        style={{ scale: scaleAgree, opacity: opacityAgree }}
+                    <DeckButton
+                        type="agree"
+                        count={agreeCount}
                         onClick={() => handleVote('agree')}
-                        data-testid="rough-agree-btn"
-                        className="z-20 flex-none flex flex-col items-center justify-center w-20 min-h-40 h-auto py-3 sm:w-[9.1rem] sm:h-[9.1rem] rounded-2xl bg-green-50 text-green-600 hover:bg-green-100 border-2 border-green-100 shadow-sm transition-colors gap-1 px-1"
-                        aria-label={t('common.agree')}
-                        aria-keyshortcuts="ArrowRight"
-                    >
-                        <div className="flex flex-col items-center gap-0.5 sm:gap-1">
-                            <Smile
-                                size={20}
-                                strokeWidth={2.5}
-                                className="sm:w-7 sm:h-7 opacity-80"
-                            />
-                            <span
-                                lang={t('common.lang_code', { defaultValue: 'en' })}
-                                className={`${sharedFontSize} font-bold uppercase tracking-wide text-center leading-tight break-words hyphens-auto`}
-                            >
-                                {t('common.agree')}
-                            </span>
-                        </div>
-                    </motion.button>
+                        scale={scaleAgree}
+                        opacity={opacityAgree}
+                        highlightKey={highlightKey}
+                        t={t}
+                        sharedFontSize={sharedFontSize}
+                        uiLabels={config?.ui_labels}
+                    />
                 </div>
 
                 {/* Row B: Anchor (Neutral Pill + Undo) */}
-                <div className="flex flex-col items-center gap-4 w-full px-2">
-                    <motion.button
-                        style={{ scale: scaleNeutral, opacity: opacityNeutral }}
+                <div className="flex flex-col items-center gap-8 w-full px-2">
+                    <DeckButton
+                        type="neutral"
+                        count={neutralCount}
                         onClick={() => handleVote('neutral')}
-                        data-testid="rough-neutral-btn"
-                        className="w-auto min-w-[160px] max-w-[240px] px-8 sm:max-w-none sm:w-[18.2rem] h-16 sm:h-[5.6rem] rounded-2xl bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-gray-200 hover:border-gray-300 flex items-center justify-center gap-2 font-bold uppercase tracking-wide shadow-sm transition-colors"
-                        aria-label={t('common.neutral')}
-                        aria-keyshortcuts="ArrowDown"
-                    >
-                        <div className="flex items-center gap-2 text-gray-600">
-                            <Meh size={20} strokeWidth={2.5} className="opacity-80" />
-                            <span
-                                lang={t('common.lang_code', { defaultValue: 'en' })}
-                                className={`${sharedFontSize} font-bold tracking-wide break-words hyphens-auto`}
-                            >
-                                {t('common.neutral')}
-                            </span>
-                        </div>
-                    </motion.button>
+                        scale={scaleNeutral}
+                        opacity={opacityNeutral}
+                        highlightKey={highlightKey}
+                        t={t}
+                        sharedFontSize={sharedFontSize}
+                        isNeutral
+                        uiLabels={config?.ui_labels}
+                    />
 
-                    <button
-                        type="button"
-                        onClick={undoRoughSort}
-                        disabled={responses.rough.history.length === 0}
-                        className="flex items-center gap-2 px-6 py-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-0 transition-all text-xs font-bold uppercase tracking-widest"
-                        aria-keyshortcuts="z"
-                    >
-                        <RotateCcw size={14} />
-                        {t('common.undo')}
-                    </button>
+                    <div className="flex items-center gap-4">
+                        <button
+                            type="button"
+                            onClick={handleUndo}
+                            disabled={roughHistory.length === 0}
+                            className="flex items-center gap-2 px-6 py-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-50 disabled:opacity-0 transition-all text-[10px] sm:text-xs font-bold uppercase tracking-widest active:scale-95 touch-manipulation"
+                            aria-keyshortcuts="z"
+                        >
+                            <RotateCcw size={14} />
+                            {config.ui_labels?.['common.undo'] || t('common.undo')}
+                        </button>
+                        {/* Desktop Keyboard Shortcuts Hint */}
+                        <div className="hidden lg:flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
+                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
+                                ←
+                            </kbd>
+                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
+                                ↓
+                            </kbd>
+                            <kbd className="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200">
+                                →
+                            </kbd>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -426,7 +427,7 @@ const RoughSortPage: React.FC = () => {
                                     {hoveredCard.code && <span>• {hoveredCard.code}</span>}
                                 </h3>
                                 <div className="text-xl sm:text-2xl font-medium text-gray-800 leading-relaxed">
-                                    <ReactMarkdown
+                                    <SafeMarkdown
                                         components={{
                                             p: ({ children }) => (
                                                 <p className="mb-4 last:mb-0">{children}</p>
@@ -434,7 +435,7 @@ const RoughSortPage: React.FC = () => {
                                         }}
                                     >
                                         {hoveredCard.text}
-                                    </ReactMarkdown>
+                                    </SafeMarkdown>
                                 </div>
                             </div>
                             <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-end">
@@ -455,3 +456,191 @@ const RoughSortPage: React.FC = () => {
 };
 
 export default RoughSortPage;
+
+interface DeckButtonProps {
+    type: 'agree' | 'disagree' | 'neutral';
+    count: number;
+    onClick: () => void;
+    // biome-ignore lint/suspicious/noExplicitAny: framer-motion Transform value
+    scale: any;
+    // biome-ignore lint/suspicious/noExplicitAny: framer-motion Transform value
+    opacity: any;
+    highlightKey?: string | null;
+    // biome-ignore lint/suspicious/noExplicitAny: translation function
+    t: any;
+    sharedFontSize: string;
+    isNeutral?: boolean;
+    uiLabels?: Record<string, string>;
+}
+
+const DeckButton: React.FC<DeckButtonProps> = ({
+    type,
+    count,
+    onClick,
+    scale,
+    opacity,
+    highlightKey,
+    t,
+    sharedFontSize,
+    uiLabels,
+}) => {
+    const { width } = useViewport();
+    const styleConfig = React.useMemo(() => {
+        const base =
+            'flex flex-col items-center justify-center rounded-2xl border-2 shadow-sm transition-all duration-200 gap-0.5 sm:gap-1 px-1.5 w-full h-full';
+        switch (type) {
+            case 'agree':
+                return {
+                    className: cn(
+                        base,
+                        'bg-green-50 text-green-600 hover:bg-green-100 border-green-100'
+                    ),
+                    icon: (
+                        <Smile size={18} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
+                    ),
+                    badgeClass: 'bg-green-600',
+                    bgCardClass: 'bg-green-50 border-green-100',
+                    ariaKey: 'ArrowRight',
+                    testid: 'rough-agree-btn',
+                };
+            case 'disagree':
+                return {
+                    className: cn(base, 'bg-red-50 text-red-600 hover:bg-red-100 border-red-100'),
+                    icon: (
+                        <Frown size={18} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />
+                    ),
+                    badgeClass: 'bg-red-600',
+                    bgCardClass: 'bg-red-50 border-red-100',
+                    ariaKey: 'ArrowLeft',
+                    testid: 'rough-disagree-btn',
+                };
+            case 'neutral':
+                return {
+                    className: cn(
+                        base,
+                        'bg-blue-50 text-blue-600 hover:bg-blue-100 border-blue-100'
+                    ),
+                    icon: <Meh size={18} strokeWidth={2.5} className="sm:w-7 sm:h-7 opacity-80" />,
+                    badgeClass: 'bg-blue-600',
+                    bgCardClass: 'bg-blue-50 border-blue-100',
+                    ariaKey: 'ArrowDown',
+                    testid: 'rough-neutral-btn',
+                };
+        }
+    }, [type]);
+
+    // Adaptive stack effect values
+    const isMobile = width < BREAKPOINTS.SM;
+    const rotate1 =
+        type === 'agree'
+            ? isMobile
+                ? 2
+                : 4
+            : type === 'disagree'
+              ? isMobile
+                  ? -2
+                  : -4
+              : isMobile
+                ? 1
+                : 2;
+    const rotate2 =
+        type === 'agree'
+            ? isMobile
+                ? -1.5
+                : -3
+            : type === 'disagree'
+              ? isMobile
+                  ? 1.5
+                  : 3
+              : isMobile
+                ? -1
+                : -2;
+    const offset1 = isMobile ? 2 : 3;
+    const offset2 = isMobile ? 4 : 6;
+
+    return (
+        <div
+            // FIXED: Mobile = Portrait (w-24 h-32), Desktop = Landscape (w-48 h-36)
+            className="relative group flex-none w-24 h-32 sm:w-48 sm:h-36 z-20"
+        >
+            {/* Visual Stack Effect (Background Cards) */}
+            <AnimatePresence>
+                {count > 0 && (
+                    <>
+                        <motion.div
+                            initial={{ scale: 1, opacity: 0 }}
+                            animate={{
+                                opacity: 1,
+                                rotate: rotate1,
+                                y: offset1,
+                            }}
+                            exit={{ opacity: 0 }}
+                            className={cn(
+                                'absolute inset-0 rounded-2xl border-2 z-0 transform',
+                                styleConfig.bgCardClass
+                            )}
+                        />
+                        {count > 3 && (
+                            <motion.div
+                                initial={{ scale: 1, opacity: 0 }}
+                                animate={{
+                                    opacity: 0.8,
+                                    rotate: rotate2,
+                                    y: offset2,
+                                }}
+                                exit={{ opacity: 0 }}
+                                className={cn(
+                                    'absolute inset-0 rounded-2xl border-2 z-0 transform bg-white',
+                                    styleConfig.bgCardClass
+                                )}
+                            />
+                        )}
+                    </>
+                )}
+            </AnimatePresence>
+
+            <motion.button
+                style={{ scale, opacity }}
+                onClick={onClick}
+                data-testid={styleConfig.testid}
+                // FIXED: Enforce absolute inset-0 to match background cards perfectly and be full-sized
+                className={cn(
+                    styleConfig.className,
+                    'absolute inset-0 z-10',
+                    highlightKey === `common.${type}` &&
+                        'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                )}
+                aria-label={uiLabels?.[`common.${type}`] || t(`common.${type}`)}
+                aria-keyshortcuts={styleConfig.ariaKey}
+            >
+                <div className="flex flex-col items-center">
+                    {styleConfig.icon}
+                    <span
+                        lang={t('common.lang_code', { defaultValue: 'en' })}
+                        className={cn(
+                            sharedFontSize,
+                            'font-bold uppercase tracking-wide text-center leading-[1.1] break-words hyphens-auto text-[10px] sm:text-xs px-0.5'
+                        )}
+                    >
+                        {uiLabels?.[`common.${type}`] || t(`common.${type}`)}
+                    </span>
+                </div>
+            </motion.button>
+            <AnimatePresence>
+                {count > 0 && (
+                    <motion.span
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        className={cn(
+                            'absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-6 h-6 sm:w-7 sm:h-7 flex items-center justify-center rounded-full text-[10px] sm:text-xs font-bold border-2 shadow-sm z-30 text-white border-white',
+                            styleConfig.badgeClass
+                        )}
+                    >
+                        {count}
+                    </motion.span>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};

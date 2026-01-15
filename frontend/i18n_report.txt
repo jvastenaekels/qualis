@@ -1,0 +1,11 @@
+
+> open-q@0.0.0 i18n-check
+> python3 scripts/check_i18n.py
+
+Checking fr.json...
+  ✓ Perfect sync.
+--------------------
+Checking fi.json...
+  ✓ Perfect sync.
+--------------------
+All localization files are in sync with en.json!

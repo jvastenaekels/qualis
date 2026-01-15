@@ -21,6 +21,7 @@ const DroppableSlot: React.FC<DroppableSlotProps> = React.memo(
         });
 
         const commonProps = {
+            id,
             ref: setNodeRef,
             onClick,
             onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>) => {

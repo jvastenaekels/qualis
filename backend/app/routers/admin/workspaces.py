@@ -1,35 +1,59 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import select, func
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+import logging
 
-from app.dependencies import get_current_active_user, get_db
+from app.dependencies import (
+    check_workspace_permission,
+    get_current_active_user,
+    get_db,
+)
 from app.models import User, Workspace, WorkspaceMember, WorkspaceRole
-from app.schemas import WorkspaceCreate, WorkspaceRead
+from app.schemas import (
+    WorkspaceCreate,
+    WorkspaceMemberRead,
+    WorkspaceMemberUpdate,
+    WorkspaceRead,
+    WorkspaceUpdate,
+    WorkspaceInvitationCreate,
+    InvitationLink,
+    WorkspaceWithRole,
+)
+from app.utils.security import create_invitation_token
+from app.utils.email import send_invitation_email
+from app.core.config import settings
+from fastapi import BackgroundTasks
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
-@router.get("/", response_model=list[WorkspaceRead])
+@router.get("", response_model=list[WorkspaceWithRole])
 async def list_workspaces(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
-) -> list[Workspace]:
+) -> list[WorkspaceWithRole]:
     """
-    List all workspaces the current user is a member of.
+    List all workspaces the current user is a member of, with their role.
     """
-    # Select workspaces where the user is a member
-    # Join WorkspaceMember to filter by user_id
+    # Select workspaces where the user is a member, inclusive of role
     query = (
-        select(Workspace)
-        .join(WorkspaceMember)
+        select(Workspace, WorkspaceMember.role)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
         .where(WorkspaceMember.user_id == current_user.id)
     )
     result = await db.execute(query)
-    workspaces = result.scalars().all()
-    return list(workspaces)
+    rows = result.all()
+
+    # Map to schema
+    return [
+        WorkspaceWithRole(**workspace.__dict__, user_role=role)
+        for workspace, role in rows
+    ]
 
 
-@router.post("/", response_model=WorkspaceRead, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=WorkspaceRead, status_code=status.HTTP_201_CREATED)
 async def create_workspace(
     workspace_in: WorkspaceCreate,
     current_user: User = Depends(get_current_active_user),
@@ -47,22 +71,256 @@ async def create_workspace(
             detail="Workspace with this slug already exists",
         )
 
-    # Create Workspace
-    workspace = Workspace(
-        title=workspace_in.title,
-        slug=workspace_in.slug,
-    )
-    db.add(workspace)
-    await db.flush()  # To get ID
+    try:
+        # Create Workspace
+        workspace = Workspace(
+            title=workspace_in.title,
+            slug=workspace_in.slug,
+        )
+        db.add(workspace)
+        await db.flush()  # To get ID
 
-    # Create Member (Owner)
-    member = WorkspaceMember(
-        workspace_id=workspace.id,
-        user_id=current_user.id,
-        role=WorkspaceRole.owner,
-    )
-    db.add(member)
-    await db.commit()
+        # Create Member (Owner)
+        member = WorkspaceMember(
+            workspace_id=workspace.id,
+            user_id=current_user.id,
+            role=WorkspaceRole.owner,
+        )
+        db.add(member)
+        await db.commit()
+    except IntegrityError as e:
+        await db.rollback()
+        logger.error(
+            f"Integrity check failed during workspace creation: {e}", exc_info=True
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Workspace with this slug likely already exists",
+        )
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during workspace creation: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while creating the workspace",
+        )
     await db.refresh(workspace)
 
     return workspace
+
+
+@router.get("/{slug}", response_model=WorkspaceRead)
+async def get_workspace(
+    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.viewer)),
+) -> Workspace:
+    """
+    Get workspace details.
+    """
+    return workspace
+
+
+@router.patch("/{slug}", response_model=WorkspaceRead)
+async def update_workspace(
+    workspace_in: WorkspaceUpdate,
+    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    db: AsyncSession = Depends(get_db),
+) -> Workspace:
+    """
+    Update workspace details.
+    """
+    try:
+        if workspace_in.title is not None:
+            workspace.title = workspace_in.title
+        if workspace_in.slug is not None and workspace_in.slug != workspace.slug:
+            # Check if new slug exists
+            query = select(Workspace).where(Workspace.slug == workspace_in.slug)
+            result = await db.execute(query)
+            if result.scalar_one_or_none():
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Workspace with this slug already exists",
+                )
+            workspace.slug = workspace_in.slug
+
+        await db.commit()
+    except IntegrityError as e:
+        await db.rollback()
+        logger.error(
+            f"Integrity check failed during workspace update: {e}", exc_info=True
+        )
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Database integrity check failed",
+        )
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during workspace update: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while updating the workspace",
+        )
+    await db.refresh(workspace)
+    return workspace
+
+
+@router.get("/{slug}/members", response_model=list[WorkspaceMemberRead])
+async def list_workspace_members(
+    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+) -> list[WorkspaceMember]:
+    """
+    List all members of a workspace.
+    """
+    from sqlalchemy.orm import selectinload
+
+    query = (
+        select(WorkspaceMember)
+        .where(WorkspaceMember.workspace_id == workspace.id)
+        .options(selectinload(WorkspaceMember.user))
+    )
+    result = await db.execute(query)
+    members = result.scalars().all()
+
+    # Manually populate user_email for the schema if needed,
+    # though lazy="selectin" or join should handle it.
+    return list(members)
+
+
+@router.patch("/{slug}/members/{user_id}", response_model=WorkspaceMemberRead)
+async def update_workspace_member(
+    user_id: int,
+    member_in: WorkspaceMemberUpdate,
+    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    db: AsyncSession = Depends(get_db),
+) -> WorkspaceMember:
+    """
+    Update a workspace member's role.
+    """
+    query = select(WorkspaceMember).where(
+        WorkspaceMember.workspace_id == workspace.id, WorkspaceMember.user_id == user_id
+    )
+    result = await db.execute(query)
+    member = result.scalar_one_or_none()
+
+    if not member:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Member not found"
+        )
+
+    try:
+        member.role = member_in.role
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during member update: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while updating member role",
+        )
+    await db.refresh(member)
+    return member
+
+
+@router.delete("/{slug}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def remove_workspace_member(
+    user_id: int,
+    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Remove a member from the workspace.
+    """
+    if user_id == current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You cannot remove yourself from the workspace",
+        )
+
+    query = select(WorkspaceMember).where(
+        WorkspaceMember.workspace_id == workspace.id, WorkspaceMember.user_id == user_id
+    )
+    result = await db.execute(query)
+    member = result.scalar_one_or_none()
+
+    if not member:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Member not found"
+        )
+
+    try:
+        await db.delete(member)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during member removal: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while removing the member",
+        )
+
+
+@router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_workspace(
+    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Delete a workspace (Owner only).
+    """
+    # Check for active studies
+    # We can't delete if there are studies? Plan says: "impossible si des études sont actives".
+    # Let's count studies.
+    # Note: Studies are cascade deleted in DB usually if configured, but plan requests safety check.
+
+    # Query count of studies
+    from app.models import Study
+
+    stmt = select(func.count(Study.id)).where(Study.workspace_id == workspace.id)
+    result = await db.execute(stmt)
+    study_count = result.scalar() or 0
+
+    if study_count > 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot delete workspace with {study_count} existing studies. Please delete them first.",
+        )
+
+    try:
+        await db.delete(workspace)
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during workspace deletion: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while deleting the workspace",
+        )
+
+
+@router.post("/{slug}/invitations", response_model=InvitationLink)
+async def create_invitation(
+    invitation_in: WorkspaceInvitationCreate,
+    background_tasks: BackgroundTasks,
+    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
+):
+    """
+    Invite a user to the workspace.
+    """
+    token = create_invitation_token(
+        email=invitation_in.email,
+        workspace_id=workspace.id,
+        role=invitation_in.role.value,
+    )
+
+    invite_url = f"{settings.FRONTEND_URL}/register?token={token}"
+
+    background_tasks.add_task(
+        send_invitation_email,
+        email_to=invitation_in.email,
+        context_name=workspace.title,
+        invite_url=invite_url,
+        context_type="workspace",
+    )
+
+    return InvitationLink(invite_url=invite_url, token=token)

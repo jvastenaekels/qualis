@@ -31,7 +31,11 @@ export const useSubmitStudy = () => {
 
             try {
                 if (!config) throw new Error('Study config is missing');
-                if (!session.token) throw new Error('No session token');
+
+                const searchParams = new URLSearchParams(window.location.search);
+                const isTestMode = searchParams.get('mode') === 'test';
+
+                if (!isTestMode && !session.token) throw new Error('No session token');
 
                 const qsortPayload = responses.qsort.map(
                     (item: { statementId: number; col: number; row: number }) => {
@@ -44,13 +48,13 @@ export const useSubmitStudy = () => {
                             statement_id: item.statementId,
                             grid_score: score,
                             card_comment:
-                                responses.postsort.card_comments[item.statementId] || null,
+                                responses.postsort.card_comments[item.statementId] || undefined,
                         };
                     }
                 );
 
                 const payload = {
-                    session_token: session.token,
+                    session_token: session.token || '00000000-0000-0000-0000-000000000000',
                     study_slug: config.slug,
                     language_used: session.language || 'en',
                     status: status,
@@ -61,11 +65,24 @@ export const useSubmitStudy = () => {
                     },
                 };
 
+                if (isTestMode) {
+                    console.log('PILOT SUBMISSION (Simulated):', payload);
+                    if (status === 'completed') {
+                        setIsSuccess(true);
+                        const code = `PILOT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
+                        setConfirmationCode(code);
+                        session.completeSession(code);
+                    }
+                    return;
+                }
+
                 const data = await submitStudyMutation({ data: payload });
 
                 if (status === 'completed') {
                     setIsSuccess(true);
-                    setConfirmationCode((data as { confirmation_code: string }).confirmation_code);
+                    const code = (data as { confirmation_code: string }).confirmation_code;
+                    setConfirmationCode(code);
+                    session.completeSession(code);
                 }
             } catch (err: unknown) {
                 console.error(err);
@@ -84,6 +101,7 @@ export const useSubmitStudy = () => {
             responses.postsort,
             responses.presort,
             submitStudyMutation,
+            session.completeSession,
         ]
     );
 

@@ -11,6 +11,7 @@ import ErrorPage from '../pages/ErrorPage';
 
 interface Props {
     children?: ReactNode;
+    fallback?: ReactNode | ((error: Error) => ReactNode);
 }
 
 interface State {
@@ -61,6 +62,14 @@ class ErrorBoundary extends Component<Props, State> {
 
     public render() {
         if (this.state.hasError) {
+            if (this.props.fallback) {
+                if (typeof this.props.fallback === 'function') {
+                    // We can't easily pass resetErrorBoundary here unless we lift state or use the key trick from parent.
+                    // But we can pass the error.
+                    return this.props.fallback(this.state.error || new Error('Unknown error'));
+                }
+                return this.props.fallback;
+            }
             return <ErrorPage error={this.state.error} />;
         }
 

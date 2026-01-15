@@ -4,13 +4,17 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { StudyTranslationCreateInstructions } from './studyTranslationCreateInstructions';
 import type { StudyTranslationCreateSubtitle } from './studyTranslationCreateSubtitle';
 import type { StudyTranslationCreateObjective } from './studyTranslationCreateObjective';
+import type { StudyTranslationCreateConditionOfInstruction } from './studyTranslationCreateConditionOfInstruction';
 import type { StudyTranslationCreateConsentTitle } from './studyTranslationCreateConsentTitle';
 import type { StudyTranslationCreateConsentDescription } from './studyTranslationCreateConsentDescription';
 import type { StudyTranslationCreateConsentAccept } from './studyTranslationCreateConsentAccept';
 import type { StudyTranslationCreateConsentDecline } from './studyTranslationCreateConsentDecline';
 import type { StudyTranslationCreateUiLabels } from './studyTranslationCreateUiLabels';
+import type { ProcessStep } from './processStep';
+import type { StudyTranslationCreateStepHelp } from './studyTranslationCreateStepHelp';
 
 /**
  * Schema for creating a study translation.
@@ -21,18 +25,20 @@ export interface StudyTranslationCreate {
      * @pattern ^[a-z]{2}(-[A-Z]{2})?$
      */
     language_code: string;
-    /**
-     * @minLength 1
-     * @maxLength 200
-     */
+    /** @maxLength 200 */
     title: string;
+    /** @maxLength 2000 */
     description?: string;
-    instructions?: string;
+    instructions?: StudyTranslationCreateInstructions;
     subtitle?: StudyTranslationCreateSubtitle;
     objective?: StudyTranslationCreateObjective;
+    condition_of_instruction?: StudyTranslationCreateConditionOfInstruction;
     consent_title?: StudyTranslationCreateConsentTitle;
     consent_description?: StudyTranslationCreateConsentDescription;
     consent_accept?: StudyTranslationCreateConsentAccept;
     consent_decline?: StudyTranslationCreateConsentDecline;
     ui_labels?: StudyTranslationCreateUiLabels;
+    process_steps?: ProcessStep[];
+    methodology_tips?: string[];
+    step_help?: StudyTranslationCreateStepHelp;
 }

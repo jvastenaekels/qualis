@@ -5,6 +5,7 @@ from typing import Any, cast
 
 import bcrypt
 import jwt
+import pyotp
 
 from app.core.config import settings
 
@@ -49,7 +50,11 @@ def create_access_token(
 
 
 def create_invitation_token(
-    email: str, study_id: int, role: str, expires_delta: timedelta | None = None
+    email: str,
+    role: str,
+    study_id: int | None = None,
+    workspace_id: int | None = None,
+    expires_delta: timedelta | None = None,
 ) -> str:
     """Create a JWT invitation token."""
     if expires_delta:
@@ -60,10 +65,13 @@ def create_invitation_token(
     to_encode = {
         "exp": expire,
         "sub": email,
-        "study_id": study_id,
         "role": role,
         "type": "invitation",
     }
+    if study_id:
+        to_encode["study_id"] = study_id
+    if workspace_id:
+        to_encode["workspace_id"] = workspace_id
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
@@ -76,3 +84,19 @@ def decode_invitation_token(token: str) -> dict[str, Any]:
     if payload.get("type") != "invitation":
         raise jwt.InvalidTokenError("Not an invitation token")
     return cast(dict[str, Any], payload)
+
+
+def generate_totp_secret() -> str:
+    """Generate a new TOTP secret."""
+    return pyotp.random_base32()
+
+
+def get_totp_uri(email: str, secret: str) -> str:
+    """Generate a TOTP provisioning URI for QR codes."""
+    return pyotp.totp.TOTP(secret).provisioning_uri(name=email, issuer_name="Open-Q")
+
+
+def verify_totp_token(secret: str, token: str) -> bool:
+    """Verify a TOTP token against a secret."""
+    totp = pyotp.TOTP(secret)
+    return totp.verify(token, valid_window=1)

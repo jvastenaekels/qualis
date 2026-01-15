@@ -1,0 +1,712 @@
+trim trailing whitespace.................................................Passed
+fix end of files.........................................................Passed
+check yaml...............................................................Passed
+check for added large files..............................................Passed
+check json...............................................................Failed
+- hook id: check-json
+- exit code: 1
+
+frontend/src/locales/fr.json: Failed to json decode (Duplicate key: header)
+frontend/src/locales/fi.json: Failed to json decode (Duplicate key: header)
+frontend/src/locales/en.json: Failed to json decode (Duplicate key: header)
+
+ruff.....................................................................Passed
+ruff-format..............................................................Passed
+mypy.....................................................................Failed
+- hook id: mypy
+- exit code: 1
+
+backend/app/database.py:21: error: Item "None" of "str | None" has no attribute "startswith"  [union-attr]
+backend/app/database.py:31: error: Argument 1 to "create_async_engine" has incompatible type "str | None"; expected "str | URL"  [arg-type]
+Found 2 errors in 1 file (checked 59 source files)
+
+Radon (Complexity).......................................................Passed
+Deptry (Check Dependencies)..............................................Passed
+Bandit (Security)........................................................Passed
+Frontend Typecheck (TSC).................................................Passed
+Frontend Lint & Format (Biome)...........................................Failed
+- hook id: frontend-biome
+- exit code: 1
+
+> open-q@0.0.0 lint
+> biome check src
+
+src/components/admin/dashboard/ParticipantDetailContent.tsx:74:52 lint/complexity/useLiteralKeys  FIXABLE  ━━━━━━━━━━
+
+  i The computed expression can be simplified without the use of a string literal.
+
+    72 │     // `DumpParticipant` has `presort` which comes from that.
+    73 │     // So `participant.presort['_recruitment_token']` should exist if it was saved.
+  > 74 │     const recruitmentToken = participant.presort?.['_recruitment_token'];
+       │                                                    ^^^^^^^^^^^^^^^^^^^^
+    75 │
+    76 │     return (
+
+  i Unsafe fix: Use a literal key instead.
+
+    74 │ ····const·recruitmentToken·=·participant.presort?.['_recruitment_token'];
+       │                                                   --                  --
+
+src/components/GridSort.tsx:211:8 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    209 │ const GridLegend: React.FC<{
+    210 │     highlightKey?: string | null;
+  > 211 │     t: any;
+        │        ^^^
+    212 │     getLegendFontSize: (maxLen: number) => string;
+    213 │ }> = React.memo(({ highlightKey, t, getLegendFontSize }) => {
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/AdminDashboard.tsx:25:39 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    23 │     const { t, i18n } = useTranslation();
+    24 │
+  > 25 │     const dateLocales: Record<string, any> = {
+       │                                       ^^^
+    26 │         en: enUS,
+    27 │         fr: fr,
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/dashboard/InteractiveDataView.tsx:113:22 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    111 │                     ...selectedParticipant,
+    112 │                     is_discarded: isDiscarded,
+  > 113 │                 } as any);
+        │                      ^^^
+    114 │             }
+    115 │         } catch (err) {
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/dashboard/InteractiveDataView.tsx:123:21 lint/correctness/useExhaustiveDependencies  FIXABLE  ━━━━━━━━━━
+
+  ! This hook does not specify its dependency on t.
+
+    121 │     const columnHelper = createColumnHelper<DumpParticipant>();
+    122 │
+  > 123 │     const columns = useMemo(
+        │                     ^^^^^^^
+    124 │         () => [
+    125 │             columnHelper.accessor('id', {
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    155 │             columnHelper.display({
+    156 │                 id: 'flags',
+  > 157 │                 header: t('admin.data.table.flags'),
+        │                         ^
+    158 │                 cell: ({ row }) => {
+    159 │                     const p = row.original;
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    143 │             }),
+    144 │             columnHelper.accessor('language', {
+  > 145 │                 header: t('admin.data.table.lang'),
+        │                         ^
+    146 │                 cell: (info) => (
+    147 │                     <div className="flex items-center gap-2">
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    191 │                             className="hover:bg-transparent hover:text-indigo-600 pr-0"
+    192 │                         >
+  > 193 │                             {t('admin.data.table.duration')}
+        │                              ^
+    194 │                             <Clock className="ml-2 h-3 w-3" />
+    195 │                         </Button>
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    173 │                             {hasComments && (
+    174 │                                 <div
+  > 175 │                                     title={t('admin.data.tooltips.has_comments')}
+        │                                            ^
+    176 │                                     className="text-indigo-500"
+    177 │                                 >
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    165 │                             {isSuspect && (
+    166 │                                 <div
+  > 167 │                                     title={t('admin.data.tooltips.suspect')}
+        │                                            ^
+    168 │                                     className="text-amber-500"
+    169 │                                 >
+
+  i This dependency is being used here, but is not specified in the hook dependency list.
+
+    131 │                             className="-ml-4 hover:bg-transparent hover:text-indigo-600"
+    132 │                         >
+  > 133 │                             {t('admin.data.table.id_token')}
+        │                              ^
+    134 │                             <ArrowUpDown className="ml-2 h-4 w-4" />
+    135 │                         </Button>
+
+  i React relies on hook dependencies to determine when to re-compute Effects.
+    Failing to specify dependencies can result in Effects not updating correctly when state changes.
+    These "stale closures" are a common source of surprising bugs.
+
+  i Unsafe fix: Add the missing dependency to the list.
+
+    228 │ ········[columnHelper,·t]
+        │                      +++
+
+src/components/admin/designer/ConditionOfInstructionEditor.tsx:23:51 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    22 │     const handleChange = (field: keyof StudyTranslation, value: string | null) => {
+  > 23 │         updateTranslation(activeLocale, (t_trans: any) => {
+       │                                                   ^^^
+    24 │             (t_trans as any)[field] = value;
+    25 │         });
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/designer/ConditionOfInstructionEditor.tsx:24:25 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    22 │     const handleChange = (field: keyof StudyTranslation, value: string | null) => {
+    23 │         updateTranslation(activeLocale, (t_trans: any) => {
+  > 24 │             (t_trans as any)[field] = value;
+       │                         ^^^
+    25 │         });
+    26 │     };
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/designer/QuestionBuilder.presort.test.tsx:171:81 lint/suspicious/noExplicitAny ━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    170 │         // Simulate the onUpdate handler logic
+  > 171 │         const onUpdateHandler = (d: typeof testDraft, questionId: string, data: any) => {
+        │                                                                                 ^^^
+    172 │             if (d.presort_config && 'enabled' in d.presort_config) {
+    173 │                 if (!d.presort_config.fields) d.presort_config.fields = {};
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/admin/designer/QuestionBuilder.tsx:354:28 lint/suspicious/noExplicitAny ━━━━━━━━━━━━━
+
+  ! Unexpected any. Specify a different type.
+
+    353 │             // If currently legacy (no enabled flag), migrate to new structure
+  > 354 │             let newConfig: any;
+        │                            ^^^
+    355 │             if (!('enabled' in currentConfig)) {
+    356 │                 newConfig = {
+
+  i any disables many type checking rules. Its use should be avoided.
+
+
+src/components/GridSort.tsx:221:13 lint/a11y/useAriaPropsSupportedByRole ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × The ARIA attribute 'aria-label' is not supported by this element.
+
+    219 │     return (
+    220 │         <div className="w-full h-auto flex flex-col gap-3 pt-4 border-t border-slate-200/50">
+  > 221 │             <div
+        │             ^^^^
+  > 222 │                 className="flex justify-between items-end w-full font-bold uppercase tracking-widest opacity-60 px-2 gap-4"
+  > 223 │                 aria-label="Grid legend"
+  > 224 │             >
+        │             ^
+    225 │                 {legends.map((key) => (
+    226 │                     <LegendLabel
+
+  i Ensure that ARIA attributes are valid for the role of the element.
+
+
+src/components/GridSort.tsx:9:15 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Several of these imports are unused.
+
+     7 │ import { useDroppable } from '@dnd-kit/core';
+     8 │ import { motion } from 'framer-motion';
+   > 9 │ import { cva, type VariantProps } from 'class-variance-authority';
+       │               ^^^^^^^^^^^^^^^^^
+    10 │ import { Check, Frown, Meh, RotateCcw, Smile, Target, ZoomIn, ZoomOut } from 'lucide-react';
+    11 │ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+  i Unused imports might be the result of an incomplete refactoring.
+
+  i Unsafe fix: Remove the unused imports.
+
+    9 │ import·{·cva,·type·VariantProps·}·from·'class-variance-authority';
+      │               ------------------
+
+src/components/ReadingZone.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+
+     82  82 │       }) => (
+     83  83 │           <div
+     84     │ - ············className={cn("font-bold·text-indigo-400·uppercase·tracking-wider·flex·items-center",·className)}
+         84 │ + ············className={cn(
+         85 │ + ················'font-bold·text-indigo-400·uppercase·tracking-wider·flex·items-center',
+         86 │ + ················className
+         87 │ + ············)}
+     85  88 │           >
+     86  89 │               <Eye size={iconSize} strokeWidth={2.5} />
+
+
+src/components/SortableCard.tsx:23:15 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━━━━━━━━━━
+
+  × Several of these imports are unused.
+
+    21 │ import { useUIStore } from '../store/useUIStore';
+    22 │ import { cn } from '@/lib/utils';
+  > 23 │ import { cva, type VariantProps } from 'class-variance-authority';
+       │               ^^^^^^^^^^^^^^^^^
+    24 │
+    25 │ interface SortableCardProps {
+
+  i Unused imports might be the result of an incomplete refactoring.
+
+  i Unsafe fix: Remove the unused imports.
+
+    23 │ import·{·cva,·type·VariantProps·}·from·'class-variance-authority';
+       │               ------------------
+
+src/components/SortableCard.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+
+    268 268 │                           className={`w-full h-full flex items-center justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
+    269 269 │                       >
+    270     │ - ························<div
+    271     │ - ····························className={textStyles({·variant,·allowScroll·})}
+    272     │ - ························>
+        270 │ + ························<div·className={textStyles({·variant,·allowScroll·})}>
+    273 271 │                               {/[*_~#]/.test(text) ? (
+    274 272 │                                   <ReactMarkdown
+
+
+src/components/admin/dashboard/RecruitmentModule.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+
+     37  37 │                   <div className="flex items-center gap-2 mb-1">
+     38  38 │                       <Megaphone className="h-5 w-5 text-indigo-500" />
+     39     │ - ····················<CardTitle·className="text-lg">{t('admin.recruitment.share_title',·'Share·study')}</CardTitle>
+         39 │ + ····················<CardTitle·className="text-lg">
+         40 │ + ························{t('admin.recruitment.share_title',·'Share·study')}
+         41 │ + ····················</CardTitle>
+     40  42 │                   </div>
+     41     │ - ················<CardDescription>{t('admin.recruitment.share_desc',·'Distribute·your·study·URL·to·invite·participants.')}</CardDescription>
+         43 │ + ················<CardDescription>
+         44 │ + ····················{t(
+         45 │ + ························'admin.recruitment.share_desc',
+         46 │ + ························'Distribute·your·study·URL·to·invite·participants.'
+         47 │ + ····················)}
+         48 │ + ················</CardDescription>
+     42  49 │               </CardHeader>
+     43  50 │               <CardContent className="p-6 space-y-6">
+    ······· │
+     79  86 │                       >
+     80  87 │                           <QrCode className="h-4 w-4" />
+     81     │ - ························{showQR·?·t('admin.recruitment.hide_qr',·'Hide·QR')·:·t('admin.recruitment.show_qr',·'Show·QR')}
+         88 │ + ························{showQR
+         89 │ + ····························?·t('admin.recruitment.hide_qr',·'Hide·QR')
+         90 │ + ····························:·t('admin.recruitment.show_qr',·'Show·QR')}
+     82  91 │                       </Button>
+     83  92 │                       <Button
+    ······· │
+    111 120 │                           </div>
+    112 121 │                           <p className="text-[11px] text-slate-400 text-center leading-relaxed max-w-[200px]">
+    113     │ - ····························{t('admin.recruitment.qr_print_hint',·'Scan·or·print·this·code·for·physical·recruitment·materials·(flyers,·posters).')}
+        122 │ + ····························{t(
+        123 │ + ································'admin.recruitment.qr_print_hint',
+        124 │ + ································'Scan·or·print·this·code·for·physical·recruitment·materials·(flyers,·posters).'
+        125 │ + ····························)}
+    114 126 │                           </p>
+    115 127 │                       </div>
+    ······· │
+    126 138 │                               </h5>
+    127 139 │                               <p className="text-[10px] text-indigo-600/70 leading-normal">
+    128     │ - ································{t('admin.recruitment.analytics_desc',·'Direct·links·and·QR·scans·are·automatically·tracked·in·the·Health·Dashboard·above.')}
+        140 │ + ································{t(
+        141 │ + ····································'admin.recruitment.analytics_desc',
+        142 │ + ····································'Direct·links·and·QR·scans·are·automatically·tracked·in·the·Health·Dashboard·above.'
+        143 │ + ································)}
+    129 144 │                               </p>
+    130 145 │                           </div>
+
+
+src/components/admin/designer/IntroductionEditor.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+
+    116 116 │                           }
+    117 117 │                           onCheckedChange={(checked: boolean) => {
+    118     │ - ····························const·currentlyEnabled·=·translation?.instructions·!==·null·&&·translation?.instructions·!==·undefined;
+        118 │ + ····························const·currentlyEnabled·=
+        119 │ + ································translation?.instructions·!==·null·&&
+        120 │ + ································translation?.instructions·!==·undefined;
+    119 121 │                               // Defensive check to prevent infinite loops
+    120 122 │                               if (checked === currentlyEnabled) return;
+
+
+src/components/admin/designer/PostSortConfigEditor.test.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+
+     30  30 │   describe('PostSortConfigEditor - Email Collection Feature', () => {
+     31  31 │       const mockUpdateDraft = vi.fn();
+     32     │ - ····
+         32 │ +
+     33  33 │       beforeEach(() => {
+     34  34 │           vi.clearAllMocks();
+    ······· │
+     49  49 │
+     50  50 │           render(<PostSortConfigEditor />);
+     51     │ - ········
+         51 │ +
+     52  52 │           expect(screen.getByText("Collecte d'Email")).toBeInTheDocument();
+     53  53 │       });
+    ······· │
+     69  69 │
+     70  70 │           render(<PostSortConfigEditor />);
+     71     │ - ········
+         71 │ +
+     72  72 │           expect(screen.getByText('Demander accord entretien')).toBeInTheDocument();
+     73  73 │           expect(screen.getByText('Demander accord résultats (Newsletter)')).toBeInTheDocument();
+    ······· │
+     90  90 │
+     91  91 │           render(<PostSortConfigEditor />);
+     92     │ - ········
+         92 │ +
+     93  93 │           expect(screen.queryByText('Demander accord entretien')).not.toBeInTheDocument();
+     94     │ - ········expect(screen.queryByText('Demander·accord·résultats·(Newsletter)')).not.toBeInTheDocument();
+         94 │ + ········expect(
+         95 │ + ············screen.queryByText('Demander·accord·résultats·(Newsletter)')
+         96 │ + ········).not.toBeInTheDocument();
+     95  97 │       });
+     96  98 │
+    ······· │
+    111 113 │
+    112 114 │           render(<PostSortConfigEditor />);
+    113     │ - ········
+        115 │ +
+    114 116 │           const switches = screen.getAllByRole('switch');
+    115     │ - ········const·emailToggle·=·switches.find(s·=>·
+        117 │ + ········const·emailToggle·=·switches.find((s)·=>
+    116 118 │               s.closest('.flex')?.textContent?.includes("Collecte d'Email")
+    117 119 │           );
+    118     │ - ········
+        120 │ +
+    119 121 │           if (emailToggle) {
+    120 122 │               fireEvent.click(emailToggle);
+    121     │ - ············
+        123 │ +
+    122 124 │               expect(mockUpdateDraft).toHaveBeenCalled();
+    123 125 │               const updateFn = mockUpdateDraft.mock.calls[0][0];
+    124 126 │               const testDraft = { postsort_config: {} };
+    125 127 │               updateFn(testDraft);
+    126     │ - ············
+        128 │ +
+    127 129 │               // biome-ignore lint/suspicious/noExplicitAny: test assertion
+    128 130 │               expect((testDraft.postsort_config as any).email_collection_enabled).toBe(true);
+    ······· │
+    152 154 │
+    153 155 │           const { rerender } = render(<PostSortConfigEditor />);
+    154     │ - ········
+        156 │ +
+    155 157 │           // Re-render should not trigger update
+    156 158 │           rerender(<PostSortConfigEditor />);
+    157     │ - ········
+        159 │ +
+    158 160 │           // Update should only be called via user interaction, not on re-render
+    159 161 │           expect(callCount).toBe(0);
+    ······· │
+    177 179 │
+    178 180 │           render(<PostSortConfigEditor />);
+    179     │ - ········
+        181 │ +
+    180 182 │           const switches = screen.getAllByRole('switch');
+    181     │ - ········const·interviewSwitch·=·switches.find(s·=>·
+        183 │ + ········const·interviewSwitch·=·switches.find((s)·=>
+    182 184 │               s.closest('.flex')?.textContent?.includes('Demander accord entretien')
+    183 185 │           );
+    184     │ - ········
+        186 │ +
+    185 187 │           // Should be checked by default (via ?? true)
+    186 188 │           expect(interviewSwitch).toHaveAttribute('data-state', 'checked');
+    ······· │
+    204 206 │
+    205 207 │           render(<PostSortConfigEditor />);
+    206     │ - ········
+        208 │ +
+    207 209 │           const switches = screen.getAllByRole('switch');
+    208     │ - ········const·newsletterSwitch·=·switches.find(s·=>·
+        210 │ + ········const·newsletterSwitch·=·switches.find((s)·=>
+    209 211 │               s.closest('.flex')?.textContent?.includes('Demander accord résultats')
+    210 212 │           );
+    211     │ - ········
+        213 │ +
+    212 214 │           // Should be checked by default (via ?? true)
+    213 215 │           expect(newsletterSwitch).toHaveAttribute('data-state', 'checked');
+    ······· │
+    231 233 │
+    232 234 │           render(<PostSortConfigEditor />);
+    233     │ - ········
+        235 │ +
+    234 236 │           const switches = screen.getAllByRole('switch');
+    235     │ - ········const·interviewSwitch·=·switches.find(s·=>·
+        237 │ + ········const·interviewSwitch·=·switches.find((s)·=>
+    236 238 │               s.closest('.flex')?.textContent?.includes('Demander accord entretien')
+    237 239 │           );
+    238     │ - ········
+        240 │ +
+    239 241 │           if (interviewSwitch) {
+    240 242 │               fireEvent.click(interviewSwitch);
+    241     │ - ············
+        243 │ +
+    242 244 │               expect(mockUpdateDraft).toHaveBeenCalled();
+    243 245 │               const updateFn = mockUpdateDraft.mock.calls[0][0];
+    244 246 │               const testDraft = { postsort_config: { interview_consent_enabled: true } };
+    245 247 │               updateFn(testDraft);
+    246     │ - ············
+        248 │ +
+    247 249 │               // biome-ignore lint/suspicious/noExplicitAny: test assertion
+    248 250 │               expect((testDraft.postsort_config as any).interview_consent_enabled).toBe(false);
+
+
+src/components/admin/designer/QuestionBuilder.presort.test.tsx:1:37 lint/correctness/noUnusedImports  FIXABLE  ━━━━━━━━━━
+
+  × Several of these imports are unused.
+
+  > 1 │ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+      │                                     ^^^^^^^
+    2 │ import { describe, it, expect, vi, beforeEach } from 'vitest';
+    3 │ import QuestionBuilder from './QuestionBuilder';
+
+  i Unused imports might be the result of an incomplete refactoring.
+
+  i Unsafe fix: Remove the unused imports.
+
+    1 │ import·{·render,·screen,·fireEvent,·waitFor·}·from·'@testing-library/react';
+      │                                     --------
+
+src/components/admin/designer/QuestionBuilder.presort.test.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+
+     35  35 │   describe('QuestionBuilder - Presort Config Migration', () => {
+     36  36 │       const mockUpdateDraft = vi.fn();
+     37     │ - ····
+         37 │ +
+     38  38 │       beforeEach(() => {
+     39  39 │           vi.clearAllMocks();
+    ······· │
+     56  56 │
+     57  57 │           render(<QuestionBuilder type="pre" />);
+     58     │ - ········
+         58 │ +
+     59  59 │           // Should render the existing questions from legacy structure
+     60  60 │           expect(screen.getByText('Name')).toBeInTheDocument();
+    ······· │
+     80  80 │
+     81  81 │           render(<QuestionBuilder type="pre" />);
+     82     │ - ········
+         82 │ +
+     83  83 │           // Should render questions from fields in new structure
+     84  84 │           expect(screen.getByText('Name')).toBeInTheDocument();
+    ······· │
+    103 103 │
+    104 104 │           render(<QuestionBuilder type="pre" />);
+    105     │ - ········
+        105 │ +
+    106 106 │           // Should NOT show question builder when disabled
+    107 107 │           expect(screen.queryByText('Add a new field')).not.toBeInTheDocument();
+    ······· │
+    124 124 │           render(<QuestionBuilder type="pre" />);
+    125 125 │           const toggle = screen.getByRole('switch');
+    126     │ - ········
+        126 │ +
+    127 127 │           // Toggle should migrate to new structure
+    128 128 │           fireEvent.click(toggle);
+    129     │ - ········
+        129 │ +
+    130 130 │           expect(mockUpdateDraft).toHaveBeenCalled();
+    131 131 │           const updateFn = mockUpdateDraft.mock.calls[0][0];
+    132 132 │           const draft = { presort_config: { q1: { type: 'text', label: 'Name', required: true } } };
+    133 133 │           updateFn(draft);
+    134     │ - ········
+        134 │ +
+    135 135 │           // Should create new structure with enabled flag and move questions to fields
+    136 136 │           expect(draft.presort_config).toHaveProperty('enabled');
+    ······· │
+    159 159 │
+    160 160 │           render(<QuestionBuilder type="pre" />);
+    161     │ - ········
+        161 │ +
+    162 162 │           // Simulate what the onUpdate handler should do
+    163 163 │           const testDraft = {
+    ······· │
+    177 177 │
+    178 178 │           onUpdateHandler(testDraft, 'q1', { type: 'email', label: 'Email', required: false });
+    179     │ - ········
+        179 │ +
+    180 180 │           // Should update in fields, not presort_config root
+    181 181 │           expect(testDraft.presort_config.fields.q1).toEqual({
+    ······· │
+    204 204 │
+    205 205 │           render(<QuestionBuilder type="pre" />);
+    206     │ - ········
+        206 │ +
+    207 207 │           // Simulate the delete handler being called
+    208 208 │           // In real usage, this would be triggered by the delete button
+    ······· │
+    224 224 │
+    225 225 │           onDeleteHandler(testDraft);
+    226     │ - ········
+        226 │ +
+    227 227 │           // Should delete from fields, not from presort_config root
+    228 228 │           expect(testDraft.presort_config.fields).toEqual({});
+    ······· │
+    248 248 │           render(<QuestionBuilder type="pre" />);
+    249 249 │           const toggle = screen.getByRole('switch');
+    250     │ - ········
+        250 │ +
+    251 251 │           // Click toggle when already enabled
+    252 252 │           fireEvent.click(toggle);
+    253     │ - ········
+        253 │ +
+    254 254 │           // Handler should still be called (controlled by component)
+    255 255 │           // but defensive check in presort toggle prevents issues
+
+
+src/components/admin/team/TeamSettings.tsx format ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Formatter would have printed the following content:
+
+     86  86 │                           </CardTitle>
+     87  87 │                           <CardDescription>
+     88     │ - ····························{t('admin.team.invite_description',·'Generate·a·secure·link·to·invite·a·new·member·to·this·study.')}
+         88 │ + ····························{t(
+         89 │ + ································'admin.team.invite_description',
+         90 │ + ································'Generate·a·secure·link·to·invite·a·new·member·to·this·study.'
+         91 │ + ····························)}
+     89  92 │                           </CardDescription>
+     90  93 │                       </CardHeader>
+     91  94 │                       <CardContent className="space-y-4">
+     92  95 │                           <div className="space-y-2">
+     93     │ - ····························<Label·htmlFor="email">{t('admin.team.email_label',·'Email·Address')}</Label>
+         96 │ + ····························<Label·htmlFor="email">
+         97 │ + ································{t('admin.team.email_label',·'Email·Address')}
+         98 │ + ····························</Label>
+     94  99 │                               <Input
+     95 100 │                                   id="email"
+    ······· │
+    107 112 │                               >
+    108 113 │                                   <SelectTrigger id="role">
+    109     │ - ····································<SelectValue·placeholder={t('admin.team.select_role',·'Select·a·role')}·/>
+        114 │ + ····································<SelectValue
+        115 │ + ········································placeholder={t('admin.team.select_role',·'Select·a·role')}
+        116 │ + ····································/>
+    110 117 │                                   </SelectTrigger>
+    111 118 │                                   <SelectContent>
+    ······· │
+    137 144 │                               <div className="mt-4 p-3 bg-muted rounded-lg border flex flex-col gap-2">
+    138 145 │                                   <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+    139     │ - ····································{t('admin.team.share_label',·'Share·this·link·with·the·invitee:')}
+        146 │ + ····································{t(
+        147 │ + ········································'admin.team.share_label',
+        148 │ + ········································'Share·this·link·with·the·invitee:'
+        149 │ + ····································)}
+    140 150 │                                   </Label>
+    141 151 │                                   <div className="flex gap-2">
+    ······· │
+    197 207 │                                       </Badge>
+    198 208 │                                       <span className="text-muted-foreground">
+    199     │ - ········································{t('admin.team.permissions.owner',·'Can·delete·the·study·and·manage·team.')}
+        209 │ + ········································{t(
+        210 │ + ············································'admin.team.permissions.owner',
+        211 │ + ············································'Can·delete·the·study·and·manage·team.'
+        212 │ + ········································)}
+    200 213 │                                       </span>
+    201 214 │                                   </div>
+    ······· │
+    208 221 │                                       </Badge>
+    209 222 │                                       <span className="text-muted-foreground">
+    210     │ - ········································{t('admin.team.permissions.editor',·'Can·modify·design·and·view·results.')}
+        223 │ + ········································{t(
+        224 │ + ············································'admin.team.permissions.editor',
+        225 │ + ············································'Can·modify·design·and·view·results.'
+        226 │ + ········································)}
+    211 227 │                                       </span>
+    212 228 │                                   </div>
+    ······· │
+    219 235 │                                       </Badge>
+    220 236 │                                       <span className="text-muted-foreground">
+    221     │ - ········································{t('admin.team.permissions.viewer',·'Read-only·access·to·all·modules.')}
+        237 │ + ········································{t(
+        238 │ + ············································'admin.team.permissions.viewer',
+        239 │ + ············································'Read-only·access·to·all·modules.'
+        240 │ + ········································)}
+    222 241 │                                       </span>
+    223 242 │                                   </div>
+    ······· │
+    235 254 │                           {t('admin.team.list_title', 'Research Team')}
+    236 255 │                       </CardTitle>
+    237     │ - ····················<CardDescription>{t('admin.team.list_description',·'Manage·access·for·existing·collaborators.')}</CardDescription>
+        256 │ + ····················<CardDescription>
+        257 │ + ························{t(
+        258 │ + ····························'admin.team.list_description',
+        259 │ + ····························'Manage·access·for·existing·collaborators.'
+        260 │ + ························)}
+        261 │ + ····················</CardDescription>
+    238 262 │                   </CardHeader>
+    239 263 │                   <CardContent>
+    240 264 │                       <div className="rounded-md border">
+    241 265 │                           <div className="grid grid-cols-12 bg-muted/50 p-3 text-xs font-bold uppercase tracking-wider text-muted-foreground border-b">
+    242     │ - ····························<div·className="col-span-6">{t('admin.team.headers.collaborator',·'Collaborator')}</div>
+        266 │ + ····························<div·className="col-span-6">
+        267 │ + ································{t('admin.team.headers.collaborator',·'Collaborator')}
+        268 │ + ····························</div>
+    243 269 │                               <div className="col-span-4">{t('admin.team.headers.role', 'Role')}</div>
+    244     │ - ····························<div·className="col-span-2·text-right">{t('admin.team.headers.actions',·'Actions')}</div>
+        270 │ + ····························<div·className="col-span-2·text-right">
+        271 │ + ································{t('admin.team.headers.actions',·'Actions')}
+        272 │ + ····························</div>
+    245 273 │                           </div>
+    246 274 │                           <div className="divide-y">
+    ······· │
+    263 291 │                                               <div className="flex flex-col">
+    264 292 │                                                   <span className="text-sm font-medium">
+    265     │ - ····················································{m.user?.email·||·t('common.unknown_user',·'Unknown·User')}
+        293 │ + ····················································{m.user?.email·||
+        294 │ + ························································t('common.unknown_user',·'Unknown·User')}
+    266 295 │                                                   </span>
+    267 296 │                                                   <span className="text-[10px] text-muted-foreground">
+
+
+The number of diagnostics exceeds the limit allowed. Use --max-diagnostics to increase it.
+Diagnostics not shown: 33.
+Checked 322 files in 251ms. No fixes applied.
+Found 34 errors.
+Found 16 warnings.
+Found 3 infos.
+check ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+
+Frontend Dead Code (Knip)................................................Passed

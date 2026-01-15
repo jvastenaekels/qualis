@@ -30,6 +30,51 @@
             "OAuth2PasswordBearer": []
           }
         ]
+      },
+      "patch": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Update User Me",
+        "description": "Update current user profile.",
+        "operationId": "update_user_me_api_me_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
       }
     },
     "/api/token": {
@@ -38,17 +83,35 @@
           "auth"
         ],
         "summary": "Login For Access Token",
-        "description": "OAuth2 compatible token login, get an access token for future requests.",
+        "description": "OAuth2 compatible token login, getting an access token for future requests.\n\nValidation Flow:\n1. Verify username (email) and password.\n2. If the user has 2FA enabled:\n   - Check for `x-totp-token` header.\n   - If missing, return a special Token response indicating `requires_2fa=True`.\n   - If present, verify the TOTP token.\n3. If all checks pass, issue a Bearer access token.",
         "operationId": "login_for_access_token_api_token_post",
+        "parameters": [
+          {
+            "name": "x-totp-token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Totp-Token"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/x-www-form-urlencoded": {
               "schema": {
                 "$ref": "#/components/schemas/Body_login_for_access_token_api_token_post"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -116,25 +179,39 @@
         }
       }
     },
-    "/api/admin/studies/": {
-      "get": {
+    "/api/me/password": {
+      "post": {
         "tags": [
-          "admin-studies"
+          "auth"
         ],
-        "summary": "List Studies",
-        "description": "List studies accessible to the current user (via Workspace membership).",
-        "operationId": "list_studies_api_admin_studies__get",
+        "summary": "Change Password",
+        "description": "Change current user password.",
+        "operationId": "change_password_api_me_password_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/StudyRead"
-                  },
-                  "type": "array",
-                  "title": "Response List Studies Api Admin Studies  Get"
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -145,23 +222,165 @@
             "OAuth2PasswordBearer": []
           }
         ]
-      },
+      }
+    },
+    "/api/me/2fa/setup": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Setup Totp",
+        "description": "Start 2FA setup by generating a secret and QR code URI.",
+        "operationId": "setup_totp_api_me_2fa_setup_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TOTPSetup"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/me/2fa/enable": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Enable Totp",
+        "description": "Enable 2FA after verifying a token.",
+        "operationId": "enable_totp_api_me_2fa_enable_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TOTPVerify"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/me/2fa/disable": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Disable Totp",
+        "description": "Disable 2FA after verifying current password.",
+        "operationId": "disable_totp_api_me_2fa_disable_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/studies": {
       "post": {
         "tags": [
           "admin-studies"
         ],
         "summary": "Create Study",
-        "description": "Create a new study in the user's active workspace.",
-        "operationId": "create_study_api_admin_studies__post",
+        "description": "Create a new study in the active workspace.",
+        "operationId": "create_study_api_admin_studies_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Workspace-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Workspace-Id"
+            }
+          }
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/StudyCreate"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "201": {
@@ -184,12 +403,64 @@
               }
             }
           }
-        },
+        }
+      },
+      "get": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "List Studies",
+        "description": "List studies in the active workspace.",
+        "operationId": "list_studies_api_admin_studies_get",
         "security": [
           {
             "OAuth2PasswordBearer": []
           }
-        ]
+        ],
+        "parameters": [
+          {
+            "name": "X-Workspace-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Workspace-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StudyRead"
+                  },
+                  "title": "Response List Studies Api Admin Studies Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/admin/studies/{slug}": {
@@ -304,7 +575,7 @@
           "admin-studies"
         ],
         "summary": "Delete Study",
-        "description": "Delete a study (Workspace Owner only).",
+        "description": "Delete a study (Superuser only, and must be Archived).",
         "operationId": "delete_study_api_admin_studies__slug__delete",
         "security": [
           {
@@ -341,13 +612,67 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/validate": {
+      "post": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Validate Study",
+        "description": "Check if study is ready for activation.",
+        "operationId": "validate_study_api_admin_studies__slug__validate_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "title": "Response Validate Study Api Admin Studies  Slug  Validate Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/state": {
       "post": {
         "tags": [
           "admin-studies"
         ],
         "summary": "Change Study State",
-        "description": "Change study state (Draft <-> Active <-> Closed).",
+        "description": "Change study state (Draft <-> Active <-> Closed <-> Archived).",
         "operationId": "change_study_state_api_admin_studies__slug__state_post",
         "security": [
           {
@@ -805,80 +1130,19 @@
         }
       }
     },
-    "/api/admin/invitations/{slug}/invite": {
-      "post": {
-        "tags": [
-          "admin-invites",
-          "Admin Invitations"
-        ],
-        "summary": "Invite Collaborator",
-        "description": "Generate a JWT invitation link for a collaborator.",
-        "operationId": "invite_collaborator_api_admin_invitations__slug__invite_post",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "slug",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "The slug of the study",
-              "title": "Slug"
-            },
-            "description": "The slug of the study"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InvitationCreate"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/InvitationLink"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/admin/invitations/verify/{token}": {
+    "/api/admin/invitations/verify": {
       "get": {
         "tags": [
           "admin-invites",
           "Admin Invitations"
         ],
         "summary": "Verify Invitation",
-        "description": "Verify an invitation token and return details.",
-        "operationId": "verify_invitation_api_admin_invitations_verify__token__get",
+        "description": "Verify an invitation token and return details including workspace name.",
+        "operationId": "verify_invitation_api_admin_invitations_verify_get",
         "parameters": [
           {
             "name": "token",
-            "in": "path",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "string",
@@ -908,7 +1172,53 @@
         }
       }
     },
-    "/api/admin/users/": {
+    "/api/admin/invitations/accept": {
+      "post": {
+        "tags": [
+          "admin-invites",
+          "Admin Invitations"
+        ],
+        "summary": "Accept Invitation",
+        "description": "Accept an invitation using an existing account.\nThe email in the token must match the current user's email.",
+        "operationId": "accept_invitation_api_admin_invitations_accept_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationAccept"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/users": {
       "get": {
         "tags": [
           "admin-users",
@@ -916,7 +1226,7 @@
         ],
         "summary": "List Users",
         "description": "List all users in the system.",
-        "operationId": "list_users_api_admin_users__get",
+        "operationId": "list_users_api_admin_users_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -927,7 +1237,7 @@
                     "$ref": "#/components/schemas/UserRead"
                   },
                   "type": "array",
-                  "title": "Response List Users Api Admin Users  Get"
+                  "title": "Response List Users Api Admin Users Get"
                 }
               }
             }
@@ -946,7 +1256,7 @@
         ],
         "summary": "Create User",
         "description": "Create a new user.",
-        "operationId": "create_user_api_admin_users__post",
+        "operationId": "create_user_api_admin_users_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1028,14 +1338,189 @@
         }
       }
     },
-    "/api/admin/workspaces/": {
+    "/api/admin/recruitment/{slug}/links": {
+      "get": {
+        "tags": [
+          "admin-recruitment",
+          "Admin Recruitment"
+        ],
+        "summary": "List Study Links",
+        "description": "List all recruitment links for a specific study.",
+        "operationId": "list_study_links_api_admin_recruitment__slug__links_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecruitmentLinkRead"
+                  },
+                  "title": "Response List Study Links Api Admin Recruitment  Slug  Links Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "admin-recruitment",
+          "Admin Recruitment"
+        ],
+        "summary": "Create Recruitment Links",
+        "description": "Create one or more recruitment links.",
+        "operationId": "create_recruitment_links_api_admin_recruitment__slug__links_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "title": "Count"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecruitmentLinkCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecruitmentLinkRead"
+                  },
+                  "title": "Response Create Recruitment Links Api Admin Recruitment  Slug  Links Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/recruitment/links/{link_id}": {
+      "delete": {
+        "tags": [
+          "admin-recruitment",
+          "Admin Recruitment"
+        ],
+        "summary": "Revoke Recruitment Link",
+        "description": "Revoke a recruitment link.",
+        "operationId": "revoke_recruitment_link_api_admin_recruitment_links__link_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "link_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Link Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/workspaces": {
       "get": {
         "tags": [
           "admin-workspaces"
         ],
         "summary": "List Workspaces",
-        "description": "List all workspaces the current user is a member of.",
-        "operationId": "list_workspaces_api_admin_workspaces__get",
+        "description": "List all workspaces the current user is a member of, with their role.",
+        "operationId": "list_workspaces_api_admin_workspaces_get",
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -1043,10 +1528,10 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/WorkspaceRead"
+                    "$ref": "#/components/schemas/WorkspaceWithRole"
                   },
                   "type": "array",
-                  "title": "Response List Workspaces Api Admin Workspaces  Get"
+                  "title": "Response List Workspaces Api Admin Workspaces Get"
                 }
               }
             }
@@ -1064,7 +1549,7 @@
         ],
         "summary": "Create Workspace",
         "description": "Create a new workspace and assign the current user as Owner.",
-        "operationId": "create_workspace_api_admin_workspaces__post",
+        "operationId": "create_workspace_api_admin_workspaces_post",
         "requestBody": {
           "content": {
             "application/json": {
@@ -1102,6 +1587,388 @@
             "OAuth2PasswordBearer": []
           }
         ]
+      }
+    },
+    "/api/admin/workspaces/{slug}": {
+      "get": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Get Workspace",
+        "description": "Get workspace details.",
+        "operationId": "get_workspace_api_admin_workspaces__slug__get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Update Workspace",
+        "description": "Update workspace details.",
+        "operationId": "update_workspace_api_admin_workspaces__slug__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Delete Workspace",
+        "description": "Delete a workspace (Owner only).",
+        "operationId": "delete_workspace_api_admin_workspaces__slug__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/workspaces/{slug}/members": {
+      "get": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "List Workspace Members",
+        "description": "List all members of a workspace.",
+        "operationId": "list_workspace_members_api_admin_workspaces__slug__members_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkspaceMemberRead"
+                  },
+                  "title": "Response List Workspace Members Api Admin Workspaces  Slug  Members Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/workspaces/{slug}/members/{user_id}": {
+      "patch": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Update Workspace Member",
+        "description": "Update a workspace member's role.",
+        "operationId": "update_workspace_member_api_admin_workspaces__slug__members__user_id__patch",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceMemberUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceMemberRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Remove Workspace Member",
+        "description": "Remove a member from the workspace.",
+        "operationId": "remove_workspace_member_api_admin_workspaces__slug__members__user_id__delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/workspaces/{slug}/invitations": {
+      "post": {
+        "tags": [
+          "admin-workspaces"
+        ],
+        "summary": "Create Invitation",
+        "description": "Invite a user to the workspace.",
+        "operationId": "create_invitation_api_admin_workspaces__slug__invitations_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the workspace",
+              "title": "Slug"
+            },
+            "description": "The slug of the workspace"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceInvitationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationLink"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/submit": {
@@ -1150,7 +2017,7 @@
           "submissions"
         ],
         "summary": "Get Study",
-        "description": "Fetches study configuration for the frontend, including language resolution.",
+        "description": "Fetches study configuration for the frontend, including language resolution.\n\nIf the study has randomize_statements=True and a session_token is provided,\nstatements will be shuffled deterministically using the token as seed.\nThis ensures the same participant always sees statements in the same order.",
         "operationId": "get_study_api_study__slug__get",
         "parameters": [
           {
@@ -1175,6 +2042,112 @@
               "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
               "default": "en",
               "title": "Lang"
+            }
+          },
+          {
+            "name": "session_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Participant session token for deterministic randomization",
+              "title": "Session Token"
+            },
+            "description": "Participant session token for deterministic randomization"
+          },
+          {
+            "name": "link_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Recruitment link token",
+              "title": "Link Token"
+            },
+            "description": "Recruitment link token"
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Study access password",
+              "title": "Password"
+            },
+            "description": "Study access password"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/study/{slug}/unlock": {
+      "post": {
+        "tags": [
+          "submissions"
+        ],
+        "summary": "Unlock Study",
+        "description": "Validate study access password.",
+        "operationId": "unlock_study_api_study__slug__unlock_post",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9-]+$",
+              "title": "Slug"
+            }
+          },
+          {
+            "name": "password",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Password"
             }
           }
         ],
@@ -1287,6 +2260,166 @@
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/init": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Init Test Db",
+        "description": "Initialize test database - ensure tables exist\nThis is typically handled by app startup, but useful for explicit initialization",
+        "operationId": "init_test_db_api_test_init_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/seed": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Seed Test Data",
+        "description": "Seed base test data: user and workspace\nIdempotent - won't create duplicates",
+        "operationId": "seed_test_data_api_test_seed_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestSeedData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/members": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Add Test Member",
+        "description": "Add a user to a workspace for testing purposes",
+        "operationId": "add_test_member_api_test_members_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestMemberData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/cleanup": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Cleanup Test Data",
+        "description": "Cleanup test data between tests\nRemoves all data except the base test user and workspace",
+        "operationId": "cleanup_test_data_api_test_cleanup_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/cleanup-all": {
+      "post": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Cleanup All Test Data",
+        "description": "Full cleanup including users and workspaces\nUse at end of test suite",
+        "operationId": "cleanup_all_test_data_api_test_cleanup_all_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/health": {
+      "get": {
+        "tags": [
+          "test"
+        ],
+        "summary": "Test Health",
+        "description": "Simple health check for test router",
+        "operationId": "test_health_api_test_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           }
@@ -1410,6 +2543,57 @@
         ],
         "title": "Body_login_for_access_token_api_token_post"
       },
+      "BrandingBase": {
+        "properties": {
+          "logo_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo Url"
+          },
+          "accent_color": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accent Color"
+          },
+          "primary_color": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Primary Color"
+          },
+          "partners": {
+            "items": {
+              "$ref": "#/components/schemas/PartnerLogo"
+            },
+            "type": "array",
+            "title": "Partners",
+            "default": []
+          }
+        },
+        "type": "object",
+        "title": "BrandingBase",
+        "description": "Schema for study branding."
+      },
       "ConsentInput": {
         "properties": {
           "study_slug": {
@@ -1480,23 +2664,18 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "InvitationCreate": {
+      "InvitationAccept": {
         "properties": {
-          "email": {
+          "token": {
             "type": "string",
-            "title": "Email"
-          },
-          "role": {
-            "$ref": "#/components/schemas/StudyRole",
-            "default": "editor"
+            "title": "Token"
           }
         },
         "type": "object",
         "required": [
-          "email"
+          "token"
         ],
-        "title": "InvitationCreate",
-        "description": "Schema for creating a study invitation."
+        "title": "InvitationAccept"
       },
       "InvitationLink": {
         "properties": {
@@ -1652,6 +2831,17 @@
             ],
             "title": "User Agent"
           },
+          "recruitment_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recruitment Token"
+          },
           "presort_answers": {
             "additionalProperties": true,
             "type": "object",
@@ -1698,7 +2888,8 @@
           "discard_reason": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 500
               },
               {
                 "type": "null"
@@ -1778,6 +2969,17 @@
               }
             ],
             "title": "User Agent"
+          },
+          "recruitment_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recruitment Token"
           }
         },
         "type": "object",
@@ -1805,6 +3007,106 @@
         "title": "ParticipantStatus",
         "description": "Enum for participant progress status."
       },
+      "PartnerLogo": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "logo_url": {
+            "type": "string",
+            "title": "Logo Url"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "logo_url"
+        ],
+        "title": "PartnerLogo",
+        "description": "Schema for a partner institution logo."
+      },
+      "PasswordChange": {
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "title": "Current Password"
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 8,
+            "title": "New Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "title": "PasswordChange",
+        "description": "Schema for changing password."
+      },
+      "ProcessStep": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Unique ID for DND and tracking"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Description"
+          },
+          "icon": {
+            "type": "string",
+            "title": "Icon",
+            "description": "Lucide icon name"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color",
+            "description": "Hex color code or CSS variable"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "description",
+          "icon"
+        ],
+        "title": "ProcessStep",
+        "description": "Schema for a dynamic study process step."
+      },
       "QSortEntryInput": {
         "properties": {
           "statement_id": {
@@ -1818,7 +3120,8 @@
           "card_comment": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 2000
               },
               {
                 "type": "null"
@@ -1835,10 +3138,156 @@
         "title": "QSortEntryInput",
         "description": "Schema for individual statement placement during submission."
       },
+      "RecruitmentLinkCreate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RecruitmentLinkType",
+            "default": "public"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          }
+        },
+        "type": "object",
+        "title": "RecruitmentLinkCreate",
+        "description": "Schema for creating a recruitment link."
+      },
+      "RecruitmentLinkRead": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RecruitmentLinkType",
+            "default": "public"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active",
+            "default": true
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "study_id": {
+            "type": "integer",
+            "title": "Study Id"
+          },
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "usage_count": {
+            "type": "integer",
+            "title": "Usage Count"
+          },
+          "start_count": {
+            "type": "integer",
+            "title": "Start Count"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "study_id",
+          "token",
+          "usage_count",
+          "start_count",
+          "created_at"
+        ],
+        "title": "RecruitmentLinkRead",
+        "description": "Schema for reading a recruitment link."
+      },
+      "RecruitmentLinkType": {
+        "type": "string",
+        "enum": [
+          "public",
+          "individual",
+          "limited"
+        ],
+        "title": "RecruitmentLinkType",
+        "description": "Enum for types of recruitment links."
+      },
       "StatementCreate": {
         "properties": {
           "code": {
             "type": "string",
+            "maxLength": 50,
             "title": "Code"
           },
           "translations": {
@@ -1861,6 +3310,7 @@
         "properties": {
           "code": {
             "type": "string",
+            "maxLength": 50,
             "title": "Code"
           },
           "id": {
@@ -1894,7 +3344,7 @@
           },
           "text": {
             "type": "string",
-            "minLength": 1,
+            "maxLength": 1000,
             "title": "Text"
           }
         },
@@ -1916,7 +3366,7 @@
           },
           "text": {
             "type": "string",
-            "minLength": 1,
+            "maxLength": 1000,
             "title": "Text"
           },
           "id": {
@@ -1942,6 +3392,7 @@
         "properties": {
           "code": {
             "type": "string",
+            "maxLength": 50,
             "title": "Code"
           },
           "translations": {
@@ -1990,6 +3441,16 @@
             "type": "object",
             "title": "Postsort Config"
           },
+          "branding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BrandingBase"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "default_language": {
             "anyOf": [
               {
@@ -2006,6 +3467,40 @@
             "type": "boolean",
             "title": "Show Statement Codes",
             "default": false
+          },
+          "randomize_statements": {
+            "type": "boolean",
+            "title": "Randomize Statements",
+            "default": false
+          },
+          "symmetry_lock": {
+            "type": "boolean",
+            "title": "Symmetry Lock",
+            "default": true
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
           },
           "translations": {
             "items": {
@@ -2064,6 +3559,16 @@
             "type": "object",
             "title": "Postsort Config"
           },
+          "branding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BrandingBase"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "default_language": {
             "anyOf": [
               {
@@ -2081,6 +3586,40 @@
             "title": "Show Statement Codes",
             "default": false
           },
+          "randomize_statements": {
+            "type": "boolean",
+            "title": "Randomize Statements",
+            "default": false
+          },
+          "symmetry_lock": {
+            "type": "boolean",
+            "title": "Symmetry Lock",
+            "default": true
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
           "id": {
             "type": "integer",
             "title": "Id"
@@ -2089,10 +3628,25 @@
             "type": "integer",
             "title": "Workspace Id"
           },
+          "workspace": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WorkspaceRead"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
           },
           "translations": {
             "items": {
@@ -2109,6 +3663,19 @@
             "type": "array",
             "title": "Statements",
             "default": []
+          },
+          "recruitment_links": {
+            "items": {
+              "$ref": "#/components/schemas/RecruitmentLinkRead"
+            },
+            "type": "array",
+            "title": "Recruitment Links",
+            "default": []
+          },
+          "requires_password": {
+            "type": "boolean",
+            "title": "Requires Password",
+            "default": false
           }
         },
         "type": "object",
@@ -2119,20 +3686,11 @@
           "postsort_config",
           "id",
           "workspace_id",
-          "created_at"
+          "created_at",
+          "updated_at"
         ],
         "title": "StudyRead",
         "description": "Schema for reading a study."
-      },
-      "StudyRole": {
-        "type": "string",
-        "enum": [
-          "owner",
-          "editor",
-          "viewer"
-        ],
-        "title": "StudyRole",
-        "description": "Enum for study-specific roles."
       },
       "StudyState": {
         "type": "string",
@@ -2201,23 +3759,31 @@
           "title": {
             "type": "string",
             "maxLength": 200,
-            "minLength": 1,
             "title": "Title"
           },
           "description": {
             "type": "string",
+            "maxLength": 2000,
             "title": "Description",
             "default": ""
           },
           "instructions": {
-            "type": "string",
-            "title": "Instructions",
-            "default": ""
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
           },
           "subtitle": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 200
               },
               {
                 "type": "null"
@@ -2228,7 +3794,8 @@
           "objective": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 1000
               },
               {
                 "type": "null"
@@ -2236,10 +3803,23 @@
             ],
             "title": "Objective"
           },
+          "condition_of_instruction": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition Of Instruction"
+          },
           "consent_title": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 200
               },
               {
                 "type": "null"
@@ -2250,7 +3830,8 @@
           "consent_description": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 5000
               },
               {
                 "type": "null"
@@ -2261,29 +3842,60 @@
           "consent_accept": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 50
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Consent Accept"
+            "title": "Consent Accept",
+            "default": "Accept"
           },
           "consent_decline": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 50
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Consent Decline"
+            "title": "Consent Decline",
+            "default": "Decline"
           },
           "ui_labels": {
             "additionalProperties": true,
             "type": "object",
             "title": "Ui Labels",
+            "default": {}
+          },
+          "process_steps": {
+            "items": {
+              "$ref": "#/components/schemas/ProcessStep"
+            },
+            "type": "array",
+            "title": "Process Steps",
+            "default": []
+          },
+          "methodology_tips": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Methodology Tips",
+            "default": []
+          },
+          "step_help": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Step Help",
             "default": {}
           }
         },
@@ -2306,23 +3918,31 @@
           "title": {
             "type": "string",
             "maxLength": 200,
-            "minLength": 1,
             "title": "Title"
           },
           "description": {
             "type": "string",
+            "maxLength": 2000,
             "title": "Description",
             "default": ""
           },
           "instructions": {
-            "type": "string",
-            "title": "Instructions",
-            "default": ""
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
           },
           "subtitle": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 200
               },
               {
                 "type": "null"
@@ -2333,7 +3953,8 @@
           "objective": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 1000
               },
               {
                 "type": "null"
@@ -2341,10 +3962,23 @@
             ],
             "title": "Objective"
           },
+          "condition_of_instruction": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Condition Of Instruction"
+          },
           "consent_title": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 200
               },
               {
                 "type": "null"
@@ -2355,7 +3989,8 @@
           "consent_description": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 5000
               },
               {
                 "type": "null"
@@ -2366,29 +4001,60 @@
           "consent_accept": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 50
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Consent Accept"
+            "title": "Consent Accept",
+            "default": "Accept"
           },
           "consent_decline": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "maxLength": 50
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Consent Decline"
+            "title": "Consent Decline",
+            "default": "Decline"
           },
           "ui_labels": {
             "additionalProperties": true,
             "type": "object",
             "title": "Ui Labels",
+            "default": {}
+          },
+          "process_steps": {
+            "items": {
+              "$ref": "#/components/schemas/ProcessStep"
+            },
+            "type": "array",
+            "title": "Process Steps",
+            "default": []
+          },
+          "methodology_tips": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Methodology Tips",
+            "default": []
+          },
+          "step_help": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Step Help",
             "default": {}
           },
           "id": {
@@ -2474,6 +4140,16 @@
             ],
             "title": "Postsort Config"
           },
+          "branding": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BrandingBase"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "default_language": {
             "anyOf": [
               {
@@ -2496,6 +4172,28 @@
               }
             ],
             "title": "Show Statement Codes"
+          },
+          "randomize_statements": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Randomize Statements"
+          },
+          "symmetry_lock": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Symmetry Lock"
           },
           "translations": {
             "anyOf": [
@@ -2524,6 +4222,53 @@
               }
             ],
             "title": "Statements"
+          },
+          "access_password": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access Password"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "last_updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Updated At"
           }
         },
         "type": "object",
@@ -2559,8 +4304,15 @@
             "default": "completed"
           },
           "presort_answers": {
-            "additionalProperties": true,
-            "type": "object",
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Presort Answers",
             "default": {}
           },
@@ -2572,10 +4324,28 @@
             "title": "Qsort"
           },
           "postsort_answers": {
-            "additionalProperties": true,
-            "type": "object",
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
             "title": "Postsort Answers",
             "default": {}
+          },
+          "link_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Token"
           }
         },
         "type": "object",
@@ -2588,26 +4358,79 @@
         "title": "SubmissionInput",
         "description": "Schema for the full study submission/completion."
       },
-      "Token": {
+      "TOTPSetup": {
         "properties": {
-          "access_token": {
+          "secret": {
             "type": "string",
-            "title": "Access Token"
+            "title": "Secret"
           },
-          "token_type": {
+          "qr_code_uri": {
             "type": "string",
-            "title": "Token Type"
+            "title": "Qr Code Uri"
           }
         },
         "type": "object",
         "required": [
-          "access_token",
-          "token_type"
+          "secret",
+          "qr_code_uri"
         ],
-        "title": "Token",
-        "description": "Schema for returning an access token."
+        "title": "TOTPSetup",
+        "description": "Schema for TOTP setup response."
       },
-      "UserCreate": {
+      "TOTPVerify": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "TOTPVerify",
+        "description": "Schema for TOTP verification."
+      },
+      "TestMemberData": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "workspace_slug": {
+            "type": "string",
+            "title": "Workspace Slug"
+          },
+          "role": {
+            "type": "string",
+            "title": "Role"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "workspace_slug",
+          "role"
+        ],
+        "title": "TestMemberData"
+      },
+      "TestSeedData": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/TestUserData"
+          },
+          "workspace": {
+            "$ref": "#/components/schemas/TestWorkspaceData"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "workspace"
+        ],
+        "title": "TestSeedData"
+      },
+      "TestUserData": {
         "properties": {
           "email": {
             "type": "string",
@@ -2615,6 +4438,105 @@
           },
           "password": {
             "type": "string",
+            "title": "Password"
+          },
+          "is_superuser": {
+            "type": "boolean",
+            "title": "Is Superuser",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "TestUserData"
+      },
+      "TestWorkspaceData": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "slug"
+        ],
+        "title": "TestWorkspaceData"
+      },
+      "Token": {
+        "properties": {
+          "access_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Access Token"
+          },
+          "token_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Type"
+          },
+          "requires_2fa": {
+            "type": "boolean",
+            "title": "Requires 2Fa",
+            "default": false
+          },
+          "temp_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temp Token"
+          }
+        },
+        "type": "object",
+        "title": "Token",
+        "description": "Schema for returning an access token or 2FA requirement."
+      },
+      "UserCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
             "title": "Password"
           },
           "is_active": {
@@ -2653,6 +4575,18 @@
             "type": "string",
             "title": "Email"
           },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          },
           "id": {
             "type": "integer",
             "title": "Id"
@@ -2664,6 +4598,10 @@
           "is_superuser": {
             "type": "boolean",
             "title": "Is Superuser"
+          },
+          "is_totp_enabled": {
+            "type": "boolean",
+            "title": "Is Totp Enabled"
           }
         },
         "type": "object",
@@ -2671,10 +4609,41 @@
           "email",
           "id",
           "is_active",
-          "is_superuser"
+          "is_superuser",
+          "is_totp_enabled"
         ],
         "title": "UserRead",
         "description": "Schema for reading user details."
+      },
+      "UserUpdate": {
+        "properties": {
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "full_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Full Name"
+          }
+        },
+        "type": "object",
+        "title": "UserUpdate",
+        "description": "Schema for updating user profile."
       },
       "ValidationError": {
         "properties": {
@@ -2713,6 +4682,7 @@
         "properties": {
           "title": {
             "type": "string",
+            "maxLength": 100,
             "title": "Title"
           },
           "slug": {
@@ -2731,22 +4701,32 @@
         "title": "WorkspaceCreate",
         "description": "Schema for creating a workspace."
       },
+      "WorkspaceInvitationCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole",
+            "default": "researcher"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "WorkspaceInvitationCreate",
+        "description": "Schema for creating a workspace invitation."
+      },
       "WorkspaceMemberRead": {
         "properties": {
           "user_id": {
             "type": "integer",
             "title": "User Id"
           },
-          "user_email": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "User Email"
+          "user": {
+            "$ref": "#/components/schemas/UserRead"
           },
           "role": {
             "$ref": "#/components/schemas/WorkspaceRole"
@@ -2760,11 +4740,25 @@
         "type": "object",
         "required": [
           "user_id",
+          "user",
           "role",
           "joined_at"
         ],
         "title": "WorkspaceMemberRead",
         "description": "Schema for reading workspace member details."
+      },
+      "WorkspaceMemberUpdate": {
+        "properties": {
+          "role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role"
+        ],
+        "title": "WorkspaceMemberUpdate",
+        "description": "Schema for updating a workspace member."
       },
       "WorkspaceRead": {
         "properties": {
@@ -2813,6 +4807,81 @@
         ],
         "title": "WorkspaceRole",
         "description": "Enum for workspace roles."
+      },
+      "WorkspaceUpdate": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 50,
+                "minLength": 3,
+                "pattern": "^[a-z0-9-]+$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slug"
+          }
+        },
+        "type": "object",
+        "title": "WorkspaceUpdate",
+        "description": "Schema for updating a workspace."
+      },
+      "WorkspaceWithRole": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "members": {
+            "items": {
+              "$ref": "#/components/schemas/WorkspaceMemberRead"
+            },
+            "type": "array",
+            "title": "Members",
+            "default": []
+          },
+          "user_role": {
+            "$ref": "#/components/schemas/WorkspaceRole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "created_at",
+          "user_role"
+        ],
+        "title": "WorkspaceWithRole",
+        "description": "Schema for reading a workspace with the current user's role."
       }
     },
     "securitySchemes": {

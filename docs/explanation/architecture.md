@@ -23,7 +23,7 @@ graph LR
     end
 
     subgraph "Storage"
-        DB[(PostgreSQL<br/>or SQLite)]
+        DB[(PostgreSQL)]
     end
 
     UI <--> State
@@ -99,12 +99,40 @@ flowchart TD
 
 ### Backend
 
-| Technology              | Purpose                           |
-| ----------------------- | --------------------------------- |
-| **FastAPI**             | Async REST API with OpenAPI docs  |
-| **SQLAlchemy**          | ORM with async support            |
-| **Pydantic**            | Data validation and serialization |
-| **SQLite / PostgreSQL** | Flexible database options         |
+| Technology     | Purpose                           |
+| -------------- | --------------------------------- |
+| **FastAPI**    | Async REST API with OpenAPI docs  |
+| **SQLAlchemy** | ORM with async support            |
+| **Pydantic**   | Data validation and serialization |
+| **PostgreSQL** | Scalable system database          |
+
+---
+
+## 📱 Responsiveness & Theming
+
+Open-Q implements a robust, multi-layer responsiveness strategy to support devices ranging from mobile phones to high-resolution desktops.
+
+### 1. Centralized Viewport Detection
+
+Instead of scattered `window.innerWidth` checks, the application uses a centralized **Viewport Context**.
+
+- **`ViewportProvider`**: Listens for resize events and exposes standardized dimensions and semantic booleans (`isMobile`, `isDesktop`).
+- **`useViewport()` Hook**: Components consume this hook to react to strict breakpoints consistently.
+- **SSR Safety**: The context handles hydration mismatches gracefully by defaulting to desktop and updating on mount.
+
+### 2. Fluid Typography
+
+We utilize **Fluid Typography** to ensure text scales smoothly across viewport sizes, avoiding abrupt jumps at breakpoints.
+
+- Implemented via `clamp()` functions in `src/styles/typography.css`.
+- Integrated into Tailwind's configuration, so classes like `text-lg` automatically scale from mobile to desktop sizes.
+
+### 3. Container Queries
+
+For complex components that appear in various contexts (e.g., cards in a grid vs. a sidebar), we use **Container Queries**.
+
+- **Plugin**: `@tailwindcss/container-queries`.
+- **Usage**: Critical components (like `CardStack`) adapt their layout and font size based on their _container's_ width, not the viewport width.
 
 ---
 
@@ -290,10 +318,13 @@ frontend/src/
 │   ├── useSessionStore.ts
 │   ├── useResponseStore.ts
 │   └── useUIStore.ts
+└── layouts/            # Shared layouts
+
+frontend/public/
 └── locales/            # i18n translations
-    ├── en.json
-    ├── fr.json
-    └── fi.json
+    ├── en/translation.json
+    ├── fr/translation.json
+    └── fi/translation.json
 ```
 
 ---

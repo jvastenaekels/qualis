@@ -24,24 +24,49 @@ import type {
     BodyLoginForAccessTokenApiTokenPost,
     ChangeStudyStateApiAdminStudiesSlugStatePostParams,
     ConsentInput,
+    CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
     GetStudyApiStudySlugGetParams,
     HTTPValidationError,
-    InvitationCreate,
-    InvitationLink,
+    InvitationAccept,
     LogEntry,
-    ParticipantDetailRead,
     ParticipantDiscardUpdate,
-    ParticipantRead,
+    PasswordChange,
+    RecruitmentLinkCreate,
     StudyCreate,
-    StudyRead,
-    StudyStatsRead,
     StudyUpdate,
     SubmissionInput,
-    Token,
+    TOTPVerify,
+    TestMemberData,
+    TestSeedData,
+    UnlockStudyApiStudySlugUnlockPostParams,
     UserCreate,
-    UserRead,
+    UserUpdate,
+    VerifyInvitationApiAdminInvitationsVerifyGetParams,
     WorkspaceCreate,
+    WorkspaceInvitationCreate,
+    WorkspaceMemberUpdate,
+    WorkspaceUpdate,
+} from './model';
+
+import { faker } from '@faker-js/faker';
+
+import { HttpResponse, http } from 'msw';
+import type { RequestHandlerOptions } from 'msw';
+
+import { ParticipantStatus, RecruitmentLinkType, StudyState, WorkspaceRole } from './model';
+import type {
+    InvitationLink,
+    ParticipantDetailRead,
+    ParticipantRead,
+    RecruitmentLinkRead,
+    StudyRead,
+    StudyStatsRead,
+    TOTPSetup,
+    Token,
+    UserRead,
+    WorkspaceMemberRead,
     WorkspaceRead,
+    WorkspaceWithRole,
 } from './model';
 
 import { customInstance } from './mutator';
@@ -102,9 +127,7 @@ export function useReadUsersMeApiMeGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useReadUsersMeApiMeGet<
     TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
     TError = unknown,
@@ -123,9 +146,7 @@ export function useReadUsersMeApiMeGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useReadUsersMeApiMeGet<
     TData = Awaited<ReturnType<typeof readUsersMeApiMeGet>>,
     TError = unknown,
@@ -136,9 +157,7 @@ export function useReadUsersMeApiMeGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Read Users Me
  */
@@ -153,9 +172,7 @@ export function useReadUsersMeApiMeGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getReadUsersMeApiMeGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -168,7 +185,93 @@ export function useReadUsersMeApiMeGet<
 }
 
 /**
- * OAuth2 compatible token login, get an access token for future requests.
+ * Update current user profile.
+ * @summary Update User Me
+ */
+export const updateUserMeApiMePatch = (userUpdate: UserUpdate) => {
+    return customInstance<UserRead>({
+        url: `/api/me`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: userUpdate,
+    });
+};
+
+export const getUpdateUserMeApiMePatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+        TError,
+        { data: UserUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+    TError,
+    { data: UserUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateUserMeApiMePatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+        { data: UserUpdate }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return updateUserMeApiMePatch(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateUserMeApiMePatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateUserMeApiMePatch>>
+>;
+export type UpdateUserMeApiMePatchMutationBody = UserUpdate;
+export type UpdateUserMeApiMePatchMutationError = HTTPValidationError;
+
+/**
+ * @summary Update User Me
+ */
+export const useUpdateUserMeApiMePatch = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+            TError,
+            { data: UserUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateUserMeApiMePatch>>,
+    TError,
+    { data: UserUpdate },
+    TContext
+> => {
+    const mutationOptions = getUpdateUserMeApiMePatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * OAuth2 compatible token login, getting an access token for future requests.
+
+Validation Flow:
+1. Verify username (email) and password.
+2. If the user has 2FA enabled:
+   - Check for `x-totp-token` header.
+   - If missing, return a special Token response indicating `requires_2fa=True`.
+   - If present, verify the TOTP token.
+3. If all checks pass, issue a Bearer access token.
  * @summary Login For Access Token
  */
 export const loginForAccessTokenApiTokenPost = (
@@ -357,138 +460,195 @@ export const useRegisterUserApiRegisterPost = <TError = HTTPValidationError, TCo
 };
 
 /**
- * List studies accessible to the current user (via Workspace membership).
- * @summary List Studies
+ * Change current user password.
+ * @summary Change Password
  */
-export const listStudiesApiAdminStudiesGet = (signal?: AbortSignal) => {
-    return customInstance<StudyRead[]>({
-        url: `/api/admin/studies/`,
-        method: 'GET',
+export const changePasswordApiMePasswordPost = (
+    passwordChange: PasswordChange,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/me/password`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: passwordChange,
         signal,
     });
 };
 
-export const getListStudiesApiAdminStudiesGetQueryKey = () => {
-    return [`/api/admin/studies/`] as const;
+export const getChangePasswordApiMePasswordPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+        TError,
+        { data: PasswordChange },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+    TError,
+    { data: PasswordChange },
+    TContext
+> => {
+    const mutationKey = ['changePasswordApiMePasswordPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+        { data: PasswordChange }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return changePasswordApiMePasswordPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
 };
 
-export const getListStudiesApiAdminStudiesGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+export type ChangePasswordApiMePasswordPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>
+>;
+export type ChangePasswordApiMePasswordPostMutationBody = PasswordChange;
+export type ChangePasswordApiMePasswordPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Change Password
+ */
+export const useChangePasswordApiMePasswordPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+            TError,
+            { data: PasswordChange },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof changePasswordApiMePasswordPost>>,
+    TError,
+    { data: PasswordChange },
+    TContext
+> => {
+    const mutationOptions = getChangePasswordApiMePasswordPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Start 2FA setup by generating a secret and QR code URI.
+ * @summary Setup Totp
+ */
+export const setupTotpApiMe2faSetupGet = (signal?: AbortSignal) => {
+    return customInstance<TOTPSetup>({ url: `/api/me/2fa/setup`, method: 'GET', signal });
+};
+
+export const getSetupTotpApiMe2faSetupGetQueryKey = () => {
+    return [`/api/me/2fa/setup`] as const;
+};
+
+export const getSetupTotpApiMe2faSetupGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
     TError = unknown,
 >(options?: {
     query?: Partial<
-        UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>
+        UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
     >;
 }) => {
     const { query: queryOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getListStudiesApiAdminStudiesGetQueryKey();
+    const queryKey = queryOptions?.queryKey ?? getSetupTotpApiMe2faSetupGetQueryKey();
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>> = ({
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>> = ({
         signal,
-    }) => listStudiesApiAdminStudiesGet(signal);
+    }) => setupTotpApiMe2faSetupGet(signal);
 
     return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+        Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type ListStudiesApiAdminStudiesGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+export type SetupTotpApiMe2faSetupGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>
 >;
-export type ListStudiesApiAdminStudiesGetQueryError = unknown;
+export type SetupTotpApiMe2faSetupGetQueryError = unknown;
 
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+export function useSetupTotpApiMe2faSetupGet<
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
     TError = unknown,
 >(
     options: {
         query: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
+            UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
         > &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
                     TError,
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+                    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSetupTotpApiMe2faSetupGet<
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
     TError = unknown,
 >(
     options?: {
         query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
+            UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
         > &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
                     TError,
-                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+                    Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useSetupTotpApiMe2faSetupGet<
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
     TError = unknown,
 >(
     options?: {
         query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
+            UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary List Studies
+ * @summary Setup Totp
  */
 
-export function useListStudiesApiAdminStudiesGet<
-    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+export function useSetupTotpApiMe2faSetupGet<
+    TData = Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>,
     TError = unknown,
 >(
     options?: {
         query?: Partial<
-            UseQueryOptions<
-                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
-                TError,
-                TData
-            >
+            UseQueryOptions<Awaited<ReturnType<typeof setupTotpApiMe2faSetupGet>>, TError, TData>
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
-    const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(options);
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getSetupTotpApiMe2faSetupGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -500,12 +660,173 @@ export function useListStudiesApiAdminStudiesGet<
 }
 
 /**
- * Create a new study in the user's active workspace.
+ * Enable 2FA after verifying a token.
+ * @summary Enable Totp
+ */
+export const enableTotpApiMe2faEnablePost = (tOTPVerify: TOTPVerify, signal?: AbortSignal) => {
+    return customInstance<unknown>({
+        url: `/api/me/2fa/enable`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: tOTPVerify,
+        signal,
+    });
+};
+
+export const getEnableTotpApiMe2faEnablePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+        TError,
+        { data: TOTPVerify },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+    TError,
+    { data: TOTPVerify },
+    TContext
+> => {
+    const mutationKey = ['enableTotpApiMe2faEnablePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+        { data: TOTPVerify }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return enableTotpApiMe2faEnablePost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type EnableTotpApiMe2faEnablePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>
+>;
+export type EnableTotpApiMe2faEnablePostMutationBody = TOTPVerify;
+export type EnableTotpApiMe2faEnablePostMutationError = HTTPValidationError;
+
+/**
+ * @summary Enable Totp
+ */
+export const useEnableTotpApiMe2faEnablePost = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+            TError,
+            { data: TOTPVerify },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
+    TError,
+    { data: TOTPVerify },
+    TContext
+> => {
+    const mutationOptions = getEnableTotpApiMe2faEnablePostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Disable 2FA after verifying current password.
+ * @summary Disable Totp
+ */
+export const disableTotpApiMe2faDisablePost = (
+    passwordChange: PasswordChange,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/me/2fa/disable`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: passwordChange,
+        signal,
+    });
+};
+
+export const getDisableTotpApiMe2faDisablePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+        TError,
+        { data: PasswordChange },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+    TError,
+    { data: PasswordChange },
+    TContext
+> => {
+    const mutationKey = ['disableTotpApiMe2faDisablePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+        { data: PasswordChange }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return disableTotpApiMe2faDisablePost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DisableTotpApiMe2faDisablePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>
+>;
+export type DisableTotpApiMe2faDisablePostMutationBody = PasswordChange;
+export type DisableTotpApiMe2faDisablePostMutationError = HTTPValidationError;
+
+/**
+ * @summary Disable Totp
+ */
+export const useDisableTotpApiMe2faDisablePost = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+            TError,
+            { data: PasswordChange },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof disableTotpApiMe2faDisablePost>>,
+    TError,
+    { data: PasswordChange },
+    TContext
+> => {
+    const mutationOptions = getDisableTotpApiMe2faDisablePostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Create a new study in the active workspace.
  * @summary Create Study
  */
 export const createStudyApiAdminStudiesPost = (studyCreate: StudyCreate, signal?: AbortSignal) => {
     return customInstance<StudyRead>({
-        url: `/api/admin/studies/`,
+        url: `/api/admin/studies`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data: studyCreate,
@@ -579,15 +900,142 @@ export const useCreateStudyApiAdminStudiesPost = <TError = HTTPValidationError, 
 };
 
 /**
+ * List studies in the active workspace.
+ * @summary List Studies
+ */
+export const listStudiesApiAdminStudiesGet = (signal?: AbortSignal) => {
+    return customInstance<StudyRead[]>({ url: `/api/admin/studies`, method: 'GET', signal });
+};
+
+export const getListStudiesApiAdminStudiesGetQueryKey = () => {
+    return [`/api/admin/studies`] as const;
+};
+
+export const getListStudiesApiAdminStudiesGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>, TError, TData>
+    >;
+}) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey = queryOptions?.queryKey ?? getListStudiesApiAdminStudiesGetQueryKey();
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>> = ({
+        signal,
+    }) => listStudiesApiAdminStudiesGet(signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListStudiesApiAdminStudiesGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+>;
+export type ListStudiesApiAdminStudiesGetQueryError = HTTPValidationError;
+
+export function useListStudiesApiAdminStudiesGet<
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudiesApiAdminStudiesGet<
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudiesApiAdminStudiesGet<
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Studies
+ */
+
+export function useListStudiesApiAdminStudiesGet<
+    TData = Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+    TError = HTTPValidationError,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudiesApiAdminStudiesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getListStudiesApiAdminStudiesGetQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * Get study details.
  * @summary Get Study
  */
 export const getStudyApiAdminStudiesSlugGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<StudyRead>({
-        url: `/api/admin/studies/${slug}`,
-        method: 'GET',
-        signal,
-    });
+    return customInstance<StudyRead>({ url: `/api/admin/studies/${slug}`, method: 'GET', signal });
 };
 
 export const getGetStudyApiAdminStudiesSlugGetQueryKey = (slug?: string) => {
@@ -617,12 +1065,7 @@ export const getGetStudyApiAdminStudiesSlugGetQueryOptions = <
         signal,
     }) => getStudyApiAdminStudiesSlugGet(slug, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!slug,
-        ...queryOptions,
-    } as UseQueryOptions<
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
         TError,
         TData
@@ -657,9 +1100,7 @@ export function useGetStudyApiAdminStudiesSlugGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetStudyApiAdminStudiesSlugGet<
     TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
     TError = HTTPValidationError,
@@ -683,9 +1124,7 @@ export function useGetStudyApiAdminStudiesSlugGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetStudyApiAdminStudiesSlugGet<
     TData = Awaited<ReturnType<typeof getStudyApiAdminStudiesSlugGet>>,
     TError = HTTPValidationError,
@@ -701,9 +1140,7 @@ export function useGetStudyApiAdminStudiesSlugGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get Study
  */
@@ -723,9 +1160,7 @@ export function useGetStudyApiAdminStudiesSlugGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getGetStudyApiAdminStudiesSlugGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -819,14 +1254,11 @@ export const useUpdateStudyApiAdminStudiesSlugPatch = <
 };
 
 /**
- * Delete a study (Workspace Owner only).
+ * Delete a study (Superuser only, and must be Archived).
  * @summary Delete Study
  */
 export const deleteStudyApiAdminStudiesSlugDelete = (slug: string) => {
-    return customInstance<void>({
-        url: `/api/admin/studies/${slug}`,
-        method: 'DELETE',
-    });
+    return customInstance<void>({ url: `/api/admin/studies/${slug}`, method: 'DELETE' });
 };
 
 export const getDeleteStudyApiAdminStudiesSlugDeleteMutationOptions = <
@@ -898,7 +1330,90 @@ export const useDeleteStudyApiAdminStudiesSlugDelete = <
 };
 
 /**
- * Change study state (Draft <-> Active <-> Closed).
+ * Check if study is ready for activation.
+ * @summary Validate Study
+ */
+export const validateStudyApiAdminStudiesSlugValidatePost = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<string[]>({
+        url: `/api/admin/studies/${slug}/validate`,
+        method: 'POST',
+        signal,
+    });
+};
+
+export const getValidateStudyApiAdminStudiesSlugValidatePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['validateStudyApiAdminStudiesSlugValidatePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return validateStudyApiAdminStudiesSlugValidatePost(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ValidateStudyApiAdminStudiesSlugValidatePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>
+>;
+
+export type ValidateStudyApiAdminStudiesSlugValidatePostMutationError = HTTPValidationError;
+
+/**
+ * @summary Validate Study
+ */
+export const useValidateStudyApiAdminStudiesSlugValidatePost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof validateStudyApiAdminStudiesSlugValidatePost>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions = getValidateStudyApiAdminStudiesSlugValidatePostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Change study state (Draft <-> Active <-> Closed <-> Archived).
  * @summary Change Study State
  */
 export const changeStudyStateApiAdminStudiesSlugStatePost = (
@@ -921,10 +1436,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostMutationOptions = <
     mutation?: UseMutationOptions<
         Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
         TError,
-        {
-            slug: string;
-            params: ChangeStudyStateApiAdminStudiesSlugStatePostParams;
-        },
+        { slug: string; params: ChangeStudyStateApiAdminStudiesSlugStatePostParams },
         TContext
     >;
 }): UseMutationOptions<
@@ -969,10 +1481,7 @@ export const useChangeStudyStateApiAdminStudiesSlugStatePost = <
         mutation?: UseMutationOptions<
             Awaited<ReturnType<typeof changeStudyStateApiAdminStudiesSlugStatePost>>,
             TError,
-            {
-                slug: string;
-                params: ChangeStudyStateApiAdminStudiesSlugStatePostParams;
-            },
+            { slug: string; params: ChangeStudyStateApiAdminStudiesSlugStatePostParams },
             TContext
         >;
     },
@@ -1028,12 +1537,7 @@ export const getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions = <
         Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>
     > = ({ signal }) => getStudyStatsApiAdminStudiesSlugStatsGet(slug, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!slug,
-        ...queryOptions,
-    } as UseQueryOptions<
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
         TError,
         TData
@@ -1068,9 +1572,7 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
     TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
     TError = HTTPValidationError,
@@ -1094,9 +1596,7 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
     TData = Awaited<ReturnType<typeof getStudyStatsApiAdminStudiesSlugStatsGet>>,
     TError = HTTPValidationError,
@@ -1112,9 +1612,7 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get Study Stats
  */
@@ -1134,9 +1632,7 @@ export function useGetStudyStatsApiAdminStudiesSlugStatsGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getGetStudyStatsApiAdminStudiesSlugStatsGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -1197,12 +1693,7 @@ export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryOp
     > = ({ signal }) =>
         getParticipantApiAdminStudiesParticipantsParticipantIdGet(participantId, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!participantId,
-        ...queryOptions,
-    } as UseQueryOptions<
+    return { queryKey, queryFn, enabled: !!participantId, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
         TError,
         TData
@@ -1244,9 +1735,7 @@ export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
     TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
     TError = HTTPValidationError,
@@ -1276,9 +1765,7 @@ export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
     TData = Awaited<ReturnType<typeof getParticipantApiAdminStudiesParticipantsParticipantIdGet>>,
     TError = HTTPValidationError,
@@ -1296,9 +1783,7 @@ export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get Participant
  */
@@ -1320,9 +1805,7 @@ export function useGetParticipantApiAdminStudiesParticipantsParticipantIdGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getGetParticipantApiAdminStudiesParticipantsParticipantIdGetQueryOptions(
         participantId,
         options
@@ -1498,12 +1981,7 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOpti
         Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>
     > = ({ signal }) => listStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!slug,
-        ...queryOptions,
-    } as UseQueryOptions<
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
         TError,
         TData
@@ -1542,9 +2020,7 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
     TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
     TError = HTTPValidationError,
@@ -1572,9 +2048,7 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
     TData = Awaited<ReturnType<typeof listStudyParticipantsApiAdminStudiesSlugParticipantsGet>>,
     TError = HTTPValidationError,
@@ -1590,9 +2064,7 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List Study Participants
  */
@@ -1612,9 +2084,7 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getListStudyParticipantsApiAdminStudiesSlugParticipantsGetQueryOptions(
         slug,
         options
@@ -1669,12 +2139,7 @@ export const getExportCsvApiAdminStudiesSlugExportCsvGetQueryOptions = <
         Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>
     > = ({ signal }) => exportCsvApiAdminStudiesSlugExportCsvGet(slug, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!slug,
-        ...queryOptions,
-    } as UseQueryOptions<
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
         TError,
         TData
@@ -1709,9 +2174,7 @@ export function useExportCsvApiAdminStudiesSlugExportCsvGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useExportCsvApiAdminStudiesSlugExportCsvGet<
     TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
     TError = HTTPValidationError,
@@ -1735,9 +2198,7 @@ export function useExportCsvApiAdminStudiesSlugExportCsvGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useExportCsvApiAdminStudiesSlugExportCsvGet<
     TData = Awaited<ReturnType<typeof exportCsvApiAdminStudiesSlugExportCsvGet>>,
     TError = HTTPValidationError,
@@ -1753,9 +2214,7 @@ export function useExportCsvApiAdminStudiesSlugExportCsvGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Export Csv
  */
@@ -1775,9 +2234,7 @@ export function useExportCsvApiAdminStudiesSlugExportCsvGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getExportCsvApiAdminStudiesSlugExportCsvGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -1833,12 +2290,7 @@ export const getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryOptions =
         Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>
     > = ({ signal }) => exportPqmethodApiAdminStudiesSlugExportPqmethodGet(slug, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!slug,
-        ...queryOptions,
-    } as UseQueryOptions<
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
         TError,
         TData
@@ -1873,9 +2325,7 @@ export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
     TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
     TError = HTTPValidationError,
@@ -1899,9 +2349,7 @@ export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
     TData = Awaited<ReturnType<typeof exportPqmethodApiAdminStudiesSlugExportPqmethodGet>>,
     TError = HTTPValidationError,
@@ -1917,9 +2365,7 @@ export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Export Pqmethod
  */
@@ -1939,9 +2385,7 @@ export function useExportPqmethodApiAdminStudiesSlugExportPqmethodGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getExportPqmethodApiAdminStudiesSlugExportPqmethodGetQueryOptions(
         slug,
         options
@@ -1996,12 +2440,7 @@ export const getExportRKitApiAdminStudiesSlugExportRKitGetQueryOptions = <
         Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>
     > = ({ signal }) => exportRKitApiAdminStudiesSlugExportRKitGet(slug, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!slug,
-        ...queryOptions,
-    } as UseQueryOptions<
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
         TError,
         TData
@@ -2036,9 +2475,7 @@ export function useExportRKitApiAdminStudiesSlugExportRKitGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useExportRKitApiAdminStudiesSlugExportRKitGet<
     TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
     TError = HTTPValidationError,
@@ -2062,9 +2499,7 @@ export function useExportRKitApiAdminStudiesSlugExportRKitGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useExportRKitApiAdminStudiesSlugExportRKitGet<
     TData = Awaited<ReturnType<typeof exportRKitApiAdminStudiesSlugExportRKitGet>>,
     TError = HTTPValidationError,
@@ -2080,9 +2515,7 @@ export function useExportRKitApiAdminStudiesSlugExportRKitGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Export R Kit
  */
@@ -2102,9 +2535,7 @@ export function useExportRKitApiAdminStudiesSlugExportRKitGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getExportRKitApiAdminStudiesSlugExportRKitGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -2156,12 +2587,7 @@ export const getGetStudyDumpApiAdminStudiesSlugDumpGetQueryOptions = <
         Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>
     > = ({ signal }) => getStudyDumpApiAdminStudiesSlugDumpGet(slug, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!slug,
-        ...queryOptions,
-    } as UseQueryOptions<
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
         TError,
         TData
@@ -2196,9 +2622,7 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
     TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
     TError = HTTPValidationError,
@@ -2222,9 +2646,7 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
     TData = Awaited<ReturnType<typeof getStudyDumpApiAdminStudiesSlugDumpGet>>,
     TError = HTTPValidationError,
@@ -2240,9 +2662,7 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get Study Dump
  */
@@ -2262,9 +2682,7 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getGetStudyDumpApiAdminStudiesSlugDumpGetQueryOptions(slug, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -2277,120 +2695,36 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
 }
 
 /**
- * Generate a JWT invitation link for a collaborator.
- * @summary Invite Collaborator
- */
-export const inviteCollaboratorApiAdminInvitationsSlugInvitePost = (
-    slug: string,
-    invitationCreate: InvitationCreate,
-    signal?: AbortSignal
-) => {
-    return customInstance<InvitationLink>({
-        url: `/api/admin/invitations/${slug}/invite`,
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        data: invitationCreate,
-        signal,
-    });
-};
-
-export const getInviteCollaboratorApiAdminInvitationsSlugInvitePostMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-        TError,
-        { slug: string; data: InvitationCreate },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-    TError,
-    { slug: string; data: InvitationCreate },
-    TContext
-> => {
-    const mutationKey = ['inviteCollaboratorApiAdminInvitationsSlugInvitePost'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-        { slug: string; data: InvitationCreate }
-    > = (props) => {
-        const { slug, data } = props ?? {};
-
-        return inviteCollaboratorApiAdminInvitationsSlugInvitePost(slug, data);
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationResult = NonNullable<
-    Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>
->;
-export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationBody = InvitationCreate;
-export type InviteCollaboratorApiAdminInvitationsSlugInvitePostMutationError = HTTPValidationError;
-
-/**
- * @summary Invite Collaborator
- */
-export const useInviteCollaboratorApiAdminInvitationsSlugInvitePost = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-            TError,
-            { slug: string; data: InvitationCreate },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof inviteCollaboratorApiAdminInvitationsSlugInvitePost>>,
-    TError,
-    { slug: string; data: InvitationCreate },
-    TContext
-> => {
-    const mutationOptions =
-        getInviteCollaboratorApiAdminInvitationsSlugInvitePostMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
-
-/**
- * Verify an invitation token and return details.
+ * Verify an invitation token and return details including workspace name.
  * @summary Verify Invitation
  */
-export const verifyInvitationApiAdminInvitationsVerifyTokenGet = (
-    token: string,
+export const verifyInvitationApiAdminInvitationsVerifyGet = (
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     signal?: AbortSignal
 ) => {
     return customInstance<unknown>({
-        url: `/api/admin/invitations/verify/${token}`,
+        url: `/api/admin/invitations/verify`,
         method: 'GET',
+        params,
         signal,
     });
 };
 
-export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryKey = (token?: string) => {
-    return [`/api/admin/invitations/verify/${token}`] as const;
+export const getVerifyInvitationApiAdminInvitationsVerifyGetQueryKey = (
+    params?: VerifyInvitationApiAdminInvitationsVerifyGetParams
+) => {
+    return [`/api/admin/invitations/verify`, ...(params ? [params] : [])] as const;
 };
 
-export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+export const getVerifyInvitationApiAdminInvitationsVerifyGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
@@ -2400,124 +2734,110 @@ export const getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions = 
     const { query: queryOptions } = options ?? {};
 
     const queryKey =
-        queryOptions?.queryKey ??
-        getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryKey(token);
+        queryOptions?.queryKey ?? getVerifyInvitationApiAdminInvitationsVerifyGetQueryKey(params);
 
     const queryFn: QueryFunction<
-        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
-    > = ({ signal }) => verifyInvitationApiAdminInvitationsVerifyTokenGet(token, signal);
+        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>
+    > = ({ signal }) => verifyInvitationApiAdminInvitationsVerifyGet(params, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!token,
-        ...queryOptions,
-    } as UseQueryOptions<
-        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type VerifyInvitationApiAdminInvitationsVerifyTokenGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
+export type VerifyInvitationApiAdminInvitationsVerifyGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>
 >;
-export type VerifyInvitationApiAdminInvitationsVerifyTokenGetQueryError = HTTPValidationError;
+export type VerifyInvitationApiAdminInvitationsVerifyGetQueryError = HTTPValidationError;
 
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+export function useVerifyInvitationApiAdminInvitationsVerifyGet<
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options: {
         query: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                     TError,
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
+                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useVerifyInvitationApiAdminInvitationsVerifyGet<
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
         > &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                     TError,
-                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>
+                    Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useVerifyInvitationApiAdminInvitationsVerifyGet<
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Verify Invitation
  */
 
-export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
-    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+export function useVerifyInvitationApiAdminInvitationsVerifyGet<
+    TData = Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
     TError = HTTPValidationError,
 >(
-    token: string,
+    params: VerifyInvitationApiAdminInvitationsVerifyGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
-                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyTokenGet>>,
+                Awaited<ReturnType<typeof verifyInvitationApiAdminInvitationsVerifyGet>>,
                 TError,
                 TData
             >
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
-    const queryOptions = getVerifyInvitationApiAdminInvitationsVerifyTokenGetQueryOptions(
-        token,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getVerifyInvitationApiAdminInvitationsVerifyGetQueryOptions(
+        params,
         options
     );
 
@@ -2531,19 +2851,102 @@ export function useVerifyInvitationApiAdminInvitationsVerifyTokenGet<
 }
 
 /**
- * List all users in the system.
- * @summary List Users
+ * Accept an invitation using an existing account.
+The email in the token must match the current user's email.
+ * @summary Accept Invitation
  */
-export const listUsersApiAdminUsersGet = (signal?: AbortSignal) => {
-    return customInstance<UserRead[]>({
-        url: `/api/admin/users/`,
-        method: 'GET',
+export const acceptInvitationApiAdminInvitationsAcceptPost = (
+    invitationAccept: InvitationAccept,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/invitations/accept`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: invitationAccept,
         signal,
     });
 };
 
+export const getAcceptInvitationApiAdminInvitationsAcceptPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+        TError,
+        { data: InvitationAccept },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+    TError,
+    { data: InvitationAccept },
+    TContext
+> => {
+    const mutationKey = ['acceptInvitationApiAdminInvitationsAcceptPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+        { data: InvitationAccept }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return acceptInvitationApiAdminInvitationsAcceptPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AcceptInvitationApiAdminInvitationsAcceptPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>
+>;
+export type AcceptInvitationApiAdminInvitationsAcceptPostMutationBody = InvitationAccept;
+export type AcceptInvitationApiAdminInvitationsAcceptPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Accept Invitation
+ */
+export const useAcceptInvitationApiAdminInvitationsAcceptPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+            TError,
+            { data: InvitationAccept },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof acceptInvitationApiAdminInvitationsAcceptPost>>,
+    TError,
+    { data: InvitationAccept },
+    TContext
+> => {
+    const mutationOptions =
+        getAcceptInvitationApiAdminInvitationsAcceptPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * List all users in the system.
+ * @summary List Users
+ */
+export const listUsersApiAdminUsersGet = (signal?: AbortSignal) => {
+    return customInstance<UserRead[]>({ url: `/api/admin/users`, method: 'GET', signal });
+};
+
 export const getListUsersApiAdminUsersGetQueryKey = () => {
-    return [`/api/admin/users/`] as const;
+    return [`/api/admin/users`] as const;
 };
 
 export const getListUsersApiAdminUsersGetQueryOptions = <
@@ -2592,9 +2995,7 @@ export function useListUsersApiAdminUsersGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListUsersApiAdminUsersGet<
     TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
     TError = unknown,
@@ -2613,9 +3014,7 @@ export function useListUsersApiAdminUsersGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListUsersApiAdminUsersGet<
     TData = Awaited<ReturnType<typeof listUsersApiAdminUsersGet>>,
     TError = unknown,
@@ -2626,9 +3025,7 @@ export function useListUsersApiAdminUsersGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List Users
  */
@@ -2643,9 +3040,7 @@ export function useListUsersApiAdminUsersGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getListUsersApiAdminUsersGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -2663,7 +3058,7 @@ export function useListUsersApiAdminUsersGet<
  */
 export const createUserApiAdminUsersPost = (userCreate: UserCreate, signal?: AbortSignal) => {
     return customInstance<UserRead>({
-        url: `/api/admin/users/`,
+        url: `/api/admin/users`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data: userCreate,
@@ -2741,10 +3136,7 @@ export const useCreateUserApiAdminUsersPost = <TError = HTTPValidationError, TCo
  * @summary Delete User
  */
 export const deleteUserApiAdminUsersUserIdDelete = (userId: number) => {
-    return customInstance<void>({
-        url: `/api/admin/users/${userId}`,
-        method: 'DELETE',
-    });
+    return customInstance<void>({ url: `/api/admin/users/${userId}`, method: 'DELETE' });
 };
 
 export const getDeleteUserApiAdminUsersUserIdDeleteMutationOptions = <
@@ -2816,19 +3208,364 @@ export const useDeleteUserApiAdminUsersUserIdDelete = <
 };
 
 /**
- * List all workspaces the current user is a member of.
+ * List all recruitment links for a specific study.
+ * @summary List Study Links
+ */
+export const listStudyLinksApiAdminRecruitmentSlugLinksGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<RecruitmentLinkRead[]>({
+        url: `/api/admin/recruitment/${slug}/links`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryKey = (slug?: string) => {
+    return [`/api/admin/recruitment/${slug}/links`] as const;
+};
+
+export const getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>
+    > = ({ signal }) => listStudyLinksApiAdminRecruitmentSlugLinksGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListStudyLinksApiAdminRecruitmentSlugLinksGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>
+>;
+export type ListStudyLinksApiAdminRecruitmentSlugLinksGetQueryError = HTTPValidationError;
+
+export function useListStudyLinksApiAdminRecruitmentSlugLinksGet<
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudyLinksApiAdminRecruitmentSlugLinksGet<
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListStudyLinksApiAdminRecruitmentSlugLinksGet<
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Study Links
+ */
+
+export function useListStudyLinksApiAdminRecruitmentSlugLinksGet<
+    TData = Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listStudyLinksApiAdminRecruitmentSlugLinksGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getListStudyLinksApiAdminRecruitmentSlugLinksGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Create one or more recruitment links.
+ * @summary Create Recruitment Links
+ */
+export const createRecruitmentLinksApiAdminRecruitmentSlugLinksPost = (
+    slug: string,
+    recruitmentLinkCreate: RecruitmentLinkCreate,
+    params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<RecruitmentLinkRead[]>({
+        url: `/api/admin/recruitment/${slug}/links`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: recruitmentLinkCreate,
+        params,
+        signal,
+    });
+};
+
+export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+        TError,
+        {
+            slug: string;
+            data: RecruitmentLinkCreate;
+            params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+        },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+    TError,
+    {
+        slug: string;
+        data: RecruitmentLinkCreate;
+        params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+    },
+    TContext
+> => {
+    const mutationKey = ['createRecruitmentLinksApiAdminRecruitmentSlugLinksPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+        {
+            slug: string;
+            data: RecruitmentLinkCreate;
+            params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+        }
+    > = (props) => {
+        const { slug, data, params } = props ?? {};
+
+        return createRecruitmentLinksApiAdminRecruitmentSlugLinksPost(slug, data, params);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>
+>;
+export type CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationBody =
+    RecruitmentLinkCreate;
+export type CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Create Recruitment Links
+ */
+export const useCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+            TError,
+            {
+                slug: string;
+                data: RecruitmentLinkCreate;
+                params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+            },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createRecruitmentLinksApiAdminRecruitmentSlugLinksPost>>,
+    TError,
+    {
+        slug: string;
+        data: RecruitmentLinkCreate;
+        params?: CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams;
+    },
+    TContext
+> => {
+    const mutationOptions =
+        getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Revoke a recruitment link.
+ * @summary Revoke Recruitment Link
+ */
+export const revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete = (linkId: number) => {
+    return customInstance<unknown>({
+        url: `/api/admin/recruitment/links/${linkId}`,
+        method: 'DELETE',
+    });
+};
+
+export const getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+        TError,
+        { linkId: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+    TError,
+    { linkId: number },
+    TContext
+> => {
+    const mutationKey = ['revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+        { linkId: number }
+    > = (props) => {
+        const { linkId } = props ?? {};
+
+        return revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete(linkId);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>
+>;
+
+export type RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Revoke Recruitment Link
+ */
+export const useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+            TError,
+            { linkId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof revokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete>>,
+    TError,
+    { linkId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * List all workspaces the current user is a member of, with their role.
  * @summary List Workspaces
  */
 export const listWorkspacesApiAdminWorkspacesGet = (signal?: AbortSignal) => {
-    return customInstance<WorkspaceRead[]>({
-        url: `/api/admin/workspaces/`,
+    return customInstance<WorkspaceWithRole[]>({
+        url: `/api/admin/workspaces`,
         method: 'GET',
         signal,
     });
 };
 
 export const getListWorkspacesApiAdminWorkspacesGetQueryKey = () => {
-    return [`/api/admin/workspaces/`] as const;
+    return [`/api/admin/workspaces`] as const;
 };
 
 export const getListWorkspacesApiAdminWorkspacesGetQueryOptions = <
@@ -2885,9 +3622,7 @@ export function useListWorkspacesApiAdminWorkspacesGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListWorkspacesApiAdminWorkspacesGet<
     TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
     TError = unknown,
@@ -2910,9 +3645,7 @@ export function useListWorkspacesApiAdminWorkspacesGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useListWorkspacesApiAdminWorkspacesGet<
     TData = Awaited<ReturnType<typeof listWorkspacesApiAdminWorkspacesGet>>,
     TError = unknown,
@@ -2927,9 +3660,7 @@ export function useListWorkspacesApiAdminWorkspacesGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary List Workspaces
  */
@@ -2948,9 +3679,7 @@ export function useListWorkspacesApiAdminWorkspacesGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getListWorkspacesApiAdminWorkspacesGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -2971,7 +3700,7 @@ export const createWorkspaceApiAdminWorkspacesPost = (
     signal?: AbortSignal
 ) => {
     return customInstance<WorkspaceRead>({
-        url: `/api/admin/workspaces/`,
+        url: `/api/admin/workspaces`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         data: workspaceCreate,
@@ -3043,6 +3772,738 @@ export const useCreateWorkspaceApiAdminWorkspacesPost = <
     TContext
 > => {
     const mutationOptions = getCreateWorkspaceApiAdminWorkspacesPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Get workspace details.
+ * @summary Get Workspace
+ */
+export const getWorkspaceApiAdminWorkspacesSlugGet = (slug: string, signal?: AbortSignal) => {
+    return customInstance<WorkspaceRead>({
+        url: `/api/admin/workspaces/${slug}`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetWorkspaceApiAdminWorkspacesSlugGetQueryKey = (slug?: string) => {
+    return [`/api/admin/workspaces/${slug}`] as const;
+};
+
+export const getGetWorkspaceApiAdminWorkspacesSlugGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getGetWorkspaceApiAdminWorkspacesSlugGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+    > = ({ signal }) => getWorkspaceApiAdminWorkspacesSlugGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetWorkspaceApiAdminWorkspacesSlugGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+>;
+export type GetWorkspaceApiAdminWorkspacesSlugGetQueryError = HTTPValidationError;
+
+export function useGetWorkspaceApiAdminWorkspacesSlugGet<
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetWorkspaceApiAdminWorkspacesSlugGet<
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetWorkspaceApiAdminWorkspacesSlugGet<
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Workspace
+ */
+
+export function useGetWorkspaceApiAdminWorkspacesSlugGet<
+    TData = Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getWorkspaceApiAdminWorkspacesSlugGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetWorkspaceApiAdminWorkspacesSlugGetQueryOptions(slug, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Update workspace details.
+ * @summary Update Workspace
+ */
+export const updateWorkspaceApiAdminWorkspacesSlugPatch = (
+    slug: string,
+    workspaceUpdate: WorkspaceUpdate
+) => {
+    return customInstance<WorkspaceRead>({
+        url: `/api/admin/workspaces/${slug}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: workspaceUpdate,
+    });
+};
+
+export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+        TError,
+        { slug: string; data: WorkspaceUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+    TError,
+    { slug: string; data: WorkspaceUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateWorkspaceApiAdminWorkspacesSlugPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+        { slug: string; data: WorkspaceUpdate }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return updateWorkspaceApiAdminWorkspacesSlugPatch(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateWorkspaceApiAdminWorkspacesSlugPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>
+>;
+export type UpdateWorkspaceApiAdminWorkspacesSlugPatchMutationBody = WorkspaceUpdate;
+export type UpdateWorkspaceApiAdminWorkspacesSlugPatchMutationError = HTTPValidationError;
+
+/**
+ * @summary Update Workspace
+ */
+export const useUpdateWorkspaceApiAdminWorkspacesSlugPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+            TError,
+            { slug: string; data: WorkspaceUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateWorkspaceApiAdminWorkspacesSlugPatch>>,
+    TError,
+    { slug: string; data: WorkspaceUpdate },
+    TContext
+> => {
+    const mutationOptions = getUpdateWorkspaceApiAdminWorkspacesSlugPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Delete a workspace (Owner only).
+ * @summary Delete Workspace
+ */
+export const deleteWorkspaceApiAdminWorkspacesSlugDelete = (slug: string) => {
+    return customInstance<void>({ url: `/api/admin/workspaces/${slug}`, method: 'DELETE' });
+};
+
+export const getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['deleteWorkspaceApiAdminWorkspacesSlugDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return deleteWorkspaceApiAdminWorkspacesSlugDelete(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>
+>;
+
+export type DeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Delete Workspace
+ */
+export const useDeleteWorkspaceApiAdminWorkspacesSlugDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof deleteWorkspaceApiAdminWorkspacesSlugDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions = getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * List all members of a workspace.
+ * @summary List Workspace Members
+ */
+export const listWorkspaceMembersApiAdminWorkspacesSlugMembersGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<WorkspaceMemberRead[]>({
+        url: `/api/admin/workspaces/${slug}/members`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey = (slug?: string) => {
+    return [`/api/admin/workspaces/${slug}/members`] as const;
+};
+
+export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+    > = ({ signal }) => listWorkspaceMembersApiAdminWorkspacesSlugMembersGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+>;
+export type ListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryError = HTTPValidationError;
+
+export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>
+                    >,
+                    TError,
+                    Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>
+                    >,
+                    TError,
+                    Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Workspace Members
+ */
+
+export function useListWorkspaceMembersApiAdminWorkspacesSlugMembersGet<
+    TData = Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listWorkspaceMembersApiAdminWorkspacesSlugMembersGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Update a workspace member's role.
+ * @summary Update Workspace Member
+ */
+export const updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch = (
+    slug: string,
+    userId: number,
+    workspaceMemberUpdate: WorkspaceMemberUpdate
+) => {
+    return customInstance<WorkspaceMemberRead>({
+        url: `/api/admin/workspaces/${slug}/members/${userId}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: workspaceMemberUpdate,
+    });
+};
+
+export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+        TError,
+        { slug: string; userId: number; data: WorkspaceMemberUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+    TError,
+    { slug: string; userId: number; data: WorkspaceMemberUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+        { slug: string; userId: number; data: WorkspaceMemberUpdate }
+    > = (props) => {
+        const { slug, userId, data } = props ?? {};
+
+        return updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch(slug, userId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationResult =
+    NonNullable<
+        Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>
+    >;
+export type UpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationBody =
+    WorkspaceMemberUpdate;
+export type UpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Update Workspace Member
+ */
+export const useUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>
+            >,
+            TError,
+            { slug: string; userId: number; data: WorkspaceMemberUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatch>>,
+    TError,
+    { slug: string; userId: number; data: WorkspaceMemberUpdate },
+    TContext
+> => {
+    const mutationOptions =
+        getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Remove a member from the workspace.
+ * @summary Remove Workspace Member
+ */
+export const removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete = (
+    slug: string,
+    userId: number
+) => {
+    return customInstance<void>({
+        url: `/api/admin/workspaces/${slug}/members/${userId}`,
+        method: 'DELETE',
+    });
+};
+
+export const getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+        TError,
+        { slug: string; userId: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+    TError,
+    { slug: string; userId: number },
+    TContext
+> => {
+    const mutationKey = ['removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+        { slug: string; userId: number }
+    > = (props) => {
+        const { slug, userId } = props ?? {};
+
+        return removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete(slug, userId);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type RemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationResult =
+    NonNullable<
+        Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>
+    >;
+
+export type RemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Remove Workspace Member
+ */
+export const useRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>
+            >,
+            TError,
+            { slug: string; userId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof removeWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDelete>>,
+    TError,
+    { slug: string; userId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Invite a user to the workspace.
+ * @summary Create Invitation
+ */
+export const createInvitationApiAdminWorkspacesSlugInvitationsPost = (
+    slug: string,
+    workspaceInvitationCreate: WorkspaceInvitationCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<InvitationLink>({
+        url: `/api/admin/workspaces/${slug}/invitations`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: workspaceInvitationCreate,
+        signal,
+    });
+};
+
+export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+        TError,
+        { slug: string; data: WorkspaceInvitationCreate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+    TError,
+    { slug: string; data: WorkspaceInvitationCreate },
+    TContext
+> => {
+    const mutationKey = ['createInvitationApiAdminWorkspacesSlugInvitationsPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+        { slug: string; data: WorkspaceInvitationCreate }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return createInvitationApiAdminWorkspacesSlugInvitationsPost(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>
+>;
+export type CreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationBody =
+    WorkspaceInvitationCreate;
+export type CreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Create Invitation
+ */
+export const useCreateInvitationApiAdminWorkspacesSlugInvitationsPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+            TError,
+            { slug: string; data: WorkspaceInvitationCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createInvitationApiAdminWorkspacesSlugInvitationsPost>>,
+    TError,
+    { slug: string; data: WorkspaceInvitationCreate },
+    TContext
+> => {
+    const mutationOptions =
+        getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -3133,6 +4594,10 @@ export const useSubmitStudyApiSubmitPost = <TError = HTTPValidationError, TConte
 
 /**
  * Fetches study configuration for the frontend, including language resolution.
+
+If the study has randomize_statements=True and a session_token is provided,
+statements will be shuffled deterministically using the token as seed.
+This ensures the same participant always sees statements in the same order.
  * @summary Get Study
  */
 export const getStudyApiStudySlugGet = (
@@ -3140,12 +4605,7 @@ export const getStudyApiStudySlugGet = (
     params?: GetStudyApiStudySlugGetParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
-        url: `/api/study/${slug}`,
-        method: 'GET',
-        params,
-        signal,
-    });
+    return customInstance<unknown>({ url: `/api/study/${slug}`, method: 'GET', params, signal });
 };
 
 export const getGetStudyApiStudySlugGetQueryKey = (
@@ -3175,14 +4635,11 @@ export const getGetStudyApiStudySlugGetQueryOptions = <
         signal,
     }) => getStudyApiStudySlugGet(slug, params, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!slug,
-        ...queryOptions,
-    } as UseQueryOptions<Awaited<ReturnType<typeof getStudyApiStudySlugGet>>, TError, TData> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type GetStudyApiStudySlugGetQueryResult = NonNullable<
@@ -3210,9 +4667,7 @@ export function useGetStudyApiStudySlugGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetStudyApiStudySlugGet<
     TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
     TError = HTTPValidationError,
@@ -3233,9 +4688,7 @@ export function useGetStudyApiStudySlugGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetStudyApiStudySlugGet<
     TData = Awaited<ReturnType<typeof getStudyApiStudySlugGet>>,
     TError = HTTPValidationError,
@@ -3248,9 +4701,7 @@ export function useGetStudyApiStudySlugGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get Study
  */
@@ -3267,9 +4718,7 @@ export function useGetStudyApiStudySlugGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getGetStudyApiStudySlugGetQueryOptions(slug, params, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -3280,6 +4729,91 @@ export function useGetStudyApiStudySlugGet<
 
     return query;
 }
+
+/**
+ * Validate study access password.
+ * @summary Unlock Study
+ */
+export const unlockStudyApiStudySlugUnlockPost = (
+    slug: string,
+    params: UnlockStudyApiStudySlugUnlockPostParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/study/${slug}/unlock`,
+        method: 'POST',
+        params,
+        signal,
+    });
+};
+
+export const getUnlockStudyApiStudySlugUnlockPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+        TError,
+        { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+    TError,
+    { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams },
+    TContext
+> => {
+    const mutationKey = ['unlockStudyApiStudySlugUnlockPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+        { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams }
+    > = (props) => {
+        const { slug, params } = props ?? {};
+
+        return unlockStudyApiStudySlugUnlockPost(slug, params);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UnlockStudyApiStudySlugUnlockPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>
+>;
+
+export type UnlockStudyApiStudySlugUnlockPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Unlock Study
+ */
+export const useUnlockStudyApiStudySlugUnlockPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+            TError,
+            { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof unlockStudyApiStudySlugUnlockPost>>,
+    TError,
+    { slug: string; params: UnlockStudyApiStudySlugUnlockPostParams },
+    TContext
+> => {
+    const mutationOptions = getUnlockStudyApiStudySlugUnlockPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * Records participant consent with timestamp and version.
@@ -3447,6 +4981,502 @@ export const useReportLogApiLogsPost = <TError = HTTPValidationError, TContext =
 };
 
 /**
+ * Initialize test database - ensure tables exist
+This is typically handled by app startup, but useful for explicit initialization
+ * @summary Init Test Db
+ */
+export const initTestDbApiTestInitPost = (signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/api/test/init`, method: 'POST', signal });
+};
+
+export const getInitTestDbApiTestInitPostMutationOptions = <
+    TError = unknown,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+        TError,
+        void,
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationKey = ['initTestDbApiTestInitPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+        void
+    > = () => {
+        return initTestDbApiTestInitPost();
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type InitTestDbApiTestInitPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof initTestDbApiTestInitPost>>
+>;
+
+export type InitTestDbApiTestInitPostMutationError = unknown;
+
+/**
+ * @summary Init Test Db
+ */
+export const useInitTestDbApiTestInitPost = <TError = unknown, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+            TError,
+            void,
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof initTestDbApiTestInitPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationOptions = getInitTestDbApiTestInitPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Seed base test data: user and workspace
+Idempotent - won't create duplicates
+ * @summary Seed Test Data
+ */
+export const seedTestDataApiTestSeedPost = (testSeedData: TestSeedData, signal?: AbortSignal) => {
+    return customInstance<unknown>({
+        url: `/api/test/seed`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: testSeedData,
+        signal,
+    });
+};
+
+export const getSeedTestDataApiTestSeedPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+        TError,
+        { data: TestSeedData },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+    TError,
+    { data: TestSeedData },
+    TContext
+> => {
+    const mutationKey = ['seedTestDataApiTestSeedPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+        { data: TestSeedData }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return seedTestDataApiTestSeedPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type SeedTestDataApiTestSeedPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>
+>;
+export type SeedTestDataApiTestSeedPostMutationBody = TestSeedData;
+export type SeedTestDataApiTestSeedPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Seed Test Data
+ */
+export const useSeedTestDataApiTestSeedPost = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+            TError,
+            { data: TestSeedData },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof seedTestDataApiTestSeedPost>>,
+    TError,
+    { data: TestSeedData },
+    TContext
+> => {
+    const mutationOptions = getSeedTestDataApiTestSeedPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Add a user to a workspace for testing purposes
+ * @summary Add Test Member
+ */
+export const addTestMemberApiTestMembersPost = (
+    testMemberData: TestMemberData,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/test/members`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: testMemberData,
+        signal,
+    });
+};
+
+export const getAddTestMemberApiTestMembersPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+        TError,
+        { data: TestMemberData },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+    TError,
+    { data: TestMemberData },
+    TContext
+> => {
+    const mutationKey = ['addTestMemberApiTestMembersPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+        { data: TestMemberData }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return addTestMemberApiTestMembersPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type AddTestMemberApiTestMembersPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>
+>;
+export type AddTestMemberApiTestMembersPostMutationBody = TestMemberData;
+export type AddTestMemberApiTestMembersPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Add Test Member
+ */
+export const useAddTestMemberApiTestMembersPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+            TError,
+            { data: TestMemberData },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof addTestMemberApiTestMembersPost>>,
+    TError,
+    { data: TestMemberData },
+    TContext
+> => {
+    const mutationOptions = getAddTestMemberApiTestMembersPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Cleanup test data between tests
+Removes all data except the base test user and workspace
+ * @summary Cleanup Test Data
+ */
+export const cleanupTestDataApiTestCleanupPost = (signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/api/test/cleanup`, method: 'POST', signal });
+};
+
+export const getCleanupTestDataApiTestCleanupPostMutationOptions = <
+    TError = unknown,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+        TError,
+        void,
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationKey = ['cleanupTestDataApiTestCleanupPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+        void
+    > = () => {
+        return cleanupTestDataApiTestCleanupPost();
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CleanupTestDataApiTestCleanupPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>
+>;
+
+export type CleanupTestDataApiTestCleanupPostMutationError = unknown;
+
+/**
+ * @summary Cleanup Test Data
+ */
+export const useCleanupTestDataApiTestCleanupPost = <TError = unknown, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+            TError,
+            void,
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof cleanupTestDataApiTestCleanupPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationOptions = getCleanupTestDataApiTestCleanupPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Full cleanup including users and workspaces
+Use at end of test suite
+ * @summary Cleanup All Test Data
+ */
+export const cleanupAllTestDataApiTestCleanupAllPost = (signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/api/test/cleanup-all`, method: 'POST', signal });
+};
+
+export const getCleanupAllTestDataApiTestCleanupAllPostMutationOptions = <
+    TError = unknown,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+        TError,
+        void,
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationKey = ['cleanupAllTestDataApiTestCleanupAllPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+        void
+    > = () => {
+        return cleanupAllTestDataApiTestCleanupAllPost();
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CleanupAllTestDataApiTestCleanupAllPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>
+>;
+
+export type CleanupAllTestDataApiTestCleanupAllPostMutationError = unknown;
+
+/**
+ * @summary Cleanup All Test Data
+ */
+export const useCleanupAllTestDataApiTestCleanupAllPost = <TError = unknown, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+            TError,
+            void,
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof cleanupAllTestDataApiTestCleanupAllPost>>,
+    TError,
+    void,
+    TContext
+> => {
+    const mutationOptions = getCleanupAllTestDataApiTestCleanupAllPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Simple health check for test router
+ * @summary Test Health
+ */
+export const testHealthApiTestHealthGet = (signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/api/test/health`, method: 'GET', signal });
+};
+
+export const getTestHealthApiTestHealthGetQueryKey = () => {
+    return [`/api/test/health`] as const;
+};
+
+export const getTestHealthApiTestHealthGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+    >;
+}) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey = queryOptions?.queryKey ?? getTestHealthApiTestHealthGetQueryKey();
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>> = ({
+        signal,
+    }) => testHealthApiTestHealthGet(signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type TestHealthApiTestHealthGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>
+>;
+export type TestHealthApiTestHealthGetQueryError = unknown;
+
+export function useTestHealthApiTestHealthGet<
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTestHealthApiTestHealthGet<
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof testHealthApiTestHealthGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useTestHealthApiTestHealthGet<
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Test Health
+ */
+
+export function useTestHealthApiTestHealthGet<
+    TData = Awaited<ReturnType<typeof testHealthApiTestHealthGet>>,
+    TError = unknown,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<Awaited<ReturnType<typeof testHealthApiTestHealthGet>>, TError, TData>
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getTestHealthApiTestHealthGetQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * Health check endpoint to verify API availability.
  * @summary Health Check
  */
@@ -3503,9 +5533,7 @@ export function useHealthCheckHealthGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useHealthCheckHealthGet<
     TData = Awaited<ReturnType<typeof healthCheckHealthGet>>,
     TError = unknown,
@@ -3524,9 +5552,7 @@ export function useHealthCheckHealthGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useHealthCheckHealthGet<
     TData = Awaited<ReturnType<typeof healthCheckHealthGet>>,
     TError = unknown,
@@ -3537,9 +5563,7 @@ export function useHealthCheckHealthGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Health Check
  */
@@ -3554,9 +5578,7 @@ export function useHealthCheckHealthGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getHealthCheckHealthGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -3573,11 +5595,7 @@ export function useHealthCheckHealthGet<
  * @summary Serve Spa
  */
 export const serveSpaFullPathGet = (fullPath: string, signal?: AbortSignal) => {
-    return customInstance<unknown>({
-        url: `/${fullPath}`,
-        method: 'GET',
-        signal,
-    });
+    return customInstance<unknown>({ url: `/${fullPath}`, method: 'GET', signal });
 };
 
 export const getServeSpaFullPathGetQueryKey = (fullPath?: string) => {
@@ -3602,14 +5620,11 @@ export const getServeSpaFullPathGetQueryOptions = <
     const queryFn: QueryFunction<Awaited<ReturnType<typeof serveSpaFullPathGet>>> = ({ signal }) =>
         serveSpaFullPathGet(fullPath, signal);
 
-    return {
-        queryKey,
-        queryFn,
-        enabled: !!fullPath,
-        ...queryOptions,
-    } as UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
+    return { queryKey, queryFn, enabled: !!fullPath, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
 export type ServeSpaFullPathGetQueryResult = NonNullable<
@@ -3636,9 +5651,7 @@ export function useServeSpaFullPathGet<
             >;
     },
     queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useServeSpaFullPathGet<
     TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
     TError = HTTPValidationError,
@@ -3658,9 +5671,7 @@ export function useServeSpaFullPathGet<
             >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useServeSpaFullPathGet<
     TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
     TError = HTTPValidationError,
@@ -3672,9 +5683,7 @@ export function useServeSpaFullPathGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-};
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Serve Spa
  */
@@ -3690,9 +5699,7 @@ export function useServeSpaFullPathGet<
         >;
     },
     queryClient?: QueryClient
-): UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-} {
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getServeSpaFullPathGetQueryOptions(fullPath, options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
@@ -3703,3 +5710,3108 @@ export function useServeSpaFullPathGet<
 
     return query;
 }
+
+export const getReadUsersMeApiMeGetResponseMock = (
+    overrideResponse: Partial<UserRead> = {}
+): UserRead => ({
+    email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    full_name: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 100 } }), null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    is_active: faker.datatype.boolean(),
+    is_superuser: faker.datatype.boolean(),
+    is_totp_enabled: faker.datatype.boolean(),
+    ...overrideResponse,
+});
+
+export const getUpdateUserMeApiMePatchResponseMock = (
+    overrideResponse: Partial<UserRead> = {}
+): UserRead => ({
+    email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    full_name: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 100 } }), null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    is_active: faker.datatype.boolean(),
+    is_superuser: faker.datatype.boolean(),
+    is_totp_enabled: faker.datatype.boolean(),
+    ...overrideResponse,
+});
+
+export const getLoginForAccessTokenApiTokenPostResponseMock = (
+    overrideResponse: Partial<Token> = {}
+): Token => ({
+    access_token: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    token_type: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    requires_2fa: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    temp_token: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getRegisterUserApiRegisterPostResponseMock = (
+    overrideResponse: Partial<UserRead> = {}
+): UserRead => ({
+    email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    full_name: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 100 } }), null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    is_active: faker.datatype.boolean(),
+    is_superuser: faker.datatype.boolean(),
+    is_totp_enabled: faker.datatype.boolean(),
+    ...overrideResponse,
+});
+
+export const getSetupTotpApiMe2faSetupGetResponseMock = (
+    overrideResponse: Partial<TOTPSetup> = {}
+): TOTPSetup => ({
+    secret: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    qr_code_uri: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ...overrideResponse,
+});
+
+export const getCreateStudyApiAdminStudiesPostResponseMock = (
+    overrideResponse: Partial<StudyRead> = {}
+): StudyRead => ({
+    slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+    state: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(StudyState)),
+        undefined,
+    ]),
+    grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            score: faker.number.int({ min: undefined, max: undefined }),
+            capacity: faker.number.int({ min: undefined, max: undefined }),
+        })
+    ),
+    presort_config: {},
+    postsort_config: {},
+    branding: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                logo_url: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                accent_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                partners: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        url: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    default_language: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 5 } }), null]),
+        undefined,
+    ]),
+    show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    start_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    end_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    workspace: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                id: faker.number.int({ min: undefined, max: undefined }),
+                title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                members: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        user_id: faker.number.int({ min: undefined, max: undefined }),
+                        user: {
+                            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            full_name: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                    null,
+                                ]),
+                                undefined,
+                            ]),
+                            id: faker.number.int({ min: undefined, max: undefined }),
+                            is_active: faker.datatype.boolean(),
+                            is_superuser: faker.datatype.boolean(),
+                            is_totp_enabled: faker.datatype.boolean(),
+                        },
+                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+                        joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    translations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+            description: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                undefined,
+            ]),
+            instructions: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            subtitle: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            objective: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            condition_of_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_title: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_description: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_accept: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_decline: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            ui_labels: faker.helpers.arrayElement([{}, undefined]),
+            process_steps: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })
+                ),
+                undefined,
+            ]),
+            methodology_tips: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => faker.string.alpha({ length: { min: 10, max: 20 } })
+                ),
+                undefined,
+            ]),
+            step_help: faker.helpers.arrayElement([
+                {
+                    [faker.string.alphanumeric(5)]: {
+                        [faker.string.alphanumeric(5)]: faker.string.alpha({
+                            length: { min: 10, max: 20 },
+                        }),
+                    },
+                },
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    statements: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            code: faker.string.alpha({ length: { min: 10, max: 50 } }),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        statement_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+        })),
+        undefined,
+    ]),
+    recruitment_links: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            type: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                undefined,
+            ]),
+            capacity: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })),
+        undefined,
+    ]),
+    requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    ...overrideResponse,
+});
+
+export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+        state: faker.helpers.arrayElement([
+            faker.helpers.arrayElement(Object.values(StudyState)),
+            undefined,
+        ]),
+        grid_config: Array.from(
+            { length: faker.number.int({ min: 1, max: 10 }) },
+            (_, i) => i + 1
+        ).map(() => ({
+            score: faker.number.int({ min: undefined, max: undefined }),
+            capacity: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        presort_config: {},
+        postsort_config: {},
+        branding: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                {
+                    logo_url: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 500 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    accent_color: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 50 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    primary_color: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 50 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    partners: faker.helpers.arrayElement([
+                        Array.from(
+                            { length: faker.number.int({ min: 1, max: 10 }) },
+                            (_, i) => i + 1
+                        ).map(() => ({
+                            id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            url: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                    null,
+                                ]),
+                                undefined,
+                            ]),
+                        })),
+                        undefined,
+                    ]),
+                },
+                null,
+            ]),
+            undefined,
+        ]),
+        default_language: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 5 } }), null]),
+            undefined,
+        ]),
+        show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        start_date: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+            undefined,
+        ]),
+        end_date: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+            undefined,
+        ]),
+        id: faker.number.int({ min: undefined, max: undefined }),
+        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+        workspace: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                {
+                    id: faker.number.int({ min: undefined, max: undefined }),
+                    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    members: faker.helpers.arrayElement([
+                        Array.from(
+                            { length: faker.number.int({ min: 1, max: 10 }) },
+                            (_, i) => i + 1
+                        ).map(() => ({
+                            user_id: faker.number.int({ min: undefined, max: undefined }),
+                            user: {
+                                email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                full_name: faker.helpers.arrayElement([
+                                    faker.helpers.arrayElement([
+                                        faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                        null,
+                                    ]),
+                                    undefined,
+                                ]),
+                                id: faker.number.int({ min: undefined, max: undefined }),
+                                is_active: faker.datatype.boolean(),
+                                is_superuser: faker.datatype.boolean(),
+                                is_totp_enabled: faker.datatype.boolean(),
+                            },
+                            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+                            joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                        })),
+                        undefined,
+                    ]),
+                },
+                null,
+            ]),
+            undefined,
+        ]),
+        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        translations: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                () => ({
+                    language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                    title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    description: faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                        undefined,
+                    ]),
+                    instructions: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    subtitle: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 200 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    objective: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    condition_of_instruction: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 500 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    consent_title: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 200 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    consent_description: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    consent_accept: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 50 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    consent_decline: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 50 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    ui_labels: faker.helpers.arrayElement([{}, undefined]),
+                    process_steps: faker.helpers.arrayElement([
+                        Array.from(
+                            { length: faker.number.int({ min: 1, max: 10 }) },
+                            (_, i) => i + 1
+                        ).map(() => ({
+                            id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                            description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                            icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            color: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                    null,
+                                ]),
+                                undefined,
+                            ]),
+                        })),
+                        undefined,
+                    ]),
+                    methodology_tips: faker.helpers.arrayElement([
+                        Array.from(
+                            { length: faker.number.int({ min: 1, max: 10 }) },
+                            (_, i) => i + 1
+                        ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+                        undefined,
+                    ]),
+                    step_help: faker.helpers.arrayElement([
+                        {
+                            [faker.string.alphanumeric(5)]: {
+                                [faker.string.alphanumeric(5)]: faker.string.alpha({
+                                    length: { min: 10, max: 20 },
+                                }),
+                            },
+                        },
+                        undefined,
+                    ]),
+                    id: faker.number.int({ min: undefined, max: undefined }),
+                    study_id: faker.number.int({ min: undefined, max: undefined }),
+                })
+            ),
+            undefined,
+        ]),
+        statements: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                () => ({
+                    code: faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    id: faker.number.int({ min: undefined, max: undefined }),
+                    translations: faker.helpers.arrayElement([
+                        Array.from(
+                            { length: faker.number.int({ min: 1, max: 10 }) },
+                            (_, i) => i + 1
+                        ).map(() => ({
+                            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                            text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                            id: faker.number.int({ min: undefined, max: undefined }),
+                            statement_id: faker.number.int({ min: undefined, max: undefined }),
+                        })),
+                        undefined,
+                    ]),
+                })
+            ),
+            undefined,
+        ]),
+        recruitment_links: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                () => ({
+                    name: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 100 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    type: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                        undefined,
+                    ]),
+                    capacity: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.number.int({ min: undefined, max: undefined }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    expires_at: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            `${faker.date.past().toISOString().split('.')[0]}Z`,
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+                    id: faker.number.int({ min: undefined, max: undefined }),
+                    study_id: faker.number.int({ min: undefined, max: undefined }),
+                    token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    usage_count: faker.number.int({ min: undefined, max: undefined }),
+                    start_count: faker.number.int({ min: undefined, max: undefined }),
+                    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                })
+            ),
+            undefined,
+        ]),
+        requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    }));
+
+export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
+    overrideResponse: Partial<StudyRead> = {}
+): StudyRead => ({
+    slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+    state: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(StudyState)),
+        undefined,
+    ]),
+    grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            score: faker.number.int({ min: undefined, max: undefined }),
+            capacity: faker.number.int({ min: undefined, max: undefined }),
+        })
+    ),
+    presort_config: {},
+    postsort_config: {},
+    branding: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                logo_url: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                accent_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                partners: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        url: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    default_language: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 5 } }), null]),
+        undefined,
+    ]),
+    show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    start_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    end_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    workspace: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                id: faker.number.int({ min: undefined, max: undefined }),
+                title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                members: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        user_id: faker.number.int({ min: undefined, max: undefined }),
+                        user: {
+                            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            full_name: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                    null,
+                                ]),
+                                undefined,
+                            ]),
+                            id: faker.number.int({ min: undefined, max: undefined }),
+                            is_active: faker.datatype.boolean(),
+                            is_superuser: faker.datatype.boolean(),
+                            is_totp_enabled: faker.datatype.boolean(),
+                        },
+                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+                        joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    translations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+            description: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                undefined,
+            ]),
+            instructions: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            subtitle: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            objective: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            condition_of_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_title: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_description: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_accept: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_decline: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            ui_labels: faker.helpers.arrayElement([{}, undefined]),
+            process_steps: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })
+                ),
+                undefined,
+            ]),
+            methodology_tips: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => faker.string.alpha({ length: { min: 10, max: 20 } })
+                ),
+                undefined,
+            ]),
+            step_help: faker.helpers.arrayElement([
+                {
+                    [faker.string.alphanumeric(5)]: {
+                        [faker.string.alphanumeric(5)]: faker.string.alpha({
+                            length: { min: 10, max: 20 },
+                        }),
+                    },
+                },
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    statements: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            code: faker.string.alpha({ length: { min: 10, max: 50 } }),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        statement_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+        })),
+        undefined,
+    ]),
+    recruitment_links: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            type: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                undefined,
+            ]),
+            capacity: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })),
+        undefined,
+    ]),
+    requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    ...overrideResponse,
+});
+
+export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
+    overrideResponse: Partial<StudyRead> = {}
+): StudyRead => ({
+    slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+    state: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(StudyState)),
+        undefined,
+    ]),
+    grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            score: faker.number.int({ min: undefined, max: undefined }),
+            capacity: faker.number.int({ min: undefined, max: undefined }),
+        })
+    ),
+    presort_config: {},
+    postsort_config: {},
+    branding: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                logo_url: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                accent_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                partners: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        url: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    default_language: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 5 } }), null]),
+        undefined,
+    ]),
+    show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    start_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    end_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    workspace: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                id: faker.number.int({ min: undefined, max: undefined }),
+                title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                members: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        user_id: faker.number.int({ min: undefined, max: undefined }),
+                        user: {
+                            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            full_name: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                    null,
+                                ]),
+                                undefined,
+                            ]),
+                            id: faker.number.int({ min: undefined, max: undefined }),
+                            is_active: faker.datatype.boolean(),
+                            is_superuser: faker.datatype.boolean(),
+                            is_totp_enabled: faker.datatype.boolean(),
+                        },
+                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+                        joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    translations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+            description: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                undefined,
+            ]),
+            instructions: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            subtitle: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            objective: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            condition_of_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_title: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_description: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_accept: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_decline: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            ui_labels: faker.helpers.arrayElement([{}, undefined]),
+            process_steps: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })
+                ),
+                undefined,
+            ]),
+            methodology_tips: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => faker.string.alpha({ length: { min: 10, max: 20 } })
+                ),
+                undefined,
+            ]),
+            step_help: faker.helpers.arrayElement([
+                {
+                    [faker.string.alphanumeric(5)]: {
+                        [faker.string.alphanumeric(5)]: faker.string.alpha({
+                            length: { min: 10, max: 20 },
+                        }),
+                    },
+                },
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    statements: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            code: faker.string.alpha({ length: { min: 10, max: 50 } }),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        statement_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+        })),
+        undefined,
+    ]),
+    recruitment_links: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            type: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                undefined,
+            ]),
+            capacity: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })),
+        undefined,
+    ]),
+    requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    ...overrideResponse,
+});
+
+export const getValidateStudyApiAdminStudiesSlugValidatePostResponseMock = (): string[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, () => faker.word.sample());
+
+export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
+    overrideResponse: Partial<StudyRead> = {}
+): StudyRead => ({
+    slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+    state: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(StudyState)),
+        undefined,
+    ]),
+    grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            score: faker.number.int({ min: undefined, max: undefined }),
+            capacity: faker.number.int({ min: undefined, max: undefined }),
+        })
+    ),
+    presort_config: {},
+    postsort_config: {},
+    branding: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                logo_url: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                accent_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                partners: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        url: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    default_language: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 5 } }), null]),
+        undefined,
+    ]),
+    show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    start_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    end_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    workspace: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                id: faker.number.int({ min: undefined, max: undefined }),
+                title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                members: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        user_id: faker.number.int({ min: undefined, max: undefined }),
+                        user: {
+                            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            full_name: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                    null,
+                                ]),
+                                undefined,
+                            ]),
+                            id: faker.number.int({ min: undefined, max: undefined }),
+                            is_active: faker.datatype.boolean(),
+                            is_superuser: faker.datatype.boolean(),
+                            is_totp_enabled: faker.datatype.boolean(),
+                        },
+                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+                        joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    translations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+            description: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                undefined,
+            ]),
+            instructions: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            subtitle: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            objective: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            condition_of_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_title: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_description: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_accept: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_decline: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            ui_labels: faker.helpers.arrayElement([{}, undefined]),
+            process_steps: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })
+                ),
+                undefined,
+            ]),
+            methodology_tips: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => faker.string.alpha({ length: { min: 10, max: 20 } })
+                ),
+                undefined,
+            ]),
+            step_help: faker.helpers.arrayElement([
+                {
+                    [faker.string.alphanumeric(5)]: {
+                        [faker.string.alphanumeric(5)]: faker.string.alpha({
+                            length: { min: 10, max: 20 },
+                        }),
+                    },
+                },
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    statements: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            code: faker.string.alpha({ length: { min: 10, max: 50 } }),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        statement_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+        })),
+        undefined,
+    ]),
+    recruitment_links: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            type: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                undefined,
+            ]),
+            capacity: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })),
+        undefined,
+    ]),
+    requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    ...overrideResponse,
+});
+
+export const getGetStudyStatsApiAdminStudiesSlugStatsGetResponseMock = (
+    overrideResponse: Partial<StudyStatsRead> = {}
+): StudyStatsRead => ({
+    started_count: faker.number.int({ min: undefined, max: undefined }),
+    completed_count: faker.number.int({ min: undefined, max: undefined }),
+    completion_rate: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    median_duration_seconds: faker.helpers.arrayElement([
+        faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+        null,
+    ]),
+    device_breakdown: {
+        [faker.string.alphanumeric(5)]: faker.number.int({ min: undefined, max: undefined }),
+    },
+    ...overrideResponse,
+});
+
+export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetResponseMock = (
+    overrideResponse: Partial<ParticipantDetailRead> = {}
+): ParticipantDetailRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    study_id: faker.number.int({ min: undefined, max: undefined }),
+    session_token: faker.string.uuid(),
+    language_used: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    status: faker.helpers.arrayElement(Object.values(ParticipantStatus)),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    submitted_at: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split('.')[0]}Z`,
+        null,
+    ]),
+    is_discarded: faker.datatype.boolean(),
+    discard_reason: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+    ]),
+    user_agent: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        null,
+    ]),
+    recruitment_token: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    presort_answers: {},
+    postsort_answers: {},
+    qsort_entries: Array.from(
+        { length: faker.number.int({ min: 1, max: 10 }) },
+        (_, i) => i + 1
+    ).map(() => ({
+        statement_id: faker.number.int({ min: undefined, max: undefined }),
+        grid_score: faker.number.int({ min: undefined, max: undefined }),
+        card_comment: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                null,
+            ]),
+            undefined,
+        ]),
+    })),
+    ...overrideResponse,
+});
+
+export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchResponseMock =
+    (overrideResponse: Partial<ParticipantRead> = {}): ParticipantRead => ({
+        id: faker.number.int({ min: undefined, max: undefined }),
+        study_id: faker.number.int({ min: undefined, max: undefined }),
+        session_token: faker.string.uuid(),
+        language_used: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        status: faker.helpers.arrayElement(Object.values(ParticipantStatus)),
+        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        submitted_at: faker.helpers.arrayElement([
+            `${faker.date.past().toISOString().split('.')[0]}Z`,
+            null,
+        ]),
+        is_discarded: faker.datatype.boolean(),
+        discard_reason: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            null,
+        ]),
+        user_agent: faker.helpers.arrayElement([
+            faker.string.alpha({ length: { min: 10, max: 20 } }),
+            null,
+        ]),
+        recruitment_token: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                null,
+            ]),
+            undefined,
+        ]),
+        ...overrideResponse,
+    });
+
+export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseMock =
+    (): ParticipantRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            session_token: faker.string.uuid(),
+            language_used: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            status: faker.helpers.arrayElement(Object.values(ParticipantStatus)),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            submitted_at: faker.helpers.arrayElement([
+                `${faker.date.past().toISOString().split('.')[0]}Z`,
+                null,
+            ]),
+            is_discarded: faker.datatype.boolean(),
+            discard_reason: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                null,
+            ]),
+            user_agent: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                null,
+            ]),
+            recruitment_token: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+        }));
+
+export const getListUsersApiAdminUsersGetResponseMock = (): UserRead[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        full_name: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 100 } }),
+                null,
+            ]),
+            undefined,
+        ]),
+        id: faker.number.int({ min: undefined, max: undefined }),
+        is_active: faker.datatype.boolean(),
+        is_superuser: faker.datatype.boolean(),
+        is_totp_enabled: faker.datatype.boolean(),
+    }));
+
+export const getCreateUserApiAdminUsersPostResponseMock = (
+    overrideResponse: Partial<UserRead> = {}
+): UserRead => ({
+    email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    full_name: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 100 } }), null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    is_active: faker.datatype.boolean(),
+    is_superuser: faker.datatype.boolean(),
+    is_totp_enabled: faker.datatype.boolean(),
+    ...overrideResponse,
+});
+
+export const getListStudyLinksApiAdminRecruitmentSlugLinksGetResponseMock =
+    (): RecruitmentLinkRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            type: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                undefined,
+            ]),
+            capacity: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        }));
+
+export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostResponseMock =
+    (): RecruitmentLinkRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            type: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                undefined,
+            ]),
+            capacity: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        }));
+
+export const getListWorkspacesApiAdminWorkspacesGetResponseMock = (): WorkspaceWithRole[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        id: faker.number.int({ min: undefined, max: undefined }),
+        title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        members: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                () => ({
+                    user_id: faker.number.int({ min: undefined, max: undefined }),
+                    user: {
+                        email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        full_name: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 100 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        is_active: faker.datatype.boolean(),
+                        is_superuser: faker.datatype.boolean(),
+                        is_totp_enabled: faker.datatype.boolean(),
+                    },
+                    role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+                    joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                })
+            ),
+            undefined,
+        ]),
+        user_role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+    }));
+
+export const getCreateWorkspaceApiAdminWorkspacesPostResponseMock = (
+    overrideResponse: Partial<WorkspaceRead> = {}
+): WorkspaceRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    members: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            user_id: faker.number.int({ min: undefined, max: undefined }),
+            user: {
+                email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                full_name: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                id: faker.number.int({ min: undefined, max: undefined }),
+                is_active: faker.datatype.boolean(),
+                is_superuser: faker.datatype.boolean(),
+                is_totp_enabled: faker.datatype.boolean(),
+            },
+            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+            joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getGetWorkspaceApiAdminWorkspacesSlugGetResponseMock = (
+    overrideResponse: Partial<WorkspaceRead> = {}
+): WorkspaceRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    members: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            user_id: faker.number.int({ min: undefined, max: undefined }),
+            user: {
+                email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                full_name: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                id: faker.number.int({ min: undefined, max: undefined }),
+                is_active: faker.datatype.boolean(),
+                is_superuser: faker.datatype.boolean(),
+                is_totp_enabled: faker.datatype.boolean(),
+            },
+            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+            joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchResponseMock = (
+    overrideResponse: Partial<WorkspaceRead> = {}
+): WorkspaceRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    members: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            user_id: faker.number.int({ min: undefined, max: undefined }),
+            user: {
+                email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                full_name: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                id: faker.number.int({ min: undefined, max: undefined }),
+                is_active: faker.datatype.boolean(),
+                is_superuser: faker.datatype.boolean(),
+                is_totp_enabled: faker.datatype.boolean(),
+            },
+            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+            joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetResponseMock =
+    (): WorkspaceMemberRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            user_id: faker.number.int({ min: undefined, max: undefined }),
+            user: {
+                email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                full_name: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                id: faker.number.int({ min: undefined, max: undefined }),
+                is_active: faker.datatype.boolean(),
+                is_superuser: faker.datatype.boolean(),
+                is_totp_enabled: faker.datatype.boolean(),
+            },
+            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+            joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        }));
+
+export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchResponseMock = (
+    overrideResponse: Partial<WorkspaceMemberRead> = {}
+): WorkspaceMemberRead => ({
+    user_id: faker.number.int({ min: undefined, max: undefined }),
+    user: {
+        email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        full_name: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 100 } }),
+                null,
+            ]),
+            undefined,
+        ]),
+        id: faker.number.int({ min: undefined, max: undefined }),
+        is_active: faker.datatype.boolean(),
+        is_superuser: faker.datatype.boolean(),
+        is_totp_enabled: faker.datatype.boolean(),
+    },
+    role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
+    joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ...overrideResponse,
+});
+
+export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostResponseMock = (
+    overrideResponse: Partial<InvitationLink> = {}
+): InvitationLink => ({
+    invite_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ...overrideResponse,
+});
+
+export const getReadUsersMeApiMeGetMockHandler = (
+    overrideResponse?:
+        | UserRead
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<UserRead> | UserRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/me',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getReadUsersMeApiMeGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUpdateUserMeApiMePatchMockHandler = (
+    overrideResponse?:
+        | UserRead
+        | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<UserRead> | UserRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/me',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateUserMeApiMePatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getLoginForAccessTokenApiTokenPostMockHandler = (
+    overrideResponse?:
+        | Token
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<Token> | Token),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/token',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getLoginForAccessTokenApiTokenPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getRegisterUserApiRegisterPostMockHandler = (
+    overrideResponse?:
+        | UserRead
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<UserRead> | UserRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/register',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getRegisterUserApiRegisterPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getChangePasswordApiMePasswordPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/me/password',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getSetupTotpApiMe2faSetupGetMockHandler = (
+    overrideResponse?:
+        | TOTPSetup
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<TOTPSetup> | TOTPSetup),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/me/2fa/setup',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getSetupTotpApiMe2faSetupGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getEnableTotpApiMe2faEnablePostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/me/2fa/enable',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getDisableTotpApiMe2faDisablePostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/me/2fa/disable',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getCreateStudyApiAdminStudiesPostMockHandler = (
+    overrideResponse?:
+        | StudyRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<StudyRead> | StudyRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateStudyApiAdminStudiesPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getListStudiesApiAdminStudiesGetMockHandler = (
+    overrideResponse?:
+        | StudyRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<StudyRead[]> | StudyRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListStudiesApiAdminStudiesGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getGetStudyApiAdminStudiesSlugGetMockHandler = (
+    overrideResponse?:
+        | StudyRead
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<StudyRead> | StudyRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetStudyApiAdminStudiesSlugGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUpdateStudyApiAdminStudiesSlugPatchMockHandler = (
+    overrideResponse?:
+        | StudyRead
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<StudyRead> | StudyRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/admin/studies/:slug',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateStudyApiAdminStudiesSlugPatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteStudyApiAdminStudiesSlugDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/studies/:slug',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getValidateStudyApiAdminStudiesSlugValidatePostMockHandler = (
+    overrideResponse?:
+        | string[]
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<string[]> | string[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:slug/validate',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getValidateStudyApiAdminStudiesSlugValidatePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getChangeStudyStateApiAdminStudiesSlugStatePostMockHandler = (
+    overrideResponse?:
+        | StudyRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<StudyRead> | StudyRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:slug/state',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler = (
+    overrideResponse?:
+        | StudyStatsRead
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<StudyStatsRead> | StudyStatsRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/stats',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetStudyStatsApiAdminStudiesSlugStatsGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler = (
+    overrideResponse?:
+        | ParticipantDetailRead
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ParticipantDetailRead> | ParticipantDetailRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/participants/:participantId',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetParticipantApiAdminStudiesParticipantsParticipantIdGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMockHandler =
+    (
+        overrideResponse?:
+            | ParticipantRead
+            | ((
+                  info: Parameters<Parameters<typeof http.patch>[1]>[0]
+              ) => Promise<ParticipantRead> | ParticipantRead),
+        options?: RequestHandlerOptions
+    ) => {
+        return http.patch(
+            '*/api/admin/studies/participants/:participantId/discard',
+            async (info) => {
+                return new HttpResponse(
+                    JSON.stringify(
+                        overrideResponse !== undefined
+                            ? typeof overrideResponse === 'function'
+                                ? await overrideResponse(info)
+                                : overrideResponse
+                            : getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchResponseMock()
+                    ),
+                    { status: 200, headers: { 'Content-Type': 'application/json' } }
+                );
+            },
+            options
+        );
+    };
+
+export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler = (
+    overrideResponse?:
+        | ParticipantRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ParticipantRead[]> | ParticipantRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/participants',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/export/csv',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/export/pqmethod',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/export/r-kit',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getGetStudyDumpApiAdminStudiesSlugDumpGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/dump',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/invitations/verify',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/invitations/accept',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getListUsersApiAdminUsersGetMockHandler = (
+    overrideResponse?:
+        | UserRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<UserRead[]> | UserRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/users',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListUsersApiAdminUsersGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getCreateUserApiAdminUsersPostMockHandler = (
+    overrideResponse?:
+        | UserRead
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<UserRead> | UserRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/users',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateUserApiAdminUsersPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteUserApiAdminUsersUserIdDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/users/:userId',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getListStudyLinksApiAdminRecruitmentSlugLinksGetMockHandler = (
+    overrideResponse?:
+        | RecruitmentLinkRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<RecruitmentLinkRead[]> | RecruitmentLinkRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/recruitment/:slug/links',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListStudyLinksApiAdminRecruitmentSlugLinksGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMockHandler = (
+    overrideResponse?:
+        | RecruitmentLinkRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<RecruitmentLinkRead[]> | RecruitmentLinkRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/recruitment/:slug/links',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/recruitment/links/:linkId',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getListWorkspacesApiAdminWorkspacesGetMockHandler = (
+    overrideResponse?:
+        | WorkspaceWithRole[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<WorkspaceWithRole[]> | WorkspaceWithRole[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/workspaces',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListWorkspacesApiAdminWorkspacesGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getCreateWorkspaceApiAdminWorkspacesPostMockHandler = (
+    overrideResponse?:
+        | WorkspaceRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<WorkspaceRead> | WorkspaceRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/workspaces',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateWorkspaceApiAdminWorkspacesPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getGetWorkspaceApiAdminWorkspacesSlugGetMockHandler = (
+    overrideResponse?:
+        | WorkspaceRead
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<WorkspaceRead> | WorkspaceRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/workspaces/:slug',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetWorkspaceApiAdminWorkspacesSlugGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUpdateWorkspaceApiAdminWorkspacesSlugPatchMockHandler = (
+    overrideResponse?:
+        | WorkspaceRead
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<WorkspaceRead> | WorkspaceRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/admin/workspaces/:slug',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateWorkspaceApiAdminWorkspacesSlugPatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/workspaces/:slug',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetMockHandler = (
+    overrideResponse?:
+        | WorkspaceMemberRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<WorkspaceMemberRead[]> | WorkspaceMemberRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/workspaces/:slug/members',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMockHandler = (
+    overrideResponse?:
+        | WorkspaceMemberRead
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<WorkspaceMemberRead> | WorkspaceMemberRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/admin/workspaces/:slug/members/:userId',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/workspaces/:slug/members/:userId',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMockHandler = (
+    overrideResponse?:
+        | InvitationLink
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<InvitationLink> | InvitationLink),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/workspaces/:slug/invitations',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateInvitationApiAdminWorkspacesSlugInvitationsPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getSubmitStudyApiSubmitPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/submit',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getGetStudyApiStudySlugGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/study/:slug',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getUnlockStudyApiStudySlugUnlockPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/study/:slug/unlock',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getRecordConsentApiStudySlugConsentPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/study/:slug/consent',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getReportLogApiLogsPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/logs',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getInitTestDbApiTestInitPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/init',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getSeedTestDataApiTestSeedPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/seed',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getAddTestMemberApiTestMembersPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/members',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getCleanupTestDataApiTestCleanupPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/cleanup',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getCleanupAllTestDataApiTestCleanupAllPostMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/test/cleanup-all',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getTestHealthApiTestHealthGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/test/health',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getHealthCheckHealthGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/health',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getServeSpaFullPathGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/:fullPath',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+export const getOpenQAPIMock = () => [
+    getReadUsersMeApiMeGetMockHandler(),
+    getUpdateUserMeApiMePatchMockHandler(),
+    getLoginForAccessTokenApiTokenPostMockHandler(),
+    getRegisterUserApiRegisterPostMockHandler(),
+    getChangePasswordApiMePasswordPostMockHandler(),
+    getSetupTotpApiMe2faSetupGetMockHandler(),
+    getEnableTotpApiMe2faEnablePostMockHandler(),
+    getDisableTotpApiMe2faDisablePostMockHandler(),
+    getCreateStudyApiAdminStudiesPostMockHandler(),
+    getListStudiesApiAdminStudiesGetMockHandler(),
+    getGetStudyApiAdminStudiesSlugGetMockHandler(),
+    getUpdateStudyApiAdminStudiesSlugPatchMockHandler(),
+    getDeleteStudyApiAdminStudiesSlugDeleteMockHandler(),
+    getValidateStudyApiAdminStudiesSlugValidatePostMockHandler(),
+    getChangeStudyStateApiAdminStudiesSlugStatePostMockHandler(),
+    getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler(),
+    getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),
+    getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMockHandler(),
+    getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler(),
+    getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
+    getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),
+    getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),
+    getGetStudyDumpApiAdminStudiesSlugDumpGetMockHandler(),
+    getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler(),
+    getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler(),
+    getListUsersApiAdminUsersGetMockHandler(),
+    getCreateUserApiAdminUsersPostMockHandler(),
+    getDeleteUserApiAdminUsersUserIdDeleteMockHandler(),
+    getListStudyLinksApiAdminRecruitmentSlugLinksGetMockHandler(),
+    getCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostMockHandler(),
+    getRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDeleteMockHandler(),
+    getListWorkspacesApiAdminWorkspacesGetMockHandler(),
+    getCreateWorkspaceApiAdminWorkspacesPostMockHandler(),
+    getGetWorkspaceApiAdminWorkspacesSlugGetMockHandler(),
+    getUpdateWorkspaceApiAdminWorkspacesSlugPatchMockHandler(),
+    getDeleteWorkspaceApiAdminWorkspacesSlugDeleteMockHandler(),
+    getListWorkspaceMembersApiAdminWorkspacesSlugMembersGetMockHandler(),
+    getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMockHandler(),
+    getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMockHandler(),
+    getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMockHandler(),
+    getSubmitStudyApiSubmitPostMockHandler(),
+    getGetStudyApiStudySlugGetMockHandler(),
+    getUnlockStudyApiStudySlugUnlockPostMockHandler(),
+    getRecordConsentApiStudySlugConsentPostMockHandler(),
+    getReportLogApiLogsPostMockHandler(),
+    getInitTestDbApiTestInitPostMockHandler(),
+    getSeedTestDataApiTestSeedPostMockHandler(),
+    getAddTestMemberApiTestMembersPostMockHandler(),
+    getCleanupTestDataApiTestCleanupPostMockHandler(),
+    getCleanupAllTestDataApiTestCleanupAllPostMockHandler(),
+    getTestHealthApiTestHealthGetMockHandler(),
+    getHealthCheckHealthGetMockHandler(),
+    getServeSpaFullPathGetMockHandler(),
+];

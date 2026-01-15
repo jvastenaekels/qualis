@@ -5,19 +5,33 @@ import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from sqlalchemy.exc import SQLAlchemyError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.limiter import limiter
-from app.middleware.errors import global_exception_handler
+from app.middleware.errors import (
+    global_exception_handler,
+    http_exception_handler,
+    sqlalchemy_exception_handler,
+    validation_exception_handler,
+)
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import auth, logs, participants, submissions
 from app.routers.admin import exports as admin_exports
 from app.routers.admin import invitations as admin_invitations
+from app.routers.admin import recruitment as admin_recruitment
 from app.routers.admin import studies as admin_studies
 from app.routers.admin import users as admin_users
 from app.routers.admin import workspaces as admin_workspaces
+from app.core.config import settings
+
+# Import test router (only active in test/dev environments)
+from app.routers import test as test_router
 
 # Configure Logging
 logging.basicConfig(
@@ -31,6 +45,20 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage the application lifespan (startup/shutdown)."""
+    # Schema Validation
+    try:
+        from app.schema_validation import validate_schema
+
+        await validate_schema()
+    except Exception as e:
+        logger.error(f"Schema validation failed: {e}")
+        logger.error("Database schema is out of sync with application models.")
+        logger.warning(
+            "Continuing startup despite schema validation failure (non-fatal)."
+        )
+        # Do not raise - prevents boot loop on some platforms (e.g. Scalingo + Py3.13)
+        # raise
+
     # Production Readiness Checks
     if os.getenv("DATABASE_URL", "").startswith("postgre"):
         salt = os.getenv("IP_HASH_SALT")
@@ -62,10 +90,16 @@ async def _rate_limit_exceeded_handler_wrapper(
 
 
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler_wrapper)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(SQLAlchemyError, sqlalchemy_exception_handler)
 app.add_exception_handler(Exception, global_exception_handler)
 
 # Security Headers (Pure ASGI)
 app.add_middleware(SecurityHeadersMiddleware)
+
+# Rate Limiter Middleware
+app.add_middleware(SlowAPIMiddleware)
 
 # CORS configuration
 origins_raw = os.getenv(
@@ -78,7 +112,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -94,6 +128,11 @@ app.include_router(
 )
 app.include_router(admin_users.router, prefix="/api/admin/users", tags=["admin-users"])
 app.include_router(
+    admin_recruitment.router,
+    prefix="/api/admin/recruitment",
+    tags=["admin-recruitment"],
+)
+app.include_router(
     admin_workspaces.router, prefix="/api/admin/workspaces", tags=["admin-workspaces"]
 )
 app.include_router(submissions.router, prefix="/api", tags=["submissions"])
@@ -101,6 +140,10 @@ app.include_router(
     participants.router, prefix="/api/study/{slug}", tags=["participants"]
 )
 app.include_router(logs.router, prefix="/api", tags=["logs"])
+
+# Include test router (only active in test/dev environments)
+if settings.ENVIRONMENT in ["test", "development"]:
+    app.include_router(test_router.router)
 
 
 @app.get("/health")
@@ -134,14 +177,48 @@ if os.path.exists(FRONTEND_DIST):
     @app.get("/{full_path:path}")
     async def serve_spa(full_path: str):
         """Serve the Single Page Application (SPA) static files and handle client-side routing."""
-        # 1. Check if it's a specific static file (e.g. favicon.ico, manifest.json) in the root
+        # 1. API 404 Fallback: Do not serve SPA for missing API routes
+        if full_path.startswith("api"):
+            raise StarletteHTTPException(
+                status_code=404, detail="API endpoint not found"
+            )
+
+        # 2. Check if it's a specific static file (e.g. favicon.ico, manifest.json) in the root
         file_path = os.path.join(FRONTEND_DIST, full_path)
         if full_path and os.path.isfile(file_path):
-            return FileResponse(file_path)
+            # Cache assets (js, css, images) for 1 year, but not HTML
+            if full_path.endswith(
+                (
+                    ".js",
+                    ".css",
+                    ".png",
+                    ".jpg",
+                    ".jpeg",
+                    ".svg",
+                    ".ico",
+                    ".woff",
+                    ".woff2",
+                )
+            ):
+                return FileResponse(
+                    file_path,
+                    headers={"Cache-Control": "public, max-age=31536000, immutable"},
+                )
+            else:
+                return FileResponse(
+                    file_path, headers={"Cache-Control": "no-cache, must-revalidate"}
+                )
 
-        # 2. Otherwise serve index.html for CSR navigation
+        # 3. Otherwise serve index.html for CSR navigation (never cache HTML)
         index_path = os.path.join(FRONTEND_DIST, "index.html")
-        return FileResponse(index_path)
+        return FileResponse(
+            index_path,
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+            },
+        )
 else:
 
     @app.get("/")

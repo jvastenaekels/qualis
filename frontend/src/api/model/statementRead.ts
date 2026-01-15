@@ -10,6 +10,7 @@ import type { StatementTranslationRead } from './statementTranslationRead';
  * Schema for reading a statement.
  */
 export interface StatementRead {
+    /** @maxLength 50 */
     code: string;
     id: number;
     translations?: StatementTranslationRead[];

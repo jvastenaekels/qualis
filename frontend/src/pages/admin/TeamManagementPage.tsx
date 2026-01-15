@@ -1,46 +1,73 @@
-import { useParams } from 'react-router-dom';
-import { Users, Shield } from 'lucide-react';
-import TeamSettings from '@/components/admin/team/TeamSettings';
-import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
+import { Users, ArrowRight, Shield } from 'lucide-react';
+import { useLoaderData, Link } from 'react-router-dom';
+import type { StudyRead } from '@/api/model';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+
+interface LoaderData {
+    study: StudyRead;
+    slug: string;
+}
 
 const TeamManagementPage = () => {
-    const { slug } = useParams<{ slug: string }>();
+    const { study } = useLoaderData() as LoaderData;
+    const { t } = useTranslation();
+
+    // Determine workspace slug, fallback to study slug's workspace logic if not present (should be present now)
+    // biome-ignore lint/suspicious/noExplicitAny: workspace slug fallback
+    const workspaceSlug = (study as any).workspace?.slug || 'default';
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6 pt-2">
-            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                        {slug}
-                        <Badge
-                            variant="outline"
-                            className="ml-2 bg-indigo-50 text-indigo-700 border-indigo-100 font-bold uppercase tracking-widest text-[10px]"
-                        >
-                            Research Team
-                        </Badge>
-                    </h1>
-                    <p className="text-slate-500 text-sm">
-                        Manage collaborators and study-level access control.
-                    </p>
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-8 max-w-4xl mx-auto w-full items-center justify-center min-h-[60vh]">
+            <div className="text-center space-y-4 max-w-lg">
+                <div className="mx-auto w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-6 shadow-sm">
+                    <Shield className="size-8" />
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="bg-white shadow-sm border rounded-lg px-4 py-2 flex items-center gap-3">
-                        <Shield className="h-4 w-4 text-indigo-500" />
-                        <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                            Protected Study
-                        </span>
-                    </div>
-                </div>
-            </header>
 
-            <div className="flex items-center gap-2 mb-2 text-slate-400">
-                <Users className="h-6 w-6" />
-                <h2 className="text-2xl font-bold tracking-tight text-slate-700">
-                    Collaboration Center
-                </h2>
+                <h1 className="text-3xl font-black tracking-tight text-slate-900">
+                    {t('admin.team.moved_title', 'Team Management has moved')}
+                </h1>
+
+                <p className="text-slate-500 font-medium leading-relaxed">
+                    {t(
+                        'admin.team.moved_description',
+                        'To make collaboration easier, team members and permissions are now managed at the Workspace level. This ensures consistent access across all your studies.'
+                    )}
+                </p>
+
+                <div className="pt-6">
+                    <Button
+                        asChild
+                        className="h-12 rounded-xl px-8 font-bold bg-indigo-600 hover:bg-indigo-700 shadow-sm text-base"
+                    >
+                        <Link to={`/admin/workspaces/${workspaceSlug}/settings`}>
+                            {t('admin.team.go_to_workspace', 'Manage Workspace Team')}
+                            <ArrowRight className="ml-2 size-4" />
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
-            <TeamSettings />
+            <Card className="w-full max-w-lg mt-8 bg-indigo-50/50 border-indigo-100 rounded-2xl shadow-sm">
+                <CardContent className="pt-6">
+                    <div className="flex gap-4">
+                        <div className="shrink-0">
+                            <Users className="size-5 text-indigo-500" />
+                        </div>
+                        <div className="space-y-1">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-indigo-900">
+                                {t('admin.team.what_changed', 'What changed?')}
+                            </h3>
+                            <p className="text-xs text-indigo-800/70 leading-relaxed">
+                                Instead of adding collaborators to individual studies, you now add
+                                members to the Workspace. Their role (Admin, Researcher, or Viewer)
+                                determines what they can do in all studies within that workspace.
+                            </p>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 };

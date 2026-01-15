@@ -7,9 +7,11 @@
 from collections import Counter
 from datetime import datetime, timezone
 from typing import Any, cast
+from uuid import UUID
 
 from fastapi import HTTPException
 from sqlalchemy import delete, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -19,10 +21,106 @@ from ..models import (
     QSortEntry,
     Statement,
     Study,
+    StudyState,
     StudyTranslation,
 )
 from ..schemas import SubmissionInput
+from .recruitment_service import RecruitmentService
 from ..utils.crypto import hash_ip
+
+
+DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
+    "en": [
+        {
+            "id": "profile",
+            "icon": "Contact",
+            "title": "Let's meet",
+            "description": "A few quick questions to better understand your background.",
+            "color": "#3b82f6",
+        },
+        {
+            "id": "rough",
+            "icon": "Zap",
+            "title": "First impressions",
+            "description": "Discover the statements and give your immediate reaction (agree, neutral, or disagree).",
+            "color": "#f59e0b",
+        },
+        {
+            "id": "fine",
+            "icon": "Target",
+            "title": "Your perspective",
+            "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you.",
+            "color": "#8b5cf6",
+        },
+        {
+            "id": "post",
+            "icon": "MessageSquareQuote",
+            "title": "Why",
+            "description": "A few words to explain your most significant choices.",
+            "color": "#10b981",
+        },
+    ],
+    "fr": [
+        {
+            "id": "profile",
+            "icon": "Contact",
+            "title": "Faisons connaissance",
+            "description": "Quelques questions rapides pour mieux comprendre votre parcours.",
+            "color": "#3b82f6",
+        },
+        {
+            "id": "rough",
+            "icon": "Zap",
+            "title": "Premières impressions",
+            "description": "Découvrez les affirmations et donnez votre réaction immédiate (d'accord, neutre ou pas d'accord).",
+            "color": "#f59e0b",
+        },
+        {
+            "id": "fine",
+            "icon": "Target",
+            "title": "Votre perspective",
+            "description": "Placez les affirmations sur la grille pour affiner votre point de vue, en donnant la priorité à ce qui compte le plus pour vous.",
+            "color": "#8b5cf6",
+        },
+        {
+            "id": "post",
+            "icon": "MessageSquareQuote",
+            "title": "Pourquoi",
+            "description": "Quelques mots pour expliquer vos choix les plus significatifs.",
+            "color": "#10b981",
+        },
+    ],
+    "fi": [
+        {
+            "id": "profile",
+            "icon": "Contact",
+            "title": "Tutustutaan",
+            "description": "Muutama nopea kysymys taustasi ymmärtämiseksi.",
+            "color": "#3b82f6",
+        },
+        {
+            "id": "rough",
+            "icon": "Zap",
+            "title": "Ensivaikutelma",
+            "description": "Tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).",
+            "color": "#f59e0b",
+        },
+        {
+            "id": "fine",
+            "icon": "Target",
+            "title": "Näkökulmasi",
+            "description": "Aseta väittämät ruudukkoon tarkentaaksesi näkökulmaasi, priorisoimalla itsellesi tärkeimmät asiat.",
+            "color": "#8b5cf6",
+        },
+        {
+            "id": "post",
+            "icon": "MessageSquareQuote",
+            "title": "Miksi",
+            "description": "Muutama sana perustellaksesi merkittävimmät valintasi.",
+            "color": "#10b981",
+        },
+    ],
+}
 
 
 class StudyService:
@@ -61,25 +159,44 @@ class StudyService:
         hashed_ip = hash_ip(ip_address or "unknown")
 
         # 2. Check if participant exists
-        stmt = select(Participant).where(Participant.session_token == session_token)
+        stmt = (
+            select(Participant)
+            .where(Participant.session_token == session_token)
+            .with_for_update()
+        )
         result = await db.execute(stmt)
         participant = result.scalar_one_or_none()
 
         if not participant:
-            # Create new participant record immediately upon consent
-            participant = Participant(
-                study_id=study.id,
-                session_token=session_token,
-                language_used=language_code,
-                consented_at=datetime.now(timezone.utc),
-                consent_hash=consent_hash,
-                ip_address=hashed_ip,
-                user_agent=user_agent,
-                status=ParticipantStatus.started,
-            )
-            db.add(participant)
-        else:
-            # Update existing (if somehow re-consenting or resuming)
+            try:
+                # Create new participant record immediately upon consent
+                participant = Participant(
+                    study_id=study.id,
+                    session_token=session_token,
+                    language_used=language_code,
+                    random_seed=str(session_token)
+                    if study.randomize_statements
+                    else None,
+                    consented_at=datetime.now(timezone.utc),
+                    consent_hash=consent_hash,
+                    ip_address=hashed_ip,
+                    user_agent=user_agent,
+                    status=ParticipantStatus.started,
+                )
+                db.add(participant)
+                await db.flush()
+            except IntegrityError:
+                # Race condition: Participant created concurrently
+                await db.rollback()
+                result = await db.execute(stmt)
+                participant = result.scalar_one_or_none()
+                if not participant:
+                    raise HTTPException(
+                        status_code=500, detail="Concurrency error during consent."
+                    )
+
+        # If we fell through (update existing)
+        if participant and participant not in db.new:
             participant.consented_at = datetime.now(timezone.utc)
             participant.consent_hash = consent_hash
             participant.language_used = language_code
@@ -124,8 +241,211 @@ class StudyService:
         return resolved_lang, translation
 
     @staticmethod
+    async def get_resolved_study_config(
+        study: Study,
+        lang: str = "en",
+        session_token: UUID | None = None,
+    ) -> dict[str, Any]:
+        """Resolves study configuration including translations, randomization, and state."""
+        resolved_lang, translation = StudyService.resolve_translation(study, lang)
+
+        # Transform to Frontend Format
+        title = getattr(translation, "title", study.slug)
+        description = getattr(translation, "description", "")
+        instructions = getattr(translation, "instructions", "")
+        condition_of_instruction = getattr(
+            translation, "condition_of_instruction", None
+        )
+        if not condition_of_instruction:
+            condition_of_instruction = "What is your stance on this statement?"
+
+        subtitle = getattr(translation, "subtitle", None)
+        objective = getattr(translation, "objective", None)
+
+        statements_data = []
+        for s in study.statements:
+            # Resolve statement translation
+            s_trans = next(
+                (t for t in s.translations if t.language_code == resolved_lang), None
+            )
+            if not s_trans:
+                s_trans = next(
+                    (t for t in s.translations if t.language_code == "en"), None
+                )
+            if not s_trans and s.translations:
+                s_trans = s.translations[0]
+
+            text = s_trans.text if s_trans else s.code
+            statements_data.append({"id": s.id, "text": text, "code": s.code})
+
+        # Q Methodology: Randomize statement order if configured
+        if study.randomize_statements and session_token:
+            import random
+
+            local_random = random.Random(str(session_token))
+            local_random.shuffle(statements_data)
+
+        # Helper for translation attributes
+        def get_t_attr(attr: str, default: Any = None) -> Any:
+            return getattr(translation, attr, default) if translation else default
+
+        # Calculate effective state based on dates
+        from datetime import datetime, timezone
+
+        now = datetime.now(timezone.utc)
+        effective_state = study.state.value
+
+        if study.state == StudyState.active:
+
+            def is_now_before(target_dt: datetime) -> bool:
+                if target_dt.tzinfo is None:
+                    return now.replace(tzinfo=None) < target_dt
+                return now < target_dt
+
+            def is_now_after(target_dt: datetime) -> bool:
+                if target_dt.tzinfo is None:
+                    return now.replace(tzinfo=None) > target_dt
+                return now > target_dt
+
+            if study.start_date and is_now_before(study.start_date):
+                effective_state = StudyState.paused.value
+            elif study.end_date and is_now_after(study.end_date):
+                effective_state = StudyState.closed.value
+
+        return {
+            "slug": study.slug,
+            "title": title,
+            "subtitle": subtitle,
+            "description": description,
+            "objective": objective,
+            "instructions": instructions,
+            "presort_config": study.presort_config,
+            "postsort_config": study.postsort_config,
+            "grid_config": study.grid_config,
+            "statements": statements_data,
+            "process_steps": getattr(translation, "process_steps", [])
+            or DEFAULT_PROCESS_STEPS.get(resolved_lang, DEFAULT_PROCESS_STEPS["en"]),
+            "consent": {
+                "title": get_t_attr("consent_title"),
+                "description": get_t_attr("consent_description"),
+                "accept": get_t_attr("consent_accept"),
+                "decline": get_t_attr("consent_decline"),
+            },
+            "condition_of_instruction": condition_of_instruction,
+            "available_languages": [t.language_code for t in study.translations],
+            "language": resolved_lang,
+            "default_language": study.default_language,
+            "show_statement_codes": study.show_statement_codes,
+            "randomize_statements": study.randomize_statements,
+            "ui_labels": get_t_attr("ui_labels", {}) or {},
+            "methodology_tips": getattr(translation, "methodology_tips", []) or [],
+            "state": effective_state,
+            "step_help": getattr(translation, "step_help", {}) or {},
+            "requires_password": False,
+            "start_date": study.start_date,
+            "end_date": study.end_date,
+            "branding": study.branding
+            or {"logo_url": None, "accent_color": None, "partners": []},
+        }
+
+    @staticmethod
+    def validate_for_activation(study: Study) -> list[str]:
+        """
+        Comprehensive check to see if a study is ready for research.
+        Returns a list of human-readable error messages.
+        """
+        errors = []
+
+        # 1. Statements Exist
+        if not study.statements:
+            errors.append("Study must have at least one statement.")
+
+        # 2. Grid Config exists and matches statements
+        if not study.grid_config:
+            errors.append("Grid configuration is missing.")
+        else:
+            total_capacity = sum(
+                int(col.get("capacity", 0)) for col in study.grid_config
+            )
+            if len(study.statements) != total_capacity:
+                errors.append(
+                    f"Grid capacity ({total_capacity}) does not match statement count ({len(study.statements)})."
+                )
+
+        # 3. Minimum Translations
+        if not study.translations:
+            errors.append("Study must have at least one language translation.")
+        else:
+            # Check if default language has a translation
+            default_lang = study.default_language or "en"
+            has_default = any(
+                t.language_code == default_lang for t in study.translations
+            )
+            if not has_default:
+                errors.append(
+                    f"Default language ({default_lang}) translation is missing."
+                )
+
+            # Check for missing titles in any translation
+            for t in study.translations:
+                if not t.title or t.title.strip() == "":
+                    errors.append(f"Title is missing for language '{t.language_code}'.")
+
+                if not t.consent_title or t.consent_title.strip() == "":
+                    errors.append(
+                        f"Consent title is missing for language '{t.language_code}'."
+                    )
+
+                if not t.consent_description or t.consent_description.strip() == "":
+                    errors.append(
+                        f"Consent description is missing for language '{t.language_code}'."
+                    )
+
+                if (
+                    not t.condition_of_instruction
+                    or t.condition_of_instruction.strip() == ""
+                ):
+                    errors.append(
+                        f"Grid sort instructions are missing for language '{t.language_code}'."
+                    )
+
+                # Check process steps
+                for i, step in enumerate(t.process_steps):
+                    title = step.get("title")
+                    if not title or title.strip() == "":
+                        errors.append(
+                            f"Step {i + 1} title is missing for language '{t.language_code}'."
+                        )
+
+        # 4. Statements have translations for all study languages
+        study_langs = {t.language_code for t in study.translations}
+        for s in study.statements:
+            s_langs = {st.language_code for st in s.translations}
+            missing = study_langs - s_langs
+            if missing:
+                errors.append(
+                    f"Statement '{s.code}' is missing translations for: {', '.join(missing)}."
+                )
+
+            # Check for empty text in existing translations
+            for st in s.translations:
+                if not st.text or st.text.strip() == "":
+                    errors.append(
+                        f"Statement '{s.code}' has empty text for language '{st.language_code}'."
+                    )
+
+        return errors
+
+    @staticmethod
     def validate_distribution(study: Study, qsort: list[Any]):
         """Validates the Q-sort distribution against the study's grid configuration."""
+        # Edge case: Ensure study has statements
+        if not study.statements:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: No statements defined.",
+            )
+
         stmt_count = len(study.statements)
         if len(qsort) != stmt_count:
             raise HTTPException(
@@ -133,19 +453,53 @@ class StudyService:
                 detail=f"Submission incomplete. Expected {stmt_count} cards, got {len(qsort)}.",
             )
 
+        # Edge case: Empty qsort should be caught above, but double-check
+        if not qsort:
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot validate distribution: Q-sort is empty.",
+            )
+
         submission_counts = Counter(entry.grid_score for entry in qsort)
         target_dist = {}
+
+        # Edge case: Handle None or invalid grid_config
+        if study.grid_config is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: grid_config is missing.",
+            )
 
         if isinstance(study.grid_config, list):
             for item in study.grid_config:
                 if isinstance(item, dict) and "score" in item and "capacity" in item:
-                    target_dist[int(item["score"])] = item["capacity"]
+                    try:
+                        score = int(item["score"])
+                        capacity = int(item["capacity"])
+                        target_dist[score] = capacity
+                    except (ValueError, TypeError):
+                        # Log but continue - malformed grid config item
+                        continue
         elif isinstance(study.grid_config, dict):
             for score_str, capacity in study.grid_config.items():
                 try:
-                    target_dist[int(score_str)] = capacity
-                except ValueError:
+                    score = int(score_str)
+                    cap = int(capacity)
+                    target_dist[score] = cap
+                except (ValueError, TypeError):
                     continue
+        else:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: grid_config has invalid type.",
+            )
+
+        # Edge case: No valid target distribution parsed
+        if not target_dist:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: Could not parse grid_config.",
+            )
 
         for score_val, capacity in target_dist.items():
             count = submission_counts.get(score_val, 0)
@@ -181,6 +535,13 @@ class StudyService:
         if not study:
             raise HTTPException(status_code=404, detail="Study not found")
 
+        # Edge case: Ensure study has statements loaded
+        if not hasattr(study, "statements") or study.statements is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: Statements not loaded.",
+            )
+
         # 2.5 Validation: Study State
         from ..models import StudyState
 
@@ -190,8 +551,35 @@ class StudyService:
                 detail=f"Study is not active (state: {study.state.value}). Submissions are not allowed.",
             )
 
+        # 2.6 Validation: Recruitment Link
+        link = None
+        if data.link_token:
+            link = await RecruitmentService.validate_link_token(
+                db, study.id, data.link_token
+            )
+            if not link:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Invalid, expired, or full recruitment link",
+                )
+
+        # Edge case: Ensure qsort is not None
+        if data.qsort is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Submission error: Q-sort data is missing.",
+            )
+
         # 3. Validation: Statement Ownership
         valid_statement_ids = {s.id for s in study.statements}
+
+        # Edge case: Handle empty valid_statement_ids
+        if not valid_statement_ids:
+            raise HTTPException(
+                status_code=500,
+                detail="Study configuration error: No statements defined.",
+            )
+
         for entry in data.qsort:
             if entry.statement_id not in valid_statement_ids:
                 raise HTTPException(
@@ -203,35 +591,97 @@ class StudyService:
         if data.status == ParticipantStatus.completed:
             StudyService.validate_distribution(study, data.qsort)
 
+        # Edge case: Ensure presort_answers and postsort_answers are dicts, not None
+        presort_answers = (
+            data.presort_answers if data.presort_answers is not None else {}
+        )
+        postsort_answers = (
+            data.postsort_answers if data.postsort_answers is not None else {}
+        )
+
         # 5. Find or Create Participant
-        participant_stmt = select(Participant).where(
-            Participant.session_token == data.session_token
+        participant_stmt = (
+            select(Participant)
+            .where(Participant.session_token == data.session_token)
+            .with_for_update()
         )
         participant_result = await db.execute(participant_stmt)
         participant = participant_result.scalar_one_or_none()
+        is_newly_created = False
 
         if not participant:
-            participant = Participant(
-                study_id=study.id,
-                session_token=data.session_token,
-                language_used=data.language_used,
-                presort_answers=data.presort_answers,
-                postsort_answers=data.postsort_answers,
-                status=data.status,
-                confirmation_code=confirmation_code,
-                ip_address=hashed_ip,
-                user_agent=user_agent,
-                submitted_at=datetime.now(timezone.utc),
-            )
-            db.add(participant)
-            await db.flush()
-        else:
+            try:
+                participant = Participant(
+                    study_id=study.id,
+                    session_token=data.session_token,
+                    language_used=data.language_used,
+                    random_seed=str(data.session_token)
+                    if study.randomize_statements
+                    else None,
+                    presort_answers=presort_answers,
+                    postsort_answers=postsort_answers,
+                    status=data.status,
+                    confirmation_code=confirmation_code,
+                    ip_address=hashed_ip,
+                    user_agent=user_agent,
+                    submitted_at=datetime.now(timezone.utc),
+                )
+                db.add(participant)
+                await db.flush()
+                is_newly_created = True
+
+                # Increment link usage if link was used
+                if link:
+                    # Persist the token in presort_answers for admin tracking
+                    # Persist the token in presort_answers for admin tracking
+                    # We modify the local 'participant' object's presort_answers so it gets saved on flush?
+                    # Actually, we passed 'presort_answers' dict to constructor. We should update it before constructor or update object after.
+                    # Since presort_answers is a dict, we can modify it.
+                    # Re-fetching participant after flush might be safest, or just relying on reference.
+                    # Let's simple add it to the dict passed to constructor if we want it saved.
+                    pass
+
+                if link and data.link_token:
+                    # We need to make sure this gets saved. The Participant constructor took 'presort_answers'.
+                    # If we modify 'presort_answers' *before* constructor, it would be cleaner.
+                    # But we allow 'link' to be checked after some validations.
+                    # Let's update the object directly.
+                    participant.presort_answers = {
+                        **participant.presort_answers,
+                        "_recruitment_token": data.link_token,
+                    }
+                    # We also need to increment usage
+                    await RecruitmentService.increment_usage(db, link.id)
+            except IntegrityError:
+                # Race condition: Participant was created by another request in the meantime.
+                # Rollback the failed insert and fetch the existing participant.
+                await db.rollback()
+                participant_result = await db.execute(participant_stmt)
+                participant = participant_result.scalar_one_or_none()
+                if not participant:
+                    # Should not happen if IntegrityError was due to session_token
+                    raise HTTPException(
+                        status_code=500,
+                        detail="Concurrency error: Could not resolve participant.",
+                    )
+            except Exception as e:
+                # Edge case: Catch any unexpected database errors
+                await db.rollback()
+                raise HTTPException(
+                    status_code=500,
+                    detail=f"Database error while creating participant: {str(e)}",
+                )
+
+        # If we fell through (either from 'else' or after catching exception), participant exists.
+        # Ensure we don't treat a newly created participant as an existing one we need to skip/update.
+        if participant and participant not in db.new and not is_newly_created:
+            # Update existing participant
             if participant.status == ParticipantStatus.completed:
                 return str(participant.session_token)[:8].upper()
 
             participant.language_used = data.language_used
-            participant.presort_answers = data.presort_answers
-            participant.postsort_answers = data.postsort_answers
+            participant.presort_answers = presort_answers
+            participant.postsort_answers = postsort_answers
             if data.status:
                 participant.status = data.status
             participant.confirmation_code = confirmation_code
@@ -247,18 +697,34 @@ class StudyService:
             )
             await db.flush()
 
-        # 6. Save Q-Sort Entries
-        new_entries = [
-            QSortEntry(
-                participant_id=participant.id,
-                statement_id=entry.statement_id,
-                grid_score=entry.grid_score,
-                card_comment=entry.card_comment,
+        # Edge case: Ensure participant.id exists before creating QSortEntry
+        if not participant or participant.id is None:
+            raise HTTPException(
+                status_code=500,
+                detail="Database error: Participant ID is missing after save.",
             )
-            for entry in data.qsort
-        ]
-        db.add_all(new_entries)
-        await db.commit()
+
+        # 6. Save Q-Sort Entries
+        try:
+            new_entries = [
+                QSortEntry(
+                    participant_id=participant.id,
+                    statement_id=entry.statement_id,
+                    grid_score=entry.grid_score,
+                    card_comment=entry.card_comment,
+                )
+                for entry in data.qsort
+            ]
+            db.add_all(new_entries)
+            await db.flush()
+            # await db.commit() -> Handled by router
+        except Exception as e:
+            # Edge case: Handle commit failures
+            await db.rollback()
+            raise HTTPException(
+                status_code=500,
+                detail=f"Database error while saving Q-sort entries: {str(e)}",
+            )
 
         return confirmation_code
 
@@ -335,7 +801,6 @@ class StudyService:
             .where(
                 Participant.study_id == study_id,
                 Participant.status == ParticipantStatus.completed,
-                Participant.is_discarded.is_(False),
             )
             .options(selectinload(Participant.qsort_entries))
         )
@@ -350,11 +815,19 @@ class StudyService:
 
         participant_data = []
         for p in participants:
-            placements = {
-                entry.statement_id: entry.grid_score for entry in p.qsort_entries
-            }
+            # Edge case: Handle missing or None qsort_entries
+            placements = {}
+            if p.qsort_entries:
+                placements = {
+                    entry.statement_id: entry.grid_score for entry in p.qsort_entries
+                }
+
             # Create a score list in the exact order of sorted_statements
             scores = [placements.get(s.id, None) for s in sorted_statements]
+
+            # Edge case: Ensure presort and postsort are not None
+            presort = p.presort_answers if p.presort_answers is not None else {}
+            postsort = p.postsort_answers if p.postsort_answers is not None else {}
 
             participant_data.append(
                 {
@@ -367,9 +840,11 @@ class StudyService:
                     "scores": scores,
                     # For raw CSV/KenQ
                     "placements": placements,
-                    "presort": p.presort_answers,
-                    "postsort": p.postsort_answers,
+                    "presort": presort,
+                    "postsort": postsort,
                     "language": p.language_used,
+                    "is_discarded": p.is_discarded,
+                    "discard_reason": p.discard_reason,
                 }
             )
 
@@ -377,6 +852,7 @@ class StudyService:
             "study": {
                 "slug": study.slug,
                 "grid_config": study.grid_config,
+                "postsort_config": study.postsort_config,
                 "statements": [
                     {
                         "id": s.id,

@@ -14,7 +14,7 @@ export interface StatementTranslationRead {
      * @pattern ^[a-z]{2}(-[A-Z]{2})?$
      */
     language_code: string;
-    /** @minLength 1 */
+    /** @maxLength 1000 */
     text: string;
     id: number;
     statement_id: number;

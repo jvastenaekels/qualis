@@ -12,11 +12,17 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import type { PreSortField } from '../schemas/study';
+import { SurveyField } from '../components/survey/SurveyField';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { cn } from '@/lib/utils';
 
-const PreSortPage: React.FC = () => {
+interface PreSortPageProps {
+    highlightKey?: string | null;
+}
+
+const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
     const { slug } = useParams();
     const navigate = useNavigate();
 
@@ -27,13 +33,21 @@ const PreSortPage: React.FC = () => {
 
     const { t, i18n } = useTranslation();
 
+    // Normalize config to get fields
+    const presortFields = useMemo(() => {
+        if (!config?.presort_config) return {};
+        if ('fields' in config.presort_config) {
+            return config.presort_config.fields;
+        }
+        // Legacy support
+        return config.presort_config as Record<string, PreSortField>;
+    }, [config?.presort_config]);
+
     // Generate Dynamic Zod Schema based on config
     const dynamicSchema = useMemo(() => {
-        if (!config?.presort_config) return z.object({});
-
         const shape: Record<string, z.ZodTypeAny> = {};
 
-        Object.entries(config.presort_config).forEach(([key, field]) => {
+        Object.entries(presortFields).forEach(([key, field]) => {
             let fieldSchema: z.ZodTypeAny;
 
             if (field.type === 'number') {
@@ -48,12 +62,37 @@ const PreSortPage: React.FC = () => {
                         field.max,
                         t('common.errors.max', { max: field.max })
                     );
+            } else if (field.type === 'email') {
+                fieldSchema = z.string().email('Please enter a valid email address');
+            } else if (field.type === 'date') {
+                fieldSchema = z.string(); // HTML date input returns string
+            } else if (field.type === 'checkbox') {
+                // Checkbox group returns array of strings
+                fieldSchema = z.array(z.string());
             } else {
+                // text, textarea, radio, select
                 fieldSchema = z.string();
+                if (field.minLength !== undefined) {
+                    fieldSchema = (fieldSchema as z.ZodString).min(
+                        field.minLength,
+                        `Minimum ${field.minLength} characters required`
+                    );
+                }
+                if (field.maxLength !== undefined) {
+                    fieldSchema = (fieldSchema as z.ZodString).max(
+                        field.maxLength,
+                        `Maximum ${field.maxLength} characters allowed`
+                    );
+                }
             }
 
             if (field.required) {
-                if (field.type !== 'number') {
+                if (field.type === 'checkbox') {
+                    fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(
+                        1,
+                        t('presort.error_required')
+                    );
+                } else if (field.type !== 'number') {
                     fieldSchema = (fieldSchema as z.ZodString).min(1, t('presort.error_required'));
                 }
             } else {
@@ -64,7 +103,7 @@ const PreSortPage: React.FC = () => {
         });
 
         return z.object(shape);
-    }, [config?.presort_config, t]);
+    }, [presortFields, t]);
 
     const {
         register,
@@ -80,15 +119,27 @@ const PreSortPage: React.FC = () => {
     // Auto-save form data to store using subscription to avoid render loops
     React.useEffect(() => {
         const subscription = watch((value) => {
+            console.log('FORM UPDATE:', { value, isValid, errors });
             setPresortResponse(value as Record<string, string | number | boolean>);
         });
         return () => subscription.unsubscribe();
-    }, [watch, setPresortResponse]);
+    }, [watch, setPresortResponse, isValid, errors]);
 
     // Set Step 2 on mount
     React.useEffect(() => {
         setStep(2);
     }, [setStep]);
+
+    // Handle skipping if disabled
+    React.useEffect(() => {
+        if (
+            config?.presort_config &&
+            'enabled' in config.presort_config &&
+            !config.presort_config.enabled
+        ) {
+            navigate(`/study/${slug}/rough-sort`, { replace: true });
+        }
+    }, [config, navigate, slug]);
 
     if (!config) return null;
 
@@ -105,51 +156,6 @@ const PreSortPage: React.FC = () => {
         return obj[i18n.language] || obj.en || Object.values(obj)[0] || '';
     };
 
-    const renderField = (key: string, fieldConfig: PreSortField) => {
-        const commonClasses =
-            'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[44px] text-base';
-        const labelText = getLocalizedText(fieldConfig.label);
-
-        switch (fieldConfig.type) {
-            case 'number':
-                return (
-                    <input
-                        id={key}
-                        type="number"
-                        {...register(key)}
-                        className={commonClasses}
-                        placeholder={labelText}
-                    />
-                );
-            case 'select':
-                return (
-                    <select id={key} {...register(key)} className={commonClasses}>
-                        <option value="">{t('presort.select_placeholder')}</option>
-                        {fieldConfig.options?.map((opt) => {
-                            const optValue = typeof opt === 'object' ? opt.value : opt;
-                            const optLabel =
-                                typeof opt === 'object' ? getLocalizedText(opt.label) : opt;
-                            return (
-                                <option key={optValue} value={optValue}>
-                                    {optLabel}
-                                </option>
-                            );
-                        })}
-                    </select>
-                );
-            default: // text
-                return (
-                    <input
-                        id={key}
-                        type="text"
-                        {...register(key)}
-                        className={commonClasses}
-                        placeholder={labelText}
-                    />
-                );
-        }
-    };
-
     return (
         <div className="max-w-3xl mx-auto py-12 px-4 space-y-6 animate-in slide-in-from-right duration-500">
             <div>
@@ -162,13 +168,17 @@ const PreSortPage: React.FC = () => {
                 onSubmit={handleSubmit(onSubmit)}
                 className="space-y-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm"
             >
-                {Object.entries(config.presort_config || {}).map(([key, fieldConfig]) => (
+                {Object.entries(presortFields).map(([key, fieldConfig]) => (
                     <div key={key}>
                         <label htmlFor={key} className="block text-sm font-medium text-gray-700">
                             {getLocalizedText(fieldConfig.label)}
                             {fieldConfig.required && <span className="text-red-500 ml-1">*</span>}
                         </label>
-                        {renderField(key, fieldConfig as PreSortField)}
+                        <SurveyField
+                            id={key}
+                            fieldConfig={fieldConfig as PreSortField}
+                            register={register}
+                        />
                         {errors[key] && (
                             <p className="text-red-500 text-sm mt-1">
                                 {(errors[key]?.message as string) || t('presort.error_required')}
@@ -183,14 +193,18 @@ const PreSortPage: React.FC = () => {
                         data-testid="presort-submit-btn"
                         // If no config, always valid. Otherwise respect form validation.
                         disabled={
-                            (config?.presort_config &&
-                                Object.keys(config.presort_config).length > 0 &&
-                                !isValid) ||
+                            (presortFields && Object.keys(presortFields).length > 0 && !isValid) ||
                             false
                         }
-                        className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-md font-bold text-sm hover:bg-blue-700 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                        className={cn(
+                            'group w-full sm:w-auto px-8 py-3 text-white rounded-full font-bold text-base hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',
+                            highlightKey === 'common.next' &&
+                                'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[10] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                        )}
+                        style={{ backgroundColor: 'var(--brand-accent)' }}
                     >
-                        {t('presort.submit')} <ArrowRight size={16} />
+                        {config.ui_labels?.['common.next'] || t('common.next', t('presort.submit'))}{' '}
+                        <ArrowRight size={16} />
                     </button>
                 </div>
             </form>

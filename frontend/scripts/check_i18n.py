@@ -2,18 +2,11 @@ import json
 import os
 import sys
 
-def get_keys(d, prefix=''):
-    keys = set()
-    for k, v in d.items():
-        if isinstance(v, dict):
-            keys.update(get_keys(v, prefix + k + '.'))
-        else:
-            keys.add(prefix + k)
-    return keys
+from i18n_utils import get_keys
 
 def check_i18n():
-    locales_dir = os.path.join(os.path.dirname(__file__), '../src/locales')
-    master_file = os.path.join(locales_dir, 'en.json')
+    locales_dir = os.path.join(os.path.dirname(__file__), '../public/locales')
+    master_file = os.path.join(locales_dir, 'en/translation.json')
 
     if not os.path.exists(master_file):
         print(f"Error: Master file {master_file} not found.")
@@ -24,12 +17,18 @@ def check_i18n():
 
     master_keys = get_keys(master_data)
 
-    locale_files = [f for f in os.listdir(locales_dir) if f.endswith('.json') and f != 'en.json']
+    # In public/locales, each language has its own directory
+    languages = [d for d in os.listdir(locales_dir) if os.path.isdir(os.path.join(locales_dir, d)) and d != 'en']
 
     overall_success = True
 
-    for filename in locale_files:
-        filepath = os.path.join(locales_dir, filename)
+    for lang in languages:
+        filepath = os.path.join(locales_dir, lang, 'translation.json')
+        if not os.path.exists(filepath):
+            print(f"⚠️  Missing translation.json for language: {lang}")
+            overall_success = False
+            continue
+
         with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
@@ -38,7 +37,7 @@ def check_i18n():
         missing = master_keys - keys
         extra = keys - master_keys
 
-        print(f"Checking {filename}...")
+        print(f"Checking {lang}...")
         if not missing and not extra:
             print("  ✓ Perfect sync.")
         else:

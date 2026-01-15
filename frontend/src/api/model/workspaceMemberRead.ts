@@ -4,7 +4,7 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
-import type { WorkspaceMemberReadUserEmail } from './workspaceMemberReadUserEmail';
+import type { UserRead } from './userRead';
 import type { WorkspaceRole } from './workspaceRole';
 
 /**
@@ -12,7 +12,7 @@ import type { WorkspaceRole } from './workspaceRole';
  */
 export interface WorkspaceMemberRead {
     user_id: number;
-    user_email?: WorkspaceMemberReadUserEmail;
+    user: UserRead;
     role: WorkspaceRole;
     joined_at: string;
 }

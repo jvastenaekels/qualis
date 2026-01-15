@@ -8,6 +8,7 @@ import type { ParticipantStatus } from './participantStatus';
 import type { ParticipantDetailReadSubmittedAt } from './participantDetailReadSubmittedAt';
 import type { ParticipantDetailReadDiscardReason } from './participantDetailReadDiscardReason';
 import type { ParticipantDetailReadUserAgent } from './participantDetailReadUserAgent';
+import type { ParticipantDetailReadRecruitmentToken } from './participantDetailReadRecruitmentToken';
 import type { ParticipantDetailReadPresortAnswers } from './participantDetailReadPresortAnswers';
 import type { ParticipantDetailReadPostsortAnswers } from './participantDetailReadPostsortAnswers';
 import type { QSortEntryInput } from './qSortEntryInput';
@@ -26,6 +27,7 @@ export interface ParticipantDetailRead {
     is_discarded: boolean;
     discard_reason: ParticipantDetailReadDiscardReason;
     user_agent: ParticipantDetailReadUserAgent;
+    recruitment_token?: ParticipantDetailReadRecruitmentToken;
     presort_answers: ParticipantDetailReadPresortAnswers;
     postsort_answers: ParticipantDetailReadPostsortAnswers;
     qsort_entries: QSortEntryInput[];

@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useConfigStore } from '../store/useConfigStore';
 import { useUIStore } from '../store/useUIStore';
 import MethodologyTips from './MethodologyTips';
+import { cn } from '@/lib/utils';
 
 interface ReadingZoneProps {
     variant: 'mobile' | 'desktop';
@@ -68,22 +69,46 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
         </div>
     );
 
+    const CardHeader = ({
+        label,
+        code,
+        className,
+        iconSize,
+    }: {
+        label: string;
+        code?: string;
+        className: string;
+        iconSize: number;
+    }) => (
+        <div
+            className={cn(
+                'font-bold text-indigo-400 uppercase tracking-wider flex items-center',
+                className
+            )}
+        >
+            <Eye size={iconSize} strokeWidth={2.5} />
+            {label}
+            {showCodes && code && (
+                <>
+                    <span className="text-indigo-300 mx-1">•</span>
+                    {code}
+                </>
+            )}
+        </div>
+    );
+
     if (variant === 'mobile') {
         return (
             <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative overflow-hidden">
                 <div ref={scrollRef} className="p-3 h-20 overflow-y-auto custom-scrollbar relative">
                     {displayCard ? (
                         <div className="animate-in fade-in slide-in-from-top-1 duration-300 pb-2">
-                            <div className="text-[10px] font-bold text-indigo-400 mb-0.5 uppercase tracking-wider flex items-center gap-1.5">
-                                <Eye size={12} strokeWidth={2.5} />
-                                {t(labelKey)}
-                                {showCodes && displayCard.code && (
-                                    <>
-                                        <span className="text-indigo-300 mx-1">•</span>
-                                        {displayCard.code}
-                                    </>
-                                )}
-                            </div>
+                            <CardHeader
+                                label={t(labelKey)}
+                                code={displayCard.code}
+                                className="text-[10px] mb-0.5 gap-1.5"
+                                iconSize={12}
+                            />
                             <div className="flex flex-col gap-0.5">
                                 <p className="text-slate-800 text-sm font-medium leading-relaxed">
                                     {displayCard.text}
@@ -107,16 +132,12 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
             >
                 {displayCard ? (
                     <div className="animate-in fade-in zoom-in-95 duration-200 pb-2">
-                        <div className="text-xs font-bold text-indigo-400 mb-1.5 uppercase tracking-wider flex items-center gap-2">
-                            <Eye size={14} strokeWidth={2.5} />
-                            {t(labelKey)}
-                            {showCodes && displayCard.code && (
-                                <>
-                                    <span className="text-indigo-300 mx-1">•</span>
-                                    {displayCard.code}
-                                </>
-                            )}
-                        </div>
+                        <CardHeader
+                            label={t(labelKey)}
+                            code={displayCard.code}
+                            className="text-xs mb-1.5 gap-2"
+                            iconSize={14}
+                        />
                         <p className="text-slate-800 text-base sm:text-lg font-medium leading-relaxed">
                             {displayCard.text}
                         </p>

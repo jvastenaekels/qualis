@@ -1,171 +1,164 @@
-import type { StudyTranslationRead as StudyTranslation } from '@/api/model/studyTranslationRead';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Info } from 'lucide-react';
+import { Hand, Clipboard, ShieldCheck } from 'lucide-react';
 import type React from 'react';
+import MarkdownEditor from './MarkdownEditor';
+import { ProcessStepEditor } from './ProcessStepEditor';
+import { useTranslation } from 'react-i18next';
+import type { StudyTranslationRead } from '@/api/model';
 
 const IntroductionEditor = () => {
+    const { t } = useTranslation();
     const { draft, activeLocale, updateTranslation } = useStudyDesigner();
 
     if (!draft) return null;
 
     const translation = draft.translations?.find((t) => t.language_code === activeLocale);
-    const hasConsent = !!translation?.consent_title;
 
-    const handleChange = (field: keyof StudyTranslation, value: string) => {
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic translation update
-        updateTranslation(activeLocale, (t: any) => {
+    const handleChange = (field: keyof StudyTranslationRead, value: string) => {
+        // biome-ignore lint/suspicious/noExplicitAny: complex state update
+        updateTranslation(activeLocale, (t_trans: any) => {
             // biome-ignore lint/suspicious/noExplicitAny: complex state update
-            (t as any)[field] = value;
-        });
-    };
-
-    const toggleConsent = (checked: boolean) => {
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic translation update
-        updateTranslation(activeLocale, (t: any) => {
-            if (checked) {
-                t.consent_title = t.consent_title || 'Consent to participate';
-                t.consent_description =
-                    t.consent_description ||
-                    'By continuing, you agree to participate in this study. Your data will be anonymized.';
-                t.consent_accept = t.consent_accept || 'I agree';
-                t.consent_decline = t.consent_decline || 'I decline';
-            } else {
-                t.consent_title = null;
-                t.consent_description = null;
-                t.consent_accept = null;
-                t.consent_decline = null;
-            }
+            (t_trans as any)[field] = value;
         });
     };
 
     return (
-        <div className="space-y-8">
-            <section className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                    <Info className="h-5 w-5" />
-                    Welcome Message
+        <div className="space-y-12 pb-12">
+            {/* Welcome Section */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
+                    <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                        <Hand className="h-5 w-5 text-indigo-600" />
+                    </div>
+                    {t('admin.design.intro.welcome_title')}
                 </div>
 
-                <Card className="shadow-sm">
-                    <CardContent className="pt-6 space-y-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="title">Study Title</Label>
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                    <CardContent className="pt-6 space-y-6">
+                        <div className="grid gap-2.5">
+                            <Label
+                                htmlFor="title"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                            >
+                                {t('admin.design.intro.fields.title')}
+                            </Label>
                             <Input
                                 id="title"
                                 value={translation?.title || ''}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                     handleChange('title', e.target.value)
                                 }
-                                placeholder="Enter public title..."
+                                placeholder={t('admin.design.intro.fields.title_placeholder')}
+                                className="font-bold text-lg h-11 rounded-xl"
                             />
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="subtitle">Subtitle (Optional)</Label>
+                        <div className="grid gap-2.5">
+                            <Label
+                                htmlFor="subtitle"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                            >
+                                {t('admin.design.intro.fields.subtitle')}
+                            </Label>
                             <Input
                                 id="subtitle"
                                 value={translation?.subtitle || ''}
                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                     handleChange('subtitle', e.target.value)
                                 }
-                                placeholder="A brief catchphrase..."
+                                placeholder={t('admin.design.intro.fields.subtitle_placeholder')}
+                                className="font-medium h-10 rounded-xl"
                             />
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="description">Short Description</Label>
-                            <Textarea
-                                id="description"
-                                value={translation?.description || ''}
-                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                    handleChange('description', e.target.value)
-                                }
-                                placeholder="What is this study about?"
+                        <div className="grid gap-2.5">
+                            <MarkdownEditor
+                                id="objective"
+                                label={t('admin.design.intro.fields.objective')}
+                                value={translation?.objective || ''}
+                                onChange={(val: string) => handleChange('objective', val)}
+                                placeholder={t('admin.design.intro.fields.objective_placeholder')}
                             />
                         </div>
                     </CardContent>
                 </Card>
             </section>
 
-            <section className="space-y-4">
-                <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                    <Info className="h-5 w-5" />
-                    Instructions
+            {/* Process Overview Section */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
+                    <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                        <Clipboard className="h-5 w-5 text-indigo-600" />
+                    </div>
+                    {t('admin.design.intro.process_title')}
                 </div>
-                <Card className="shadow-sm">
+
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardContent className="pt-6">
-                        <div className="grid gap-2">
-                            <Label htmlFor="instructions">
-                                Task Instructions (Markdown supported)
-                            </Label>
-                            <Textarea
+                        <div className="grid gap-2.5">
+                            <MarkdownEditor
                                 id="instructions"
-                                className="min-h-[200px] font-serif"
+                                label={t('admin.design.intro.fields.task_overview')}
                                 value={translation?.instructions || ''}
-                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                    handleChange('instructions', e.target.value)
-                                }
-                                placeholder="# Instructions&#10;&#10;1. Phase 1...&#10;2. Phase 2..."
+                                onChange={(val: string) => handleChange('instructions', val)}
+                                placeholder={t('admin.design.intro.fields.task_placeholder')}
                             />
                         </div>
                     </CardContent>
                 </Card>
+
+                <ProcessStepEditor />
             </section>
 
-            <section className="space-y-4 pb-12">
+            {/* Consent Section (Mandatory) */}
+            <section className="space-y-6">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-primary font-semibold text-lg">
-                        <Info className="h-5 w-5" />
-                        Consent Builder
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Switch
-                            id="require-consent"
-                            checked={hasConsent}
-                            onCheckedChange={toggleConsent}
-                        />
-                        <Label htmlFor="require-consent" className="cursor-pointer">
-                            Enable Consent Step
-                        </Label>
+                    <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
+                        <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                            <ShieldCheck className="h-5 w-5 text-indigo-600" />
+                        </div>
+                        {t('admin.design.intro.consent_title')}
                     </div>
                 </div>
 
-                {hasConsent && (
-                    <Card className="shadow-sm border-primary/20 bg-primary/5">
-                        <CardHeader>
-                            <CardTitle className="text-sm">Consent Form Details</CardTitle>
-                            <CardDescription>
-                                Participants must agree to these terms before starting.
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="consent-title">Consent Title</Label>
-                                <Input
-                                    id="consent-title"
-                                    value={translation?.consent_title || ''}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                        handleChange('consent_title', e.target.value)
-                                    }
-                                />
-                            </div>
-                            <div className="grid gap-2">
-                                <Label htmlFor="consent-description">Legal Text / Agreement</Label>
-                                <Textarea
-                                    id="consent-description"
-                                    className="min-h-[150px]"
-                                    value={translation?.consent_description || ''}
-                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                                        handleChange('consent_description', e.target.value)
-                                    }
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
-                )}
+                <Card className="border-none shadow-sm bg-slate-50/50 rounded-2xl overflow-hidden border border-slate-200/60">
+                    <CardHeader className="pb-4">
+                        <CardTitle className="text-sm font-bold">
+                            {t('admin.design.intro.consent_details')}
+                        </CardTitle>
+                        <CardDescription className="text-xs font-medium text-slate-500">
+                            {t('admin.design.intro.consent_desc')}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="grid gap-2.5">
+                            <Label
+                                htmlFor="consent-title"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                            >
+                                {t('admin.design.intro.fields.consent_title_label')}
+                            </Label>
+                            <Input
+                                id="consent-title"
+                                value={translation?.consent_title || ''}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                    handleChange('consent_title', e.target.value)
+                                }
+                                className="font-bold text-sm h-10 rounded-xl"
+                            />
+                        </div>
+                        <div className="grid gap-2.5">
+                            <MarkdownEditor
+                                id="consent-description"
+                                label={t('admin.design.intro.fields.legal_text')}
+                                value={translation?.consent_description || ''}
+                                onChange={(val: string) => handleChange('consent_description', val)}
+                                placeholder={t('admin.design.intro.fields.legal_placeholder')}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
             </section>
         </div>
     );

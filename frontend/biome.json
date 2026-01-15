@@ -1,54 +1,60 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
-    "vcs": {
-        "enabled": true,
-        "clientKind": "git",
-        "useIgnoreFile": true
-    },
-    "files": {
-        "ignoreUnknown": false,
-        "includes": ["**", "!**/dist", "!**/node_modules", "!**/package-lock.json", "!**/*.css"]
-    },
-    "formatter": {
-        "enabled": true,
-        "formatWithErrors": false,
-        "indentStyle": "space",
-        "indentWidth": 4,
-        "lineEnding": "lf",
-        "lineWidth": 100,
-        "attributePosition": "auto"
-    },
-    "assist": { "enabled": false },
-    "linter": {
-        "enabled": true,
-        "includes": ["**", "!src/api/generated.ts", "!src/api/model/**"],
-        "rules": {
-            "recommended": true,
-            "correctness": {
-                "noUnusedVariables": "error",
-                "useExhaustiveDependencies": "warn",
-                "noUnusedImports": "error"
-            },
-            "suspicious": {
-                "noArrayIndexKey": "off",
-                "noUnknownAtRules": "off"
-            },
-            "style": {
-                "noNonNullAssertion": "warn"
-            },
-            "a11y": {
-                "recommended": true,
-                "useSemanticElements": "off"
-            }
-        }
-    },
-    "javascript": {
-        "formatter": {
-            "quoteStyle": "single",
-            "jsxQuoteStyle": "double",
-            "trailingCommas": "es5",
-            "semicolons": "always",
-            "arrowParentheses": "always"
-        }
+  "$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!**/dist",
+      "!**/node_modules",
+      "!**/package-lock.json",
+      "!**/*.css"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 4,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto"
+  },
+  "assist": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "includes": ["**", "!src/api/generated.ts", "!src/api/model/**"],
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "warn",
+        "noUnusedImports": "error"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "off",
+        "noUnknownAtRules": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "warn"
+      },
+      "a11y": {
+        "recommended": true,
+        "useSemanticElements": "off"
+      }
     }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "trailingCommas": "es5",
+      "semicolons": "always",
+      "arrowParentheses": "always"
+    }
+  }
 }

@@ -1,25 +1,26 @@
-import { type Page, expect } from '@playwright/test';
-import { BasePage } from './BasePage';
+import { expect } from "@playwright/test";
+import { BasePage } from "./BasePage";
 
 export class WelcomePage extends BasePage {
-    readonly startButton = this.page.getByTestId('start-btn');
-    readonly loadingSpinner = this.page.locator('[data-testid="loading-spinner"]');
+  readonly startButton = this.page.getByTestId("start-btn");
+  readonly loadingSpinner = this.page.locator(
+    '[data-testid="loading-spinner"]',
+  );
 
-    constructor(page: Page) {
-        super(page);
-    }
+  async visit(slug: string) {
+    await this.goto(`/study/${slug}/welcome`);
+    await this.waitForLoad();
+  }
 
-    async visit(slug: string) {
-        await this.goto(`/study/${slug}/welcome`);
-        await this.waitForLoading();
-    }
+  async waitForLoad() {
+    await this.loadingSpinner
+      .waitFor({ state: "hidden", timeout: 15000 })
+      .catch(() => {});
+  }
 
-    async waitForLoading() {
-        await this.loadingSpinner.waitFor({ state: 'hidden', timeout: 15000 }).catch(() => {});
-    }
-
-    async startStudy() {
-        await expect(this.startButton.first()).toBeVisible({ timeout: 30000 });
-        await this.startButton.first().click();
-    }
+  async startStudy() {
+    const startBtn = this.page.getByTestId("start-btn");
+    await expect(startBtn).toBeVisible({ timeout: 10000 });
+    await startBtn.click();
+  }
 }

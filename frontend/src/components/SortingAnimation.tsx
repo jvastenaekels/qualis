@@ -34,7 +34,11 @@ const FINE_STEPS = [
     { id: 'C0_2', x: 0, y: -ROW_H * 2, source: 1 },
 ];
 
-const SortingAnimation: React.FC = () => {
+interface SortingAnimationProps {
+    scale?: number;
+}
+
+const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
     const [phase, setPhase] = useState<'ROUGH' | 'FINE'>('ROUGH');
     const [step, setStep] = useState(0);
 
@@ -141,8 +145,8 @@ const SortingAnimation: React.FC = () => {
     const MOBILE_GRID_ROW0_Y = -12;
     const MOBILE_SOURCE_CENTER_Y = 40;
     const DESKTOP_GRID_ROW0_Y = 26;
-    const DESKTOP_GRID_OFFSET_X = -40;
-    const DESKTOP_DECK_OFFSET_X = 60;
+    const DESKTOP_GRID_OFFSET_X = -30; // Balanced (Centered)
+    const DESKTOP_DECK_OFFSET_X = 70; // Balanced (Centered)
 
     const currentGridBaseY = isDesktop ? DESKTOP_GRID_ROW0_Y : MOBILE_GRID_ROW0_Y;
     const currentSourceBaseY = isDesktop ? 0 : MOBILE_SOURCE_CENTER_Y;
@@ -185,6 +189,8 @@ const SortingAnimation: React.FC = () => {
         (activeFineStep ? activeFineStep.x : 0) + (isDesktop ? DESKTOP_GRID_OFFSET_X : 0);
     const fineTargetY = currentGridBaseY + (activeFineStep ? activeFineStep.y : 0);
 
+    const finalScale = scale ?? 2.0;
+
     return (
         <div
             className="relative w-full h-80 md:h-72 flex items-center justify-center py-6 select-none pointer-events-none"
@@ -193,8 +199,14 @@ const SortingAnimation: React.FC = () => {
             {/* ROUGH PHASE */}
             <div
                 data-testid="phase-1"
+                style={{
+                    transform:
+                        phase === 'ROUGH'
+                            ? `scale(${finalScale}) translateY(${isDesktop ? '0px' : '0px'})`
+                            : `scale(${finalScale - 0.1})`,
+                }}
                 className={`absolute inset-0 flex items-center justify-center transition-all duration-700 ease-in-out
-                ${phase === 'ROUGH' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] z-10'}`}
+                ${phase === 'ROUGH' ? 'opacity-100 z-20' : 'opacity-0 z-10'}`}
             >
                 <div className="relative z-20">
                     <DynamicStack count={roughDeckCount} type="deck" />
@@ -257,8 +269,14 @@ const SortingAnimation: React.FC = () => {
             {/* FINE PHASE */}
             <div
                 data-testid="phase-2"
+                style={{
+                    transform:
+                        phase === 'FINE'
+                            ? `scale(${finalScale}) translateY(${isDesktop ? '-8px' : '-8px'})`
+                            : `scale(${finalScale - 0.1})`,
+                }}
                 className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-700 ease-in-out
-                ${phase === 'FINE' ? 'opacity-100 scale-[2.0] md:scale-[2.0] -translate-y-8 md:-translate-y-12 z-20' : 'opacity-0 scale-[1.9] z-10'}`}
+                ${phase === 'FINE' ? 'opacity-100 z-20' : 'opacity-0 z-10'}`}
             >
                 <div
                     className="absolute z-10 flex items-end justify-center left-1/2"
@@ -384,7 +402,7 @@ const SortingAnimation: React.FC = () => {
                 </div>
             </div>
 
-            <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none">
+            <div className="absolute bottom-0 md:-bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50 pointer-events-none">
                 <div
                     className={`transition-all duration-500 rounded-full w-2.5 h-2.5 border ${phase === 'ROUGH' ? 'bg-blue-600 border-blue-600 shadow-md scale-110' : 'bg-slate-100 border-slate-300'}`}
                 />

@@ -4,42 +4,20 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import i18n from '../i18n';
 import type { StudyConfig } from '../schemas/study';
 import { applyStudyOverrides, resetBaseLocales } from './i18nOverrides';
 
-// Mock the locales to keep tests stable and fast
-vi.mock('../locales/en.json', () => ({
-    default: {
-        common: {
-            agree: 'Agree',
-            disagree: 'Disagree',
-        },
-    },
-}));
-
-vi.mock('../locales/fr.json', () => ({
-    default: {
-        common: {
-            agree: "D'accord",
-            disagree: "Pas d'accord",
-        },
-    },
-}));
-
-vi.mock('../locales/fi.json', () => ({
-    default: {
-        common: {
-            agree: 'Samaa mieltä',
-            disagree: 'Eri mieltä',
-        },
-    },
-}));
-
-// Mock i18next functions we are using
-vi.spyOn(i18n, 'addResourceBundle');
-
 describe('i18nOverrides utility', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        // Setup spies on i18n methods
+        vi.spyOn(i18n, 'addResourceBundle');
+        vi.spyOn(i18n, 'removeResourceBundle');
+        vi.spyOn(i18n, 'reloadResources');
+    });
+
     it('should apply study overrides from config successfully', () => {
         const config = {
             ui_labels: { 'common.next': 'Localized Next' },
@@ -74,8 +52,6 @@ describe('i18nOverrides utility', () => {
     });
 
     it('should do nothing if labels are empty', () => {
-        vi.clearAllMocks();
-
         applyStudyOverrides('en', {});
         applyStudyOverrides('en', undefined);
 
@@ -83,31 +59,15 @@ describe('i18nOverrides utility', () => {
     });
 
     it('should reset base locales to original state', () => {
-        vi.clearAllMocks();
-
         resetBaseLocales();
 
-        // Check once for each supported language
-        expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-            'en',
-            'translation',
-            expect.any(Object),
-            true,
-            true
-        );
-        expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-            'fr',
-            'translation',
-            expect.any(Object),
-            true,
-            true
-        );
-        expect(i18n.addResourceBundle).toHaveBeenCalledWith(
-            'fi',
-            'translation',
-            expect.any(Object),
-            true,
-            true
-        );
+        const langs = ['en', 'fr', 'fi'];
+
+        // Check for each supported language
+        for (const lang of langs) {
+            expect(i18n.removeResourceBundle).toHaveBeenCalledWith(lang, 'translation');
+        }
+
+        expect(i18n.reloadResources).toHaveBeenCalledWith(langs, ['translation']);
     });
 });

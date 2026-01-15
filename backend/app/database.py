@@ -4,21 +4,15 @@
 
 """Database configuration and session management."""
 
-import os
-from typing import Any
+from typing import Any, cast
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from app.core.config import settings
 
-# For local development with SQLite
-# On Scalingo/Production, this will be provided via DATABASE_URL
-# Ensure DB path is absolute to avoid CWD issues
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(BASE_DIR, "q_method.db")
-
-SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
+SQLALCHEMY_DATABASE_URL = cast(str, settings.DATABASE_URL)
 
 # Fix for SQLAlchemy + asyncpg: "postgres://" or "postgresql://" -> "postgresql+asyncpg://"
 if SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
@@ -33,8 +27,6 @@ elif SQLALCHEMY_DATABASE_URL and SQLALCHEMY_DATABASE_URL.startswith("postgresql:
 # asyncpg doesn't support the 'sslmode' query parameter.
 # We strip it if present to avoid TypeError.
 if "sslmode=" in SQLALCHEMY_DATABASE_URL:
-    from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
-
     u = urlparse(SQLALCHEMY_DATABASE_URL)
     q = parse_qs(u.query)
     q.pop("sslmode", None)
@@ -42,20 +34,24 @@ if "sslmode=" in SQLALCHEMY_DATABASE_URL:
 
 engine_kwargs: dict[str, Any] = {
     "echo": False,
+    "pool_size": 20,
+    "max_overflow": 40,
+    "pool_timeout": 30,
+    "pool_recycle": 1800,
+    "pool_pre_ping": True,  # Detect disconnected connections
 }
 
-# SQLite doesn't support these pool settings
-if not SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
-    engine_kwargs.update(
-        {
-            "pool_size": 10,
-            "max_overflow": 20,
-            "pool_timeout": 30,
-            "pool_recycle": 1800,
+# Add strict statement timeout for production
+if "postgre" in SQLALCHEMY_DATABASE_URL:
+    engine_kwargs["connect_args"] = {
+        "server_settings": {
+            "statement_timeout": "30000",  # 30s timeout per query
+            "idle_in_transaction_session_timeout": "60000",  # 60s max idle tx
         }
-    )
+    }
 
 engine = create_async_engine(SQLALCHEMY_DATABASE_URL, **engine_kwargs)
+
 
 SessionLocal = async_sessionmaker(
     autocommit=False,

@@ -4,11 +4,16 @@
  * Open-Q API
  * OpenAPI spec version: 0.1.0
  */
+import type { TokenAccessToken } from './tokenAccessToken';
+import type { TokenTokenType } from './tokenTokenType';
+import type { TokenTempToken } from './tokenTempToken';
 
 /**
- * Schema for returning an access token.
+ * Schema for returning an access token or 2FA requirement.
  */
 export interface Token {
-    access_token: string;
-    token_type: string;
+    access_token?: TokenAccessToken;
+    token_type?: TokenTokenType;
+    requires_2fa?: boolean;
+    temp_token?: TokenTempToken;
 }

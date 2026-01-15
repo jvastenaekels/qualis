@@ -5,37 +5,31 @@
  */
 
 import i18n from 'i18next';
+import HttpBackend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
-import en from './locales/en.json';
-import fi from './locales/fi.json';
-import fr from './locales/fr.json';
-
 i18n
+    // load translation using http -> see /public/locales
+    // (tip: move them in a JSON file and import them, or even better, load them from a backend)
+    .use(HttpBackend)
     // detect user language
     .use(LanguageDetector)
     // pass the i18n instance to react-i18next.
     .use(initReactI18next)
     // init i18next
+    // for all options read: https://www.i18next.com/overview/configuration-options
     .init({
-        resources: {
-            en: {
-                translation: en,
-            },
-            fr: {
-                translation: fr,
-            },
-            fi: {
-                translation: fi,
-            },
-        },
         fallbackLng: 'en',
         supportedLngs: ['en', 'fr', 'fi'], // Allow list
-        debug: false, // Set to true for debugging if needed
+        debug: false,
 
         interpolation: {
             escapeValue: false, // not needed for react as it escapes by default
+        },
+
+        backend: {
+            loadPath: '/locales/{{lng}}/{{ns}}.json',
         },
 
         detection: {

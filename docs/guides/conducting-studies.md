@@ -13,18 +13,34 @@ Open-Q streamlines the traditional Q-sort process into a modern, digital experie
 5.  **Phase 3: Fine Sort (The Grid)**: Participants place statements into a forced distribution grid.
 6.  **Phase 4: Post-sort (Reflections)**: Participants provide qualitative feedback on their placements.
 
-## 🛠️ Configuring a Study
+### Recruitment Analytics
 
-Currently, studies are configured via the database. For technical setup, refer to the [Configuration Reference](CONFIG_REFERENCE.md).
+Track your participant conversion funnel in real-time on the **Recruitment** page:
 
-### Using `seed.py` as a Template
+- **Started**: Participants who accessed your study via a recruitment link.
+- **Submitted**: Participants who fully completed the sorting session.
+- **Success Rate**: The percentage of starts that resulted in a submission.
 
-For now, the easiest way to create or modify a study is by editing `backend/seed.py`. This script serves as a living example of how to:
+> [!TIP]
+> Use the **Recruitment Funnel** chart to identify exactly where participants are dropping off (e.g., after the welcome page vs. during the fine sort).
 
-- Define study titles and descriptions in multiple languages.
-- Set up the grid dimensions.
-- Customize the pre-sort and post-sort questions.
-- Add your Q-set (statements).
+### Data Analysis & Quality Control
+
+Access the **Analytics** and **Exports** tabs for deeper insights:
+
+1.  **Consensus & Controversy**: Identify which statements show high agreement vs. high polarization across your cohort.
+2.  **Duration Auditing**: Identify "suspect" participants who completed the task too quickly (speeders) to ensure your factor analysis is based on high-quality engagement.
+3.  **Visual Audit**: Reconstruct individual Q-sorts visually to look for patterns or anomalies before exporting for factor analysis.
+
+### Study Access Security
+
+You can restrict access to your study in two ways:
+
+1.  **Public Access**: Anyone with the link can participate.
+2.  **Password Protected**: Participants must enter a broad "access password" before they can view the study configuration (Consent, Statements, etc.).
+
+> [!NOTE]
+> Passwords can be set or changed at any time in the **Design** tab of your study.
 
 ### Tips for a Great Q-Sort
 
@@ -39,4 +55,4 @@ Once your study is "active", every completed sort by a participant is stored as 
 - Participants receive a **Confirmation Code** at the end of the study.
 - All data is anonymized by default.
 
-For details on how to retrieve this data, see the [Data Export Guide](DATA_EXPORT.md).
+For details on how to retrieve this data, see the [Data Export Guide](data-export.md).

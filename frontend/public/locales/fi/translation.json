@@ -1,0 +1,1249 @@
+{
+  "common": {
+    "agree": "Jokseenkin samaa mieltä",
+    "disagree": "Jokseenkin eri mieltä",
+    "neutral": "Neutraali",
+    "undo": "Kumoa",
+    "next": "Seuraava",
+    "submit": "Lähetä vastaukset",
+    "continue": "Jatka",
+    "loading": "Ladataan...",
+    "lang_code": "fi",
+    "attention": "Huomio",
+    "error": "Virhe",
+    "submitting": "Lähetetään...",
+    "cards": "väitettä",
+    "close": "Sulje",
+    "optional": "Valinnainen",
+    "processing": "Käsitellään...",
+    "statement": "Väite",
+    "step": "Vaihe",
+    "back": "Takaisin",
+    "cancel": "Peruuta",
+    "slots": "paikkaa",
+    "workspace_label": "Työtila",
+    "reduce": "Vähennä",
+    "expand": "Laajenna",
+    "errors": {
+      "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
+      "not_found": "Tutkimusta ei löytynyt.",
+      "validation": "Järjestelmävirhe: Tietojen vahvistus epäonnistui.",
+      "unknown": "Tapahtui odottamaton virhe.",
+      "retry": "Yritä uudelleen",
+      "min": "Arvon on oltava vähintään {{min}}",
+      "max": "Arvon on oltava enintään {{max}}",
+      "404": {
+        "title": "Sivua ei löytynyt",
+        "message": "Etsimääsi sivua tai tutkimusta ei ole olemassa."
+      },
+      "429": {
+        "title": "Liikaa pyyntöjä",
+        "message": "Toimit liian nopeasti. Odota hetki."
+      },
+      "500": {
+        "title": "Palvelinvirhe",
+        "message": "Palvelimellamme ilmeni ongelma. Yritä myöhemmin uudelleen."
+      },
+      "network_title": "Yhteys katkesi",
+      "home": "Siirry etusivulle",
+      "reset": "Nollaa istunto",
+      "default_title": "Hups! Jotain meni pieleen.",
+      "study_not_found": {
+        "title": "Tutkimusta ei löytynyt",
+        "message": "Emme löytäneet tutkimusta tällä nimellä. Tarkista osoite tai ota yhteyttä tutkijaan.",
+        "action": "Siirry etusivulle"
+      }
+    },
+    "status": {
+      "draft": {
+        "title": "Tutkimus valmisteilla",
+        "message": "Tämä tutkimus ei ole vielä osallistuttavissa. Ole hyvä ja palaa myöhemmin.",
+        "action": "Siirry etusivulle"
+      },
+      "steps": {
+        "draft": {
+          "label": "Luonnos",
+          "description": "Määritys ja suunnittelu"
+        },
+        "active": {
+          "label": "Aktiivinen",
+          "description": "Vastausten kerääminen"
+        },
+        "paused": {
+          "label": "Tauolla",
+          "description": "Odottaa"
+        },
+        "closed": {
+          "label": "Suljettu",
+          "description": "Analyysi ja vienti"
+        }
+      },
+      "paused": {
+        "title": "Huoltotauko",
+        "message": "Tiedonkeruu on tilapäisesti keskeytetty huollon ajaksi. Palaamme pian.",
+        "action": "Yritä uudelleen"
+      },
+      "closed": {
+        "title": "Tiedonkeruu päättynyt",
+        "message": "Tämä tutkimus on suljettu. Osallistuminen ei ole enää mahdollista.",
+        "action": "Siirry etusivulle"
+      }
+    }
+  },
+  "layout": {
+    "title": "Open-Q",
+    "preparing": "Valmistellaan tutkimusistuntoa...",
+    "pilot_mode": "Pilottitila: Muutokset ovat väliaikaisia eikä tietoja tallenneta",
+    "default_study_title": "Q-metodologinen tutkimus",
+    "loading_content": "Ladataan tutkimuksen sisältöä...",
+    "change_lang_title": "Vaihda kieli",
+    "steps": {
+      "welcome": "Tervetuloa",
+      "presort": "Pre-sort",
+      "rough": "Karkea lajittelu",
+      "fine": "Hieno lajittelu",
+      "review": "Post-sort"
+    },
+    "mobile_step": "Vaihe",
+    "navigation": "Navigointi",
+    "language": "Suomi"
+  },
+  "study": {
+    "help": {
+      "title": "Apua & Tietoa",
+      "trigger": "Apua",
+      "what": "Mitä kysymme",
+      "why": "Miksi se on tärkeää",
+      "step_welcome": {
+        "what": "Tutustu tutkimuksen tavoitteisiin ja vahvista vapaaehtoinen osallistumisesi.",
+        "why": "Varmistaa, että olet täysin tietoinen ja olet suostunut tutkimusprosessiin."
+      },
+      "step_presort": {
+        "what": "Vastaa muutamaan nopeaan kysymykseen profiilistasi.",
+        "why": "Auttaa meitä ymmärtämään, miten eri näkökulmat korreloivat osallistujien taustojen kanssa."
+      },
+      "step_rough": {
+        "what": "Lajittele väittämät spontaanisti kolmeen luokkaan: samaa mieltä, neutraali ja eri mieltä.",
+        "why": "Tallentaa välittömän, intuitiivisen reaktiosi tutkimuksen keskeisiin teemoihin."
+      },
+      "step_fine": {
+        "what": "Jaa väittämät ruudukkoon samaa mieltä olemisen tasosi perusteella.",
+        "why": "Luo jäsennellyn, mitattavissa olevan kartan erityisestä näkökulmastasi."
+      },
+      "step_post": {
+        "what": "Tarkista lopullinen lajittelusi ja anna halutessasi lisäpohdintoja.",
+        "why": "Mahdollistaa näkökulmasi selventämisen ja rikastuttaa tietoja laadullisilla yksityiskohdilla."
+      }
+    },
+    "steps": {
+      "presort": "Esikysely",
+      "rough": "Karkea lajittelu",
+      "fine": "Ruudukkoasettelu",
+      "post": "Lopullinen arviointi"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Järjestelmänvalvojan kirjautuminen",
+      "email_label": "Sähköpostiosoite",
+      "password_label": "Salasana",
+      "submit": "Jatka",
+      "forgot_password": "Unohditko?",
+      "loading": "Tunnistaudutaan...",
+      "subtitle": "Syötä tunnistetietosi tutkimusten hallintaa varten",
+      "card_title": "Kirjaudu sisään",
+      "card_description": "Suojattu pääsy tutkimuksen hallintapaneeliin",
+      "privacy": "Kirjautumalla sisään hyväksyt käyttöehdot ja tietosuojakäytäntömme.",
+      "powered_by": "Tarjoaa",
+      "welcome_back": "Tervetuloa takaisin!",
+      "error_401": "Virheellinen sähköposti tai salasana",
+      "error_generic": "Jotain meni vikaan. Yritä uudelleen."
+    },
+    "register": {
+      "title": "Luo tili",
+      "subtitle": "Liity tutkimusprojektiin",
+      "secure_invitation": "Suojattu kutsu",
+      "invitation_to": "Kutsu kohteeseen:",
+      "study_label": "Tutkimus",
+      "role_label": "Rooli",
+      "email_label": "Sähköpostiosoite",
+      "password_label": "Valitse salasana",
+      "confirm_password_label": "Vahvista salasana",
+      "placeholder_password": "••••••••",
+      "submit": "Viimeistele rekisteröinti",
+      "loading": "Luodaan tiliä...",
+      "success_title": "Tervetuloa mukaan!",
+      "success_desc": "Tilisi on luotu ja linkitetty tutkimukseen.",
+      "success_cta": "Siirry hallintapaneeliin",
+      "success_hint": "Voit nyt kirjautua hallintapaneeliin aloittaaksesi yhteistyön.",
+      "invalid_title": "Virheellinen kutsu",
+      "invalid_desc": "Tämä kutsulinkki on virheellinen tai vanhentunut.",
+      "missing_token_title": "Puuttuva tunnus",
+      "missing_token_desc": "Tämä sivu vaatii voimassa olevan kutsutunnuksen. Tarkista saamasi linkki.",
+      "verifying": "Vahvistetaan kutsuasi...",
+      "privacy_hint": "Rekisteröitymällä sitoudut noudattamaan tälle tutkimukselle määritettyjä tutkimuseettisiä ohjeita.",
+      "errors": {
+        "password_mismatch": "Salasanat eivät täsmää",
+        "generic_fail": "Rekisteröityminen epäonnistui"
+      }
+    }
+  },
+  "welcome": {
+    "start": "Aloita",
+    "consent": {
+      "label": "Olen lukenut yllä olevat tiedot ja suostun osallistumaan tähän tutkimukseen.",
+      "error": "Hyväksy ehdot jatkaaksesi."
+    },
+    "reset_confirm": "Oletko varma, että haluat aloittaa uuden istunnon? Tämä poistaa nykyisen edistymisesi.",
+    "restart": "Aloita uusi istunto",
+    "preview_title": "Esikatselu",
+    "conducted_by": "Tämän tutkimuksen toteuttaa",
+    "how_it_works": "Tutkimuksen kulku",
+    "objective_label": "Tutkimuksen tavoite",
+    "instructions_label": "Kulku",
+    "default_instructions": "1. **Tutustutaanpa hieman:** muutamia nopeita kysymyksiä, jotta ymmärrämme paremmin taustaasi.\n2. **Ensimmäiset mielikuvat:** tutustu väitteisiin ja kerro välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).\n3. **Oma näkemyksesi:** tarkenna ajatuksiasi asettamalla kukin väite ruudukkoon niin, että se heijastaa juuri sinun näkökulmaasi.\n4. **Perustelut:** muutama sana tärkeimpien valintojesi selittämiseksi.",
+    "steps": {
+      "profile": {
+        "title": "Tutustutaan",
+        "description": "Muutama nopea kysymys taustasi ymmärtämiseksi."
+      },
+      "rough": {
+        "title": "Ensivaikutelma",
+        "description": "Tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä)."
+      },
+      "fine": {
+        "title": "Näkökulmasi",
+        "description": "Aseta väittämät ruudukkoon tarkentaaksesi näkökulmaasi, priorisoimalla itsellesi tärkeimmät asiat."
+      },
+      "post": {
+        "title": "Miksi",
+        "description": "Muutama sana perustellaksesi merkittävimmät valintasi."
+      }
+    }
+  },
+  "consent": {
+    "title": "Suostumus osallistumiseen",
+    "subtitle": "Lue seuraavat tiedot huolellisesti.",
+    "default_text": "**Ymmärryksen vahvistaminen:** Rastittamalla alla olevan ruudun vahvistat lukeneesi tervetuloa-sivulla kuvatut tutkimuksen tavoitteet ja menettelyt. Ymmärrät, että tämä tehtävä sisältää väitteiden lajittelua henkilökohtaisen näkökulmasi mallintamiseksi ja että oikeita tai vääriä vastauksia ei ole.\n\n**Luottamuksellisuus ja tietosuoja:** Osallistumisesi on anonyymiä. Vastauksillesi annetaan koodi, eikä niitä yhdistetä henkilöllisyyteesi missään raporteissa tai julkaisuissa. Kerätyt tiedot analysoidaan yhdessä jaettujen näkökulmien (faktoreiden) tunnistamiseksi. Lajittelun jälkeisessä vaiheessa annettuja kirjallisia kommentteja voidaan lainata nimettömästi näiden näkökantojen havainnollistamiseksi.\n\n**Vapaaehtoinen osallistuminen:** Osallistuminen on täysin vapaaehtoista. Sinulla on oikeus keskeyttää lajitteluprosessi ja sulkea selain milloin tahansa ilman seuraamuksia. Jos keskeytät ennen lähettämistä, osittaisia tietojasi ei säilytetä."
+  },
+  "presort": {
+    "title": "Tietoa sinusta",
+    "description": "Ole hyvä ja vastaa muutamaan kysymykseen auttaaksesi meitä ymmärtämään näkökulmaasi.",
+    "submit": "Jatka lajitteluun",
+    "select_placeholder": "Valitse...",
+    "error_required": "Tämä kysymys on pakollinen."
+  },
+  "rough": {
+    "header": {
+      "subtitle": "Pyyhkäise vasemmalle (Eri mieltä), oikealle (Samaa mieltä), tai alas (Neutraali).",
+      "hint": "Tämä on spontaania – voit muuttaa mieltäsi heti seuraavassa vaiheessa."
+    },
+    "complete": {
+      "title": "Ensimmäinen vaihe valmis",
+      "subtitle": "Nyt tarkennetaan nyansseja.",
+      "button": "Jatka Q-lajitteluun"
+    },
+    "instructions": {
+      "desktop_tip": "Vedä, paina tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"
+    }
+  },
+  "fine": {
+    "deck": {
+      "title": "Vapaat väitteet",
+      "all_placed": "Kaikki väitteet on lajiteltu"
+    },
+    "toolbar": {
+      "preview": "Väitteen esikatselu",
+      "zoom_in": "Lähennä",
+      "zoom_out": "Loitonna",
+      "fit_screen": "Sovita näyttöön",
+      "label": "Grid controls"
+    },
+    "grid": {
+      "label": "Lajitteluruudukko",
+      "column": "Sarake",
+      "slot": "Paikka",
+      "in_column": "sarakkeessa"
+    },
+    "legend": {
+      "disagree": "Täysin eri mieltä",
+      "neutral": "Neutraali",
+      "agree": "Eniten samaa mieltä",
+      "label": "Spektrin selite"
+    },
+    "actions": {
+      "validate": "Vahvista lajittelu",
+      "finish": "Lopeta lajittelu",
+      "ready": "Tarkastele näkemystäni",
+      "not_ready": "Sijoita kaikki väitteet jatkaaksesi"
+    },
+    "header": {
+      "title": "Sijoita väitteet ruudukkoon"
+    },
+    "workbench": {
+      "active_card": "Aktiivinen väite",
+      "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
+      "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
+      "initial_instruction": "Vedä tai napauta väitettä",
+      "help": "Miten tämä toimii?",
+      "methodology": {
+        "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
+        "vertical": "Samassa sarakkeessa järjestyksellä ylhäältä alas ei ole väliä.",
+        "constraint": "Kaikki pitää mahduttaa! Se voi olla palapeliä, mutta tarkoitus on priorisoida.",
+        "relative": "Muistutus: väitteet lajitellaan suhteessa toisiinsa.",
+        "zoom": "Voit zoomata ruudukon eri osiin nähdäksesi paremmin.",
+        "flexibility": "Mikään ei ole lopullista: voit siirtää kortteja tai palauttaa ne pakkaan milloin tahansa."
+      }
+    }
+  },
+  "post": {
+    "title": "Lopuksi",
+    "description": "Olet melkein valmis! Kommenttisi merkittävimmistä väitteistä ovat erittäin tärkeitä analyysillemme.",
+    "extreme": {
+      "why": "Miksi valitsit tämän väittämän juuri tähän? Miten se on merkityksellinen sinulle?",
+      "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
+      "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",
+      "label_agree": "Vahvimmin samaa mieltä",
+      "label_disagree": "Vahvimmin eri mieltä"
+    },
+    "optional": {
+      "title": "Lisäkommentit (valinnainen)",
+      "description": "Voit vapaasti kommentoida muita väitteitä tarkentaaksesi valintojasi.",
+      "select_placeholder": "Valitse kommentoitava väite...",
+      "placeholder": "Kommenttisi tähän..."
+    },
+    "submit": "Lähetä vastaukset",
+    "validation_error": "Ole hyvä ja selitä lyhyesti tärkeimmät valintasi jatkaaksesi.",
+    "success": {
+      "title": "Kiitos osallistumisestasi!",
+      "message": "Vastauksesi tutkimukseen on tallennettu.",
+      "id_label": "Vahvistuskoodi"
+    },
+    "contact": {
+      "title": "Tulokset ja yhteystiedot",
+      "email_label": "Sähköpostiosoitteesi (valinnainen)",
+      "email_placeholder": "esimerkki@email.com",
+      "interview_consent": "Suostun siihen, että tutkija ottaa minuun tarvittaessa yhteyttä jatkotoimenpiteitä varten.",
+      "newsletter_consent": "Haluan saada tietoa tutkimuksen tuloksista.",
+      "gdpr_note": "Sähköpostiosoitettasi ei koskaan jaeta julkisesti. Sitä säilytetään vain yllä valittuja tarkoituksia varten."
+    }
+  },
+  "admin": {
+    "study": {
+      "state": {
+        "manage": "Hallitse tutkimuksen kulkua"
+      }
+    },
+    "components": {
+      "markdown": {
+        "label": "Markdown",
+        "tooltip": "Tukee Markdown-muotoilua",
+        "bold": "Lihavointi",
+        "italic": "Kursivointi",
+        "list": "Lista",
+        "link": "Linkki",
+        "edit": "Muokkaa",
+        "preview": "Esikatselu",
+        "empty": "Ei esikatseltavaa sisältöä"
+      },
+      "click_to_edit": "Napsauta muokataksesi"
+    },
+    "layout": {
+      "title": "Admin",
+      "back_home": "Palaa etusivulle",
+      "beta": "Tutkimus beta",
+      "logout": "Kirjaudu ulos",
+      "profile": "Profiili"
+    },
+    "sidebar": {
+      "home": "Hallintapaneeli",
+      "add_study": "Lisää tutkimus",
+      "create_project": "LUO UUSI PROJEKTI",
+      "dashboard": "Kojelauta",
+      "design": "Suunnittelu",
+      "recruit": "Rekrytointi",
+      "data": "Tiedot",
+      "team": "Tiimi",
+      "settings": "Asetukset",
+      "documentation": "Dokumentaatio",
+      "support": "Tuki",
+      "study_management": "Tutkimuksen hallinta",
+      "search": "Hae...",
+      "studies": "Tutkimukset",
+      "select_study_msg": "Valitse tai luo tutkimus aloittaaksesi.",
+      "study": "Tutkimus"
+    },
+    "workspace": {
+      "switcher": {
+        "settings": "Työtilan asetukset",
+        "settings_desc": "Jäsenet ja profiilit",
+        "new_workspace": "Uusi työtila",
+        "new_workspace_desc": "Luo uusi organisaatio"
+      },
+      "roles": {
+        "owner": "Omistaja",
+        "admin": "Ylläpitäjä",
+        "researcher": "Tutkija",
+        "member": "Jäsen"
+      },
+      "create": {
+        "title": "Luo työtila",
+        "description": "Luo uusi organisaatio hallinnoidaksesi tutkimuksiasi ja tiimiäsi.",
+        "card_title": "Työtilan tiedot",
+        "card_description": "Syötä nimi ja URL-tunnus uudelle työtilallesi.",
+        "name_label": "Työtilan nimi",
+        "name_placeholder": "Yliopiston tutkimusryhmäni",
+        "url_label": "Työtilan URL",
+        "url_placeholder": "tutkimusryhma",
+        "url_description": "Tätä käytetään työtilasi URL-osoitteessa.",
+        "cancel": "Peruuta",
+        "create_button": "Luo työtila",
+        "creating": "Luodaan...",
+        "success": "Työtila luotu onnistuneesti",
+        "error": "Työtilan luominen epäonnistui"
+      }
+    },
+    "recruitment": {
+      "title": "Rekrytointi",
+      "description": "Luo turvallisia linkkejä osallistujille ja seuraa rekrytoinnin tehokkuutta reaaliajassa.",
+      "new_link": "Uusi pääsulinkki",
+      "create_title": "Luo pääsulinkejä",
+      "create_description": "Kohdista linkit erityisryhmille tai yleiseen jakeluun. Jokaisella linkillä on eri tietoturva- ja käyttöominaisuudet.",
+      "link_type": "Pääsystrategia",
+      "select_type": "Valitse rekrytointityyppi...",
+      "campaign_name": "Kanava / Kampanjan nimi",
+      "name_placeholder": "esim. LinkedIn, Sähköpostierä A, Opiskelijalista...",
+      "link_count": "Erän koko",
+      "capacity_label": "Maksimilähetykset",
+      "generate_links": "Luo linkit",
+      "no_links": "Ei vielä luotuja rekrytointilinkkejä.",
+      "unnamed": "Nimetön kanava",
+      "revoked": "Pääsy peruutettu",
+      "qr_title": "Jaa pääsykoodi",
+      "qr_desc": "Osallistujat voivat skannata tämän koodin siirtyäkseen suoraan tutkimukseen.",
+      "copy_link": "Kopioi turvallinen URL",
+      "table_title": "Pääsynhallintapaneeli",
+      "table_description": "Aktiiviset kanavat ja linkkien elinkaaren hallinta.",
+      "share_title": "Jaa tutkimus",
+      "share_desc": "Levitä tutkimuslinkkiä kutsuaksesi osallistujia.",
+      "public_url_label": "Julkinen osallistumislinkki",
+      "hide_qr": "Piilota QR",
+      "show_qr": "Näytä QR",
+      "live_study": "Tutkimus käynnissä",
+      "qr_print_hint": "Skannaa tai tulosta tämä koodi fyysisiä materiaaleja varten (esitteet, julisteet).",
+      "analytics_title": "Kampanja-analytiikka",
+      "analytics_desc": "Suorat linkit ja QR-skannaukset seurataan automaattisesti kojelaudalla yläpuolella.",
+      "copy_success": "Linkki kopioitu leikepöydälle",
+      "types": {
+        "public": "Avoin pääsy (Julkinen)",
+        "individual": "Kertakäyttöinen koodi",
+        "limited": "Rajoitettu osallistuminen"
+      },
+      "guidance": {
+        "public": "Paras suurten määrien rekrytointiin. Yksi URL kaikille osallistujille.",
+        "individual": "Maksimaalinen turvallisuus. Luo yksilöllisiä linkkejä, jotka vanhenevat yhden onnistuneen suorituksen jälkeen.",
+        "limited": "Hallittu pääsy. Yksi linkki, joka lakkaa toimimasta tietyn lähetysmäärän jälkeen."
+      },
+      "stats": {
+        "total_links": "Kanavat",
+        "active_channels": "Aktiiviset erät",
+        "started": "Istunnot",
+        "engagements": "Osallistujat",
+        "submitted": "Tiedot",
+        "completions": "Valmiit",
+        "conversion": "Konversio",
+        "efficiency": "Tehokkuus"
+      },
+      "table": {
+        "name": "Kampanja",
+        "type": "Tyyppi",
+        "token": "Tunniste",
+        "usage": "Kapasiteetti",
+        "status": "Tila",
+        "actions": "Hallitse"
+      },
+      "status": {
+        "public": "Julkinen",
+        "individual": "Yksilöllinen",
+        "limited": "Rajoitettu"
+      }
+    },
+    "breadcrumbs": {
+      "admin": "Admin",
+      "dashboard": "Yhteenveto",
+      "study_dashboard": "Yhteenveto",
+      "design": "Suunnittelu",
+      "participants": "Osallistujat",
+      "team": "Tiimi",
+      "recruitment": "Rekrytointi",
+      "exports": "Tiedot",
+      "settings": "Asetukset"
+    },
+    "command_menu": {
+      "title": "Globaali komentovalikko",
+      "placeholder": "Kirjoita komento tai hae...",
+      "no_results": "Tuloksia ei löytynyt.",
+      "switch_workspace": "Vaihda työtilaa",
+      "switch_study": "Vaihda tutkimusta",
+      "study_actions": "Tutkimuksen toiminnot",
+      "system": "Järjestelmä",
+      "no_studies": "Ei tutkimuksia tässä työtilassa.",
+      "open_dashboard": "Avaa kojelauta",
+      "design_study": "Tutkimuksen suunnittelu",
+      "collaborators": "Yhteistyökumppanit",
+      "copy_link": "Kopioi julkinen linkki",
+      "toggle_theme": "Vaihda teemaa",
+      "logout": "Kirjaudu ulos",
+      "search_label": "Hae tai suorita komentoja",
+      "to_open": "avataksesi",
+      "active": "Aktiivinen"
+    },
+    "dashboard": {
+      "title": "Työtilan kojelauta",
+      "welcome": "Tervetuloa takaisin,",
+      "snapshot": "Tässä on yhteenveto tutkimustoiminnastasi.",
+      "create_study": "Luo tutkimus",
+      "total_studies": "Tutkimuksia yhteensä",
+      "across_statuses": "Kaikissa tiloissa",
+      "active_data_collection": "Aktiivinen tiedonkeruu",
+      "receiving_responses": "Tutkimukset, jotka vastaanottavat vastauksia",
+      "recent_studies": "Viimeisimmät tutkimukset",
+      "recent_description": "Luettelo viimeksi päivitetyistä tutkimuksistasi.",
+      "created": "Luotu",
+      "no_studies": "Ei tutkimuksia. Luo ensimmäinen tutkimuksesi aloittaaksesi!"
+    },
+    "dialogs": {
+      "create_study": {
+        "title": "Luo uusi tutkimus",
+        "description": "Aloita uusi Q-metodologinen tutkimus. Voit määrittää väitteet ja asetukset myöhemmin.",
+        "study_title": "Tutkimuksen otsikko",
+        "study_title_placeholder": "esim. Näkökulmia tekoälyyn",
+        "url_slug": "URL-tunniste",
+        "url_slug_placeholder": "esim. ai-perspectives-2025",
+        "cancel": "Peruuta",
+        "create": "Luo tutkimus",
+        "success": "Tutkimus luotu onnistuneesti",
+        "error": "Tutkimuksen luominen epäonnistui",
+        "languages": "Kielet",
+        "languages_desc": "Valitse aktivoitavat kielet. Sisältö alustetaan paikallisilla oletusteksteillä."
+      }
+    },
+    "validation": {
+      "required": "Pakollinen",
+      "slug_min": "Tunnisteen on oltava vähintään 3 merkkiä",
+      "slug_regex": "Tunniste saa sisältää vain pieniä kirjaimia, numeroita ja väliviivoja"
+    },
+    "study_overview": {
+      "title": "Hallintapaneeli",
+      "subtitle": "Reaaliaikainen analytiikka ja osallistujien esikatselu.",
+      "sample_size": "Otoskoko (N)",
+      "valid": "kelvollinen",
+      "completion_rate": "Konversioprosentti",
+      "active": "aktiivinen",
+      "mobile": "mobiili",
+      "median_duration": "Mediaanikesto",
+      "time_to_complete": "Aika valmistua",
+      "recent_activity": "Viimeaikainen toiminta",
+      "latest_submissions": "Viimeisimmät lähetykset (5 / {{total}})",
+      "recently_completed": "Äskettäin valmistuneet",
+      "view_all": "Näytä kaikki osallistujat ja tiedot",
+      "no_participants": "Ei vielä osallistujia.",
+      "view_data": "Näytä",
+      "submitted": "Lähetetty",
+      "edit_design": "Muokkaa suunnittelua",
+      "steps": {
+        "welcome": "Tervetuloa",
+        "consent": "Suostumus",
+        "rough_sort": "Alustava lajittelu",
+        "fine_sort": "Hieno lajittelu",
+        "final": "Viimeiset vaiheet"
+      }
+    },
+    "study_status": {
+      "dialog": {
+        "draft": {
+          "title": "Palauta luonnokseksi?",
+          "desc": "Tämä pysäyttää tiedonkeruun, mutta antaa sinun muokata tutkimuksen suunnittelua. Olemassa olevat tiedot säilytetään.",
+          "action": "Palauta luonnokseksi"
+        },
+        "active": {
+          "title": "Julkaise tutkimus?",
+          "desc": "Tutkimuksen aktivointi avaa sen osallistujille.",
+          "action": "Aseta aktiiviseksi"
+        },
+        "paused": {
+          "title": "Keskeytä tutkimus?",
+          "desc": "Osallistujat eivät pääse tutkimukseen sen ollessa keskeytettynä. Voit jatkaa myöhemmin.",
+          "action": "Keskeytä tutkimus"
+        },
+        "closed": {
+          "title": "Sulje tutkimus?",
+          "desc": "Tämä estää uusien osallistujien pääsyn. Olemassa olevat istunnot voivat silti päättyä. Voit avata uudelleen myöhemmin.",
+          "action": "Sulje tutkimus"
+        }
+      },
+      "steps": {
+        "draft": {
+          "label": "Luonnos",
+          "description": "Määritys ja suunnittelu"
+        },
+        "active": {
+          "label": "Aktiivinen",
+          "description": "Vastausten kerääminen"
+        },
+        "paused": {
+          "label": "Tauolla",
+          "description": "Odottaa"
+        },
+        "closed": {
+          "label": "Suljettu",
+          "description": "Analyysi ja vienti"
+        }
+      },
+      "notifications": {
+        "success": {
+          "draft": "Tutkimus palautettu onnistuneesti luonnokseksi",
+          "active": "Tutkimus julkaistu onnistuneesti",
+          "paused": "Tutkimus keskeytetty onnistuneesti",
+          "closed": "Tutkimus suljettu onnistuneesti"
+        },
+        "error": "Tutkimuksen tilan muuttaminen epäonnistui",
+        "state_changed_active": "Tutkimus on nyt aktiivinen!"
+      },
+      "state": {
+        "activate": "Aktivoi tutkimus",
+        "manage": "Hallitse tilaa"
+      }
+    },
+    "team": {
+      "title": "Tutkimusryhmä",
+      "description": "Hallitse yhteistyökumppaneita ja tutkimustason pääsynhallintaa.",
+      "invite_title": "Kutsu yhteistyökumppani",
+      "invite_description": "Luo turvallinen linkki kutsuaksesi uuden jäsenen tähän tutkimukseen.",
+      "email_label": "Sähköpostiosoite",
+      "role_label": "Rooli",
+      "select_role": "Valitse rooli",
+      "generate_link": "Luo linkki",
+      "share_label": "Jaa tämä linkki kutsutun kanssa:",
+      "copy_success": "Linkki kopioitu leikepöydälle",
+      "invite_success": "Kutsulinkki luotu!",
+      "invite_error": "Kutsun luominen epäonnistui",
+      "list_title": "Yhteistyökumppanit",
+      "list_description": "Hallitse olemassa olevien yhteistyökumppaneiden pääsyä.",
+      "added_on": "Lisätty",
+      "headers": {
+        "collaborator": "Yhteistyökumppani",
+        "role": "Rooli",
+        "actions": "Toiminnot"
+      },
+      "roles": {
+        "owner": "Omistaja (täysi hallinta)",
+        "editor": "Muokkaaja (suunnittelu ja analyysi)",
+        "viewer": "Katselija (vain luku)",
+        "owner_badge": "OMISTAJA",
+        "editor_badge": "MUOKKAAJA",
+        "viewer_badge": "KATSELIJA"
+      },
+      "permissions": {
+        "owner": "Voi poistaa tutkimuksen ja hallita tiimiä.",
+        "editor": "Voi muokata suunnittelua ja tarkastella tuloksia.",
+        "viewer": "Vain luku -oikeus kaikkiin moduuleihin."
+      }
+    },
+    "design": {
+      "translation_needed": "Tarkistus vaaditaan (Kopio)",
+      "translation_needed_desc": "Tämä sisältö on kopioitu automaattisesti toisesta kielestä. Tarkista ja lokalisoi se.",
+      "guidance": {
+        "intro_title": "Tervetuloa Studioon",
+        "intro_desc": "Aloita määrittelemällä tutkimuksesi tarkoitus. Nämä tiedot näytetään osallistujille ennen lajitteluprosessin aloittamista.",
+        "qsort_title": "Väittämien ja ruudukon tasapaino",
+        "qsort_desc": "Varmista, että ruudukon kapasiteetti vastaa tarkalleen väittämien määrää. Tasapainoinen Q-sarja sisältää yleensä 30–60 kohtaa luotettavaa faktorianalyysiä varten."
+      },
+      "checklist": {
+        "title": "Tarkistuslista",
+        "statements": "Väittämät",
+        "grid_balance": "Ruudukko tasapainossa",
+        "branding": "Logo & Värit",
+        "instructions": "Ohjeistukset",
+        "ready": "Kaikki valmiina. Voit julkaista tutkimuksen!",
+        "pending": "Täydennä vaaditut vaiheet yllä julkaistaksesi.",
+        "study_title": "Tutkimuksen otsikko",
+        "consent_defined": "Suostumuslomake",
+        "progress": "Edistyminen",
+        "languages": "Kielet",
+        "status_ready": "Valmis",
+        "status_pending": "Odottaa",
+        "required": "Pakollinen"
+      },
+      "tips": {
+        "title": "Quick Tip",
+        "pilot": "Always run a test sort yourself before sharing the link with participants."
+      },
+      "toolbar": {
+        "title": "Suunnittelu",
+        "back": "Takaisin",
+        "preview": "Näytä esikatselu",
+        "hide_preview": "Piilota esikatselu",
+        "popout": "Avaa esikatselu uuteen ikkunaan",
+        "discard": "Hylkää muutokset",
+        "test_run": "Koeajo",
+        "save": "Tallenna",
+        "closed": "Suljettu",
+        "back_to_study": "Palaa tutkimukseen",
+        "editing_language": "Muokkauskieli",
+        "manage_langs": "Kielten hallinta",
+        "select_lang": "Valitse kieli"
+      },
+      "sync": {
+        "saving": "Tallennetaan...",
+        "error": "Tallennusvirhe",
+        "modified": "Tallentamattomia muutoksia",
+        "synced": "Muutokset tallennettu",
+        "wait_save": "Tallennus käynnissä... odota hetki.",
+        "recovered": "Luonnos palautettu paikallisesta varmuuskopiosta!",
+        "recovery_title": "Tallentamattomia muutoksia löytyi",
+        "recovery_desc": "Löysimme tästä tutkimuksesta paikallisen version, joka on uudempi kuin palvelimella oleva. Haluatko palauttaa sen?",
+        "recovery_restore": "Palauta paikallinen versio",
+        "recovery_discard": "Hylkää paikallinen versio"
+      },
+      "validation": {
+        "failed_title": "Määritys puutteellinen",
+        "failed_desc": "Tutkimustasi ei voida vielä aktivoida. Korjaa seuraavat ongelmat:"
+      },
+      "languages": {
+        "manage_title": "Kielten hallinta",
+        "manage_desc": "Ota käyttöön tai poista käytöstä kielet, jotka osallistujat näkevät tässä tutkimuksessa.",
+        "auto_translate": "Automaattinen käännös",
+        "auto_translate_desc": "Pian voit käyttää tekoälyä kääntääksesi tutkimuksesi automaattisesti yli 30 kielelle.",
+        "activate_title": "Aktivoi kieli",
+        "activate_desc": "Valitse lähdekieli, josta käännökset kopioidaan. Tämä estää tyhjät kentät osallistujille.",
+        "source_label": "Lähdekieli",
+        "copy_notice": "Kaikki kentät kopioidaan. Näet visuaalisen merkin kentissä, jotka vaativat vielä kääntämistä.",
+        "confirm_activate": "Aktivoi ja kopioi"
+      },
+      "tabs": {
+        "welcome": "Tervetuloa",
+        "presort": "Esikysely",
+        "condition": "Ehto",
+        "qsort": "Q-lajittelu",
+        "postsort": "Jälkikysely",
+        "interface": "Käyttöliittymä",
+        "theme": "Teema"
+      },
+      "view_mode": {
+        "mobile": "Mobiilinäkymä",
+        "desktop": "Työpöytänäkymä"
+      },
+      "intro": {
+        "welcome_title": "Tervetuloviesti",
+        "process_title": "Vaiheiden yleiskatsaus",
+        "process_steps": {
+          "title": "Vaiheiden yleiskatsaus",
+          "desc": "Define the phases shown to participants on the welcome page. If left empty, default steps will be used.",
+          "add_step": "Add step",
+          "empty": {
+            "title": "No custom steps defined",
+            "desc": "The study will use the standard Q-methodology workflow (Meet, First impressions, Perspective, Why)."
+          },
+          "fields": {
+            "title": "Step title",
+            "description": "Short description",
+            "icon": "Icon"
+          },
+          "defaults": {
+            "new_step": "New study step",
+            "new_desc": "Explain what the participant will do in this phase."
+          }
+        },
+        "consent_title": "Suostumuslomake",
+        "consent_details": "Suostumuksen tiedot",
+        "fields": {
+          "title": "Tutkimuksen otsikko",
+          "title_placeholder": "Syötä julkinen otsikko...",
+          "subtitle": "Alaotsikko (valinnainen)",
+          "subtitle_placeholder": "Lyhyt iskulause...",
+          "objective": "Tutkimuksen tavoite",
+          "objective_placeholder": "Mikä on tutkimuskysymys tai tarkoitus?",
+          "task_overview": "Johdanto",
+          "task_placeholder": "Kuvaile tutkimuksen kulku tähän (vaiheiden määrä, arvioitu kesto, jne.). Tämä kenttä on valinnainen, jos käytät mukautettuja vaiheita yllä.",
+          "consent_title_label": "Suostumuksen otsikko",
+          "legal_text": "Lakiteksti / sopimus",
+          "legal_placeholder": "Syötä sopimuksen koko teksti..."
+        },
+        "consent_desc": "Osallistujien on hyväksyttävä nämä ehdot ennen aloittamista."
+      },
+      "condition": {
+        "title": "Ohjeistuksen ehto",
+        "label": "Määritä ohjeistuksen ehto",
+        "desc": "Tämä on keskeinen kehote, joka ohjaa osallistujia koko lajitteluprosessin ajan.",
+        "field_label": "Ohjeteksti",
+        "placeholder": "esim. Ole hyvä ja järjestä seuraavat väittämät siitä, minkä kanssa olet eniten samaa mieltä, siihen, minkä kanssa olet eniten eri mieltä",
+        "grid_title": "Ohjeistuksen ehto (Ruudukkolajittelu)",
+        "grid_desc": "Tämä on keskeinen ohje, joka ohjaa osallistujia ruudukkolajittelun aikana.",
+        "pre_title": "Ohjeistus alustavaan lajitteluun",
+        "pre_desc": "Ohje, joka annetaan osallistujille alustavan ryhmittelyn aikana kolmeen pinoon.",
+        "pre_field_label": "Ohjeteksti",
+        "pre_placeholder": "esim. Oman näkemyksesi perusteella, jaa kortit kolmeen pinoon...",
+        "enable_pre": "Ota käyttöön esiohje-vaihe",
+        "pre_label": "Esiohjeen sisältö",
+        "tips": {
+          "title": "Miksi tämä on tärkeää?",
+          "desc": "Q-metodologia käyttää lähes normaalijakaumaa varmistaakseen, että osallistujat tekevät merkityksellisiä erotteluja."
+        }
+      },
+      "questions": {
+        "enable_presort": "Ota esikysely käyttöön",
+        "enable_presort_desc": "Kerää demografisia tietoja tai muita tietoja ennen lajittelutehtävää.",
+        "add_field": "Lisää uusi kenttä",
+        "basic_fields": "Peruskentät",
+        "choice_fields": "Valintakentät",
+        "labels": {
+          "question": "Kysymyksen otsikko",
+          "required": "Pakollinen kenttä",
+          "options": "Vaihtoehdot",
+          "multiple": "(useita valintoja sallittu)",
+          "single": "(yksi valinta)",
+          "placeholder": "Kirjoita kysymyksesi tähän..."
+        },
+        "types": {
+          "text": "Teksti",
+          "long_text": "Pitkä teksti",
+          "number": "Numero",
+          "date": "Päivämäärä",
+          "email": "Sähköposti",
+          "dropdown": "Pudotusvalikko",
+          "radio": "Radio-painike",
+          "checkboxes": "Valintaruudut"
+        },
+        "empty": {
+          "title": "Ei vielä kysymyksiä",
+          "desc": "Klikkaa yllä lisätäksesi ensimmäisen kysymyksen"
+        },
+        "defaults": {
+          "new_question": "Uusi kysymys",
+          "option": "Vaihtoehto",
+          "enter_answer": "Kirjoita vastauksesi...",
+          "untitled": "Nimetön kysymys"
+        },
+        "actions": {
+          "add_option": "Lisää vaihtoehto"
+        }
+      },
+      "qsort": {
+        "tabs": {
+          "statements": "Väittämät",
+          "distribution": "Jakauma"
+        },
+        "bulk": {
+          "title": "Massalisäys (pikaliittäminen)",
+          "desc": "Yksi väittämä per rivi. Tukee \"Koodi: Teksti\" -muotoa.",
+          "replace_all": "Korvaa kaikki",
+          "append": "Lisää luetteloon",
+          "placeholder": "Liitä väittämät tähän...\n1. Ensimmäinen väittämä\n2. Toinen väittämä",
+          "detected": "{{count}} väittämää havaittu",
+          "process_replace": "Käsittele ja korvaa",
+          "process_append": "Käsittele ja lisää"
+        },
+        "set": {
+          "title": "Väittämäjoukko",
+          "clear": "Tyhjennä kaikki",
+          "confirm_clear": "Haluatko varmasti poistaa KAIKKI väittämät? Tätä toimintoa ei voi kumota.",
+          "updated": "Väittämä päivitetty",
+          "cleared": "Kaikki väittämät poistettu",
+          "imported": "{{count}} väittämää tuotu onnistuneesti",
+          "reset_codes": "Reset Codes",
+          "confirm_reset_codes": "Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?",
+          "codes_reset": "Statement codes re-sequenced"
+        },
+        "settings": {
+          "title": "Tutkimusasetukset",
+          "desc": "Määritä, miten väittämät esitetään osallistujille",
+          "show_codes": "Näytä väittämäkoodit",
+          "show_codes_desc": "Näytä koodit (esim. S1, S2) tekstin vieressä."
+        },
+        "grid": {
+          "title": "Pakotettu jakauma -ruudukko",
+          "desc": "Ruudukon muoto pakottaa osallistujat erottelemaan väittämät toisistaan.",
+          "perfect": "Täydellinen tasapaino",
+          "too_many": "{{count}} väitettä liikaa",
+          "stat_count": "{{count}} väitettä",
+          "slot_count": "{{count}} ruutua varattu",
+          "too_few": "{{count}} väitettä puuttuu",
+          "min_reached": "Minimiraja saavutettu (±2)",
+          "max_reached": "Maksimiraja saavutettu (±6)",
+          "remove_extreme_columns": "Poista äärimmäiset sarakkeet",
+          "add_extreme_columns": "Lisää äärimmäisiä sarakkeita",
+          "tooltip_title": "Miksi pakotettu jakauma?",
+          "tooltip_desc": "Q-metodologia käyttää lähes normaalijakaumaa varmistaakseen, että osallistujat tekevät merkityksellisiä erotteluja.",
+          "locked": "Suunnittelu Lukittu",
+          "locked_desc": "Tämä tutkimus ei ole enää luonnostilassa. Muutoksia on rajoitettu tietojen eheyden säilyttämiseksi.",
+          "locked_active": "Tutkimus on Aktiivinen",
+          "locked_active_desc": "Tutkimus kerää parhaillaan tietoja. Muokataksesi suunnittelua, sinun on ensin palautettava se luonnostilaan (varoitus: tämä voi mitätöidä olemassa olevat tulokset).",
+          "locked_paused": "Tutkimus on Keskeytetty",
+          "locked_paused_desc": "Tutkimus on tällä hetkellä keskeytetty. Suunnittelu pysyy lukittuna olemassa olevien tietojen suojaamiseksi.",
+          "locked_closed": "Tutkimus on Suljettu",
+          "locked_closed_desc": "Tämä tutkimus on valmis. Suunnittelu on arkistoitu eikä sitä voi muuttaa.",
+          "mismatch_title": "Ruudukon konfiguraatiovirhe",
+          "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
+          "asymmetric": "Asymmetric",
+          "auto_balance": "Auto-balance",
+          "auto_balance_desc": "Automatically adjust grid to match statement count.",
+          "ideal_shape": "Ideal Shape",
+          "no_statements": "No statements",
+          "reshaped": "Grid reshaped",
+          "statements": "Statements",
+          "symmetric": "Symmetric",
+          "symmetry_lock": "Symmetry Lock",
+          "symmetry_lock_desc": "Keep grid symmetric when adding/removing columns."
+        }
+      },
+      "postsort": {
+        "extreme": {
+          "title": "Ääripäiden sarakkeet",
+          "desc": "Valitse sarakkeet, jotka käynnistävät jatkokysymyksiä.",
+          "no_columns": "Ei valittuja sarakkeita.",
+          "add_label": "Lisää sarake:",
+          "prompt_label": "Kysymys ääripään korteille",
+          "prompt_placeholder": "Miksi sijoitit tämän väittämän tähän?",
+          "add": "Lisää",
+          "select_placeholder": "Valitse..."
+        },
+        "random_comments": {
+          "title": "Salli vapaat kommentit",
+          "desc": "Salli osallistujien lisätä kommentteja mihin tahansa väittämään."
+        },
+        "custom": {
+          "title": "Mukautetut kysymykset",
+          "desc": "Lisää mukautettuja kysymyksiä jälkikyselyyn."
+        },
+        "email": {
+          "title": "Osallistujan seuranta",
+          "desc": "Kerää sähköpostiosoitteita seurantaa tai tuloksia varten.",
+          "interview": "Tarjoa seurantaa",
+          "results": "Tarjoa mahdollisuutta liittyä postituslistalle tutkimuksen tuloksista",
+          "interview_warning": "Huom: Suostumus yhteydenottoon poistaa anonymiteetin tutkijalta.",
+          "results_hint": "Sähköpostia käytetään vain tulosten lähettämiseen, anonymiteetti säilyy."
+        }
+      },
+      "interface": {
+        "title": "Käyttöliittymän mukauttaminen",
+        "desc": "Mukauta käyttöliittymän painikkeita ja tekstejä vastaamaan tutkimuksesi sävyä (esim. muuta \"Samaa mieltä/Eri mieltä\" muotoon \"Tykkään/En tykkää\").",
+        "nav": {
+          "title": "Navigointipainikkeet",
+          "start": "Aloituspainike",
+          "next": "Seuraava vaihe -painike",
+          "submit": "Lähetä-painike",
+          "confirm": "Vahvista lajittelu -painike",
+          "tooltips": {
+            "start": "Painike, joka aloittaa tutkimuksen",
+            "next": "Siirry seuraavaan vaiheeseen",
+            "submit": "Lähetä tulokset lopussa",
+            "confirm": "Yleinen vahvistuspainike"
+          }
+        },
+        "terms": {
+          "title": "Lajittelutermistö",
+          "desc": "Määritä otsikot karkealle lajittelulle ja ruudukon ääripäille.",
+          "rough": "Karkean lajittelun otsikot",
+          "agree": "Samaa mieltä",
+          "neutral": "Neutraali",
+          "disagree": "Eri mieltä",
+          "grid": "Ruudukon selitteet (ääripäät)",
+          "most_agree": "Täysin samaa mieltä",
+          "most_disagree": "Täysin eri mieltä"
+        },
+        "hints": {
+          "title": "Metodologiset vinkit",
+          "desc": "Lisää tai muokkaa kelluvia vinkkejä auttaaksesi osallistujia ruudukkolajitteluvaiheessa.",
+          "placeholder": "Kirjoita metodologinen vinkki...",
+          "add": "Lisää vinkki",
+          "reset": "Palauta oletukset"
+        },
+        "help": {
+          "title": "Vaiheittainen ohjaus (Mitä/Miksi)",
+          "desc": "Mukauta osallistujien saatavilla olevaa kontekstisidonnaista apua kussakin vaiheessa '?' -kuvakkeen kautta."
+        }
+      },
+      "theme": {
+        "title": "Visuaalinen brändäys",
+        "accent": {
+          "title": "Korostusväri",
+          "desc": "Tätä väriä käytetään painikkeissa, linkeissä ja korostuksissa koko tutkimuksen ajan.",
+          "pick": "Valitse väri",
+          "reset": "Palauta oletus"
+        },
+        "logo": {
+          "title": "Tutkimuksen logo",
+          "desc": "Lataa oma logo korvataksesi oletusarvoisen Open-Q-brändäyksen.",
+          "label": "Logon URL",
+          "hint": "Suositeltu koko: 200x50px. Tukee PNG, SVG, JPG.",
+          "preview": "Logon esikatselu",
+          "help_title": "Missä tämä logo näkyy?",
+          "help_desc": "Logo näytetään jokaisen tutkimussivun yläosassa (navigointipalkki) ja tervetulosivulla. Se vahvistaa projektisi visuaalista identiteettiä."
+        },
+        "partners": {
+          "title": "Institutionaaliset kumppanit",
+          "desc": "Lisää tukevien instituutioiden tai kumppaneiden logot.",
+          "add": "Lisää kumppani",
+          "name_label": "Kumppanin nimi",
+          "name_placeholder": "Institution nimi",
+          "logo_label": "Logon URL",
+          "url_label": "Verkkosivusto (valinnainen)",
+          "url_placeholder": "https://...",
+          "help_title": "Logojen näyttäminen",
+          "help_desc": "Kumppanien logot näytetään aloitussivulla sekä tutkimuksen otsikossa päälogon vieressä."
+        },
+        "upload": {
+          "upload": "Lataa",
+          "recommended": "Suositeltu",
+          "invalid_type": "Virheellinen tiedostotyyppi. Käytä PNG-, JPG- tai SVG-tiedostoa.",
+          "file_too_large": "Tiedosto on liian suuri. Maksimikoko: {{size}}KB.",
+          "conversion_error": "Kuvan käsittely epäonnistui.",
+          "processing": "Käsitellään kuvaa...",
+          "drag_drop": "Vedä ja pudota tai napsauta ladataksesi",
+          "max": "Maks"
+        }
+      }
+    },
+    "data": {
+      "title": "Analytiikka & Tiedot",
+      "description": "Tarkastele osallistujien suorituksia, laadullista palautetta ja vie tietoaineistoja.",
+      "stats": {
+        "email_collection": "Sähköpostien kerääminen",
+        "participants": "osallistujaa",
+        "newsletter": "Uutiskirjeen tilaus",
+        "opt_in": "tilausta",
+        "follow_up": "Jatkotuudun haastattelu",
+        "interested": "kiinnostunutta"
+      },
+      "tabs": {
+        "browse": "Interaktiivinen näkymä",
+        "export": "Vie tiedot"
+      },
+      "guide": {
+        "title": "Muoto-opas",
+        "csv": {
+          "title": "Universaali CSV",
+          "desc": "Raaka datatiedosto. Paras R-, Python-, SPSS- tai Excel-analyysiin. Sisältää kaikki metatiedot."
+        },
+        "json": {
+          "title": "KenQ JSON",
+          "desc": "Optimoitu Web-KenQ-analyysityökalulle. Sisältää tutkimuksen määrittelyn ja lajittelut."
+        },
+        "zip": {
+          "title": "PQMethod-paketti (ZIP)",
+          "desc": "Sisältää legacy .DAT- ja .STA-tiedostot DOS PQMethod -analyysia varten."
+        }
+      },
+      "table": {
+        "id_token": "ID / Tunniste",
+        "lang": "Kieli",
+        "flags": "Merkinnät",
+        "duration": "Kesto",
+        "actions": "Toiminnot"
+      },
+      "tooltips": {
+        "suspect": "Epäilyttävä (Nopea suoritus)",
+        "has_comments": "Sisältää laadullisia kommentteja"
+      },
+      "search": {
+        "placeholder": "Hae ID:llä...",
+        "records_found": "tulosta löytyi",
+        "no_results": "Ei tuloksia"
+      },
+      "errors": {
+        "load_failed": "Tietojen lataus epäonnistui. Päivitä sivu."
+      },
+      "detail": {
+        "title": "Osallistujan profiili",
+        "session": "Istunto",
+        "discarded_badge": "Hylätty",
+        "description": "Kattavat Q-lajittelutulokset ja metatiedot.",
+        "stats": {
+          "duration": "Kokonaiskesto",
+          "language": "Käytetty kieli"
+        },
+        "actions": {
+          "discard": "Hylkää osallistuja",
+          "restore": "Palauta osallistuja"
+        },
+        "sort_config": "Lajittelukonfiguraatio",
+        "survey": {
+          "title": "Kyselyvastaukset",
+          "csv_note": "Täydelliset vastaukset saatavilla CSV-viennissä."
+        }
+      },
+      "team": {
+        "title": "Tutkimustiimi",
+        "description": "Hallitse yhteistyökumppaneita ja tutkimustason pääsynhallintaa.",
+        "invite_title": "Kutsu yhteistyökumppani",
+        "invite_description": "Luo turvallinen linkki uuden jäsenen kutsumiseksi tähän tutkimukseen.",
+        "email_label": "Sähköpostiosoite",
+        "role_label": "Rooli",
+        "select_role": "Valitse rooli",
+        "generate_link": "Luo linkki",
+        "invite_success": "Kutsulinkki luotu!",
+        "invite_error": "Kutsun luominen epäonnistui",
+        "copy_success": "Linkki kopioitu leikepöydälle",
+        "share_label": "Jaa tämä linkki kutsuttavan kanssa:",
+        "collab_overview": "Yhteistyön yleiskatsaus",
+        "active_members": "Aktiiviset jäsenet",
+        "permissions_info": "Lupatiedot",
+        "list_title": "Tutkimustiimi",
+        "list_description": "Hallitse olemassa olevien yhteistyökumppaneiden pääsyä.",
+        "added_on": "Lisätty",
+        "headers": {
+          "collaborator": "Yhteistyökumppani",
+          "role": "Rooli",
+          "actions": "Toiminnot"
+        },
+        "roles": {
+          "owner": "Omistaja (Täydet oikeudet)",
+          "editor": "Muokkaja (Suunnittelu ja analyysi)",
+          "viewer": "Katsoja (Vain luku)",
+          "owner_badge": "OMISTAJA",
+          "editor_badge": "MUOKKAAJA",
+          "viewer_badge": "KATSOJA"
+        },
+        "permissions": {
+          "owner": "Voi poistaa tutkimuksen ja hallinnoida tiimiä.",
+          "editor": "Voi muokata suunnitelmaa ja tarkastella tuloksia.",
+          "viewer": "Vain luku -pääsy kaikkiin moduuleihin."
+        }
+      },
+      "empty_states": {
+        "participants": {
+          "title": "Valmiina julkaisuun?",
+          "desc": "Jaa tutkimuslinkkisi aloittaaksesi vastausten keräämisen. Ensimmäinen osallistuja on vain klikkauksen päässä.",
+          "action": "Kopioi tutkimuslinkki",
+          "hint": "Tai skannaa QR-koodi",
+          "copy_success": "Tutkimuslinkki kopioitu leikepöydälle!"
+        },
+        "team": {
+          "title": "Työskentelet yksin",
+          "desc": "Kutsu yhteistyökumppaneita auttamaan tämän tutkimuksen hallinnassa. He voivat tarkastella tietoja, muokata suunnitelmaa tai vain seurata.",
+          "action": "Kutsu ensimmäinen yhteistyökumppanisi"
+        },
+        "designer": {
+          "title": "Tabula Rasa",
+          "desc": "Tässä tutkimuksessa ei ole vielä väitteitä. Lisää Q-set-kohtia aloittaaksesi lajittelun suunnittelun.",
+          "action": "Lataa esimerkki Q-Set"
+        }
+      }
+    },
+    "status": {
+      "active": "Aktiivinen",
+      "paused": "Tauolla",
+      "closed": "Suljettu",
+      "draft": "Luonnos"
+    },
+    "settings": {
+      "title": "General Settings",
+      "description": "Manage basic study configuration, URL slug, and lifecycle states.",
+      "basic": {
+        "title": "Basic Information",
+        "description": "Configure the study identity and availability window.",
+        "slug_label": "URL Slug",
+        "slug_description": "The unique identifier used in the URL.",
+        "start_date_label": "Start Date (Optional)",
+        "start_date_description": "Automatically opens the study on this date.",
+        "end_date_label": "End Date (Optional)",
+        "end_date_description": "Automatically closes the study on this date.",
+        "pick_date": "Pick a date"
+      },
+      "lifecycle": {
+        "title": "Archiving",
+        "description": "Archive the study to make it read-only for everyone.",
+        "notice": "To archive a study, it must first be Closed. Once archived, no further changes can be made.",
+        "archived_status": "Study is Archived",
+        "archive_button": "Archive Study",
+        "current_state": "Current State"
+      },
+      "danger": {
+        "title": "Danger Zone",
+        "description": "Actions here are irreversible.",
+        "notice": "Deleting a study removes ALL data (participants, answers, config) permanently. Study must be Archived before deletion.",
+        "delete_button": "Delete Study",
+        "delete_confirm": "Are you sure? This action is IRREVERSIBLE."
+      },
+      "save_button": "Save Changes",
+      "save_success": "Settings updated",
+      "save_success_desc": "Study settings have been saved.",
+      "save_error": "Error updating settings",
+      "save_error_desc": "Failed to update settings. Slug might be taken.",
+      "archive_success": "Study Archived",
+      "archive_success_desc": "The study is now archived and read-only.",
+      "archive_error": "Error archiving study",
+      "archive_error_desc": "Failed to archive study. Is it closed?",
+      "delete_success": "Study Deleted",
+      "delete_success_desc": "The study has been permanently removed.",
+      "delete_error": "Error deleting study",
+      "delete_error_desc": "Failed to delete study."
+    },
+    "workspaces": {
+      "title": "Työtilat",
+      "settings": {
+        "title": "Työtilan asetukset",
+        "identity_desc": "Hallitse työtilan identiteettiä ja tiimin käyttöoikeuksia.",
+        "general": {
+          "title": "Yleiset asetukset",
+          "desc": "Työtilasi identiteetti ja ensisijainen tunnistus.",
+          "label_title": "Työtilan nimi",
+          "placeholder_title": "Oma mahtava laboratorio",
+          "label_slug": "URL-osoitteen polku",
+          "placeholder_slug": "oma-labra",
+          "slug_hint": "Polun muuttaminen päivittää kaikki tutkimuksen hallintapaneelin linkit.",
+          "save": "Tallenna muutokset",
+          "save_success": "Työtila päivitetty onnistuneesti",
+          "save_error": "Työtilan päivitys epäonnistui"
+        },
+        "team_growth_title": "Tiimin hallinta",
+        "team_growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita työtilaasi. He voivat hallinnoida kaikkia työtilan tutkimuksia.",
+        "team": {
+          "title": "Tiimin jäsenet",
+          "desc": "Luettelo käyttäjistä, joilla on pääsy tähän työtilaan.",
+          "col_user": "Käyttäjä",
+          "col_role": "Rooli",
+          "col_joined": "Liittynyt",
+          "col_actions": "Toiminnot",
+          "remove_confirm": "Haluatko varmasti poistaa tämän jäsenen?",
+          "remove_success": "Jäsen poistettu onnistuneesti",
+          "remove_error": "Jäsenen poistaminen epäonnistui",
+          "growth_title": "Tiimin kasvu",
+          "growth_desc": "Tarvitsetko lisää tutkijoita? Voit kutsua yhteistyökumppaneita työtilaasi. He pystyvät hallitsemaan kaikkia tämän työtilan tutkimuksia.",
+          "invite_button": "Kutsu yhteistyökumppani",
+          "permissions_matrix": {
+            "title": "Käyttöoikeusmatriisi",
+            "admin": {
+              "label": "Admin",
+              "badge": "Täysi pääsy",
+              "desc": "Voi hallita työtilan asetuksia, jäseniä ja kaikkia tutkimuksia."
+            },
+            "researcher": {
+              "label": "Tutkija",
+              "badge": "Luonti",
+              "desc": "Voi luoda ja hallita kaikkia tutkimuksia. Rajoitettu pääsy työtilan asetuksiin."
+            },
+            "viewer": {
+              "label": "Katsoja",
+              "badge": "Luku-oikeus",
+              "desc": "Vain luku -pääsy kaikkiin työtilan tutkimuksiin ja tietoihin."
+            }
+          },
+          "coming_soon": "Tulossa pian",
+          "invite_modal": {
+            "title": "Kutsu yhteistyökumppani",
+            "desc": "Lähetä suojattu kutsu liittyäksesi tutkimustiimiisi.",
+            "email_label": "Yhteistyökumppanin sähköposti",
+            "role_label": "Määritetty rooli",
+            "success": "Kutsulinkki luotu!",
+            "error": "Kutsun luominen epäonnistui.",
+            "send": "Luo ja lähetä kutsu",
+            "copy_success": "Linkki kopioitu leikepöydälle!",
+            "copy_hint": "Kopioi tämä linkki ja lähetä se manuaalisesti, jos sähköposti epäonnistuu."
+          }
+        }
+      }
+    }
+  }
+}

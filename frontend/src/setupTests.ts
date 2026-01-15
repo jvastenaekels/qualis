@@ -15,38 +15,23 @@ import { useConfigStore } from './store/useConfigStore';
 import { useResponseStore } from './store/useResponseStore';
 import { useSessionStore } from './store/useSessionStore';
 import { useUIStore } from './store/useUIStore';
-import { server } from './test/server';
+import { useStudyDesigner } from './store/useStudyDesigner';
+import { server } from './test-utils/server';
+// Initialize i18n for tests (side effect - this sets up the singleton)
+import './test-utils/i18n-test';
 
-// Mock react-i18next globally
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => key,
-        i18n: {
-            changeLanguage: () => new Promise(() => {}),
-            language: 'en',
-            addResourceBundle: vi.fn(),
-        },
-    }),
-    initReactI18next: {
-        type: '3rdParty',
-        init: () => {},
-    },
-    Trans: ({ children }: React.PropsWithChildren) => {
-        return children || null;
-    },
-}));
+// Mock the app's i18n module to prevent the real i18n.ts from running
+// This is crucial because i18n.ts uses HttpBackend which fails in tests
+vi.mock('./i18n', async () => {
+    // This runs lazily when ./i18n is first imported
+    const testI18n = await import('./test-utils/i18n-test');
+    return { default: testI18n.default };
+});
 
-// Mock local i18n module
-vi.mock('./i18n', () => ({
-    default: {
-        changeLanguage: vi.fn(),
-        language: 'en',
-        addResourceBundle: vi.fn(),
-        init: vi.fn().mockReturnValue(Promise.resolve()),
-        use: vi.fn().mockReturnThis(),
-    },
-    t: (key: string) => key,
-}));
+vi.mock('@/i18n', async () => {
+    const testI18n = await import('./test-utils/i18n-test');
+    return { default: testI18n.default };
+});
 
 // Polyfill ResizeObserver
 vi.stubGlobal(
@@ -72,7 +57,7 @@ Object.defineProperty(window, 'matchMedia', {
 });
 
 // Polyfill scrollTo
-window.scrollTo = vi.fn();
+// Mocks removed
 window.confirm = vi.fn();
 
 // MSW Server Setup
@@ -84,5 +69,28 @@ afterEach(() => {
     useResponseStore.getState().resetResponses();
     useSessionStore.getState().resetSession();
     useUIStore.getState().setHoveredCard(null);
+    // Reset StudyDesigner store
+    useStudyDesigner.setState({
+        draft: null,
+        original: null,
+        activeStep: 'intro',
+        activeSubStep: 'statements',
+        activeLocale: 'en',
+        syncStatus: 'synced',
+        lastSavedAt: null,
+    });
 });
 afterAll(() => server.close());
+
+// Mock react-router-dom's useLoaderData globally
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return {
+        ...actual,
+        useLoaderData: vi.fn().mockReturnValue({}),
+        useBlocker: vi
+            .fn()
+            .mockReturnValue({ state: 'unblocked', proceed: vi.fn(), reset: vi.fn() }),
+        useBeforeUnload: vi.fn(),
+    };
+});

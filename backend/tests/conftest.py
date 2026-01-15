@@ -5,12 +5,15 @@
 
 """Pytest configuration and fixtures."""
 
+import os
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import select
+
+# Set testing environment variable BEFORE app matches are imported
+os.environ["TESTING"] = "true"
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import selectinload
-from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 
@@ -33,8 +36,13 @@ from app.utils.security import get_password_hash
 TEST_EMAIL = "test@example.com"
 TEST_PASSWORD = "testpassword"
 
-# Use in-memory SQLite for testing
-TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
+# Use PostgreSQL for testing
+# We use the 'open_q' database as default since creating new databases
+# (like 'open_q_test') might require superuser permissions not available in all environments.
+TEST_DATABASE_URL = os.getenv(
+    "TEST_DATABASE_URL",
+    "postgresql+asyncpg://open_q_user:open-q-pwd@127.0.0.1:5432/open_q",
+)
 
 
 @pytest_asyncio.fixture
@@ -43,8 +51,6 @@ async def db_engine():
     engine = create_async_engine(
         TEST_DATABASE_URL,
         echo=False,
-        connect_args={"check_same_thread": False},
-        poolclass=StaticPool,
     )
     yield engine
     await engine.dispose()
@@ -132,7 +138,7 @@ async def seed_study(db, test_user, test_workspace):
     study = Study(
         slug="test-study",
         workspace_id=test_workspace.id,
-        state=StudyState.active,
+        state=StudyState.draft,  # Use draft for update tests
         grid_config=grid_config,
         presort_config={
             "age": {"type": "number", "label": {"en": "Age"}, "required": True},
@@ -249,7 +255,7 @@ async def study_factory(db: AsyncSession):
         study = Study(
             slug=slug,
             workspace_id=workspace.id,
-            state=StudyState.active,
+            state=StudyState.draft,  # Use draft for update tests
             grid_config=[{"score": 0, "capacity": 1}],
             presort_config={},
             postsort_config={},
@@ -294,17 +300,28 @@ def auth_token_factory():
 
 
 @pytest_asyncio.fixture
-async def study_collaborator_factory(db: AsyncSession):
-    """Factory to add users as collaborators on studies with specific roles."""
-    from app.models import StudyCollaborator, StudyRole
+async def workspace_member_factory(db: AsyncSession):
+    """Factory to add users as members of a workspace."""
+    from app.models import WorkspaceMember, WorkspaceRole
 
-    async def _add_collaborator(study: Study, user: User, role: StudyRole) -> None:
-        collab = StudyCollaborator(
-            study_id=study.id,
+    async def _add_member(
+        workspace: Workspace, user: User, role: WorkspaceRole
+    ) -> None:
+        member = WorkspaceMember(
+            workspace_id=workspace.id,
             user_id=user.id,
             role=role,
         )
-        db.add(collab)
+        db.add(member)
         await db.commit()
 
-    return _add_collaborator
+    return _add_member
+
+
+@pytest_asyncio.fixture
+async def active_study(db, seed_study):
+    """Convert seed_study to active state for submission tests."""
+    seed_study.state = StudyState.active
+    await db.commit()
+    await db.refresh(seed_study)
+    return seed_study

@@ -2,16 +2,17 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Command } from 'cmdk';
 import {
+    BarChart3,
     Briefcase,
-    LayoutDashboard,
-    PencilRuler,
-    Users,
-    Moon,
-    Sun,
-    LogOut,
     Copy,
     FileText,
+    LayoutDashboard,
+    LogOut,
+    PencilRuler,
     Search,
+    Settings,
+    UserPlus,
+    Users,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -21,28 +22,37 @@ import {
 } from '@/api/generated';
 import { useSessionStore } from '@/store/useSessionStore';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 
 export const CommandMenu = () => {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
     const { activeStudyId, activeWorkspaceId, setActiveWorkspace, setActiveStudy } =
         useAdminStore();
-    const logout = useAuthStore((state) => state.logout);
+    const { logout, setCurrentWorkspace } = useAuthStore();
     const { data: studies } = useListStudiesApiAdminStudiesGet();
     const { data: workspaces } = useListWorkspacesApiAdminWorkspacesGet();
+    const { t } = useTranslation();
 
     const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
+    const isValidStudy = activeStudyId && filteredStudies?.some((s) => s.slug === activeStudyId);
 
     // Toggle on Cmd+K or Ctrl+K
     useEffect(() => {
+        const handleOpen = () => setOpen((open) => !open);
         const down = (e: KeyboardEvent) => {
             if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
-                setOpen((open) => !open);
+                handleOpen();
             }
         };
+
         document.addEventListener('keydown', down);
-        return () => document.removeEventListener('keydown', down);
+        window.addEventListener('open-command-menu', handleOpen);
+        return () => {
+            document.removeEventListener('keydown', down);
+            window.removeEventListener('open-command-menu', handleOpen);
+        };
     }, []);
 
     const runCommand = (command: () => void) => {
@@ -51,17 +61,11 @@ export const CommandMenu = () => {
     };
 
     const handleCopyLink = () => {
-        if (activeStudyId) {
+        if (isValidStudy) {
             const link = `${window.location.origin}/study/${activeStudyId}/welcome`;
             navigator.clipboard.writeText(link);
             toast.success('Study link copied!');
         }
-    };
-
-    const handleThemeToggle = () => {
-        const root = document.documentElement;
-        root.classList.toggle('dark');
-        toast.success(root.classList.contains('dark') ? 'Dark mode enabled' : 'Light mode enabled');
     };
 
     const handleLogout = () => {
@@ -75,50 +79,77 @@ export const CommandMenu = () => {
         <Command.Dialog
             open={open}
             onOpenChange={setOpen}
-            label="Global Command Menu"
-            className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/50 backdrop-blur-sm"
+            label={t('admin.command_menu.title', 'Global Command Menu')}
+            className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] bg-slate-950/20 backdrop-blur-md transition-all duration-300"
         >
-            <div className="w-full max-w-[640px] rounded-xl border bg-white dark:bg-slate-900 shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95">
-                <Command.Input
-                    placeholder="Type a command or search..."
-                    className="w-full px-4 py-3 text-base border-b outline-none bg-transparent placeholder:text-slate-400"
-                    autoFocus
-                />
+            <div className="w-full max-w-[640px] rounded-2xl border border-white/20 bg-white/80 dark:bg-slate-900/80 shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 backdrop-saturate-150">
+                <div className="flex items-center border-b border-border/50 px-4">
+                    <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground opacity-50" />
+                    <Command.Input
+                        placeholder={t(
+                            'admin.command_menu.placeholder',
+                            'Type a command or search...'
+                        )}
+                        className="flex h-12 w-full bg-transparent py-3 text-sm outline-none placeholder:text-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
+                        autoFocus
+                    />
+                </div>
                 <Command.List className="max-h-[400px] overflow-y-auto p-2">
-                    <Command.Empty className="py-6 text-center text-sm text-slate-500">
-                        No results found.
+                    <Command.Empty className="py-6 text-center text-slate-500">
+                        {t('admin.command_menu.no_results', 'No results found.')}
                     </Command.Empty>
 
                     {/* Workspaces */}
                     <Command.Group
-                        heading="Switch Workspace"
-                        className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                        heading={t('admin.command_menu.switch_workspace', 'Switch Workspace')}
+                        className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
                     >
-                        {workspaces?.map((ws) => (
-                            <Command.Item
-                                key={ws.id}
-                                value={`workspace ${ws.title}`}
-                                onSelect={() =>
-                                    runCommand(() => {
-                                        setActiveWorkspace(ws.id);
-                                        toast.success(`Switched to ${ws.title}`);
-                                    })
-                                }
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
-                            >
-                                <Briefcase className="h-4 w-4 text-slate-400" />
-                                <span>{ws.title}</span>
-                                {ws.id === activeWorkspaceId && (
-                                    <span className="ml-auto text-xs text-slate-400">Active</span>
+                        {(Array.isArray(workspaces) ? workspaces : []).map((ws) => (
+                            <div key={ws.id}>
+                                <Command.Item
+                                    value={`workspace ${ws.title}`}
+                                    onSelect={() =>
+                                        runCommand(() => {
+                                            setActiveWorkspace(ws.id);
+                                            setCurrentWorkspace(ws);
+                                            setActiveStudy(null);
+                                            toast.success(`Switched to ${ws.title}`);
+                                        })
+                                    }
+                                    className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors aria-selected:bg-indigo-50 dark:aria-selected:bg-indigo-900/20 aria-selected:text-indigo-600 dark:aria-selected:text-indigo-400"
+                                >
+                                    <div className="flex h-6 w-6 items-center justify-center rounded bg-indigo-100 dark:bg-indigo-900/40">
+                                        <Briefcase className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                                    </div>
+                                    <span>{ws.title}</span>
+                                    {ws.id === activeWorkspaceId && (
+                                        <div className="ml-auto size-1.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/50" />
+                                    )}
+                                </Command.Item>
+                                {ws.id === activeWorkspaceId && ws.slug && (
+                                    <Command.Item
+                                        value={`workspace settings manage ${ws.title}`}
+                                        onSelect={() =>
+                                            runCommand(() =>
+                                                navigate(`/admin/workspaces/${ws.slug}/settings`)
+                                            )
+                                        }
+                                        className="flex items-center gap-3 px-9 py-1.5 rounded-lg cursor-pointer transition-colors aria-selected:bg-slate-50 aria-selected:text-slate-900 text-slate-500"
+                                    >
+                                        <Settings className="h-3 w-3" />
+                                        <span className="text-xs font-bold">
+                                            {t('admin.workspace.switcher.settings')}
+                                        </span>
+                                    </Command.Item>
                                 )}
-                            </Command.Item>
+                            </div>
                         ))}
                     </Command.Group>
 
                     {/* Studies (Filtered) */}
                     <Command.Group
-                        heading="Switch Study"
-                        className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                        heading={t('admin.command_menu.switch_study', 'Switch Study')}
+                        className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
                     >
                         {filteredStudies?.map((study) => (
                             <Command.Item
@@ -130,49 +161,86 @@ export const CommandMenu = () => {
                                         navigate(`/admin/studies/${study.slug}`);
                                     })
                                 }
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
                             >
-                                <FileText className="h-4 w-4 text-slate-400" />
-                                <span>{study.slug}</span>
+                                <div className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 dark:bg-slate-800">
+                                    <FileText className="h-3.5 w-3.5 text-slate-500" />
+                                </div>
+                                <span className="font-medium">{study.slug}</span>
                                 {study.slug === activeStudyId && (
-                                    <span className="ml-auto text-xs text-slate-400">Active</span>
+                                    <div className="ml-auto size-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/50" />
                                 )}
                             </Command.Item>
                         ))}
                         {(!filteredStudies || filteredStudies.length === 0) && (
-                            <div className="px-4 py-2 text-sm text-slate-500">
-                                No studies in this workspace.
+                            <div className="px-4 py-3 text-sm text-slate-400 italic">
+                                {t(
+                                    'admin.command_menu.no_studies',
+                                    'No studies in this workspace.'
+                                )}
                             </div>
                         )}
                     </Command.Group>
 
-                    {/* Contextual Actions (only when study is active) */}
-                    {activeStudyId && (
+                    {/* Contextual Actions (only when study is active and valid) */}
+                    {isValidStudy && (
                         <Command.Group
-                            heading="Study Actions"
-                            className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                            heading={t('admin.command_menu.study_actions', 'Study Actions')}
+                            className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
                         >
                             <Command.Item
                                 value="overview dashboard"
                                 onSelect={() =>
                                     runCommand(() => navigate(`/admin/studies/${activeStudyId}`))
                                 }
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
                             >
-                                <LayoutDashboard className="h-4 w-4 text-indigo-500" />
-                                <span>Open Dashboard</span>
+                                <div className="flex h-6 w-6 items-center justify-center rounded bg-indigo-100 dark:bg-indigo-900/40">
+                                    <LayoutDashboard className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                                </div>
+                                <span>{t('admin.sidebar.dashboard')}</span>
                             </Command.Item>
                             <Command.Item
-                                value="design study protocol"
+                                value="design study"
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(`/admin/studies/${activeStudyId}/design`)
                                     )
                                 }
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
                             >
-                                <PencilRuler className="h-4 w-4 text-emerald-500" />
-                                <span>Protocol Design</span>
+                                <div className="flex h-6 w-6 items-center justify-center rounded bg-emerald-100 dark:bg-emerald-900/40">
+                                    <PencilRuler className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                                </div>
+                                <span>{t('admin.sidebar.design')}</span>
+                            </Command.Item>
+                            <Command.Item
+                                value="recruit recruitment"
+                                onSelect={() =>
+                                    runCommand(() =>
+                                        navigate(`/admin/studies/${activeStudyId}/recruitment`)
+                                    )
+                                }
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
+                            >
+                                <div className="flex h-6 w-6 items-center justify-center rounded bg-pink-100 dark:bg-pink-900/40">
+                                    <UserPlus className="h-3.5 w-3.5 text-pink-600 dark:text-pink-400" />
+                                </div>
+                                <span>{t('admin.sidebar.recruit')}</span>
+                            </Command.Item>
+                            <Command.Item
+                                value="data exports stats analytics"
+                                onSelect={() =>
+                                    runCommand(() =>
+                                        navigate(`/admin/studies/${activeStudyId}/exports`)
+                                    )
+                                }
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
+                            >
+                                <div className="flex h-6 w-6 items-center justify-center rounded bg-amber-100 dark:bg-amber-900/40">
+                                    <BarChart3 className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                                </div>
+                                <span>{t('admin.sidebar.data')}</span>
                             </Command.Item>
                             <Command.Item
                                 value="team management collaborators"
@@ -181,43 +249,54 @@ export const CommandMenu = () => {
                                         navigate(`/admin/studies/${activeStudyId}/team`)
                                     )
                                 }
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
                             >
-                                <Users className="h-4 w-4 text-amber-500" />
-                                <span>Collaborators</span>
+                                <div className="flex h-6 w-6 items-center justify-center rounded bg-blue-100 dark:bg-blue-900/40">
+                                    <Users className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <span>{t('admin.sidebar.team')}</span>
+                            </Command.Item>
+                            <Command.Item
+                                value="settings configuration"
+                                onSelect={() =>
+                                    runCommand(() =>
+                                        navigate(`/admin/studies/${activeStudyId}/settings`)
+                                    )
+                                }
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
+                            >
+                                <div className="flex h-6 w-6 items-center justify-center rounded bg-slate-100 dark:bg-slate-800 border">
+                                    <Settings className="h-3.5 w-3.5 text-slate-500" />
+                                </div>
+                                <span>{t('admin.sidebar.settings')}</span>
                             </Command.Item>
                             <Command.Item
                                 value="copy share link"
                                 onSelect={() => runCommand(handleCopyLink)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
                             >
-                                <Copy className="h-4 w-4 text-sky-500" />
-                                <span>Copy Public Link</span>
+                                <div className="flex h-6 w-6 items-center justify-center rounded bg-sky-100 dark:bg-sky-900/40">
+                                    <Copy className="h-3.5 w-3.5 text-sky-600 dark:text-sky-400" />
+                                </div>
+                                <span>{t('admin.command_menu.copy_link', 'Copy Public Link')}</span>
                             </Command.Item>
                         </Command.Group>
                     )}
 
                     {/* System Actions */}
                     <Command.Group
-                        heading="System"
-                        className="px-2 py-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wider"
+                        heading={t('admin.command_menu.system', 'System')}
+                        className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
                     >
-                        <Command.Item
-                            value="theme toggle dark light"
-                            onSelect={() => runCommand(handleThemeToggle)}
-                            className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
-                        >
-                            <Sun className="h-4 w-4 text-amber-500 dark:hidden" />
-                            <Moon className="h-4 w-4 text-indigo-400 hidden dark:block" />
-                            <span>Toggle Theme</span>
-                        </Command.Item>
                         <Command.Item
                             value="logout sign out"
                             onSelect={() => runCommand(handleLogout)}
-                            className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-red-50 dark:aria-selected:bg-red-900/20 aria-selected:text-red-600 dark:aria-selected:text-red-400"
                         >
-                            <LogOut className="h-4 w-4 text-red-500" />
-                            <span>Logout</span>
+                            <div className="flex h-6 w-6 items-center justify-center rounded bg-red-100 dark:bg-red-900/40">
+                                <LogOut className="h-3.5 w-3.5 text-red-600" />
+                            </div>
+                            <span>{t('admin.command_menu.logout', 'Logout')}</span>
                         </Command.Item>
                     </Command.Group>
                 </Command.List>
@@ -225,13 +304,15 @@ export const CommandMenu = () => {
                 <div className="border-t px-4 py-2 flex items-center justify-between text-xs text-slate-400">
                     <div className="flex items-center gap-2">
                         <Search className="h-3 w-3" />
-                        <span>Search or run commands</span>
+                        <span>
+                            {t('admin.command_menu.search_label', 'Search or run commands')}
+                        </span>
                     </div>
                     <div className="flex items-center gap-1">
                         <kbd className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-[10px] font-mono">
                             ⌘K
                         </kbd>
-                        <span>to open</span>
+                        <span>{t('admin.command_menu.to_open', 'to open')}</span>
                     </div>
                 </div>
             </div>

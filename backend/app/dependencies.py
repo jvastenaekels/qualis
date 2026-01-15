@@ -1,25 +1,28 @@
 """Dependency injection definitions."""
 
 from collections.abc import Callable
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import jwt
-from fastapi import Depends, HTTPException, Path, status
+from fastapi import Depends, HTTPException, Path, status, Header
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
 from app.database import get_db
 from app.models import (
     Study,
+    StudyRole,
     User,
     WorkspaceMember,
     WorkspaceRole,
-    StudyCollaborator,
-    StudyRole,
 )
+
+if TYPE_CHECKING:
+    from app.models import Workspace
 from app.schemas import TokenData
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
@@ -67,6 +70,48 @@ async def get_current_active_user(
     return current_user
 
 
+async def get_current_workspace(
+    x_workspace_id: str | None = Header(None, alias="X-Workspace-ID"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> tuple["Workspace", WorkspaceMember]:
+    """Validate workspace context from header and return workspace + member info."""
+    if not x_workspace_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="X-Workspace-ID header is required",
+        )
+
+    try:
+        workspace_id = int(x_workspace_id)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid Workspace ID"
+        )
+
+    from app.models import Workspace
+
+    # Check permission
+    # Query membership
+    query = (
+        select(Workspace, WorkspaceMember)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
+        .where(Workspace.id == workspace_id)
+        .where(WorkspaceMember.user_id == current_user.id)
+    )
+
+    result = await db.execute(query)
+    row = result.one_or_none()
+
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access to this workspace is denied",
+        )
+
+    return cast(tuple[Workspace, WorkspaceMember], row)
+
+
 # --- RBAC Logic ---
 
 ROLE_MAP = {
@@ -82,6 +127,57 @@ STUDY_ROLE_HIERARCHY = {
 }
 
 
+WORKSPACE_ROLE_HIERARCHY = {
+    WorkspaceRole.owner: 40,
+    WorkspaceRole.researcher: 20,
+    WorkspaceRole.viewer: 10,
+}
+
+
+def check_workspace_permission(required_role: WorkspaceRole) -> Callable:
+    """Factory creating a dependency to verify workspace access."""
+
+    async def permission_dependency(
+        slug: str = Path(..., description="The slug of the workspace"),
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ) -> "Workspace":
+        """Dependency that returns the Workspace if the user has required workspace role."""
+        from app.models import Workspace
+
+        query = (
+            select(Workspace, WorkspaceMember)
+            .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
+            .where(Workspace.slug == slug)
+            .where(WorkspaceMember.user_id == current_user.id)
+        )
+
+        result = await db.execute(query)
+        row = result.one_or_none()
+
+        if not row:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Workspace not found or access denied",
+            )
+
+        workspace, member = row
+
+        # Check Role Hierarchy
+        required_level = WORKSPACE_ROLE_HIERARCHY[required_role]
+        user_level = WORKSPACE_ROLE_HIERARCHY[member.role]
+
+        if user_level < required_level:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Insufficient permissions. Required: {required_role.value}",
+            )
+
+        return cast(Workspace, workspace)
+
+    return permission_dependency
+
+
 def check_study_permission(required_role: StudyRole) -> Callable:
     """Factory creating a dependency to verify study access."""
 
@@ -90,69 +186,43 @@ def check_study_permission(required_role: StudyRole) -> Callable:
         current_user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db),
     ) -> Study:
-        """Dependency that returns the Study if the user has required study role."""
-        # Check StudyCollaborator table
+        """Dependency that returns the Study if the user has required study role (via Workspace)."""
+        # Strategy: Check Workspace Membership for the Study's Workspace
         query = (
-            select(Study, StudyCollaborator)
-            .join(StudyCollaborator, StudyCollaborator.study_id == Study.id)
+            select(Study, WorkspaceMember)
+            .join(Study.workspace)
+            .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
+            .options(selectinload(Study.workspace))
             .where(Study.slug == slug)
-            .where(StudyCollaborator.user_id == current_user.id)
+            .where(WorkspaceMember.user_id == current_user.id)
         )
 
         result = await db.execute(query)
         row = result.one_or_none()
 
         if not row:
-            # Fallback for Workspace Admins/Superusers?
-            # In Phase 4, we want Study-level focus, but let's allow legacy Workspace Admin for now
-            # to avoid locking out existing users before full migration.
-            ws_query = (
-                select(Study, WorkspaceMember)
-                .join(Study.workspace)
-                .join(
-                    WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id
-                )
-                .where(Study.slug == slug)
-                .where(WorkspaceMember.user_id == current_user.id)
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Study not found or access denied",
             )
-            ws_result = await db.execute(ws_query)
-            ws_row = ws_result.one_or_none()
 
-            if not ws_row:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Study not found or access denied",
-                )
+        study, member = row
 
-            study, member = ws_row
-            # Fallback: Map WorkspaceRole to StudyRole
-            mapped_role = ROLE_MAP.get(member.role)
-            if not mapped_role:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
-                )
+        # Map WorkspaceRole to StudyRole equivalent for hierarchy check
+        # We use strict mapping or hierarchy
+        # Workspace Owner/Admin -> Study Owner
+        # Workspace Researcher -> Study Editor
+        # Workspace Viewer -> Study Viewer
 
-            user_level = STUDY_ROLE_HIERARCHY[mapped_role]
-            required_level = STUDY_ROLE_HIERARCHY[required_role]
+        effective_study_role = ROLE_MAP.get(member.role, StudyRole.viewer)
 
-            if user_level < required_level:
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Insufficient permissions. Required: {required_role.value}",
-                )
-
-            return cast(Study, study)
-
-        study, collaborator = row
-
-        # Check Role Hierarchy
         required_level = STUDY_ROLE_HIERARCHY[required_role]
-        user_level = STUDY_ROLE_HIERARCHY[collaborator.role]
+        user_level = STUDY_ROLE_HIERARCHY[effective_study_role]
 
         if user_level < required_level:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Insufficient permissions. Required: {required_role.value}",
+                detail=f"Insufficient permissions. Required: {required_role.value} (via Workspace Role)",
             )
 
         return cast(Study, study)

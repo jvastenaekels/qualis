@@ -9,10 +9,17 @@ import type { StudyUpdateState } from './studyUpdateState';
 import type { StudyUpdateGridConfig } from './studyUpdateGridConfig';
 import type { StudyUpdatePresortConfig } from './studyUpdatePresortConfig';
 import type { StudyUpdatePostsortConfig } from './studyUpdatePostsortConfig';
+import type { StudyUpdateBranding } from './studyUpdateBranding';
 import type { StudyUpdateDefaultLanguage } from './studyUpdateDefaultLanguage';
 import type { StudyUpdateShowStatementCodes } from './studyUpdateShowStatementCodes';
+import type { StudyUpdateRandomizeStatements } from './studyUpdateRandomizeStatements';
+import type { StudyUpdateSymmetryLock } from './studyUpdateSymmetryLock';
 import type { StudyUpdateTranslations } from './studyUpdateTranslations';
 import type { StudyUpdateStatements } from './studyUpdateStatements';
+import type { StudyUpdateAccessPassword } from './studyUpdateAccessPassword';
+import type { StudyUpdateStartDate } from './studyUpdateStartDate';
+import type { StudyUpdateEndDate } from './studyUpdateEndDate';
+import type { StudyUpdateLastUpdatedAt } from './studyUpdateLastUpdatedAt';
 
 /**
  * Schema for updating a study.
@@ -23,8 +30,15 @@ export interface StudyUpdate {
     grid_config?: StudyUpdateGridConfig;
     presort_config?: StudyUpdatePresortConfig;
     postsort_config?: StudyUpdatePostsortConfig;
+    branding?: StudyUpdateBranding;
     default_language?: StudyUpdateDefaultLanguage;
     show_statement_codes?: StudyUpdateShowStatementCodes;
+    randomize_statements?: StudyUpdateRandomizeStatements;
+    symmetry_lock?: StudyUpdateSymmetryLock;
     translations?: StudyUpdateTranslations;
     statements?: StudyUpdateStatements;
+    access_password?: StudyUpdateAccessPassword;
+    start_date?: StudyUpdateStartDate;
+    end_date?: StudyUpdateEndDate;
+    last_updated_at?: StudyUpdateLastUpdatedAt;
 }

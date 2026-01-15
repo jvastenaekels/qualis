@@ -1,164 +1,628 @@
-import { useParams } from 'react-router-dom';
-import {
-    useGetStudyStatsApiAdminStudiesSlugStatsGet,
-    useListStudyParticipantsApiAdminStudiesSlugParticipantsGet,
-    useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch,
-    useGetStudyApiAdminStudiesSlugGet,
-} from '@/api/generated';
-import HealthDashboard from '@/components/admin/dashboard/HealthDashboard';
-import ParticipantTable from '@/components/admin/dashboard/ParticipantTable';
-import ParticipantDetailSheet from '@/components/admin/dashboard/ParticipantDetailSheet';
-import ExportCenter from '@/components/admin/dashboard/ExportCenter';
+import { useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
+import type { StudyRead, ParticipantRead, StudyStatsRead } from '@/api/model';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
-import { DashboardSkeleton } from '@/components/admin/DashboardSkeleton';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Activity, Users } from 'lucide-react';
-import { useState } from 'react';
-import type { ParticipantRead as Participant } from '@/api/model';
-import { toast } from 'sonner';
+import { Progress } from '@/components/ui/progress';
+import {
+    Activity,
+    Users,
+    CheckCircle2,
+    Clock,
+    AlertTriangle,
+    Table as TableIcon,
+    LayoutDashboard,
+    Copy,
+    Eye,
+    Link as LinkIcon,
+} from 'lucide-react';
+import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
+import { Link } from 'react-router-dom';
 import StudyStatusControl from '@/components/admin/dashboard/StudyStatusControl';
+import { SubmissionsTimelineChart } from '@/components/admin/dashboard/charts/SubmissionsTimelineChart';
+import { CompletionRateTrendChart } from '@/components/admin/dashboard/charts/CompletionRateTrendChart';
+import { DeviceBreakdownChart } from '@/components/admin/dashboard/charts/DeviceBreakdownChart';
+import { DurationHistogramChart } from '@/components/admin/dashboard/charts/DurationHistogramChart';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow, format } from 'date-fns';
+import { enUS, fr, fi } from 'date-fns/locale';
+import { toast } from 'sonner';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useTranslation } from 'react-i18next';
+
+interface LoaderData {
+    stats: StudyStatsRead;
+    participants: ParticipantRead[];
+    study: StudyRead;
+    slug: string;
+}
 
 const StudyOverviewPage = () => {
-    const { slug } = useParams();
-    const { data: stats, isLoading: statsLoading } = useGetStudyStatsApiAdminStudiesSlugStatsGet(
-        slug || ''
-    );
-    const { data: study } = useGetStudyApiAdminStudiesSlugGet(slug || '');
-    const {
-        data: participants,
-        isLoading: participantsLoading,
-        refetch: refetchParticipants,
-    } = useListStudyParticipantsApiAdminStudiesSlugParticipantsGet(slug || '');
-    const { refetch: refetchStats } = useGetStudyStatsApiAdminStudiesSlugStatsGet(slug || '');
-    const discardMutation =
-        useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch();
+    const { stats, participants, study, slug } = useLoaderData() as LoaderData;
+    const revalidator = useRevalidator();
+    const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
 
-    const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null);
-    const [detailOpen, setDetailOpen] = useState(false);
+    // biome-ignore lint/suspicious/noExplicitAny: library locale types are complex
+    const dateLocales: Record<string, any> = {
+        en: enUS,
+        fr: fr,
+        fi: fi,
+    };
+    const currentLocale = dateLocales[i18n.language] || enUS;
 
-    const handleViewDetail = (p: Participant) => {
-        setSelectedParticipantId(p.id);
-        setDetailOpen(true);
+    const recentParticipants = (participants || []).slice(0, 5);
+
+    // Helper: Generate consistent color from participant ID
+    const getParticipantColor = (id: string) => {
+        const hue = (id.charCodeAt(0) + id.charCodeAt(1)) % 360;
+        return {
+            hue,
+            bg: `hsl(${hue}, 70%, 92%)`,
+            border: `hsl(${hue}, 60%, 75%)`,
+            text: `hsl(${hue}, 70%, 35%)`,
+        };
     };
 
-    const handleToggleDiscard = async (id: number, isDiscarded: boolean) => {
-        try {
-            await discardMutation.mutateAsync({
-                participantId: id,
-                data: {
-                    is_discarded: isDiscarded,
-                    discard_reason: isDiscarded ? 'Manual review' : null,
-                },
-            });
-            toast.success(isDiscarded ? 'Participant flagged' : 'Participant restored');
-            refetchParticipants();
-        } catch (_err) {
-            toast.error('Failed to update participant status');
-        }
+    // Helper: Determine current step from progress percentage
+    const _getCurrentStep = (progress: number) => {
+        if (progress < 20) return t('admin.study_overview.steps.welcome', 'Welcome');
+        if (progress < 40) return t('admin.study_overview.steps.consent', 'Consent');
+        if (progress < 60) return t('admin.study_overview.steps.rough_sort', 'Rough Sort');
+        if (progress < 90) return t('admin.study_overview.steps.fine_sort', 'Fine Sort');
+        return t('admin.study_overview.steps.final', 'Final Steps');
     };
 
-    if (statsLoading || participantsLoading) {
-        return <DashboardSkeleton />;
-    }
+    const getStatusLabel = (state: string) => {
+        return t(`admin.status.${state}`, state.charAt(0).toUpperCase() + state.slice(1));
+    };
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6 pt-2">
-            <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-b border-slate-100">
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-2">
-                        {slug}
-                        {stats && (
-                            <Badge
-                                variant="outline"
-                                role="status"
-                                className={cn(
-                                    'ml-2 font-bold uppercase tracking-widest text-[10px]',
-                                    study?.state === 'active'
-                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                        : study?.state === 'closed'
-                                          ? 'bg-slate-50 text-slate-700 border-slate-100'
-                                          : 'bg-amber-50 text-amber-700 border-amber-100'
-                                )}
-                            >
-                                {study?.state === 'active'
-                                    ? 'Live Fieldwork'
-                                    : study?.state === 'closed'
-                                      ? 'Closed'
-                                      : 'Draft Mode'}
-                            </Badge>
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+            <StudyPageHeader
+                title={t('admin.study_overview.title', 'Overview')}
+                description={t(
+                    'admin.study_overview.subtitle',
+                    'Real-time analytics and participant overview for this study.'
+                )}
+                icon={LayoutDashboard}
+                statusBadge={
+                    <Badge
+                        variant="outline"
+                        role="status"
+                        className={cn(
+                            'font-black uppercase tracking-[0.2em] text-[10px] px-2 py-0.5 rounded-full',
+                            study?.state === 'active'
+                                ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
+                                : study?.state === 'paused'
+                                  ? 'bg-orange-50 text-orange-700 border-orange-100'
+                                  : study?.state === 'closed'
+                                    ? 'bg-slate-50 text-slate-700 border-slate-100'
+                                    : 'bg-amber-50 text-amber-700 border-amber-100'
                         )}
-                    </h1>
-                    <p className="text-slate-500 text-sm">
-                        Real-time analytics and participant overview for this study.
-                    </p>
-                </div>
-                <div className="flex items-center gap-2">
-                    {study?.translations?.map((t) => (
-                        <Badge key={t.language_code} variant="secondary" className="text-xs">
-                            {t.language_code.toUpperCase()}
-                        </Badge>
-                    ))}
-                    <div className="bg-white shadow-sm border rounded-lg px-4 py-2 flex items-center gap-3">
-                        <div className="relative">
-                            <Activity className="h-4 w-4 text-emerald-500" />
-                            <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                            </span>
-                        </div>
-                        <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                            Receiving Data
-                        </span>
+                    >
+                        {getStatusLabel(study?.state || 'draft')}
+                    </Badge>
+                }
+                actions={
+                    <div className="flex items-center gap-2">
+                        {/* Removed redundant 'Edit design' button as per plan 5.1 */}
                     </div>
-                </div>
-            </header>
+                }
+            />
 
-            {/* biome-ignore lint/suspicious/noExplicitAny: stats type is dynamic from generated client */}
-            {stats && <HealthDashboard stats={stats as any} />}
+            {/* Key Metrics Dashboard + Study Status */}
+            {stats && (
+                <>
+                    {/* Status Control - Full Width at Top */}
+                    <StudyStatusControl
+                        slug={slug}
+                        currentState={study?.state || 'draft'}
+                        onStateChange={() => {
+                            revalidator.revalidate();
+                        }}
+                    />
+
+                    <div className="bg-gradient-to-br from-slate-50 to-white px-4 py-4 rounded-xl border border-slate-100 shadow-sm mb-6">
+                        <div className="grid gap-3 md:grid-cols-3">
+                            {/* Sample Size */}
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                <CardContent className="pt-4 pb-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Users className="h-4 w-4 text-indigo-600" />
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                                            {t(
+                                                'admin.study_overview.sample_size',
+                                                'Sample size (N)'
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="text-4xl font-bold text-slate-900 mb-1">
+                                        {stats.completed_count}
+                                    </div>
+                                    <p className="text-xs text-slate-400 font-medium">&nbsp;</p>
+                                </CardContent>
+                            </Card>
+
+                            {/* Completion Rate */}
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                <CardContent className="pt-4 pb-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                                            {t(
+                                                'admin.study_overview.completion_rate',
+                                                'Completion rate'
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="text-4xl font-bold text-emerald-600 mb-2">
+                                        {Math.round(
+                                            (stats.completed_count / stats.started_count) * 100
+                                        ) || 0}
+                                        %
+                                    </div>
+                                    <Progress
+                                        value={
+                                            Math.round(
+                                                (stats.completed_count / stats.started_count) * 100
+                                            ) || 0
+                                        }
+                                        className="h-1.5 bg-emerald-50 mb-1.5"
+                                    />
+                                    <p className="text-[10px] text-slate-400">&nbsp;</p>
+                                </CardContent>
+                            </Card>
+
+                            {/* Median Duration */}
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                                <CardContent className="pt-4 pb-4">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Clock className="h-4 w-4 text-amber-500" />
+                                        <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                                            {t(
+                                                'admin.study_overview.median_duration',
+                                                'Median duration'
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-baseline gap-2 mb-1">
+                                        <div className="text-4xl font-bold text-slate-900">
+                                            {stats.median_duration_seconds
+                                                ? `${Math.floor(stats.median_duration_seconds / 60)}m ${stats.median_duration_seconds % 60}s`
+                                                : '--'}
+                                        </div>
+                                        {stats.median_duration_seconds &&
+                                            stats.median_duration_seconds < 120 && (
+                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-[9px] font-bold uppercase ring-1 ring-amber-200">
+                                                    <AlertTriangle size={9} />{' '}
+                                                    {t('admin.study_overview.suspect', 'Suspect')}
+                                                </span>
+                                            )}
+                                    </div>
+                                    <p className="text-[10px] text-slate-400">
+                                        {t(
+                                            'admin.study_overview.time_to_complete',
+                                            'Time to complete'
+                                        )}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+
+                    {/* Analytics Overview - Phase 1 */}
+                    <div className="grid gap-6 md:grid-cols-12 mb-6">
+                        <div className="col-span-12 md:col-span-8">
+                            <SubmissionsTimelineChart
+                                participants={participants}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
+                        </div>
+                        <div className="col-span-12 md:col-span-4">
+                            <CompletionRateTrendChart
+                                participants={participants}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-12 mb-6">
+                        <div className="col-span-12 md:col-span-8">
+                            <DurationHistogramChart
+                                participants={participants}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
+                        </div>
+                        <div className="col-span-12 md:col-span-4">
+                            <DeviceBreakdownChart
+                                deviceBreakdown={stats.device_breakdown}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
+                        </div>
+                    </div>
+                </>
+            )}
 
             <div className="grid gap-6 md:grid-cols-12 pb-12">
-                <Card className="col-span-12 md:col-span-8 shadow-md border-none bg-slate-50/30">
-                    <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100 bg-white/50">
+                {/* Recent Activity / Analytics Promo */}
+                <Card className="col-span-12 md:col-span-8 border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                    <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 pb-4">
                         <div className="space-y-1">
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <Users className="h-5 w-5 text-indigo-500" />
-                                Participant Audit Table
+                                <Activity className="h-5 w-5 text-indigo-500" />
+                                {t('admin.study_overview.recent_activity', 'Recent activity')}
                             </CardTitle>
                             <CardDescription>
-                                Monitor individual progress and flag low-quality data.
+                                {t('admin.study_overview.latest_submissions', {
+                                    count: recentParticipants.length,
+                                    total: (participants || []).length,
+                                    defaultValue: `Latest submissions (${recentParticipants.length} of ${(participants || []).length})`,
+                                })}
                             </CardDescription>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-6">
-                        <ParticipantTable
-                            data={participants || []}
-                            onViewDetail={handleViewDetail}
-                            onToggleDiscard={handleToggleDiscard}
-                        />
+                    <CardContent className="p-0">
+                        {recentParticipants.length === 0 ? (
+                            <div className="p-8 text-center text-slate-400 text-sm">
+                                {t('admin.study_overview.no_participants', 'No participants yet.')}
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-slate-100">
+                                {/* Recently Completed Section */}
+                                {recentParticipants.filter(
+                                    (p) => p.status === 'completed' && !p.is_discarded
+                                ).length > 0 && (
+                                    <div className="p-3">
+                                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
+                                            {t(
+                                                'admin.study_overview.recently_completed',
+                                                'Recently Completed'
+                                            )}{' '}
+                                            (
+                                            {
+                                                recentParticipants.filter(
+                                                    (p) =>
+                                                        p.status === 'completed' && !p.is_discarded
+                                                ).length
+                                            }
+                                            )
+                                        </div>
+                                        <div className="space-y-2">
+                                            {recentParticipants
+                                                .filter(
+                                                    (p) =>
+                                                        p.status === 'completed' && !p.is_discarded
+                                                )
+                                                .map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="flex items-center justify-between p-3 hover:bg-emerald-50/30 transition-colors rounded-lg border border-emerald-100 bg-emerald-50/20 group"
+                                                    >
+                                                        <div className="flex items-center gap-3 flex-1">
+                                                            {(() => {
+                                                                const colors = getParticipantColor(
+                                                                    p.session_token
+                                                                );
+                                                                return (
+                                                                    <div
+                                                                        className="h-9 w-9 rounded-full border-2 flex items-center justify-center text-xs font-black shadow-sm"
+                                                                        style={{
+                                                                            backgroundColor:
+                                                                                colors.bg,
+                                                                            borderColor:
+                                                                                colors.border,
+                                                                            color: colors.text,
+                                                                        }}
+                                                                    >
+                                                                        {p.session_token
+                                                                            .substring(0, 2)
+                                                                            .toUpperCase()}
+                                                                    </div>
+                                                                );
+                                                            })()}
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm font-mono font-bold text-slate-800">
+                                                                        {p.session_token.substring(
+                                                                            0,
+                                                                            8
+                                                                        )}
+                                                                    </span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            navigator.clipboard.writeText(
+                                                                                p.session_token
+                                                                            );
+                                                                            toast.success(
+                                                                                'ID copied'
+                                                                            );
+                                                                        }}
+                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
+                                                                    >
+                                                                        <Copy className="h-3 w-3 text-slate-400" />
+                                                                    </button>
+                                                                    {p.recruitment_token && (
+                                                                        <Badge
+                                                                            variant="outline"
+                                                                            className="ml-1 h-5 bg-white text-slate-500 border-slate-200 gap-1 pl-1.5 pr-2"
+                                                                        >
+                                                                            <LinkIcon className="w-3 h-3" />
+                                                                            <span className="font-mono text-[10px]">
+                                                                                {
+                                                                                    p.recruitment_token
+                                                                                }
+                                                                            </span>
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+                                                                <TooltipProvider>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            <div className="text-xs text-emerald-600 font-medium mt-0.5 cursor-help">
+                                                                                {t(
+                                                                                    'admin.study_overview.submitted',
+                                                                                    'Submitted'
+                                                                                )}{' '}
+                                                                                {formatDistanceToNow(
+                                                                                    new Date(
+                                                                                        p.submitted_at as unknown as string
+                                                                                    ),
+                                                                                    {
+                                                                                        addSuffix: true,
+                                                                                        locale: currentLocale,
+                                                                                    }
+                                                                                )}
+                                                                            </div>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent className="text-xs">
+                                                                            {format(
+                                                                                new Date(
+                                                                                    p.submitted_at as unknown as string
+                                                                                ),
+                                                                                'PPpp',
+                                                                                {
+                                                                                    locale: currentLocale,
+                                                                                }
+                                                                            )}
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            variant="default"
+                                                            size="sm"
+                                                            className="h-8 text-xs font-bold px-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    `/admin/studies/${slug}/participants/${p.id}`
+                                                                )
+                                                            }
+                                                        >
+                                                            <Eye className="h-3.5 w-3.5 mr-1.5" />
+                                                            {t(
+                                                                'admin.study_overview.view_data',
+                                                                'View'
+                                                            )}
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* In Progress Section */}
+                                {recentParticipants.filter(
+                                    // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
+                                    (p: any) => !p.completed && !p.is_discarded
+                                ).length > 0 && (
+                                    <div className="p-3">
+                                        <div className="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-3 px-1">
+                                            {t('admin.study_overview.in_progress', 'In Progress')} (
+                                            {
+                                                recentParticipants.filter(
+                                                    // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
+                                                    (p: any) => !p.completed && !p.is_discarded
+                                                ).length
+                                            }
+                                            )
+                                        </div>
+                                        <div className="space-y-2">
+                                            {recentParticipants
+                                                .filter(
+                                                    // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
+                                                    (p: any) => !p.completed && !p.is_discarded
+                                                )
+                                                .map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="flex items-center justify-between p-3 hover:bg-slate-50/50 transition-colors rounded-lg border border-slate-100 bg-white group"
+                                                    >
+                                                        <div className="flex items-center gap-3 flex-1">
+                                                            {(() => {
+                                                                const colors = getParticipantColor(
+                                                                    p.session_token
+                                                                );
+                                                                return (
+                                                                    <div
+                                                                        className="h-9 w-9 rounded-full border-2 flex items-center justify-center text-xs font-black shadow-sm"
+                                                                        style={{
+                                                                            backgroundColor:
+                                                                                colors.bg,
+                                                                            borderColor:
+                                                                                colors.border,
+                                                                            color: colors.text,
+                                                                        }}
+                                                                    >
+                                                                        {p.session_token
+                                                                            .substring(0, 2)
+                                                                            .toUpperCase()}
+                                                                    </div>
+                                                                );
+                                                            })()}
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm font-mono font-bold text-slate-800">
+                                                                        {p.session_token.substring(
+                                                                            0,
+                                                                            8
+                                                                        )}
+                                                                    </span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            navigator.clipboard.writeText(
+                                                                                p.session_token
+                                                                            );
+                                                                            toast.success(
+                                                                                'ID copied'
+                                                                            );
+                                                                        }}
+                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
+                                                                    >
+                                                                        <Copy className="h-3 w-3 text-slate-400" />
+                                                                    </button>
+                                                                    {p.recruitment_token && (
+                                                                        <Badge
+                                                                            variant="outline"
+                                                                            className="ml-1 h-5 bg-white text-slate-500 border-slate-200 gap-1 pl-1.5 pr-2"
+                                                                        >
+                                                                            <LinkIcon className="w-3 h-3" />
+                                                                            <span className="font-mono text-[10px]">
+                                                                                {
+                                                                                    p.recruitment_token
+                                                                                }
+                                                                            </span>
+                                                                        </Badge>
+                                                                    )}
+                                                                </div>
+
+                                                                <TooltipProvider>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            <div className="text-xs text-slate-500 mt-0.5 cursor-help">
+                                                                                {t(
+                                                                                    'admin.study_overview.started'
+                                                                                )}{' '}
+                                                                                {formatDistanceToNow(
+                                                                                    new Date(
+                                                                                        p.created_at as unknown as string
+                                                                                    ),
+                                                                                    {
+                                                                                        addSuffix: true,
+                                                                                        locale: currentLocale,
+                                                                                    }
+                                                                                )}
+                                                                            </div>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent className="text-xs">
+                                                                            {format(
+                                                                                new Date(
+                                                                                    p.created_at as unknown as string
+                                                                                ),
+                                                                                'PPpp',
+                                                                                {
+                                                                                    locale: currentLocale,
+                                                                                }
+                                                                            )}
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
+                                                            </div>
+                                                        </div>
+
+                                                        <Button
+                                                            variant="default"
+                                                            size="sm"
+                                                            className="h-8 text-xs font-bold px-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    `/admin/studies/${slug}/participants/${p.id}`
+                                                                )
+                                                            }
+                                                        >
+                                                            <Eye className="h-3.5 w-3.5 mr-1.5" />
+                                                            {t(
+                                                                'admin.study_overview.view_data',
+                                                                'View'
+                                                            )}
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Discarded Section (if any) */}
+                                {recentParticipants.filter((p) => p.is_discarded).length > 0 && (
+                                    <div className="p-3 bg-red-50/20">
+                                        <div className="text-[10px] font-black uppercase tracking-wider text-red-400 mb-3 px-1">
+                                            {t('admin.study_overview.discarded', 'Discarded')} (
+                                            {
+                                                recentParticipants.filter((p) => p.is_discarded)
+                                                    .length
+                                            }
+                                            )
+                                        </div>
+                                        <div className="space-y-2">
+                                            {recentParticipants
+                                                .filter((p) => p.is_discarded)
+                                                .map((p) => (
+                                                    <div
+                                                        key={p.id}
+                                                        className="flex items-center justify-between p-3 transition-colors rounded-lg border border-red-100 bg-red-50/50 opacity-60"
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-red-100 to-red-50 border border-red-200 flex items-center justify-center text-xs font-bold text-red-600 shadow-sm">
+                                                                {p.language_used
+                                                                    .substring(0, 2)
+                                                                    .toUpperCase()}
+                                                            </div>
+                                                            <div>
+                                                                <div className="text-sm font-mono font-bold text-slate-700">
+                                                                    {p.session_token.substring(
+                                                                        0,
+                                                                        8
+                                                                    )}
+                                                                </div>
+                                                                <div className="text-xs text-red-600 font-medium mt-0.5">
+                                                                    {t(
+                                                                        'admin.study_overview.discarded',
+                                                                        'Discarded'
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                        <div className="p-3 bg-slate-50/50 border-t border-slate-100 text-center">
+                            <Link
+                                to={`/admin/studies/${slug}/exports`}
+                                className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
+                            >
+                                <TableIcon className="w-3 h-3" />
+                                {t(
+                                    'admin.study_overview.view_all',
+                                    'View all participants and data details'
+                                )}
+                            </Link>
+                        </div>
                     </CardContent>
                 </Card>
 
                 <div className="col-span-12 md:col-span-4 space-y-6">
-                    <StudyStatusControl
-                        slug={slug || ''}
-                        currentState={study?.state || 'draft'}
-                        onStateChange={() => {
-                            refetchParticipants();
-                            refetchStats();
-                        }}
-                    />
                     <RecruitmentModule slug={slug || ''} />
-                    <ExportCenter slug={slug || ''} />
                 </div>
             </div>
-
-            <ParticipantDetailSheet
-                participantId={selectedParticipantId}
-                open={detailOpen}
-                onOpenChange={setDetailOpen}
-            />
         </div>
     );
 };

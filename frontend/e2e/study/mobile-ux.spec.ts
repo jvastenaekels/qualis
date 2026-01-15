@@ -1,110 +1,91 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable security/detect-non-literal-regexp */
-import { test } from '@playwright/test';
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { mockSubmitAPI } from '../fixtures/study-config';
-import { WelcomePage } from '../pages/WelcomePage';
-import { ConsentPage } from '../pages/ConsentPage';
-import { PreSortPage } from '../pages/PreSortPage';
-import { RoughSortPage } from '../pages/RoughSortPage';
-import { FineSortPage } from '../pages/FineSortPage';
+import { test } from "../fixtures/db-setup";
+import { WelcomePage } from "../pages/WelcomePage";
+import { ConsentPage } from "../pages/ConsentPage";
+import { PreSortPage } from "../pages/PreSortPage";
+import { RoughSortPage } from "../pages/RoughSortPage";
+import { FineSortPage } from "../pages/FineSortPage";
+import { testDataBuilders } from "../fixtures/test-data";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+test.describe("Mobile UX (Focus Flow) (Real Backend)", () => {
+  test.use({
+    viewport: { width: 375, height: 667 },
+    isMobile: true,
+    hasTouch: true,
+  });
 
-// Load and Transform example-study.json
-const studyJsonPath = path.resolve(__dirname, '../../../backend/data/example-study.json');
-const rawStudy = JSON.parse(fs.readFileSync(studyJsonPath, 'utf-8'));
+  test.skip(
+    ({ browserName }) => browserName === "firefox",
+    "Firefox does not support mobile emulation",
+  );
 
-// Synthesize ID for statements
-const statements = rawStudy.statements.map((s: any, index: number) => ({
-    id: index + 1,
-    text: s.translations.en,
-    code: s.code,
-}));
+  let studySlug: string;
 
-const mockStudyConfig = {
-    ...rawStudy,
-    title: rawStudy.translations.en.title,
-    subtitle: rawStudy.translations.en.subtitle,
-    description: rawStudy.translations.en.description || '',
-    objective: rawStudy.translations.en.objective,
-    instructions: rawStudy.translations.en.instructions,
-    ui_labels: rawStudy.translations.en.ui_labels,
-    statements: statements,
-    state: rawStudy.state || 'active',
-};
-
-test.describe('Mobile UX (Focus Flow) [Refactored]', () => {
-    test.use({
-        viewport: { width: 375, height: 667 },
-        isMobile: true,
-        hasTouch: true,
-    });
-
-    test.skip(
-        ({ browserName }) => browserName === 'firefox',
-        'Firefox does not support mobile emulation'
+  test.beforeEach(async ({ testDb, authToken }) => {
+    const study = await testDb.createStudy(
+      authToken,
+      testDataBuilders.study({
+        title: "Mobile UX Test",
+        slug: `mobile-ux-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+        statements: testDataBuilders.statements(10),
+        grid_config: [
+          { score: -1, capacity: 3 },
+          { score: 0, capacity: 4 },
+          { score: 1, capacity: 3 },
+        ],
+        presort_config: testDataBuilders.presortConfig({
+          age: testDataBuilders.presortField("number", "Age", {
+            required: true,
+          }),
+          gender: testDataBuilders.presortField("select", "Gender", {
+            required: true,
+            options: ["Male", "Female"],
+          }),
+          education: testDataBuilders.presortField("select", "Education", {
+            required: true,
+            options: ["High School", "Bachelor"],
+          }),
+        }),
+        state: "active",
+      }),
     );
+    studySlug = study.slug;
+  });
 
-    test.beforeEach(async ({ page }) => {
-        // Mock Study API
-        await page.route(`**/api/study/${mockStudyConfig.slug}**`, async (route) => {
-            await route.fulfill({
-                status: 200,
-                contentType: 'application/json',
-                body: JSON.stringify(mockStudyConfig),
-            });
-        });
+  test("should activate workbench on card tap", async ({
+    page,
+    testDb,
+    authToken,
+  }) => {
+    const welcomePage = new WelcomePage(page);
+    const consentPage = new ConsentPage(page);
+    const preSortPage = new PreSortPage(page);
+    const roughSortPage = new RoughSortPage(page);
+    const fineSortPage = new FineSortPage(page);
 
-        // Mock Submission API
-        await mockSubmitAPI(page);
+    // 1. WELCOME
+    await welcomePage.visit(studySlug);
+    await welcomePage.startStudy();
 
-        // Mock Logging
-        await page.route('**/api/logs', async (route) => {
-            await route.fulfill({ status: 200, body: '{}' });
-        });
-    });
+    // 2. CONSENT
+    await consentPage.waitForLoad();
+    await consentPage.acceptConsent();
 
-    test('should activate workbench on card tap', async ({ page }) => {
-        const welcomePage = new WelcomePage(page);
-        const consentPage = new ConsentPage(page);
-        const preSortPage = new PreSortPage(page);
-        const roughSortPage = new RoughSortPage(page);
-        const fineSortPage = new FineSortPage(page);
+    // 3. PRESORT
+    await preSortPage.waitForLoad();
+    await preSortPage.completePreSort();
 
-        // 1. WELCOME
-        await welcomePage.visit(mockStudyConfig.slug);
-        await welcomePage.startStudy();
+    // 4. ROUGH SORT
+    await roughSortPage.waitForLoad();
+    // Distribute to populate Fine Sort Disagree deck
+    // completeRoughSort puts cards into piles.
+    // We have 10 cards.
+    await roughSortPage.completeRoughSort(10);
 
-        // 2. CONSENT
-        await consentPage.waitForLoad();
-        await consentPage.acceptConsent();
+    // 5. FINE SORT
+    await fineSortPage.waitForLoad();
 
-        // 3. PRESORT
-        // Ensure we handle presort if it appears
-        // In mobile-ux original, it was explicit click
-        await preSortPage.waitForLoad();
-        await preSortPage.completePreSort();
-
-        // 4. ROUGH SORT
-        await roughSortPage.waitForLoad();
-        // Distribute to populate Fine Sort Disagree deck (Mock logic puts 1st in Disagree)
-        await roughSortPage.completeRoughSort(mockStudyConfig.statements.length);
-
-        // Navigation: RoughSortPage.completeRoughSort waits for animations but maybe not click next?
-        // Check implementation of RoughSortPage: it *doesn't* click next, just sorts.
-        // We need to click next.
-        const nextBtn = page.getByRole('button', { name: /next|suivant|continue/i }).first();
-        await nextBtn.click();
-
-        // 5. FINE SORT
-        await fineSortPage.waitForLoad();
-
-        // Mobile Interactions
-        await fineSortPage.tapFirstCard();
-        await fineSortPage.verifyWorkbenchActive();
-    });
+    // Mobile Interactions
+    await fineSortPage.tapFirstCard();
+    await fineSortPage.verifyWorkbenchActive();
+  });
 });

@@ -5,9 +5,6 @@
  */
 
 import i18n from '../i18n';
-import en from '../locales/en.json';
-import fi from '../locales/fi.json';
-import fr from '../locales/fr.json';
 
 /**
  * Applies study-specific overrides to the i18n resource bundle.
@@ -16,21 +13,21 @@ import fr from '../locales/fr.json';
 export const applyStudyOverrides = (lang: string, labels?: Record<string, string>) => {
     if (!labels || Object.keys(labels).length === 0) return;
 
-    // i18next expects a nested object if using dots,
-    // but addResourceBundle with deep: true and dot-notated keys
-    // can sometimes be tricky depending on the version/config.
-    // We'll manually expand or just use the flat keys if i18next is configured for them.
-    // Given our JSON structure is nested, it's safer to use the 'deep' merge.
-
+    // i18next handles dot-notated keys automatically when using addResourceBundle
+    // with deep: true and the key-value pair.
     i18n.addResourceBundle(lang, 'translation', labels, true, true);
 };
 
 /**
  * Resets the i18n resource bundles to their original state
  * to prevent label leakage between different studies.
+ * It reloads the base translations from the server/public folder.
  */
 export const resetBaseLocales = () => {
-    i18n.addResourceBundle('en', 'translation', en, true, true);
-    i18n.addResourceBundle('fr', 'translation', fr, true, true);
-    i18n.addResourceBundle('fi', 'translation', fi, true, true);
+    const langs = ['en', 'fr', 'fi'];
+    for (const lang of langs) {
+        i18n.removeResourceBundle(lang, 'translation');
+    }
+    // Reload will trigger fetching the original JSONs via HttpBackend
+    i18n.reloadResources(langs, ['translation']);
 };

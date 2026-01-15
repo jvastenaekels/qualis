@@ -11,7 +11,7 @@ import type { StudyConfig } from '../schemas/study';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import WelcomePage from './WelcomePage';
 
 // Mocks
@@ -28,14 +28,6 @@ const mockConfig = {
         description: null,
     },
 };
-
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string, defaultValue: string) => defaultValue || key }),
-}));
-
-vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: () => ({ isLoading: false, error: null }),
-}));
 
 describe('WelcomePage', () => {
     beforeEach(() => {
@@ -56,7 +48,7 @@ describe('WelcomePage', () => {
     it('renders instructions markdown', () => {
         renderWithProviders(<WelcomePage />);
         // Label
-        expect(screen.getByText('Instructions')).toBeInTheDocument();
+        expect(screen.getByText('Process')).toBeInTheDocument();
 
         // Markdown Content - split check to be resilient to formatting/newlines
         expect(screen.getByText('Content')).toBeInTheDocument();
@@ -76,7 +68,7 @@ describe('WelcomePage', () => {
             { initialEntries: ['/study/test-study/welcome'] }
         );
 
-        const button = screen.getByRole('button', { name: /Continue/i });
+        const button = screen.getByRole('button', { name: /Get Started/i });
         expect(button).toBeInTheDocument();
 
         fireEvent.click(button);

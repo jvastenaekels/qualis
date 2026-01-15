@@ -11,8 +11,13 @@ import StudyLayout from '../layouts/StudyLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import FineSortPage from './FineSortPage';
+
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({ t: (key: string) => key }),
+    I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
 
 describe('FineSortPage Mobile Interaction (Integration)', () => {
     beforeEach(() => {
@@ -46,6 +51,22 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
             configurable: true,
             value: 375,
         });
+
+        // Mock matchMedia for mobile
+        Object.defineProperty(window, 'matchMedia', {
+            writable: true,
+            value: vi.fn().mockImplementation((query) => ({
+                matches: true, // Always match mobile queries
+                media: query,
+                onchange: null,
+                addListener: vi.fn(),
+                removeListener: vi.fn(),
+                addEventListener: vi.fn(),
+                removeEventListener: vi.fn(),
+                dispatchEvent: vi.fn(),
+            })),
+        });
+
         window.dispatchEvent(new Event('resize'));
     });
 
@@ -66,7 +87,9 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         );
 
         // 2. Ensure we are on the 'disagree' pile
-        const disagreeTab = await screen.findByRole('tab', { name: /common.disagree/i });
+        const disagreeTab = await screen.findByRole('tab', {
+            name: /common.disagree/i,
+        });
         fireEvent.click(disagreeTab);
 
         // 3. Wait for Card 1 to appear in the deck
@@ -110,7 +133,9 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         );
 
         // Ensure we are on 'disagree'
-        const disagreeTab = await screen.findByRole('tab', { name: /common.disagree/i });
+        const disagreeTab = await screen.findByRole('tab', {
+            name: /common.disagree/i,
+        });
         fireEvent.click(disagreeTab);
 
         // Check for precise "all placed" label
@@ -134,7 +159,9 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         );
 
         // 2. Ensure we are on the 'disagree' pile
-        const disagreeTab = await screen.findByRole('tab', { name: /common.disagree/i });
+        const disagreeTab = await screen.findByRole('tab', {
+            name: /common.disagree/i,
+        });
         fireEvent.click(disagreeTab);
 
         // 3. Select Card 2 (in Deck)

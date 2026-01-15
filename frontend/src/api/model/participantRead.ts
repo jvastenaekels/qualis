@@ -8,6 +8,7 @@ import type { ParticipantStatus } from './participantStatus';
 import type { ParticipantReadSubmittedAt } from './participantReadSubmittedAt';
 import type { ParticipantReadDiscardReason } from './participantReadDiscardReason';
 import type { ParticipantReadUserAgent } from './participantReadUserAgent';
+import type { ParticipantReadRecruitmentToken } from './participantReadRecruitmentToken';
 
 /**
  * Schema for reading a participant.
@@ -23,4 +24,5 @@ export interface ParticipantRead {
     is_discarded: boolean;
     discard_reason: ParticipantReadDiscardReason;
     user_agent: ParticipantReadUserAgent;
+    recruitment_token?: ParticipantReadRecruitmentToken;
 }

@@ -10,6 +10,7 @@ import type { StatementTranslationCreate } from './statementTranslationCreate';
  * Schema for updating a statement text (by code).
  */
 export interface StatementUpdate {
+    /** @maxLength 50 */
     code: string;
     translations: StatementTranslationCreate[];
 }

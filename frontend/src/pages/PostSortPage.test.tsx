@@ -5,7 +5,7 @@ import StudyLayout from '../layouts/StudyLayout';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
-import { renderWithProviders } from '../test/test-utils';
+import { renderWithProviders } from '../test-utils/test-utils';
 import PostSortPage from './PostSortPage';
 
 // Mock GridSort
@@ -33,7 +33,11 @@ vi.mock('../hooks/useSubmitStudy', () => ({
 
 // Mock useStudyConfig since it's used in StudyLayout
 vi.mock('../hooks/useStudyConfig', () => ({
-    useStudyConfig: vi.fn(() => ({ isLoading: false, error: null, retry: vi.fn() })),
+    useStudyConfig: vi.fn(() => ({
+        isLoading: false,
+        error: null,
+        retry: vi.fn(),
+    })),
 }));
 
 describe('PostSortPage', () => {
@@ -104,7 +108,51 @@ describe('PostSortPage', () => {
         );
 
         // Should render Post Sort specific content (e.g. Title)
-        // Note: Title key is 'post.title', mocked i18n returns key
-        expect(await screen.findByText('post.title')).toBeInTheDocument();
+        // Note: Title key is 'post.title', real i18n returns "To conclude"
+        expect(await screen.findByText('To conclude')).toBeInTheDocument();
+    });
+
+    it('Renders specific prompts for positive and negative extremes', async () => {
+        useConfigStore.setState({
+            config: {
+                statements: [
+                    { id: 1, text: 'Card Negative' },
+                    { id: 2, text: 'Card Positive' },
+                ],
+                slug: 'demo',
+                grid_config: [
+                    { score: -1, capacity: 1 },
+                    { score: 1, capacity: 1 },
+                ],
+                postsort_config: {
+                    extreme_columns: [-1, 1],
+                    prompts: {
+                        extreme_negative: 'Why so negative?',
+                        extreme_positive: 'Why so positive?',
+                    },
+                },
+                state: 'active',
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
+            } as any,
+        });
+
+        useResponseStore.setState({
+            qsort: [
+                { statementId: 1, col: 0, row: 0 }, // Score -1
+                { statementId: 2, col: 1, row: 0 }, // Score 1
+            ],
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="post-sort" element={<PostSortPage />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/post-sort'] }
+        );
+
+        expect(await screen.findByText('Why so negative?')).toBeInTheDocument();
+        expect(await screen.findByText('Why so positive?')).toBeInTheDocument();
     });
 });

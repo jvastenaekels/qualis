@@ -12,13 +12,22 @@
  * Manages the top navigation bar, step progress, and locale switching.
  */
 
-import { Check, ChevronDown, Globe } from 'lucide-react';
+import { Check, ChevronDown, Globe, WifiOff } from 'lucide-react';
+import { useNetworkStatus } from '../hooks/useNetworkStatus';
+import type { PartnerLogo } from '@/api/model';
+import type { StudyConfig } from '@/schemas/study';
 import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import {
+    Navigate,
+    Outlet,
+    useLocation,
+    useNavigate,
+    useParams,
+    useLoaderData,
+} from 'react-router-dom';
 import { ApiError } from '../api/client';
-import ErrorBoundary from '../components/ErrorBoundary';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
@@ -28,13 +37,16 @@ import type { StudyStatusType } from '../pages/StudyStatusPage';
 import StudyStatusPage from '../pages/StudyStatusPage';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
+import { StudyAccessGate } from '../components/study/StudyAccessGate';
+import HelpOverlay from '../components/study/HelpOverlay';
+import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },
-    { id: 2, labelKey: 'layout.steps.presort' },
-    { id: 3, labelKey: 'layout.steps.rough' },
-    { id: 4, labelKey: 'layout.steps.fine' },
-    { id: 5, labelKey: 'layout.steps.review' },
+    { id: 2, labelKey: 'welcome.steps.profile.title' },
+    { id: 3, labelKey: 'welcome.steps.rough.title' },
+    { id: 4, labelKey: 'welcome.steps.fine.title' },
+    { id: 5, labelKey: 'welcome.steps.post.title' },
 ];
 
 const StudyLayoutContent: React.FC = () => {
@@ -45,7 +57,15 @@ const StudyLayoutContent: React.FC = () => {
     const config = useConfigStore((state) => state.config);
     const configLoading = useConfigStore((state) => state.isLoading);
     const configError = useConfigStore((state) => state.error);
-    const session = useSessionStore();
+    const setConfig = useConfigStore((state) => state.setConfig);
+
+    // session selectors
+    const maxReachedStep = useSessionStore((state) => state.maxReachedStep);
+    const currentStep = useSessionStore((state) => state.currentStep);
+    const isCompleted = useSessionStore((state) => state.isCompleted);
+    const hasConsented = useSessionStore((state) => state.hasConsented);
+    const sessionLanguage = useSessionStore((state) => state.language);
+    const isPilotMode = useSessionStore((state) => state.isPilotMode);
 
     const location = useLocation();
     const { headerAction } = useLayoutState();
@@ -54,8 +74,21 @@ const StudyLayoutContent: React.FC = () => {
     const langMenuRef = useRef<HTMLDivElement>(null);
     const stepMenuRef = useRef<HTMLDivElement>(null);
 
+    // Network Status
+    const { isOnline } = useNetworkStatus();
+
     const handleStepClick = (stepId: number) => {
-        if (stepId > session.maxReachedStep) return;
+        if (stepId > maxReachedStep) return;
+
+        // Skip presort if disabled
+        if (
+            stepId === 2 &&
+            config?.presort_config &&
+            'enabled' in config.presort_config &&
+            config.presort_config.enabled === false
+        ) {
+            return;
+        }
 
         const routes: Record<number, string> = {
             1: 'welcome',
@@ -67,12 +100,12 @@ const StudyLayoutContent: React.FC = () => {
 
         const route = routes[stepId];
         if (route) {
-            navigate(`/study/${slug}/${route}`);
+            navigate(`/study/${slug}/${route}${location.search}`);
         }
     };
 
     // Trigger config fetch/re-fetch on slug or language change
-    const { retry } = useStudyConfig();
+    const { retry, unlock, passwordError } = useStudyConfig();
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -92,10 +125,10 @@ const StudyLayoutContent: React.FC = () => {
 
     // Sync i18n with Store (Persistence Source of Truth) - Atomic update with config
     useEffect(() => {
-        if (session.language && session.language !== i18n.language && !configLoading) {
-            i18n.changeLanguage(session.language);
+        if (sessionLanguage && sessionLanguage !== i18n.language && !configLoading) {
+            i18n.changeLanguage(sessionLanguage);
         }
-    }, [session.language, configLoading]);
+    }, [sessionLanguage, configLoading]);
 
     const changeLanguage = (lng: string) => {
         // Sync store (this will trigger config refetch)
@@ -103,13 +136,34 @@ const StudyLayoutContent: React.FC = () => {
         setIsLangMenuOpen(false);
     };
 
+    // --- RR7 Loader Data ---
+    // This component uses `useLoaderData` to hydrate the config store.
+    // In tests, we mock `useLoaderData` (see setupTests.ts) to avoid "Data Router" errors.
+    const { study } = useLoaderData() as { study: StudyConfig };
+
+    // Sync loader data to config store
+    useEffect(() => {
+        console.log('[StudyLayout] Loader data type:', typeof study, Array.isArray(study));
+        console.log('[StudyLayout] Loader data keys:', study ? Object.keys(study) : 'null');
+        if (study) {
+            console.log('[StudyLayout] Setting config', study);
+            setConfig(study);
+        } else {
+            console.error('[StudyLayout] Loader data is falsy!');
+        }
+    }, [study, setConfig]);
+
+    useEffect(() => {
+        console.log('[StudyLayout] ConfigStore:', config);
+    }, [config]);
+
     // Full Page Error State (if we have no config at all)
     if (configError && !config) {
         // Special Case: Study Not Found (404) -> Custom User Friendly Page
         if (configError === 'common.errors.not_found') {
             return <StudyStatusPage type="not_found" />;
         }
-
+        // ... (truncated for brevity, keep existing logic)
         // Map known error keys to ApiErrors for better UI
         let errorObj: Error | ApiError | null = null;
 
@@ -135,11 +189,15 @@ const StudyLayoutContent: React.FC = () => {
             <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
                 <div
                     data-testid="loading-spinner"
-                    className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"
+                    className="w-16 h-16 border-4 border-t-transparent rounded-full animate-spin"
+                    style={{
+                        borderColor: 'var(--brand-accent)',
+                        borderTopColor: 'transparent',
+                    }}
                 ></div>
                 <div className="space-y-2 text-center animate-pulse">
                     <p className="text-slate-500 font-bold text-xl">{t('common.loading')}</p>
-                    <p className="text-slate-400 text-sm">Preparing your study session...</p>
+                    <p className="text-slate-400 text-sm">{t('layout.preparing')}</p>
                 </div>
                 <div className="w-full max-w-md space-y-3 pt-8">
                     <div className="h-4 bg-slate-200 rounded w-3/4 mx-auto animate-pulse"></div>
@@ -150,19 +208,37 @@ const StudyLayoutContent: React.FC = () => {
     }
 
     // Study State Check (Draft, Paused, Closed)
-    if (config?.state && config.state !== 'active') {
+    // Pilot mode allows viewing regardless of study state
+    const isPilotModePersistent =
+        isPilotMode ||
+        new URLSearchParams(location.search).get('mode') === 'test' ||
+        sessionStorage.getItem('open-q-pilot-mode') === 'true';
+
+    if (!isPilotModePersistent && config?.state && config.state !== 'active') {
         return <StudyStatusPage type={config.state as StudyStatusType} onRetry={retry} />;
     }
 
-    // Basic Protection Check
-    const isProtected = ['presort', 'sort', 'review'].some((path) =>
-        location.pathname.includes(path)
-    );
-    if (isProtected && !session.hasConsented) {
-        return <Navigate to={`/study/${slug}/welcome`} replace />;
+    // Password Protection Gate
+    if (config?.requires_password) {
+        return (
+            <StudyAccessGate
+                title={config.title}
+                description={config.description || ''}
+                onUnlock={unlock}
+                isLoading={configLoading}
+                error={passwordError ? 'Incorrect password' : null}
+            />
+        );
     }
 
-    // Redirect study base URL to current/welcome step
+    // Basic Protection Check
+    const protectedPaths = ['/presort', '/rough-sort', '/fine-sort', '/post-sort'];
+    const isProtected = protectedPaths.some((path) => location.pathname.includes(path));
+
+    if (isProtected && !hasConsented) {
+        return <Navigate to={`/study/${slug}/welcome${location.search}`} replace />;
+    }
+
     // Redirect study base URL to current/welcome step
     const isStudyBase =
         location.pathname === `/study/${slug}` || location.pathname === `/study/${slug}/`;
@@ -174,55 +250,123 @@ const StudyLayoutContent: React.FC = () => {
             4: 'fine-sort',
             5: 'post-sort',
         };
-        const target = stepRoutes[session.currentStep] || 'welcome';
-        return <Navigate to={`/study/${slug}/${target}`} replace />;
+        const target = stepRoutes[currentStep] || 'welcome';
+        return <Navigate to={`/study/${slug}/${target}${location.search}`} replace />;
     }
 
     // Enforce One-Time Submission
     // If completed, redirect everything to post-sort (Thank You page)
-    if (session.isCompleted && !location.pathname.includes('post-sort')) {
-        return <Navigate to={`/study/${slug}/post-sort`} replace />;
+    if (isCompleted && !location.pathname.includes('post-sort')) {
+        return <Navigate to={`/study/${slug}/post-sort${location.search}`} replace />;
     }
 
     // Determine if we should show the mobile footer (only if headerAction exists)
     // This effectively acts as the bottom bar for mobile when an action is present
     const showMobileFooter = !!headerAction;
 
+    const branding = config?.branding;
+    const accentColor = branding?.accent_color || '#2563eb'; // Default to blue-600
+
+    // Filter steps based on config
+    const isPresortDisabled =
+        config?.presort_config &&
+        'enabled' in config.presort_config &&
+        config.presort_config.enabled === false;
+
+    const visibleSteps = steps.filter((step) => !(step.id === 2 && isPresortDisabled));
+
+    const currentVisibleIndex = visibleSteps.findIndex((s) => s.id === currentStep);
+
     return (
-        <div className="h-dvh bg-gray-50 flex flex-col overflow-hidden">
+        <div
+            className="min-h-screen bg-gray-50 flex flex-col overflow-hidden"
+            style={{ '--brand-accent': accentColor } as React.CSSProperties}
+        >
+            {/* Pilot Mode Banner */}
+            {isPilotModePersistent && (
+                <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex items-center justify-center gap-2 text-amber-900 text-[11px] font-bold uppercase tracking-wider relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
+                    <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                    {t('layout.pilot_mode')}
+                </div>
+            )}
+
+            {/* Offline Status Banner */}
+            {!isOnline && (
+                <div className="bg-slate-800 text-white px-4 py-2 flex items-center justify-center gap-2 text-sm font-medium sticky top-0 z-[70] shadow-md animate-in fade-in slide-in-from-top duration-300">
+                    <WifiOff size={16} className="animate-pulse" />
+                    <span>
+                        {t(
+                            'common.status.offline',
+                            'You are offline. Changes are queued and will sync when reconnected.'
+                        )}
+                    </span>
+                </div>
+            )}
             {/* Header */}
             <header
                 data-testid="layout-header"
-                className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-50 flex items-center justify-between relative shadow-sm"
+                className="px-6 h-16 border-b border-slate-200 bg-white sticky top-0 z-header flex items-center justify-between relative shadow-sm"
             >
                 {/* Subtle Loading Line (Background Re-validation) */}
                 {configLoading && (
-                    <div className="absolute top-0 left-0 w-full h-[2px] bg-blue-600/20 overflow-hidden">
-                        <div className="h-full bg-blue-600 w-1/3 animate-loading-line" />
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-[var(--brand-accent)]/20 overflow-hidden">
+                        <div className="h-full bg-[var(--brand-accent)] w-1/3 animate-loading-line" />
                     </div>
                 )}
 
                 {/* Mobile Progress Bar (Top Edge) */}
                 <div className="md:hidden absolute top-0 left-0 w-full h-1 bg-slate-100">
                     <div
-                        className="h-full bg-blue-600 transition-all duration-300 ease-in-out"
-                        style={{ width: `${(session.currentStep / steps.length) * 100}%` }}
+                        className="h-full bg-[var(--brand-accent)] transition-all duration-300 ease-in-out"
+                        style={{
+                            width: `${((currentVisibleIndex + 1) / visibleSteps.length) * 100}%`,
+                        }}
                     />
                 </div>
 
                 {/* LEFT: Branding / Context */}
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-md">
-                        {/* Use logo if on step 1, else config title */}
-                        {session.currentStep === 1 ? (
+                        {/* Use custom logo if available, or logo if on step 1, else config title */}
+                        {/* Show Main Logo if available */}
+                        {branding?.logo_url && (
                             <img
-                                src="/open-q-logo.svg"
-                                alt="Open-Q"
-                                className="h-8 w-auto object-contain"
+                                src={branding.logo_url}
+                                alt={config?.title || t('layout.default_study_title')}
+                                className="h-8 w-auto object-contain mr-4"
                             />
-                        ) : (
-                            config?.title || 'Q-Method Study'
                         )}
+
+                        {/* Show Partner Logos */}
+                        {Array.isArray(branding?.partners) && branding.partners.length > 0 && (
+                            <div className="flex items-center gap-4 border-l border-slate-200 pl-4">
+                                {branding.partners.map(
+                                    (partner: PartnerLogo) =>
+                                        partner.logo_url && (
+                                            <img
+                                                key={partner.id || partner.logo_url}
+                                                src={partner.logo_url}
+                                                alt={partner.name || ''}
+                                                title={partner.name || ''}
+                                                className="h-6 w-auto object-contain opacity-80"
+                                            />
+                                        )
+                                )}
+                            </div>
+                        )}
+
+                        {/* Fallback to Title if no logos */}
+                        {!branding?.logo_url &&
+                            !(branding?.partners && branding.partners.length > 0) &&
+                            (currentStep === 1 ? (
+                                <img
+                                    src="/open-q-logo.svg"
+                                    alt={t('layout.title')}
+                                    className="h-8 w-auto object-contain"
+                                />
+                            ) : (
+                                config?.title || t('layout.default_study_title')
+                            ))}
                     </div>
 
                     {/* Mobile Step Counter & Menu */}
@@ -230,12 +374,17 @@ const StudyLayoutContent: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setIsStepMenuOpen(!isStepMenuOpen)}
+                            style={{
+                                backgroundColor: isStepMenuOpen ? 'var(--brand-accent)' : undefined,
+                                color: isStepMenuOpen ? 'white' : undefined,
+                            }}
                             className={`
                                 text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap transition-all flex items-center gap-1.5
-                                ${isStepMenuOpen ? 'bg-blue-600 text-white shadow-md scale-105' : 'text-slate-500 bg-slate-100 hover:bg-slate-200'}
+                                ${!isStepMenuOpen ? 'text-slate-500 bg-slate-100 hover:bg-slate-200' : 'shadow-md scale-105'}
                             `}
                         >
-                            {t('layout.mobile_step')} {session.currentStep}/{steps.length}
+                            {t('layout.mobile_step')} {currentVisibleIndex + 1}/
+                            {visibleSteps.length}
                             <ChevronDown
                                 size={12}
                                 className={`transition-transform duration-200 ${isStepMenuOpen ? 'rotate-180' : ''}`}
@@ -248,9 +397,9 @@ const StudyLayoutContent: React.FC = () => {
                                 <div className="px-3 py-1 mb-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                                     {t('layout.navigation')}
                                 </div>
-                                {steps.map((step) => {
-                                    const isReached = step.id <= session.maxReachedStep;
-                                    const isCurrent = step.id === session.currentStep;
+                                {visibleSteps.map((step, index) => {
+                                    const isReached = step.id <= maxReachedStep;
+                                    const isCurrent = step.id === currentStep;
 
                                     return (
                                         <button
@@ -261,11 +410,19 @@ const StudyLayoutContent: React.FC = () => {
                                                 handleStepClick(step.id);
                                                 setIsStepMenuOpen(false);
                                             }}
+                                            style={{
+                                                backgroundColor: isCurrent
+                                                    ? 'color-mix(in srgb, var(--brand-accent), transparent 90%)'
+                                                    : undefined,
+                                                color: isCurrent
+                                                    ? 'var(--brand-accent)'
+                                                    : undefined,
+                                            }}
                                             className={`
                                                 w-full px-3 py-2.5 flex items-center justify-between text-left transition-colors
                                                 ${
                                                     isCurrent
-                                                        ? 'bg-blue-50 text-blue-700 font-semibold'
+                                                        ? 'font-semibold'
                                                         : isReached
                                                           ? 'text-slate-700 hover:bg-slate-50 active:bg-slate-100'
                                                           : 'text-slate-400 cursor-not-allowed pointer-events-none opacity-60'
@@ -273,13 +430,14 @@ const StudyLayoutContent: React.FC = () => {
                                             `}
                                         >
                                             <span className="text-sm">
-                                                {step.id}. {t(step.labelKey)}
+                                                {index + 1}. {t(step.labelKey)}
                                             </span>
-                                            {isReached &&
-                                                !isCurrent &&
-                                                session.currentStep > step.id && (
-                                                    <Check size={14} className="text-blue-500" />
-                                                )}
+                                            {isReached && !isCurrent && currentStep > step.id && (
+                                                <Check
+                                                    size={14}
+                                                    style={{ color: 'var(--brand-accent)' }}
+                                                />
+                                            )}
                                         </button>
                                     );
                                 })}
@@ -290,23 +448,29 @@ const StudyLayoutContent: React.FC = () => {
 
                 {/* CENTER: Stepper (Desktop Only) */}
                 <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
-                    <div className="flex items-center gap-1">
-                        {steps.map((step, index) => {
+                    <div data-testid="stepper-container" className="flex items-center gap-1">
+                        {visibleSteps.map((step, index) => {
                             const status =
-                                session.currentStep === step.id
+                                currentStep === step.id
                                     ? 'current'
-                                    : session.currentStep > step.id
+                                    : currentStep > step.id
                                       ? 'completed'
                                       : 'upcoming';
 
-                            const isReachable = step.id <= session.maxReachedStep;
+                            const isReachable = step.id <= maxReachedStep;
 
                             return (
                                 <div key={step.id} className="flex items-center">
                                     {/* Connection Line */}
                                     {index > 0 && (
                                         <div
-                                            className={`w-8 h-0.5 mx-2 transition-colors duration-300 ${status === 'upcoming' ? 'bg-slate-200' : 'bg-blue-600'}`}
+                                            className="w-8 h-0.5 mx-2 transition-colors duration-300"
+                                            style={{
+                                                backgroundColor:
+                                                    status === 'upcoming'
+                                                        ? '#e2e8f0'
+                                                        : 'var(--brand-accent)',
+                                            }}
                                         />
                                     )}
 
@@ -315,25 +479,48 @@ const StudyLayoutContent: React.FC = () => {
                                         type="button"
                                         onClick={() => handleStepClick(step.id)}
                                         disabled={!isReachable}
+                                        style={{
+                                            borderColor:
+                                                status === 'upcoming'
+                                                    ? '#e2e8f0'
+                                                    : 'var(--brand-accent)',
+                                            backgroundColor:
+                                                status === 'completed'
+                                                    ? 'var(--brand-accent)'
+                                                    : 'white',
+                                            color:
+                                                status === 'completed'
+                                                    ? 'white'
+                                                    : 'var(--brand-accent)',
+                                            boxShadow:
+                                                status === 'current'
+                                                    ? '0 0 0 4px color-mix(in srgb, var(--brand-accent), transparent 90%)'
+                                                    : undefined,
+                                        }}
                                         className={`
-                           w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
-                           ${
-                               status === 'current'
-                                   ? 'border-blue-600 text-blue-600 bg-white shadow-sm ring-4 ring-blue-50'
-                                   : status === 'completed'
-                                     ? 'bg-blue-600 border-blue-600 text-white hover:bg-blue-700 hover:scale-110 cursor-pointer shadow-sm'
-                                     : isReachable
-                                       ? 'border-blue-400 text-blue-600 bg-white hover:bg-blue-50 hover:border-blue-600 cursor-pointer shadow-sm ring-2 ring-blue-50'
-                                       : 'border-slate-200 bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
-                           }
-                       `}
+                                           w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                                           ${
+                                               status === 'upcoming' && !isReachable
+                                                   ? 'bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
+                                                   : 'cursor-pointer shadow-sm'
+                                           }
+                                       `}
                                     >
                                         {status === 'completed' ? (
                                             <Check size={16} strokeWidth={3} />
                                         ) : status === 'current' ? (
-                                            <div className="w-2.5 h-2.5 bg-blue-600 rounded-full" />
+                                            <div
+                                                className="w-2.5 h-2.5 rounded-full"
+                                                style={{ backgroundColor: 'var(--brand-accent)' }}
+                                            />
                                         ) : isReachable ? (
-                                            <div className="w-2 h-2 bg-blue-400 rounded-full" />
+                                            <div
+                                                className="w-2 h-2 rounded-full"
+                                                style={{
+                                                    backgroundColor:
+                                                        'color-mix(in srgb, var(--brand-accent), transparent 40%)',
+                                                }}
+                                            />
                                         ) : (
                                             <div className="w-2 h-2 bg-slate-200 rounded-full" />
                                         )}
@@ -358,15 +545,15 @@ const StudyLayoutContent: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                            className="p-2 rounded-full hover:bg-slate-100 text-slate-600 transition-colors"
-                            title="Change language"
+                            className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-slate-100 text-slate-600 transition-colors touch-manipulation"
+                            title={t('layout.change_lang_title')}
                         >
                             <Globe size={20} />
                         </button>
 
                         {/* Dropdown (Simplified) */}
                         {isLangMenuOpen && (
-                            <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-50 animate-in fade-in zoom-in-95">
+                            <div className="absolute right-0 top-full mt-2 w-40 bg-white rounded-lg shadow-xl border border-slate-100 py-1 z-dropdown animate-in fade-in zoom-in-95">
                                 {['en', 'fr', 'fi']
                                     .filter(
                                         (lang) =>
@@ -378,10 +565,20 @@ const StudyLayoutContent: React.FC = () => {
                                             key={lang}
                                             type="button"
                                             onClick={() => changeLanguage(lang)}
-                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${i18n.language.startsWith(lang) ? 'text-blue-600 font-semibold' : 'text-slate-700'}`}
+                                            style={{
+                                                color: i18n.language.startsWith(lang)
+                                                    ? 'var(--brand-accent)'
+                                                    : undefined,
+                                            }}
+                                            className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 flex items-center justify-between ${i18n.language.startsWith(lang) ? 'font-semibold' : 'text-slate-700'}`}
                                         >
                                             <span className="uppercase">{lang}</span>
-                                            {i18n.language.startsWith(lang) && <Check size={14} />}
+                                            {i18n.language.startsWith(lang) && (
+                                                <Check
+                                                    size={14}
+                                                    style={{ color: 'var(--brand-accent)' }}
+                                                />
+                                            )}
                                         </button>
                                     ))}
                             </div>
@@ -401,18 +598,35 @@ const StudyLayoutContent: React.FC = () => {
                 <div
                     className={`flex-1 min-h-0 flex flex-col transition-opacity duration-300 ${configLoading ? 'opacity-50 pointer-events-none' : 'opacity-100'}`}
                 >
-                    <ErrorBoundary>
-                        <Outlet />
-                    </ErrorBoundary>
+                    <ComponentErrorBoundary
+                        title="Unable to load study step"
+                        onReset={() => window.location.reload()}
+                    >
+                        <Suspense
+                            fallback={
+                                <div className="flex-1 flex flex-col items-center justify-center space-y-4">
+                                    <div className="w-12 h-12 border-4 border-t-transparent border-indigo-600 rounded-full animate-spin" />
+                                    <p className="text-slate-500 font-medium">
+                                        {t('layout.loading_content')}
+                                    </p>
+                                </div>
+                            }
+                        >
+                            <Outlet />
+                        </Suspense>
+                    </ComponentErrorBoundary>
                 </div>
             </main>
 
             {/* Mobile Footer (Primary Action) */}
             {showMobileFooter && (
-                <div className="md:hidden flex-none bg-white border-t border-slate-200 p-4 sticky bottom-0 z-50 pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div className="md:hidden flex-none bg-white border-t border-slate-200 p-4 sticky bottom-0 z-sticky pb-safe shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                     {headerAction}
                 </div>
             )}
+
+            {/* Help Overlay (Floating) */}
+            <HelpOverlay />
         </div>
     );
 };

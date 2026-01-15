@@ -18,6 +18,7 @@ interface SessionState {
     isCompleted: boolean;
     confirmationCode: string | null;
     isSaving: boolean;
+    isPilotMode: boolean;
 
     setToken: (token: string) => void;
     setConsent: (hasConsented: boolean) => void;
@@ -25,8 +26,22 @@ interface SessionState {
     setLanguage: (lang: string) => void;
     completeSession: (code: string) => void;
     setSaving: (isSaving: boolean) => void;
+    setPilotMode: (isPilot: boolean) => void;
     resetSession: () => void;
 }
+
+const isPilot = () => {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('mode') === 'test') {
+            sessionStorage.setItem('open-q-pilot-mode', 'true');
+            return true;
+        }
+        return sessionStorage.getItem('open-q-pilot-mode') === 'true';
+    } catch {
+        return false;
+    }
+};
 
 export const useSessionStore = create<SessionState>()(
     persist(
@@ -39,6 +54,7 @@ export const useSessionStore = create<SessionState>()(
             isCompleted: false,
             confirmationCode: null,
             isSaving: false,
+            isPilotMode: isPilot(),
 
             setToken: (token) => set({ token }),
             setConsent: (hasConsented) => set({ hasConsented }),
@@ -50,6 +66,7 @@ export const useSessionStore = create<SessionState>()(
             setLanguage: (language) => set({ language }),
             completeSession: (confirmationCode) => set({ isCompleted: true, confirmationCode }),
             setSaving: (isSaving) => set({ isSaving }),
+            setPilotMode: (isPilotMode) => set({ isPilotMode }),
             resetSession: () => {
                 resetBaseLocales();
                 set({
@@ -61,11 +78,12 @@ export const useSessionStore = create<SessionState>()(
                     isCompleted: false,
                     confirmationCode: null,
                     isSaving: false,
+                    isPilotMode: false,
                 });
             },
         }),
         {
-            name: 'open-q-session',
+            name: isPilot() ? 'open-q-pilot-session' : 'open-q-session',
             version: 1,
         }
     )
