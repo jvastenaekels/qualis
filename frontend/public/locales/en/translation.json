@@ -365,6 +365,7 @@
       "data": "Data",
       "team": "Team",
       "settings": "Settings",
+      "analytics": "Analytics",
       "documentation": "Documentation",
       "support": "Support",
       "study_management": "Study Management",
@@ -402,6 +403,10 @@
         "success": "Workspace created successfully",
         "error": "Failed to create workspace"
       }
+    },
+    "analytics": {
+      "title": "Study Analytics",
+      "description": "Deep dive into participation patterns, consensus analysis, and statistical distributions."
     },
     "recruitment": {
       "title": "Recruitment",

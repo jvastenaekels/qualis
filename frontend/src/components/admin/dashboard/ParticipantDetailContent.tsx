@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { ParticipantGridView } from './charts/ParticipantGridView';
 
 // Helper to reconstruct Q-Sort
 const getReconstructedQSort = (participant: DumpParticipant, studyData: DumpResponse) => {
@@ -196,6 +197,13 @@ export function ParticipantDetailContent({
                     <Eye className="w-4 h-4 text-indigo-500" />
                     {t('admin.data.detail.sort_config', 'Sort Re-construction')}
                 </h3>
+
+                <ParticipantGridView
+                    participant={participant}
+                    studyData={studyData}
+                    className="mb-8"
+                />
+
                 <div className="space-y-6 relative before:absolute before:left-3.5 before:top-4 before:bottom-4 before:w-0.5 before:bg-slate-200 before:-z-10">
                     {getReconstructedQSort(participant, studyData).map((pile) => (
                         <div key={pile.score} className="relative pl-10 group">

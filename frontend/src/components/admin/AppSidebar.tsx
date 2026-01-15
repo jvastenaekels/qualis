@@ -1,6 +1,5 @@
 import {
     BadgeCheck,
-    BarChart3,
     ChevronsUpDown,
     Globe,
     LayoutDashboard,
@@ -9,6 +8,8 @@ import {
     Search,
     Settings,
     UserPlus,
+    Download,
+    AreaChart,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
@@ -191,6 +192,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           icon: PencilRuler,
                       },
                       {
+                          title: t('admin.sidebar.analytics', 'Analytics'),
+                          url: `/admin/studies/${activeStudyId}/analytics`,
+                          icon: AreaChart,
+                      },
+                      {
                           title: t('admin.sidebar.recruit'),
                           url: `/admin/studies/${activeStudyId}/recruitment`,
                           icon: UserPlus,
@@ -198,7 +204,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       {
                           title: t('admin.sidebar.data'),
                           url: `/admin/studies/${activeStudyId}/exports`,
-                          icon: BarChart3,
+                          icon: Download,
                       },
                       {
                           title: t('admin.sidebar.settings'),

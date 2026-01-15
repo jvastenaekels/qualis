@@ -50,6 +50,8 @@ import {
     useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete,
 } from '@/api/generated';
 import type { RecruitmentLinkRead, RecruitmentLinkType } from '@/api/model';
+import { RecruitmentFunnelChart } from '@/components/admin/dashboard/charts/RecruitmentFunnelChart';
+import { LinkPerformanceChart } from '@/components/admin/dashboard/charts/LinkPerformanceChart';
 
 const RecruitmentPage = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -385,6 +387,21 @@ const RecruitmentPage = () => {
                         </p>
                     </CardContent>
                 </Card>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-12">
+                <div className="col-span-12 md:col-span-4">
+                    <RecruitmentFunnelChart
+                        links={links}
+                        className="border-none shadow-sm bg-white rounded-2xl h-full"
+                    />
+                </div>
+                <div className="col-span-12 md:col-span-8">
+                    <LinkPerformanceChart
+                        links={links}
+                        className="border-none shadow-sm bg-white rounded-2xl h-full"
+                    />
+                </div>
             </div>
 
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">

@@ -21,6 +21,10 @@ import {
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Link } from 'react-router-dom';
 import StudyStatusControl from '@/components/admin/dashboard/StudyStatusControl';
+import { SubmissionsTimelineChart } from '@/components/admin/dashboard/charts/SubmissionsTimelineChart';
+import { CompletionRateTrendChart } from '@/components/admin/dashboard/charts/CompletionRateTrendChart';
+import { DeviceBreakdownChart } from '@/components/admin/dashboard/charts/DeviceBreakdownChart';
+import { DurationHistogramChart } from '@/components/admin/dashboard/charts/DurationHistogramChart';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, format } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
@@ -206,6 +210,37 @@ const StudyOverviewPage = () => {
                                     </p>
                                 </CardContent>
                             </Card>
+                        </div>
+                    </div>
+
+                    {/* Analytics Overview - Phase 1 */}
+                    <div className="grid gap-6 md:grid-cols-12 mb-6">
+                        <div className="col-span-12 md:col-span-8">
+                            <SubmissionsTimelineChart
+                                participants={participants}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
+                        </div>
+                        <div className="col-span-12 md:col-span-4">
+                            <CompletionRateTrendChart
+                                participants={participants}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-12 mb-6">
+                        <div className="col-span-12 md:col-span-8">
+                            <DurationHistogramChart
+                                participants={participants}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
+                        </div>
+                        <div className="col-span-12 md:col-span-4">
+                            <DeviceBreakdownChart
+                                deviceBreakdown={stats.device_breakdown}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
                         </div>
                     </div>
                 </>
