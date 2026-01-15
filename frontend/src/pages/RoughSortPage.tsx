@@ -249,7 +249,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     }
 
     return (
-        <div className="w-full px-4 md:px-6 lg:max-w-7xl lg:mx-auto flex flex-col h-full overflow-hidden relative select-none">
+        <div className="w-full px-2 sm:px-4 md:px-6 lg:max-w-7xl lg:mx-auto flex flex-col h-full overflow-hidden relative select-none">
             {/* 1. Slim Progress Bar (Top) */}
             <div className="w-full h-1 bg-gray-100 flex-none z-30">
                 <div
@@ -314,7 +314,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
             </div>
 
             {/* 3. The Control Cluster (Centered Stage) */}
-            <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-2 py-4 relative gap-2 sm:gap-8 md:gap-12">
+            <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-0 sm:px-2 py-4 relative gap-2 sm:gap-8 md:gap-12">
                 {/* FLOATING TIP REMOVED (Moved to Header) */}
 
                 {/* Row A: Horizon (Disagree - Card - Agree) */}
