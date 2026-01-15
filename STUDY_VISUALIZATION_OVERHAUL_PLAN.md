@@ -14,10 +14,11 @@ This plan outlines a comprehensive overhaul of study data visualization in the O
 1. Implement time-series visualizations for tracking participation trends
 2. Add distribution charts for duration, scores, and demographic analysis
 3. Create interactive statement analysis visualizations
-4. Enhance recruitment analytics with funnel and cohort visualizations
-5. Build a dedicated Analytics dashboard
-6. Ensure mobile responsiveness and accessibility
-7. Leverage the already-installed `recharts` library (v3.6.0)
+4. **Transform individual participant visualization with rich, interactive components**
+5. Enhance recruitment analytics with funnel and cohort visualizations
+6. Build a dedicated Analytics dashboard
+7. Ensure mobile responsiveness and accessibility
+8. Leverage the already-installed `recharts` library (v3.6.0)
 
 ---
 
@@ -413,6 +414,796 @@ For each statement, show distribution of positive/neutral/negative placements.
 
 ---
 
+### Phase 4.5: Individual Participant Visualization Enhancement
+
+#### Overview
+While aggregate analytics provide macro-level insights, researchers need rich, interactive visualizations for individual participant responses. The current `ParticipantDetailContent` component shows basic data but lacks visual sophistication for deep analysis. This phase transforms the individual participant view into a comprehensive analytical interface.
+
+**Current Limitations:**
+- Q-Sort shown as simple vertical list with score badges
+- No visual grid representation matching actual sorting experience
+- No comparison with cohort average or other participants
+- Presort/postsort data displayed as plain text key-value pairs
+- No journey visualization showing participant progression
+- No visual quality indicators or anomaly detection
+- Limited interactivity and exploration capabilities
+
+---
+
+#### 4.5.1 Enhanced Q-Sort Grid Visualization
+**Component:** `QSortGridVisualization.tsx`
+**Location:** `/components/admin/dashboard/participant/`
+
+**Description:**
+Transform the linear score pile display into an interactive 2D grid that matches the actual Q-sort experience.
+
+**Features:**
+
+**Grid Layout Views:**
+1. **Pyramid View** (Default)
+   - Recreate the forced-distribution grid structure
+   - Visual representation matching participant's actual sorting board
+   - Statements positioned in their grid columns by score
+   - Color gradient from negative (red) to positive (green)
+
+2. **Compact List View** (Current implementation, improved)
+   - Vertical timeline with enhanced visual design
+   - Statement cards with richer information
+   - Smooth animations when expanding/collapsing
+
+3. **Heatmap View**
+   - Grid showing statement placement intensity
+   - Compare this participant's placement with cohort average
+   - Highlight outlier placements (statements placed unusually)
+
+**Interactive Features:**
+- Toggle between grid/list/heatmap views
+- Hover on statement to see:
+  - Statement full text with translations
+  - Statement code/ID
+  - Time spent on this statement (if tracked)
+  - Average placement across all participants
+  - How many other participants placed it at same score
+- Click statement to see detailed analysis:
+  - Statement distribution chart (mini histogram)
+  - Other participants who placed it similarly
+  - Comments related to this statement (if available)
+- Zoom controls for grid view
+- Export grid as image (PNG/SVG)
+
+**Visual Enhancements:**
+- Smooth transitions when switching views (framer-motion)
+- Statement cards with gradient borders based on score
+- Subtle shadows and depth for better visual hierarchy
+- Responsive design: grid → list on mobile
+
+**Data Source:**
+- `participant.scores` array
+- `participant.placements` for grid positioning
+- `studyData.study.statements` for statement content
+- `studyData.study.grid_config` for grid structure
+- Aggregate statistics for comparison
+
+**Component Structure:**
+```typescript
+interface QSortGridVisualizationProps {
+  participant: DumpParticipant;
+  studyData: DumpResponse;
+  viewMode?: 'grid' | 'list' | 'heatmap';
+  showComparison?: boolean;
+  comparisonData?: ParticipantComparison;
+}
+
+interface ParticipantComparison {
+  averageScores: number[]; // Average score for each statement
+  stdDevScores: number[];  // Standard deviation for each statement
+  similarity: number;       // 0-100 similarity to cohort
+}
+```
+
+**Recharts Integration:**
+For heatmap view, use custom SVG with color scales:
+```typescript
+<HeatmapGrid
+  data={heatmapData}
+  xAxis="statement"
+  yAxis="score"
+  colorScale={['#ef4444', '#f59e0b', '#fbbf24', '#a3e635', '#22c55e']}
+/>
+```
+
+**Integration Point:**
+- ParticipantDetailContent (replace current Q-Sort reconstruction)
+- Participant comparison modal
+
+---
+
+#### 4.5.2 Participant Journey Timeline
+**Component:** `ParticipantJourneyTimeline.tsx`
+
+**Description:**
+Visual timeline showing participant's progression through the study, from start to completion.
+
+**Features:**
+
+**Timeline Stages:**
+1. **Study Start** - Initial landing
+2. **Consent** - Consent form completion
+3. **Presort Survey** - Pre-sorting questions
+4. **Rough Sort** - Initial categorization
+5. **Fine Sort** - Detailed Q-sort placement
+6. **Postsort** - Debrief and comments
+7. **Completion** - Final submission
+
+**Visual Elements:**
+- Horizontal timeline with stage markers
+- Time spent at each stage (bar width or annotation)
+- Color coding:
+  - Completed stages: Emerald green
+  - Current stage: Indigo blue
+  - Skipped/incomplete: Slate gray
+- Progress percentage indicator
+- Total duration overlay
+
+**Interactive Features:**
+- Hover on stage to see:
+  - Exact timestamps (started, completed)
+  - Time spent in this stage
+  - Actions taken (if tracked)
+  - Average time for this stage across cohort
+- Click stage to jump to relevant data section
+- Compare with average participant journey
+
+**Anomaly Detection:**
+- Visual indicators for unusual patterns:
+  - ⚠️ Suspiciously fast completion (< 2 minutes)
+  - 🐌 Unusually slow progression
+  - 🔄 Multiple revisits to same stage
+  - ⏸️ Long pauses between stages
+
+**Data Source:**
+- `created_at` (study start)
+- `submitted_at` (completion)
+- `duration_seconds` (total duration)
+- Stage-specific timestamps (if backend tracks them)
+- Cohort averages for comparison
+
+**Recharts Component:**
+```typescript
+<BarChart
+  layout="vertical"
+  data={journeyStages}
+  margin={{ top: 20, right: 30, left: 100, bottom: 20 }}
+>
+  <XAxis type="number" dataKey="duration" label="Time (seconds)" />
+  <YAxis type="category" dataKey="stage" />
+  <Bar dataKey="duration" fill="#4f46e5">
+    {journeyStages.map((stage, index) => (
+      <Cell key={index} fill={stage.completed ? '#10b981' : '#94a3b8'} />
+    ))}
+  </Bar>
+  <Tooltip content={<CustomTooltip />} />
+</BarChart>
+```
+
+**Integration Point:**
+- ParticipantDetailContent (new section near header)
+- Overview dashboards for quality monitoring
+
+---
+
+#### 4.5.3 Statement Interaction Heatmap
+**Component:** `StatementInteractionHeatmap.tsx`
+
+**Description:**
+Show how participant engaged with each statement during the sorting process.
+
+**Features:**
+
+**Visualization Types:**
+1. **Movement Tracker**
+   - Show initial placement vs. final placement
+   - Arrow indicators for statement movement
+   - Color intensity = amount of movement
+   - Highlight statements that moved significantly
+
+2. **Attention Heatmap**
+   - Time spent on each statement (if tracked)
+   - Click frequency (if tracked)
+   - Hover duration (if tracked)
+
+3. **Placement Confidence**
+   - Statements placed quickly (< 5s): Low confidence?
+   - Statements with multiple adjustments: Uncertainty
+   - Final placements without changes: High confidence
+
+**Visual Design:**
+- Grid layout: Statements × Metrics
+- Color scales:
+  - Blue for attention/time
+  - Purple for interactions
+  - Green for confidence
+- Gradient intensity based on values
+
+**Interactive Features:**
+- Hover cell to see exact values
+- Click statement row to highlight across all metrics
+- Filter by statement category
+- Sort by any metric column
+- Export as CSV or image
+
+**Data Requirements:**
+This feature requires backend tracking of:
+- Statement interaction timestamps
+- Placement changes during sorting
+- Time spent per statement
+
+**Fallback:**
+If tracking data unavailable, show simplified version:
+- Final placement only
+- Comparison with average
+- Outlier highlighting
+
+**Integration Point:**
+- ParticipantDetailContent (optional advanced section)
+- Quality assurance dashboard
+
+---
+
+#### 4.5.4 Comparative Participant Analysis
+**Component:** `ParticipantComparison.tsx`
+
+**Description:**
+Side-by-side comparison of individual participant with cohort statistics.
+
+**Features:**
+
+**Comparison Metrics:**
+
+1. **Score Distribution Comparison**
+   - Dual histogram: This participant vs. Cohort average
+   - Overlaid line charts showing score patterns
+   - Similarity score (correlation coefficient)
+   - Outlier statements highlighted
+
+2. **Duration Benchmarking**
+   - Visual indicator: participant duration vs. cohort
+   - Percentile ranking (e.g., "Faster than 75% of participants")
+   - Stage-by-stage duration comparison
+
+3. **Statement Placement Divergence**
+   - List of statements placed very differently from average
+   - Magnitude and direction of divergence
+   - Color-coded: Red (controversial), Green (consensus)
+
+4. **Response Pattern Analysis**
+   - Use of score range (did they use full spectrum?)
+   - Central tendency bias (clustering around zero?)
+   - Extreme scores usage frequency
+
+**Visual Components:**
+
+```typescript
+// Dual histogram comparison
+<ComposedChart data={comparisonData}>
+  <Bar dataKey="participantCount" fill="#4f46e5" name="This Participant" />
+  <Line
+    dataKey="cohortAverage"
+    stroke="#10b981"
+    strokeWidth={2}
+    name="Cohort Average"
+  />
+  <XAxis dataKey="score" />
+  <YAxis />
+  <Tooltip />
+  <Legend />
+</ComposedChart>
+
+// Similarity gauge
+<RadialBarChart
+  data={[{ name: 'Similarity', value: 85, fill: '#4f46e5' }]}
+  innerRadius="70%"
+  outerRadius="100%"
+>
+  <RadialBar dataKey="value" />
+  <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
+    <tspan fontSize="24" fontWeight="bold">85%</tspan>
+    <tspan x="50%" dy="1.5em" fontSize="12">Similar to cohort</tspan>
+  </text>
+</RadialBarChart>
+```
+
+**Statistical Indicators:**
+- Pearson correlation coefficient with cohort
+- Z-scores for outlier statements
+- Percentage of statements within 1 standard deviation
+- Quality flags (e.g., "Straight-lining", "Acquiescence bias")
+
+**Interactive Features:**
+- Toggle comparison on/off
+- Select comparison group:
+  - All participants
+  - Same recruitment link
+  - Same language
+  - Custom segment
+- Drill down to specific divergent statements
+
+**Integration Point:**
+- ParticipantDetailContent (new comparison section)
+- Batch comparison tool for reviewing multiple participants
+
+---
+
+#### 4.5.5 Enhanced Presort/Postsort Visualization
+**Component:** `SurveyDataVisualization.tsx`
+
+**Description:**
+Transform plain text survey responses into rich, interactive visualizations.
+
+**Features:**
+
+**Data Type-Specific Visualizations:**
+
+1. **Multiple Choice Questions**
+   - Pie chart showing selected option
+   - Bar chart comparing with cohort distribution
+   - Percentage of participants who selected same option
+
+2. **Likert Scales**
+   - Horizontal bar with marker showing participant's response
+   - Distribution curve showing where they fall
+   - Color coding: Strongly Disagree (red) → Strongly Agree (green)
+
+3. **Numeric Responses**
+   - Number display with context (min, max, average)
+   - Position on number line
+   - Percentile ranking
+
+4. **Text Responses**
+   - Card display with better formatting
+   - Character/word count
+   - Sentiment indicator (if analyzed)
+   - Word cloud for longer responses
+
+5. **Consent Checkboxes**
+   - Visual checkmarks with icons
+   - Percentage of cohort who consented
+   - Color-coded status badges
+
+**Layout Structure:**
+```
+┌─────────────────────────────────────────┐
+│ Survey Data (Presort)                   │
+├─────────────────────────────────────────┤
+│ ┌─────────────────┬─────────────────┐   │
+│ │ Question 1      │ [Pie Chart]     │   │
+│ │ Multiple choice │ + Distribution  │   │
+│ └─────────────────┴─────────────────┘   │
+│ ┌─────────────────────────────────────┐ │
+│ │ Question 2                          │ │
+│ │ [====█=========] (Likert Scale)     │ │
+│ │ You: 4/5 | Avg: 3.2/5              │ │
+│ └─────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────┐ │
+│ │ Question 3: [Text Response Card]    │ │
+│ │ 156 words | Positive sentiment 😊   │ │
+│ └─────────────────────────────────────┘ │
+└─────────────────────────────────────────┘
+
+┌─────────────────────────────────────────┐
+│ Debrief / Postsort                      │
+├─────────────────────────────────────────┤
+│ ✅ Email Collected: user@example.com    │
+│ ✅ Newsletter: Opted in (45% of cohort) │
+│ ❌ Interview: Declined (65% declined)   │
+│                                         │
+│ Comments on statements:                 │
+│ [Card for each commented statement]    │
+└─────────────────────────────────────────┘
+```
+
+**Interactive Features:**
+- Expand/collapse sections
+- Filter comments by statement
+- Export responses
+- Print-friendly format
+
+**Recharts Components:**
+```typescript
+// Likert scale visualization
+<BarChart
+  layout="vertical"
+  data={[{ category: question.text, value: response, avg: cohortAvg }]}
+  margin={{ left: 150 }}
+>
+  <XAxis type="number" domain={[1, 5]} />
+  <YAxis type="category" dataKey="category" width={140} />
+  <Bar dataKey="value" fill="#4f46e5" />
+  <ReferenceLine x={cohortAvg} stroke="#10b981" strokeDasharray="3 3" />
+  <Tooltip />
+</BarChart>
+
+// Multiple choice distribution
+<PieChart>
+  <Pie
+    data={optionDistribution}
+    dataKey="count"
+    nameKey="option"
+    cx="50%"
+    cy="50%"
+    outerRadius={60}
+  >
+    {optionDistribution.map((entry, index) => (
+      <Cell
+        key={index}
+        fill={entry.selected ? '#4f46e5' : '#e2e8f0'}
+        stroke={entry.selected ? '#312e81' : '#cbd5e1'}
+        strokeWidth={entry.selected ? 3 : 1}
+      />
+    ))}
+  </Pie>
+  <Tooltip />
+  <Legend />
+</PieChart>
+```
+
+**Integration Point:**
+- Replace current plain text display in ParticipantDetailContent
+- Survey analysis page (aggregate view)
+
+---
+
+#### 4.5.6 Response Quality Dashboard
+**Component:** `ResponseQualityIndicators.tsx`
+
+**Description:**
+Visual indicators and metrics to assess participant response quality and engagement.
+
+**Features:**
+
+**Quality Metrics:**
+
+1. **Response Completeness**
+   - Progress ring showing % of data provided
+   - Breakdown: Survey, Q-sort, Debrief
+   - Missing data indicators
+
+2. **Engagement Score**
+   - Composite score (0-100) based on:
+     - Duration appropriateness
+     - Full score range usage
+     - Survey response completeness
+     - Comment/debrief provision
+   - Color-coded: Red (low) → Green (high)
+   - Comparison with cohort average
+
+3. **Attention Checks**
+   - If study includes attention checks, show results
+   - Visual pass/fail indicators
+   - Flag suspicious patterns
+
+4. **Response Patterns**
+   - **Straight-lining**: Used same score repeatedly?
+   - **Central tendency**: Over-used neutral scores?
+   - **Extreme responding**: Over-used extreme scores?
+   - **Acquiescence**: Agreed with everything?
+   - Visual indicators with explanations
+
+5. **Data Quality Flags**
+   - ⚠️ Suspiciously fast completion
+   - ⚠️ Incomplete responses
+   - ⚠️ Failed attention checks
+   - ⚠️ Unusual patterns detected
+   - ✅ High quality response
+
+**Visual Design:**
+
+```typescript
+// Engagement score gauge
+<RadialBarChart
+  width={200}
+  height={200}
+  innerRadius="80%"
+  outerRadius="100%"
+  data={[{ name: 'Engagement', value: engagementScore, fill: getColorByScore(engagementScore) }]}
+  startAngle={180}
+  endAngle={0}
+>
+  <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+  <RadialBar dataKey="value" />
+  <text x="50%" y="50%" textAnchor="middle">
+    <tspan fontSize="32" fontWeight="bold">{engagementScore}</tspan>
+    <tspan x="50%" dy="1.5em" fontSize="14">Engagement</tspan>
+  </text>
+</RadialBarChart>
+
+// Completeness breakdown
+<PieChart>
+  <Pie
+    data={completenessData}
+    dataKey="percentage"
+    nameKey="section"
+    cx="50%"
+    cy="50%"
+    innerRadius={40}
+    outerRadius={60}
+  >
+    {completenessData.map((entry, index) => (
+      <Cell key={index} fill={entry.percentage === 100 ? '#10b981' : '#f59e0b'} />
+    ))}
+  </Pie>
+  <Tooltip />
+  <Legend />
+</PieChart>
+```
+
+**Pattern Detection Visualization:**
+```
+Score Distribution Analysis:
+[====] Too concentrated (Straight-lining detected)
+[========] Balanced distribution ✓
+[=] Under-utilized score range
+```
+
+**Interactive Features:**
+- Hover on quality flags for explanations
+- Click to see detailed breakdown
+- Compare quality score with cohort
+- Export quality report
+
+**Integration Point:**
+- ParticipantDetailContent (prominent header section)
+- Quality filtering in InteractiveDataView
+- Bulk quality assessment tool
+
+---
+
+#### 4.5.7 Participant Comparison Side Panel
+**Component:** `ParticipantCompareSidePanel.tsx`
+
+**Description:**
+Side-by-side comparison panel for analyzing multiple participants simultaneously.
+
+**Features:**
+
+**Comparison Interface:**
+- Select 2-4 participants for side-by-side comparison
+- Synchronized scrolling through sections
+- Highlight differences automatically
+- Show similarity scores between selected participants
+
+**Comparison Views:**
+1. **Q-Sort Grids** - Side by side
+2. **Score Distributions** - Overlaid charts
+3. **Survey Responses** - Table comparison
+4. **Quality Metrics** - Comparative dashboard
+5. **Timeline Journeys** - Parallel timelines
+
+**Visual Design:**
+```
+┌────────────┬────────────┬────────────┐
+│ Participant│ Participant│ Participant│
+│ A (ref)    │ B          │ C          │
+├────────────┼────────────┼────────────┤
+│ [Q-Sort A] │ [Q-Sort B] │ [Q-Sort C] │
+│            │ 85% similar│ 62% similar│
+├────────────┼────────────┼────────────┤
+│ Engagement │ Engagement │ Engagement │
+│   92/100   │   88/100   │   45/100   │
+│     ✓      │     ✓      │     ⚠      │
+├────────────┼────────────┼────────────┤
+│ Duration:  │ Duration:  │ Duration:  │
+│   12m 34s  │   15m 02s  │   2m 15s   │
+│            │            │   ⚠ Fast   │
+└────────────┴────────────┴────────────┘
+```
+
+**Difference Highlighting:**
+- Statements placed differently: highlighted in orange
+- Score divergence > 2 points: highlighted in red
+- Unique responses: highlighted in blue
+
+**Statistical Comparison:**
+- Correlation matrix between selected participants
+- Agreement/disagreement percentages
+- Common patterns identification
+
+**Integration Point:**
+- New dedicated comparison page: `/admin/studies/:slug/compare`
+- Accessible from participant list (checkbox multi-select)
+- "Compare" button in InteractiveDataView
+
+---
+
+#### 4.5.8 Export & Reporting for Individual Participants
+**Component:** `ParticipantReportExporter.tsx`
+
+**Description:**
+Generate comprehensive, print-friendly reports for individual participant analysis.
+
+**Features:**
+
+**Report Formats:**
+1. **PDF Report**
+   - Professional layout with study branding
+   - All visualizations rendered as images
+   - Printable format (A4/Letter)
+   - Table of contents with page numbers
+
+2. **Interactive HTML**
+   - Standalone HTML file with embedded charts
+   - Interactive visualizations preserved
+   - Shareable via email or web
+
+3. **Presentation Slides**
+   - Key insights formatted for presentations
+   - One slide per major section
+   - Export to PPTX or PDF
+
+**Report Sections:**
+1. Executive Summary
+2. Participant Profile (ID, metadata, quality score)
+3. Journey Timeline
+4. Q-Sort Grid Visualization
+5. Statement Analysis
+6. Survey Responses
+7. Quality Assessment
+8. Cohort Comparison
+9. Appendix (raw data)
+
+**Customization:**
+- Select which sections to include
+- Choose visualization styles
+- Add researcher notes/annotations
+- Include or exclude identifiable information
+
+**Integration Point:**
+- Export button in ParticipantDetailContent header
+- Bulk export for multiple participants
+- Scheduled report generation
+
+---
+
+#### Implementation Priority
+
+**High Priority (Sprint 1):**
+1. Enhanced Q-Sort Grid Visualization (4.5.1)
+2. Response Quality Dashboard (4.5.6)
+3. Enhanced Presort/Postsort Visualization (4.5.5)
+
+**Medium Priority (Sprint 2):**
+4. Participant Journey Timeline (4.5.2)
+5. Comparative Participant Analysis (4.5.4)
+
+**Low Priority (Sprint 3):**
+6. Statement Interaction Heatmap (4.5.3) - requires backend changes
+7. Participant Comparison Side Panel (4.5.7)
+8. Export & Reporting (4.5.8)
+
+---
+
+#### Technical Considerations
+
+**Component Architecture:**
+```
+/components/admin/dashboard/participant/
+├── QSortGridVisualization.tsx
+├── ParticipantJourneyTimeline.tsx
+├── StatementInteractionHeatmap.tsx
+├── ParticipantComparison.tsx
+├── SurveyDataVisualization.tsx
+├── ResponseQualityIndicators.tsx
+├── ParticipantCompareSidePanel.tsx
+├── ParticipantReportExporter.tsx
+└── shared/
+    ├── StatementCard.tsx
+    ├── QualityBadge.tsx
+    ├── ComparisonMetric.tsx
+    └── EngagementGauge.tsx
+```
+
+**Data Processing:**
+```typescript
+// lib/participantAnalysis.ts
+
+export function calculateEngagementScore(
+  participant: DumpParticipant,
+  studyData: DumpResponse
+): number {
+  const durationScore = calculateDurationScore(participant.duration_seconds);
+  const completenessScore = calculateCompletenessScore(participant);
+  const diversityScore = calculateScoreDiversityScore(participant.scores);
+
+  return (durationScore + completenessScore + diversityScore) / 3;
+}
+
+export function detectResponsePatterns(
+  participant: DumpParticipant
+): ResponsePattern[] {
+  const patterns: ResponsePattern[] = [];
+
+  // Detect straight-lining
+  if (isStraightLining(participant.scores)) {
+    patterns.push({
+      type: 'straight-lining',
+      severity: 'high',
+      description: 'Multiple statements assigned identical scores'
+    });
+  }
+
+  // Detect central tendency
+  if (hasCentralTendencyBias(participant.scores)) {
+    patterns.push({
+      type: 'central-tendency',
+      severity: 'medium',
+      description: 'Over-reliance on neutral scores'
+    });
+  }
+
+  return patterns;
+}
+
+export function compareParticipants(
+  participant1: DumpParticipant,
+  participant2: DumpParticipant
+): ComparisonResult {
+  // Calculate correlation
+  const correlation = pearsonCorrelation(
+    participant1.scores,
+    participant2.scores
+  );
+
+  // Find divergent statements
+  const divergentStatements = findDivergentStatements(
+    participant1.scores,
+    participant2.scores,
+    threshold: 2
+  );
+
+  return {
+    similarity: correlation * 100,
+    divergentStatements,
+    agreementPercentage: calculateAgreementPercentage(
+      participant1.scores,
+      participant2.scores
+    )
+  };
+}
+```
+
+**Performance Optimization:**
+- Lazy load complex visualizations
+- Memoize expensive calculations
+- Virtual scrolling for large comparison grids
+- Progressive image loading for reports
+
+**Accessibility:**
+- Keyboard navigation for all interactive elements
+- Screen reader descriptions for visualizations
+- High contrast mode support
+- Text alternatives for all visual data
+
+---
+
+#### Success Metrics for Individual Visualizations
+
+**User Engagement:**
+- Average time spent on participant detail page
+- Number of visualization interactions per session
+- Feature adoption rate (% using new visualizations)
+
+**Research Efficiency:**
+- Time to identify quality issues (before vs. after)
+- Number of participants reviewed per session
+- False positive rate in quality flagging
+
+**User Satisfaction:**
+- Researcher feedback scores
+- Feature request patterns
+- Support ticket reduction
+
+---
+
 ### Phase 5: New Analytics Dashboard
 
 #### 5.1 Create Analytics Page
@@ -635,20 +1426,27 @@ Add "Statements" to AppSidebar (below "Data")
    - Mobile responsiveness check
    - Performance profiling
 
-#### Sprint 2: Distribution Charts (Week 3-4)
+#### Sprint 2: Distribution Charts & Individual Participant Enhancement (Week 3-4)
 1. **Implement Phase 2 charts**
    - DurationHistogramChart
    - DeviceBreakdownChart
    - Add to appropriate pages
 
-2. **Create Analytics page structure**
+2. **Implement Phase 4.5 high-priority components**
+   - Enhanced Q-Sort Grid Visualization (4.5.1)
+   - Response Quality Dashboard (4.5.6)
+   - Enhanced Presort/Postsort Visualization (4.5.5)
+   - Create `/components/admin/dashboard/participant/` directory
+   - Integrate into ParticipantDetailContent
+
+3. **Create Analytics page structure**
    - Page layout and routing
    - Navigation integration
    - Responsive grid system
 
-3. **Testing & refinement**
+4. **Testing & refinement**
 
-#### Sprint 3: Recruitment & Statements (Week 5-6)
+#### Sprint 3: Recruitment, Statements & Comparative Analysis (Week 5-6)
 1. **Implement Phase 3 charts**
    - RecruitmentFunnelChart
    - LinkPerformanceChart
@@ -659,35 +1457,48 @@ Add "Statements" to AppSidebar (below "Data")
    - StatementConsensusChart
    - StatementSentimentChart
 
-3. **Create Statement Analysis page**
+3. **Implement Phase 4.5 medium-priority components**
+   - Participant Journey Timeline (4.5.2)
+   - Comparative Participant Analysis (4.5.4)
+   - Integrate into ParticipantDetailContent
+
+4. **Create Statement Analysis page**
    - Page structure and routing
    - Integration of statement charts
 
-4. **Testing & refinement**
+5. **Testing & refinement**
 
-#### Sprint 4: Polish & Optimization (Week 7-8)
-1. **Interactive features**
+#### Sprint 4: Advanced Features, Polish & Optimization (Week 7-8)
+1. **Implement Phase 4.5 low-priority components**
+   - Statement Interaction Heatmap (4.5.3) - if backend ready
+   - Participant Comparison Side Panel (4.5.7)
+   - Export & Reporting for Individual Participants (4.5.8)
+   - Create comparison page route
+
+2. **Interactive features**
    - Click-through navigation
    - Advanced tooltips
    - Filter and time range controls
 
-2. **Performance optimization**
+3. **Performance optimization**
    - Code splitting
    - Data caching
    - Chart rendering optimization
+   - Lazy loading for participant visualizations
 
-3. **Accessibility**
+4. **Accessibility**
    - Keyboard navigation
    - Screen reader support
    - Color contrast validation
    - ARIA labels
 
-4. **Documentation**
+5. **Documentation**
    - Component documentation
    - Usage examples
    - Admin guide for interpreting charts
+   - Individual participant visualization guide
 
-5. **Comprehensive testing**
+6. **Comprehensive testing**
    - Cross-browser testing
    - Mobile device testing
    - Performance benchmarking
