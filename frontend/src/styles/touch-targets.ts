@@ -23,19 +23,19 @@ export const MIN_TOUCH_TARGET_SPACING = 8;
  */
 export const TOUCH_BUTTON_CLASSES = {
     /** Primary touch target (44x44px minimum) */
-    base: "min-w-[44px] min-h-[44px] touch-manipulation",
+    base: 'min-w-[44px] min-h-[44px] touch-manipulation',
 
     /** Icon-only button (44x44px) */
-    icon: "p-3 min-w-[44px] min-h-[44px] touch-manipulation",
+    icon: 'p-3 min-w-[44px] min-h-[44px] touch-manipulation',
 
     /** Small button with text (44px height minimum) */
-    small: "px-4 py-3 min-h-[44px] touch-manipulation",
+    small: 'px-4 py-3 min-h-[44px] touch-manipulation',
 
     /** Medium button with text */
-    medium: "px-6 py-3 min-h-[44px] touch-manipulation",
+    medium: 'px-6 py-3 min-h-[44px] touch-manipulation',
 
     /** Large button with text */
-    large: "px-8 py-4 min-h-[48px] touch-manipulation",
+    large: 'px-8 py-4 min-h-[48px] touch-manipulation',
 } as const;
 
 /**
