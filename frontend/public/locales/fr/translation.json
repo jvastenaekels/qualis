@@ -860,7 +860,9 @@
           "title": "Paramètres de recherche",
           "desc": "Configurer la présentation des énoncés aux participants",
           "show_codes": "Afficher les codes des énoncés",
-          "show_codes_desc": "Afficher les codes (ex. S1, S2) à côté du texte."
+          "show_codes_desc": "Afficher les codes (ex. S1, S2) à côté du texte.",
+          "randomize": "Aléatoriser l'ordre des énoncés",
+          "randomize_desc": "Présenter les énoncés dans un ordre aléatoire à chaque participant (constant au sein d'une session)"
         },
         "grid": {
           "title": "Grille de distribution forcée",

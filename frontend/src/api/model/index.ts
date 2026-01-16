@@ -121,6 +121,7 @@ export * from './studyUpdatePostsortConfig';
 export * from './studyUpdatePostsortConfigAnyOf';
 export * from './studyUpdatePresortConfig';
 export * from './studyUpdatePresortConfigAnyOf';
+export * from './studyUpdateRandomizeStatementOrder';
 export * from './studyUpdateRandomizeStatements';
 export * from './studyUpdateShowStatementCodes';
 export * from './studyUpdateSlug';

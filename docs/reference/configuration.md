@@ -89,14 +89,14 @@ A boolean flag to control the display of statement identifiers (e.g., "S1", "S2"
 - **true**: Displays a subtle light-gray identifier in the top-left corner of each card and in the zoom overlays. Useful for research analysis and cross-referencing.
 - **false (Default)**: Statement codes are hidden for a cleaner participant experience.
 
-### `randomize_statements`
+### `randomize_statement_order`
 
 A boolean flag to control whether statements are shuffled for each participant.
 
 ```json
 {
   "slug": "my-study",
-  "randomize_statements": true,
+  "randomize_statement_order": true,
   ...
 }
 ```

@@ -5,6 +5,7 @@
  */
 
 import { renderHook } from '@testing-library/react';
+import { AllTheProviders } from '../test-utils/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useGridZoom } from './useGridZoom';
 
@@ -78,12 +79,16 @@ describe('useGridZoom', () => {
     });
 
     it('initializes with transformRef', () => {
-        const { result } = renderHook(() => useGridZoom(defaultProps));
+        const { result } = renderHook(() => useGridZoom(defaultProps), {
+            wrapper: AllTheProviders,
+        });
         expect(result.current.transformRef).toBeDefined();
     });
 
     it('performs auto-fit on desktop correctly', () => {
-        const { result } = renderHook(() => useGridZoom(defaultProps));
+        const { result } = renderHook(() => useGridZoom(defaultProps), {
+            wrapper: AllTheProviders,
+        });
 
         result.current.performAutoFit();
 
@@ -97,7 +102,9 @@ describe('useGridZoom', () => {
 
     it('performs auto-fit on mobile correctly', () => {
         global.window.innerWidth = 500; // Mobile
-        const { result } = renderHook(() => useGridZoom(defaultProps));
+        const { result } = renderHook(() => useGridZoom(defaultProps), {
+            wrapper: AllTheProviders,
+        });
 
         result.current.performAutoFit();
 
@@ -120,6 +127,11 @@ describe('useGridZoom', () => {
             top: 400,
             width: 100,
             height: 100,
+            bottom: 500,
+            right: 500,
+            x: 400,
+            y: 400,
+            toJSON: () => {},
         } as DOMRect);
         vi.spyOn(
             defaultProps.contentRef.current as Element,
@@ -129,9 +141,14 @@ describe('useGridZoom', () => {
             top: 0,
             width: 500,
             height: 400,
+            bottom: 400,
+            right: 500,
+            x: 0,
+            y: 0,
+            toJSON: () => {},
         } as DOMRect);
 
-        renderHook(() => useGridZoom(props));
+        renderHook(() => useGridZoom(props), { wrapper: AllTheProviders });
 
         // Advance time to trigger Step 2 (Step 1 is mount)
         vi.advanceTimersByTime(501);

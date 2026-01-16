@@ -1,4 +1,5 @@
-import { render, waitFor } from '@testing-library/react';
+import { renderWithProviders as render } from '../test-utils/test-utils';
+import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import FineSortPage from './FineSortPage';
 
@@ -8,12 +9,6 @@ vi.mock('react-router-dom', async () => ({
     ...(await vi.importActual<Record<string, unknown>>('react-router-dom')),
     useNavigate: () => mockNavigate,
     useParams: () => ({ slug: 'test-study' }),
-}));
-
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => key,
-    }),
 }));
 
 // Mock Stores

@@ -895,7 +895,9 @@
           "title": "Research settings",
           "desc": "Configure how statements are presented to participants",
           "show_codes": "Show statement codes",
-          "show_codes_desc": "Display statement codes (e.g., \"S1\", \"S2\") alongside the text."
+          "show_codes_desc": "Display statement codes (e.g., \"S1\", \"S2\") alongside the text.",
+          "randomize": "Randomize statement order",
+          "randomize_desc": "Present statements in random order to each participant (consistent within session)"
         },
         "grid": {
           "title": "Forced distribution grid",

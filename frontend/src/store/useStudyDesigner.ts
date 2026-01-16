@@ -47,7 +47,7 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
         postsort_config: study.postsort_config,
         default_language: study.default_language,
         show_statement_codes: study.show_statement_codes,
-        randomize_statements: study.randomize_statements,
+        randomize_statement_order: study.randomize_statement_order,
         branding: study.branding,
 
         translations: (study.translations || []).map((t) => ({

@@ -4595,7 +4595,7 @@ export const useSubmitStudyApiSubmitPost = <TError = HTTPValidationError, TConte
 /**
  * Fetches study configuration for the frontend, including language resolution.
 
-If the study has randomize_statements=True and a session_token is provided,
+If the study has randomize_statement_order=True and a session_token is provided,
 statements will be shuffled deterministically using the token as seed.
 This ensures the same participant always sees statements in the same order.
  * @summary Get Study
@@ -5851,7 +5851,7 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
         undefined,
     ]),
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-    randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
@@ -6133,7 +6133,10 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
             undefined,
         ]),
         show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-        randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        randomize_statement_order: faker.helpers.arrayElement([
+            faker.datatype.boolean(),
+            undefined,
+        ]),
         symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
         start_date: faker.helpers.arrayElement([
             faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
@@ -6423,7 +6426,7 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
         undefined,
     ]),
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-    randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
@@ -6705,7 +6708,7 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
         undefined,
     ]),
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-    randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
@@ -6990,7 +6993,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
         undefined,
     ]),
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
-    randomize_statements: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     start_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),

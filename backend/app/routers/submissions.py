@@ -69,7 +69,7 @@ async def get_study(
 ):
     """Fetches study configuration for the frontend, including language resolution.
 
-    If the study has randomize_statements=True and a session_token is provided,
+    If the study has randomize_statement_order=True and a session_token is provided,
     statements will be shuffled deterministically using the token as seed.
     This ensures the same participant always sees statements in the same order.
     """

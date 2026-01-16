@@ -2017,7 +2017,7 @@
           "submissions"
         ],
         "summary": "Get Study",
-        "description": "Fetches study configuration for the frontend, including language resolution.\n\nIf the study has randomize_statements=True and a session_token is provided,\nstatements will be shuffled deterministically using the token as seed.\nThis ensures the same participant always sees statements in the same order.",
+        "description": "Fetches study configuration for the frontend, including language resolution.\n\nIf the study has randomize_statement_order=True and a session_token is provided,\nstatements will be shuffled deterministically using the token as seed.\nThis ensures the same participant always sees statements in the same order.",
         "operationId": "get_study_api_study__slug__get",
         "parameters": [
           {
@@ -3468,9 +3468,9 @@
             "title": "Show Statement Codes",
             "default": false
           },
-          "randomize_statements": {
+          "randomize_statement_order": {
             "type": "boolean",
-            "title": "Randomize Statements",
+            "title": "Randomize Statement Order",
             "default": false
           },
           "symmetry_lock": {
@@ -3586,9 +3586,9 @@
             "title": "Show Statement Codes",
             "default": false
           },
-          "randomize_statements": {
+          "randomize_statement_order": {
             "type": "boolean",
-            "title": "Randomize Statements",
+            "title": "Randomize Statement Order",
             "default": false
           },
           "symmetry_lock": {
@@ -4173,7 +4173,7 @@
             ],
             "title": "Show Statement Codes"
           },
-          "randomize_statements": {
+          "randomize_statement_order": {
             "anyOf": [
               {
                 "type": "boolean"
@@ -4182,7 +4182,7 @@
                 "type": "null"
               }
             ],
-            "title": "Randomize Statements"
+            "title": "Randomize Statement Order"
           },
           "symmetry_lock": {
             "anyOf": [

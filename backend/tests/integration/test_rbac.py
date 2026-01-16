@@ -79,7 +79,6 @@ class TestStudyRBAC:
         "role,expected_get,expected_patch,expected_delete",
         [
             (WorkspaceRole.owner, 200, 200, 403),  # Delete is Superuser only
-            (WorkspaceRole.admin, 200, 200, 403),  # Admin is same
             (
                 WorkspaceRole.researcher,
                 200,

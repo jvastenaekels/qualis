@@ -31,7 +31,7 @@ export const testDataBuilders = {
     state: "draft",
     default_language: "en",
     show_statement_codes: false,
-    randomize_statements: false,
+    randomize_statement_order: false,
     translations: [
       {
         language_code: "en",
@@ -40,6 +40,10 @@ export const testDataBuilders = {
         instructions: "Follow the instructions carefully",
         objective: "Test study objective",
         condition_of_instruction: "What is your stance on this statement?",
+        consent_title: "Informed Consent",
+        consent_description: "Please read and accept the terms to proceed.",
+        consent_accept: "I Agree",
+        consent_decline: "I Decline",
       },
     ],
     statements: testDataBuilders.statements(23),
@@ -243,7 +247,7 @@ export interface StudyData {
   workspace_id?: number;
   default_language: string;
   show_statement_codes: boolean;
-  randomize_statements: boolean;
+  randomize_statement_order: boolean;
   translations: Array<{
     language_code: string;
     title: string;
@@ -251,6 +255,10 @@ export interface StudyData {
     instructions?: string;
     objective?: string;
     condition_of_instruction?: string;
+    consent_title?: string;
+    consent_description?: string;
+    consent_accept?: string;
+    consent_decline?: string;
   }>;
   statements: StatementData[];
   grid_config: GridColumn[];

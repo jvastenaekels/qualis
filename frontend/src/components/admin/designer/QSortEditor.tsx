@@ -672,6 +672,29 @@ const QSortEditor = () => {
                                     }}
                                 />
                             </div>
+
+                            <div className="flex items-center justify-between py-4 border-t border-slate-100">
+                                <div className="space-y-1">
+                                    <Label
+                                        htmlFor="randomize-stmts"
+                                        className="text-sm font-bold text-slate-700"
+                                    >
+                                        {t('admin.design.qsort.settings.randomize')}
+                                    </Label>
+                                    <p className="text-xs font-medium text-slate-500 max-w-md leading-relaxed">
+                                        {t('admin.design.qsort.settings.randomize_desc')}
+                                    </p>
+                                </div>
+                                <Switch
+                                    id="randomize-stmts"
+                                    checked={draft.randomize_statement_order ?? false}
+                                    onCheckedChange={(checked: boolean) => {
+                                        updateDraft((d) => {
+                                            d.randomize_statement_order = checked;
+                                        });
+                                    }}
+                                />
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>

@@ -4,7 +4,13 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import {
+    act,
+    cleanup,
+    fireEvent,
+    renderWithProviders as render,
+    screen,
+} from '../test-utils/test-utils';
 import { useMotionValue } from 'framer-motion';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { useUIStore } from '../store/useUIStore';

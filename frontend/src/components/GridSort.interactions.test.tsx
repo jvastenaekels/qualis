@@ -5,7 +5,7 @@
  */
 
 import { DndContext } from '@dnd-kit/core';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, renderWithProviders as render, screen } from '../test-utils/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import GridSort from './GridSort';
 

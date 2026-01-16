@@ -32,7 +32,7 @@ export interface StudyCreate {
     branding?: StudyCreateBranding;
     default_language?: StudyCreateDefaultLanguage;
     show_statement_codes?: boolean;
-    randomize_statements?: boolean;
+    randomize_statement_order?: boolean;
     symmetry_lock?: boolean;
     start_date?: StudyCreateStartDate;
     end_date?: StudyCreateEndDate;

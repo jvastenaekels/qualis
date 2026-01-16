@@ -12,7 +12,7 @@ import type { StudyUpdatePostsortConfig } from './studyUpdatePostsortConfig';
 import type { StudyUpdateBranding } from './studyUpdateBranding';
 import type { StudyUpdateDefaultLanguage } from './studyUpdateDefaultLanguage';
 import type { StudyUpdateShowStatementCodes } from './studyUpdateShowStatementCodes';
-import type { StudyUpdateRandomizeStatements } from './studyUpdateRandomizeStatements';
+import type { StudyUpdateRandomizeStatementOrder } from './studyUpdateRandomizeStatementOrder';
 import type { StudyUpdateSymmetryLock } from './studyUpdateSymmetryLock';
 import type { StudyUpdateTranslations } from './studyUpdateTranslations';
 import type { StudyUpdateStatements } from './studyUpdateStatements';
@@ -33,7 +33,7 @@ export interface StudyUpdate {
     branding?: StudyUpdateBranding;
     default_language?: StudyUpdateDefaultLanguage;
     show_statement_codes?: StudyUpdateShowStatementCodes;
-    randomize_statements?: StudyUpdateRandomizeStatements;
+    randomize_statement_order?: StudyUpdateRandomizeStatementOrder;
     symmetry_lock?: StudyUpdateSymmetryLock;
     translations?: StudyUpdateTranslations;
     statements?: StudyUpdateStatements;

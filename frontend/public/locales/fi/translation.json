@@ -895,7 +895,9 @@
           "title": "Tutkimusasetukset",
           "desc": "Määritä, miten väittämät esitetään osallistujille",
           "show_codes": "Näytä väittämäkoodit",
-          "show_codes_desc": "Näytä koodit (esim. S1, S2) tekstin vieressä."
+          "show_codes_desc": "Näytä koodit (esim. S1, S2) tekstin vieressä.",
+          "randomize": "Satunnaista väittämien järjestys",
+          "randomize_desc": "Esitä väittämät satunnaisessa järjestyksessä kullekin osallistujalle (pysyy samana istunnon sisällä)"
         },
         "grid": {
           "title": "Pakotettu jakauma -ruudukko",

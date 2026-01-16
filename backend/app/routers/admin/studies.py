@@ -156,23 +156,10 @@ async def list_studies(
     workspace, _ = workspace_ctx
 
     # Simple filter by workspace. Isolation secured.
+    # Simple filter by workspace. Isolation secured by get_current_workspace dependency.
     query = (
         select(Study)
-        .join(WorkspaceMember, WorkspaceMember.workspace_id == Study.workspace_id)
-        .where(Workspace.id == workspace.id)
-        .where(
-            (WorkspaceMember.user_id == current_user.id)
-            & (
-                WorkspaceMember.role.in_(
-                    [
-                        WorkspaceRole.owner,
-                        WorkspaceRole.researcher,
-                        WorkspaceRole.viewer,
-                    ]
-                )
-            )
-        )
-        .distinct()
+        .where(Study.workspace_id == workspace.id)
         .order_by(Study.created_at.desc())
     )
     result = await db.execute(query)

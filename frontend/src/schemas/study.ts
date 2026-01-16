@@ -110,6 +110,7 @@ export const StudyConfigSchema = z.object({
     available_languages: z.array(z.string()).optional(),
     language: z.string().optional(),
     show_statement_codes: z.boolean().optional(),
+    randomize_statement_order: z.boolean().optional().default(false),
     state: z.enum(['draft', 'active', 'paused', 'closed']).optional(),
     branding: BrandingSchema.optional(),
     process_steps: z.array(ProcessStepSchema).optional(),

@@ -7,8 +7,8 @@
 from collections import Counter
 from datetime import datetime, timezone
 from typing import Any, cast
+import hashlib
 from uuid import UUID
-
 from fastapi import HTTPException
 from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
@@ -141,6 +141,11 @@ class StudyService:
         return cast(Study | None, result.scalar_one_or_none())
 
     @staticmethod
+    def _generate_session_seed(token: str) -> int:
+        """Generate deterministic seed from submission token for reproducible randomization"""
+        return int(hashlib.sha256(token.encode()).hexdigest()[:8], 16)
+
+    @staticmethod
     async def record_consent(
         db: AsyncSession,
         study_slug: str,
@@ -174,8 +179,10 @@ class StudyService:
                     study_id=study.id,
                     session_token=session_token,
                     language_used=language_code,
-                    random_seed=str(session_token)
-                    if study.randomize_statements
+                    random_seed=str(
+                        StudyService._generate_session_seed(str(session_token))
+                    )
+                    if study.randomize_statement_order
                     else None,
                     consented_at=datetime.now(timezone.utc),
                     consent_hash=consent_hash,
@@ -279,10 +286,12 @@ class StudyService:
             statements_data.append({"id": s.id, "text": text, "code": s.code})
 
         # Q Methodology: Randomize statement order if configured
-        if study.randomize_statements and session_token:
+        if study.randomize_statement_order and session_token:
             import random
 
-            local_random = random.Random(str(session_token))
+            local_random = random.Random(
+                StudyService._generate_session_seed(str(session_token))
+            )
             local_random.shuffle(statements_data)
 
         # Helper for translation attributes
@@ -336,7 +345,7 @@ class StudyService:
             "language": resolved_lang,
             "default_language": study.default_language,
             "show_statement_codes": study.show_statement_codes,
-            "randomize_statements": study.randomize_statements,
+            "randomize_statement_order": study.randomize_statement_order,
             "ui_labels": get_t_attr("ui_labels", {}) or {},
             "methodology_tips": getattr(translation, "methodology_tips", []) or [],
             "state": effective_state,
@@ -615,8 +624,10 @@ class StudyService:
                     study_id=study.id,
                     session_token=data.session_token,
                     language_used=data.language_used,
-                    random_seed=str(data.session_token)
-                    if study.randomize_statements
+                    random_seed=str(
+                        StudyService._generate_session_seed(str(data.session_token))
+                    )
+                    if study.randomize_statement_order
                     else None,
                     presort_answers=presort_answers,
                     postsort_answers=postsort_answers,

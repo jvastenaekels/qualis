@@ -356,7 +356,7 @@ class StudyBase(BaseModel):
     branding: BrandingBase | None = None
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool = False
-    randomize_statements: bool = False
+    randomize_statement_order: bool = False
     symmetry_lock: bool = True
     start_date: datetime | None = None
     end_date: datetime | None = None
@@ -390,7 +390,7 @@ class StudyUpdate(BaseModel):
     branding: BrandingBase | None = None
     default_language: str | None = Field(None, max_length=5)
     show_statement_codes: bool | None = None
-    randomize_statements: bool | None = None
+    randomize_statement_order: bool | None = None
     symmetry_lock: bool | None = None
     translations: list[StudyTranslationCreate] | None = None
     statements: list[StatementUpdate] | None = None

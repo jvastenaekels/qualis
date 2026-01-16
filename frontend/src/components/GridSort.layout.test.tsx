@@ -5,7 +5,7 @@
  */
 
 import { DndContext } from '@dnd-kit/core';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, renderWithProviders as render, screen } from '../test-utils/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import GridSort from './GridSort';
 
@@ -43,9 +43,13 @@ vi.mock('./ReadingZone', () => ({
     ),
 }));
 
-vi.mock('react-i18next', () => ({
-    useTranslation: () => ({ t: (key: string) => key }),
-}));
+vi.mock('react-i18next', async () => {
+    const actual = await vi.importActual<typeof import('react-i18next')>('react-i18next');
+    return {
+        ...actual,
+        useTranslation: () => ({ t: (key: string) => key }),
+    };
+});
 
 describe('GridSort Detailed UI Verification', () => {
     const defaultProps = {

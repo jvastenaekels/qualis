@@ -63,7 +63,10 @@ build:
 ci: lint check test build
 	@echo "\n--- Fast CI checks passed locally! (Skipped E2E) ---"
 
-ci-full: ci e2e
+db-reset:
+	cd backend && uv run python init_db.py --reset
+
+ci-full: ci db-reset e2e
 	@echo "\n--- All CI (Full) checks passed locally! ---"
 
 run-ci: ci

@@ -58,7 +58,7 @@ async def validate_schema() -> None:
             if "studies" in tables:
                 study_columns = {c["name"] for c in inspector.get_columns("studies")}
                 for col in [
-                    "randomize_statements",
+                    "randomize_statement_order",
                     "show_statement_codes",
                     "workspace_id",
                 ]:

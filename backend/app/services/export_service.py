@@ -17,8 +17,9 @@ class ExportService:
         writer = csv.writer(output)
 
         # 1. Header
-        # Get all statement codes for the header
-        statement_codes = [s.code for s in study.statements]
+        # Get all statement codes for the header, sorted by ID for consistency
+        sorted_statements = sorted(study.statements, key=lambda s: s.id)
+        statement_codes = [s.code for s in sorted_statements]
         header = [
             "Participant_UID",
             "Confirmation_Code",
@@ -63,7 +64,7 @@ class ExportService:
             scores_map = {
                 entry.statement_id: entry.grid_score for entry in p.qsort_entries
             }
-            for s in study.statements:
+            for s in sorted_statements:
                 score = scores_map.get(s.id)
                 row.append(str(score) if score is not None else "")
 

@@ -161,7 +161,7 @@ class Study(Base):
         String(5), nullable=True
     )  # e.g. "en"
     show_statement_codes: Mapped[bool] = mapped_column(Boolean, default=False)
-    randomize_statements: Mapped[bool] = mapped_column(
+    randomize_statement_order: Mapped[bool] = mapped_column(
         Boolean, default=False
     )  # Randomize statement order per participant (Q methodology best practice)
     symmetry_lock: Mapped[bool] = mapped_column(

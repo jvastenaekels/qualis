@@ -34,7 +34,7 @@ export interface StudyRead {
     branding?: StudyReadBranding;
     default_language?: StudyReadDefaultLanguage;
     show_statement_codes?: boolean;
-    randomize_statements?: boolean;
+    randomize_statement_order?: boolean;
     symmetry_lock?: boolean;
     start_date?: StudyReadStartDate;
     end_date?: StudyReadEndDate;

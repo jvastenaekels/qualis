@@ -140,6 +140,18 @@ SchemaValidationError
 
 # --- app/services/ ---
 _.start_count
+delete_link
 
 # --- app/utils/script_utils.py ---
 sync_study_from_file
+
+# --- Pydantic Validators (app/schemas.py) ---
+validate_full_name
+validate_title
+validate_strings
+validate_trans_strings
+validate_text
+validate_code
+validate_comment
+validate_reason
+validate_name
