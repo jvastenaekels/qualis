@@ -19,8 +19,15 @@ def run_alembic_upgrade():
     os.chdir(backend_dir)
 
     try:
-        # We use 'uv run' if possible, or python -m alembic
-        cmd = [sys.executable, "-m", "alembic", "upgrade", "head"]
+        # Locate alembic binary relative to python executable
+        bin_dir = os.path.dirname(sys.executable)
+        alembic_bin = os.path.join(bin_dir, "alembic")
+
+        cmd = [alembic_bin, "upgrade", "head"]
+
+        # Fallback to simple command if binary not found there
+        if not os.path.exists(alembic_bin):
+            cmd = ["alembic", "upgrade", "head"]
 
         if os.path.exists("uv.lock") and shutil.which("uv"):
             cmd = ["uv", "run", "alembic", "upgrade", "head"]

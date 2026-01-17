@@ -38,9 +38,16 @@ async def init_db(reset: bool = False):
     print("1. Running database migrations (Alembic)...")
     try:
         import shutil
+        # Locate alembic binary relative to python executable
+        bin_dir = os.path.dirname(sys.executable)
+        alembic_bin = os.path.join(bin_dir, "alembic")
 
-        # Use python -m alembic to ensure we use the installed module
-        cmd = [sys.executable, "-m", "alembic", "upgrade", "head"]
+        cmd = [alembic_bin, "upgrade", "head"]
+
+        # Fallback to simple command if binary not found there
+        if not os.path.exists(alembic_bin):
+            cmd = ["alembic", "upgrade", "head"]
+
         if os.path.exists("uv.lock") and shutil.which("uv"):
             cmd = ["uv", "run", "alembic", "upgrade", "head"]
         subprocess.run(cmd, check=True)
