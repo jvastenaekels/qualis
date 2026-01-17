@@ -37,8 +37,10 @@ async def init_db(reset: bool = False):
 
     print("1. Running database migrations (Alembic)...")
     try:
+        import shutil
+
         cmd = ["alembic", "upgrade", "head"]
-        if os.path.exists("uv.lock"):
+        if os.path.exists("uv.lock") and shutil.which("uv"):
             cmd = ["uv", "run", "alembic", "upgrade", "head"]
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as e:
