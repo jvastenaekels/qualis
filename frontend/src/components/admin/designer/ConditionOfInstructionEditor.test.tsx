@@ -35,24 +35,46 @@ describe('ConditionOfInstructionEditor', () => {
     it('renders instruction input', () => {
         renderEditor();
 
-        expect(screen.getByText('Condition of Instruction (Grid Sort)')).toBeInTheDocument();
+        // Check for Grid Sort Instruction
+        expect(screen.getByText('Grid Sort Instruction')).toBeInTheDocument();
 
-        // There is one "Instruction Text" label now
+        // Check for Preliminary Sort Instruction
+        expect(screen.getByText('Preliminary Sort Instruction')).toBeInTheDocument();
+
+        // There are two "Instruction Text" labels now (one for each section)
         const labels = screen.getAllByText('Instruction Text');
-        expect(labels).toHaveLength(1);
+        expect(labels).toHaveLength(2);
     });
 
     it('updates grid sort instruction field', () => {
         renderEditor();
 
-        const input = screen.getByLabelText('Instruction Text');
-        fireEvent.change(input, { target: { value: 'Test grid instruction' } });
+        // Since there are multiple inputs with label "Instruction Text"
+        const inputs = screen.getAllByLabelText('Instruction Text');
+        const gridInput = inputs[1]; // Grid Sort is the second card
+
+        fireEvent.change(gridInput, { target: { value: 'Test grid instruction' } });
 
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const currentDraft: any = useStudyDesigner.getState().draft;
         // biome-ignore lint/suspicious/noExplicitAny: access internal structure
         const enTranslation = currentDraft.translations.find((t: any) => t.language_code === 'en');
         expect(enTranslation.condition_of_instruction).toBe('Test grid instruction');
+    });
+
+    it('updates preliminary sort instruction field', () => {
+        renderEditor();
+
+        const inputs = screen.getAllByLabelText('Instruction Text');
+        const preInput = inputs[0]; // Pre-Sort is the first card
+
+        fireEvent.change(preInput, { target: { value: 'Test pre instruction' } });
+
+        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
+        const currentDraft: any = useStudyDesigner.getState().draft;
+        // biome-ignore lint/suspicious/noExplicitAny: access internal structure
+        const enTranslation = currentDraft.translations.find((t: any) => t.language_code === 'en');
+        expect(enTranslation.pre_instruction).toBe('Test pre instruction');
     });
 
     it('displays existing values from draft', () => {
@@ -62,13 +84,15 @@ describe('ConditionOfInstructionEditor', () => {
                     {
                         language_code: 'en',
                         condition_of_instruction: 'Existing grid instruction',
+                        pre_instruction: 'Existing pre instruction',
                     },
                 ],
             },
         });
 
-        const input = screen.getByLabelText('Instruction Text') as HTMLInputElement;
-        expect(input.value).toBe('Existing grid instruction');
+        const inputs = screen.getAllByLabelText('Instruction Text') as HTMLInputElement[];
+        expect(inputs[0].value).toBe('Existing pre instruction');
+        expect(inputs[1].value).toBe('Existing grid instruction');
     });
 
     it('returns null when draft is missing', () => {

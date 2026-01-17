@@ -155,3 +155,4 @@ validate_code
 validate_comment
 validate_reason
 validate_name
+pre_instruction

@@ -5938,6 +5938,13 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
                 ]),
                 undefined,
             ]),
+            pre_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
             consent_title: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     faker.string.alpha({ length: { min: 10, max: 200 } }),
@@ -6204,6 +6211,13 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                         undefined,
                     ]),
                     condition_of_instruction: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 500 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    pre_instruction: faker.helpers.arrayElement([
                         faker.helpers.arrayElement([
                             faker.string.alpha({ length: { min: 10, max: 500 } }),
                             null,
@@ -6485,6 +6499,13 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
                 ]),
                 undefined,
             ]),
+            pre_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
             consent_title: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     faker.string.alpha({ length: { min: 10, max: 200 } }),
@@ -6747,6 +6768,13 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
                 undefined,
             ]),
             condition_of_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            pre_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     faker.string.alpha({ length: { min: 10, max: 500 } }),
                     null,
@@ -7018,6 +7046,13 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
                 undefined,
             ]),
             condition_of_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 500 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            pre_instruction: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     faker.string.alpha({ length: { min: 10, max: 500 } }),
                     null,

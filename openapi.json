@@ -3815,6 +3815,18 @@
             ],
             "title": "Condition Of Instruction"
           },
+          "pre_instruction": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pre Instruction"
+          },
           "consent_title": {
             "anyOf": [
               {
@@ -3947,6 +3959,18 @@
               }
             ],
             "title": "Condition Of Instruction"
+          },
+          "pre_instruction": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pre Instruction"
           },
           "consent_title": {
             "anyOf": [

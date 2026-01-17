@@ -207,6 +207,7 @@ class StudyTranslationBase(BaseModel):
     subtitle: str | None = Field(None, max_length=200)
     objective: str | None = Field(None, max_length=1000)
     condition_of_instruction: str | None = Field(None, max_length=500)
+    pre_instruction: str | None = Field(None, max_length=500)
 
     consent_title: str | None = Field(None, max_length=200)
     consent_description: str | None = Field(None, max_length=5000)
@@ -221,6 +222,7 @@ class StudyTranslationBase(BaseModel):
         "subtitle",
         "objective",
         "condition_of_instruction",
+        "pre_instruction",
         "consent_title",
         "consent_description",
     )

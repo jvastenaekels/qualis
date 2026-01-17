@@ -8,6 +8,7 @@ import type { StudyTranslationCreateInstructions } from './studyTranslationCreat
 import type { StudyTranslationCreateSubtitle } from './studyTranslationCreateSubtitle';
 import type { StudyTranslationCreateObjective } from './studyTranslationCreateObjective';
 import type { StudyTranslationCreateConditionOfInstruction } from './studyTranslationCreateConditionOfInstruction';
+import type { StudyTranslationCreatePreInstruction } from './studyTranslationCreatePreInstruction';
 import type { StudyTranslationCreateConsentTitle } from './studyTranslationCreateConsentTitle';
 import type { StudyTranslationCreateConsentDescription } from './studyTranslationCreateConsentDescription';
 import type { StudyTranslationCreateUiLabels } from './studyTranslationCreateUiLabels';
@@ -31,6 +32,7 @@ export interface StudyTranslationCreate {
     subtitle?: StudyTranslationCreateSubtitle;
     objective?: StudyTranslationCreateObjective;
     condition_of_instruction?: StudyTranslationCreateConditionOfInstruction;
+    pre_instruction?: StudyTranslationCreatePreInstruction;
     consent_title?: StudyTranslationCreateConsentTitle;
     consent_description?: StudyTranslationCreateConsentDescription;
     ui_labels?: StudyTranslationCreateUiLabels;
