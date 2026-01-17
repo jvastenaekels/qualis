@@ -2,7 +2,7 @@ import { DEFAULT_STUDY_CONTENT } from '@/constants/studyDefaults';
 import { toast } from 'sonner';
 import type { TFunction } from 'i18next';
 
-export interface ResetOptions {
+interface ResetOptions {
     confirmMessage?: string;
     successMessage?: string;
     requireConfirmation?: boolean;

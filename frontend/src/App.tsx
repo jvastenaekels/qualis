@@ -41,7 +41,7 @@ const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
 const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
 const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage'));
 const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
-const StudyAnalyticsPage = lazy(() => import('./pages/admin/StudyAnalyticsPage'));
+
 const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
 const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetailsPage'));
 const DesignerPreviewPage = lazy(() => import('./pages/admin/DesignerPreviewPage'));
@@ -49,7 +49,7 @@ const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
 const WorkspaceSettingsPage = lazy(() => import('./pages/admin/WorkspaceSettingsPage'));
 const CreateWorkspacePage = lazy(() => import('./pages/admin/CreateWorkspacePage'));
 import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
-import { studyAnalyticsPageLoader } from './pages/admin/StudyAnalyticsPage.loader';
+
 import { studyLayoutLoader } from './layouts/StudyLayout.loader';
 import { studyOverviewPageLoader } from './pages/admin/StudyOverviewPage.loader';
 import { teamManagementPageLoader } from './pages/admin/TeamManagementPage.loader';
@@ -131,11 +131,7 @@ const router = createBrowserRouter([
                         element: <RecruitmentPage />,
                         loader: recruitmentPageLoader,
                     },
-                    {
-                        path: 'studies/:slug/analytics',
-                        element: <StudyAnalyticsPage />,
-                        loader: studyAnalyticsPageLoader,
-                    },
+
                     {
                         path: 'studies/:slug/exports',
                         element: <DataExportsPage />,

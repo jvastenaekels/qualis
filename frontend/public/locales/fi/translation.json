@@ -368,7 +368,7 @@
       "data": "Tiedot",
       "team": "Tiimi",
       "settings": "Asetukset",
-      "analytics": "Analytiikka",
+
       "documentation": "Dokumentaatio",
       "support": "Tuki",
       "study_management": "Tutkimuksen hallinta",
@@ -407,41 +407,7 @@
         "error": "Työtilan luominen epäonnistui"
       }
     },
-    "analytics": {
-      "title": "Tutkimuksen analytiikka",
-      "description": "Syvenny osallistumismalleihin, konsensusanalyysiin ja tilastollisiin jakaumiin.",
-      "charts": {
-        "research_strength": "Tutkimuksen vahvuus",
-        "valid_samples": "Kelvolliset näytteet",
-        "target_confidence": "Luottamusindeksi",
-        "momentum": "Osallistumistahti",
-        "momentum_desc": "Tutkimustoiminta on aktiivista kaikissa kanavissa.",
-        "broad_viewpoint": "Laaja näkökulma",
-        "broad_viewpoint_desc": "Väittämät osoittavat monipuolisia mielipiteitä.",
-        "quick_insights": "Pikakatsaus",
-        "participant_grid": {
-          "title": "Osallistujajakauma",
-          "statement_code": "Väite {{code}}",
-          "no_text": "Ei tekstiä"
-        },
-        "link_performance": {
-          "title": "Linkkien vertailu",
-          "subtitle": "Parhaat rekrytointikanavat",
-          "volume": "Määrä",
-          "yield": "Tuotto %",
-          "conversion_rate": "Konversio",
-          "total_responses": "Vastauksia"
-        },
-        "duration": {
-          "title": "Keston jakauma",
-          "subtitle": "Tutkimuksen täyttämiseen kulunut aika",
-          "suspect": "{{count}} Epäilyttävää",
-          "high_risk": "Nopea (< 2m)",
-          "medium_risk": "Keskitaso (2-5m)",
-          "normal": "Normaali (> 5m)"
-        }
-      }
-    },
+
     "recruitment": {
       "title": "Rekrytointi",
       "description": "Luo turvallisia linkkejä osallistujille ja seuraa rekrytoinnin tehokkuutta reaaliajassa.",

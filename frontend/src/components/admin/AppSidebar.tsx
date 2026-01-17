@@ -9,7 +9,6 @@ import {
     Settings,
     UserPlus,
     Download,
-    AreaChart,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
@@ -190,11 +189,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           title: t('admin.sidebar.design'),
                           url: `/admin/studies/${activeStudyId}/design`,
                           icon: PencilRuler,
-                      },
-                      {
-                          title: t('admin.sidebar.analytics', 'Analytics'),
-                          url: `/admin/studies/${activeStudyId}/analytics`,
-                          icon: AreaChart,
                       },
                       {
                           title: t('admin.sidebar.recruit'),

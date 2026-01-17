@@ -368,7 +368,7 @@
       "data": "Données",
       "team": "Équipe",
       "settings": "Réglages",
-      "analytics": "Analytique",
+
       "documentation": "Documentation",
       "support": "Support",
       "study_management": "Gestion",
@@ -1152,41 +1152,7 @@
       "closed": "Fermé",
       "draft": "Brouillon"
     },
-    "analytics": {
-      "title": "Analytique de l'étude",
-      "description": "Analysez en profondeur les modèles de participation, le consensus et les distributions statistiques.",
-      "charts": {
-        "research_strength": "Force de la recherche",
-        "valid_samples": "Échantillons valides",
-        "target_confidence": "Indice de confiance",
-        "momentum": "Dynamique",
-        "momentum_desc": "L'activité est soutenue sur tous les canaux.",
-        "broad_viewpoint": "Diversité",
-        "broad_viewpoint_desc": "Les opinions exprimées sont variées.",
-        "quick_insights": "Aperçus rapides",
-        "participant_grid": {
-          "title": "Distribution des participants",
-          "statement_code": "Énoncé {{code}}",
-          "no_text": "Sans texte"
-        },
-        "link_performance": {
-          "title": "Performance des liens",
-          "subtitle": "Meilleurs canaux de recrutement",
-          "volume": "Volume",
-          "yield": "Rendement",
-          "conversion_rate": "Taux de conv.",
-          "total_responses": "Total réponses"
-        },
-        "duration": {
-          "title": "Temps de complétion",
-          "subtitle": "Durée pour terminer l'étude",
-          "suspect": "{{count}} Suspects",
-          "high_risk": "Rapide (< 2m)",
-          "medium_risk": "Moyen (2-5m)",
-          "normal": "Normal (> 5m)"
-        }
-      }
-    },
+
     "settings": {
       "title": "General Settings",
       "description": "Manage basic study configuration, URL slug, and lifecycle states.",
