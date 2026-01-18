@@ -16,6 +16,7 @@ import { injectParticipantSession } from '../../fixtures/session-utils';
 test.describe('Post-Sort Configuration Testing', () => {
     test.describe('Email Collection', () => {
         let studySlug: string;
+        let statementIds: number[];
 
         test.beforeEach(async ({ testDb, authToken }) => {
             const study = await testDb.createStudy(
@@ -23,9 +24,19 @@ test.describe('Post-Sort Configuration Testing', () => {
                 testDataBuilders.study({
                     slug: `test-postsort-email-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
                     statements: testDataBuilders.statements(10),
+                    grid_config: [
+                        { score: -3, capacity: 1 },
+                        { score: -2, capacity: 1 },
+                        { score: -1, capacity: 2 },
+                        { score: 0, capacity: 2 },
+                        { score: 1, capacity: 2 },
+                        { score: 2, capacity: 1 },
+                        { score: 3, capacity: 1 },
+                    ],
                 })
             );
             studySlug = study.slug;
+            statementIds = study.statements.map((s: any) => s.id);
         });
 
         test('Admin: Can enable email collection', async ({ page, testDb }) => {
@@ -81,6 +92,7 @@ test.describe('Post-Sort Configuration Testing', () => {
                 statementCount: 10,
                 step: 5,
                 token: session_token,
+                statementIds: statementIds,
             });
 
             // Navigate to study (should redirect to Post-Sort based on step 5)
@@ -105,6 +117,7 @@ test.describe('Post-Sort Configuration Testing', () => {
                 statementCount: 10,
                 step: 5,
                 token: session_token,
+                statementIds: statementIds,
             });
 
             // Navigate to post-sort
@@ -115,14 +128,15 @@ test.describe('Post-Sort Configuration Testing', () => {
             await page.getByTestId('postsort-submit-btn').click();
 
             // Verify validation error
-            await expect(page.locator('text=email', { hasText: /email/i })).toBeVisible();
+            await expect(page.getByTestId('postsort-email-error')).toBeVisible();
 
             // Fix email
             await page.fill('input[type="email"]', 'test@example.com');
             await page.getByTestId('postsort-submit-btn').click();
 
-            // Should proceed
-            await expect(page).toHaveURL(/thank-you|complete/);
+            // Should show success message
+            await expect(page.getByText(/thank you/i)).toBeVisible();
+            await expect(page.locator('.font-mono')).toBeVisible(); // Confirmation code
         });
 
         test('Edge Case: Email optional when disabled', async ({ page, testDb, authToken }) => {
@@ -139,6 +153,7 @@ test.describe('Post-Sort Configuration Testing', () => {
                 statementCount: 10,
                 step: 5,
                 token: session_token,
+                statementIds: statementIds,
             });
 
             await page.goto(`/study/${studySlug}`);
@@ -148,12 +163,13 @@ test.describe('Post-Sort Configuration Testing', () => {
 
             // Can submit without email
             await page.getByTestId('postsort-submit-btn').click();
-            await expect(page).toHaveURL(/thank-you|complete/);
+            await expect(page.getByText(/thank you/i)).toBeVisible();
         });
     });
 
     test.describe('Consent Options', () => {
         let studySlug: string;
+        let statementIds: number[];
 
         test.beforeEach(async ({ testDb, authToken }) => {
             const study = await testDb.createStudy(
@@ -161,9 +177,19 @@ test.describe('Post-Sort Configuration Testing', () => {
                 testDataBuilders.study({
                     slug: `test-postsort-consent-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
                     statements: testDataBuilders.statements(10),
+                    grid_config: [
+                        { score: -3, capacity: 1 },
+                        { score: -2, capacity: 1 },
+                        { score: -1, capacity: 2 },
+                        { score: 0, capacity: 2 },
+                        { score: 1, capacity: 2 },
+                        { score: 2, capacity: 1 },
+                        { score: 3, capacity: 1 },
+                    ],
                 })
             );
             studySlug = study.slug;
+            statementIds = study.statements.map((s: any) => s.id);
         });
 
         test('Admin: Can enable interview consent', async ({ page, testDb }) => {
@@ -220,6 +246,7 @@ test.describe('Post-Sort Configuration Testing', () => {
                 statementCount: 10,
                 step: 5,
                 token: session_token,
+                statementIds: statementIds,
             });
 
             // Navigate to post-sort
@@ -243,6 +270,7 @@ test.describe('Post-Sort Configuration Testing', () => {
         for (const questionType of QUESTION_TYPES) {
             test.describe(`Question Type: ${questionType}`, () => {
                 let studySlug: string;
+                let statementIds: number[];
 
                 test.beforeEach(async ({ testDb, authToken }) => {
                     const study = await testDb.createStudy(
@@ -250,9 +278,19 @@ test.describe('Post-Sort Configuration Testing', () => {
                         testDataBuilders.study({
                             slug: `test-postsort-q-${questionType}-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
                             statements: testDataBuilders.statements(10),
+                            grid_config: [
+                                { score: -3, capacity: 1 },
+                                { score: -2, capacity: 1 },
+                                { score: -1, capacity: 2 },
+                                { score: 0, capacity: 2 },
+                                { score: 1, capacity: 2 },
+                                { score: 2, capacity: 1 },
+                                { score: 3, capacity: 1 },
+                            ],
                         })
                     );
                     studySlug = study.slug;
+                    statementIds = study.statements.map((s: any) => s.id);
                 });
 
                 test(`Admin: Can add ${questionType} question`, async ({ page, testDb }) => {
@@ -345,6 +383,7 @@ test.describe('Post-Sort Configuration Testing', () => {
                         statementCount: 10,
                         step: 5,
                         token: session_token,
+                        statementIds: statementIds,
                     });
 
                     // Navigate to post-sort
@@ -386,6 +425,7 @@ test.describe('Post-Sort Configuration Testing', () => {
                         statementCount: 10,
                         step: 5,
                         token: session_token,
+                        statementIds: statementIds,
                     });
 
                     // Navigate to post-sort

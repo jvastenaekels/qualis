@@ -193,6 +193,7 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                 <div className="pt-4 flex justify-end w-full">
                     <button
                         type="submit"
+                        disabled={!isValid}
                         data-testid="presort-submit-btn"
                         className={cn(
                             'group w-full sm:w-auto px-8 py-3 text-white rounded-full font-bold text-base hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',

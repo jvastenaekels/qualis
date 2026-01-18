@@ -270,7 +270,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             p: ({ children }) => <span>{children}</span>,
                         }}
                     >
-                        {config.condition_of_instruction}
+                        {config.pre_instruction || config.condition_of_instruction}
                     </SafeMarkdown>
                     <span className="text-slate-400 text-[10px] sm:text-xs font-medium bg-slate-100 rounded-full px-2 py-0.5 border border-slate-200/50">
                         {config &&

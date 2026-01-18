@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Layout, Activity, ExternalLink } from 'lucide-react';
+import { Plus, Layout, Activity, ExternalLink, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuthStore } from '@/store/useAuthStore';
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
+import { ImportStudyDialog } from '@/components/admin/ImportStudyDialog';
 import { useAdminStore } from '@/store/useAdminStore';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +20,7 @@ export function AdminDashboard() {
     const navigate = useNavigate();
     const { setActiveStudy } = useAdminStore();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
+    const [showImportDialog, setShowImportDialog] = useState(false);
     const { data: allStudies, isLoading, refetch } = useListStudiesApiAdminStudiesGet();
     const { t, i18n } = useTranslation();
 
@@ -72,6 +74,15 @@ export function AdminDashboard() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
+                    <Button
+                        onClick={() => setShowImportDialog(true)}
+                        variant="outline"
+                        size="lg"
+                        className="w-full md:w-auto border-slate-200 hover:border-indigo-500 hover:text-indigo-600 shadow-sm font-bold h-12 px-8 rounded-xl"
+                    >
+                        <Upload className="mr-2 h-5 w-5" />{' '}
+                        {t('admin.dashboard.import_study', 'Import Study')}
+                    </Button>
                     <Button
                         onClick={() => setShowCreateDialog(true)}
                         size="lg"
@@ -178,6 +189,7 @@ export function AdminDashboard() {
             </Card>
 
             <CreateStudyDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
+            <ImportStudyDialog open={showImportDialog} onOpenChange={setShowImportDialog} />
         </div>
     );
 }

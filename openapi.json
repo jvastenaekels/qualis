@@ -934,6 +934,186 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/export/config": {
+      "get": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Export Study Config",
+        "description": "Export study configuration without participant data.\nReturns clean JSON suitable for import.",
+        "operationId": "export_study_config_api_admin_studies__slug__export_config_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/validate-import": {
+      "post": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Validate Study Import",
+        "description": "Validate imported configuration without creating study.\nReturns validation results and warnings.",
+        "operationId": "validate_study_import_api_admin_studies_validate_import_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Workspace-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Workspace-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Config"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/import": {
+      "post": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Import Study Config",
+        "description": "Import study configuration from exported JSON.\nCreates a new study in draft state.",
+        "operationId": "import_study_config_api_admin_studies_import_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Workspace-ID",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Workspace-Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudyImportRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyImportResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/export/csv": {
       "get": {
         "tags": [
@@ -3529,6 +3709,43 @@
         "title": "StudyCreate",
         "description": "Schema for creating a study."
       },
+      "StudyImportRequest": {
+        "properties": {
+          "config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config"
+          },
+          "new_slug": {
+            "type": "string",
+            "title": "New Slug"
+          }
+        },
+        "type": "object",
+        "required": [
+          "config",
+          "new_slug"
+        ],
+        "title": "StudyImportRequest"
+      },
+      "StudyImportResponse": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "slug",
+          "message"
+        ],
+        "title": "StudyImportResponse"
+      },
       "StudyRead": {
         "properties": {
           "slug": {
@@ -4649,6 +4866,86 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "ValidationResult": {
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Errors"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ValidationSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "valid",
+          "errors",
+          "warnings"
+        ],
+        "title": "ValidationResult"
+      },
+      "ValidationSummary": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "languages": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Languages"
+          },
+          "statement_count": {
+            "type": "integer",
+            "title": "Statement Count"
+          },
+          "grid_range": {
+            "type": "string",
+            "title": "Grid Range"
+          },
+          "has_presort": {
+            "type": "boolean",
+            "title": "Has Presort"
+          },
+          "has_postsort": {
+            "type": "boolean",
+            "title": "Has Postsort"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "languages",
+          "statement_count",
+          "grid_range",
+          "has_presort",
+          "has_postsort"
+        ],
+        "title": "ValidationSummary"
       },
       "WorkspaceCreate": {
         "properties": {

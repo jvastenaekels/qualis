@@ -33,6 +33,7 @@ import type {
     PasswordChange,
     RecruitmentLinkCreate,
     StudyCreate,
+    StudyImportRequest,
     StudyUpdate,
     SubmissionInput,
     TOTPVerify,
@@ -41,6 +42,7 @@ import type {
     UnlockStudyApiStudySlugUnlockPostParams,
     UserCreate,
     UserUpdate,
+    ValidateStudyImportApiAdminStudiesValidateImportPostBody,
     VerifyInvitationApiAdminInvitationsVerifyGetParams,
     WorkspaceCreate,
     WorkspaceInvitationCreate,
@@ -59,11 +61,13 @@ import type {
     ParticipantDetailRead,
     ParticipantRead,
     RecruitmentLinkRead,
+    StudyImportResponse,
     StudyRead,
     StudyStatsRead,
     TOTPSetup,
     Token,
     UserRead,
+    ValidationResult,
     WorkspaceMemberRead,
     WorkspaceRead,
     WorkspaceWithRole,
@@ -2098,6 +2102,335 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
 
     return query;
 }
+
+/**
+ * Export study configuration without participant data.
+Returns clean JSON suitable for import.
+ * @summary Export Study Config
+ */
+export const exportStudyConfigApiAdminStudiesSlugExportConfigGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/studies/${slug}/export/config`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getExportStudyConfigApiAdminStudiesSlugExportConfigGetQueryKey = (slug?: string) => {
+    return [`/api/admin/studies/${slug}/export/config`] as const;
+};
+
+export const getExportStudyConfigApiAdminStudiesSlugExportConfigGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getExportStudyConfigApiAdminStudiesSlugExportConfigGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>
+    > = ({ signal }) => exportStudyConfigApiAdminStudiesSlugExportConfigGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ExportStudyConfigApiAdminStudiesSlugExportConfigGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>
+>;
+export type ExportStudyConfigApiAdminStudiesSlugExportConfigGetQueryError = HTTPValidationError;
+
+export function useExportStudyConfigApiAdminStudiesSlugExportConfigGet<
+    TData = Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportStudyConfigApiAdminStudiesSlugExportConfigGet<
+    TData = Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportStudyConfigApiAdminStudiesSlugExportConfigGet<
+    TData = Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Export Study Config
+ */
+
+export function useExportStudyConfigApiAdminStudiesSlugExportConfigGet<
+    TData = Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof exportStudyConfigApiAdminStudiesSlugExportConfigGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getExportStudyConfigApiAdminStudiesSlugExportConfigGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Validate imported configuration without creating study.
+Returns validation results and warnings.
+ * @summary Validate Study Import
+ */
+export const validateStudyImportApiAdminStudiesValidateImportPost = (
+    validateStudyImportApiAdminStudiesValidateImportPostBody: ValidateStudyImportApiAdminStudiesValidateImportPostBody,
+    signal?: AbortSignal
+) => {
+    return customInstance<ValidationResult>({
+        url: `/api/admin/studies/validate-import`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: validateStudyImportApiAdminStudiesValidateImportPostBody,
+        signal,
+    });
+};
+
+export const getValidateStudyImportApiAdminStudiesValidateImportPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof validateStudyImportApiAdminStudiesValidateImportPost>>,
+        TError,
+        { data: ValidateStudyImportApiAdminStudiesValidateImportPostBody },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof validateStudyImportApiAdminStudiesValidateImportPost>>,
+    TError,
+    { data: ValidateStudyImportApiAdminStudiesValidateImportPostBody },
+    TContext
+> => {
+    const mutationKey = ['validateStudyImportApiAdminStudiesValidateImportPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof validateStudyImportApiAdminStudiesValidateImportPost>>,
+        { data: ValidateStudyImportApiAdminStudiesValidateImportPostBody }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return validateStudyImportApiAdminStudiesValidateImportPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ValidateStudyImportApiAdminStudiesValidateImportPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof validateStudyImportApiAdminStudiesValidateImportPost>>
+>;
+export type ValidateStudyImportApiAdminStudiesValidateImportPostMutationBody =
+    ValidateStudyImportApiAdminStudiesValidateImportPostBody;
+export type ValidateStudyImportApiAdminStudiesValidateImportPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Validate Study Import
+ */
+export const useValidateStudyImportApiAdminStudiesValidateImportPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof validateStudyImportApiAdminStudiesValidateImportPost>>,
+            TError,
+            { data: ValidateStudyImportApiAdminStudiesValidateImportPostBody },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof validateStudyImportApiAdminStudiesValidateImportPost>>,
+    TError,
+    { data: ValidateStudyImportApiAdminStudiesValidateImportPostBody },
+    TContext
+> => {
+    const mutationOptions =
+        getValidateStudyImportApiAdminStudiesValidateImportPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Import study configuration from exported JSON.
+Creates a new study in draft state.
+ * @summary Import Study Config
+ */
+export const importStudyConfigApiAdminStudiesImportPost = (
+    studyImportRequest: StudyImportRequest,
+    signal?: AbortSignal
+) => {
+    return customInstance<StudyImportResponse>({
+        url: `/api/admin/studies/import`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: studyImportRequest,
+        signal,
+    });
+};
+
+export const getImportStudyConfigApiAdminStudiesImportPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof importStudyConfigApiAdminStudiesImportPost>>,
+        TError,
+        { data: StudyImportRequest },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof importStudyConfigApiAdminStudiesImportPost>>,
+    TError,
+    { data: StudyImportRequest },
+    TContext
+> => {
+    const mutationKey = ['importStudyConfigApiAdminStudiesImportPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof importStudyConfigApiAdminStudiesImportPost>>,
+        { data: StudyImportRequest }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return importStudyConfigApiAdminStudiesImportPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ImportStudyConfigApiAdminStudiesImportPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof importStudyConfigApiAdminStudiesImportPost>>
+>;
+export type ImportStudyConfigApiAdminStudiesImportPostMutationBody = StudyImportRequest;
+export type ImportStudyConfigApiAdminStudiesImportPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Import Study Config
+ */
+export const useImportStudyConfigApiAdminStudiesImportPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof importStudyConfigApiAdminStudiesImportPost>>,
+            TError,
+            { data: StudyImportRequest },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof importStudyConfigApiAdminStudiesImportPost>>,
+    TError,
+    { data: StudyImportRequest },
+    TContext
+> => {
+    const mutationOptions = getImportStudyConfigApiAdminStudiesImportPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * Export study results as CSV.
@@ -7295,6 +7628,44 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseM
             ]),
         }));
 
+export const getValidateStudyImportApiAdminStudiesValidateImportPostResponseMock = (
+    overrideResponse: Partial<ValidationResult> = {}
+): ValidationResult => ({
+    valid: faker.datatype.boolean(),
+    errors: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() =>
+        faker.string.alpha({ length: { min: 10, max: 20 } })
+    ),
+    warnings: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => faker.string.alpha({ length: { min: 10, max: 20 } })
+    ),
+    summary: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                languages: Array.from(
+                    { length: faker.number.int({ min: 1, max: 10 }) },
+                    (_, i) => i + 1
+                ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+                statement_count: faker.number.int({ min: undefined, max: undefined }),
+                grid_range: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                has_presort: faker.datatype.boolean(),
+                has_postsort: faker.datatype.boolean(),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getImportStudyConfigApiAdminStudiesImportPostResponseMock = (
+    overrideResponse: Partial<StudyImportResponse> = {}
+): StudyImportResponse => ({
+    slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    message: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ...overrideResponse,
+});
+
 export const getListUsersApiAdminUsersGetResponseMock = (): UserRead[] =>
     Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
         email: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -8031,6 +8402,76 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandl
     );
 };
 
+export const getExportStudyConfigApiAdminStudiesSlugExportConfigGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/export/config',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getValidateStudyImportApiAdminStudiesValidateImportPostMockHandler = (
+    overrideResponse?:
+        | ValidationResult
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<ValidationResult> | ValidationResult),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/validate-import',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getValidateStudyImportApiAdminStudiesValidateImportPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getImportStudyConfigApiAdminStudiesImportPostMockHandler = (
+    overrideResponse?:
+        | StudyImportResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<StudyImportResponse> | StudyImportResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/import',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getImportStudyConfigApiAdminStudiesImportPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -8748,6 +9189,9 @@ export const getOpenQAPIMock = () => [
     getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),
     getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMockHandler(),
     getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler(),
+    getExportStudyConfigApiAdminStudiesSlugExportConfigGetMockHandler(),
+    getValidateStudyImportApiAdminStudiesValidateImportPostMockHandler(),
+    getImportStudyConfigApiAdminStudiesImportPostMockHandler(),
     getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
     getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),

@@ -65,6 +65,15 @@ delete_study
 get_participant
 discard_participant
 list_study_participants
+validate_slug
+languages
+grid_range
+has_presort
+has_postsort
+valid
+export_study_config
+validate_study_import
+import_study_config
 
 # admin/users.py
 list_users

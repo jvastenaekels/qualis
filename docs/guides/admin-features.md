@@ -50,6 +50,16 @@ Define the forced distribution shape for the Q-sort:
 - **Randomize Statements**: Shuffle statement order per participant to prevent bias (Q-methodology best practice).
 - **Access Password**: Require a password before participants can view the study content.
 
+### 🔄 Import / Export Configuration
+
+Easily duplicate studies or back up your configurations:
+
+- **Export Configuration**: Download a JSON file containing the full study design (grid, statements, translations, and settings). This **excludes** participant data.
+- **Import Study**: Create a new study by uploading a previously exported configuration file. The system will validate the file and allow you to set a new slug for the imported study.
+
+> [!TIP]
+> Use this feature to create "template" studies that you can clone and adapt for different contexts or languages.
+
 ### Translations & Content
 
 Manage multilingual content for your study:

@@ -33,8 +33,12 @@ export default function AdminLayout() {
 
     useEffect(() => {
         const match = location.pathname.match(/\/admin\/studies\/([^/]+)/);
-        if (match && match[1] !== activeStudyId) {
-            setActiveStudy(match[1]);
+        if (match) {
+            if (match[1] !== activeStudyId) {
+                setActiveStudy(match[1]);
+            }
+        } else if (activeStudyId && !location.pathname.startsWith('/admin/studies')) {
+            setActiveStudy(null);
         }
     }, [location.pathname, activeStudyId, setActiveStudy]);
 

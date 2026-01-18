@@ -516,7 +516,45 @@
             "recent_studies": "Recent Studies",
             "recent_description": "A list of your most recently updated studies.",
             "created": "Created",
-            "no_studies": "No studies found. Create your first study to get started!"
+            "no_studies": "No studies found. Create your first study to get started!",
+            "import_study": "Import Study"
+        },
+        "export": {
+            "config": "Export Configuration",
+            "exporting": "Exporting...",
+            "config_success": "Configuration exported successfully",
+            "config_error": "Failed to export configuration"
+        },
+        "import": {
+            "title": "Import Study Configuration",
+            "upload_desc": "Upload a previously exported study configuration file",
+            "validate_desc": "Review configuration and provide a unique slug",
+            "creating_desc": "Creating study...",
+            "file_upload": "File Upload",
+            "paste_json": "Paste JSON",
+            "drop_here": "Drop file here",
+            "drag_drop": "Drag & drop JSON file or click to browse",
+            "supported": "Supported format: .json",
+            "paste_label": "Paste JSON configuration",
+            "validate": "Validate & Continue",
+            "valid": "Configuration is valid",
+            "invalid": "Configuration has errors",
+            "errors": "Errors",
+            "warnings": "Warnings",
+            "summary": "Study Summary",
+            "title_field": "Title",
+            "languages": "Languages",
+            "statements": "Statements",
+            "grid": "Grid Range",
+            "new_slug": "New Study Slug",
+            "slug_help": "Must be unique, 3-100 characters, lowercase letters, numbers, and hyphens only",
+            "creating": "Creating study from configuration...",
+            "create_study": "Create Study",
+            "invalid_json": "Invalid JSON",
+            "validation_failed": "Validation failed",
+            "success": "Study imported successfully",
+            "redirecting": "Opening study designer...",
+            "failed": "Import failed"
         },
         "dialogs": {
             "create_study": {

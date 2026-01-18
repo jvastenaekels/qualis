@@ -35,6 +35,10 @@ from app.schemas import (
     StudyStatsRead,
     StudyUpdate,
 )
+from pydantic import BaseModel, field_validator
+import re
+from datetime import datetime, timezone
+from fastapi.responses import JSONResponse
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -583,3 +587,350 @@ async def list_study_participants(
     )
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+class ValidationSummary(BaseModel):
+    title: str
+    languages: list[str]
+    statement_count: int
+    grid_range: str
+    has_presort: bool
+    has_postsort: bool
+
+
+class ValidationResult(BaseModel):
+    valid: bool
+    errors: list[str]
+    warnings: list[str]
+    summary: ValidationSummary | None = None
+
+
+def _get_grid_range(grid_config: list) -> str:
+    """Helper to get grid score range as string"""
+    if not grid_config:
+        return "Unknown"
+    try:
+        scores = [col["score"] for col in grid_config if isinstance(col, dict)]
+        if not scores:
+            return "Unknown"
+        return f"{min(scores)} to {max(scores)}"
+    except (KeyError, ValueError, TypeError):
+        return "Invalid"
+
+
+@router.get("/{slug}/export/config")
+async def export_study_config(
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Export study configuration without participant data.
+    Returns clean JSON suitable for import.
+    """
+    # Ensure relationships are loaded
+    from app.models import Statement
+
+    stmt = (
+        select(Study)
+        .where(Study.id == study.id)
+        .options(
+            selectinload(Study.translations),
+            selectinload(Study.statements).selectinload(Statement.translations),
+        )
+    )
+    res = await db.execute(stmt)
+    study = res.scalar_one()
+
+    # Build export structure
+    config = {
+        "version": "1.0",  # Schema version for future compatibility
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "exported_by": current_user.email,
+        "study": {
+            "slug": study.slug,
+            "default_language": study.default_language,
+            "show_statement_codes": study.show_statement_codes,
+            "randomize_statement_order": study.randomize_statement_order,
+            "symmetry_lock": study.symmetry_lock,
+            "grid_config": study.grid_config,
+            "presort_config": study.presort_config,
+            "postsort_config": study.postsort_config,
+            "branding": study.branding,
+            "translations": [
+                {
+                    "language_code": t.language_code,
+                    "title": t.title,
+                    "subtitle": t.subtitle,
+                    "description": t.description,
+                    "objective": t.objective,
+                    "instructions": t.instructions,
+                    "condition_of_instruction": t.condition_of_instruction,
+                    "pre_instruction": t.pre_instruction,
+                    "consent_title": t.consent_title,
+                    "consent_description": t.consent_description,
+                    "ui_labels": t.ui_labels,
+                    "process_steps": t.process_steps,
+                    "methodology_tips": t.methodology_tips,
+                    "step_help": t.step_help,
+                }
+                for t in study.translations
+            ],
+            "statements": [
+                {
+                    "code": s.code,
+                    "translations": [
+                        {"language_code": st.language_code, "text": st.text}
+                        for st in s.translations
+                    ],
+                }
+                for s in study.statements
+            ],
+        },
+    }
+
+    filename = (
+        f"{study.slug}_config_{datetime.now(timezone.utc).strftime('%Y%m%d')}.json"
+    )
+
+    return JSONResponse(
+        content=config,
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
+
+
+@router.post("/validate-import", response_model=ValidationResult)
+async def validate_study_import(
+    config: dict,
+    current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Validate imported configuration without creating study.
+    Returns validation results and warnings.
+    """
+    warnings = []
+    errors = []
+
+    # Check version
+    version = config.get("version")
+    if not version:
+        errors.append("Missing version field")
+    elif version != "1.0":
+        errors.append(f"Unsupported version: {version}")
+
+    study_data = config.get("study", {})
+
+    # Validate required fields
+    required = ["slug", "translations", "statements", "grid_config"]
+    for field in required:
+        if field not in study_data:
+            errors.append(f"Missing required field: {field}")
+
+    # Check translations
+    translations = study_data.get("translations", [])
+    if not translations:
+        errors.append("At least one translation required")
+
+    for i, trans in enumerate(translations):
+        required_trans = [
+            "language_code",
+            "title",
+            "description",
+            "consent_title",
+            "consent_description",
+        ]
+        for field in required_trans:
+            if field not in trans or not trans[field]:
+                errors.append(f"Translation {i + 1} missing required field: {field}")
+
+        # Validate language code
+        lang_code = trans.get("language_code", "")
+        if lang_code and not re.match(r"^[a-z]{2}(-[A-Z]{2})?$", lang_code):
+            errors.append(
+                f"Invalid language code: {lang_code} (must be 2 lowercase letters, e.g. 'en', or with region, e.g. 'en-US')"
+            )
+
+    # Check statements
+    statements = study_data.get("statements", [])
+    if not statements:
+        errors.append("At least one statement required")
+
+    # Check for duplicate codes
+    codes = [s.get("code") for s in statements if s.get("code")]
+    duplicates = [code for code in codes if codes.count(code) > 1]
+    if duplicates:
+        errors.append(f"Duplicate statement codes: {', '.join(set(duplicates))}")
+
+    # Check statement translations
+    for i, stmt in enumerate(statements):
+        if "translations" not in stmt or not stmt["translations"]:
+            errors.append(f"Statement {i + 1} missing translations")
+
+    # Check statements vs grid capacity
+    grid_config = study_data.get("grid_config", [])
+    if grid_config:
+        if not isinstance(grid_config, list):
+            errors.append("Invalid grid_config: must be a list")
+        else:
+            try:
+                grid_capacity = sum(
+                    int(col.get("capacity", 0))
+                    for col in grid_config
+                    if isinstance(col, dict)
+                )
+                statement_count = len(statements)
+                if statement_count != grid_capacity:
+                    errors.append(
+                        f"Statement count ({statement_count}) doesn't match grid capacity ({grid_capacity})"
+                    )
+            except (KeyError, TypeError, ValueError) as e:
+                errors.append(f"Invalid grid_config structure: {str(e)}")
+
+    # Check for external resources
+    branding = study_data.get("branding", {})
+    if branding:
+        if branding.get("logo_url", "").startswith("http"):
+            warnings.append(
+                "Logo URL references external resource - may not be accessible"
+            )
+
+        partners = branding.get("partners", [])
+        for partner in partners:
+            if partner.get("logo_url", "").startswith("http"):
+                warnings.append(
+                    f"Partner '{partner.get('name', 'Unknown')}' logo references external resource"
+                )
+
+    # Summary
+    summary = None
+    if not errors:
+        try:
+            summary_trans = translations[0] if translations else {}
+            summary = ValidationSummary(
+                title=summary_trans.get("title", "Unknown"),
+                languages=[t.get("language_code", "??") for t in translations],
+                statement_count=len(statements),
+                grid_range=_get_grid_range(grid_config),
+                has_presort=bool(study_data.get("presort_config")),
+                has_postsort=bool(study_data.get("postsort_config")),
+            )
+        except Exception as e:
+            errors.append(f"Error building summary: {str(e)}")
+
+    return ValidationResult(
+        valid=len(errors) == 0, errors=errors, warnings=warnings, summary=summary
+    )
+
+
+class StudyImportRequest(BaseModel):
+    config: dict
+    new_slug: str
+
+    @field_validator("new_slug")
+    @classmethod
+    def validate_slug(cls, v: str) -> str:
+        if not re.match(r"^[a-z0-9-]{3,100}$", v):
+            raise ValueError(
+                "Slug must be 3-100 characters, lowercase letters, numbers, and hyphens only"
+            )
+        return v
+
+
+class StudyImportResponse(BaseModel):
+    slug: str
+    message: str
+
+
+@router.post("/import", response_model=StudyImportResponse)
+async def import_study_config(
+    request: StudyImportRequest,
+    current_user: User = Depends(get_current_user),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Import study configuration from exported JSON.
+    Creates a new study in draft state.
+    """
+    workspace, member = workspace_ctx
+
+    # Check permission
+    if member.role not in [WorkspaceRole.owner, WorkspaceRole.researcher]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You need to be an Admin or Researcher in this Workspace to import a study.",
+        )
+
+    config = request.config
+    version = config.get("version")
+    if version != "1.0":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unsupported configuration version: {version}. Expected: 1.0",
+        )
+
+    # Check slug uniqueness
+    query = select(Study).where(Study.slug == request.new_slug)
+    result = await db.execute(query)
+    if result.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Study with slug '{request.new_slug}' already exists",
+        )
+
+    study_data = config.get("study", {}).copy()
+
+    # Create Study in DRAFT
+    try:
+        from app.models import StudyTranslation, Statement, StatementTranslation
+
+        db_study = Study(
+            slug=request.new_slug,
+            workspace_id=workspace.id,
+            state=StudyState.draft,
+            grid_config=study_data.get("grid_config"),
+            presort_config=study_data.get("presort_config", {}),
+            postsort_config=study_data.get("postsort_config", {}),
+            default_language=study_data.get("default_language", "en"),
+            show_statement_codes=study_data.get("show_statement_codes", False),
+            randomize_statement_order=study_data.get(
+                "randomize_statement_order", False
+            ),
+            symmetry_lock=study_data.get("symmetry_lock", True),
+            branding=study_data.get("branding"),
+        )
+        db.add(db_study)
+        await db.flush()
+
+        # Translations
+        for t_data in study_data.get("translations", []):
+            db.add(StudyTranslation(study_id=db_study.id, **t_data))
+
+        # Statements
+        for s_data in study_data.get("statements", []):
+            stmt = Statement(study_id=db_study.id, code=s_data.get("code"))
+            db.add(stmt)
+            await db.flush()
+            for st_data in s_data.get("translations", []):
+                db.add(
+                    StatementTranslation(
+                        statement_id=stmt.id,
+                        language_code=st_data.get("language_code"),
+                        text=st_data.get("text"),
+                    )
+                )
+
+        await db.commit()
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Error during study import: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to import study: {str(e)}",
+        )
+
+    return StudyImportResponse(
+        slug=db_study.slug, message="Study imported successfully"
+    )

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type {
     DumpParticipant,
     DumpResponse,
+    DumpStatement,
 } from '@/components/admin/dashboard/InteractiveDataView';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +29,7 @@ export const ParticipantGridView = ({
 
         // Map scores to statements
         const scores = participant.scores;
-        const placements: Record<number, any[]> = {};
+        const placements: Record<number, DumpStatement[]> = {};
 
         scores.forEach((score, index) => {
             if (score === null || score === undefined) return;
@@ -45,7 +46,6 @@ export const ParticipantGridView = ({
             columns: sortedColumnScores.map((score) => ({
                 score,
                 statements: placements[score] || [],
-                // biome-ignore lint/suspicious/noExplicitAny: API type mismatch
                 maxAllowed: (gridConfig as Record<string, number>)[String(score)],
             })),
             // biome-ignore lint/suspicious/noExplicitAny: API type mismatch

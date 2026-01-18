@@ -516,7 +516,45 @@
             "recent_studies": "Viimeisimmät tutkimukset",
             "recent_description": "Luettelo viimeksi päivitetyistä tutkimuksistasi.",
             "created": "Luotu",
-            "no_studies": "Ei tutkimuksia. Luo ensimmäinen tutkimuksesi aloittaaksesi!"
+            "no_studies": "Ei tutkimuksia. Luo ensimmäinen tutkimuksesi aloittaaksesi!",
+            "import_study": "Tuo tutkimus"
+        },
+        "export": {
+            "config": "Vie asetukset",
+            "exporting": "Viedään...",
+            "config_success": "Asetukset viety onnistuneesti",
+            "config_error": "Asetusten vienti epäonnistui"
+        },
+        "import": {
+            "title": "Tuo tutkimusasetukset",
+            "upload_desc": "Lataa aiemmin viety tutkimuksen asetustiedosto",
+            "validate_desc": "Tarkista asetukset ja anna yksilöllinen tunniste",
+            "creating_desc": "Luodaan tutkimusta...",
+            "file_upload": "Tiedoston lataus",
+            "paste_json": "Liitä JSON",
+            "drop_here": "Pudota tiedosto tähän",
+            "drag_drop": "Vedä ja pudota JSON-tiedosto tai napsauta selaaksesi",
+            "supported": "Tuettu muoto: .json",
+            "paste_label": "Liitä JSON-asetukset",
+            "validate": "Vahvista ja jatka",
+            "valid": "Asetukset ovat kelvolliset",
+            "invalid": "Asetuksissa on virheitä",
+            "errors": "Virheet",
+            "warnings": "Varoitukset",
+            "summary": "Tutkimuksen yhteenveto",
+            "title_field": "Otsikko",
+            "languages": "Kielet",
+            "statements": "Väittämät",
+            "grid": "Ruudukon alue",
+            "new_slug": "Uusi tutkimustunniste",
+            "slug_help": "Tunnisteen on oltava yksilöllinen, 3–100 merkkiä, vain pieniä kirjaimia, numeroita ja väliviivoja",
+            "creating": "Luodaan tutkimusta asetuksista...",
+            "create_study": "Luo tutkimus",
+            "invalid_json": "Virheellinen JSON",
+            "validation_failed": "Vahvistus epäonnistui",
+            "success": "Tutkimus tuotu onnistuneesti",
+            "redirecting": "Avataan tutkimussuunnittelija...",
+            "failed": "Tuonti epäonnistui"
         },
         "dialogs": {
             "create_study": {

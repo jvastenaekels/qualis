@@ -64,7 +64,7 @@ describe('Study Consistency (Admin -> Participant)', () => {
 
         // Rename it to something unique
         // First expand the accordion (it's collapsed by default)
-        const toggleBtn = await screen.findByRole('button', { name: /Toggle/i });
+        const toggleBtn = await screen.findByTestId('question-accordion-trigger');
         fireEvent.click(toggleBtn);
 
         const input = await screen.findByDisplayValue('New question');

@@ -515,7 +515,45 @@
             "recent_studies": "Études récentes",
             "recent_description": "Une liste de vos études mises à jour récemment.",
             "created": "Créée",
-            "no_studies": "Aucune étude trouvée. Créez votre première étude pour commencer !"
+            "no_studies": "Aucune étude trouvée. Créez votre première étude pour commencer !",
+            "import_study": "Importer une étude"
+        },
+        "export": {
+            "config": "Exporter la configuration",
+            "exporting": "Export en cours...",
+            "config_success": "Configuration exportée avec succès",
+            "config_error": "Échec de l'export de la configuration"
+        },
+        "import": {
+            "title": "Importer une configuration d'étude",
+            "upload_desc": "Téléchargez un fichier de configuration d'étude précédemment exporté",
+            "validate_desc": "Vérifiez la configuration et fournissez un slug unique",
+            "creating_desc": "Création de l'étude...",
+            "file_upload": "Téléchargement de fichier",
+            "paste_json": "Coller JSON",
+            "drop_here": "Déposez le fichier ici",
+            "drag_drop": "Glissez-déposez le fichier JSON ou cliquez pour parcourir",
+            "supported": "Format supporté : .json",
+            "paste_label": "Coller la configuration JSON",
+            "validate": "Valider et continuer",
+            "valid": "Configuration valide",
+            "invalid": "La configuration contient des erreurs",
+            "errors": "Erreurs",
+            "warnings": "Avertissements",
+            "summary": "Résumé de l'étude",
+            "title_field": "Titre",
+            "languages": "Langues",
+            "statements": "Énoncés",
+            "grid": "Plage de la grille",
+            "new_slug": "Slug de la nouvelle étude",
+            "slug_help": "Doit être unique, 3-100 caractères, lettres minuscules, chiffres et traits d'union uniquement",
+            "creating": "Création de l'étude à partir de la configuration...",
+            "create_study": "Créer l'étude",
+            "invalid_json": "JSON invalide",
+            "validation_failed": "Échec de la validation",
+            "success": "Étude importée avec succès",
+            "redirecting": "Ouverture du concepteur d'étude...",
+            "failed": "L'import a échoué"
         },
         "dialogs": {
             "create_study": {

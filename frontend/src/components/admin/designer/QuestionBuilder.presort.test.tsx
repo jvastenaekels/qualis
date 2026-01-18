@@ -110,7 +110,7 @@ describe('QuestionBuilder - Presort Config Migration', () => {
         renderBuilder({ draft: newDraft });
 
         // Find toggle button and click it
-        const toggleBtn = screen.getByRole('button', { name: /Toggle/i });
+        const toggleBtn = screen.getByTestId('question-accordion-trigger');
         fireEvent.click(toggleBtn);
 
         // Wait for input to appear and change it

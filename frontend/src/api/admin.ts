@@ -5,6 +5,7 @@ import {
 } from './generated';
 import type { StudyState } from './model';
 import type { StudyUpdate } from './model';
+import { useAuthStore } from '../store/useAuthStore';
 
 export const AdminService = {
     /**
@@ -29,5 +30,55 @@ export const AdminService = {
      */
     deleteStudy: async (slug: string) => {
         return deleteStudyApiAdminStudiesSlugDelete(slug);
+    },
+
+    /**
+     * Export study configuration as JSON
+     */
+    exportStudyConfig: async (slug: string) => {
+        const response = await fetch(`/api/admin/studies/${slug}/export/config`, {
+            headers: {
+                Authorization: `Bearer ${useAuthStore.getState().token}`,
+            },
+        });
+        if (!response.ok) throw new Error('Failed to export configuration');
+        return response.json();
+    },
+
+    /**
+     * Validate study configuration for import
+     */
+    validateStudyImport: async (config: any) => {
+        const response = await fetch('/api/admin/studies/validate-import', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${useAuthStore.getState().token}`,
+                'X-Workspace-ID': String(useAuthStore.getState().currentWorkspace?.id),
+            },
+            body: JSON.stringify(config),
+        });
+        if (!response.ok) throw new Error('Validation failed');
+        return { data: await response.json() };
+    },
+
+    /**
+     * Import study configuration and create new study
+     */
+    importStudyConfig: async (data: { config: any; new_slug: string }) => {
+        const response = await fetch('/api/admin/studies/import', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${useAuthStore.getState().token}`,
+                'X-Workspace-ID': String(useAuthStore.getState().currentWorkspace?.id),
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.detail || 'Import failed');
+        }
+        return { data: await response.json() };
     },
 };

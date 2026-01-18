@@ -297,12 +297,20 @@ export class TestDatabase {
         }
 
         // Build qsort as list of QSortEntryInput objects using REAL statement IDs
+        // Build qsort as list of QSortEntryInput objects using REAL statement IDs and grid limits
+        const targetDist = publicConfig.grid_config || [];
+        const scorePool: number[] = [];
+        for (const col of targetDist) {
+            for (let i = 0; i < col.capacity; i++) {
+                scorePool.push(col.score);
+            }
+        }
+
         const qsortEntries =
             overrides.qsort ||
             statements.map((s: any, index: number) => {
-                // Map first 7 statements to our distribution, others to 0 or ignored
-                const scores = [-3, -2, -1, 0, 1, 2, 3];
-                const score = index < scores.length ? scores[index] : 0;
+                // Take score from pool, fallback to 0 if pool is exhausted (should not happen if counts match)
+                const score = index < scorePool.length ? scorePool[index] : 0;
                 return { statement_id: s.id, grid_score: score };
             });
 
@@ -339,7 +347,8 @@ export const test = base.extend<{
     testDb: TestDatabase;
     authToken: string;
 }>({
-    testDb: async (_, use) => {
+    // biome-ignore lint/correctness/noEmptyPattern: Playwright requires object destructuring for fixtures
+    testDb: async ({}, use) => {
         const db = new TestDatabase();
         await db.setup();
         await use(db);

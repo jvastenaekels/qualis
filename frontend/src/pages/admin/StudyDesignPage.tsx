@@ -36,6 +36,7 @@ import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
 import ConditionOfInstructionEditor from '@/components/admin/designer/ConditionOfInstructionEditor';
 import { GuidanceCard } from '@/components/admin/designer/GuidanceCard';
 import { useStudyPersistence } from '@/hooks/useStudyPersistence';
+import { ExportConfigButton } from '@/components/admin/designer/ExportConfigButton';
 import { customInstance } from '@/api/mutator';
 
 import { toast } from 'sonner';
@@ -507,6 +508,12 @@ const StudyDesignPage = () => {
                             </span>
                         </Button>
                     </div>
+
+                    <ExportConfigButton
+                        studySlug={slug || ''}
+                        variant="outline"
+                        className="h-8 rounded-lg"
+                    />
 
                     <Button
                         size="sm"

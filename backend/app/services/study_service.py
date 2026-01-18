@@ -386,6 +386,7 @@ class StudyService:
                 "description": get_t_attr("consent_description"),
             },
             "condition_of_instruction": condition_of_instruction,
+            "pre_instruction": getattr(translation, "pre_instruction", None),
             "available_languages": [t.language_code for t in study.translations],
             "language": resolved_lang,
             "default_language": study.default_language,

@@ -248,11 +248,19 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
         return comment.length >= 10;
     };
 
+    const isEmailValid = () => {
+        const email = responses.postsort.email;
+        if (!email) return true; // It's optional if empty
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
     const validateAll = async () => {
         let valid = true;
         extremeCards.forEach((c) => {
             if (!isCommentValid(c.statementId)) valid = false;
         });
+
+        if (!isEmailValid()) valid = false;
 
         const isFormValid = await triggerFormValidation();
         if (!isFormValid) valid = false;
@@ -645,8 +653,19 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                                         onChange={(e) =>
                                             setPostSortResponse('email', e.target.value)
                                         }
-                                        className="bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                                        className={`bg-white border-blue-200 focus:border-blue-400 focus:ring-blue-400 ${!isEmailValid() ? 'border-red-500 focus:border-red-500' : ''}`}
                                     />
+                                    {!isEmailValid() && (
+                                        <p
+                                            className="text-red-500 text-xs mt-1"
+                                            data-testid="postsort-email-error"
+                                        >
+                                            {t(
+                                                'post.contact.error_invalid_email',
+                                                'Please enter a valid email address'
+                                            )}
+                                        </p>
+                                    )}
                                 </div>
                             )}
 
