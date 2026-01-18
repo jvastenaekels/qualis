@@ -1,7 +1,11 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Rocket, PowerOff, Sparkles, Loader2, Lock } from 'lucide-react';
-import { useChangeStudyStateApiAdminStudiesSlugStatePost } from '@/api/generated';
+import {
+    useChangeStudyStateApiAdminStudiesSlugStatePost,
+    getListStudiesApiAdminStudiesGetQueryKey,
+    getGetStudyApiAdminStudiesSlugGetQueryKey,
+} from '@/api/generated';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -45,12 +49,12 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
             // Invalidate queries more explicitly to ensure cache refresh
             // 1. Invalidate the specific study query
             await queryClient.invalidateQueries({
-                queryKey: [`/api/admin/studies/${slug}`],
+                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
             });
 
-            // 2. Also invalidate the studies list
+            // 2. Also invalidate the studies list (for sidebar/switcher)
             await queryClient.invalidateQueries({
-                queryKey: ['/api/admin/studies/'],
+                queryKey: getListStudiesApiAdminStudiesGetQueryKey(),
             });
 
             onStateChange();
@@ -177,7 +181,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
     };
 
     return (
-        <Card className="shadow-sm border border-slate-200 bg-white mb-6">
+        <Card className="shadow-sm border border-slate-200 bg-white">
             <CardContent className="p-1">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-1">
                     {steps.map((step) => {
@@ -212,7 +216,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                         const content = (
                             <div
                                 className={cn(
-                                    'relative flex flex-col items-center justify-center p-4 rounded-lg transition-all border',
+                                    'relative flex flex-col items-center justify-center p-2.5 rounded-lg transition-all border',
                                     isActive
                                         ? cn(
                                               'bg-white shadow-sm z-10',
@@ -226,7 +230,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
                             >
                                 <div
                                     className={cn(
-                                        'h-8 w-8 rounded-full flex items-center justify-center mb-2 transition-colors',
+                                        'h-7 w-7 rounded-full flex items-center justify-center mb-1.5 transition-colors',
                                         isActive ? step.bg : 'bg-slate-100'
                                     )}
                                 >

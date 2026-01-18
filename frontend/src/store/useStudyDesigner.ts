@@ -62,6 +62,7 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
             ui_labels: t.ui_labels,
             process_steps: t.process_steps,
             condition_of_instruction: t.condition_of_instruction,
+            pre_instruction: t.pre_instruction,
 
             // biome-ignore lint/suspicious/noExplicitAny: methodology tips missing in generated type
             methodology_tips: (t as any).methodology_tips || [],

@@ -180,7 +180,10 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                             register={register}
                         />
                         {errors[key] && (
-                            <p className="text-red-500 text-sm mt-1">
+                            <p
+                                className="text-red-500 text-sm mt-1"
+                                data-testid="presort-field-error"
+                            >
                                 {(errors[key]?.message as string) || t('presort.error_required')}
                             </p>
                         )}
@@ -191,11 +194,6 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                     <button
                         type="submit"
                         data-testid="presort-submit-btn"
-                        // If no config, always valid. Otherwise respect form validation.
-                        disabled={
-                            (presortFields && Object.keys(presortFields).length > 0 && !isValid) ||
-                            false
-                        }
                         className={cn(
                             'group w-full sm:w-auto px-8 py-3 text-white rounded-full font-bold text-base hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none',
                             highlightKey === 'common.next' &&

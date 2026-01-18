@@ -66,18 +66,21 @@ export default function AdminLayout() {
             <AppSidebar />
 
             <SidebarInset
-                className={cn(location.pathname.includes('/design') && '!m-0 !rounded-none')}
+                className={cn(
+                    'min-w-0 overflow-hidden',
+                    location.pathname.includes('/design') && '!m-0 !rounded-none'
+                )}
             >
-                <header className="flex h-16 shrink-0 items-center justify-between border-b px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                    <div className="flex items-center gap-2 px-4">
+                <header className="flex h-16 shrink-0 items-center justify-between border-b px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 min-w-0 overflow-hidden">
+                    <div className="flex items-center gap-2 px-4 min-w-0 flex-1">
                         <SidebarTrigger className="-ml-1" />
                         <Separator orientation="vertical" className="mr-2 h-4" />
-                        <Breadcrumb>
-                            <BreadcrumbList>
+                        <Breadcrumb className="min-w-0 flex-1 overflow-hidden">
+                            <BreadcrumbList className="flex-nowrap min-w-0 max-w-full">
                                 {/* Workspace Context (if available) */}
                                 {currentWorkspace && (
                                     <>
-                                        <BreadcrumbItem className="hidden md:block">
+                                        <BreadcrumbItem className="hidden md:block shrink-0">
                                             <BreadcrumbLink
                                                 href="/admin"
                                                 className="text-xs font-medium text-slate-500 hover:text-indigo-600 transition-colors"
@@ -85,27 +88,27 @@ export default function AdminLayout() {
                                                 {currentWorkspace.title}
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
-                                        <BreadcrumbSeparator className="hidden md:block" />
+                                        <BreadcrumbSeparator className="hidden md:block shrink-0" />
                                     </>
                                 )}
 
                                 {/* Study Context (if on study page) */}
                                 {activeStudyId && study && (
                                     <>
-                                        <BreadcrumbItem className="hidden md:block">
+                                        <BreadcrumbItem className="hidden md:block min-w-0 flex-1 max-w-[200px] lg:max-w-[400px]">
                                             <BreadcrumbLink
                                                 href={`/admin/studies/${activeStudyId}`}
-                                                className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors"
+                                                className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors truncate block"
                                             >
                                                 {study.translations?.[0]?.title || activeStudyId}
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
-                                        <BreadcrumbSeparator className="hidden md:block" />
+                                        <BreadcrumbSeparator className="hidden md:block shrink-0" />
                                     </>
                                 )}
 
                                 {/* Current Page */}
-                                <BreadcrumbItem>
+                                <BreadcrumbItem className="shrink-0">
                                     <BreadcrumbPage className="text-sm font-bold text-slate-900">
                                         {getCurrentPageName()}
                                     </BreadcrumbPage>
@@ -113,24 +116,13 @@ export default function AdminLayout() {
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
-                    <div className="flex items-center gap-4 px-4">
-                        <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 shadow-sm animate-pulse-slow">
-                            <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                            </span>
-                            <span className="text-[10px] font-bold uppercase tracking-wider">
-                                {t('admin.layout.beta')}
-                            </span>
-                        </div>
-                    </div>
                 </header>
                 <div
                     className={cn(
                         'flex flex-1 flex-col transition-all duration-300 min-w-0',
                         !location.pathname.includes('/design')
                             ? 'gap-4 p-4 pt-0'
-                            : 'overflow-hidden'
+                            : 'overflow-hidden max-w-full'
                     )}
                 >
                     <Outlet />

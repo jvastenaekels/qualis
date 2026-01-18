@@ -80,7 +80,7 @@ const StudyOverviewPage = () => {
     };
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+        <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6 pt-2">
             <StudyPageHeader
                 title={t('admin.study_overview.title', 'Overview')}
                 description={t(
@@ -125,11 +125,11 @@ const StudyOverviewPage = () => {
                         }}
                     />
 
-                    <div className="bg-gradient-to-br from-slate-50 to-white px-4 py-4 rounded-xl border border-slate-100 shadow-sm mb-6">
+                    <div className="bg-gradient-to-br from-slate-50 to-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
                         <div className="grid gap-3 md:grid-cols-3">
                             {/* Sample Size */}
-                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                                <CardContent className="pt-4 pb-4">
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden h-full">
+                                <CardContent className="p-3.5">
                                     <div className="flex items-center gap-2 mb-2">
                                         <Users className="h-4 w-4 text-indigo-600" />
                                         <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
@@ -139,16 +139,15 @@ const StudyOverviewPage = () => {
                                             )}
                                         </div>
                                     </div>
-                                    <div className="text-4xl font-bold text-slate-900 mb-1">
+                                    <div className="text-4xl font-bold text-slate-900">
                                         {stats.completed_count}
                                     </div>
-                                    <p className="text-xs text-slate-400 font-medium">&nbsp;</p>
                                 </CardContent>
                             </Card>
 
                             {/* Completion Rate */}
-                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                                <CardContent className="pt-4 pb-4">
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden h-full">
+                                <CardContent className="p-3.5">
                                     <div className="flex items-center gap-2 mb-2">
                                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                                         <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
@@ -170,15 +169,14 @@ const StudyOverviewPage = () => {
                                                 (stats.completed_count / stats.started_count) * 100
                                             ) || 0
                                         }
-                                        className="h-1.5 bg-emerald-50 mb-1.5"
+                                        className="h-1.5 bg-emerald-50"
                                     />
-                                    <p className="text-[10px] text-slate-400">&nbsp;</p>
                                 </CardContent>
                             </Card>
 
                             {/* Median Duration */}
-                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                                <CardContent className="pt-4 pb-4">
+                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden h-full">
+                                <CardContent className="p-3.5">
                                     <div className="flex items-center gap-2 mb-2">
                                         <Clock className="h-4 w-4 text-amber-500" />
                                         <div className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
@@ -202,7 +200,7 @@ const StudyOverviewPage = () => {
                                                 </span>
                                             )}
                                     </div>
-                                    <p className="text-[10px] text-slate-400">
+                                    <p className="text-[10px] text-slate-400 font-medium">
                                         {t(
                                             'admin.study_overview.time_to_complete',
                                             'Time to complete'
@@ -214,35 +212,39 @@ const StudyOverviewPage = () => {
                     </div>
 
                     {/* Analytics Overview - Phase 1 */}
-                    <div className="grid gap-6 md:grid-cols-12 mb-6">
-                        <div className="col-span-12 md:col-span-8">
-                            <SubmissionsTimelineChart
-                                participants={participants}
-                                className="border-none shadow-sm bg-white rounded-2xl h-full"
-                            />
-                        </div>
-                        <div className="col-span-12 md:col-span-4">
-                            <CompletionRateTrendChart
-                                participants={participants}
-                                className="border-none shadow-sm bg-white rounded-2xl h-full"
-                            />
-                        </div>
-                    </div>
+                    {participants.length > 0 && (
+                        <>
+                            <div className="grid gap-6 md:grid-cols-12">
+                                <div className="col-span-12 md:col-span-8">
+                                    <SubmissionsTimelineChart
+                                        participants={participants}
+                                        className="border-none shadow-sm bg-white rounded-2xl h-full"
+                                    />
+                                </div>
+                                <div className="col-span-12 md:col-span-4">
+                                    <CompletionRateTrendChart
+                                        participants={participants}
+                                        className="border-none shadow-sm bg-white rounded-2xl h-full"
+                                    />
+                                </div>
+                            </div>
 
-                    <div className="grid gap-6 md:grid-cols-12 mb-6">
-                        <div className="col-span-12 md:col-span-8">
-                            <DurationHistogramChart
-                                participants={participants}
-                                className="border-none shadow-sm bg-white rounded-2xl h-full"
-                            />
-                        </div>
-                        <div className="col-span-12 md:col-span-4">
-                            <DeviceBreakdownChart
-                                deviceBreakdown={stats.device_breakdown}
-                                className="border-none shadow-sm bg-white rounded-2xl h-full"
-                            />
-                        </div>
-                    </div>
+                            <div className="grid gap-6 md:grid-cols-12">
+                                <div className="col-span-12 md:col-span-8">
+                                    <DurationHistogramChart
+                                        participants={participants}
+                                        className="border-none shadow-sm bg-white rounded-2xl h-full"
+                                    />
+                                </div>
+                                <div className="col-span-12 md:col-span-4">
+                                    <DeviceBreakdownChart
+                                        deviceBreakdown={stats.device_breakdown}
+                                        className="border-none shadow-sm bg-white rounded-2xl h-full"
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </>
             )}
 

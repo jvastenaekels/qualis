@@ -300,7 +300,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
             }
             return null;
         },
-        [config, qsort, selectedCardId, handleCardClick, activeId, showCodes]
+        [config, qsort, selectedCardId, handleCardClick, activeId, showCodes, isDesktop]
     );
 
     // 10. Condition Check (After all hooks)

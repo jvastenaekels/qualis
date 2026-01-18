@@ -7,6 +7,8 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { Briefcase, Plus, Save, ArrowLeft, Globe } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { getListWorkspacesApiAdminWorkspacesGetQueryKey } from '@/api/generated';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -37,6 +39,7 @@ export default function CreateWorkspacePage() {
     const navigate = useNavigate();
     const { setCurrentWorkspace, setWorkspaces, workspaces } = useAuthStore();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const queryClient = useQueryClient();
 
     const form = useForm<z.infer<typeof schema>>({
         resolver: zodResolver(schema),
@@ -78,6 +81,11 @@ export default function CreateWorkspacePage() {
 
             setWorkspaces([...workspaces, newWorkspace]);
             setCurrentWorkspace(newWorkspace);
+
+            // Invalidate React Query list to ensure Sidebar/Switcher are updated
+            await queryClient.invalidateQueries({
+                queryKey: getListWorkspacesApiAdminWorkspacesGetQueryKey(),
+            });
 
             toast.success(t('admin.workspace.create.success'));
             navigate(`/admin/workspaces/${newWorkspace.slug}/settings`);

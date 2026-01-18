@@ -258,6 +258,7 @@ export const useGridZoom = ({
         gridColumns,
         activePileCount,
         setHasPerformedZonalFocus,
+        isDesktop,
     ]);
 
     return {

@@ -91,18 +91,32 @@ async def create_study(
         await db.flush()  # to get ID
 
         from app.models import Statement, StatementTranslation, StudyTranslation
-        from app.services.study_service import DEFAULT_PROCESS_STEPS
+        from app.services.study_service import (
+            DEFAULT_PROCESS_STEPS,
+            DEFAULT_TRANSLATION_CONTENT,
+        )
 
         logger.error(
             f"DEBUG: creating study with translations: {len(study.translations)}"
         )
         for t_in in study.translations:
             t_data = t_in.model_dump()
+            lang = t_data.get("language_code", "en")
+            defaults = DEFAULT_TRANSLATION_CONTENT.get(
+                lang, DEFAULT_TRANSLATION_CONTENT["en"]
+            )
+
             # Inject default process steps if not provided
             if not t_data.get("process_steps"):
                 t_data["process_steps"] = DEFAULT_PROCESS_STEPS.get(
-                    t_data.get("language_code", "en"), DEFAULT_PROCESS_STEPS["en"]
+                    lang, DEFAULT_PROCESS_STEPS["en"]
                 )
+
+            # Inject other defaults if empty
+            for field, value in defaults.items():
+                if not t_data.get(field):
+                    t_data[field] = value
+
             db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
         # 3. Add Statements and their translations
@@ -206,7 +220,7 @@ async def update_study(
         _ = s.translations
 
     # Relax structural checks in update_study if study is in DRAFT
-    # The frontend will hit this endpoint for auto-save.
+    # The frontend will hit this endpoint for save.
     # We only block grid modification if there are ALREADY participants.
     if study_update.grid_config is not None:
         new_grid = [col.model_dump() for col in study_update.grid_config]

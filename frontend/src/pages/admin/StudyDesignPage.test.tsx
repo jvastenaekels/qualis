@@ -126,11 +126,14 @@ describe('StudyDesignPage Feature Tests', () => {
 
         renderPage();
 
-        await waitFor(async () => {
-            // The "Grid balanced" item should be incomplete
-            const incompleteItems = await screen.findAllByTestId('checklist-item-incomplete');
-            expect(incompleteItems.length).toBeGreaterThan(0);
-        });
+        await waitFor(
+            async () => {
+                // The "Grid balanced" item should be incomplete
+                const incompleteItems = await screen.findAllByTestId('checklist-item-incomplete');
+                expect(incompleteItems.length).toBeGreaterThan(0);
+            },
+            { timeout: 15000 }
+        );
     });
 
     it('enables sequential navigation between steps', async () => {

@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Copy, QrCode, ExternalLink, Check, Megaphone } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
+import { Download } from 'lucide-react';
 
 interface RecruitmentModuleProps {
     slug: string;
@@ -15,7 +16,7 @@ interface RecruitmentModuleProps {
 const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
     const { t } = useTranslation();
     const [copied, setCopied] = useState(false);
-    const [showQR, setShowQR] = useState(true);
+    const [showQR, setShowQR] = useState(false);
 
     // Construct the public study URL
     const publicUrl = `${window.location.origin}/study/${slug}`;
@@ -29,6 +30,19 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
 
     const handleOpen = () => {
         window.open(publicUrl, '_blank');
+    };
+
+    const handleDownloadQR = () => {
+        const canvas = document.getElementById('study-qr-code') as HTMLCanvasElement;
+        if (canvas) {
+            const pngUrl = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+            const downloadLink = document.createElement('a');
+            downloadLink.href = pngUrl;
+            downloadLink.download = `qr-code-${slug}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
     };
 
     return (
@@ -47,7 +61,7 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                     )}
                 </CardDescription>
             </CardHeader>
-            <CardContent className="p-6 space-y-6">
+            <CardContent className="p-4 space-y-4">
                 <div className="space-y-2">
                     <label
                         htmlFor="public-url"
@@ -103,7 +117,8 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                 {showQR && (
                     <div className="pt-4 border-t border-slate-50 flex flex-col items-center animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="p-4 bg-white border border-slate-100 rounded-2xl shadow-sm mb-4">
-                            <QRCodeSVG
+                            <QRCodeCanvas
+                                id="study-qr-code"
                                 value={publicUrl}
                                 size={150}
                                 level="H"
@@ -118,12 +133,25 @@ const RecruitmentModule: React.FC<RecruitmentModuleProps> = ({ slug }) => {
                                 }}
                             />
                         </div>
-                        <p className="text-[11px] text-slate-400 text-center leading-relaxed max-w-[200px]">
-                            {t(
-                                'admin.recruitment.qr_print_hint',
-                                'Scan or print this code for physical recruitment materials (flyers, posters).'
-                            )}
-                        </p>
+
+                        <div className="w-full flex flex-col gap-3 items-center">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleDownloadQR}
+                                className="w-full gap-2 border-slate-200 hover:bg-slate-50 text-slate-600 font-bold rounded-xl"
+                            >
+                                <Download className="h-3.5 w-3.5" />
+                                {t('admin.recruitment.download_qr', 'Download Image')}
+                            </Button>
+
+                            <p className="text-[11px] text-slate-400 text-center leading-relaxed max-w-[200px]">
+                                {t(
+                                    'admin.recruitment.qr_print_hint',
+                                    'Scan or print this code for physical recruitment materials (flyers, posters).'
+                                )}
+                            </p>
+                        </div>
                     </div>
                 )}
             </CardContent>

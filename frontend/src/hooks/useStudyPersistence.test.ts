@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-import { useAutoSave } from './useAutoSave';
+import { renderHook, act } from '@testing-library/react';
+import { useStudyPersistence } from './useStudyPersistence';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
 
@@ -8,7 +8,7 @@ import { useUpdateStudyApiAdminStudiesSlugPatch } from '@/api/generated';
 vi.mock('@/store/useStudyDesigner');
 vi.mock('@/api/generated');
 vi.mock('@/utils/mergeStudy', () => ({
-    mergeStudyUpdates: vi.fn((draft, server, _original) => ({
+    mergeStudyUpdates: vi.fn((draft, server) => ({
         success: true,
         merged: { ...server, ...draft }, // Simple merge for testing
     })),
@@ -18,7 +18,7 @@ vi.mock('react-router-dom', () => ({
     useBlocker: vi.fn(() => ({ state: 'unblocked', proceed: vi.fn(), reset: vi.fn() })),
 }));
 
-describe('useAutoSave', () => {
+describe('useStudyPersistence', () => {
     let mockSetSyncStatus: ReturnType<typeof vi.fn>;
     let mockSetLastSavedAt: ReturnType<typeof vi.fn>;
     let mockUpdateOriginal: ReturnType<typeof vi.fn>;
@@ -64,7 +64,6 @@ describe('useAutoSave', () => {
 
     afterEach(() => {
         vi.clearAllMocks();
-        vi.clearAllTimers();
     });
 
     // Helper to mock store state properly
@@ -93,39 +92,59 @@ describe('useAutoSave', () => {
         return fullState;
     };
 
-    it('should not trigger save when draft is null', () => {
-        renderHook(() => useAutoSave());
+    it('should not trigger save automatically', () => {
+        const draft = { slug: 'test-study', statements: [] };
+        mockStoreState({ draft, syncStatus: 'modified' });
+
+        renderHook(() => useStudyPersistence());
 
         expect(mockMutateAsync).not.toHaveBeenCalled();
     });
 
-    it('should backup draft to localStorage immediately', () => {
+    it('should trigger save when manual save is called', async () => {
         const draft = { slug: 'test-study', statements: [] };
-
         mockStoreState({ draft, syncStatus: 'modified' });
 
-        renderHook(() => useAutoSave());
+        const { result } = renderHook(() => useStudyPersistence());
+
+        await act(async () => {
+            await result.current.save();
+        });
+
+        expect(mockMutateAsync).toHaveBeenCalledWith({
+            slug: 'test-study',
+            data: draft,
+        });
+        expect(mockSetSyncStatus).toHaveBeenCalledWith('saving');
+        expect(mockSetSyncStatus).toHaveBeenCalledWith('synced');
+    });
+
+    it('should backup draft to localStorage immediately', async () => {
+        vi.useFakeTimers();
+        const draft = { slug: 'test-study', statements: [] };
+        const original = { id: 'orig-id', slug: 'test-study' };
+
+        mockStoreState({ draft, original: original as any, syncStatus: 'modified' });
+
+        renderHook(() => useStudyPersistence());
+
+        act(() => {
+            vi.advanceTimersByTime(1000);
+        });
 
         const backup = localStorage.getItem('open-q-draft-backup-test-study');
-        expect(backup).toBe(JSON.stringify(draft));
+        expect(backup).toContain('"slug":"test-study"');
+        expect(backup).toContain('"_study_id":"orig-id"');
+        vi.useRealTimers();
     });
 
-    it.skip('should debounce save attempts', async () => {
-        // ... (skipped)
-    });
-
-    it.skip('should handle successful save', async () => {
-        // ... (skipped)
-    });
-
-    it('should handle 409 conflict with successful merge - critical test for infinite loop fix', async () => {
+    it('should handle 409 conflict and merge', async () => {
         const draft = { slug: 'test-study', statements: ['local-change'] };
         const serverState = { slug: 'test-study', statements: ['server-change'] };
         const original = { slug: 'test-study', statements: [] };
 
         mockStoreState({ draft, original, syncStatus: 'modified' });
 
-        // Mock 409 conflict error matching ApiError structure
         const conflictError = {
             status: 409,
             details: {
@@ -135,20 +154,15 @@ describe('useAutoSave', () => {
 
         mockMutateAsync.mockRejectedValueOnce(conflictError);
 
-        renderHook(() => useAutoSave(10)); // Very short debounce for testing
+        const { result } = renderHook(() => useStudyPersistence());
 
-        // Wait for autosave logic to run
-        await waitFor(
-            () => {
-                expect(mockUpdateOriginal).toHaveBeenCalled();
-                expect(mockUpdateDraft).toHaveBeenCalled();
-                expect(mockSetSyncStatus).toHaveBeenCalledWith('synced');
-            },
-            { timeout: 3000 }
-        );
+        await act(async () => {
+            await result.current.save();
+        });
 
-        // Critical: Should NOT call mutateAsync again (no infinite loop)
-        expect(mockMutateAsync).toHaveBeenCalledTimes(1);
+        expect(mockUpdateOriginal).toHaveBeenCalled();
+        expect(mockUpdateDraft).toHaveBeenCalled();
+        expect(mockSetSyncStatus).toHaveBeenCalledWith('modified');
     });
 
     it('should warn user before unload when changes are unsaved', () => {
@@ -156,7 +170,7 @@ describe('useAutoSave', () => {
 
         mockStoreState({ draft, syncStatus: 'modified' });
 
-        renderHook(() => useAutoSave());
+        renderHook(() => useStudyPersistence());
 
         const event = new Event('beforeunload') as BeforeUnloadEvent;
         const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
@@ -171,7 +185,7 @@ describe('useAutoSave', () => {
 
         mockStoreState({ draft, original: draft, syncStatus: 'synced' });
 
-        renderHook(() => useAutoSave());
+        renderHook(() => useStudyPersistence());
 
         const event = new Event('beforeunload') as BeforeUnloadEvent;
         const preventDefaultSpy = vi.spyOn(event, 'preventDefault');

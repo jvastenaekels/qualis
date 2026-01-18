@@ -1,10 +1,13 @@
 // biome-ignore lint/suspicious/noExplicitAny: default content is dynamic
 export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
     en: {
-        instructions: 'Please sort the statements according to your perspective.',
+        instructions:
+            'This study involves expressing your personal viewpoint through a sorting process. There are no right or wrong answers; we are simply interested in your perspective.',
         consent_title: 'Informed Consent',
         consent_description:
             '**Confirmation of Understanding:** By checking the box below, you confirm that you have read the study objectives and process described on the home page. You understand that this task involves sorting statements to model your personal point of view and that there are no right or wrong answers.\n\n**Confidentiality and Data Protection:** Your participation is anonymous. Your responses will be associated with a code and will not be linked to your identity in any report or publication. Collected data will be analyzed collectively to identify shared perspectives (factors). Written comments provided during the post-sort phase may be quoted anonymously to illustrate these viewpoints.\n\n**Voluntary Participation:** Participation is entirely voluntary. You reserve the right to interrupt the sorting process and close the browser at any time without penalty. If you withdraw before submission, your partial data will not be retained.',
+        pre_instruction:
+            'Based on your personal point of view; divide the cards into three piles: those you agree with, those you disagree with, and those about which you are neutral or undecided.',
         condition_of_instruction:
             'Please rank the following statements from those you most agree with to those you most disagree with',
 
@@ -50,10 +53,13 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
         ],
     },
     fr: {
-        instructions: 'Veuillez trier les énoncés selon votre propre point de vue.',
+        instructions:
+            "Cette étude consiste à exprimer votre point de vue personnel à travers un processus de classement. Il n'y a pas de bonnes ou de mauvaises réponses ; nous sommes simplement intéressés par votre perspective.",
         consent_title: 'Consentement éclairé',
         consent_description:
             "**Confirmation de compréhension :** En cochant la case ci-dessous, vous confirmez avoir lu les objectifs et le déroulement de l'étude décrits sur la page d'accueil. Vous comprenez que cette tâche consiste à trier des énoncés afin de modéliser votre point de vue personnel et qu'il n'y a pas de bonnes ou de mauvaises réponses.\n\n**Confidentialité et protection des données :** Votre participation est anonyme. Vos réponses seront associées à un code et ne seront liées à votre identité dans aucun rapport ou publication. Les données collectées seront analysées collectivement pour identifier des perspectives partagées (facteurs). Les commentaires écrits fournis lors de la phase post-tri pourront être cités anonymement pour illustrer ces points de vue.\n\n**Participation volontaire :** La participation est entièrement volontaire. Vous vous réservez le droit d'interrompre le processus de tri et de fermer le navigateur à tout moment sans pénalité. Si vous vous retirez avant la soumission, vos données partielles ne seront pas conservées.",
+        pre_instruction:
+            "Selon votre point de vue personnel, répartissez les cartes en trois piles : celles avec lesquelles vous êtes d'accord, celles avec lesquelles vous n'êtes pas d'accord, et celles pour lesquelles votre avis est neutre ou vous êtes indécis.",
         condition_of_instruction:
             'Veuillez classer les énoncés suivants de celui avec lequel vous êtes le plus d’accord à celui avec lequel vous êtes le plus en désaccord',
 
@@ -99,10 +105,13 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
         ],
     },
     fi: {
-        instructions: 'Lajittele väittämät oman näkemyksesi mukaan.',
+        instructions:
+            'Tämä tutkimus käsittää oman näkökulmasi ilmaisemisen lajitteluprosessin kautta. Oikeita tai vääriä vastauksia ei ole; olemme kiinnostuneita vain sinun näkökulmastasi.',
         consent_title: 'Tietoon perustuva suostumus',
         consent_description:
             '**Ymmärryksen vahvistus:** Rastittamalla alla olevan ruudun vahvistat lukeneesi etusivulla kuvatut tutkimuksen tavoitteet ja prosessin. Ymmärrät, että tässä tehtävässä lajitellaan väitteitä henkilökohtaisen näkemyksesi mallintamiseksi, eikä oikeita tai vääriä vastauksia ole.\n\n**Luottamuksellisuus ja tietosuoja:** Osallistumisesi on nimetöntä. Vastauksesi yhdistetään koodiin, eikä niitä linkitetä henkilöllisyyteesi missään raportissa tai julkaisussa. Kerätyt tiedot analysoidaan kollektiivisesti jaettujen näkökulmien (tekijöiden) tunnistamiseksi. Lajittelun jälkeisessä vaiheessa annettuja kirjallisia kommentteja voidaan lainata nimettömästi näiden näkökulmien havainnollistamiseksi.\n\n**Vapaaehtoinen osallistuminen:** Osallistuminen on täysin vapaaehtoista. Pidätät oikeuden keskeyttää lajitteluprosessin ja sulkea selaimen milloin tahansa ilman seuraamuksia. Jos vetäydyt ennen lähettämistä, osittaisia tietojasi ei säilytetä.',
+        pre_instruction:
+            'Lajittele väitteet kolmeen pinoon oman näkemyksesi mukaan: ne, joiden kanssa olet samaa mieltä, ne, joiden kanssa olet eri mieltä, ja ne, joihin suhtaudut neutraalisti tai joista et ole varma.',
         condition_of_instruction:
             'Ole hyvä ja järjestä seuraavat väittämät siitä, minkä kanssa olet eniten samaa mieltä, siihen, minkä kanssa olet eniten eri mieltä',
 

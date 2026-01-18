@@ -141,6 +141,7 @@ const InterfaceEditor = () => {
                                 </TooltipProvider>
                             </div>
                             <Input
+                                name="welcome.start"
                                 value={getLabel('welcome.start')}
                                 onChange={(e) => updateLabel('welcome.start', e.target.value)}
                                 onFocus={() => setActiveSubStep('welcome.start')}
@@ -165,6 +166,7 @@ const InterfaceEditor = () => {
                                 </TooltipProvider>
                             </div>
                             <Input
+                                name="common.next"
                                 value={getLabel('common.next')}
                                 onChange={(e) => updateLabel('common.next', e.target.value)}
                                 onFocus={() => setActiveSubStep('common.next')}
@@ -192,6 +194,7 @@ const InterfaceEditor = () => {
                                 </TooltipProvider>
                             </div>
                             <Input
+                                name="post.submit"
                                 value={getLabel('post.submit')}
                                 onChange={(e) => updateLabel('post.submit', e.target.value)}
                                 onFocus={() => setActiveSubStep('post.submit')}
@@ -216,6 +219,7 @@ const InterfaceEditor = () => {
                                 </TooltipProvider>
                             </div>
                             <Input
+                                name="fine.actions.validate"
                                 value={getLabel('fine.actions.validate')}
                                 onChange={(e) =>
                                     updateLabel('fine.actions.validate', e.target.value)
@@ -255,6 +259,7 @@ const InterfaceEditor = () => {
                                     {t('admin.design.interface.terms.agree')}
                                 </Label>
                                 <Input
+                                    name="common.agree"
                                     value={getLabel('common.agree')}
                                     onChange={(e) => updateLabel('common.agree', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.agree')}
@@ -267,6 +272,7 @@ const InterfaceEditor = () => {
                                     {t('admin.design.interface.terms.neutral')}
                                 </Label>
                                 <Input
+                                    name="common.neutral"
                                     value={getLabel('common.neutral')}
                                     onChange={(e) => updateLabel('common.neutral', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.neutral')}
@@ -279,6 +285,7 @@ const InterfaceEditor = () => {
                                     {t('admin.design.interface.terms.disagree')}
                                 </Label>
                                 <Input
+                                    name="common.disagree"
                                     value={getLabel('common.disagree')}
                                     onChange={(e) => updateLabel('common.disagree', e.target.value)}
                                     onFocus={() => setActiveSubStep('common.disagree')}
@@ -302,6 +309,7 @@ const InterfaceEditor = () => {
                                         {t('admin.design.interface.terms.most_agree')}
                                     </Label>
                                     <Input
+                                        name="fine.legend.agree"
                                         value={getLabel('fine.legend.agree')}
                                         onChange={(e) =>
                                             updateLabel('fine.legend.agree', e.target.value)
@@ -316,6 +324,7 @@ const InterfaceEditor = () => {
                                         {t('admin.design.interface.terms.neutral')}
                                     </Label>
                                     <Input
+                                        name="fine.legend.neutral"
                                         value={getLabel('fine.legend.neutral')}
                                         onChange={(e) =>
                                             updateLabel('fine.legend.neutral', e.target.value)
@@ -330,6 +339,7 @@ const InterfaceEditor = () => {
                                         {t('admin.design.interface.terms.most_disagree')}
                                     </Label>
                                     <Input
+                                        name="fine.legend.disagree"
                                         value={getLabel('fine.legend.disagree')}
                                         onChange={(e) =>
                                             updateLabel('fine.legend.disagree', e.target.value)

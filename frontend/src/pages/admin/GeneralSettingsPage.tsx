@@ -4,6 +4,11 @@ import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { useAdminStore } from '@/store/useAdminStore';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+    getListStudiesApiAdminStudiesGetQueryKey,
+    getGetStudyApiAdminStudiesSlugGetQueryKey,
+} from '@/api/generated';
 import {
     Card,
     CardContent,
@@ -53,6 +58,7 @@ export default function GeneralSettingsPage() {
     };
     const { user } = useAuthStore();
     const { t } = useTranslation();
+    const queryClient = useQueryClient();
 
     const study = initialStudy;
     const slug = initialSlug;
@@ -85,6 +91,14 @@ export default function GeneralSettingsPage() {
                 description: t('admin.settings.save_success_desc'),
             });
 
+            // Invalidate queries to update sidebar and local data
+            await queryClient.invalidateQueries({
+                queryKey: getListStudiesApiAdminStudiesGetQueryKey(),
+            });
+            await queryClient.invalidateQueries({
+                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
+            });
+
             if (data.slug !== slug) {
                 navigate(`/admin/studies/${data.slug}/settings`);
             } else {
@@ -105,6 +119,15 @@ export default function GeneralSettingsPage() {
             toast.success(t('admin.settings.archive_success'), {
                 description: t('admin.settings.archive_success_desc'),
             });
+
+            // Invalidate queries
+            await queryClient.invalidateQueries({
+                queryKey: getListStudiesApiAdminStudiesGetQueryKey(),
+            });
+            await queryClient.invalidateQueries({
+                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
+            });
+
             navigate('.', { replace: true });
         } catch (error) {
             const message = parseApiErrorSync(error, t('admin.settings.archive_error'));
@@ -120,6 +143,12 @@ export default function GeneralSettingsPage() {
         try {
             await AdminService.deleteStudy(slug);
             useAdminStore.getState().setActiveStudy(null);
+
+            // Invalidate studies list query to remove deleted study from sidebar
+            await queryClient.invalidateQueries({
+                queryKey: getListStudiesApiAdminStudiesGetQueryKey(),
+            });
+
             toast.success(t('admin.settings.delete_success'), {
                 description: t('admin.settings.delete_success_desc'),
             });

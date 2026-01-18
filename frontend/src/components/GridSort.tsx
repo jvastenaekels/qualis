@@ -571,7 +571,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             if (selectedCardId && !isDesktop) {
                 setAutoFitEnabled(false);
             }
-        }, [selectedCardId]);
+        }, [selectedCardId, isDesktop]);
 
         useEffect(() => {
             setAutoFitEnabled(true);

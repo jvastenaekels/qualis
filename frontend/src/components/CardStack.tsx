@@ -60,7 +60,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
         };
 
         checkOverflow();
-    }, [statement.text, width]);
+    }, []);
 
     useImperativeHandle(ref, () => ({
         swipe: async (direction) => {

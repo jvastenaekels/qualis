@@ -27,7 +27,10 @@ import {
     FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useCreateStudyApiAdminStudiesPost } from '@/api/generated';
+import {
+    useCreateStudyApiAdminStudiesPost,
+    getListStudiesApiAdminStudiesGetQueryKey,
+} from '@/api/generated';
 import { useAdminStore } from '@/store/useAdminStore';
 
 interface CreateStudyDialogProps {
@@ -104,7 +107,7 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
 
             // Invalidate and refetch studies list to show the new study
             await queryClient.invalidateQueries({
-                queryKey: ['/api/admin/studies/'],
+                queryKey: getListStudiesApiAdminStudiesGetQueryKey(),
             });
 
             setActiveStudy(newStudy.slug);

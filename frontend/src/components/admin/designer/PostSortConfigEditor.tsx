@@ -228,6 +228,7 @@ const PostSortConfigEditor = () => {
                             </CardDescription>
                         </div>
                         <Switch
+                            data-testid="allow-random-comments-toggle"
                             checked={allowRandomComments}
                             onCheckedChange={(checked: boolean) => {
                                 if (checked === allowRandomComments) return;
@@ -270,6 +271,7 @@ const PostSortConfigEditor = () => {
                     </p>
                 </div>
                 <Switch
+                    data-testid="email-collection-toggle"
                     checked={config?.email_collection_enabled || false}
                     onCheckedChange={(checked: boolean) => {
                         const currentValue = config?.email_collection_enabled || false;
@@ -290,6 +292,7 @@ const PostSortConfigEditor = () => {
                                 {t('admin.design.postsort.email.interview')}
                             </Label>
                             <Switch
+                                data-testid="interview-consent-toggle"
                                 checked={config?.interview_consent_enabled ?? true}
                                 onCheckedChange={(checked: boolean) => {
                                     const currentValue = config?.interview_consent_enabled ?? true;
@@ -318,6 +321,7 @@ const PostSortConfigEditor = () => {
                             </p>
                         </div>
                         <Switch
+                            data-testid="newsletter-consent-toggle"
                             checked={config?.newsletter_consent_enabled ?? true}
                             onCheckedChange={(checked: boolean) => {
                                 const currentValue = config?.newsletter_consent_enabled ?? true;

@@ -105,6 +105,7 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
         <div
             ref={setNodeRef}
             style={style}
+            data-testid="question-item"
             className={cn(
                 'group relative bg-white border-none shadow-sm rounded-2xl overflow-hidden transition-all mb-4',
                 isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20'
@@ -123,39 +124,47 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                     <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value="item-1" className="border-none">
                             <div className="flex items-center justify-between w-full pr-2">
-                                <div className="flex items-center gap-3 overflow-hidden">
-                                    <div className="p-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-600">
-                                        {question.type === 'text' && <Type className="h-4 w-4" />}
-                                        {question.type === 'number' && <Hash className="h-4 w-4" />}
-                                        {question.type === 'select' && (
-                                            <ListCircle className="h-4 w-4" />
-                                        )}
-                                        {question.type === 'checkbox' && (
-                                            <CheckSquare className="h-4 w-4" />
-                                        )}
-                                        {question.type === 'radio' && (
-                                            <Circle className="h-4 w-4" />
-                                        )}
-                                        {question.type === 'date' && (
-                                            <Calendar className="h-4 w-4" />
-                                        )}
-                                        {question.type === 'email' && <Mail className="h-4 w-4" />}
-                                        {question.type === 'textarea' && (
-                                            <AlignLeft className="h-4 w-4" />
-                                        )}
+                                <AccordionTrigger
+                                    data-testid="question-accordion-trigger"
+                                    className="flex-1 py-2 hover:no-underline px-2 hover:bg-slate-50/50 rounded-xl transition-all text-left"
+                                >
+                                    <div className="flex items-center gap-3 overflow-hidden">
+                                        <div className="p-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-600">
+                                            {question.type === 'text' && (
+                                                <Type className="h-4 w-4" />
+                                            )}
+                                            {question.type === 'number' && (
+                                                <Hash className="h-4 w-4" />
+                                            )}
+                                            {question.type === 'select' && (
+                                                <ListCircle className="h-4 w-4" />
+                                            )}
+                                            {question.type === 'checkbox' && (
+                                                <CheckSquare className="h-4 w-4" />
+                                            )}
+                                            {question.type === 'radio' && (
+                                                <Circle className="h-4 w-4" />
+                                            )}
+                                            {question.type === 'date' && (
+                                                <Calendar className="h-4 w-4" />
+                                            )}
+                                            {question.type === 'email' && (
+                                                <Mail className="h-4 w-4" />
+                                            )}
+                                            {question.type === 'textarea' && (
+                                                <AlignLeft className="h-4 w-4" />
+                                            )}
+                                        </div>
+                                        <span className="text-sm font-bold text-slate-900 truncate tracking-tight">
+                                            {label || (
+                                                <span className="text-slate-400 italic font-medium">
+                                                    {t('admin.design.questions.defaults.untitled')}
+                                                </span>
+                                            )}
+                                        </span>
                                     </div>
-                                    <span className="text-sm font-bold text-slate-900 truncate tracking-tight">
-                                        {label || (
-                                            <span className="text-slate-400 italic font-medium">
-                                                {t('admin.design.questions.defaults.untitled')}
-                                            </span>
-                                        )}
-                                    </span>
-                                </div>
+                                </AccordionTrigger>
                                 <div className="flex items-center gap-2">
-                                    <AccordionTrigger className="py-2 hover:no-underline p-2 hover:bg-slate-50 rounded-xl transition-colors">
-                                        <span className="sr-only">Toggle</span>
-                                    </AccordionTrigger>
                                     <Button
                                         variant="ghost"
                                         size="icon"
@@ -202,7 +211,10 @@ const QuestionItem = ({ id, question, onUpdate, onDelete, activeLocale }: Questi
                                         </Label>
                                     </div>
 
-                                    <div className="text-[10px] text-slate-400 uppercase tracking-widest font-black bg-slate-50 px-2 py-1 rounded-lg">
+                                    <div
+                                        data-testid="question-type-label"
+                                        className="text-[10px] text-slate-400 uppercase tracking-widest font-black bg-slate-50 px-2 py-1 rounded-lg"
+                                    >
                                         {question.type}
                                     </div>
                                 </div>
@@ -474,6 +486,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                             </p>
                         </div>
                         <Switch
+                            data-testid="presort-toggle"
                             checked={!!isPresortEnabled}
                             onCheckedChange={handlePresortToggle}
                         />
@@ -506,6 +519,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                                 ].map((field) => (
                                     <Button
                                         key={field.type}
+                                        data-testid={`add-question-${field.type}`}
                                         variant="outline"
                                         size="sm"
                                         onClick={() => addQuestion(field.type as QuestionType)}
@@ -530,6 +544,7 @@ const QuestionBuilder = ({ type }: QuestionBuilderProps) => {
                                 ].map((field) => (
                                     <Button
                                         key={field.type}
+                                        data-testid={`add-question-${field.type}`}
                                         variant="outline"
                                         size="sm"
                                         onClick={() => addQuestion(field.type as QuestionType)}

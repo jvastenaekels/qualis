@@ -7,6 +7,7 @@ import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
 } from '@/api/generated';
 import { queryClient } from '@/lib/queryClient';
+import { useAdminStore } from '@/store/useAdminStore';
 import { type LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 export const studyOverviewPageLoader = async ({ params }: LoaderFunctionArgs) => {
@@ -33,11 +34,10 @@ export const studyOverviewPageLoader = async ({ params }: LoaderFunctionArgs) =>
         return { stats, participants, study, slug };
     } catch (error) {
         console.error('Failed to load study overview:', error);
-        // If study is not found, clear the active study in store to prevent infinite redirects
-        // and redirect to the dashboard
-        import('@/store/useAdminStore').then(({ useAdminStore }) => {
-            useAdminStore.getState().setActiveStudy(null);
-        });
+
+        // Synchronously clear the active study in store to prevent infinite redirects
+        // before we move away from this route.
+        useAdminStore.getState().setActiveStudy(null);
 
         throw redirect('/admin');
     }

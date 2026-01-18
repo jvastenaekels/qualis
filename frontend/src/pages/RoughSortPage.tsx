@@ -94,7 +94,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
             unsubscribeX();
             unsubscribeY();
         };
-    }, [showTip, x, y]);
+    }, [showTip, x, y, isDesktop]);
 
     useEffect(() => {
         // Cleanup function to clear the header action when component unmounts

@@ -1,13 +1,8 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import type {
-    StudyUpdate,
-    StudyRead,
-    StudyTranslationRead,
-    StudyTranslationCreate,
-} from '@/api/model';
+import type { StudyTranslationRead, StudyTranslationCreate } from '@/api/model';
 import {
     Wand2,
     Eye,
@@ -18,21 +13,10 @@ import {
     Check,
     ChevronDown,
     Settings2,
-    History,
     Rocket,
     ArrowRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import {
     Dialog,
     DialogContent,
@@ -51,8 +35,7 @@ import BrandingEditor from '@/components/admin/designer/BrandingEditor';
 import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
 import ConditionOfInstructionEditor from '@/components/admin/designer/ConditionOfInstructionEditor';
 import { GuidanceCard } from '@/components/admin/designer/GuidanceCard';
-import { useAutoSave } from '@/hooks/useAutoSave';
-import { SyncStatusIndicator } from '@/components/admin/designer/SyncStatusIndicator';
+import { useStudyPersistence } from '@/hooks/useStudyPersistence';
 import { customInstance } from '@/api/mutator';
 
 import { toast } from 'sonner';
@@ -93,8 +76,20 @@ const StudyDesignPage = () => {
         syncStatus,
     } = useStudyDesigner();
 
-    // Enable auto-save
-    useAutoSave(1000);
+    // Enable manual persistence
+    const { save } = useStudyPersistence();
+
+    // Support Ctrl+S / Cmd+S
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                save();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [save]);
 
     const [isLangModalOpen, setIsLangModalOpen] = useState(false);
 
@@ -110,12 +105,31 @@ const StudyDesignPage = () => {
             // Deep clone to allow mutation for defaults
             const studyWithDefaults = JSON.parse(JSON.stringify(study));
 
-            // Ensure defaults for methodology tips if missing
+            // Ensure defaults for key fields if missing or empty
             studyWithDefaults.translations?.forEach((tr: StudyTranslationRead) => {
+                const defaults =
+                    DEFAULT_STUDY_CONTENT[tr.language_code] || DEFAULT_STUDY_CONTENT.en;
+                if (!defaults) return;
+
+                // Simple text fields
+                const fieldsToDefault = [
+                    'instructions',
+                    'consent_title',
+                    'consent_description',
+                    'pre_instruction',
+                    'condition_of_instruction',
+                ] as const;
+
+                for (const field of fieldsToDefault) {
+                    if (!tr[field] || tr[field]?.trim() === '') {
+                        // biome-ignore lint/suspicious/noExplicitAny: dynamic field update
+                        (tr as any)[field] = defaults[field];
+                    }
+                }
+
+                // Methodology tips (array)
                 if (!tr.methodology_tips || tr.methodology_tips.length === 0) {
-                    const defaults =
-                        DEFAULT_STUDY_CONTENT[tr.language_code] || DEFAULT_STUDY_CONTENT.en;
-                    if (defaults?.methodology_tips) {
+                    if (defaults.methodology_tips) {
                         tr.methodology_tips = [...defaults.methodology_tips];
                     }
                 }
@@ -158,51 +172,6 @@ const StudyDesignPage = () => {
     // Permission States
     const isFullyReadOnly = draft ? draft.state !== 'draft' : false;
     const isStructureLocked = draft ? draft.state !== 'draft' : false; // active, paused, closed
-
-    // Recovery logic: Detect local backup on mount
-    const [isRecoveryModalOpen, setIsRecoveryModalOpen] = useState(false);
-    const [backupToRestore, setBackupToRestore] = useState<StudyUpdate | null>(null);
-    const hasCheckedRecovery = useRef(false);
-
-    useEffect(() => {
-        // Only run this check once per page load to prevent annoying popups while editing
-        if (hasCheckedRecovery.current) return;
-
-        const backupJson = localStorage.getItem(`open-q-draft-backup-${slug}`);
-
-        // We need draft to be loaded to compare
-        if (backupJson && draft) {
-            hasCheckedRecovery.current = true;
-            try {
-                const backup = JSON.parse(backupJson);
-                // Compare current live draft (with defaults/normalizations) with backup
-                if (!areStudiesEqual(backup, draft)) {
-                    setBackupToRestore(backup);
-                    setIsRecoveryModalOpen(true);
-                }
-            } catch (e) {
-                console.error('Failed to parse backup:', e);
-            }
-        } else if (draft) {
-            // If draft is loaded but no backup exists, we can also consider the check "done"
-            hasCheckedRecovery.current = true;
-        }
-    }, [slug, draft]);
-
-    const handleRestoreBackup = () => {
-        if (backupToRestore) {
-            setStudy(backupToRestore as unknown as StudyRead);
-            toast.success(t('admin.design.sync.recovered', 'Draft recovered from local backup!'));
-        }
-        setIsRecoveryModalOpen(false);
-    };
-
-    const handleDiscardBackup = () => {
-        if (slug) {
-            localStorage.removeItem(`open-q-draft-backup-${slug}`);
-        }
-        setIsRecoveryModalOpen(false);
-    };
 
     // Grid Validation
     const statementsCount = draft?.statements?.length || 0;
@@ -373,7 +342,7 @@ const StudyDesignPage = () => {
             style={{ animationFillMode: 'forwards' }}
         >
             {/* Toolbar */}
-            <div className="border-b bg-background px-4 py-2 flex flex-col lg:flex-row gap-3 lg:items-center justify-between shrink-0">
+            <div className="border-b bg-background px-4 py-2 flex flex-col lg:flex-row gap-3 lg:items-center justify-between shrink-0 min-w-0 overflow-hidden">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div
                         className="flex items-center justify-center h-8 w-8 bg-indigo-50 border border-indigo-100 rounded-lg shrink-0"
@@ -491,8 +460,13 @@ const StudyDesignPage = () => {
                         variant="secondary"
                         size="sm"
                         onClick={handleTestRun}
-                        disabled
-                        className="gap-2 h-8 font-bold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg shadow-sm transition-all"
+                        disabled={!isLaunchReady}
+                        className={cn(
+                            'gap-2 h-8 font-bold rounded-lg shadow-sm transition-all',
+                            isLaunchReady
+                                ? 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
+                                : 'bg-slate-50 border-slate-100 text-slate-400 opacity-50 cursor-not-allowed'
+                        )}
                     >
                         <Eye className="h-4 w-4 text-indigo-500" />
                         <span className="hidden sm:inline">
@@ -500,7 +474,39 @@ const StudyDesignPage = () => {
                         </span>
                     </Button>
 
-                    <SyncStatusIndicator className="hidden sm:flex mr-4" />
+                    <div className="flex items-center gap-2">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={save}
+                            disabled={
+                                syncStatus === 'synced' ||
+                                syncStatus === 'saving' ||
+                                isFullyReadOnly
+                            }
+                            className={cn(
+                                'h-8 font-black rounded-lg shadow-sm transition-all active:scale-95 px-4',
+                                syncStatus === 'modified'
+                                    ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
+                                    : 'bg-white text-slate-400 border-slate-200'
+                            )}
+                        >
+                            {syncStatus === 'saving' ? (
+                                <Loader2 className="h-4 w-4 sm:mr-1.5 animate-spin" />
+                            ) : syncStatus === 'modified' ? (
+                                <CheckCircle className="h-4 w-4 sm:mr-1.5" />
+                            ) : (
+                                <CheckCircle className="h-4 w-4 sm:mr-1.5 opacity-50" />
+                            )}
+                            <span className="hidden sm:inline uppercase tracking-wider text-[11px]">
+                                {syncStatus === 'saving'
+                                    ? t('admin.design.sync.saving')
+                                    : syncStatus === 'synced'
+                                      ? t('admin.design.sync.synced')
+                                      : t('admin.design.toolbar.save')}
+                            </span>
+                        </Button>
+                    </div>
 
                     <Button
                         size="sm"
@@ -526,7 +532,7 @@ const StudyDesignPage = () => {
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-1 overflow-hidden relative max-w-full">
+            <div className="flex flex-1 overflow-hidden relative max-w-full min-w-0">
                 {/* Read-only Overlay - For non-draft studies */}
                 {isFullyReadOnly && (
                     <div className="absolute inset-0 z-50 bg-white/60 backdrop-blur-md flex items-center justify-center p-4 sm:p-8">
@@ -590,7 +596,7 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <TabsList className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap justify-start overflow-x-auto w-full max-w-5xl mx-auto shadow-sm mb-12 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory scroll-smooth rounded-2xl h-14">
+                        <TabsList className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap justify-start overflow-x-auto w-full max-w-full lg:max-w-5xl mx-auto shadow-sm mb-12 scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory scroll-smooth rounded-2xl h-14">
                             <TabsTrigger
                                 value="intro"
                                 data-testid="tab-intro"
@@ -968,39 +974,6 @@ const StudyDesignPage = () => {
                     </div>
                 </DialogContent>
             </Dialog>
-
-            <AlertDialog open={isRecoveryModalOpen} onOpenChange={setIsRecoveryModalOpen}>
-                <AlertDialogContent className="max-w-lg rounded-3xl p-8">
-                    <AlertDialogHeader>
-                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mb-4 border border-indigo-100">
-                            <History className="h-6 w-6 text-indigo-500" />
-                        </div>
-                        <AlertDialogTitle className="text-xl font-black text-slate-900 tracking-tight">
-                            {t('admin.design.sync.recovery_title', 'Unsaved Changes Found')}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-sm font-medium text-slate-500 mt-2 leading-relaxed">
-                            {t(
-                                'admin.design.sync.recovery_desc',
-                                'We found a local version of this study that is more recent than the one on the server. Would you like to restore it?'
-                            )}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="flex flex-col sm:flex-row gap-2 mt-6">
-                        <AlertDialogCancel
-                            onClick={handleDiscardBackup}
-                            className="rounded-xl font-bold border-slate-200 text-slate-600 hover:bg-slate-50"
-                        >
-                            {t('admin.design.sync.recovery_discard', 'Discard local version')}
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleRestoreBackup}
-                            className="rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200"
-                        >
-                            {t('admin.design.sync.recovery_restore', 'Restore local version')}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
         </div>
     );
 };

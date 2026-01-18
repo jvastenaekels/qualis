@@ -603,7 +603,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                                     register={register}
                                 />
                                 {formErrors[key] && (
-                                    <p className="text-red-500 text-sm mt-1">
+                                    <p
+                                        className="text-red-500 text-sm mt-1"
+                                        data-testid="postsort-field-error"
+                                    >
                                         {(formErrors[key]?.message as string) ||
                                             t('presort.error_required')}
                                     </p>
@@ -710,6 +713,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                     </Button>
                     <Button
                         onClick={handleSubmit}
+                        data-testid="postsort-submit-btn"
                         className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[200px]"
                     >
                         {isLoading ? (

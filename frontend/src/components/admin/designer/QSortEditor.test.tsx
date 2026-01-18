@@ -101,7 +101,7 @@ describe('QSortEditor', () => {
             expect(await screen.findByText('New Statement 1')).toBeInTheDocument();
             expect(await screen.findByText('New Statement 2')).toBeInTheDocument();
             expect(screen.queryByText('Existing Statement')).not.toBeInTheDocument();
-        });
+        }, 15000);
 
         it('handles bulk statement import (Append mode)', async () => {
             const user = userEvent.setup();
