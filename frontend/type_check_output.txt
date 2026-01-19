@@ -1,6 +1,0 @@
-
-> open-q@0.0.0 type-check
-> tsc -b
-
-src/components/admin/dashboard/InteractiveDataView.tsx(109,20): error TS2352: Conversion of type '{ id: string; db_id: number; duration_seconds: number | null; scores: never[]; placements: {}; presort: {}; postsort: {}; language: string; is_discarded: boolean; discard_reason: ParticipantReadDiscardReason; }[]' to type 'DumpParticipant[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
-  Property 'is_test_run' is missing in type '{ id: string; db_id: number; duration_seconds: number | null; scores: never[]; placements: {}; presort: {}; postsort: {}; language: string; is_discarded: boolean; discard_reason: ParticipantReadDiscardReason; }' but required in type 'DumpParticipant'.
