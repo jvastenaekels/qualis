@@ -928,7 +928,7 @@
                     "long_text": "Texte long",
                     "number": "Nombre",
                     "date": "Date",
-                    "email": "Email",
+                    "email": "E-mail",
                     "dropdown": "Menu déroulant",
                     "radio": "Radio",
                     "checkboxes": "Cases à cocher"
@@ -1088,7 +1088,7 @@
                     "desc": "Ajoutez ou modifiez des conseils flottants pour aider les participants pendant la phase de tri sur grille.",
                     "placeholder": "Entrez un conseil méthodologique...",
                     "add": "Ajouter un conseil",
-                    "reset": "Réinitialiser par défaut"
+                    "reset": "Réinitialiser"
                 },
                 "help": {
                     "title": "Guidage par étape (Quoi/Pourquoi)",
@@ -1101,7 +1101,7 @@
                     "title": "Couleur d'accentuation",
                     "desc": "Cette couleur sera utilisée pour les boutons, liens et mises en évidence dans toute l'étude.",
                     "pick": "Choisir une couleur",
-                    "reset": "Rétablir le défaut"
+                    "reset": "Réinitialiser"
                 },
                 "logo": {
                     "title": "Logo de l'étude",

@@ -292,6 +292,7 @@ const StudyDesignPage = () => {
             condition_of_instruction: translation?.condition_of_instruction,
 
             ui_labels: translation?.ui_labels || {},
+            process_steps: translation?.process_steps || [],
             language: activeLocale,
             // biome-ignore lint/suspicious/noExplicitAny: complex draft type
             statements: (draft.statements || []).map((s: any, index: number) => {

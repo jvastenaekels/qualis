@@ -22,6 +22,7 @@ import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { cn } from '@/lib/utils';
 import { DynamicIcon } from '../components/DynamicIcon';
+import { DEFAULT_STUDY_CONTENT } from '../constants/studyDefaults';
 
 interface WelcomePageProps {
     highlightKey?: string | null;
@@ -105,7 +106,10 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     };
 
     // biome-ignore lint/suspicious/noExplicitAny: dynamic process steps
-    const steps = (study as any).process_steps || [];
+    const studyLang = (study as any).language || 'en';
+    const defaultSteps = DEFAULT_STUDY_CONTENT[studyLang]?.process_steps || DEFAULT_STUDY_CONTENT.en.process_steps;
+    const rawSteps = (study as any).process_steps;
+    const steps = rawSteps && rawSteps.length > 0 ? rawSteps : defaultSteps;
 
     return (
         <div className="max-w-5xl mx-auto py-6 px-4 animate-in fade-in duration-500">
