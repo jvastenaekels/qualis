@@ -579,12 +579,13 @@ const StudyDesignPage = () => {
                             </span>
                         </Button>
                     </div>
-
-                    <LanguageManagerModal
-                        isOpen={isLangModalOpen}
-                        onClose={() => setIsLangModalOpen(false)}
-                    />
+                </div>
             </div>
+
+            <LanguageManagerModal
+                isOpen={isLangModalOpen}
+                onClose={() => setIsLangModalOpen(false)}
+            />
 
             {/* Main Content */}
             <div className="flex flex-1 overflow-hidden relative max-w-full min-w-0">
