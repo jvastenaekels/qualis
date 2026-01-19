@@ -610,24 +610,24 @@ const StudyDesignPage = () => {
                                     <Lock className="h-10 w-10" />
                                 )}
                             </div>
-                            <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                            <h3 className="text-2xl font-bold text-slate-800 tracking-normal">
                                 {draft.state === 'active'
                                     ? t('admin.design.qsort.grid.locked_active')
                                     : draft.state === 'paused'
                                       ? t('admin.design.qsort.grid.locked_paused')
                                       : t('admin.design.qsort.grid.locked_closed')}
                             </h3>
-                            <p className="text-base font-medium text-slate-500 mt-4 mb-10 text-pretty leading-relaxed">
+                            <p className="text-base font-medium text-slate-500 mt-4 mb-8 text-pretty leading-relaxed">
                                 {draft.state === 'active'
                                     ? t('admin.design.qsort.grid.locked_active_desc')
                                     : draft.state === 'paused'
                                       ? t('admin.design.qsort.grid.locked_paused_desc')
                                       : t('admin.design.qsort.grid.locked_closed_desc')}
                             </p>
-                            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                 <Button
                                     variant="outline"
-                                    className="h-12 px-8 rounded-xl font-bold border-slate-200 hover:bg-slate-50 text-slate-600"
+                                    className="h-11 px-6 rounded-xl font-bold border-slate-200 hover:bg-slate-50 text-slate-600"
                                     onClick={() => navigate(`/admin/studies/${draft.slug}`)}
                                 >
                                     {t('admin.design.toolbar.back_to_study', 'Back to Study')}
@@ -635,7 +635,7 @@ const StudyDesignPage = () => {
                                 {draft.state === 'active' && (
                                     <Button
                                         variant="default"
-                                        className="h-12 px-8 rounded-xl font-bold shadow-lg shadow-primary/20"
+                                        className="h-11 px-6 rounded-xl font-bold shadow-lg shadow-indigo-200 bg-indigo-600 hover:bg-indigo-700"
                                         onClick={() => navigate(`/admin/studies/${draft.slug}`)}
                                     >
                                         {t('admin.study.state.manage')}
@@ -653,22 +653,22 @@ const StudyDesignPage = () => {
                         onValueChange={(v: string) => setActiveStep(v as any)}
                         className="w-full"
                     >
-                        <div className="relative max-w-full lg:max-w-5xl mx-auto mb-12 group/tabs">
+                        <div className="relative max-w-full lg:max-w-5xl mx-auto mb-8 group/tabs">
                             {showLeftArrow && (
                                 <button
                                     type="button"
                                     onClick={() => scrollTabs('left')}
-                                    className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 flex items-center justify-center bg-white/90 backdrop-blur-md border border-slate-200 rounded-full shadow-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all hover:scale-110 active:scale-95 animate-in fade-in zoom-in duration-300"
+                                    className="absolute -left-4 top-1/2 -translate-y-1/2 z-20 h-9 w-9 flex items-center justify-center bg-white/90 backdrop-blur-md border border-slate-200 rounded-full shadow-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-200 transition-all hover:scale-110 active:scale-95 animate-in fade-in zoom-in duration-300"
                                     aria-label="Scroll left"
                                 >
-                                    <ChevronLeft size={20} strokeWidth={3} />
+                                    <ChevronLeft size={18} strokeWidth={2.5} />
                                 </button>
                             )}
 
                             <TabsList
                                 ref={tabsListRef}
                                 onScroll={checkScroll}
-                                className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap justify-start overflow-x-auto w-full max-w-full shadow-sm scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory scroll-smooth rounded-2xl h-14"
+                                className="bg-white/70 backdrop-blur-md border border-slate-200/60 p-1 flex flex-nowrap justify-start overflow-x-auto w-full max-w-full shadow-sm scrollbar-hide [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] snap-x snap-mandatory scroll-smooth rounded-xl h-12"
                             >
                                 <TabsTrigger
                                     value="intro"
