@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Layout, Activity, ExternalLink, Upload } from 'lucide-react';
+import { Plus, Layout, TrendingUp, ExternalLink, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
@@ -100,7 +100,7 @@ export function AdminDashboard() {
                         <CardTitle className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
                             {t('admin.dashboard.active_data_collection')}
                         </CardTitle>
-                        <Activity className="h-4 w-4 text-indigo-500" />
+                        <TrendingUp className="h-4 w-4 text-indigo-500" />
                     </CardHeader>
                     <CardContent className="pt-4">
                         <div className="text-3xl font-black text-indigo-600">

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import {
-    Activity,
+    TrendingUp,
     Users,
     CheckCircle2,
     Clock,
@@ -249,7 +249,7 @@ const StudyOverviewPage = () => {
                     <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 pb-4">
                         <div className="space-y-1">
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <Activity className="h-5 w-5 text-indigo-500" />
+                                <TrendingUp className="h-5 w-5 text-indigo-500" />
                                 {t('admin.study_overview.recent_activity', 'Recent activity')}
                             </CardTitle>
                             <CardDescription>
