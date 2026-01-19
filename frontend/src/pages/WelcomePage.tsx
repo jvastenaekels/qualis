@@ -116,7 +116,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
             {/* 1. Context Section (The "Why") */}
             <div className="text-center max-w-3xl mx-auto mb-8 space-y-6">
                 <div>
-                    <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
+                    <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
                         {study.title}
                     </h1>
                     {study.subtitle && (
@@ -256,8 +256,8 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                     </div>
 
                     {/* Visual Column */}
-                    <div className="md:col-span-12 lg:col-span-5 p-8 md:p-12 bg-slate-100 flex flex-col items-start min-h-[350px] md:min-h-[500px] relative overflow-hidden">
-                        <div className="absolute top-4 left-6 z-20 uppercase tracking-wider text-xs font-bold text-slate-600 bg-slate-200/80 backdrop-blur-sm w-fit px-3 py-1.5 rounded-md border border-slate-300 shadow-sm">
+                    <div className="md:col-span-12 lg:col-span-5 p-8 md:px-10 md:pt-10 md:pb-6 bg-slate-100 flex flex-col items-start min-h-[350px] md:min-h-[500px] relative overflow-hidden">
+                        <div className="uppercase tracking-wider text-xs font-bold text-slate-600 bg-slate-200/80 backdrop-blur-sm w-fit px-3 py-1.5 rounded-md border border-slate-300 shadow-sm mb-4">
                             {t('welcome.preview_title', "It's child's play!")}
                         </div>
 
