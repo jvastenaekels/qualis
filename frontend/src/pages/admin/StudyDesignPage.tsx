@@ -168,6 +168,15 @@ const StudyDesignPage = () => {
                         tr.methodology_tips = [...defaults.methodology_tips];
                     }
                 }
+
+                // Process steps (array)
+                // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
+                if (!tr.process_steps || (tr.process_steps as any).length === 0) {
+                    if (defaults.process_steps) {
+                        // biome-ignore lint/suspicious/noExplicitAny: dynamic assignment
+                        (tr as any).process_steps = [...defaults.process_steps];
+                    }
+                }
             });
 
             const currentDraft = useStudyDesigner.getState().draft;
