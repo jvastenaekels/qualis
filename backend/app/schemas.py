@@ -200,12 +200,12 @@ class StudyTranslationBase(BaseModel):
 
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
     title: str = Field(..., max_length=200)
-    description: str = Field("", max_length=2000)
-    instructions: str | None = Field(None, max_length=2000)
+    description: str = Field("", max_length=5000)
+    instructions: str | None = Field(None, max_length=5000)
     subtitle: str | None = Field(None, max_length=200)
-    objective: str | None = Field(None, max_length=1000)
-    condition_of_instruction: str | None = Field(None, max_length=500)
-    pre_instruction: str | None = Field(None, max_length=500)
+    objective: str | None = Field(None, max_length=5000)
+    condition_of_instruction: str | None = Field(None, max_length=1000)
+    pre_instruction: str | None = Field(None, max_length=1000)
 
     consent_title: str | None = Field(None, max_length=200)
     consent_description: str | None = Field(None, max_length=5000)
