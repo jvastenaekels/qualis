@@ -392,10 +392,10 @@ const StudyDesignPage = () => {
             style={{ animationFillMode: 'forwards' }}
         >
             {/* Toolbar */}
-            <div className="border-b bg-background px-6 py-3 shrink-0">
-                <div className="flex items-center justify-between gap-4 min-w-0">
+            <div className="border-b bg-background px-3 sm:px-6 py-2 sm:py-3 shrink-0">
+                <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4 min-w-0">
                     {/* Left section: Icon + Title + Status */}
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                         <div
                             className="flex items-center justify-center h-9 w-9 bg-indigo-50/50 border border-indigo-100 rounded-xl shrink-0"
                             title={t('admin.design.toolbar.title')}
@@ -412,7 +412,7 @@ const StudyDesignPage = () => {
                             role="status"
                             data-testid="study-status"
                             className={cn(
-                                'px-2.5 py-1 rounded-md text-xs font-semibold border shrink-0 hidden sm:flex',
+                                'px-2.5 py-1 rounded-md text-xs font-semibold border shrink-0 hidden md:flex',
                                 draft.state === 'active'
                                     ? 'bg-green-50 text-green-700 border-green-200'
                                     : draft.state === 'closed'
@@ -431,20 +431,20 @@ const StudyDesignPage = () => {
                     </div>
 
                     {/* Right section: Actions grouped logically */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                         {/* Language + Test Group */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button
                                         variant="outline"
                                         size="sm"
                                         data-testid="language-switcher"
-                                        className="h-9 gap-2 font-bold bg-white border-slate-200 rounded-lg hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm px-3"
+                                        className="h-9 gap-2 font-bold bg-white border-slate-200 rounded-lg hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm px-2 sm:px-3"
                                     >
                                         <Globe className="h-4 w-4 text-indigo-500" />
-                                        {activeLocale.toUpperCase()}
-                                        <ChevronDown className="h-3 w-3 opacity-50" />
+                                        <span className="hidden sm:inline">{activeLocale.toUpperCase()}</span>
+                                        <ChevronDown className="h-3 w-3 opacity-50 hidden sm:inline" />
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
@@ -506,23 +506,23 @@ const StudyDesignPage = () => {
                                 onClick={handleTestRun}
                                 disabled={!isLaunchReady}
                                 className={cn(
-                                    'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-3',
+                                    'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-2 sm:px-3',
                                     isLaunchReady
                                         ? 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
                                         : 'bg-slate-50 border-slate-100 text-slate-400 opacity-50 cursor-not-allowed'
                                 )}
                             >
                                 <Eye className="h-4 w-4 text-indigo-500" />
-                                <span className="hidden sm:inline">
+                                <span className="hidden md:inline">
                                     {t('admin.design.toolbar.test_run')}
                                 </span>
                             </Button>
                         </div>
 
-                        <div className="h-6 w-px bg-slate-200" />
+                        <div className="h-6 w-px bg-slate-200 hidden sm:block" />
 
                         {/* Save + Export Group */}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5 sm:gap-2">
                             <Button
                                 size="sm"
                                 variant="outline"
@@ -533,7 +533,7 @@ const StudyDesignPage = () => {
                                     isFullyReadOnly
                                 }
                                 className={cn(
-                                    'h-9 font-bold rounded-lg shadow-sm transition-all active:scale-95 px-4',
+                                    'h-9 w-9 font-bold rounded-lg shadow-sm transition-all active:scale-95 p-0',
                                     syncStatus === 'modified'
                                         ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
                                         : 'bg-white text-slate-500 border-slate-200'
@@ -555,7 +555,7 @@ const StudyDesignPage = () => {
                             />
                         </div>
 
-                        <div className="h-6 w-px bg-slate-200" />
+                        <div className="h-6 w-px bg-slate-200 hidden sm:block" />
 
                         {/* Activate Button */}
                         <Button
@@ -563,18 +563,18 @@ const StudyDesignPage = () => {
                             onClick={handleActivate}
                             disabled={isActivating || isFullyReadOnly}
                             className={cn(
-                                'transition-all h-9 font-bold rounded-lg shadow-sm px-4',
+                                'transition-all h-9 font-bold rounded-lg shadow-sm px-3 sm:px-4',
                                 !isFullyReadOnly
                                     ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200'
                                     : 'bg-slate-100 text-slate-400'
                             )}
                         >
                             {isActivating ? (
-                                <Loader2 className="h-4 w-4 sm:mr-2 animate-spin" />
+                                <Loader2 className="h-4 w-4 md:mr-2 animate-spin" />
                             ) : (
-                                <Rocket className="h-4 w-4 sm:mr-2" />
+                                <Rocket className="h-4 w-4 md:mr-2" />
                             )}
-                            <span className="hidden sm:inline">
+                            <span className="hidden md:inline">
                                 {t('admin.study_status.state.activate', 'Activate Study')}
                             </span>
                         </Button>
