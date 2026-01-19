@@ -100,38 +100,15 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
         if (langCode === 'en' && activeLanguageCodes.length === 1) return; // Prevent last language removal
 
         updateDraft((d) => {
-            // We keep the data but filter it out from "active" view
-            // The plan says: "les données de traduction doivent persister en base de données (ne pas effacer les chaînes)"
-            // But currently the system uses the presence in the translations array as "activity".
-            // To "persist without being active", we might need an 'is_active' flag on the translation.
-            // For now, removing it from the array is how it works, but we can't easily "persist" it unless we keep it.
-            // Let's add an 'is_hidden' or similar if we want to follow the plan strictly.
-            // Actually, the simplest is to filter them out in the selector if we add a 'hidden' flag.
-            const translation = d.translations?.find((t) => t.language_code === langCode);
-            if (translation) {
-                // biome-ignore lint/suspicious/noExplicitAny: is_disabled not in type definition
-                (translation as any).is_disabled = true;
-            }
+            // Remove the translation object entirely to disable the language
+            d.translations = (d.translations || []).filter((t) => t.language_code !== langCode);
         });
     };
 
     const toggleLanguage = (langCode: string) => {
         const isActive = activeLanguageCodes.includes(langCode);
-        const translation = draft.translations?.find((t) => t.language_code === langCode);
-        // biome-ignore lint/suspicious/noExplicitAny: is_disabled not in type definition
-        const isDisabled = (translation as any)?.is_disabled;
-
-        if (!isActive || isDisabled) {
-            // Reactivate or Brand New
-            if (translation) {
-                updateDraft((d) => {
-                    const t = d.translations?.find((tr) => tr.language_code === langCode);
-                    // biome-ignore lint/suspicious/noExplicitAny: is_disabled not in type definition
-                    if (t) (t as any).is_disabled = false;
-                });
-            } else {
-                handleActivate(langCode);
-            }
+        if (!isActive) {
+            handleActivate(langCode);
         } else {
             handleDeactivate(langCode);
         }
@@ -160,11 +137,7 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
                 <div className="py-6 space-y-4">
                     <div className="grid gap-3">
                         {UI_LANGUAGES.map((lang) => {
-                            const translation = draft.translations?.find(
-                                (t) => t.language_code === lang.code
-                            );
-                            // biome-ignore lint/suspicious/noExplicitAny: is_disabled not in type definition
-                            const isActive = !!translation && !(translation as any).is_disabled;
+                            const isActive = activeLanguageCodes.includes(lang.code);
 
                             return (
                                 <button
