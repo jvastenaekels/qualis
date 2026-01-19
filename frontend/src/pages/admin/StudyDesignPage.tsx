@@ -430,160 +430,160 @@ const StudyDesignPage = () => {
                         </div>
                     </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
-                    {/* Language Switcher - Study Content Language */}
-                    <div className="flex items-center gap-2">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    data-testid="language-switcher"
-                                    className="h-9 gap-2 font-bold bg-white border-slate-200 rounded-lg hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm px-3"
+                    {/* Right section: Actions grouped logically */}
+                    <div className="flex items-center gap-3">
+                        {/* Language + Test Group */}
+                        <div className="flex items-center gap-2">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        data-testid="language-switcher"
+                                        className="h-9 gap-2 font-bold bg-white border-slate-200 rounded-lg hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm px-3"
+                                    >
+                                        <Globe className="h-4 w-4 text-indigo-500" />
+                                        {activeLocale.toUpperCase()}
+                                        <ChevronDown className="h-3 w-3 opacity-50" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    align="end"
+                                    className="w-56 rounded-xl shadow-xl border-slate-100 p-1.5"
                                 >
-                                    <Globe className="h-4 w-4 text-indigo-500" />
-                                    {activeLocale.toUpperCase()}
-                                    <ChevronDown className="h-3 w-3 opacity-50" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                align="end"
-                                className="w-56 rounded-xl shadow-xl border-slate-100 p-1.5"
-                            >
-                                <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-400">
-                                    {t('admin.design.toolbar.select_lang', 'Select language')}
-                                </DropdownMenuLabel>
-                                <DropdownMenuSeparator className="bg-slate-100 my-1" />
-                                {(() => {
-                                    const activeLangs = (draft.translations || [])
-                                        .filter(
-                                            (
-                                                t: StudyTranslationCreate & {
-                                                    is_disabled?: boolean;
-                                                }
-                                            ) => !t.is_disabled
-                                        )
-                                        .map((t) => t.language_code);
+                                    <DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-slate-400">
+                                        {t('admin.design.toolbar.select_lang', 'Select language')}
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="bg-slate-100 my-1" />
+                                    {(() => {
+                                        const activeLangs = (draft.translations || [])
+                                            .filter(
+                                                (
+                                                    t: StudyTranslationCreate & {
+                                                        is_disabled?: boolean;
+                                                    }
+                                                ) => !t.is_disabled
+                                            )
+                                            .map((t) => t.language_code);
 
-                                    const langs = activeLangs.length > 0 ? activeLangs : ['en'];
-                                    return langs.map((lang: string) => (
-                                        <DropdownMenuItem
-                                            key={lang}
-                                            onSelect={() => setActiveLocale(lang)}
-                                            className={cn(
-                                                'flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all font-medium text-sm',
-                                                activeLocale === lang
-                                                    ? 'bg-indigo-50 text-indigo-700 font-bold'
-                                                    : 'hover:bg-slate-50 text-slate-600'
-                                            )}
-                                        >
-                                            <span className="flex items-center gap-3">
-                                                {lang.toUpperCase()}
-                                            </span>
-                                            {activeLocale === lang && (
-                                                <Check className="h-3.5 w-3.5" />
-                                            )}
-                                        </DropdownMenuItem>
-                                    ));
-                                })()}
-                                <DropdownMenuSeparator className="bg-slate-100 my-1" />
-                                <DropdownMenuItem
-                                    onSelect={() => setIsLangModalOpen(true)}
-                                    className="gap-2.5 cursor-pointer py-2 px-3 rounded-lg text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-semibold transition-all"
-                                >
-                                    <Settings2 className="h-3.5 w-3.5" />
-                                    <span>
-                                        {t('admin.design.toolbar.manage_langs', 'Manage Languages')}
-                                    </span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                        const langs = activeLangs.length > 0 ? activeLangs : ['en'];
+                                        return langs.map((lang: string) => (
+                                            <DropdownMenuItem
+                                                key={lang}
+                                                onSelect={() => setActiveLocale(lang)}
+                                                className={cn(
+                                                    'flex items-center justify-between cursor-pointer py-2 px-3 rounded-lg transition-all font-medium text-sm',
+                                                    activeLocale === lang
+                                                        ? 'bg-indigo-50 text-indigo-700 font-bold'
+                                                        : 'hover:bg-slate-50 text-slate-600'
+                                                )}
+                                            >
+                                                <span className="flex items-center gap-3">
+                                                    {lang.toUpperCase()}
+                                                </span>
+                                                {activeLocale === lang && (
+                                                    <Check className="h-3.5 w-3.5" />
+                                                )}
+                                            </DropdownMenuItem>
+                                        ));
+                                    })()}
+                                    <DropdownMenuSeparator className="bg-slate-100 my-1" />
+                                    <DropdownMenuItem
+                                        onSelect={() => setIsLangModalOpen(true)}
+                                        className="gap-2.5 cursor-pointer py-2 px-3 rounded-lg text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 font-semibold transition-all"
+                                    >
+                                        <Settings2 className="h-3.5 w-3.5" />
+                                        <span>
+                                            {t('admin.design.toolbar.manage_langs', 'Manage Languages')}
+                                        </span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={handleTestRun}
+                                disabled={!isLaunchReady}
+                                className={cn(
+                                    'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-3',
+                                    isLaunchReady
+                                        ? 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
+                                        : 'bg-slate-50 border-slate-100 text-slate-400 opacity-50 cursor-not-allowed'
+                                )}
+                            >
+                                <Eye className="h-4 w-4 text-indigo-500" />
+                                <span className="hidden sm:inline">
+                                    {t('admin.design.toolbar.test_run')}
+                                </span>
+                            </Button>
+                        </div>
+
+                        <div className="h-6 w-px bg-slate-200" />
+
+                        {/* Save + Export Group */}
+                        <div className="flex items-center gap-2">
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={save}
+                                disabled={
+                                    syncStatus === 'synced' ||
+                                    syncStatus === 'saving' ||
+                                    isFullyReadOnly
+                                }
+                                className={cn(
+                                    'h-9 font-bold rounded-lg shadow-sm transition-all active:scale-95 px-4',
+                                    syncStatus === 'modified'
+                                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
+                                        : 'bg-white text-slate-500 border-slate-200'
+                                )}
+                            >
+                                {syncStatus === 'saving' ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : syncStatus === 'modified' ? (
+                                    <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                                ) : (
+                                    <CheckCircle className="h-3.5 w-3.5 opacity-50" />
+                                )}
+                            </Button>
+
+                            <ExportConfigButton
+                                studySlug={slug || ''}
+                                variant="outline"
+                                className="h-9 w-9 p-0 rounded-lg text-slate-500"
+                            />
+                        </div>
+
+                        <div className="h-6 w-px bg-slate-200" />
+
+                        {/* Activate Button */}
+                        <Button
+                            size="sm"
+                            onClick={handleActivate}
+                            disabled={isActivating || isFullyReadOnly}
+                            className={cn(
+                                'transition-all h-9 font-bold rounded-lg shadow-sm px-4',
+                                !isFullyReadOnly
+                                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200'
+                                    : 'bg-slate-100 text-slate-400'
+                            )}
+                        >
+                            {isActivating ? (
+                                <Loader2 className="h-4 w-4 sm:mr-2 animate-spin" />
+                            ) : (
+                                <Rocket className="h-4 w-4 sm:mr-2" />
+                            )}
+                            <span className="hidden sm:inline">
+                                {t('admin.study_status.state.activate', 'Activate Study')}
+                            </span>
+                        </Button>
                     </div>
 
                     <LanguageManagerModal
                         isOpen={isLangModalOpen}
                         onClose={() => setIsLangModalOpen(false)}
                     />
-
-                    <div className="h-6 w-px bg-slate-200 mx-1" />
-
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={handleTestRun}
-                        disabled={!isLaunchReady}
-                        className={cn(
-                            'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-3',
-                            isLaunchReady
-                                ? 'bg-white border-slate-200 hover:bg-slate-50 text-slate-700'
-                                : 'bg-slate-50 border-slate-100 text-slate-400 opacity-50 cursor-not-allowed'
-                        )}
-                    >
-                        <Eye className="h-4 w-4 text-indigo-500" />
-                        <span className="hidden sm:inline">
-                            {t('admin.design.toolbar.test_run')}
-                        </span>
-                    </Button>
-
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={save}
-                        disabled={
-                            syncStatus === 'synced' ||
-                            syncStatus === 'saving' ||
-                            isFullyReadOnly
-                        }
-                        className={cn(
-                            'h-9 font-bold rounded-lg shadow-sm transition-all active:scale-95 px-4 min-w-[100px]',
-                            syncStatus === 'modified'
-                                ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
-                                : 'bg-white text-slate-500 border-slate-200'
-                        )}
-                    >
-                        {syncStatus === 'saving' ? (
-                            <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
-                        ) : syncStatus === 'modified' ? (
-                            <div className="h-2 w-2 rounded-full bg-amber-500 mr-2 animate-pulse" />
-                        ) : (
-                            <CheckCircle className="h-3.5 w-3.5 mr-2 opacity-50" />
-                        )}
-                        <span className="hidden xl:inline text-xs font-bold">
-                            {syncStatus === 'saving'
-                                ? t('admin.design.sync.saving')
-                                : syncStatus === 'synced'
-                                  ? t('admin.design.sync.synced')
-                                  : t('admin.design.toolbar.save')}
-                        </span>
-                    </Button>
-
-                    <ExportConfigButton
-                        studySlug={slug || ''}
-                        variant="outline"
-                        className="h-9 w-9 p-0 rounded-lg text-slate-500"
-                    />
-
-                    <Button
-                        size="sm"
-                        onClick={handleActivate}
-                        disabled={isActivating || isFullyReadOnly}
-                        className={cn(
-                            'transition-all h-9 font-bold rounded-lg shadow-sm ml-2 px-4',
-                            !isFullyReadOnly
-                                ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200'
-                                : 'bg-slate-100 text-slate-400'
-                        )}
-                    >
-                        {isActivating ? (
-                            <Loader2 className="h-4 w-4 sm:mr-2 animate-spin" />
-                        ) : (
-                            <Rocket className="h-4 w-4 sm:mr-2" />
-                        )}
-                        <span className="hidden sm:inline">
-                            {t('admin.study_status.state.activate', 'Activate Study')}
-                        </span>
-                    </Button>
-                </div>
             </div>
 
             {/* Main Content */}
