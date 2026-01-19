@@ -94,6 +94,9 @@ export const StudyConfigSchema = z.object({
             prompts: z
                 .object({
                     extreme: z.union([z.string(), z.record(z.string())]).optional(),
+                    extreme_positive: z.union([z.string(), z.record(z.string())]).optional(),
+                    extreme_negative: z.union([z.string(), z.record(z.string())]).optional(),
+                    extreme_neutral: z.union([z.string(), z.record(z.string())]).optional(),
                     missing: z.union([z.string(), z.record(z.string())]).optional(),
                     general: z.union([z.string(), z.record(z.string())]).optional(),
                 })
