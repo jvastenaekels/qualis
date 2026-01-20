@@ -333,7 +333,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     />
 
                     {/* Card Zone */}
-                    <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-md md:max-w-lg lg:max-w-xl min-w-[6rem] min-h-[8rem] sm:min-w-[12rem] sm:min-h-[9rem]">
+                    <div className="relative flex-1 h-auto aspect-[3/4] sm:aspect-[4/3] flex justify-center items-center z-10 sm:max-w-sm md:max-w-md min-w-[6rem] min-h-[8rem] sm:min-w-[12rem] sm:min-h-[9rem]">
                         <div className="w-full h-full relative">
                             <CardStack
                                 ref={cardStackRef}
