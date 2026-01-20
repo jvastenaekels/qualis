@@ -28,6 +28,7 @@ import {
     PlusCircle,
     List as ListCircle,
     CheckSquare,
+    GitBranch,
     Calendar,
     Mail,
     AlignLeft,
@@ -253,160 +254,178 @@ const QuestionItem = ({
                                     </div>
                                 </div>
 
-                                <div className="space-y-4 pt-4 border-t border-slate-100">
-                                    <div className="flex items-center justify-between">
-                                        <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                            {t('admin.design.questions.logic.title')}
-                                        </Label>
-                                        {!readOnly && (
-                                            <Switch
-                                                checked={!!question.visibility_condition}
-                                                onCheckedChange={(checked) => {
-                                                    if (checked) {
-                                                        onUpdate({
-                                                            ...question,
-                                                            visibility_condition: {
-                                                                depends_on:
-                                                                    availableQuestions[0]?.id || '',
-                                                                operator: 'equals',
-                                                                value: '',
-                                                            },
-                                                        });
-                                                    } else {
-                                                        const { visibility_condition: _, ...rest } =
-                                                            question;
-                                                        onUpdate(rest);
-                                                    }
-                                                }}
-                                            />
-                                        )}
-                                    </div>
-
-                                    {question.visibility_condition && (
-                                        <div className="grid gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
-                                            <div className="space-y-2">
-                                                <Label className="text-[10px] font-bold text-slate-500 uppercase">
-                                                    {t('admin.design.questions.logic.depends_on')}
+                                {availableQuestions.length > 0 && (
+                                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <GitBranch className="h-3.5 w-3.5 text-indigo-500" />
+                                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                                    {t('admin.design.questions.logic.title')}
                                                 </Label>
-                                                <Select
-                                                    value={question.visibility_condition.depends_on}
-                                                    onValueChange={(val) =>
-                                                        onUpdate({
-                                                            ...question,
-                                                            visibility_condition:
-                                                                question.visibility_condition
-                                                                    ? {
-                                                                          ...question.visibility_condition,
-                                                                          depends_on: val,
-                                                                      }
-                                                                    : undefined,
-                                                        })
-                                                    }
-                                                >
-                                                    <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
-                                                        <SelectValue
-                                                            placeholder={t(
-                                                                'admin.design.questions.logic.select_placeholder'
-                                                            )}
-                                                        />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        {availableQuestions.map((aq) => {
-                                                            const aqLabel =
-                                                                typeof aq.label === 'string'
-                                                                    ? aq.label
-                                                                    : aq.label[activeLocale] ||
-                                                                      aq.label.en ||
-                                                                      aq.id;
-                                                            return (
-                                                                <SelectItem
-                                                                    key={aq.id}
-                                                                    value={aq.id}
-                                                                >
-                                                                    {aqLabel}
-                                                                </SelectItem>
-                                                            );
-                                                        })}
-                                                        {availableQuestions.length === 0 && (
-                                                            <SelectItem value="none" disabled>
-                                                                No previous questions
-                                                            </SelectItem>
-                                                        )}
-                                                    </SelectContent>
-                                                </Select>
                                             </div>
+                                            {!readOnly && (
+                                                <Switch
+                                                    checked={!!question.visibility_condition}
+                                                    onCheckedChange={(checked) => {
+                                                        if (checked) {
+                                                            onUpdate({
+                                                                ...question,
+                                                                visibility_condition: {
+                                                                    depends_on:
+                                                                        availableQuestions[0]?.id ||
+                                                                        '',
+                                                                    operator: 'equals',
+                                                                    value: '',
+                                                                },
+                                                            });
+                                                        } else {
+                                                            const {
+                                                                visibility_condition: _,
+                                                                ...rest
+                                                            } = question;
+                                                            onUpdate(rest);
+                                                        }
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
 
-                                            <div className="grid grid-cols-2 gap-4">
+                                        {question.visibility_condition && (
+                                            <div className="grid gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
                                                 <div className="space-y-2">
                                                     <Label className="text-[10px] font-bold text-slate-500 uppercase">
-                                                        {t('admin.design.questions.logic.operator')}
+                                                        {t(
+                                                            'admin.design.questions.logic.depends_on'
+                                                        )}
                                                     </Label>
                                                     <Select
                                                         value={
-                                                            question.visibility_condition.operator
+                                                            question.visibility_condition.depends_on
                                                         }
-                                                        onValueChange={(val: 'equals' | 'not_equals' | 'contains' | 'greater_than' | 'less_than') =>
+                                                        onValueChange={(val) =>
                                                             onUpdate({
                                                                 ...question,
                                                                 visibility_condition:
                                                                     question.visibility_condition
                                                                         ? {
                                                                               ...question.visibility_condition,
-                                                                              operator: val,
+                                                                              depends_on: val,
                                                                           }
                                                                         : undefined,
                                                             })
                                                         }
                                                     >
                                                         <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
-                                                            <SelectValue />
+                                                            <SelectValue
+                                                                placeholder={t(
+                                                                    'admin.design.questions.logic.select_placeholder'
+                                                                )}
+                                                            />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            {[
-                                                                'equals',
-                                                                'not_equals',
-                                                                'contains',
-                                                                'greater_than',
-                                                                'less_than',
-                                                            ].map((op) => (
-                                                                <SelectItem key={op} value={op}>
-                                                                    {t(
-                                                                        `admin.design.questions.logic.operators.${op}`
-                                                                    )}
-                                                                </SelectItem>
-                                                            ))}
+                                                            {availableQuestions.map((aq) => {
+                                                                const aqLabel =
+                                                                    typeof aq.label === 'string'
+                                                                        ? aq.label
+                                                                        : aq.label[activeLocale] ||
+                                                                          aq.label.en ||
+                                                                          aq.id;
+                                                                return (
+                                                                    <SelectItem
+                                                                        key={aq.id}
+                                                                        value={aq.id}
+                                                                    >
+                                                                        {aqLabel}
+                                                                    </SelectItem>
+                                                                );
+                                                            })}
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
 
-                                                <div className="space-y-2">
-                                                    <Label className="text-[10px] font-bold text-slate-500 uppercase">
-                                                        {t('admin.design.questions.logic.value')}
-                                                    </Label>
-                                                    <Input
-                                                        value={
-                                                            (question.visibility_condition.value as string) ||
-                                                            ''
-                                                        }
-                                                        onChange={(e) =>
-                                                            onUpdate({
-                                                                ...question,
-                                                                visibility_condition:
-                                                                    question.visibility_condition
-                                                                        ? {
-                                                                              ...question.visibility_condition,
-                                                                              value: e.target.value,
-                                                                          }
-                                                                        : undefined,
-                                                            })
-                                                        }
-                                                        className="bg-white rounded-lg h-9 text-xs"
-                                                    />
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <Label className="text-[10px] font-bold text-slate-500 uppercase">
+                                                            {t(
+                                                                'admin.design.questions.logic.operator'
+                                                            )}
+                                                        </Label>
+                                                        <Select
+                                                            value={
+                                                                question.visibility_condition
+                                                                    .operator
+                                                            }
+                                                            onValueChange={(
+                                                                val:
+                                                                    | 'equals'
+                                                                    | 'not_equals'
+                                                                    | 'contains'
+                                                                    | 'greater_than'
+                                                                    | 'less_than'
+                                                            ) =>
+                                                                onUpdate({
+                                                                    ...question,
+                                                                    visibility_condition:
+                                                                        question.visibility_condition
+                                                                            ? {
+                                                                                  ...question.visibility_condition,
+                                                                                  operator: val,
+                                                                              }
+                                                                            : undefined,
+                                                                })
+                                                            }
+                                                        >
+                                                            <SelectTrigger className="bg-white rounded-lg h-9 text-xs">
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                {[
+                                                                    'equals',
+                                                                    'not_equals',
+                                                                    'contains',
+                                                                    'greater_than',
+                                                                    'less_than',
+                                                                ].map((op) => (
+                                                                    <SelectItem key={op} value={op}>
+                                                                        {t(
+                                                                            `admin.design.questions.logic.operators.${op}`
+                                                                        )}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <Label className="text-[10px] font-bold text-slate-500 uppercase">
+                                                            {t('admin.design.questions.logic.value')}
+                                                        </Label>
+                                                        <Input
+                                                            value={
+                                                                (question.visibility_condition
+                                                                    .value as string) || ''
+                                                            }
+                                                            onChange={(e) =>
+                                                                onUpdate({
+                                                                    ...question,
+                                                                    visibility_condition:
+                                                                        question.visibility_condition
+                                                                            ? {
+                                                                                  ...question.visibility_condition,
+                                                                                  value: e.target
+                                                                                      .value,
+                                                                              }
+                                                                            : undefined,
+                                                                })
+                                                            }
+                                                            className="bg-white rounded-lg h-9 text-xs"
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    )}
-                                </div>
+                                        )}
+                                    </div>
+                                )}
 
                                 {(question.type === 'select' ||
                                     question.type === 'radio' ||
