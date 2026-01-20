@@ -16,6 +16,7 @@ import { SafeMarkdown } from '../components/SafeMarkdown';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useLayoutAction } from '../hooks/useLayout';
 import { useSubmitStudy } from '../hooks/useSubmitStudy';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -81,81 +82,75 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
         formState: { errors: formErrors },
     } = useForm({
         mode: 'onChange',
+        resolver: async (data, context, options) => {
+            if (!questions) return zodResolver(z.object({}))(data, context, options);
+
+            const shape: Record<string, z.ZodTypeAny> = {};
+
+            Object.entries(questions).forEach(([key, field]) => {
+                const isVisible = evaluateVisibilityCondition(field.visibility_condition, data);
+                let fieldSchema: z.ZodTypeAny;
+
+                if (field.type === 'number') {
+                    fieldSchema = z.coerce.number();
+                    if (field.min !== undefined)
+                        fieldSchema = (fieldSchema as z.ZodNumber).min(
+                            field.min,
+                            t('common.errors.min', { min: field.min })
+                        );
+                    if (field.max !== undefined)
+                        fieldSchema = (fieldSchema as z.ZodNumber).max(
+                            field.max,
+                            t('common.errors.max', { max: field.max })
+                        );
+                } else if (field.type === 'email') {
+                    fieldSchema = z.string().email('Please enter a valid email address');
+                } else if (field.type === 'date') {
+                    fieldSchema = z.string();
+                } else if (field.type === 'checkbox') {
+                    fieldSchema = z.array(z.string());
+                } else {
+                    fieldSchema = z.string();
+                    if (field.minLength !== undefined) {
+                        fieldSchema = (fieldSchema as z.ZodString).min(
+                            field.minLength,
+                            `Minimum ${field.minLength} characters required`
+                        );
+                    }
+                    if (field.maxLength !== undefined) {
+                        fieldSchema = (fieldSchema as z.ZodString).max(
+                            field.maxLength,
+                            `Maximum ${field.maxLength} characters allowed`
+                        );
+                    }
+                }
+
+                if (field.required && isVisible) {
+                    if (field.type === 'checkbox') {
+                        fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(
+                            1,
+                            t('presort.error_required')
+                        );
+                    } else if (field.type !== 'number') {
+                        fieldSchema = (fieldSchema as z.ZodString).min(
+                            1,
+                            t('presort.error_required')
+                        );
+                    }
+                } else {
+                    fieldSchema = fieldSchema.optional().nullable();
+                }
+
+                shape[key] = fieldSchema;
+            });
+
+            return zodResolver(z.object(shape))(data, context, options);
+        },
         defaultValues: responses.postsort.questions_answers,
     });
 
     const currentValues = watch();
 
-    const dynamicSchema = useMemo(() => {
-        if (!questions) return z.object({});
-
-        const shape: Record<string, z.ZodTypeAny> = {};
-
-        Object.entries(questions).forEach(([key, field]) => {
-            const isVisible = evaluateVisibilityCondition(
-                field.visibility_condition,
-                currentValues
-            );
-            let fieldSchema: z.ZodTypeAny;
-
-            if (field.type === 'number') {
-                fieldSchema = z.coerce.number();
-                if (field.min !== undefined)
-                    fieldSchema = (fieldSchema as z.ZodNumber).min(
-                        field.min,
-                        t('common.errors.min', { min: field.min })
-                    );
-                if (field.max !== undefined)
-                    fieldSchema = (fieldSchema as z.ZodNumber).max(
-                        field.max,
-                        t('common.errors.max', { max: field.max })
-                    );
-            } else if (field.type === 'email') {
-                fieldSchema = z.string().email('Please enter a valid email address');
-            } else if (field.type === 'date') {
-                fieldSchema = z.string();
-            } else if (field.type === 'checkbox') {
-                fieldSchema = z.array(z.string());
-            } else {
-                fieldSchema = z.string();
-                if (field.minLength !== undefined) {
-                    fieldSchema = (fieldSchema as z.ZodString).min(
-                        field.minLength,
-                        `Minimum ${field.minLength} characters required`
-                    );
-                }
-                if (field.maxLength !== undefined) {
-                    fieldSchema = (fieldSchema as z.ZodString).max(
-                        field.maxLength,
-                        `Maximum ${field.maxLength} characters allowed`
-                    );
-                }
-            }
-
-            if (field.required && isVisible) {
-                if (field.type === 'checkbox') {
-                    fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(
-                        1,
-                        t('presort.error_required')
-                    );
-                } else if (field.type !== 'number') {
-                    fieldSchema = (fieldSchema as z.ZodString).min(1, t('presort.error_required'));
-                }
-            } else {
-                fieldSchema = fieldSchema.optional().nullable();
-            }
-
-            shape[key] = fieldSchema;
-        });
-
-        return z.object(shape);
-    }, [questions, t, currentValues]);
-
-    // Re-validate when schema changes
-    // biome-ignore lint/correctness/useExhaustiveDependencies: We want to re-validate when schema changes
-    React.useEffect(() => {
-        triggerFormValidation();
-    }, [dynamicSchema, triggerFormValidation]);
 
     // Auto-save form data to store
     React.useEffect(() => {

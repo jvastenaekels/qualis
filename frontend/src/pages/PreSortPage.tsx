@@ -12,6 +12,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import type { PreSortField } from '../schemas/study';
 import { SurveyField } from '../components/survey/SurveyField';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
@@ -48,90 +49,79 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
         register,
         handleSubmit,
         watch,
-        control: _control,
         formState: { errors, isValid },
-        trigger,
     } = useForm({
         mode: 'onChange',
+        resolver: async (data, context, options) => {
+            // Generate Dynamic Zod Schema based on current data
+            const shape: Record<string, z.ZodTypeAny> = {};
+
+            Object.entries(presortFields).forEach(([key, field]) => {
+                const isVisible = evaluateVisibilityCondition(field.visibility_condition, data);
+                let fieldSchema: z.ZodTypeAny;
+
+                if (field.type === 'number') {
+                    fieldSchema = z.coerce.number();
+                    if (field.min !== undefined)
+                        fieldSchema = (fieldSchema as z.ZodNumber).min(
+                            field.min,
+                            t('common.errors.min', { min: field.min })
+                        );
+                    if (field.max !== undefined)
+                        fieldSchema = (fieldSchema as z.ZodNumber).max(
+                            field.max,
+                            t('common.errors.max', { max: field.max })
+                        );
+                } else if (field.type === 'email') {
+                    fieldSchema = z.string().email('Please enter a valid email address');
+                } else if (field.type === 'date') {
+                    fieldSchema = z.string();
+                } else if (field.type === 'checkbox') {
+                    fieldSchema = z.array(z.string());
+                } else {
+                    fieldSchema = z.string();
+                    if (field.minLength !== undefined) {
+                        fieldSchema = (fieldSchema as z.ZodString).min(
+                            field.minLength,
+                            `Minimum ${field.minLength} characters required`
+                        );
+                    }
+                    if (field.maxLength !== undefined) {
+                        fieldSchema = (fieldSchema as z.ZodString).max(
+                            field.maxLength,
+                            `Maximum ${field.maxLength} characters allowed`
+                        );
+                    }
+                }
+
+                if (field.required && isVisible) {
+                    if (field.type === 'checkbox') {
+                        fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(
+                            1,
+                            t('presort.error_required')
+                        );
+                    } else if (field.type !== 'number') {
+                        fieldSchema = (fieldSchema as z.ZodString).min(
+                            1,
+                            t('presort.error_required')
+                        );
+                    }
+                } else {
+                    fieldSchema = fieldSchema.optional().nullable();
+                }
+
+                shape[key] = fieldSchema;
+            });
+
+            const dynamicSchema = z.object(shape);
+            return zodResolver(dynamicSchema)(data, context, options);
+        },
         defaultValues: presortResponse,
     });
 
     const currentValues = watch();
 
-    // Generate Dynamic Zod Schema based on config and visibility
-    const dynamicSchema = useMemo(() => {
-        const shape: Record<string, z.ZodTypeAny> = {};
 
-        Object.entries(presortFields).forEach(([key, field]) => {
-            const isVisible = evaluateVisibilityCondition(
-                field.visibility_condition,
-                currentValues
-            );
-            let fieldSchema: z.ZodTypeAny;
-
-            if (field.type === 'number') {
-                fieldSchema = z.coerce.number();
-                if (field.min !== undefined)
-                    fieldSchema = (fieldSchema as z.ZodNumber).min(
-                        field.min,
-                        t('common.errors.min', { min: field.min })
-                    );
-                if (field.max !== undefined)
-                    fieldSchema = (fieldSchema as z.ZodNumber).max(
-                        field.max,
-                        t('common.errors.max', { max: field.max })
-                    );
-            } else if (field.type === 'email') {
-                fieldSchema = z.string().email('Please enter a valid email address');
-            } else if (field.type === 'date') {
-                fieldSchema = z.string();
-            } else if (field.type === 'checkbox') {
-                fieldSchema = z.array(z.string());
-            } else {
-                fieldSchema = z.string();
-                if (field.minLength !== undefined) {
-                    fieldSchema = (fieldSchema as z.ZodString).min(
-                        field.minLength,
-                        `Minimum ${field.minLength} characters required`
-                    );
-                }
-                if (field.maxLength !== undefined) {
-                    fieldSchema = (fieldSchema as z.ZodString).max(
-                        field.maxLength,
-                        `Maximum ${field.maxLength} characters allowed`
-                    );
-                }
-            }
-
-            if (field.required && isVisible) {
-                if (field.type === 'checkbox') {
-                    fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(
-                        1,
-                        t('presort.error_required')
-                    );
-                } else if (field.type !== 'number') {
-                    fieldSchema = (fieldSchema as z.ZodString).min(1, t('presort.error_required'));
-                }
-            } else {
-                fieldSchema = fieldSchema.optional().nullable();
-            }
-
-            shape[key] = fieldSchema;
-        });
-
-        return z.object(shape);
-    }, [presortFields, t, currentValues]);
-
-    // Manual validation when values change because the schema is dynamic
-    React.useEffect(() => {
-        const validate = async () => {
-            await dynamicSchema.safeParseAsync(currentValues);
-            // We don't necessarily need to set errors manually if we use the resolver,
-            // but since we want the resolver to change, we'll re-trigger it.
-            trigger();
-        };
-        validate();
-    }, [currentValues, dynamicSchema, trigger]);
 
     // Auto-save form data to store
     React.useEffect(() => {
