@@ -109,6 +109,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     const studyLang = (study as any).language || 'en';
     const defaultSteps =
         DEFAULT_STUDY_CONTENT[studyLang]?.process_steps || DEFAULT_STUDY_CONTENT.en.process_steps;
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic process steps
     const rawSteps = (study as any).process_steps;
     const steps = rawSteps && rawSteps.length > 0 ? rawSteps : defaultSteps;
 
@@ -145,7 +146,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             <SafeMarkdown>{study.objective}</SafeMarkdown>
                         </div>
 
-                        {/* Institutional Signature */}
+                        {/* biome-ignore lint/suspicious/noExplicitAny: dynamic branding */}
                         {Array.isArray((study.branding as any)?.partners) &&
                             // biome-ignore lint/suspicious/noExplicitAny: dynamic branding
                             (study.branding as any).partners.some((p: any) => !!p.logo_url) && (

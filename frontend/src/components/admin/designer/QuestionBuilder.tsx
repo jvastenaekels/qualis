@@ -87,6 +87,7 @@ interface QuestionItemProps {
     onDelete: () => void;
     activeLocale: string;
     readOnly?: boolean;
+    structureLocked?: boolean;
     availableQuestions: { id: string; label: string | Record<string, string> }[];
 }
 
@@ -97,12 +98,13 @@ const QuestionItem = ({
     onDelete,
     activeLocale,
     readOnly,
+    structureLocked,
     availableQuestions,
 }: QuestionItemProps) => {
     const { t } = useTranslation();
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id,
-        disabled: readOnly,
+        disabled: readOnly || structureLocked,
     });
 
     const style = {
@@ -138,7 +140,7 @@ const QuestionItem = ({
             )}
         >
             <div className="flex items-start p-4 gap-4">
-                {!readOnly && (
+                {!readOnly && !structureLocked && (
                     <div
                         {...attributes}
                         {...listeners}
@@ -192,7 +194,7 @@ const QuestionItem = ({
                                         </span>
                                     </div>
                                 </AccordionTrigger>
-                                {!readOnly && (
+                                {!readOnly && !structureLocked && (
                                     <div className="flex items-center gap-2">
                                         <Button
                                             variant="ghost"
@@ -543,9 +545,10 @@ const QuestionItem = ({
 interface QuestionBuilderProps {
     type: 'pre' | 'post';
     readOnly?: boolean;
+    structureLocked?: boolean;
 }
 
-const QuestionBuilder = ({ type, readOnly }: QuestionBuilderProps) => {
+const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderProps) => {
     const { t } = useTranslation();
     const { draft, updateDraft, activeLocale } = useStudyDesigner();
 
@@ -712,7 +715,7 @@ const QuestionBuilder = ({ type, readOnly }: QuestionBuilderProps) => {
                             data-testid="presort-toggle"
                             checked={!!isPresortEnabled}
                             onCheckedChange={handlePresortToggle}
-                            disabled={readOnly}
+                            disabled={readOnly || structureLocked}
                         />
                     </CardContent>
                 </Card>
@@ -722,7 +725,7 @@ const QuestionBuilder = ({ type, readOnly }: QuestionBuilderProps) => {
             {(type !== 'pre' || !!isPresortEnabled) && (
                 <>
                     <div className="bg-slate-50/60 p-6 rounded-2xl border border-dashed border-slate-200 space-y-6">
-                        {!readOnly && (
+                        {!readOnly && !structureLocked && (
                             <div className="flex items-center gap-2">
                                 <PlusCircle className="size-4 text-indigo-500" />
                                 <span className="text-sm font-bold text-slate-900 tracking-tight">
@@ -731,7 +734,7 @@ const QuestionBuilder = ({ type, readOnly }: QuestionBuilderProps) => {
                             </div>
                         )}
 
-                        {!readOnly && (
+                        {!readOnly && !structureLocked && (
                             <div className="space-y-4">
                                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                     {t('admin.design.questions.basic_fields')}
@@ -760,7 +763,7 @@ const QuestionBuilder = ({ type, readOnly }: QuestionBuilderProps) => {
                             </div>
                         )}
 
-                        {!readOnly && (
+                        {!readOnly && !structureLocked && (
                             <div className="space-y-4">
                                 <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                     {t('admin.design.questions.choice_fields')}
@@ -822,6 +825,7 @@ const QuestionBuilder = ({ type, readOnly }: QuestionBuilderProps) => {
                                             question={q}
                                             activeLocale={activeLocale}
                                             readOnly={readOnly}
+                                            structureLocked={structureLocked}
                                             availableQuestions={questions.slice(0, index)}
                                             onUpdate={(data: QuestionConfig) => {
                                                 // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update

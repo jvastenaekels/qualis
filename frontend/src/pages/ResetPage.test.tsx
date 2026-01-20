@@ -18,13 +18,15 @@ const mockResetResponses = vi.fn();
 
 vi.mocked(useSessionStore).getState = vi.fn(() => ({
     resetSession: mockResetSession,
-})) as any;
+})) as unknown as ReturnType<typeof useSessionStore.getState>;
+
 vi.mocked(useConfigStore).getState = vi.fn(() => ({
     resetConfig: mockResetConfig,
-})) as any;
+})) as unknown as ReturnType<typeof useConfigStore.getState>;
+
 vi.mocked(useResponseStore).getState = vi.fn(() => ({
     resetResponses: mockResetResponses,
-})) as any;
+})) as unknown as ReturnType<typeof useResponseStore.getState>;
 
 describe('ResetPage', () => {
     beforeEach(() => {

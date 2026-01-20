@@ -837,7 +837,11 @@ const StudyDesignPage = () => {
                             </TabsContent>
 
                             <TabsContent value="pre-sort" className="mt-0 outline-none">
-                                <QuestionBuilder type="pre" readOnly={isFullyReadOnly} />
+                                <QuestionBuilder
+                                    type="pre"
+                                    readOnly={isFullyReadOnly}
+                                    structureLocked={isStructureLocked}
+                                />
                             </TabsContent>
 
                             <TabsContent value="condition" className="mt-0 outline-none space-y-6">
@@ -846,9 +850,9 @@ const StudyDesignPage = () => {
 
                             <TabsContent value="q-sort" className="mt-0 outline-none space-y-6">
                                 {isStructureLocked && (
-                                    <div className="p-6 bg-indigo-50/50 border border-indigo-100 rounded-2xl flex items-start gap-4 shadow-sm mb-6 animate-in fade-in duration-500 translate-y-0 text-indigo-900 font-bold">
-                                        <div className="bg-white p-2 rounded-xl border border-indigo-100 shadow-sm shrink-0">
-                                            <Lock className="h-5 w-5 text-indigo-600" />
+                                    <div className="p-6 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-4 shadow-sm mb-6 animate-in fade-in duration-500 translate-y-0 text-amber-900 font-bold">
+                                        <div className="bg-white p-2 rounded-xl border border-amber-100 shadow-sm shrink-0">
+                                            <Lock className="h-5 w-5 text-amber-600" />
                                         </div>
                                         <div className="flex-1 space-y-1">
                                             <h4 className="text-base font-black tracking-tight">
@@ -860,7 +864,7 @@ const StudyDesignPage = () => {
                                             {original?.state === 'draft' && (
                                                 <Button
                                                     variant="link"
-                                                    className="h-auto p-0 text-indigo-700 underline font-bold text-xs mt-2 hover:text-indigo-900"
+                                                    className="h-auto p-0 text-amber-700 underline font-bold text-xs mt-2 hover:text-amber-900"
                                                     onClick={() =>
                                                         navigate(`/admin/studies/${slug}?tab=data`)
                                                     }
@@ -892,16 +896,18 @@ const StudyDesignPage = () => {
                                         </div>
                                     </div>
                                 )}
-                                <GuidanceCard
-                                    title={t(
-                                        'admin.design.guidance.qsort_title',
-                                        'Statement & Grid Balance'
-                                    )}
-                                    description={t(
-                                        'admin.design.guidance.qsort_desc',
-                                        'Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually has between 30 and 60 items for robust factor analysis.'
-                                    )}
-                                />
+                                {!isStructureLocked && (
+                                    <GuidanceCard
+                                        title={t(
+                                            'admin.design.guidance.qsort_title',
+                                            'Statement & Grid Balance'
+                                        )}
+                                        description={t(
+                                            'admin.design.guidance.qsort_desc',
+                                            'Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually has between 30 and 60 items for robust factor analysis.'
+                                        )}
+                                    />
+                                )}
                                 <QSortEditor
                                     readOnly={isFullyReadOnly}
                                     structureLocked={isStructureLocked}
@@ -909,7 +915,10 @@ const StudyDesignPage = () => {
                             </TabsContent>
 
                             <TabsContent value="post-sort" className="mt-0 outline-none">
-                                <PostSortConfigEditor readOnly={isFullyReadOnly} />
+                                <PostSortConfigEditor
+                                    readOnly={isFullyReadOnly}
+                                    structureLocked={isStructureLocked}
+                                />
                             </TabsContent>
 
                             <TabsContent value="interface" className="mt-0 outline-none">

@@ -678,10 +678,13 @@
                     "duplicate_codes": "Duplicate statement codes: {{codes}}",
                     "missing_stmt_translations": "Statement {{index}} missing translations",
                     "invalid_grid_config": "Invalid grid_config: must be a list",
-                    "grid_capacity_mismatch": "Statement count ({{count}}) doesn't match grid capacity ({{capacity}})",
                     "invalid_grid_structure": "Invalid grid_config structure: {{error}}"
                 },
                 "warnings": {
+                    "grid_capacity_mismatch": "Statement count ({{count}}) doesn't match grid capacity ({{capacity}})",
+                    "missing_consent_draft": "Consent title or description missing (draft study)",
+                    "external_branding_logo": "Branding logo uses an external URL: {{url}}",
+                    "external_partner_logo": "Partner logo for '{{name}}' uses an external URL: {{url}}",
                     "external_logo": "Logo URL references external resource - may not be accessible"
                 }
             }
@@ -1130,7 +1133,7 @@
                     "tooltip_title": "Why forced distribution?",
                     "tooltip_desc": "Q-methodology uses a quasi-normal distribution (kurtosis > 0) to ensure participants make meaningful distinctions. The pyramid shape prevents central tendency bias.",
                     "locked": "Design Locked",
-                    "locked_desc": "This study is no longer in draft mode. Modifications are restricted to preserve data integrity for existing participants.",
+                    "locked_desc": "Structural changes (statement codes, grid) are disabled because the study has collected data or is no longer in draft mode. You can still edit text translations.",
                     "locked_active": "Study is Active",
                     "locked_active_desc": "The study is currently collecting data. To modify the design, you must first revert it to draft mode (warning: this may invalidate existing results).",
                     "locked_paused": "Study is Paused",

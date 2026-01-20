@@ -36,6 +36,9 @@ test.describe('Import/Export Study Configuration', () => {
         await testDb.updateStudy(authToken, sourceSlug, {
             statements,
             grid_config: gridConfig,
+            access_password: 'secret-password',
+            start_date: '2025-01-01T00:00:00Z',
+            end_date: '2025-12-31T23:59:59Z',
             translations: [
                 {
                     language_code: 'en',
@@ -104,10 +107,13 @@ test.describe('Import/Export Study Configuration', () => {
         expect(exportedJson.study.slug).toBe(sourceSlug);
         expect(exportedJson.study.statements).toHaveLength(3);
         expect(exportedJson.study.statements[0].translations[0].text).toBe('Original Statement 1');
+        expect(exportedJson.study.access_password).toBe('secret-password');
+        expect(exportedJson.study.start_date).toBe('2025-01-01T00:00:00Z');
+        expect(exportedJson.study.end_date).toBe('2025-12-31T23:59:59Z');
 
         // 4. Import Configuration
         // Navigate back to Dashboard
-        await page.goto('/admin');
+        await page.goto('/admin?dashboard');
 
         // Wait for dashboard to load
         await expect(page.getByText('Workspace Dashboard')).toBeVisible();

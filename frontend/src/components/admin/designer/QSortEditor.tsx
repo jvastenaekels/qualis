@@ -11,7 +11,6 @@ import {
     Minus,
     CheckCircle2,
     AlertCircle,
-    Info,
     Quote,
     Grid3X3,
     Trash2,
@@ -514,23 +513,6 @@ const QSortEditor = ({
                         <Grid3X3 className="h-4 w-4" /> {t('admin.design.qsort.tabs.distribution')}
                     </TabsTrigger>
                 </TabsList>
-
-                {!readOnly && structureLocked && (
-                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-start gap-3">
-                        <Info className="w-5 h-5 text-amber-600 mt-0.5" />
-                        <div>
-                            <h4 className="text-sm font-bold text-amber-900">
-                                {t('admin.design.structure_locked.title', 'Structure Locked')}
-                            </h4>
-                            <p className="text-sm text-amber-700 mt-1">
-                                {t(
-                                    'admin.design.structure_locked.description',
-                                    'Structural changes (statement codes, grid) are disabled because this study has collected data. You can still edit text translations.'
-                                )}
-                            </p>
-                        </div>
-                    </div>
-                )}
 
                 <TabsContent value="statements" className="space-y-8 pt-6">
                     {!readOnly && !structureLocked && (

@@ -695,6 +695,13 @@ async def export_study_config(
             "presort_config": study.presort_config,
             "postsort_config": study.postsort_config,
             "branding": study.branding,
+            "access_password": study.access_password,
+            "start_date": study.start_date.isoformat().replace("+00:00", "Z")
+            if study.start_date
+            else None,
+            "end_date": study.end_date.isoformat().replace("+00:00", "Z")
+            if study.end_date
+            else None,
             "translations": [
                 {
                     "language_code": t.language_code,
@@ -768,46 +775,65 @@ async def validate_study_import(
     elif version != "1.0":
         add_error("unsupported_version", version=version)
 
-    study_data = config.get("study", {})
+    study_data = config.get("study") or {}
+    if not isinstance(study_data, dict):
+        add_error("invalid_structure")
+        study_data = {}
 
     # Validate required fields
-    required = ["slug", "translations", "statements", "grid_config"]
+    required = ["translations", "statements", "grid_config"]
     for field in required:
         if field not in study_data:
             add_error("missing_field", field=field)
 
     # Check translations
-    translations = study_data.get("translations", [])
+    translations = study_data.get("translations") or []
+    if not isinstance(translations, list):
+        add_error("invalid_translations")
+        translations = []
+
     if not translations:
         add_error("no_translations")
 
+    consent_missing = False
     for i, trans in enumerate(translations):
         required_trans = [
             "language_code",
             "title",
             "description",
-            "consent_title",
-            "consent_description",
         ]
         for field in required_trans:
             if field not in trans or not trans[field]:
                 add_error("missing_translation_field", index=i + 1, field=field)
+
+        # Check for missing consent fields (warning only for drafts)
+        if not trans.get("consent_title") or not trans.get("consent_description"):
+            consent_missing = True
 
         # Validate language code
         lang_code = trans.get("language_code", "")
         if lang_code and not re.match(r"^[a-z]{2}(-[A-Z]{2})?$", lang_code):
             add_error("invalid_lang_code", lang=lang_code)
 
+    if consent_missing:
+        add_warning("missing_consent_draft")
+
     # Check statements
-    statements = study_data.get("statements", [])
+    statements = study_data.get("statements") or []
+    if not isinstance(statements, list):
+        add_error("invalid_statements")
+        statements = []
+
     if not statements:
         add_error("no_statements")
 
     # Check for duplicate codes
-    codes = [s.get("code") for s in statements if s.get("code")]
+    codes = [s.get("code") for s in statements if isinstance(s, dict) and s.get("code")]
     duplicates = [code for code in codes if codes.count(code) > 1]
     if duplicates:
-        add_error("duplicate_codes", codes=", ".join(set(duplicates)))
+        add_error(
+            "duplicate_codes", codes=", ".join(set(str(c) for c in duplicates if c))
+        )
 
     # Check statement translations
     for i, stmt in enumerate(statements):
@@ -828,7 +854,7 @@ async def validate_study_import(
                 )
                 statement_count = len(statements)
                 if statement_count != grid_capacity:
-                    add_error(
+                    add_warning(
                         "grid_capacity_mismatch",
                         count=statement_count,
                         capacity=grid_capacity,
@@ -837,14 +863,16 @@ async def validate_study_import(
                 add_error("invalid_grid_structure", error=str(e))
 
     # Check for external resources
-    branding = study_data.get("branding", {})
-    if branding:
+    branding = study_data.get("branding") or {}
+    if isinstance(branding, dict):
         if branding.get("logo_url", "").startswith("http"):
             add_warning("external_logo")
 
-        partners = branding.get("partners", [])
+        partners = branding.get("partners") or []
         for partner in partners:
-            if partner.get("logo_url", "").startswith("http"):
+            if isinstance(partner, dict) and partner.get("logo_url", "").startswith(
+                "http"
+            ):
                 warnings.append(
                     f"Partner '{partner.get('name', 'Unknown')}' logo references external resource"
                 )
@@ -946,6 +974,13 @@ async def import_study_config(
             ),
             symmetry_lock=study_data.get("symmetry_lock", True),
             branding=study_data.get("branding"),
+            access_password=study_data.get("access_password"),
+            start_date=datetime.fromisoformat(study_data.get("start_date"))
+            if study_data.get("start_date")
+            else None,
+            end_date=datetime.fromisoformat(study_data.get("end_date"))
+            if study_data.get("end_date")
+            else None,
         )
         db.add(db_study)
         await db.flush()

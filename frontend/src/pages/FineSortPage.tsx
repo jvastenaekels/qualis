@@ -245,7 +245,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
 
             if (pointerCollisions.length > 0) {
                 // Check for direct slot or deck hit
-                const targetContainer = pointerCollisions.find((c: any) => {
+                const targetContainer = pointerCollisions.find((c) => {
                     const idStr = String(c.id);
                     return idStr.startsWith('slot_') || idStr.startsWith('deck-');
                 });
@@ -253,7 +253,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                 if (targetContainer) return [targetContainer];
 
                 // Check for card hit -> resolve to slot
-                const cardCollision = pointerCollisions.find((c: any) => {
+                const cardCollision = pointerCollisions.find((c) => {
                     return typeof c.id === 'number' || !Number.isNaN(Number(c.id));
                 });
 

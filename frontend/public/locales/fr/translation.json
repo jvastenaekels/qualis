@@ -677,10 +677,13 @@
                     "duplicate_codes": "Codes d'énoncés en double : {{codes}}",
                     "missing_stmt_translations": "L'énoncé {{index}} n'a pas de traduction",
                     "invalid_grid_config": "Configuration de grille invalide : doit être une liste",
-                    "grid_capacity_mismatch": "La nombre d'énoncés ({{count}}) ne correspond pas à la capacité de la grille ({{capacity}})",
                     "invalid_grid_structure": "Structure de grille invalide : {{error}}"
                 },
                 "warnings": {
+                    "grid_capacity_mismatch": "La nombre d'énoncés ({{count}}) ne correspond pas à la capacité de la grille ({{capacity}})",
+                    "missing_consent_draft": "Titre ou description du consentement manquant (étude en brouillon)",
+                    "external_branding_logo": "Le logo de la marque utilise une URL externe : {{url}}",
+                    "external_partner_logo": "Le logo du partenaire '{{name}}' utilise une URL externe : {{url}}",
                     "external_logo": "L'URL du logo fait référence à une ressource externe - elle pourrait ne pas être accessible"
                 }
             }
@@ -1129,7 +1132,7 @@
                     "tooltip_title": "Logique de distribution",
                     "tooltip_desc": "Dans la méthode Q, une distribution forcée est généralement quasi-normale. Cela oblige le participant à faire des choix difficiles et à discriminer clairement entre les items.",
                     "locked": "Conception verrouillée",
-                    "locked_desc": "Cette étude n'est plus en mode brouillon. Les modifications sont restreintes pour préserver l'intégrité des données.",
+                    "locked_desc": "Les changements structurels (codes des énoncés, grille) sont désactivés car l'étude a recueilli des données ou n'est plus en mode brouillon. Vous pouvez toujours modifier les textes des traductions.",
                     "locked_active": "L'étude est active",
                     "locked_active_desc": "L'étude collecte actuellement des données. Pour modifier la conception, vous devez d'abord la repasser en brouillon (attention : cela peut invalider les résultats existants).",
                     "locked_paused": "L'étude est en pause",

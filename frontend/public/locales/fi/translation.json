@@ -678,10 +678,13 @@
                     "duplicate_codes": "Väitteiden tunnisteissa on kaksoiskappaleita: {{codes}}",
                     "missing_stmt_translations": "Väitteeltä {{index}} puuttuu käännökset",
                     "invalid_grid_config": "Virheellinen grid_config: on oltava lista",
-                    "grid_capacity_mismatch": "Väitteiden määrä ({{count}}) ei vastaa ruudukon kapasiteettia ({{capacity}})",
                     "invalid_grid_structure": "Virheellinen grid_config-rakenne: {{error}}"
                 },
                 "warnings": {
+                    "grid_capacity_mismatch": "Väitteiden määrä ({{count}}) ei vastaa ruudukon kapasiteettia ({{capacity}})",
+                    "missing_consent_draft": "Suostumuksen otsikko tai kuvaus puuttuu (luonnostila)",
+                    "external_branding_logo": "Brändilogo käyttää ulkoista URL-osoitetta: {{url}}",
+                    "external_partner_logo": "Kumppanin '{{name}}' logo käyttää ulkoista URL-osoitetta: {{url}}",
                     "external_logo": "Logon URL viittaa ulkoiseen resurssiin - se ei ehkä ole saavutettavissa"
                 }
             }
@@ -1130,7 +1133,7 @@
                     "tooltip_title": "Jakauman logiikka",
                     "tooltip_desc": "Q-metodologiassa pakotettu jakauma on yleensä lähes normaali. Tämä pakottaa osallistujan tekemään vaikeita valintoja ja erottelemaan kohteet selkeästi.",
                     "locked": "Suunnittelu lukittu",
-                    "locked_desc": "Tämä tutkimus ei ole enää luonnostilassa. Muutoksia on rajoitettu tietojen eheyden säilyttämiseksi.",
+                    "locked_desc": "Rakenteelliset muutokset (väittämäkoodit, ruudukko) on poistettu käytöstä, koska tutkimus on kerännyt aineistoa tai se ei ole enää luonnostilassa. Voit silti muokata käännöksiä.",
                     "locked_active": "Tutkimus on aktiivinen",
                     "locked_active_desc": "Tutkimus kerää parhaillaan tietoja. Muokataksesi suunnittelua, sinun on ensin palautettava se luonnostilaan (varoitus: tämä voi mitätöidä olemassa olevat tulokset).",
                     "locked_paused": "Tutkimus on keskeytetty",

@@ -19,7 +19,13 @@ import QuestionBuilder from './QuestionBuilder';
 
 import { useTranslation } from 'react-i18next';
 
-const PostSortConfigEditor = ({ readOnly }: { readOnly?: boolean }) => {
+const PostSortConfigEditor = ({
+    readOnly,
+    structureLocked,
+}: {
+    readOnly?: boolean;
+    structureLocked?: boolean;
+}) => {
     const { t, i18n } = useTranslation();
     const { draft, activeLocale, updateDraft } = useStudyDesigner();
     const [selectedScore, setSelectedScore] = useState<number | null>(null);
@@ -166,17 +172,21 @@ const PostSortConfigEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                         <span className="text-sm text-slate-400 font-medium italic">
                                             {t('admin.design.postsort.extreme.no_columns')}
                                         </span>
-                                        {availableScores.length >= 2 && !readOnly && (
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={addDefaultExtremes}
-                                                className="h-8 rounded-lg text-indigo-600 border-indigo-100 hover:bg-indigo-50"
-                                            >
-                                                <Plus className="h-3.5 w-3.5 mr-1.5" />
-                                                {t('admin.design.postsort.extreme.add_defaults')}
-                                            </Button>
-                                        )}
+                                        {availableScores.length >= 2 &&
+                                            !readOnly &&
+                                            !structureLocked && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={addDefaultExtremes}
+                                                    className="h-8 rounded-lg text-indigo-600 border-indigo-100 hover:bg-indigo-50"
+                                                >
+                                                    <Plus className="h-3.5 w-3.5 mr-1.5" />
+                                                    {t(
+                                                        'admin.design.postsort.extreme.add_defaults'
+                                                    )}
+                                                </Button>
+                                            )}
                                     </div>
                                 ) : (
                                     extremeColumns.map((score: number) => (
@@ -187,7 +197,7 @@ const PostSortConfigEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                         >
                                             {score > 0 ? '+' : ''}
                                             {score}
-                                            {!readOnly && (
+                                            {!readOnly && !structureLocked && (
                                                 <button
                                                     type="button"
                                                     onClick={() => removeExtremeColumn(score)}
@@ -201,7 +211,7 @@ const PostSortConfigEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 )}
                             </div>
 
-                            {unselectedScores.length > 0 && !readOnly && (
+                            {unselectedScores.length > 0 && !readOnly && !structureLocked && (
                                 <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
                                     <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
                                         {t('admin.design.postsort.extreme.add_label')}
@@ -347,7 +357,7 @@ const PostSortConfigEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                         if (checked === allowRandomComments) return;
                                         toggleAllowRandomComments(checked);
                                     }}
-                                    disabled={readOnly}
+                                    disabled={readOnly || structureLocked}
                                 />
                             </div>
                         </CardHeader>
@@ -372,7 +382,7 @@ const PostSortConfigEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                         if (checked === allowMissingStatements) return;
                                         toggleAllowMissingStatements(checked);
                                     }}
-                                    disabled={readOnly}
+                                    disabled={readOnly || structureLocked}
                                 />
                             </div>
                         </CardHeader>
@@ -422,7 +432,11 @@ const PostSortConfigEditor = ({ readOnly }: { readOnly?: boolean }) => {
                             </div>
                         </CardHeader>
                         <CardContent className="pb-8">
-                            <QuestionBuilder type="post" readOnly={readOnly} />
+                            <QuestionBuilder
+                                type="post"
+                                readOnly={readOnly}
+                                structureLocked={structureLocked}
+                            />
                         </CardContent>
                     </Card>
 
