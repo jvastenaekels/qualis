@@ -29,7 +29,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             },
             {
                 id: 'fine',
-                title: 'Your perspective',
+                title: 'Grid Sorting',
                 description:
                     'Place the statements onto the grid to refine your point of view, prioritizing what matters most to you.',
                 icon: 'Target',
@@ -37,7 +37,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             },
             {
                 id: 'post',
-                title: 'Why',
+                title: 'Almost done!',
                 description: 'A few words to explain your most significant choices.',
                 icon: 'MessageSquare',
                 color: '#10b981',
@@ -81,7 +81,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             },
             {
                 id: 'fine',
-                title: 'Votre perspective',
+                title: 'Placement sur la grille',
                 description:
                     'Placez les énoncés sur la grille pour affiner votre point de vue, en priorisant ce qui compte le plus pour vous.',
                 icon: 'Target',
@@ -89,7 +89,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             },
             {
                 id: 'post',
-                title: 'Pourquoi',
+                title: 'Presque fini !',
                 description: 'Quelques mots pour expliquer vos choix les plus significatifs.',
                 icon: 'MessageSquare',
                 color: '#10b981',
@@ -133,7 +133,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             },
             {
                 id: 'fine',
-                title: 'Näkökulmasi',
+                title: 'Ruudukkoasettelu',
                 description:
                     'Aseta väittämät ruudukkoon tarkentaaksesi näkökulmaasi ja priorisoidaksesi sinulle tärkeimmät asiat.',
                 icon: 'Target',
@@ -141,7 +141,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             },
             {
                 id: 'post',
-                title: 'Miksi',
+                title: 'Melkein valmista!',
                 description: 'Muutama sana merkittävimpien valintojesi selittämiseksi.',
                 icon: 'MessageSquare',
                 color: '#10b981',
