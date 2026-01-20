@@ -24,6 +24,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import type { PreSortField } from '../schemas/study';
 import { SurveyField } from '../components/survey/SurveyField';
+import { useViewport } from '@/contexts/ViewportContext';
 
 import { evaluateVisibilityCondition } from '../utils/visibilityEvaluator';
 
@@ -32,6 +33,7 @@ interface PostSortPageProps {
 }
 
 const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey }) => {
+    const { isDesktop } = useViewport();
     const config = useConfigStore((state) => state.config);
     const session = useSessionStore((state) => ({
         isCompleted: state.isCompleted,
@@ -507,11 +509,20 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                                         return !isExtreme && !isAdded;
                                     })
                                     .sort((a, b) => a.statementId - b.statementId)
-                                    .map((s) => (
-                                        <option key={s.statementId} value={s.statementId}>
-                                            {`S${s.statementId}: ${getCardText(s.statementId).substring(0, 35)}${getCardText(s.statementId).length > 35 ? '...' : ''}`}
-                                        </option>
-                                    ))}
+                                    .map((s) => {
+                                        const text = getCardText(s.statementId);
+                                        const truncateLen = isDesktop ? 80 : 35;
+                                        const displayLabel =
+                                            text.length > truncateLen
+                                                ? `${text.substring(0, truncateLen)}...`
+                                                : text;
+
+                                        return (
+                                            <option key={s.statementId} value={s.statementId}>
+                                                {`S${s.statementId}: ${displayLabel}`}
+                                            </option>
+                                        );
+                                    })}
                             </select>
                         </div>
 
