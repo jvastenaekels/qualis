@@ -130,6 +130,15 @@ const StudyLayoutContent: React.FC = () => {
         }
     }, [sessionLanguage, configLoading]);
 
+    // Browser Tab Title Management
+    useEffect(() => {
+        if (config?.title) {
+            document.title = `${config.title} | ${t('layout.title', 'Libre-Q')}`;
+        } else {
+            document.title = t('layout.title', 'Libre-Q');
+        }
+    }, [config?.title, t]);
+
     const changeLanguage = (lng: string) => {
         // Sync store (this will trigger config refetch)
         useSessionStore.getState().setLanguage(lng);
