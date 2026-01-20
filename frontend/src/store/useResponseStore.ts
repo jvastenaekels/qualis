@@ -223,6 +223,8 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             },
 
             setPostSortResponse: (field, value) => {
+                const current = get().postsort[field];
+                if (JSON.stringify(current) === JSON.stringify(value)) return;
                 set((state) => ({
                     postsort: {
                         ...state.postsort,

@@ -151,14 +151,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
 
     const currentValues = watch();
 
-
     // Auto-save form data to store
     React.useEffect(() => {
         const subscription = watch((value) => {
-            setPostSortResponse(
-                'questions_answers',
-                value as any
-            );
+            setPostSortResponse('questions_answers', value as any);
         });
         return () => subscription.unsubscribe();
     }, [watch, setPostSortResponse]);
@@ -199,7 +195,9 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 const promptConfig = (prompts as Record<string, unknown>)[key];
                 if (promptConfig) {
                     if (typeof promptConfig === 'string') return promptConfig;
-                    const text = (promptConfig as Record<string, string>)[currentLang] || (promptConfig as Record<string, string>).en;
+                    const text =
+                        (promptConfig as Record<string, string>)[currentLang] ||
+                        (promptConfig as Record<string, string>).en;
                     if (text) return text;
                 }
             }

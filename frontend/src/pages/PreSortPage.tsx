@@ -121,8 +121,6 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
 
     const currentValues = watch();
 
-
-
     // Auto-save form data to store
     React.useEffect(() => {
         const subscription = watch((value) => {

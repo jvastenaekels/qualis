@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { StudyTranslationRead, StudyTranslationCreate } from '@/api/model';
 import {
@@ -86,13 +86,13 @@ const StudyDesignPage = () => {
     const [showLeftArrow, setShowLeftArrow] = useState(false);
     const [showRightArrow, setShowRightArrow] = useState(false);
 
-    const checkScroll = () => {
+    const checkScroll = useCallback(() => {
         if (tabsListRef.current) {
             const { scrollLeft, scrollWidth, clientWidth } = tabsListRef.current;
             setShowLeftArrow(scrollLeft > 0);
             setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 2);
         }
-    };
+    }, []);
 
     useEffect(() => {
         const timer = setTimeout(checkScroll, 100);

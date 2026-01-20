@@ -398,7 +398,9 @@ const QuestionItem = ({
 
                                                     <div className="space-y-2">
                                                         <Label className="text-[10px] font-bold text-slate-500 uppercase">
-                                                            {t('admin.design.questions.logic.value')}
+                                                            {t(
+                                                                'admin.design.questions.logic.value'
+                                                            )}
                                                         </Label>
                                                         <Input
                                                             value={
