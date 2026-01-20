@@ -15,12 +15,13 @@ import { queryClient } from './lib/queryClient';
 
 // Handle chunk loading failures (e.g., after deployments with new asset hashes)
 // This prevents users from seeing broken pages due to stale cached HTML
-window.addEventListener('error', (event) => {
-    // Check if this is a chunk loading error
+const handleChunkError = (error: string | Error | undefined) => {
+    const errorMessage = typeof error === 'string' ? error : error?.message || '';
     if (
-        event.message.includes('Failed to fetch dynamically imported module') ||
-        event.message.includes('Importing a module script failed') ||
-        event.filename?.includes('/assets/')
+        errorMessage.includes('Failed to fetch dynamically imported module') ||
+        errorMessage.includes('Importing a module script failed') ||
+        errorMessage.includes('loading chunk') ||
+        errorMessage.includes('NetworkError when attempting to fetch resource')
     ) {
         console.warn('Chunk loading failed, reloading page to fetch latest version...');
         // Store that we tried to reload to prevent infinite loops
@@ -34,6 +35,14 @@ window.addEventListener('error', (event) => {
             console.error('Failed to load after reload, this may be a network issue');
         }
     }
+};
+
+window.addEventListener('error', (event) => {
+    handleChunkError(event.message || event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    handleChunkError(event.reason);
 });
 
 // Clear reload flag on successful load

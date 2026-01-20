@@ -27,8 +27,10 @@ export function StudySwitcher() {
     const { isMobile } = useSidebar();
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const { data: studies, isLoading } = useListStudiesApiAdminStudiesGet();
     const { activeStudyId, setActiveStudy, activeWorkspaceId } = useAdminStore();
+    const { data: studies, isLoading } = useListStudiesApiAdminStudiesGet({
+        query: { enabled: !!activeWorkspaceId },
+    });
     const [showCreateDialog, setShowCreateDialog] = React.useState(false);
 
     const filteredStudies = studies?.filter((s) => s.workspace_id === activeWorkspaceId);
@@ -106,7 +108,7 @@ export function StudySwitcher() {
                             </SidebarMenuButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
-                            className="w-[--radix-dropdown-menu-trigger-width] min-w-64 rounded-xl border-white/20 bg-white/80 backdrop-blur-xl shadow-2xl p-2 animate-in fade-in-0 zoom-in-95"
+                            className="w-[--radix-dropdown-menu-trigger-width] min-w-64 rounded-xl border-slate-200 bg-white backdrop-blur-xl shadow-2xl p-2 animate-in fade-in-0 zoom-in-95"
                             align="start"
                             side={isMobile ? 'bottom' : 'right'}
                             sideOffset={4}

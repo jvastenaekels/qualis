@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Plus, Layout, TrendingUp, ExternalLink, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
@@ -21,15 +21,12 @@ export function AdminDashboard() {
     const { setActiveStudy } = useAdminStore();
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [showImportDialog, setShowImportDialog] = useState(false);
-    const { data: allStudies, isLoading, refetch } = useListStudiesApiAdminStudiesGet();
+    const { data: allStudies, isLoading } = useListStudiesApiAdminStudiesGet({
+        query: {
+            enabled: !!currentWorkspace?.id,
+        },
+    });
     const { t, i18n } = useTranslation();
-
-    // Refetch studies when workspace changes
-    useEffect(() => {
-        if (currentWorkspace?.id) {
-            refetch();
-        }
-    }, [currentWorkspace?.id, refetch]);
 
     // biome-ignore lint/suspicious/noExplicitAny: date locales from date-fns
     const dateLocales: Record<string, any> = {

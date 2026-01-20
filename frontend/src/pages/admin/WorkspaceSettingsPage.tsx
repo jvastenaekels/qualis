@@ -572,122 +572,124 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                     {t('admin.workspaces.settings.team.invite_button')}
                 </Button>
             </DialogTrigger>
-            <DialogContent className="rounded-2xl border-white/20 glass shadow-2xl max-w-sm">
-                <DialogHeader>
-                    <DialogTitle className="text-xl font-black text-slate-900">
-                        {t('admin.workspaces.settings.team.invite_modal.title')}
-                    </DialogTitle>
-                    <DialogDescription>
-                        {t('admin.workspaces.settings.team.invite_modal.desc')}
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent className="rounded-2xl border-slate-200 bg-white shadow-2xl max-w-sm p-0 overflow-hidden">
+                <div className="p-6">
+                    <DialogHeader className="mb-4">
+                        <DialogTitle className="text-2xl font-black text-slate-900 leading-tight">
+                            {t('admin.workspaces.settings.team.invite_modal.title')}
+                        </DialogTitle>
+                        <DialogDescription className="text-sm font-medium text-slate-600 mt-2">
+                            {t('admin.workspaces.settings.team.invite_modal.desc')}
+                        </DialogDescription>
+                    </DialogHeader>
 
-                {!inviteUrl ? (
-                    <form onSubmit={handleInvite} className="space-y-4 pt-4">
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                {t('admin.workspaces.settings.team.invite_modal.email_label')}
-                            </Label>
-                            <Input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="researcher@university.edu"
-                                className="h-11 rounded-xl bg-white/50"
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                {t('admin.workspaces.settings.team.invite_modal.role_label')}
-                            </Label>
-                            <Select
-                                value={role}
-                                onValueChange={(val) => setRole(val as WorkspaceRole)}
-                            >
-                                <SelectTrigger className="h-11 rounded-xl bg-white/50 border-slate-200">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-xl border-white/20 glass shadow-2xl">
-                                    <SelectItem
-                                        value="researcher"
-                                        className="text-xs font-bold py-2 rounded-lg m-1"
-                                    >
-                                        Researcher
-                                    </SelectItem>
-                                    <SelectItem
-                                        value="viewer"
-                                        className="text-xs font-bold py-2 rounded-lg m-1"
-                                    >
-                                        Viewer
-                                    </SelectItem>
-                                    <SelectItem
-                                        value="owner"
-                                        className="text-xs font-bold py-2 rounded-lg m-1"
-                                    >
-                                        Admin (Owner)
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-                        <DialogFooter className="pt-2">
-                            <Button
-                                type="submit"
-                                className="w-full h-11 rounded-xl bg-slate-900 font-bold"
-                                disabled={inviteMutation.isPending}
-                            >
-                                {inviteMutation.isPending ? (
-                                    <Loader2 className="size-4 animate-spin mr-2" />
-                                ) : (
-                                    <Mail className="size-4 mr-2" />
-                                )}
-                                {t('admin.workspaces.settings.team.invite_modal.send')}
-                            </Button>
-                        </DialogFooter>
-                    </form>
-                ) : (
-                    <div className="space-y-4 pt-4">
-                        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 space-y-3">
-                            <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
-                                <Check className="size-4" />
-                                {t('admin.workspaces.settings.team.invite_modal.success')}
-                            </div>
-                            <div className="relative group">
+                    {!inviteUrl ? (
+                        <form onSubmit={handleInvite} className="space-y-4 pt-4">
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-700">
+                                    {t('admin.workspaces.settings.team.invite_modal.email_label')}
+                                </Label>
                                 <Input
-                                    readOnly
-                                    value={inviteUrl}
-                                    className="pr-10 bg-white/80 border-emerald-200 text-xs font-mono"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="researcher@university.edu"
+                                    className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:bg-white transition-colors"
+                                    required
                                 />
-                                <Button
-                                    size="sm"
-                                    variant="ghost"
-                                    className="absolute right-1 top-1/2 -translate-y-1/2 size-8 p-0"
-                                    onClick={copyToClipboard}
-                                >
-                                    {copied ? (
-                                        <Check className="size-3 text-emerald-600" />
-                                    ) : (
-                                        <Copy className="size-3 text-slate-400" />
-                                    )}
-                                </Button>
                             </div>
-                            <p className="text-[10px] text-emerald-600/70 italic">
-                                {t('admin.workspaces.settings.team.invite_modal.copy_hint')}
-                            </p>
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-700">
+                                    {t('admin.workspaces.settings.team.invite_modal.role_label')}
+                                </Label>
+                                <Select
+                                    value={role}
+                                    onValueChange={(val) => setRole(val as WorkspaceRole)}
+                                >
+                                    <SelectTrigger className="h-11 rounded-xl bg-slate-50 border-slate-200">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-xl border-slate-200 bg-white shadow-2xl">
+                                        <SelectItem
+                                            value="researcher"
+                                            className="text-xs font-bold py-2 rounded-lg m-1"
+                                        >
+                                            Researcher
+                                        </SelectItem>
+                                        <SelectItem
+                                            value="viewer"
+                                            className="text-xs font-bold py-2 rounded-lg m-1"
+                                        >
+                                            Viewer
+                                        </SelectItem>
+                                        <SelectItem
+                                            value="owner"
+                                            className="text-xs font-bold py-2 rounded-lg m-1"
+                                        >
+                                            Admin (Owner)
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <DialogFooter className="pt-2">
+                                <Button
+                                    type="submit"
+                                    className="w-full h-11 rounded-xl bg-slate-900 font-bold"
+                                    disabled={inviteMutation.isPending}
+                                >
+                                    {inviteMutation.isPending ? (
+                                        <Loader2 className="size-4 animate-spin mr-2" />
+                                    ) : (
+                                        <Mail className="size-4 mr-2" />
+                                    )}
+                                    {t('admin.workspaces.settings.team.invite_modal.send')}
+                                </Button>
+                            </DialogFooter>
+                        </form>
+                    ) : (
+                        <div className="space-y-4 pt-4">
+                            <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 space-y-3">
+                                <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
+                                    <Check className="size-4" />
+                                    {t('admin.workspaces.settings.team.invite_modal.success')}
+                                </div>
+                                <div className="relative group">
+                                    <Input
+                                        readOnly
+                                        value={inviteUrl}
+                                        className="pr-10 bg-white/80 border-emerald-200 text-xs font-mono"
+                                    />
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="absolute right-1 top-1/2 -translate-y-1/2 size-8 p-0"
+                                        onClick={copyToClipboard}
+                                    >
+                                        {copied ? (
+                                            <Check className="size-3 text-emerald-600" />
+                                        ) : (
+                                            <Copy className="size-3 text-slate-400" />
+                                        )}
+                                    </Button>
+                                </div>
+                                <p className="text-[10px] text-emerald-600/70 italic">
+                                    {t('admin.workspaces.settings.team.invite_modal.copy_hint')}
+                                </p>
+                            </div>
+                            <Button
+                                variant="outline"
+                                className="w-full h-11 rounded-xl border-slate-200 text-slate-600 font-bold hover:bg-slate-50"
+                                onClick={() => {
+                                    setOpen(false);
+                                    setInviteUrl(null);
+                                    setEmail('');
+                                }}
+                            >
+                                {t('common.close')}
+                            </Button>
                         </div>
-                        <Button
-                            variant="outline"
-                            className="w-full rounded-xl"
-                            onClick={() => {
-                                setOpen(false);
-                                setInviteUrl(null);
-                                setEmail('');
-                            }}
-                        >
-                            {t('common.close')}
-                        </Button>
-                    </div>
-                )}
+                    )}
+                </div>
             </DialogContent>
         </Dialog>
     );

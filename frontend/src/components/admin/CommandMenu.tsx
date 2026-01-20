@@ -29,8 +29,13 @@ export const CommandMenu = () => {
     const navigate = useNavigate();
     const { activeStudyId, activeWorkspaceId, setActiveWorkspace, setActiveStudy } =
         useAdminStore();
-    const { logout, setCurrentWorkspace } = useAuthStore();
-    const { data: studies } = useListStudiesApiAdminStudiesGet();
+    const { logout, setCurrentWorkspace, currentWorkspace } = useAuthStore();
+    // Studies query enabled only when workspace is present
+    const { data: studies } = useListStudiesApiAdminStudiesGet({
+        query: {
+            enabled: !!currentWorkspace?.id,
+        },
+    });
     const { data: workspaces } = useListWorkspacesApiAdminWorkspacesGet();
     const { t } = useTranslation();
 
@@ -82,7 +87,7 @@ export const CommandMenu = () => {
             label={t('admin.command_menu.title', 'Global Command Menu')}
             className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4 bg-slate-950/20 backdrop-blur-md transition-all duration-300"
         >
-            <div className="w-full max-w-[640px] rounded-2xl border border-white/20 bg-white/80 dark:bg-slate-900/80 shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 backdrop-saturate-150">
+            <div className="w-full max-w-[640px] rounded-2xl border border-slate-200 bg-white shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95">
                 <div className="flex items-center border-b border-border/50 px-4">
                     <Search className="mr-2 h-4 w-4 shrink-0 text-muted-foreground opacity-50" />
                     <Command.Input

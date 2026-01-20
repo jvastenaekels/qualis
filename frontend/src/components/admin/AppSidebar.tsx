@@ -168,7 +168,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const location = useLocation();
     const { t } = useTranslation();
 
-    const { data: studies } = useListStudiesApiAdminStudiesGet();
+    const { data: studies } = useListStudiesApiAdminStudiesGet({
+        query: {
+            enabled: !!activeWorkspaceId,
+        },
+    });
     const isValidStudy =
         activeStudyId &&
         studies?.some((s) => s.slug === activeStudyId && s.workspace_id === activeWorkspaceId);
