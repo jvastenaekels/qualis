@@ -97,6 +97,7 @@ export const StudyConfigSchema = z.object({
         .object({
             extreme_columns: z.array(z.number()).optional(),
             ask_missing: z.boolean().optional(),
+            missing_statements_enabled: z.boolean().optional(),
             ask_general_comment: z.boolean().optional(),
             prompts: z
                 .object({
@@ -105,6 +106,7 @@ export const StudyConfigSchema = z.object({
                     extreme_negative: z.union([z.string(), z.record(z.string())]).optional(),
                     extreme_neutral: z.union([z.string(), z.record(z.string())]).optional(),
                     missing: z.union([z.string(), z.record(z.string())]).optional(),
+                    missing_statements: z.union([z.string(), z.record(z.string())]).optional(),
                     general: z.union([z.string(), z.record(z.string())]).optional(),
                 })
                 .optional(),

@@ -1,4 +1,5 @@
 import { screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, it, expect } from 'vitest';
 import PostSortConfigEditor from './PostSortConfigEditor';
 import { renderWithStore } from '@/test-utils/renderWithStore';
@@ -25,19 +26,28 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         });
     };
 
-    it('renders email collection toggle', () => {
+    const switchToStep2 = async (user: any) => {
+        await user.click(screen.getByText('Step 2: Questions'));
+        await screen.findByText('Participant Follow-up');
+    };
+
+    it('renders email collection toggle', async () => {
+        const user = userEvent.setup();
         renderEditor({ draft: { postsort_config: {}, grid_config: [] } });
+        await switchToStep2(user);
 
         expect(screen.getByText('Participant Follow-up')).toBeInTheDocument();
     });
 
-    it('shows sub-toggles when email collection is enabled', () => {
+    it('shows sub-toggles when email collection is enabled', async () => {
+        const user = userEvent.setup();
         renderEditor({
             draft: {
                 postsort_config: { email_collection_enabled: true },
                 grid_config: [],
             },
         });
+        await switchToStep2(user);
 
         expect(screen.getByText('Offer follow-up')).toBeInTheDocument();
         expect(
@@ -45,13 +55,15 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         ).toBeInTheDocument();
     });
 
-    it('hides sub-toggles when email collection is disabled', () => {
+    it('hides sub-toggles when email collection is disabled', async () => {
+        const user = userEvent.setup();
         renderEditor({
             draft: {
                 postsort_config: { email_collection_enabled: false },
                 grid_config: [],
             },
         });
+        await switchToStep2(user);
 
         expect(screen.queryByText('Offer follow-up')).not.toBeInTheDocument();
         expect(
@@ -59,13 +71,15 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         ).not.toBeInTheDocument();
     });
 
-    it('toggles email_collection_enabled with defensive check', () => {
+    it('toggles email_collection_enabled with defensive check', async () => {
+        const user = userEvent.setup();
         renderEditor({
             draft: {
                 postsort_config: { email_collection_enabled: false },
                 grid_config: [],
             },
         });
+        await switchToStep2(user);
 
         const switches = screen.getAllByRole('switch');
         const emailToggle = switches.find((s) =>
@@ -75,7 +89,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         expect(emailToggle).toBeDefined();
 
         if (emailToggle) {
-            fireEvent.click(emailToggle);
+            await user.click(emailToggle);
 
             // Access store to verify
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure
@@ -84,7 +98,8 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         }
     });
 
-    it('defaults interview_consent_enabled to true when undefined', () => {
+    it('defaults interview_consent_enabled to true when undefined', async () => {
+        const user = userEvent.setup();
         renderEditor({
             draft: {
                 postsort_config: {
@@ -94,6 +109,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
                 grid_config: [],
             },
         });
+        await switchToStep2(user);
 
         const switches = screen.getAllByRole('switch');
         const interviewSwitch = switches.find((s) =>
@@ -103,7 +119,8 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         expect(interviewSwitch).toHaveAttribute('data-state', 'checked');
     });
 
-    it('defaults newsletter_consent_enabled to true when undefined', () => {
+    it('defaults newsletter_consent_enabled to true when undefined', async () => {
+        const user = userEvent.setup();
         renderEditor({
             draft: {
                 postsort_config: {
@@ -113,6 +130,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
                 grid_config: [],
             },
         });
+        await switchToStep2(user);
 
         const switches = screen.getAllByRole('switch');
         const newsletterSwitch = switches.find((s) =>
@@ -124,7 +142,8 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         expect(newsletterSwitch).toHaveAttribute('data-state', 'checked');
     });
 
-    it('toggles interview_consent_enabled correctly', () => {
+    it('toggles interview_consent_enabled correctly', async () => {
+        const user = userEvent.setup();
         renderEditor({
             draft: {
                 postsort_config: {
@@ -134,6 +153,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
                 grid_config: [],
             },
         });
+        await switchToStep2(user);
 
         const switches = screen.getAllByRole('switch');
         const interviewSwitch = switches.find((s) =>
@@ -141,7 +161,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         );
 
         if (interviewSwitch) {
-            fireEvent.click(interviewSwitch);
+            await user.click(interviewSwitch);
 
             // Check store
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure

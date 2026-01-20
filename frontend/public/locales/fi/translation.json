@@ -319,7 +319,7 @@
             "placeholder": "Kommenttisi tähän..."
         },
         "submit": "Lähetä vastaukset",
-        "validation_error": "Ole hyvä ja selitä lyhyesti tärkeimmät valintasi jatkaaksesi.",
+        "validation_error": "Täytä kaikki pakolliset kentät.",
         "success": {
             "title": "Kiitos osallistumisestasi!",
             "message": "Vastauksesi tutkimukseen on tallennettu.",
@@ -1158,6 +1158,16 @@
                 "custom": {
                     "title": "Mukautetut kysymykset",
                     "desc": "Lisää mukautettuja kysymyksiä jälkikyselyyn."
+                },
+                "missing": {
+                    "title": "Puuttuvat väittämät",
+                    "desc": "Salli osallistujien ehdottaa väittämiä, joiden he kokivat puuttuvan tutkimuksesta.",
+                    "prompt_label": "Kysymysteksti",
+                    "prompt_placeholder": "Puuttuiko tästä väittämäsarjasta mielestäsi joitain ideoita tai näkökulmia?"
+                },
+                "steps": {
+                    "step1": "Vaihe 1: Palaute",
+                    "step2": "Vaihe 2: Kysymykset"
                 },
                 "email": {
                     "title": "Osallistujan seuranta",

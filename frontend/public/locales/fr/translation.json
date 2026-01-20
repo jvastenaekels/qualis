@@ -1158,6 +1158,16 @@
                     "title": "Questions personnalisées",
                     "desc": "Ajouter des questions personnalisées au questionnaire post-tri."
                 },
+                "missing": {
+                   "title": "Énoncés manquants",
+                   "desc": "Permettre aux participants de suggérer des énoncés qu'ils ont trouvé manquants dans l'étude.",
+                   "prompt_label": "Texte de la question",
+                   "prompt_placeholder": "Y a-t-il des idées ou perspectives qui manquaient selon vous dans ce jeu d'énoncés ?"
+                },
+                "steps": {
+                    "step1": "Étape 1 : Retours",
+                    "step2": "Étape 2 : Questions"
+                },
                 "email": {
                     "title": "Suivi des participants",
                     "desc": "Collecter les adresses email pour un recontact ou l'envoi des résultats.",

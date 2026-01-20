@@ -319,7 +319,7 @@
             "placeholder": "Your comment here..."
         },
         "submit": "Share my perspective",
-        "validation_error": "Please briefly explain your key choices to continue.",
+        "validation_error": "Please fill in all required fields.",
         "success": {
             "title": "Thank you for your participation!",
             "message": "Your contribution to the study has been saved.",
@@ -1158,6 +1158,16 @@
                 "custom": {
                     "title": "Custom questions",
                     "desc": "Add custom questions to the post-sort survey."
+                },
+                "missing": {
+                    "title": "Missing Statements",
+                    "desc": "Allow participants to suggest statements they felt were missing from the study.",
+                    "prompt_label": "Prompt Text",
+                    "prompt_placeholder": "Were there any ideas or perspectives you felt were missing from this set of statements?"
+                },
+                "steps": {
+                    "step1": "Step 1: Feedback",
+                    "step2": "Step 2: Questions"
                 },
                 "email": {
                     "title": "Participant Follow-up",

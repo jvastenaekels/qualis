@@ -7,18 +7,7 @@ import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test-utils/test-utils';
 import PostSortPage from './PostSortPage';
-
-// Mock GridSort
-vi.mock('../components/GridSort', () => ({
-    // biome-ignore lint/suspicious/noExplicitAny: mock props
-    default: ({ isAllPlaced, onValidate, showCodes }: any) => (
-        <div data-testid="grid-sort">
-            {/* biome-ignore lint/a11y/useButtonType: mock component */}
-            <button onClick={() => onValidate(isAllPlaced)}>Validate</button>
-            {showCodes && <span>Show Codes</span>}
-        </div>
-    ),
-}));
+import userEvent from '@testing-library/user-event';
 
 // Mock dependencies
 vi.mock('../hooks/useSubmitStudy', () => ({
@@ -46,7 +35,7 @@ describe('PostSortPage', () => {
         useResponseStore.getState().resetResponses();
         useSessionStore.getState().resetSession();
 
-        // Setup basic config
+        // Setup base config
         useConfigStore.setState({
             config: {
                 statements: [
@@ -59,8 +48,25 @@ describe('PostSortPage', () => {
                     { score: 1, capacity: 1 },
                 ],
                 state: 'active',
-                // biome-ignore lint/suspicious/noExplicitAny: mock config
+                postsort_config: {
+                    extreme_columns: [-1, 1],
+                    missing_statements_enabled: true,
+                },
+                // biome-ignore lint/suspicious/noExplicitAny: mock
             } as any,
+        });
+
+        useResponseStore.setState({
+            qsort: [
+                { statementId: 1, col: 0, row: 0 },
+                { statementId: 2, col: 1, row: 0 },
+            ],
+            postsort: {
+                card_comments: {},
+                missing_statement: '',
+                general_comment: '',
+                questions_answers: {},
+            },
         });
 
         useSessionStore.setState({
@@ -70,10 +76,7 @@ describe('PostSortPage', () => {
     });
 
     it('Redirects to /fine-sort if qsort is incomplete', async () => {
-        // Setup incomplete qsort (0 cards placed)
-        useResponseStore.setState({
-            qsort: [],
-        });
+        useResponseStore.setState({ qsort: [] });
 
         renderWithProviders(
             <Routes>
@@ -85,19 +88,10 @@ describe('PostSortPage', () => {
             { initialEntries: ['/study/demo/post-sort'] }
         );
 
-        // Should redirect to Fine Sort (which renders "Fine Sort Page")
         expect(await screen.findByText('Fine Sort Page')).toBeInTheDocument();
     });
 
-    it('Renders Post Sort page if qsort is complete', async () => {
-        // Setup complete qsort (all 2 cards placed)
-        useResponseStore.setState({
-            qsort: [
-                { statementId: 1, col: 0, row: 0 },
-                { statementId: 2, col: 1, row: 0 },
-            ],
-        });
-
+    it('Renders Step 1 (Feedback) initially', async () => {
         renderWithProviders(
             <Routes>
                 <Route path="/study/:slug" element={<StudyLayout />}>
@@ -107,41 +101,14 @@ describe('PostSortPage', () => {
             { initialEntries: ['/study/demo/post-sort'] }
         );
 
-        // Should render Post Sort specific content (e.g. Title)
-        // Note: Title key is 'post.title', real i18n returns "To conclude"
+        // Step 1 title (Post Sort)
         expect(await screen.findByText('To conclude')).toBeInTheDocument();
+        // Check for Missing Statements section
+        expect(await screen.findByText('Missing Statements')).toBeInTheDocument();
     });
 
-    it('Renders specific prompts for positive and negative extremes', async () => {
-        useConfigStore.setState({
-            config: {
-                statements: [
-                    { id: 1, text: 'Card Negative' },
-                    { id: 2, text: 'Card Positive' },
-                ],
-                slug: 'demo',
-                grid_config: [
-                    { score: -1, capacity: 1 },
-                    { score: 1, capacity: 1 },
-                ],
-                postsort_config: {
-                    extreme_columns: [-1, 1],
-                    prompts: {
-                        extreme_negative: 'Why so negative?',
-                        extreme_positive: 'Why so positive?',
-                    },
-                },
-                state: 'active',
-                // biome-ignore lint/suspicious/noExplicitAny: mock config
-            } as any,
-        });
-
-        useResponseStore.setState({
-            qsort: [
-                { statementId: 1, col: 0, row: 0 }, // Score -1
-                { statementId: 2, col: 1, row: 0 }, // Score 1
-            ],
-        });
+    it('Validates Step 1 before proceeding to Step 2 (Updated)', async () => {
+        const user = userEvent.setup();
 
         renderWithProviders(
             <Routes>
@@ -152,7 +119,72 @@ describe('PostSortPage', () => {
             { initialEntries: ['/study/demo/post-sort'] }
         );
 
-        expect(await screen.findByText('Why so negative?')).toBeInTheDocument();
-        expect(await screen.findByText('Why so positive?')).toBeInTheDocument();
+        // Try to click Next without filling extreme comments
+        const nextBtn = await screen.findByRole('button', { name: /Next Step/i });
+        await user.click(nextBtn);
+
+        // Should see validation error
+        expect(await screen.findByText('Please fill in all required fields.')).toBeInTheDocument();
+
+        // Fill comments
+        const inputs = screen.getAllByTestId('extreme-comment-input');
+        for (const input of inputs) {
+            await user.type(input, 'Because it is true');
+        }
+
+        // Click Next again
+        await user.click(nextBtn);
+
+        // Should be on Step 2 now (Final Questions)
+        expect(await screen.findByText('Step 2: Questions')).toBeInTheDocument();
+    });
+
+    it('Handles Missing Statements input', async () => {
+        const user = userEvent.setup();
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="post-sort" element={<PostSortPage />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/post-sort'] }
+        );
+
+        const missingInput = screen.getByLabelText('Missing Statements Input');
+        await user.type(missingInput, 'I missed the topic of AI safety.');
+
+        expect(useResponseStore.getState().postsort.missing_statement).toBe(
+            'I missed the topic of AI safety.'
+        );
+    });
+
+    it('Allows navigating back from Step 2 to Step 1', async () => {
+        const user = userEvent.setup();
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug" element={<StudyLayout />}>
+                    <Route path="post-sort" element={<PostSortPage />} />
+                </Route>
+            </Routes>,
+            { initialEntries: ['/study/demo/post-sort'] }
+        );
+
+        // Fill Step 1 to proceed
+        const inputs = screen.getAllByTestId('extreme-comment-input');
+        for (const input of inputs) {
+            await user.type(input, 'Reason');
+        }
+        await user.click(screen.getByRole('button', { name: /Next Step/i }));
+
+        // Expect Step 2
+        expect(await screen.findByText('Step 2: Questions')).toBeInTheDocument();
+
+        // Click Back
+        await user.click(screen.getByRole('button', { name: /Back/i }));
+
+        // Expect Step 1 again
+        expect(await screen.findByText('To conclude')).toBeInTheDocument();
     });
 });
