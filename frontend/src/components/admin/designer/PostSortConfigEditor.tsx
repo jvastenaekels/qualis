@@ -400,7 +400,7 @@ const PostSortConfigEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                             'admin.design.postsort.missing.prompt_placeholder'
                                         )}
                                         readOnly={readOnly}
-                                        className="min-h-[80px] rounded-2xl border-slate-200 focus:ring-slate-500/20 focus:border-slate-500 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
+                                        className="min-h-[80px] rounded-2xl border-slate-300 focus:ring-slate-500/20 focus:border-slate-500 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
                                     />
                                 </div>
                             </CardContent>

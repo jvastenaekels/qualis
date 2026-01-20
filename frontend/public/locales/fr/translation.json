@@ -303,7 +303,7 @@
         }
     },
     "post": {
-        "title": "Pour conclure",
+        "title": "Votre perspective & retours",
         "description": "Nous y sommes presque ! Vos explications sur les énoncés les plus significatifs sont précieuses pour l'analyse.",
         "extreme": {
             "why": "Pourquoi avez-vous choisi de placer cet énoncé ici ? En quoi est-il significatif pour vous ?",
@@ -1159,10 +1159,10 @@
                     "desc": "Ajouter des questions personnalisées au questionnaire post-tri."
                 },
                 "missing": {
-                   "title": "Énoncés manquants",
-                   "desc": "Permettre aux participants de suggérer des énoncés qu'ils ont trouvé manquants dans l'étude.",
-                   "prompt_label": "Texte de la question",
-                   "prompt_placeholder": "Y a-t-il des idées ou perspectives qui manquaient selon vous dans ce jeu d'énoncés ?"
+                    "title": "Des énoncés manquants ?",
+                    "desc": "Y a-t-il des idées qui vous tiennent à cœur et qui vous semblent absentes de cet ensemble d'énoncés ?",
+                    "prompt_label": "Texte de l'invite",
+                    "prompt_placeholder": "N'hésitez pas à nous en faire part et à expliquer pourquoi."
                 },
                 "steps": {
                     "step1": "Étape 1 : Retours",

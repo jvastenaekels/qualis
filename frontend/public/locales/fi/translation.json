@@ -303,7 +303,7 @@
         }
     },
     "post": {
-        "title": "Lopuksi",
+        "title": "Näkökulmasi ja palautteesi",
         "description": "Olet melkein valmis! Kommenttisi merkittävimmistä väitteistä ovat erittäin tärkeitä analyysillemme.",
         "extreme": {
             "why": "Miksi valitsit tämän väittämän juuri tähän? Miten se on merkityksellinen sinulle?",
@@ -1160,10 +1160,10 @@
                     "desc": "Lisää mukautettuja kysymyksiä jälkikyselyyn."
                 },
                 "missing": {
-                    "title": "Puuttuvat väittämät",
-                    "desc": "Salli osallistujien ehdottaa väittämiä, joiden he kokivat puuttuvan tutkimuksesta.",
-                    "prompt_label": "Kysymysteksti",
-                    "prompt_placeholder": "Puuttuiko tästä väittämäsarjasta mielestäsi joitain ideoita tai näkökulmia?"
+                    "title": "Puuttuuko väitteitä?",
+                    "desc": "Onko mielessäsi tärkeitä ajatuksia, jotka mielestäsi puuttuvat tästä väitejoukosta?",
+                    "prompt_label": "Kehotteen teksti",
+                    "prompt_placeholder": "Kerro tähän vapaasti, mitä jäit kaipaamaan ja miksi."
                 },
                 "steps": {
                     "step1": "Vaihe 1: Palaute",

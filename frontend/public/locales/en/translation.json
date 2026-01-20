@@ -303,7 +303,7 @@
         }
     },
     "post": {
-        "title": "To conclude",
+        "title": "Your Perspective & Feedback",
         "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
         "extreme": {
             "why": "Why did you choose to place this statement here? How is it significant to you?",
@@ -1160,10 +1160,10 @@
                     "desc": "Add custom questions to the post-sort survey."
                 },
                 "missing": {
-                    "title": "Missing Statements",
-                    "desc": "Allow participants to suggest statements they felt were missing from the study.",
+                    "title": "Missing Statements?",
+                    "desc": "Are there any ideas that are important to you and that you feel are missing from this set of statements?",
                     "prompt_label": "Prompt Text",
-                    "prompt_placeholder": "Were there any ideas or perspectives you felt were missing from this set of statements?"
+                    "prompt_placeholder": "Please feel free to suggest and explain."
                 },
                 "steps": {
                     "step1": "Step 1: Feedback",

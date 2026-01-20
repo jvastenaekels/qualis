@@ -218,8 +218,8 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         }))
                                     }
                                     className={`
-                                        min-h-[100px] text-base
-                                        ${!isValid && isTouched ? 'border-red-300 focus:ring-red-200 bg-red-50' : ''}
+                                        min-h-[100px] text-base border-slate-300
+                                        ${!isValid && isTouched ? 'border-red-400 focus:ring-red-200 bg-red-50' : ''}
                                     `}
                                     placeholder={t('post.extreme.placeholder')}
                                     data-testid="extreme-comment-input"
@@ -356,7 +356,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         value={postsort.card_comments[id]}
                                         onChange={(e) => handleCommentChange(id, e.target.value)}
                                         placeholder={t('post.optional.placeholder')}
-                                        className="min-h-[100px]"
+                                        className="min-h-[100px] border-slate-300"
                                     />
                                 </div>
                             );
@@ -396,7 +396,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                     'missing_statements',
                                     'admin.design.postsort.missing.prompt_placeholder'
                                 )}
-                                className="min-h-[120px] text-base"
+                                className="min-h-[120px] text-base border-slate-300"
                             />
                         </div>
                     </div>
