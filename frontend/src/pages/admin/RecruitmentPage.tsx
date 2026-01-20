@@ -50,8 +50,6 @@ import {
     useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete,
 } from '@/api/generated';
 import type { RecruitmentLinkRead, RecruitmentLinkType } from '@/api/model';
-import { RecruitmentFunnelChart } from '@/components/admin/dashboard/charts/RecruitmentFunnelChart';
-import { LinkPerformanceChart } from '@/components/admin/dashboard/charts/LinkPerformanceChart';
 
 const RecruitmentPage = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -303,13 +301,13 @@ const RecruitmentPage = () => {
                 }
             />
 
-            <div className="grid gap-6 md:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-3">
                 <Card className="md:col-span-1 border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group">
                     <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
                         <Users className="h-12 w-12 text-indigo-600" />
                     </div>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <CardTitle className="text-xs font-semibold text-slate-500">
                             {t('admin.recruitment.stats.total_links', 'Total Links')}
                         </CardTitle>
                     </CardHeader>
@@ -328,7 +326,7 @@ const RecruitmentPage = () => {
                         <Globe className="h-12 w-12 text-amber-600" />
                     </div>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <CardTitle className="text-xs font-semibold text-slate-500">
                             {t('admin.recruitment.stats.started', 'Started')}
                         </CardTitle>
                     </CardHeader>
@@ -348,7 +346,7 @@ const RecruitmentPage = () => {
                         <CheckCircle2 className="h-12 w-12 text-green-600" />
                     </div>
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        <CardTitle className="text-xs font-semibold text-slate-500">
                             {t('admin.recruitment.stats.submitted', 'Submitted')}
                         </CardTitle>
                     </CardHeader>
@@ -361,47 +359,6 @@ const RecruitmentPage = () => {
                         </p>
                     </CardContent>
                 </Card>
-
-                <Card className="md:col-span-1 shadow-sm border-slate-200 bg-slate-50/50 overflow-hidden relative group">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                            {t('admin.recruitment.stats.conversion', 'Success Rate')}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-black text-slate-600">
-                            {(() => {
-                                const started =
-                                    // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
-                                    links?.reduce((acc, l: any) => acc + (l.start_count || 0), 0) ||
-                                    0;
-                                const submitted =
-                                    links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0;
-                                return started > 0
-                                    ? `${Math.round((submitted / started) * 100)}%`
-                                    : '0%';
-                            })()}
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-1 font-medium">
-                            {t('admin.recruitment.stats.efficiency', 'Cohort efficiency')}
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-12">
-                <div className="col-span-12 md:col-span-4">
-                    <RecruitmentFunnelChart
-                        links={links}
-                        className="border-none shadow-sm bg-white rounded-2xl h-full"
-                    />
-                </div>
-                <div className="col-span-12 md:col-span-8">
-                    <LinkPerformanceChart
-                        links={links}
-                        className="border-none shadow-sm bg-white rounded-2xl h-full"
-                    />
-                </div>
             </div>
 
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">

@@ -20,7 +20,7 @@ window.addEventListener('error', (event) => {
     if (
         event.message.includes('Failed to fetch dynamically imported module') ||
         event.message.includes('Importing a module script failed') ||
-        (event.filename && event.filename.includes('/assets/'))
+        event.filename?.includes('/assets/')
     ) {
         console.warn('Chunk loading failed, reloading page to fetch latest version...');
         // Store that we tried to reload to prevent infinite loops

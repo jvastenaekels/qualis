@@ -122,6 +122,7 @@ export const useSubmitStudy = () => {
             responses.presort,
             submitStudyMutation,
             session.completeSession,
+            session.isPilotMode,
         ]
     );
 

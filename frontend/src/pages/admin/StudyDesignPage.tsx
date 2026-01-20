@@ -294,6 +294,7 @@ const StudyDesignPage = () => {
                 description: translation?.consent_description,
                 // consent_accept and consent_decline removed
             },
+            pre_instruction: translation?.pre_instruction,
             condition_of_instruction: translation?.condition_of_instruction,
 
             ui_labels: translation?.ui_labels || {},
@@ -443,7 +444,9 @@ const StudyDesignPage = () => {
                                         className="h-9 gap-2 font-bold bg-white border-slate-200 rounded-lg hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm px-2 sm:px-3"
                                     >
                                         <Globe className="h-4 w-4 text-indigo-500" />
-                                        <span className="hidden sm:inline">{activeLocale.toUpperCase()}</span>
+                                        <span className="hidden sm:inline">
+                                            {activeLocale.toUpperCase()}
+                                        </span>
                                         <ChevronDown className="h-3 w-3 opacity-50 hidden sm:inline" />
                                     </Button>
                                 </DropdownMenuTrigger>
@@ -494,7 +497,10 @@ const StudyDesignPage = () => {
                                     >
                                         <Settings2 className="h-3.5 w-3.5" />
                                         <span>
-                                            {t('admin.design.toolbar.manage_langs', 'Manage Languages')}
+                                            {t(
+                                                'admin.design.toolbar.manage_langs',
+                                                'Manage Languages'
+                                            )}
                                         </span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -519,7 +525,7 @@ const StudyDesignPage = () => {
                             </Button>
                         </div>
 
-                        <div className="h-6 w-px bg-slate-200 hidden sm:block" />
+                        <div className="h-6 w-px bg-slate-200 hidden lg:block" />
 
                         {/* Save + Export Group */}
                         <div className="flex items-center gap-1.5 sm:gap-2">
@@ -527,6 +533,7 @@ const StudyDesignPage = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={save}
+                                title={t('admin.design.toolbar.save_changes')}
                                 disabled={
                                     syncStatus === 'synced' ||
                                     syncStatus === 'saving' ||
@@ -536,7 +543,7 @@ const StudyDesignPage = () => {
                                     'h-9 w-9 font-bold rounded-lg shadow-sm transition-all active:scale-95 p-0',
                                     syncStatus === 'modified'
                                         ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 hover:border-amber-300'
-                                        : 'bg-white text-slate-500 border-slate-200'
+                                        : 'bg-white text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600'
                                 )}
                             >
                                 {syncStatus === 'saving' ? (
@@ -544,18 +551,19 @@ const StudyDesignPage = () => {
                                 ) : syncStatus === 'modified' ? (
                                     <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                                 ) : (
-                                    <CheckCircle className="h-3.5 w-3.5 opacity-50" />
+                                    <CheckCircle className="h-4 w-4 text-emerald-500 opacity-80" />
                                 )}
                             </Button>
 
                             <ExportConfigButton
                                 studySlug={slug || ''}
                                 variant="outline"
-                                className="h-9 w-9 p-0 rounded-lg text-slate-500"
+                                showText={false}
+                                className="h-9 w-9 p-0 rounded-lg text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600"
                             />
                         </div>
 
-                        <div className="h-6 w-px bg-slate-200 hidden sm:block" />
+                        <div className="h-6 w-px bg-slate-200 hidden md:block" />
 
                         {/* Activate Button */}
                         <Button
@@ -825,12 +833,16 @@ const StudyDesignPage = () => {
                                                 <Button
                                                     variant="link"
                                                     className="h-auto p-0 text-indigo-700 underline font-bold text-xs mt-2 hover:text-indigo-900"
-                                                    onClick={() => navigate(`/admin/studies/${slug}?tab=data`)}
+                                                    onClick={() =>
+                                                        navigate(`/admin/studies/${slug}?tab=data`)
+                                                    }
                                                 >
-                                                    {t('admin.design.qsort.grid.unlock_hint', 'Go to Data Explorer to purge sessions and unlock structure')}
+                                                    {t(
+                                                        'admin.design.qsort.grid.unlock_hint',
+                                                        'Go to Data Explorer to purge sessions and unlock structure'
+                                                    )}
                                                 </Button>
                                             )}
-
                                         </div>
                                     </div>
                                 )}

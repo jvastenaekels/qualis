@@ -486,6 +486,29 @@
                 "limited": "Limited"
             }
         },
+        "analytics": {
+            "charts": {
+                "recruitment_funnel": {
+                    "title": "Recruitment Funnel",
+                    "subtitle": "Aggregate conversion performance",
+                    "initial_contact": "Initial Contact",
+                    "completion": "Completion",
+                    "started_study": "Started Study",
+                    "submitted": "Submitted",
+                    "yield": "Yield",
+                    "success_rate": "Success Rate",
+                    "completion_rate": "{{rate}}% of starters completed"
+                },
+                "link_performance": {
+                    "title": "Link Performance Tracking",
+                    "subtitle": "Monitor individual recruitment channel effectiveness",
+                    "volume": "Volume",
+                    "yield": "Yield",
+                    "conversion_rate": "Conversion rate",
+                    "total_responses": "responses"
+                }
+            }
+        },
         "breadcrumbs": {
             "admin": "Admin",
             "dashboard": "Dashboard",

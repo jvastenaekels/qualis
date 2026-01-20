@@ -182,26 +182,26 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
     }, [config, responses.qsort.length, navigate, slug, session.isCompleted, submit]);
 
     // Helper to resolve custom prompts
-    const getPrompt = (keys: string | string[], defaultText: string) => {
+    const getPrompt = (keys: string | string[], defaultTextKey: string) => {
         const prompts = config?.postsort_config?.prompts;
-        if (!prompts) return defaultText;
+        const currentLang = i18n.language || 'en';
 
-        const keyList = Array.isArray(keys) ? keys : [keys];
+        if (prompts) {
+            const keyList = Array.isArray(keys) ? keys : [keys];
 
-        for (const key of keyList) {
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic key access
-            const promptConfig = (prompts as any)[key];
-            if (promptConfig) {
-                if (typeof promptConfig === 'string') return promptConfig;
-                const currentLang = i18n.language || 'en';
-                const text =
-                    promptConfig[currentLang] ||
-                    promptConfig.en ||
-                    Object.values(promptConfig)[0];
-                if (text) return text;
+            for (const key of keyList) {
+                // biome-ignore lint/suspicious/noExplicitAny: dynamic key access
+                const promptConfig = (prompts as any)[key];
+                if (promptConfig) {
+                    if (typeof promptConfig === 'string') return promptConfig;
+                    const text = promptConfig[currentLang] || promptConfig.en;
+                    if (text) return text;
+                }
             }
         }
-        return defaultText;
+
+        // No custom prompt found, use default i18n translation
+        return t(defaultTextKey);
     };
 
     // Helper for multilingual strings

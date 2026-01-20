@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { AdminService } from '@/api/admin';
+import { cn } from '@/lib/utils';
 
 interface ExportConfigButtonProps {
     studySlug: string;
     variant?: 'default' | 'outline' | 'ghost' | 'secondary' | 'destructive' | 'link';
     className?: string;
+    showText?: boolean;
 }
 
 /**
@@ -18,6 +20,7 @@ export function ExportConfigButton({
     studySlug,
     variant = 'outline',
     className,
+    showText = true,
 }: ExportConfigButtonProps) {
     const { t } = useTranslation();
     const [isExporting, setIsExporting] = useState(false);
@@ -60,16 +63,17 @@ export function ExportConfigButton({
             className={className}
             onClick={handleExport}
             disabled={isExporting}
+            title={!showText ? t('admin.export.config', 'Export Configuration') : undefined}
         >
             {isExporting ? (
                 <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {t('admin.export.exporting', 'Exporting...')}
+                    <Loader2 className={cn('h-4 w-4 animate-spin', showText && 'mr-2')} />
+                    {showText && t('admin.export.exporting', 'Exporting...')}
                 </>
             ) : (
                 <>
-                    <Download className="h-4 w-4 mr-2" />
-                    {t('admin.export.config', 'Export Configuration')}
+                    <Download className={cn('h-4 w-4', showText && 'mr-2')} />
+                    {showText && t('admin.export.config', 'Export Configuration')}
                 </>
             )}
         </Button>

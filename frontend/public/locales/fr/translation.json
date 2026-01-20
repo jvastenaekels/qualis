@@ -485,6 +485,29 @@
                 "limited": "Limité"
             }
         },
+        "analytics": {
+            "charts": {
+                "recruitment_funnel": {
+                    "title": "Entonnoir de recrutement",
+                    "subtitle": "Performance de conversion globale",
+                    "initial_contact": "Contact initial",
+                    "completion": "Achèvement",
+                    "started_study": "Étude commencée",
+                    "submitted": "Soumis",
+                    "yield": "Rendement",
+                    "success_rate": "Taux de réussite",
+                    "completion_rate": "{{rate}}% des participants ont terminé"
+                },
+                "link_performance": {
+                    "title": "Suivi de la performance des liens",
+                    "subtitle": "Surveiller l'efficacité de chaque canal de recrutement",
+                    "volume": "Volume",
+                    "yield": "Rendement",
+                    "conversion_rate": "Taux de conversion",
+                    "total_responses": "réponses"
+                }
+            }
+        },
         "breadcrumbs": {
             "admin": "Admin",
             "dashboard": "Tableau de bord",

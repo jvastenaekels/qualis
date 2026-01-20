@@ -189,7 +189,9 @@ export default function InteractiveDataView({
                 url: `/api/admin/studies/${slug}/participants`,
                 method: 'DELETE',
             });
-            toast.success(t('admin.data.actions.clear_all_success', 'All participants successfully cleared!'));
+            toast.success(
+                t('admin.data.actions.clear_all_success', 'All participants successfully cleared!')
+            );
             queryClient.invalidateQueries({
                 queryKey: getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey(slug),
             });
@@ -619,7 +621,10 @@ export default function InteractiveDataView({
                                     >
                                         <Trash2 className="h-4 w-4" />
                                         <span className="hidden sm:inline">
-                                            {t('admin.data.actions.clear_all_data', 'Clear All Data')}
+                                            {t(
+                                                'admin.data.actions.clear_all_data',
+                                                'Clear All Data'
+                                            )}
                                         </span>
                                     </Button>
                                 </AlertDialogTrigger>
@@ -629,7 +634,10 @@ export default function InteractiveDataView({
                                             <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">
                                                 <Trash2 className="w-5 h-5" />
                                             </div>
-                                            {t('admin.data.actions.clear_all_data', 'Clear All Data')}
+                                            {t(
+                                                'admin.data.actions.clear_all_data',
+                                                'Clear All Data'
+                                            )}
                                         </AlertDialogTitle>
                                         <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
                                             {t(
