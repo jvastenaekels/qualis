@@ -162,7 +162,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
         const subscription = watch((value) => {
             setPostSortResponse(
                 'questions_answers',
-                value as Record<string, unknown>
+                value as any
             );
         });
         return () => subscription.unsubscribe();
@@ -238,7 +238,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
 
     const defaultExtremes = [-4, 4];
     const extremeCols = config?.postsort_config?.extreme_columns || defaultExtremes;
-    const allowRandomComments = (config?.postsort_config as unknown)?.allow_random_comments ?? true;
+    const allowRandomComments = (config?.postsort_config as any)?.allow_random_comments ?? true;
 
     const extremeCards = responses.qsort.filter((p) => {
         const colDef = gridColumns[p.col];

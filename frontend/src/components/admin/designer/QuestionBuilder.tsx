@@ -385,7 +385,7 @@ const QuestionItem = ({
                                                     </Label>
                                                     <Input
                                                         value={
-                                                            question.visibility_condition.value ||
+                                                            (question.visibility_condition.value as string) ||
                                                             ''
                                                         }
                                                         onChange={(e) =>
