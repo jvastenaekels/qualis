@@ -802,6 +802,12 @@
                 "required": "Requis",
                 "reset_defaults": "Réinitialiser par défaut"
             },
+            "unsaved_changes": {
+                "title": "Modifications non enregistrées",
+                "description": "Vous avez des modifications non enregistrées dans la conception de votre étude. Si vous quittez maintenant, ces changements seront perdus.",
+                "confirm": "Quitter sans sauvegarder",
+                "cancel": "Continuer l'édition"
+            },
             "tips": {
                 "title": "Conseil rapide",
                 "pilot": "Testez toujours le tri vous-même avant de partager le lien avec les participants."

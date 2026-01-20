@@ -52,18 +52,8 @@ export function useStudyPersistence() {
             currentLocation.pathname !== nextLocation.pathname
     );
 
-    useEffect(() => {
-        if (blocker.state === 'blocked') {
-            const confirm = window.confirm(
-                'You have unsaved changes. Are you sure you want to leave? Your changes will be lost.'
-            );
-            if (confirm) {
-                blocker.proceed();
-            } else {
-                blocker.reset();
-            }
-        }
-    }, [blocker]);
+    // Exposed blocker for UI handling
+    // We intentionally removed the window.confirm logic here to let the UI handle it via the blocker object
 
     // 4. Change Detection Logic
     useEffect(() => {
@@ -225,5 +215,6 @@ export function useStudyPersistence() {
         save,
         syncStatus,
         lastSavedAt,
+        blocker,
     };
 }

@@ -41,6 +41,7 @@ import { GuidanceCard } from '@/components/admin/designer/GuidanceCard';
 import { useStudyPersistence } from '@/hooks/useStudyPersistence';
 import { ExportConfigButton } from '@/components/admin/designer/ExportConfigButton';
 import { customInstance } from '@/api/mutator';
+import { UnsavedChangesDialog } from '@/components/admin/designer/UnsavedChangesDialog';
 
 import { toast } from 'sonner';
 import { formatBackendError } from '@/utils/i18nHelpers';
@@ -114,7 +115,7 @@ const StudyDesignPage = () => {
     };
 
     // Enable manual persistence
-    const { save } = useStudyPersistence();
+    const { save, blocker } = useStudyPersistence();
 
     // Support Ctrl+S / Cmd+S
     useEffect(() => {
@@ -365,6 +366,14 @@ const StudyDesignPage = () => {
         },
     ];
 
+    // Validation Statuses for Tabs
+    const isIntroValid =
+        !!currentTranslation?.title &&
+        !!currentTranslation?.consent_title &&
+        !!currentTranslation?.consent_description;
+    const isConditionValid = !!currentTranslation?.condition_of_instruction;
+    const isQSortValid = (draft.statements?.length || 0) > 0 && isGridValid;
+
     // Calculate readiness for all languages for the global indicator
     const globalRequirementsMet = (draft.statements?.length || 0) > 0 && isGridValid;
     const languageReadiness = (draft.translations || [])
@@ -602,6 +611,7 @@ const StudyDesignPage = () => {
                 isOpen={isLangModalOpen}
                 onClose={() => setIsLangModalOpen(false)}
             />
+            <UnsavedChangesDialog blocker={blocker} />
 
             {/* Main Content */}
             <div className="flex flex-1 overflow-hidden relative max-w-full min-w-0">
@@ -694,6 +704,9 @@ const StudyDesignPage = () => {
                                         👋
                                     </span>{' '}
                                     {t('admin.design.tabs.welcome')}
+                                    {!isIntroValid && (
+                                        <AlertTriangle size={14} className="text-amber-500 ml-1" />
+                                    )}
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="pre-sort"
@@ -714,6 +727,9 @@ const StudyDesignPage = () => {
                                         🎯
                                     </span>{' '}
                                     {t('admin.design.tabs.condition')}
+                                    {!isConditionValid && (
+                                        <AlertTriangle size={14} className="text-amber-500 ml-1" />
+                                    )}
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="q-sort"
@@ -724,6 +740,9 @@ const StudyDesignPage = () => {
                                         🧩
                                     </span>{' '}
                                     {t('admin.design.tabs.qsort')}
+                                    {!isQSortValid && !isStructureLocked && (
+                                        <AlertTriangle size={14} className="text-amber-500 ml-1" />
+                                    )}
                                     {isStructureLocked && (
                                         <Lock size={12} className="text-slate-400 ml-1" />
                                     )}
