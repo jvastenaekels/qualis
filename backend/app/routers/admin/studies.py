@@ -483,6 +483,19 @@ async def change_study_state(
     return updated_study
 
 
+@router.post("/{slug}/reset", status_code=status.HTTP_204_NO_CONTENT)
+async def reset_study_participants(
+    study: Study = Depends(check_study_permission(StudyRole.owner)),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete all participants for the study (Owner only)."""
+    from app.services.study_service import StudyService
+
+    await StudyService.reset_study_participants(db, study.id)
+    return None
+
+
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_study(
     study: Study = Depends(check_study_permission(StudyRole.owner)),

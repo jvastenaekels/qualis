@@ -801,6 +801,13 @@ class StudyService:
         return {"confirmation_code": confirmation_code, "id": participant.id}
 
     @staticmethod
+    async def reset_study_participants(db: AsyncSession, study_id: int):
+        """Delete all participants for a specific study."""
+        stmt = delete(Participant).where(Participant.study_id == study_id)
+        await db.execute(stmt)
+        await db.commit()
+
+    @staticmethod
     async def get_study_stats(db: AsyncSession, study_id: int) -> dict[str, Any]:
         """Calculates aggregated statistics for a study."""
         # 1. Get all participants for this study (excluding discarded)
