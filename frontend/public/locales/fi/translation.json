@@ -487,6 +487,29 @@
                 "limited": "Rajoitettu"
             }
         },
+        "analytics": {
+            "charts": {
+                "recruitment_funnel": {
+                    "title": "Rekrytointiputki",
+                    "subtitle": "Kokonaiskonversio",
+                    "initial_contact": "Alkuyhteys",
+                    "completion": "Valmiit",
+                    "started_study": "Aloittanut",
+                    "submitted": "Lähetetty",
+                    "yield": "Tuotto",
+                    "success_rate": "Onnistumisaste",
+                    "completion_rate": "{{rate}}% aloittaneista valmistui"
+                },
+                "link_performance": {
+                    "title": "Linkkien suorituskyky",
+                    "subtitle": "Seuraa rekrytointikanavien tehokkuutta",
+                    "volume": "Volyymi",
+                    "yield": "Tuotto",
+                    "conversion_rate": "Konversioaste",
+                    "total_responses": "vastausta"
+                }
+            }
+        },
         "breadcrumbs": {
             "admin": "Admin",
             "dashboard": "Yhteenveto",
@@ -655,7 +678,12 @@
                 "rough_sort": "Alustava lajittelu",
                 "fine_sort": "Hieno lajittelu",
                 "final": "Viimeiset vaiheet"
-            }
+            },
+            "reset_participants": "Nollaa tiedot",
+            "reset_title": "Nollaa kaikki osallistumiset?",
+            "reset_description": "Tätä toimintoa ei voi kumota. Tämä poistaa pysyvästi kaikki osallistujatiedot ja Q-lajitteluvastaukset tästä tutkimuksesta.",
+            "reset_success": "Osallistujat nollattu onnistuneesti",
+            "reset_error": "Osallistujien nollaus epäonnistui"
         },
         "study_status": {
             "dialog": {
@@ -775,6 +803,12 @@
                 "required": "Pakollinen",
                 "reset_defaults": "Palauta oletukset"
             },
+            "unsaved_changes": {
+                "title": "Tallentamattomia muutoksia",
+                "description": "Sinulla on tallentamattomia muutoksia. Jos poistut nyt, menetät ne.",
+                "confirm": "Poistu tallentamatta",
+                "cancel": "Jatka muokkaamista"
+            },
             "tips": {
                 "title": "Quick Tip",
                 "pilot": "Always run a test sort yourself before sharing the link with participants."
@@ -788,6 +822,7 @@
                 "discard": "Hylkää muutokset",
                 "test_run": "Koeajo",
                 "save": "Tallenna",
+                "saved": "Tallennettu",
                 "closed": "Suljettu",
                 "back_to_study": "Palaa tutkimukseen",
                 "editing_language": "Muokkauskieli",
@@ -949,6 +984,21 @@
                 },
                 "actions": {
                     "add_option": "Lisää vaihtoehto"
+                },
+                "logic": {
+                    "title": "Näkyvyyslogiikka",
+                    "enable": "Lisää näkyvyysehto",
+                    "depends_on": "Näytä tämä kysymys vain jos...",
+                    "select_placeholder": "Valitse yläkysymys",
+                    "operator": "Operaattori",
+                    "value": "Vertailuarvo",
+                    "operators": {
+                        "equals": "Yhtä suuri kuin",
+                        "not_equals": "Eri suuri kuin",
+                        "contains": "Sisältää",
+                        "greater_than": "Suurempi kuin",
+                        "less_than": "Pienempi kuin"
+                    }
                 }
             },
             "qsort": {
@@ -1027,7 +1077,6 @@
                     "locked_paused_desc": "Tutkimus on tällä hetkellä keskeytetty. Suunnittelu pysyy lukittuna olemassa olevien tietojen suojaamiseksi.",
                     "locked_closed": "Tutkimus on suljettu",
                     "locked_closed_desc": "Tämä tutkimus on valmis. Suunnittelu on arkistoitu eikä sitä voi muuttaa.",
-                    "mismatch_title": "Ruudukon konfiguraatiovirhe",
                     "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
                     "unlock_hint": "Siirry Data-selaimeen tyhjentääksesi vastaukset ja avataksesi rakenteen muokkauksen"
                 }

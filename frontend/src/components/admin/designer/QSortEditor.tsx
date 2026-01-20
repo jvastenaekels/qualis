@@ -11,6 +11,7 @@ import {
     Minus,
     CheckCircle2,
     AlertCircle,
+    Info,
     Quote,
     Grid3X3,
     Trash2,
@@ -83,7 +84,13 @@ function parseCSVOrTSV(text: string, separator: string = '\t') {
     return result.filter((r) => r.length > 0 && r.some((c) => c !== ''));
 }
 
-const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
+const QSortEditor = ({
+    readOnly,
+    structureLocked,
+}: {
+    readOnly?: boolean;
+    structureLocked?: boolean;
+}) => {
     const { t } = useTranslation();
     const { draft, activeLocale, updateDraft, activeSubStep, setActiveSubStep } =
         useStudyDesigner();
@@ -508,8 +515,25 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     </TabsTrigger>
                 </TabsList>
 
+                {!readOnly && structureLocked && (
+                    <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl flex items-start gap-3">
+                        <Info className="w-5 h-5 text-amber-600 mt-0.5" />
+                        <div>
+                            <h4 className="text-sm font-bold text-amber-900">
+                                {t('admin.design.structure_locked.title', 'Structure Locked')}
+                            </h4>
+                            <p className="text-sm text-amber-700 mt-1">
+                                {t(
+                                    'admin.design.structure_locked.description',
+                                    'Structural changes (statement codes, grid) are disabled because this study has collected data. You can still edit text translations.'
+                                )}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 <TabsContent value="statements" className="space-y-8 pt-6">
-                    {!readOnly && (
+                    {!readOnly && !structureLocked && (
                         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                             <CardHeader className="pb-4">
                                 <div className="flex items-center gap-3 mb-1">
@@ -652,7 +676,7 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
                             </span>
                         </h3>
                         <div className="flex items-center gap-2">
-                            {!readOnly && (
+                            {!readOnly && !structureLocked && (
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -684,7 +708,7 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 </Button>
                             )}
 
-                            {statements.length > 0 && !readOnly && (
+                            {statements.length > 0 && !readOnly && !structureLocked && (
                                 <>
                                     <Button
                                         variant="ghost"
@@ -700,8 +724,8 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                             ) {
                                                 updateDraft((d) => {
                                                     if (d.statements) {
-                                                        // biome-ignore lint/suspicious/noExplicitAny: complex draft
                                                         d.statements.forEach(
+                                                            // biome-ignore lint/suspicious/noExplicitAny: complex draft
                                                             (s: any, idx: number) => {
                                                                 s.code = `s${idx + 1}`;
                                                             }
@@ -744,7 +768,7 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                     key={idx}
                                     className="flex items-center gap-4 p-4 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100"
                                 >
-                                    {isEditing && !readOnly ? (
+                                    {isEditing && !readOnly && !structureLocked ? (
                                         <Input
                                             value={editingCode}
                                             onChange={(e) => setEditingCode(e.target.value)}
@@ -819,7 +843,7 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                             >
                                                 {item.text}
                                             </div>
-                                            {!readOnly && (
+                                            {!readOnly && !structureLocked && (
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -1028,7 +1052,7 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                     key={idx}
                                     className="flex flex-col items-center gap-4 relative group/col"
                                 >
-                                    {!readOnly && (
+                                    {!readOnly && !structureLocked && (
                                         <Button
                                             variant="outline"
                                             size="icon"
@@ -1061,7 +1085,7 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                         {col.score > 0 ? `+${col.score}` : col.score}
                                     </div>
 
-                                    {!readOnly && (
+                                    {!readOnly && !structureLocked && (
                                         <Button
                                             variant="outline"
                                             size="icon"
@@ -1079,7 +1103,7 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
 
                         {/* Main Grid Actions */}
                         <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
-                            {!readOnly && (
+                            {!readOnly && !structureLocked && (
                                 <div className="flex items-center gap-2 p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
                                     <Button
                                         variant="ghost"
@@ -1101,7 +1125,7 @@ const QSortEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 </div>
                             )}
 
-                            {!readOnly && (
+                            {!readOnly && !structureLocked && (
                                 <Button
                                     size="sm"
                                     onClick={autoShapeGrid}

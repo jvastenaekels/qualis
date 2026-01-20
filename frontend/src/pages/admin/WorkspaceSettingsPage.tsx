@@ -525,7 +525,6 @@ export default function WorkspaceSettingsPage() {
     );
 }
 
-// biome-ignore lint/suspicious/noExplicitAny: API type inference issue
 function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }) {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');

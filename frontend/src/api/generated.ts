@@ -1502,6 +1502,90 @@ export const useChangeStudyStateApiAdminStudiesSlugStatePost = <
 };
 
 /**
+ * Delete all participants for the study (Owner only).
+ * @summary Reset Study Participants
+ */
+export const resetStudyParticipantsApiAdminStudiesSlugResetPost = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<void>({
+        url: `/api/admin/studies/${slug}/reset`,
+        method: 'POST',
+        signal,
+    });
+};
+
+export const getResetStudyParticipantsApiAdminStudiesSlugResetPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof resetStudyParticipantsApiAdminStudiesSlugResetPost>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof resetStudyParticipantsApiAdminStudiesSlugResetPost>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['resetStudyParticipantsApiAdminStudiesSlugResetPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof resetStudyParticipantsApiAdminStudiesSlugResetPost>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return resetStudyParticipantsApiAdminStudiesSlugResetPost(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ResetStudyParticipantsApiAdminStudiesSlugResetPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof resetStudyParticipantsApiAdminStudiesSlugResetPost>>
+>;
+
+export type ResetStudyParticipantsApiAdminStudiesSlugResetPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Reset Study Participants
+ */
+export const useResetStudyParticipantsApiAdminStudiesSlugResetPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof resetStudyParticipantsApiAdminStudiesSlugResetPost>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof resetStudyParticipantsApiAdminStudiesSlugResetPost>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions =
+        getResetStudyParticipantsApiAdminStudiesSlugResetPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * Get aggregated study statistics.
  * @summary Get Study Stats
  */
@@ -2102,6 +2186,87 @@ export function useListStudyParticipantsApiAdminStudiesSlugParticipantsGet<
 
     return query;
 }
+
+/**
+ * Delete ALL participants for this study. Only allowed in DRAFT state.
+ * @summary Clear All Participants
+ */
+export const clearAllParticipantsApiAdminStudiesSlugParticipantsDelete = (slug: string) => {
+    return customInstance<void>({
+        url: `/api/admin/studies/${slug}/participants`,
+        method: 'DELETE',
+    });
+};
+
+export const getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+        TError,
+        { slug: string },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationKey = ['clearAllParticipantsApiAdminStudiesSlugParticipantsDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+        { slug: string }
+    > = (props) => {
+        const { slug } = props ?? {};
+
+        return clearAllParticipantsApiAdminStudiesSlugParticipantsDelete(slug);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>
+>;
+
+export type ClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Clear All Participants
+ */
+export const useClearAllParticipantsApiAdminStudiesSlugParticipantsDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+            TError,
+            { slug: string },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof clearAllParticipantsApiAdminStudiesSlugParticipantsDelete>>,
+    TError,
+    { slug: string },
+    TContext
+> => {
+    const mutationOptions =
+        getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * Export study configuration without participant data.
@@ -8397,6 +8562,24 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostMockHandler = (
     );
 };
 
+export const getResetStudyParticipantsApiAdminStudiesSlugResetPostMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:slug/reset',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
 export const getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler = (
     overrideResponse?:
         | StudyStatsRead
@@ -8497,6 +8680,24 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandl
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
+        },
+        options
+    );
+};
+
+export const getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/studies/:slug/participants',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
         },
         options
     );
@@ -9303,10 +9504,12 @@ export const getOpenQAPIMock = () => [
     getDeleteStudyApiAdminStudiesSlugDeleteMockHandler(),
     getValidateStudyApiAdminStudiesSlugValidatePostMockHandler(),
     getChangeStudyStateApiAdminStudiesSlugStatePostMockHandler(),
+    getResetStudyParticipantsApiAdminStudiesSlugResetPostMockHandler(),
     getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler(),
     getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),
     getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMockHandler(),
     getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler(),
+    getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMockHandler(),
     getExportStudyConfigApiAdminStudiesSlugExportConfigGetMockHandler(),
     getValidateStudyImportApiAdminStudiesValidateImportPostMockHandler(),
     getImportStudyConfigApiAdminStudiesImportPostMockHandler(),

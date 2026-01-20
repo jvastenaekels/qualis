@@ -221,8 +221,9 @@ const StudyDesignPage = () => {
     const isFullyReadOnly = draft ? draft.state !== 'draft' : false;
 
     // isStructureLocked: Critical structural elements ARE BLOCKED (Grid, Statement codes/add/remove, Question add/remove)
-    // Locked if not in draft.
-    const isStructureLocked = draft?.state !== 'draft' && !!draft;
+    // Locked if not in draft OR (in draft but has participants)
+    const isStructureLocked =
+        (draft?.state !== 'draft' || (original?.participant_count || 0) > 0) && !!draft;
 
     // Grid Validation
     const statementsCount = draft?.statements?.length || 0;
@@ -901,7 +902,10 @@ const StudyDesignPage = () => {
                                         'Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually has between 30 and 60 items for robust factor analysis.'
                                     )}
                                 />
-                                <QSortEditor readOnly={isStructureLocked} />
+                                <QSortEditor
+                                    readOnly={isFullyReadOnly}
+                                    structureLocked={isStructureLocked}
+                                />
                             </TabsContent>
 
                             <TabsContent value="post-sort" className="mt-0 outline-none">

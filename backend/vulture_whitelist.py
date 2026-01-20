@@ -76,6 +76,7 @@ export_study_config
 validate_study_import
 import_study_config
 clear_test_runs
+clear_all_participants
 
 # admin/users.py
 list_users

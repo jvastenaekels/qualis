@@ -724,6 +724,49 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/reset": {
+      "post": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Reset Study Participants",
+        "description": "Delete all participants for the study (Owner only).",
+        "operationId": "reset_study_participants_api_admin_studies__slug__reset_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/stats": {
       "get": {
         "tags": [
@@ -920,6 +963,47 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Clear All Participants",
+        "description": "Delete ALL participants for this study. Only allowed in DRAFT state.",
+        "operationId": "clear_all_participants_api_admin_studies__slug__participants_delete",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
