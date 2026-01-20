@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronsUpDown, Plus, Briefcase, Layout, Settings } from 'lucide-react';
+import { ChevronsUpDown, Plus, Briefcase, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -18,10 +18,7 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import { useNavigate } from 'react-router-dom';
-import {
-    useListWorkspacesApiAdminWorkspacesGet,
-    useListStudiesApiAdminStudiesGet,
-} from '@/api/generated';
+import { useListWorkspacesApiAdminWorkspacesGet } from '@/api/generated';
 import { useAuthStore } from '@/store/useAuthStore';
 import type { WorkspaceWithRole } from '@/types/backend';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,9 +36,6 @@ export function WorkspaceSwitcher() {
         useListWorkspacesApiAdminWorkspacesGet();
     // Cast to our type including role
     const workspaces = workspacesData as WorkspaceWithRole[] | undefined;
-
-    const { data: studies, isLoading: isStudiesLoading } = useListStudiesApiAdminStudiesGet();
-
     // Use Auth Store for global state
     const { currentWorkspace, setCurrentWorkspace, setWorkspaces } = useAuthStore();
 
@@ -59,7 +53,7 @@ export function WorkspaceSwitcher() {
         }
     }, [currentWorkspace, setActiveWorkspace]);
 
-    const isLoading = isWorkspacesLoading || isStudiesLoading;
+    const isLoading = isWorkspacesLoading;
 
     // Auto-select first workspace if none selected and data loaded
     React.useEffect(() => {
@@ -96,22 +90,6 @@ export function WorkspaceSwitcher() {
                                 <span className="truncate font-bold tracking-tight text-slate-900">
                                     {currentWorkspace ? currentWorkspace.title : 'Select Workspace'}
                                 </span>
-                                {currentWorkspace && (
-                                    <span className="truncate text-xs font-semibold text-slate-400">
-                                        {studies?.filter(
-                                            (s) => s.workspace_id === currentWorkspace.id
-                                        ).length || 0}{' '}
-                                        {studies?.filter(
-                                            (s) => s.workspace_id === currentWorkspace.id
-                                        ).length === 1
-                                            ? t
-                                                ? t('admin.sidebar.study', 'Study')
-                                                : 'Study'
-                                            : t
-                                              ? t('admin.sidebar.studies', 'Studies')
-                                              : 'Studies'}
-                                    </span>
-                                )}
                             </div>
                             <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
                         </SidebarMenuButton>
@@ -127,9 +105,6 @@ export function WorkspaceSwitcher() {
                         </DropdownMenuLabel>
                         <div className="space-y-1 my-1">
                             {workspaces?.map((workspace) => {
-                                const studyCount =
-                                    studies?.filter((s) => s.workspace_id === workspace.id)
-                                        .length || 0;
                                 const isActive = workspace.id === currentWorkspace?.id;
                                 return (
                                     <DropdownMenuItem
@@ -179,8 +154,6 @@ export function WorkspaceSwitcher() {
                                                         workspace.user_role
                                                     )}
                                                 </span>
-                                                <span className="mx-1">•</span>
-                                                <Layout className="size-2.5" /> {studyCount}
                                             </span>
                                         </div>
                                         {isActive && (

@@ -121,24 +121,24 @@
             "what": "Mitä kysymme",
             "why": "Miksi se on tärkeää",
             "step_welcome": {
-                "what": "Tutustu tutkimuksen tavoitteisiin ja vahvista vapaaehtoinen osallistumisesi.",
-                "why": "Varmistaa, että olet täysin tietoinen ja olet suostunut tutkimusprosessiin."
+                "what": "Lue tutkimuksen tavoitteet ja osallistumisohjeet huolellisesti.",
+                "why": "Eettisen suostumuksen lisäksi tämä varmistaa, että ymmärrät 'ohjeistuksen ehdon' (tietty näkökulma, jonka kautta väittämiä tulee arvioida), mikä on välttämätöntä tiedon luotettavuuden kannalta."
             },
             "step_presort": {
-                "what": "Vastaa muutamaan nopeaan kysymykseen profiilistasi.",
-                "why": "Auttaa meitä ymmärtämään, miten eri näkökulmat korreloivat osallistujien taustojen kanssa."
+                "what": "Anna taustatietoja profiilisi määrittelemiseksi.",
+                "why": "Tämä taustoitus mahdollistaa sen, että tutkijat voivat analysoida, miten erilaiset näkökulmat (faktorits) korreloivat osallistujaryhmän taustamuuttujien kanssa."
             },
             "step_rough": {
-                "what": "Lajittele väittämät spontaanisti kolmeen luokkaan: samaa mieltä, neutraali ja eri mieltä.",
-                "why": "Tallentaa välittömän, intuitiivisen reaktiosi tutkimuksen keskeisiin teemoihin."
+                "what": "Lajittele väittämät kolmeen alustavaan pinoon välittömän reaktiosi perusteella.",
+                "why": "Tämä valmisteleva vaihe on suunniteltu vähentämään kognitiivista kuormitusta; sen avulla voit tutustua aihepiiriin kokonaisuudessaan ennen vaativampaa vertailevaa järjestämistä."
             },
             "step_fine": {
-                "what": "Jaa väittämät ruudukkoon samaa mieltä olemisen tasosi perusteella.",
-                "why": "Luo jäsennellyn, mitattavissa olevan kartan erityisestä näkökulmastasi."
+                "what": "Asettele väittämät ruudukkoon siirtymällä ääripäistä kohti keskustaa.",
+                "why": "Ruudukon rakenne asettaa 'pakotetun jakauman', joka estää pitämästä kaikkia asioita yhtä tärkeinä; se pakottaa tekemään arvovalintoja, mikä mallintaa kunkin idean suhteellista merkitystä ajattelussasi."
             },
             "step_post": {
-                "what": "Tarkista lopullinen lajittelusi ja anna halutessasi lisäpohdintoja.",
-                "why": "Mahdollistaa näkökulmasi selventämisen ja rikastuttaa tietoja laadullisilla yksityiskohdilla."
+                "what": "Vahvista ruudukon järjestys ja lisää kommentteja, joissa selität vahvimmat valintasi.",
+                "why": "Laadulliset selityksesi ovat kriittisiä tilastollisen analyysin validoimiseksi; ne auttavat tutkijoita tulkitsemaan tietoja sinun logiikkasi kautta sen sijaan, että he tekisivät omia oletuksiaan valinnoistasi."
             }
         },
         "steps": {

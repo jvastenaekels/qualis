@@ -121,24 +121,24 @@
             "what": "Ce que nous demandons",
             "why": "Pourquoi c'est important",
             "step_welcome": {
-                "what": "Prenez connaissance des objectifs de l'étude et confirmez votre participation volontaire.",
-                "why": "Garantit que vous êtes pleinement informé et que vous avez consenti au processus de recherche."
+                "what": "Lisez les objectifs de l'étude et les instructions spécifiques de participation.",
+                "why": "Au-delà du consentement éthique, cela garantit que vous saisissez bien la « consigne spécifique » (l'angle précis sous lequel vous devez évaluer les énoncés), ce qui est essentiel à la validité des données."
             },
             "step_presort": {
-                "what": "Répondez à quelques questions rapides sur votre profil.",
-                "why": "Nous aide à comprendre comment les différentes perspectives sont corrélées aux antécédents des participants."
+                "what": "Renseignez les informations d'arrière-plan pour aider à caractériser votre profil.",
+                "why": "Ce contexte permet à l'équipe de recherche d'analyser comment des points de vue distincts peuvent être corrélés (ou non) avec certaines variables démographiques ou professionnelles au sein du groupe de participants."
             },
             "step_rough": {
-                "what": "Triez spontanément les affirmations en trois catégories : D'accord, Neutre et Pas d'accord.",
-                "why": "Capture votre réaction initiale et intuitive aux thèmes centraux de l'étude."
+                "what": "Triez le jeu d'énoncés en trois piles initiales basées sur votre réaction immédiate.",
+                "why": "Cette étape préparatoire vise à réduire la charge cognitive ; elle vous permet de vous familiariser avec l'ensemble du sujet avant d'entamer la tâche plus exigeante du classement comparatif."
             },
             "step_fine": {
-                "what": "Répartissez vos affirmations sur la grille en fonction de votre niveau d'accord.",
-                "why": "Crée une carte structurée et mesurable de votre point de vue spécifique."
+                "what": "Placez les énoncés sur la grille, en allant des extrêmes vers le centre.",
+                "why": "La structure de la grille impose une « distribution forcée » qui vous empêche de tout noter au même niveau ; elle vous oblige à faire des arbitrages, modélisant ainsi l'importance relative de chaque idée dans votre système de pensée."
             },
             "step_post": {
-                "what": "Révisez votre classement final et apportez des réflexions complémentaires si vous le souhaitez.",
-                "why": "Permet de préciser votre pensée et d'enrichir les données avec des détails qualitatifs."
+                "what": "Confirmez la disposition de votre grille et ajoutez des commentaires expliquant vos choix les plus marqués.",
+                "why": "Vos explications qualitatives sont cruciales pour valider l'analyse statistique ; elles aident les chercheurs à interpréter les données selon votre logique propre, plutôt que de plaquer leurs hypothèses sur vos choix."
             }
         },
         "steps": {

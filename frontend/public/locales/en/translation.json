@@ -121,24 +121,24 @@
             "what": "What we ask",
             "why": "Why it matters",
             "step_welcome": {
-                "what": "Review the study objectives and confirm your voluntary participation.",
-                "why": "Ensures you are fully informed and have consented to the research process."
+                "what": "Read the research objectives and the specific instructions for participation.",
+                "why": "Beyond standard ethical consent, this ensures you grasp the specific 'condition of instruction'—the precise lens or scenario you must adopt to evaluate the statements—which is essential for data validity."
             },
             "step_presort": {
-                "what": "Answer a few quick questions about your profile.",
-                "why": "Helps us understand how different perspectives correlate with participant backgrounds."
+                "what": "Provide background information to help characterize your participant profile.",
+                "why": "This context allows the research team to analyze how distinct viewpoints (factors) may or may not correlate with specific demographic variables or professional backgrounds within the participant group."
             },
             "step_rough": {
-                "what": "Spontaneously sort the statements into three categories: Agree, Neutral, and Disagree.",
-                "why": "Captures your initial, intuitive reaction to the study's central themes."
+                "what": "Sort the deck of statements into three initial piles based on your immediate reaction.",
+                "why": "This preparatory step is designed to reduce cognitive load; it allows you to familiarize yourself with the full range of the topic (the Q-set) before the more demanding task of comparative ranking begins."
             },
             "step_fine": {
-                "what": "Distribute your statements on the grid based on your level of agreement.",
-                "why": "Creates a structured, measurable map of your specific point of view."
+                "what": "Place the statements onto the grid structure, moving from the extremes toward the center.",
+                "why": "The grid's structure imposes a 'forced distribution' that prevents you from rating everything as equally important; it compels you to make trade-offs, thereby modelling the relative significance of each idea in your specific belief system."
             },
             "step_post": {
-                "what": "Review your final sort and provide additional reflections if you wish.",
-                "why": "Allows you to clarify your perspective and enrich the data with qualitative detail."
+                "what": "Confirm your grid arrangement and add comments explaining your strongest choices.",
+                "why": "Your qualitative explanations are critical for validating the statistical analysis; they help the researchers interpret the data through your logic rather than imposing their own assumptions on your choices."
             }
         },
         "steps": {
