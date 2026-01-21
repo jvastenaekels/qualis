@@ -862,10 +862,12 @@
         },
 
         "design": {
+            "title": "Study Design",
             "translation_needed": "Review required (Copy)",
             "translation_needed_desc": "This content was automatically copied from another language. Please review and localize it.",
             "reset_defaults": "Reset to Defaults",
             "guidance": {
+                "title": "Design Guidance",
                 "intro_title": "Welcome to the Studio",
                 "intro_desc": "Start by defining the purpose of your study. This information will be shown to participants before they begin the sorting process.",
                 "qsort_title": "Statement & Grid Balance",
@@ -962,7 +964,12 @@
                 "qsort": "Q-sort",
                 "postsort": "Post-sort",
                 "interface": "Interface",
-                "theme": "Theme"
+                "theme": "Theme",
+                "general": "General",
+                "statements": "Statements",
+                "grid": "Grid",
+                "survey": "Survey",
+                "branding": "Branding"
             },
             "view_mode": {
                 "mobile": "Mobile view",
@@ -1550,6 +1557,18 @@
                         "copy_hint": "Copy this link and send it manually if the email fails."
                     }
                 }
+            }
+        },
+        "participants": {
+            "title": "Participants",
+            "description": "Manage participants and explore submitted data.",
+            "table": {
+                "id": "ID",
+                "status": "Status",
+                "started": "Started at",
+                "completed": "Completed at",
+                "duration": "Duration",
+                "actions": "Actions"
             }
         }
     }

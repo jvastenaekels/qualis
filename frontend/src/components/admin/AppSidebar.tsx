@@ -186,7 +186,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     const { data: studies } = useListStudiesApiAdminStudiesGet({
         query: {
-            enabled: !!activeWorkspaceId,
+            enabled: !!currentWorkspace?.id,
         },
     });
 

@@ -153,15 +153,15 @@
     },
     "auth": {
         "login": {
-            "title": "Admin Login",
-            "email_label": "Email Address",
-            "password_label": "Password",
-            "submit": "Continue",
+            "title": "Ylläpitäjän kirjautuminen",
+            "email_label": "Sähköpostiosoite",
+            "password_label": "Salasana",
+            "submit": "Jatka",
             "forgot_password": "Forgot?",
-            "loading": "Authenticating...",
+            "loading": "Kirjaudutaan...",
             "subtitle": "Enter your credentials to manage your studies",
-            "card_title": "Sign in",
-            "card_description": "Secure access to your research dashboard",
+            "card_title": "Kirjaudu sisään",
+            "card_description": "Suojattu pääsy hallintapaneeliin",
             "privacy": "By signing in, you agree to our Terms and Privacy Policy.",
             "powered_by": "Powered by",
             "welcome_back": "Welcome back!",
@@ -342,12 +342,12 @@
     },
     "admin": {
         "hub": {
-            "title": "Researcher Hub",
-            "welcome": "Welcome back, ",
-            "new_workspace": "New Workspace",
-            "your_workspaces": "Your Workspaces",
-            "studies_count": "studies",
-            "recent_studies": "Recent Studies"
+            "title": "Tutkijakeskus",
+            "welcome": "Tervetuloa takaisin, ",
+            "new_workspace": "Uusi työtila",
+            "your_workspaces": "Työtilasi",
+            "studies_count": "tutkimusta",
+            "recent_studies": "Viimeisimmät tutkimukset"
         },
         "study": {
             "save": {
@@ -376,12 +376,12 @@
             "click_to_edit": "Click to edit"
         },
         "layout": {
-            "title": "Admin",
-            "back_home": "Back to Home",
-            "beta": "Research beta",
-            "logout": "Log out",
-            "profile": "Profile",
-            "admin_user": "Admin User"
+            "title": "Ylläpito",
+            "back_home": "Takaisin etusivulle",
+            "beta": "Tutkimus beta",
+            "logout": "Kirjaudu ulos",
+            "profile": "Profiili",
+            "admin_user": "Ylläpitäjä"
         },
         "profile": {
             "title": "Profile & Security",
@@ -435,29 +435,28 @@
             }
         },
         "sidebar": {
-            "home": "Dashboard",
-            "add_study": "Add Study",
-            "create_project": "CREATE NEW PROJECT",
-            "dashboard": "Dashboard",
-            "design": "Design",
-            "recruit": "Recruit",
-            "data": "Data",
-            "team": "Team",
-            "settings": "Settings",
-            "workspace_settings": "Settings",
-            "study_tools": "Study Tools",
-            "workspace": "Workspace",
-
-            "documentation": "Documentation",
-            "support": "Support",
-            "study_management": "Study Management",
-            "search": "Search...",
-            "studies": "Studies",
-            "select_study": "Select Study",
+            "home": "Hallintapaneeli",
+            "add_study": "Lisää tutkimus",
+            "create_project": "LUO UUSI PROJEKTI",
+            "dashboard": "Hallintapaneeli",
+            "design": "Suunnittelu",
+            "recruit": "Rekrytointi",
+            "data": "Aineisto",
+            "team": "Tiimi",
+            "settings": "Asetukset",
+            "workspace_settings": "Asetukset",
+            "study_tools": "Tutkimustyökalut",
+            "workspace": "Työtila",
+            "documentation": "Dokumentaatio",
+            "support": "Tuki",
+            "study_management": "Tutkimuksen hallinta",
+            "search": "Hae...",
+            "studies": "Tutkimukset",
+            "select_study": "Valitse tutkimus",
             "select_study_msg": "Please select or create a study to begin.",
             "view_all_studies": "All Studies",
             "study": "Study",
-            "select_workspace": "Select Workspace"
+            "select_workspace": "Valitse työtila"
         },
         "workspace": {
             "switcher": {
@@ -496,7 +495,6 @@
                 "error": "Failed to create workspace"
             }
         },
-
         "recruitment": {
             "title": "Recruitment",
             "description": "Generate secure links for your participants and monitor real-time recruitment efficiency.",
@@ -734,11 +732,11 @@
             "slug_regex": "Slug must contain only lowercase letters, numbers, and hyphens"
         },
         "study_overview": {
-            "title": "Overview",
-            "subtitle": "Real-time analytics and participant overview for this study.",
-            "back_to_overview": "Back to Overview",
-            "sample_size": "Sample Size (N)",
-            "valid": "valid",
+            "title": "Yleiskatsaus",
+            "subtitle": "Reaaliaikainen analytiikka ja osallistujien yleiskuva.",
+            "back_to_overview": "Takaisin yleisnäkymään",
+            "sample_size": "Otoskoko (n)",
+            "valid": "hyväksytty",
             "completion_rate": "Completion Rate",
             "active": "active",
             "mobile": "mobile",
@@ -746,12 +744,12 @@
             "suspect": "Suspect",
             "time_to_complete": "Time to complete",
             "recent_activity": "Recent Activity",
-            "latest_submissions": "Viimeisimmät lähetykset ({{count}} / {{total}})",
+            "latest_submissions": "Viimeisimmät vastaukset ({{count}} / {{total}})",
             "recently_completed": "Recently Completed",
             "in_progress": "In Progress",
             "discarded": "Discarded",
             "started": "Started",
-            "view_all": "View all participants and data details",
+            "view_all": "Näytä kaikki",
             "no_participants": "No participants yet.",
             "view_data": "View",
             "submitted": "Submitted",
@@ -860,12 +858,13 @@
                 "viewer": "Read-only access to all modules."
             }
         },
-
         "design": {
+            "title": "Tutkimuksen suunnittelu",
             "translation_needed": "Review required (Copy)",
             "translation_needed_desc": "This content was automatically copied from another language. Please review and localize it.",
             "reset_defaults": "Reset to Defaults",
             "guidance": {
+                "title": "Suunnitteluohjeet",
                 "intro_title": "Welcome to the Studio",
                 "intro_desc": "Start by defining the purpose of your study. This information will be shown to participants before they begin the sorting process.",
                 "qsort_title": "Statement & Grid Balance",
@@ -956,13 +955,18 @@
                 "confirm_activate": "Activate & Copy"
             },
             "tabs": {
-                "welcome": "Welcome",
-                "presort": "Pre-sort",
-                "condition": "Condition",
+                "welcome": "Tervetuloa",
+                "presort": "Esikarsinta",
+                "condition": "Ehto",
                 "qsort": "Q-sort",
-                "postsort": "Post-sort",
-                "interface": "Interface",
-                "theme": "Theme"
+                "postsort": "Jälkikysely",
+                "interface": "Käyttöliittymä",
+                "theme": "Teema",
+                "general": "Yleiset",
+                "statements": "Väitteet",
+                "grid": "Ruudukko",
+                "survey": "Kysely",
+                "branding": "Brändäys"
             },
             "view_mode": {
                 "mobile": "Mobile view",
@@ -1550,6 +1554,18 @@
                         "copy_hint": "Copy this link and send it manually if the email fails."
                     }
                 }
+            }
+        },
+        "participants": {
+            "title": "Osallistujat",
+            "description": "Hallinnoi osallistujia ja tutki lähetettyjä tietoja.",
+            "table": {
+                "id": "Tunniste",
+                "status": "Tila",
+                "started": "Aloitettu",
+                "completed": "Valmistunut",
+                "duration": "Kesto",
+                "actions": "Toiminnot"
             }
         }
     }
