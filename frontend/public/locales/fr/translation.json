@@ -72,7 +72,7 @@
             "steps": {
                 "draft": {
                     "label": "Brouillon",
-                    "description": "Configuration et design"
+                    "description": "Configuration & conception"
                 },
                 "active": {
                     "label": "Active",
@@ -84,7 +84,7 @@
                 },
                 "closed": {
                     "label": "Fermée",
-                    "description": "Analyse et export"
+                    "description": "Analyse & export"
                 }
             },
             "paused": {
@@ -785,7 +785,7 @@
             "steps": {
                 "draft": {
                     "label": "Brouillon",
-                    "description": "Configuration & design"
+                    "description": "Configuration & conception"
                 },
                 "active": {
                     "label": "Active",
