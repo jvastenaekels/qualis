@@ -6,8 +6,8 @@ import { queryClient } from '@/lib/queryClient';
 import type { LoaderFunctionArgs } from 'react-router-dom';
 
 export const dataExportsPageLoader = async ({ params }: LoaderFunctionArgs) => {
-    const slug = params.slug || params.studySlug;
-    if (!slug) throw new Error('Slug is required');
+    const slug = params.slug || params.studySlug || params.workspaceSlug;
+    if (!slug) throw new Error('Slug is required (Data Exports)');
 
     try {
         const participants = await queryClient.fetchQuery({

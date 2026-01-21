@@ -11,8 +11,8 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { type LoaderFunctionArgs, redirect } from 'react-router-dom';
 
 export const studyOverviewPageLoader = async ({ params }: LoaderFunctionArgs) => {
-    const slug = params.slug || params.studySlug;
-    if (!slug) throw new Error('Slug is required');
+    const slug = params.slug || params.studySlug || params.workspaceSlug;
+    if (!slug) throw new Error('Slug is required (Study Overview)');
 
     try {
         // Pre-fetch all data in parallel
