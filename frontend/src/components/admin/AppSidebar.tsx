@@ -12,6 +12,7 @@ import {
     Users,
     ArrowLeft,
     Settings2,
+    Plus,
 } from 'lucide-react';
 import { StudySwitcher } from './StudySwitcher';
 import { WorkspaceSwitcher } from './WorkspaceSwitcher';
@@ -62,7 +63,8 @@ function NavLanguage() {
                         <SidebarMenuButton size="sm" className="text-muted-foreground">
                             <Globe className="size-4" />
                             <span>
-                                {languages.find((l) => l.code === currentLang)?.label || 'Language'}
+                                {languages.find((l) => l.code === currentLang)?.label ||
+                                    t('layout.language')}
                             </span>
                             <ChevronsUpDown className="ml-auto size-3" />
                         </SidebarMenuButton>
@@ -141,7 +143,7 @@ function NavUser({ user }: { user: any }) {
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">
-                                        {user?.full_name || 'Admin User'}
+                                        {user?.full_name || t('admin.layout.admin_user')}
                                     </span>
                                     <span className="truncate text-xs">{user?.email}</span>
                                 </div>
@@ -260,7 +262,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const navMain = isValidStudy
         ? [
               {
-                  title: 'Navigation',
+                  title: t('layout.navigation'),
                   url: '#',
                   isActive: true,
                   items: [
@@ -308,7 +310,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 className="flex items-center gap-2 px-2 py-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                             >
                                 <ArrowLeft className="h-4 w-4" />
-                                <span>{currentWorkspace?.title || 'Workspace'}</span>
+                                <span>
+                                    {currentWorkspace?.title || t('admin.sidebar.workspace')}
+                                </span>
                             </button>
                             <div className="px-2">
                                 <Badge variant="outline" className="font-semibold">
@@ -325,6 +329,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     {isFocusMode ? (
                         // Focus Mode: Study navigation
                         <SidebarGroup>
+                            <SidebarMenu>
+                                <SidebarMenuItem className="px-2 mb-4">
+                                    <SidebarMenuButton
+                                        size="sm"
+                                        className="bg-muted/50 hover:bg-muted border border-border/50 text-muted-foreground transition-all duration-200"
+                                        onClick={() => {
+                                            window.dispatchEvent(
+                                                new CustomEvent('open-command-menu')
+                                            );
+                                        }}
+                                    >
+                                        <Search className="size-3.5 mr-2" />
+                                        <span className="text-xs">
+                                            {t('admin.sidebar.search', 'Search')}
+                                        </span>
+                                        <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                                            <span className="text-xs">⌘</span>K
+                                        </kbd>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
                             <SidebarGroupLabel className="px-2 text-xs font-semibold text-muted-foreground/70">
                                 {t('admin.sidebar.study_tools', 'Study Tools')}
                             </SidebarGroupLabel>
@@ -392,6 +417,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     )}
                 </SidebarContent>
                 <SidebarFooter className="gap-2">
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                                onClick={() => navigate('/admin/workspaces/new')}
+                            >
+                                <Plus className="size-4" />
+                                <span>{t('admin.workspace.switcher.new_workspace')}</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
                     <NavLanguage />
                     <NavUser user={user} />
                 </SidebarFooter>
@@ -455,6 +491,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 )}
             </SidebarContent>
             <SidebarFooter className="gap-2">
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton
+                            className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                            onClick={() => navigate('/admin/workspaces/new')}
+                        >
+                            <Plus className="size-4" />
+                            <span>{t('admin.workspace.switcher.new_workspace')}</span>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
                 <NavLanguage />
                 <NavUser user={user} />
             </SidebarFooter>

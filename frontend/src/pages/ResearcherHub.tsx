@@ -11,6 +11,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 
 /**
@@ -23,6 +24,7 @@ export default function ResearcherHub() {
     const { workspaces, user } = useAuthStore();
     const { setActiveStudy, setActiveWorkspace } = useAdminStore();
     const navigate = useNavigate();
+    const { t } = useTranslation();
 
     const { data: allStudies } = useListStudiesApiAdminStudiesGet();
 
@@ -45,14 +47,17 @@ export default function ResearcherHub() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-black text-slate-900">Researcher Hub</h1>
+                            <h1 className="text-3xl font-black text-slate-900">
+                                {t('admin.hub.title', 'Researcher Hub')}
+                            </h1>
                             <p className="text-sm text-slate-500 mt-1">
-                                Welcome back, <span className="font-semibold">{user?.email}</span>
+                                {t('admin.hub.welcome', 'Welcome back, ')}
+                                <span className="font-semibold">{user?.email}</span>
                             </p>
                         </div>
                         <Button onClick={() => navigate('/admin/workspaces/new')}>
                             <Plus className="h-4 w-4 mr-2" />
-                            New Workspace
+                            {t('admin.hub.new_workspace', 'New Workspace')}
                         </Button>
                     </div>
                 </div>
@@ -62,7 +67,9 @@ export default function ResearcherHub() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Workspaces Section */}
                 <section className="mb-12">
-                    <h2 className="text-xl font-bold text-slate-900 mb-4">Your Workspaces</h2>
+                    <h2 className="text-xl font-bold text-slate-900 mb-4">
+                        {t('admin.hub.your_workspaces', 'Your Workspaces')}
+                    </h2>
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {workspaces?.map((workspace) => (
                             <Card
@@ -89,7 +96,10 @@ export default function ResearcherHub() {
                                                                 : 'bg-blue-100 text-blue-700'
                                                         )}
                                                     >
-                                                        {workspace.user_role}
+                                                        {t(
+                                                            `admin.roles.${workspace.user_role}`,
+                                                            workspace.user_role as string
+                                                        )}
                                                     </span>
                                                 </CardDescription>
                                             </div>
@@ -103,7 +113,7 @@ export default function ResearcherHub() {
                                             {allStudies?.filter(
                                                 (s) => s.workspace_id === workspace.id
                                             ).length || 0}{' '}
-                                            studies
+                                            {t('admin.hub.studies_count', 'studies')}
                                         </span>
                                     </div>
                                 </CardContent>
@@ -115,7 +125,9 @@ export default function ResearcherHub() {
                 {/* Recent Studies */}
                 {recentStudies.length > 0 && (
                     <section>
-                        <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Studies</h2>
+                        <h2 className="text-xl font-bold text-slate-900 mb-4">
+                            {t('admin.hub.recent_studies', 'Recent Studies')}
+                        </h2>
                         <div className="bg-white rounded-lg shadow">
                             {recentStudies.map((study, index) => {
                                 const workspace = workspaces?.find(
@@ -157,7 +169,10 @@ export default function ResearcherHub() {
                                                     : 'bg-slate-100 text-slate-600'
                                             )}
                                         >
-                                            {study.state}
+                                            {t(
+                                                `admin.study_states.${study.state}`,
+                                                study.state as string
+                                            )}
                                         </div>
                                     </div>
                                 );

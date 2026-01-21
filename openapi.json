@@ -1928,7 +1928,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/WorkspaceRead"
+                  "$ref": "#/components/schemas/WorkspaceWithRole"
                 }
               }
             }

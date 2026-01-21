@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronsUpDown, Plus, Briefcase, Settings } from 'lucide-react';
+import { ChevronsUpDown, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +8,6 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -77,7 +76,9 @@ export function WorkspaceSwitcher() {
                             </div>
                             <div className="grid flex-1 text-left text-sm leading-tight ml-1">
                                 <span className="truncate font-bold tracking-tight text-slate-900">
-                                    {currentWorkspace ? currentWorkspace.title : 'Select Workspace'}
+                                    {currentWorkspace
+                                        ? currentWorkspace.title
+                                        : t('admin.sidebar.select_workspace')}
                                 </span>
                             </div>
                             <ChevronsUpDown className="ml-auto size-4 text-slate-400" />
@@ -155,43 +156,6 @@ export function WorkspaceSwitcher() {
                                 );
                             })}
                         </div>
-                        <DropdownMenuSeparator className="bg-slate-100 my-1" />
-                        {currentWorkspace && (
-                            <DropdownMenuItem
-                                className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 transition-all duration-200"
-                                onClick={() => {
-                                    navigate(`/app/${currentWorkspace.slug}/settings`);
-                                }}
-                            >
-                                <div className="flex size-7 items-center justify-center rounded-md border border-slate-200 bg-white shadow-sm">
-                                    <Settings className="size-3.5" />
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-sm font-bold">
-                                        {t('admin.workspace.switcher.settings')}
-                                    </span>
-                                    <span className="text-[9px] font-black uppercase tracking-wider text-slate-400">
-                                        {t('admin.workspace.switcher.settings_desc')}
-                                    </span>
-                                </div>
-                            </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem
-                            className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-600 group"
-                            onClick={() => navigate('/admin/workspaces/new')}
-                        >
-                            <div className="flex size-7 items-center justify-center rounded-md border border-dashed border-slate-200 bg-slate-50 transition-colors group-hover:border-slate-300">
-                                <Plus className="size-3.5" />
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="text-sm font-bold">
-                                    {t('admin.workspace.switcher.new_workspace')}
-                                </span>
-                                <span className="text-[9px] font-black uppercase tracking-wider text-slate-500">
-                                    {t('admin.workspace.switcher.new_workspace_desc')}
-                                </span>
-                            </div>
-                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </SidebarMenuItem>

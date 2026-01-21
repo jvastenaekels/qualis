@@ -4356,7 +4356,7 @@ export const useCreateWorkspaceApiAdminWorkspacesPost = <
  * @summary Get Workspace
  */
 export const getWorkspaceApiAdminWorkspacesSlugGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<WorkspaceRead>({
+    return customInstance<WorkspaceWithRole>({
         url: `/api/admin/workspaces/${slug}`,
         method: 'GET',
         signal,
@@ -8102,8 +8102,8 @@ export const getCreateWorkspaceApiAdminWorkspacesPostResponseMock = (
 });
 
 export const getGetWorkspaceApiAdminWorkspacesSlugGetResponseMock = (
-    overrideResponse: Partial<WorkspaceRead> = {}
-): WorkspaceRead => ({
+    overrideResponse: Partial<WorkspaceWithRole> = {}
+): WorkspaceWithRole => ({
     id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -8130,6 +8130,7 @@ export const getGetWorkspaceApiAdminWorkspacesSlugGetResponseMock = (
         })),
         undefined,
     ]),
+    user_role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
     ...overrideResponse,
 });
 
@@ -9091,10 +9092,10 @@ export const getCreateWorkspaceApiAdminWorkspacesPostMockHandler = (
 
 export const getGetWorkspaceApiAdminWorkspacesSlugGetMockHandler = (
     overrideResponse?:
-        | WorkspaceRead
+        | WorkspaceWithRole
         | ((
               info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<WorkspaceRead> | WorkspaceRead),
+          ) => Promise<WorkspaceWithRole> | WorkspaceWithRole),
     options?: RequestHandlerOptions
 ) => {
     return http.get(

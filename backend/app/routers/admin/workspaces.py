@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Path
 from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -109,14 +109,34 @@ async def create_workspace(
     return workspace
 
 
-@router.get("/{slug}", response_model=WorkspaceRead)
+@router.get("/{slug}", response_model=WorkspaceWithRole)
 async def get_workspace(
-    workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.viewer)),
-) -> Workspace:
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+    slug: str = Path(..., description="The slug of the workspace"),
+) -> WorkspaceWithRole:
     """
     Get workspace details.
     """
-    return workspace
+    # Query membership to get the role
+    query = (
+        select(Workspace, WorkspaceMember.role)
+        .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
+        .where(Workspace.slug == slug)
+        .where(WorkspaceMember.user_id == current_user.id)
+    )
+
+    result = await db.execute(query)
+    row = result.one_or_none()
+
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Workspace not found or access denied",
+        )
+
+    workspace, role = row
+    return WorkspaceWithRole(**workspace.__dict__, user_role=role)
 
 
 @router.patch("/{slug}", response_model=WorkspaceRead)

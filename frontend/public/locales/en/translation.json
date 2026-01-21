@@ -338,6 +338,14 @@
         }
     },
     "admin": {
+        "hub": {
+            "title": "Researcher Hub",
+            "welcome": "Welcome back, ",
+            "new_workspace": "New Workspace",
+            "your_workspaces": "Your Workspaces",
+            "studies_count": "studies",
+            "recent_studies": "Recent Studies"
+        },
         "study": {
             "save": {
                 "success": "Changes saved successfully",
@@ -369,7 +377,8 @@
             "back_home": "Back to Home",
             "beta": "Research beta",
             "logout": "Log out",
-            "profile": "Profile"
+            "profile": "Profile",
+            "admin_user": "Admin User"
         },
         "profile": {
             "title": "Profile & Security",
@@ -432,6 +441,9 @@
             "data": "Data",
             "team": "Team",
             "settings": "Settings",
+            "workspace_settings": "Settings",
+            "study_tools": "Study Tools",
+            "workspace": "Workspace",
 
             "documentation": "Documentation",
             "support": "Support",
@@ -441,7 +453,8 @@
             "select_study": "Select Study",
             "select_study_msg": "Please select or create a study to begin.",
             "view_all_studies": "All Studies",
-            "study": "Study"
+            "study": "Study",
+            "select_workspace": "Select Workspace"
         },
         "workspace": {
             "switcher": {
@@ -454,7 +467,14 @@
                 "owner": "Owner",
                 "admin": "Administrator",
                 "researcher": "Researcher",
+                "viewer": "Viewer",
                 "member": "Member"
+            },
+            "study_states": {
+                "active": "Active",
+                "draft": "Draft",
+                "paused": "Paused",
+                "closed": "Closed"
             },
             "create": {
                 "title": "Create Workspace",
