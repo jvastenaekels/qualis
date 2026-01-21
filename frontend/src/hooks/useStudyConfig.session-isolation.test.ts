@@ -69,6 +69,7 @@ describe('Session Isolation Tests', () => {
                 isLoading: false,
                 error: null,
                 refetch: vi.fn(),
+                // biome-ignore lint/suspicious/noExplicitAny: mock query return type
             } as any);
 
             // Setup initial session state for Study A
@@ -113,6 +114,7 @@ describe('Session Isolation Tests', () => {
                 isLoading: false,
                 error: null,
                 refetch: vi.fn(),
+                // biome-ignore lint/suspicious/noExplicitAny: mock query return type
             } as any);
 
             // Setup initial session state
@@ -408,6 +410,7 @@ describe('Session Isolation Tests', () => {
             useConfigStore.getState().setConfig({
                 statements: [{ id: 1, text: 'Test' }],
                 grid_config: [{ score: 0, capacity: 5 }],
+                // biome-ignore lint/suspicious/noExplicitAny: mock study data
             } as any);
 
             // Study A: Place cards in grid

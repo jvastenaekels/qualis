@@ -16,19 +16,22 @@ import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { useMemo } from 'react';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function ParticipantDetailsPage() {
-    const { slug, participantId } = useParams<{
+    const { currentWorkspace } = useAuthStore();
+    const { studySlug, participantId } = useParams<{
         slug: string;
+        studySlug: string;
         participantId: string;
     }>();
+    const effectiveSlug = studySlug || '';
     const navigate = useNavigate();
     const { t } = useTranslation();
 
     // Fetch Study Info
-    const { data: study, isLoading: isStudyLoading } = useGetStudyApiAdminStudiesSlugGet(
-        slug || ''
-    );
+    const { data: study, isLoading: isStudyLoading } =
+        useGetStudyApiAdminStudiesSlugGet(effectiveSlug);
 
     // Fetch Individual Participant
     const {
@@ -99,14 +102,20 @@ export default function ParticipantDetailsPage() {
             return placements[s.id] !== undefined ? placements[s.id] : null;
         });
 
-        const adaptedParticipant: DumpParticipant = {
+        const adaptedParticipant: DumpParticipant & {
+            user_agent?: string;
+            created_at?: string;
+            ip_address?: string;
+        } = {
             id: participant.session_token,
             db_id: participant.id,
             duration_seconds:
                 participant.submitted_at && participant.created_at
-                    ? (new Date(participant.submitted_at).getTime() -
-                          new Date(participant.created_at).getTime()) /
-                      1000
+                    ? Math.floor(
+                          (new Date(participant.submitted_at).getTime() -
+                              new Date(participant.created_at).getTime()) /
+                              1000
+                      )
                     : null,
             scores,
             placements,
@@ -119,6 +128,11 @@ export default function ParticipantDetailsPage() {
             is_test_run: participant.is_test_run,
             discard_reason: participant.discard_reason,
             status: participant.status,
+            user_agent: participant.user_agent || undefined,
+            created_at: participant.created_at || undefined,
+            submitted_at: participant.submitted_at || undefined,
+            // biome-ignore lint/suspicious/noExplicitAny: optional participant metadata field
+            ip_address: (participant as any).ip_address,
         };
 
         return { studyData: studyDump, participantData: adaptedParticipant };
@@ -166,7 +180,14 @@ export default function ParticipantDetailsPage() {
                         ? t('common.error')
                         : t('admin.data.detail.not_found', 'Participant not found')}
                 </h2>
-                <Button variant="outline" onClick={() => navigate(`/admin/studies/${slug}`)}>
+                <Button
+                    variant="outline"
+                    onClick={() =>
+                        navigate(
+                            `/app/${currentWorkspace?.slug || 'default'}/studies/${effectiveSlug}`
+                        )
+                    }
+                >
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     {t('common.back', 'Back to Study')}
                 </Button>
@@ -179,11 +200,16 @@ export default function ParticipantDetailsPage() {
             <div className="flex-none p-6 pb-0">
                 <Button
                     variant="ghost"
-                    onClick={() => navigate(`/admin/studies/${slug}`)}
-                    className="mb-4 text-slate-500 hover:text-slate-900 pl-0 hover:bg-transparent"
+                    size="sm"
+                    onClick={() =>
+                        navigate(
+                            `/app/${currentWorkspace?.slug || 'default'}/studies/${effectiveSlug}/data`
+                        )
+                    }
+                    className="text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50 rounded-xl px-2 -ml-2"
                 >
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    {t('admin.study_overview.back_to_overview', 'Back to Overview')}
+                    {t('common.back', 'Back')}
                 </Button>
 
                 <StudyPageHeader

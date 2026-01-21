@@ -191,8 +191,16 @@ export function AdminDashboard() {
                 </CardContent>
             </Card>
 
-            <CreateStudyDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
-            <ImportStudyDialog open={showImportDialog} onOpenChange={setShowImportDialog} />
+            <CreateStudyDialog
+                open={showCreateDialog}
+                onOpenChange={setShowCreateDialog}
+                workspaceSlug={currentWorkspace?.slug || ''}
+            />
+            <ImportStudyDialog
+                open={showImportDialog}
+                onOpenChange={setShowImportDialog}
+                workspaceSlug={currentWorkspace?.slug || ''}
+            />
         </div>
     );
 }

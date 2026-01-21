@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils';
 interface ImportStudyDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    workspaceSlug: string;
 }
 
 type Step = 'upload' | 'validate' | 'creating';
@@ -50,7 +51,7 @@ interface ValidationResult {
 /**
  * Dialog component for importing study configurations
  */
-export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps) {
+export function ImportStudyDialog({ open, onOpenChange, workspaceSlug }: ImportStudyDialogProps) {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -152,7 +153,7 @@ export function ImportStudyDialog({ open, onOpenChange }: ImportStudyDialogProps
 
             // Close dialog and navigate
             onOpenChange(false);
-            navigate(`/admin/studies/${result.data.slug}/design`);
+            navigate(`/app/${workspaceSlug}/studies/${result.data.slug}/design`);
         } catch (error: unknown) {
             const errorMsg = error instanceof Error ? error.message : 'Unknown error';
             toast.error(t('admin.import.failed', 'Import failed'), {

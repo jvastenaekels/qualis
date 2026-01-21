@@ -3,6 +3,7 @@ import {
     changeStudyStateApiAdminStudiesSlugStatePost,
     deleteStudyApiAdminStudiesSlugDelete,
 } from './generated';
+import { customInstance } from './mutator';
 import type { StudyState } from './model';
 import type { StudyUpdate } from './model';
 import { useAuthStore } from '../store/useAuthStore';
@@ -36,13 +37,10 @@ export const AdminService = {
      * Reset/Delete all participants for a study
      */
     resetStudyParticipants: async (slug: string) => {
-        const response = await fetch(`/api/admin/studies/${slug}/reset`, {
+        await customInstance({
+            url: `/api/admin/studies/${slug}/reset`,
             method: 'POST',
-            headers: {
-                Authorization: `Bearer ${useAuthStore.getState().token}`,
-            },
         });
-        if (!response.ok) throw new Error('Failed to reset participants');
     },
 
     /**

@@ -26,6 +26,7 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
         });
     };
 
+    // biome-ignore lint/suspicious/noExplicitAny: testing user utilities mock
     const switchToStep2 = async (user: any) => {
         await user.click(screen.getByText('Step 2: Questions'));
         await screen.findByText('Participant Follow-up');
@@ -94,7 +95,8 @@ describe('PostSortConfigEditor - Email Collection Feature', () => {
             // Access store to verify
             // biome-ignore lint/suspicious/noExplicitAny: access internal structure
             const currentDraft: any = useStudyDesigner.getState().draft;
-            expect(currentDraft.postsort_config.email_collection_enabled).toBe(true);
+            // biome-ignore lint/suspicious/noExplicitAny: complex config
+            expect((currentDraft.postsort_config as any).email_collection_enabled).toBe(true);
         }
     });
 

@@ -371,63 +371,61 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         </SidebarGroup>
                     ) : (
                         // Workspace View: Workspace navigation
-                        <>
-                            <SidebarGroup>
-                                <SidebarMenu>
-                                    <SidebarMenuItem className="px-2 mb-4">
+                        <SidebarGroup>
+                            <SidebarMenu>
+                                <SidebarMenuItem className="px-2 mb-4">
+                                    <SidebarMenuButton
+                                        size="sm"
+                                        className="bg-muted/50 hover:bg-muted border border-border/50 text-muted-foreground transition-all duration-200"
+                                        onClick={() => {
+                                            window.dispatchEvent(
+                                                new CustomEvent('open-command-menu')
+                                            );
+                                        }}
+                                    >
+                                        <Search className="size-3.5 mr-2" />
+                                        <span className="text-xs">{t('admin.sidebar.search')}</span>
+                                        <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
+                                            <span className="text-xs">⌘</span>K
+                                        </kbd>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                            <SidebarGroupLabel className="px-2 text-xs font-semibold text-muted-foreground/70">
+                                {t('admin.sidebar.workspace', 'Workspace')}
+                            </SidebarGroupLabel>
+                            <SidebarMenu>
+                                {workspaceNav.map((item) => (
+                                    <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton
-                                            size="sm"
-                                            className="bg-muted/50 hover:bg-muted border border-border/50 text-muted-foreground transition-all duration-200"
-                                            onClick={() => {
-                                                window.dispatchEvent(
-                                                    new CustomEvent('open-command-menu')
-                                                );
-                                            }}
+                                            asChild
+                                            isActive={location.pathname === item.url}
                                         >
-                                            <Search className="size-3.5 mr-2" />
-                                            <span className="text-xs">
-                                                {t('admin.sidebar.search')}
-                                            </span>
-                                            <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-                                                <span className="text-xs">⌘</span>K
-                                            </kbd>
+                                            <Link to={item.url}>
+                                                <item.icon />
+                                                <span>{item.title}</span>
+                                            </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
-                                </SidebarMenu>
-                                <SidebarGroupLabel className="px-2 text-xs font-semibold text-muted-foreground/70">
-                                    {t('admin.sidebar.workspace', 'Workspace')}
-                                </SidebarGroupLabel>
-                                <SidebarMenu>
-                                    {workspaceNav.map((item) => (
-                                        <SidebarMenuItem key={item.title}>
-                                            <SidebarMenuButton
-                                                asChild
-                                                isActive={location.pathname === item.url}
-                                            >
-                                                <Link to={item.url}>
-                                                    <item.icon />
-                                                    <span>{item.title}</span>
-                                                </Link>
-                                            </SidebarMenuButton>
-                                        </SidebarMenuItem>
-                                    ))}
-                                </SidebarMenu>
-                            </SidebarGroup>
-                        </>
+                                ))}
+                            </SidebarMenu>
+                        </SidebarGroup>
                     )}
                 </SidebarContent>
                 <SidebarFooter className="gap-2">
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                                onClick={() => navigate('/app/workspaces/new')}
-                            >
-                                <Plus className="size-4" />
-                                <span>{t('admin.workspace.switcher.new_workspace')}</span>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
+                    {!isFocusMode && (
+                        <SidebarMenu>
+                            <SidebarMenuItem>
+                                <SidebarMenuButton
+                                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                                    onClick={() => navigate('/app/workspaces/new')}
+                                >
+                                    <Plus className="size-4" />
+                                    <span>{t('admin.workspace.switcher.new_workspace')}</span>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                    )}
                     <NavLanguage />
                     <NavUser user={user} />
                 </SidebarFooter>
@@ -491,17 +489,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 )}
             </SidebarContent>
             <SidebarFooter className="gap-2">
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton
-                            className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                            onClick={() => navigate('/app/workspaces/new')}
-                        >
-                            <Plus className="size-4" />
-                            <span>{t('admin.workspace.switcher.new_workspace')}</span>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                {!isValidStudy && (
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton
+                                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                                onClick={() => navigate('/app/workspaces/new')}
+                            >
+                                <Plus className="size-4" />
+                                <span>{t('admin.workspace.switcher.new_workspace')}</span>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                )}
                 <NavLanguage />
                 <NavUser user={user} />
             </SidebarFooter>

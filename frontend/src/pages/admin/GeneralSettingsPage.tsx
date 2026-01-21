@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { useTranslation } from 'react-i18next';
-import { useLoaderData, useNavigate } from 'react-router-dom';
+import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -56,7 +56,12 @@ export default function GeneralSettingsPage() {
         study: StudyRead;
         slug: string;
     };
-    const { user } = useAuthStore();
+    const { workspaceSlug: paramWorkspaceSlug } = useParams<{
+        workspaceSlug?: string;
+        studySlug?: string;
+    }>();
+    const { user, currentWorkspace } = useAuthStore();
+    const workspaceSlug = paramWorkspaceSlug || currentWorkspace?.slug;
     const { t } = useTranslation();
     const queryClient = useQueryClient();
 
@@ -100,7 +105,10 @@ export default function GeneralSettingsPage() {
             });
 
             if (data.slug !== slug) {
-                navigate(`/admin/studies/${data.slug}/settings`);
+                const targetUrl = workspaceSlug
+                    ? `/app/${workspaceSlug}/studies/${data.slug}/settings`
+                    : `/admin/studies/${data.slug}/settings`;
+                navigate(targetUrl);
             } else {
                 navigate('.', { replace: true });
             }
@@ -152,7 +160,8 @@ export default function GeneralSettingsPage() {
             toast.success(t('admin.settings.delete_success'), {
                 description: t('admin.settings.delete_success_desc'),
             });
-            navigate('/admin');
+            const targetHome = workspaceSlug ? `/app/${workspaceSlug}/dashboard` : '/hub';
+            navigate(targetHome);
         } catch (error) {
             const message = parseApiErrorSync(error, t('admin.settings.delete_error'));
             toast.error(t('admin.settings.delete_error'), {

@@ -71,7 +71,8 @@ const DESIGN_STEPS = [
 
 const StudyDesignPage = () => {
     const { t } = useTranslation();
-    const { slug } = useParams<{ slug: string }>();
+    const { slug, studySlug } = useParams<{ slug: string; studySlug: string }>();
+    const effectiveSlug = studySlug || slug || '';
     const navigate = useNavigate();
     const {
         draft,
@@ -132,7 +133,7 @@ const StudyDesignPage = () => {
 
     const [isLangModalOpen, setIsLangModalOpen] = useState(false);
 
-    const { data: study, isLoading } = useGetStudyApiAdminStudiesSlugGet(slug ?? '', {
+    const { data: study, isLoading } = useGetStudyApiAdminStudiesSlugGet(effectiveSlug, {
         query: {
             enabled: !!slug,
         },
@@ -235,7 +236,7 @@ const StudyDesignPage = () => {
     const isGridValid = statementsCount === gridCapacity;
 
     const handleActivate = async () => {
-        if (!slug || !draft) return;
+        if (!effectiveSlug || !draft) return;
 
         if (isDirty) {
             toast.warning(
@@ -248,7 +249,7 @@ const StudyDesignPage = () => {
         try {
             // 1. Explicit Validation
             const errors = await customInstance<string[]>({
-                url: `/api/admin/studies/${slug}/validate`,
+                url: `/api/admin/studies/${effectiveSlug}/validate`,
                 method: 'POST',
             });
 
@@ -260,7 +261,7 @@ const StudyDesignPage = () => {
 
             // 2. Perform state change
             await customInstance({
-                url: `/api/admin/studies/${slug}/state`,
+                url: `/api/admin/studies/${effectiveSlug}/state`,
                 method: 'POST',
                 params: { new_state: 'active' },
             });
@@ -277,7 +278,7 @@ const StudyDesignPage = () => {
     };
 
     const handleTestRun = () => {
-        if (!draft || !slug) return;
+        if (!draft || !effectiveSlug) return;
 
         // 1. Build synthetic config (same logic as side-preview)
         // biome-ignore lint/suspicious/noExplicitAny: complex draft type
@@ -321,7 +322,7 @@ const StudyDesignPage = () => {
         localStorage.setItem(`open-q-pilot-reset-${slug}`, 'true');
 
         // 3. Open in new tab with mode=test
-        window.open(`/study/${slug}?mode=test`, '_blank');
+        window.open(`/study/${effectiveSlug}?mode=test`, '_blank');
         toast.info(`${t('admin.design.toolbar.test_run')}...`);
     };
 
@@ -418,7 +419,7 @@ const StudyDesignPage = () => {
                         <div className="h-6 w-px bg-border hidden lg:block" />
                         <h2 className="text-sm font-bold text-slate-800 truncate flex-1">
                             {draft.translations?.find((t) => t.language_code === activeLocale)
-                                ?.title || draft.slug}
+                                ?.title || effectiveSlug}
                         </h2>
                         {/* Status Badge */}
                         <div
@@ -581,7 +582,7 @@ const StudyDesignPage = () => {
                             />
 
                             <ExportConfigButton
-                                studySlug={slug || ''}
+                                studySlug={effectiveSlug}
                                 variant="outline"
                                 showText={false}
                                 className="h-9 w-9 p-0 rounded-lg text-slate-400 border-slate-200 hover:bg-slate-50 hover:text-slate-600"

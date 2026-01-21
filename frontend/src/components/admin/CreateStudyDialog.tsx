@@ -36,9 +36,10 @@ import { useAdminStore } from '@/store/useAdminStore';
 interface CreateStudyDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    workspaceSlug: string;
 }
 
-export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps) {
+export function CreateStudyDialog({ open, onOpenChange, workspaceSlug }: CreateStudyDialogProps) {
     const { setActiveStudy } = useAdminStore();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -111,7 +112,7 @@ export function CreateStudyDialog({ open, onOpenChange }: CreateStudyDialogProps
             });
 
             setActiveStudy(newStudy.slug);
-            navigate(`/admin/studies/${newStudy.slug}`);
+            navigate(`/app/${workspaceSlug}/studies/${newStudy.slug}/design`);
             onOpenChange(false);
             form.reset();
         } catch (error: unknown) {

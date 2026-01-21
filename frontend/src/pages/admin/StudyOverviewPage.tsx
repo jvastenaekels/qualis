@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
+import { useOutletContext, useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
+import type { WorkspaceWithRole } from '@/types/backend';
 import type { StudyRead, ParticipantRead, StudyStatsRead } from '@/api/model';
 import { AdminService } from '@/api/admin';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
@@ -31,6 +32,7 @@ import {
     Eye,
     Link as LinkIcon,
     Trash2,
+    Loader2,
 } from 'lucide-react';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Link } from 'react-router-dom';
@@ -54,10 +56,12 @@ interface LoaderData {
 
 const StudyOverviewPage = () => {
     const { stats, participants, study, slug } = useLoaderData() as LoaderData;
+    const { workspace } = useOutletContext<{ workspace: WorkspaceWithRole }>();
     const revalidator = useRevalidator();
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+    const [isResetLoading, setIsResetLoading] = useState(false);
 
     // biome-ignore lint/suspicious/noExplicitAny: library locale types are complex
     const dateLocales: Record<string, any> = {
@@ -95,6 +99,7 @@ const StudyOverviewPage = () => {
     };
 
     const handleResetParticipants = async () => {
+        setIsResetLoading(true);
         try {
             await AdminService.resetStudyParticipants(slug);
             toast.success(
@@ -104,6 +109,8 @@ const StudyOverviewPage = () => {
             revalidator.revalidate();
         } catch (_error) {
             toast.error(t('admin.study_overview.reset_error', 'Failed to reset participants'));
+        } finally {
+            setIsResetLoading(false);
         }
     };
 
@@ -415,7 +422,7 @@ const StudyOverviewPage = () => {
                                                                     className="h-8 text-xs font-bold px-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                                                                     onClick={() =>
                                                                         navigate(
-                                                                            `/admin/studies/${slug}/participants/${p.id}`
+                                                                            `/app/${workspace.slug}/studies/${slug}/participants/${p.id}`
                                                                         )
                                                                     }
                                                                 >
@@ -570,7 +577,7 @@ const StudyOverviewPage = () => {
                                                                     className="h-8 text-xs font-bold px-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
                                                                     onClick={() =>
                                                                         navigate(
-                                                                            `/admin/studies/${slug}/participants/${p.id}`
+                                                                            `/app/${workspace.slug}/studies/${slug}/participants/${p.id}`
                                                                         )
                                                                     }
                                                                 >
@@ -641,7 +648,7 @@ const StudyOverviewPage = () => {
                                 )}
                                 <div className="p-3 bg-slate-50/50 border-t border-slate-100 text-center">
                                     <Link
-                                        to={`/admin/studies/${slug}/exports`}
+                                        to={`/app/${workspace.slug}/studies/${slug}/data`}
                                         className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
                                     >
                                         <TableIcon className="w-3 h-3" />
@@ -661,22 +668,20 @@ const StudyOverviewPage = () => {
 
                     {/* Analytics Overview - Phase 1 */}
                     {participants.length > 0 && (
-                        <>
-                            <div className="grid gap-6 md:grid-cols-12">
-                                <div className="col-span-12 md:col-span-8">
-                                    <SubmissionsTimelineChart
-                                        participants={validParticipants}
-                                        className="border-none shadow-sm bg-white rounded-2xl h-full"
-                                    />
-                                </div>
-                                <div className="col-span-12 md:col-span-4">
-                                    <DeviceBreakdownChart
-                                        deviceBreakdown={stats.device_breakdown}
-                                        className="border-none shadow-sm bg-white rounded-2xl h-full"
-                                    />
-                                </div>
+                        <div className="grid gap-6 md:grid-cols-12">
+                            <div className="col-span-12 md:col-span-8">
+                                <SubmissionsTimelineChart
+                                    participants={validParticipants}
+                                    className="border-none shadow-sm bg-white rounded-2xl h-full"
+                                />
                             </div>
-                        </>
+                            <div className="col-span-12 md:col-span-4">
+                                <DeviceBreakdownChart
+                                    deviceBreakdown={stats.device_breakdown}
+                                    className="border-none shadow-sm bg-white rounded-2xl h-full"
+                                />
+                            </div>
+                        </div>
                     )}
                 </>
             )}
@@ -698,8 +703,14 @@ const StudyOverviewPage = () => {
                         <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleResetParticipants}
+                            disabled={isResetLoading}
                             className="bg-red-600 hover:bg-red-700"
                         >
+                            {isResetLoading ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            ) : (
+                                <Trash2 className="w-4 h-4 mr-2" />
+                            )}
                             {t('common.reset', 'Reset Data')}
                         </AlertDialogAction>
                     </AlertDialogFooter>

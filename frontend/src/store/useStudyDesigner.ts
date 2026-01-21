@@ -32,6 +32,7 @@ export interface StudyDesignerState {
     setSyncStatus: (status: 'synced' | 'saving' | 'error' | 'modified') => void;
     setLastSavedAt: (date: Date) => void;
     updateOriginal: (study: StudyRead) => void;
+    // biome-ignore lint/suspicious/noExplicitAny: flexible study configuration import
     importConfig: (config: any) => void;
 }
 
@@ -196,6 +197,7 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
     setSyncStatus: (status) => set({ syncStatus: status }),
     setLastSavedAt: (date) => set({ lastSavedAt: date }),
     updateOriginal: (study) => set({ original: study }),
+    // biome-ignore lint/suspicious/noExplicitAny: flexible study configuration import
     importConfig: (config: any) =>
         set(
             produce((state: StudyDesignerState) => {

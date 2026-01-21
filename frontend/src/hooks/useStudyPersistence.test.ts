@@ -121,10 +121,11 @@ describe('useStudyPersistence', () => {
 
     it('should backup draft to localStorage immediately', async () => {
         vi.useFakeTimers();
-        const draft = { slug: 'test-study', statements: [] };
-        const original = { id: 'orig-id', slug: 'test-study' };
+        const _draft = { slug: 'test-study', statements: [] };
+        const _original = { id: 'orig-id', slug: 'test-study' };
 
-        mockStoreState({ draft, original: original as any, syncStatus: 'modified' });
+        // biome-ignore lint/suspicious/noExplicitAny: test mock data
+        mockStoreState({ draft: _draft, original: _original as any, syncStatus: 'modified' });
 
         renderHook(() => useStudyPersistence());
 

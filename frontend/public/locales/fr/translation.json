@@ -746,7 +746,7 @@
             "suspect": "Suspect",
             "time_to_complete": "Time to complete",
             "recent_activity": "Recent Activity",
-            "latest_submissions": "Latest submissions (last 5 of {{total}})",
+            "latest_submissions": "Dernières soumissions ({{count}} sur {{total}})",
             "recently_completed": "Recently Completed",
             "in_progress": "In Progress",
             "discarded": "Discarded",

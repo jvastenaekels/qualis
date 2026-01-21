@@ -37,7 +37,7 @@ import {
     Calendar,
     MousePointer2,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     useGetStudyDumpApiAdminStudiesSlugDumpGet,
     useClearTestRunsApiAdminStudiesSlugTestRunsDelete,
@@ -124,6 +124,7 @@ export default function InteractiveDataView({
 }: InteractiveDataViewProps) {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
     const queryClient = useQueryClient();
 
     const { data: rawData, isLoading, error } = useGetStudyDumpApiAdminStudiesSlugDumpGet(slug);
@@ -214,9 +215,12 @@ export default function InteractiveDataView({
 
     const handleViewParticipant = useCallback(
         (participant: DumpParticipant) => {
-            navigate(`/admin/studies/${slug}/participants/${participant.db_id || participant.id}`);
+            const baseUrl = workspaceSlug
+                ? `/app/${workspaceSlug}/studies/${slug}`
+                : `/admin/studies/${slug}`;
+            navigate(`${baseUrl}/participants/${participant.db_id || participant.id}`);
         },
-        [navigate, slug]
+        [navigate, slug, workspaceSlug]
     );
 
     const columnHelper = createColumnHelper<DumpParticipant>();

@@ -171,6 +171,7 @@ const QSortEditor = ({
     const handleBulkSave = () => {
         if (!bulkText.trim()) return;
 
+        // biome-ignore lint/suspicious/noExplicitAny: dynamic parsed statement items
         let parsedItems: any[] = [];
 
         if (detectedFormat.type === 'excel') {
@@ -186,6 +187,7 @@ const QSortEditor = ({
             if (hasCodeHeader || langHeaders.length > 0) {
                 // EXCEL HEADER MODE
                 parsedItems = rows.slice(1).map((cells) => {
+                    // biome-ignore lint/suspicious/noExplicitAny: dynamic parsed statement
                     const item: any = { translations: [] };
                     if (hasCodeHeader) {
                         item.code = cells[headers.indexOf('code')]?.trim();
@@ -231,6 +233,7 @@ const QSortEditor = ({
             });
         }
 
+        // biome-ignore lint/suspicious/noExplicitAny: draft update with dynamic statement structure
         updateDraft((d: any) => {
             if (importMode === 'replace') {
                 d.statements = [];
@@ -241,6 +244,7 @@ const QSortEditor = ({
             parsedItems.forEach((item) => {
                 let existing = null;
                 if (importMode === 'sync' && item.code) {
+                    // biome-ignore lint/suspicious/noExplicitAny: statement search
                     existing = currentStatements.find((s: any) => s.code === item.code);
                 }
 

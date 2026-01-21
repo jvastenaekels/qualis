@@ -199,7 +199,11 @@ export function StudySwitcher() {
                 </SidebarMenuItem>
             </SidebarMenu>
 
-            <CreateStudyDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} />
+            <CreateStudyDialog
+                open={showCreateDialog}
+                onOpenChange={setShowCreateDialog}
+                workspaceSlug={currentWorkspace?.slug || ''}
+            />
         </>
     );
 }
