@@ -5,7 +5,7 @@
         "agree": "Somewhat agree",
         "disagree": "Somewhat disagree",
         "neutral": "Neutral",
-        "reset_to_default": "Reset to Default",
+        "reset_to_default": "Reset to default",
         "reset_to_default_success": "Restored to default",
         "reset_to_default_confirm": "Are you sure you want to reset this field to its default value? Any custom changes will be lost.",
         "undo": "Undo",
@@ -33,7 +33,7 @@
         "errors": {
             "network": "Network connection error. Please check your internet connection.",
             "not_found": "Study not found.",
-            "validation": "System error: Data validation failed.",
+            "validation": "System error: data validation failed.",
             "unknown": "An unexpected error occurred.",
             "retry": "Retry",
             "min": "Value must be at least {{min}}",
@@ -42,32 +42,32 @@
             "min_length": "Minimum {{count}} characters required",
             "max_length": "Maximum {{count}} characters allowed",
             "404": {
-                "title": "Page Not Found",
+                "title": "Page not found",
                 "message": "The page or study you are looking for does not exist."
             },
             "429": {
-                "title": "Too Many Requests",
+                "title": "Too many requests",
                 "message": "You are doing that too fast. Please wait a moment."
             },
             "500": {
-                "title": "Server Error",
+                "title": "Server error",
                 "message": "Our servers encountered an issue. Please try again later."
             },
-            "network_title": "Connection Lost",
-            "home": "Go to Home",
-            "reset": "Reset Session",
+            "network_title": "Connection lost",
+            "home": "Go to home",
+            "reset": "Reset session",
             "default_title": "Oops! Something went wrong.",
             "study_not_found": {
-                "title": "Study Not Found",
+                "title": "Study not found",
                 "message": "We couldn't find a study with that name. Please check the URL or contact the researcher.",
-                "action": "Go to Home"
+                "action": "Go to home"
             }
         },
         "status": {
             "draft": {
-                "title": "Study Under Preparation",
+                "title": "Study under preparation",
                 "message": "This study is not available for participation yet. Please check back later.",
-                "action": "Back to Home"
+                "action": "Back to home"
             },
             "steps": {
                 "draft": {
@@ -88,29 +88,29 @@
                 }
             },
             "paused": {
-                "title": "Maintenance in Progress",
+                "title": "Maintenance in progress",
                 "message": "Data collection is temporarily paused for maintenance. We will be back shortly.",
                 "action": "Retry"
             },
             "closed": {
-                "title": "Data Collection Closed",
+                "title": "Data collection closed",
                 "message": "This study is now closed. Participation is no longer possible.",
-                "action": "Back to Home"
+                "action": "Back to home"
             }
         }
     },
     "layout": {
         "title": "Open-Q",
         "preparing": "Preparing your study session...",
-        "pilot_mode": "Pilot Mode: Changes are temporary & data will not be saved",
-        "default_study_title": "Q-Method Study",
+        "pilot_mode": "Pilot mode: changes are temporary & data will not be saved",
+        "default_study_title": "Q-Method study",
         "loading_content": "Loading study content...",
         "change_lang_title": "Change language",
         "steps": {
             "welcome": "Welcome",
             "presort": "Pre-sort",
-            "rough": "Rough Sort",
-            "fine": "Fine Sort",
+            "rough": "Rough sort",
+            "fine": "Fine sort",
             "review": "Post-sort"
         },
         "mobile_step": "Step",
@@ -119,7 +119,7 @@
     },
     "study": {
         "help": {
-            "title": "Help & Information",
+            "title": "Help & information",
             "trigger": "Help",
             "what": "What we ask",
             "why": "Why it matters",
@@ -145,16 +145,16 @@
             }
         },
         "steps": {
-            "presort": "Pre-sort Survey",
-            "rough": "Preliminary Sort",
-            "fine": "Grid Placement",
-            "post": "Post-sort Stage"
+            "presort": "Pre-sort survey",
+            "rough": "Preliminary sort",
+            "fine": "Grid placement",
+            "post": "Post-sort stage"
         }
     },
     "auth": {
         "login": {
-            "title": "Admin Login",
-            "email_label": "Email Address",
+            "title": "Admin login",
+            "email_label": "Email address",
             "password_label": "Password",
             "submit": "Continue",
             "forgot_password": "Forgot?",
@@ -162,32 +162,32 @@
             "subtitle": "Enter your credentials to manage your studies",
             "card_title": "Sign in",
             "card_description": "Secure access to your research dashboard",
-            "privacy": "By signing in, you agree to our Terms and Privacy Policy.",
+            "privacy": "By signing in, you agree to our terms and privacy policy.",
             "powered_by": "Powered by",
             "welcome_back": "Welcome back!",
             "error_401": "Invalid email or password",
             "error_generic": "Something went wrong. Please try again."
         },
         "register": {
-            "title": "Create Account",
+            "title": "Create account",
             "subtitle": "Join the research project",
-            "secure_invitation": "Secure Invitation",
-            "invitation_to": "Invitation To:",
+            "secure_invitation": "Secure invitation",
+            "invitation_to": "Invitation to:",
             "study_label": "Study",
             "role_label": "Role",
-            "email_label": "Email Address",
-            "password_label": "Choose Password",
-            "confirm_password_label": "Confirm Password",
+            "email_label": "Email address",
+            "password_label": "Choose password",
+            "confirm_password_label": "Confirm password",
             "placeholder_password": "••••••••",
-            "submit": "Complete Registration",
-            "loading": "Creating Account...",
-            "success_title": "Welcome Aboard!",
+            "submit": "Complete registration",
+            "loading": "Creating account...",
+            "success_title": "Welcome aboard!",
             "success_desc": "Your account has been created and linked to the study.",
-            "success_cta": "Go to Dashboard",
+            "success_cta": "Go to dashboard",
             "success_hint": "You can now log in to the administrative dashboard to begin collaborating.",
-            "invalid_title": "Invalid Invitation",
+            "invalid_title": "Invalid invitation",
             "invalid_desc": "This invitation link is invalid or has expired.",
-            "missing_token_title": "Missing Token",
+            "missing_token_title": "Missing token",
             "missing_token_desc": "This page requires a valid invitation token. Please check the link you received.",
             "verifying": "Verifying your invitation...",
             "privacy_hint": "By registering, you agree to follow the research ethics guidelines configured for this study.",
@@ -198,9 +198,9 @@
         }
     },
     "welcome": {
-        "start": "Get Started",
+        "start": "Get started",
         "consent": {
-            "label": "I confirm that I have read the above information and consent to the processing of my data for the purposes of this study.",
+            "label": "I confirm that i have read the above information and consent to the processing of my data for the purposes of this study.",
             "error": "Please accept the terms to continue."
         },
         "reset_confirm": "Are you sure you want to start a new session? This will clear your current progress.",
@@ -208,9 +208,9 @@
         "preview_title": "Preview",
         "conducted_by": "Conducted by",
         "how_it_works": "Process",
-        "objective_label": "Study Objective",
+        "objective_label": "Study objective",
         "instructions_label": "Process",
-        "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Grid Sorting:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Almost done!:** a few words to explain your most significant choices.",
+        "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Grid sorting:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Almost done!:** a few words to explain your most significant choices.",
         "steps": {
             "profile": {
                 "title": "Let's meet",
@@ -221,7 +221,7 @@
                 "description": "Discover the statements and give your immediate reaction (agree, neutral, or disagree)."
             },
             "fine": {
-                "title": "Grid Sorting",
+                "title": "Grid sorting",
                 "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you."
             },
             "post": {
@@ -233,24 +233,24 @@
     "consent": {
         "title": "Informed consent and data processing agreement",
         "subtitle": "Please read the following information carefully.",
-        "default_text": "1. Nature of the study and participant understanding\nBy checking the box below, you acknowledge that you have reviewed the study objectives outlined on the home page. You understand that this exercise employs Q-methodology, a research technique designed to model subjective viewpoints. The task requires you to sort statements according to their significance relative to your personal perspective; consequently, there are no objective \"right\" or \"wrong\" answers.\n\n2. Data processing and pseudonymization (GDPR compliance)\n\nData collection: Your responses (the Q-sort configuration and post-sort explanations) will be assigned a unique alphanumeric code upon submission.\n\nDe-identification and retention:\n\nStandard procedure: Direct identifiers (such as IP addresses) are immediately converted into an anonymous code and are never stored in their original format. This technical process ensures that your digital footprint cannot be used to re-identify you once the session ends.\n\nException for follow-up: If you voluntarily provide your contact details at the end of the study for a follow-up contact, the link between your identity (email) and your response will be maintained strictly for the duration of that specific follow-up phase.\n\nReporting: The final results will be presented in an anonymized format. Data will be aggregated to reveal shared social perspectives (factors). Qualitative comments may be quoted to contextualize these factors but will be screened to remove revealing details.\n\n3. Voluntary participation and right to withdraw\nYour participation is strictly voluntary. You maintain the right to discontinue the sorting process and close your browser at any time prior to submission without penalty.\n\nPre-submission: If you withdraw before finalizing your sort, no partial data will be retained.\n\nPost-submission: Due to the statistical nature of Q-methodology (factor analysis), once your data has been submitted and aggregated into the dataset, individual withdrawal may not be feasible.\n\n4. Data retention and rights\nIn accordance with the General Data Protection Regulation (GDPR), you retain the right to request access to, or rectification of, your personal data as long as it remains identifiable (i.e., prior to final anonymization)."
+        "default_text": "1. Nature of the study and participant understanding. You understand that this exercise employs q-methodology, a research technique designed to model subjective viewpoints. The task requires you to sort statements according to their significance relative to your personal perspective; consequently, there are no objective \"right\" or \"wrong\" answers.\n\n2. Data processing and pseudonymization (GDPR compliance).\n\nDe-identification and retention:. This technical process ensures that your digital footprint cannot be used to re-identify you once the session ends.\n\nException for follow-up: if you voluntarily provide your contact details at the end of the study for a follow-up contact, the link between your identity (email) and your response will be maintained strictly for the duration of that specific follow-up phase.\n\nReporting: the final results will be presented in an anonymized format. Data will be aggregated to reveal shared social perspectives (factors). Qualitative comments may be quoted to contextualize these factors but will be screened to remove revealing details.\n\n3. Voluntary participation and right to withdraw. You maintain the right to discontinue the sorting process and close your browser at any time prior to submission without penalty.\n\nPre-submission: if you withdraw before finalizing your sort, no partial data will be retained.\n\nPost-submission: due to the statistical nature of q-methodology (factor analysis), once your data has been submitted and aggregated into the dataset, individual withdrawal may not be feasible.\n\n4. Data retention and rights"
     },
     "presort": {
         "title": "Before we start",
         "description": "Please answer a few questions to help us situate your viewpoint.",
-        "submit": "Continue to Sorting",
+        "submit": "Continue to sorting",
         "select_placeholder": "Select...",
         "error_required": "Please answer this question."
     },
     "rough": {
         "header": {
-            "subtitle": "Swipe **left** to Disagree, **right** to Agree, or **down** to be Neutral.",
+            "subtitle": "Swipe **left** to disagree, **right** to agree, or **down** to be neutral.",
             "hint": "This is spontaneous — you can change your mind right after."
         },
         "complete": {
-            "title": "First Step Complete",
+            "title": "First step complete",
             "subtitle": "We will now refine the nuances.",
-            "button": "Continue to Fine Sort"
+            "button": "Continue to fine sort"
         },
         "instructions": {
             "desktop_tip": "Drag, press, or use keyboard ( ← ↓ → ) to sort"
@@ -258,30 +258,30 @@
     },
     "fine": {
         "deck": {
-            "title": "Available Statements",
+            "title": "Available statements",
             "all_placed": "All statements in this pile are sorted"
         },
         "toolbar": {
-            "preview": "Statement Preview",
-            "zoom_in": "Zoom In",
-            "zoom_out": "Zoom Out",
-            "fit_screen": "Fit to Screen",
+            "preview": "Statement preview",
+            "zoom_in": "Zoom in",
+            "zoom_out": "Zoom out",
+            "fit_screen": "Fit to screen",
             "label": "Grid controls"
         },
         "grid": {
-            "label": "Sorting Grid",
+            "label": "Sorting grid",
             "column": "Column",
             "slot": "Slot",
-            "in_column": "in column"
+            "in_column": "In column"
         },
         "legend": {
-            "disagree": "Most Disagree",
+            "disagree": "Most disagree",
             "neutral": "Neutral",
-            "agree": "Most Agree",
+            "agree": "Most agree",
             "label": "Spectrum legend"
         },
         "actions": {
-            "validate": "Confirm Sort",
+            "validate": "Confirm sort",
             "finish": "Finish sorting",
             "ready": "Review overview",
             "not_ready": "Place all statements to continue"
@@ -290,13 +290,13 @@
             "title": "Place statements on the grid"
         },
         "workbench": {
-            "active_card": "Active Statement",
-            "place_on_grid": "Tap Grid to Place",
+            "active_card": "Active statement",
+            "place_on_grid": "Tap grid to place",
             "drag_or_tap": "Drag to grid or tap slot",
-            "initial_instruction": "Drag or Tap Statement",
+            "initial_instruction": "Drag or tap statement",
             "help": "How does it work?",
             "methodology": {
-                "extremes": "Tip: Start with what is most obvious to you (the extremes).",
+                "extremes": "Tip: start with what is most obvious to you (the extremes).",
                 "vertical": "In the same column, the order from top to bottom doesn't matter.",
                 "constraint": "You have to fit everything! It can be a puzzle, but that's how we prioritize choices.",
                 "relative": "Reminder: items are sorted relative to each other (relative agreement).",
@@ -306,19 +306,19 @@
         }
     },
     "post": {
-        "title": "Your Perspective & Feedback",
+        "title": "Your perspective & feedback",
         "description": "You're almost done! Your comments on the most significant statements are crucial for our analysis.",
         "step2_title": "Almost done!",
         "step2_description": "Please answer these final questions to complete the study.",
         "extreme": {
             "why": "Why did you choose to place this statement here? How is it significant to you?",
-            "placeholder": "E.g., A specific event, a strong belief, or a particular word in the statement...",
+            "placeholder": "E.g., a specific event, a strong belief, or a particular word in the statement...",
             "min_chars": "A few words are enough to help us understand the context.",
-            "label_agree": "Strongest Agreement",
-            "label_disagree": "Strongest Disagreement"
+            "label_agree": "Strongest agreement",
+            "label_disagree": "Strongest disagreement"
         },
         "optional": {
-            "title": "Additional Comments (optional)",
+            "title": "Additional comments (optional)",
             "description": "Feel free to add comments to any other statement if you wish to elaborate on your choices.",
             "select_placeholder": "Select a statement to comment...",
             "placeholder": "Your comment here..."
@@ -331,9 +331,9 @@
             "id_label": "Confirmation code"
         },
         "contact": {
-            "title": "Results & Contact",
-            "email_label": "Your email address (Optional)",
-            "email_placeholder": "example@email.com",
+            "title": "Results & contact",
+            "email_label": "Your email address (optional)",
+            "email_placeholder": "Example@email.com",
             "interview_consent": "I agree to be contacted by the researcher for follow-up.",
             "newsletter_consent": "I wish to be informed about the study results.",
             "gdpr_note": "Your email will never be publicly shared. Providing it ensures pseudonymization: your data remains identifiable only for research purposes by the investigator.",
@@ -342,12 +342,12 @@
     },
     "admin": {
         "hub": {
-            "title": "Researcher Hub",
-            "welcome": "Welcome back, ",
-            "new_workspace": "New Workspace",
-            "your_workspaces": "Your Workspaces",
+            "title": "Researcher hub",
+            "welcome": "Welcome back,",
+            "new_workspace": "New workspace",
+            "your_workspaces": "Your workspaces",
             "studies_count": "studies",
-            "recent_studies": "Recent Studies"
+            "recent_studies": "Recent studies"
         },
         "study": {
             "save": {
@@ -358,7 +358,7 @@
                 "error": "Failed to save changes"
             },
             "state": {
-                "manage": "Manage Study Flow"
+                "manage": "Manage study flow"
             }
         },
         "components": {
@@ -377,22 +377,22 @@
         },
         "layout": {
             "title": "Admin",
-            "back_home": "Back to Home",
+            "back_home": "Back to home",
             "beta": "Research beta",
             "logout": "Log out",
             "profile": "Profile",
-            "admin_user": "Admin User"
+            "admin_user": "Admin user"
         },
         "profile": {
-            "title": "Profile & Security",
+            "title": "Profile & security",
             "description": "Manage your personal information and security settings.",
             "personal": {
-                "title": "Personal Information",
+                "title": "Personal information",
                 "description": "Your account details and contact information.",
-                "email": "Email Address",
+                "email": "Email address",
                 "email_locked": "Email cannot be changed directly. Contact admin.",
-                "name": "Full Name",
-                "save": "Save Changes",
+                "name": "Full name",
+                "save": "Save changes",
                 "saving": "Saving...",
                 "success": "Profile updated successfully",
                 "error": "Failed to update profile",
@@ -404,14 +404,14 @@
                 "enabled": "Enabled",
                 "status_active": "Your account is secured with two-factor authentication.",
                 "status_inactive": "Account security is low",
-                "setup_cta": "Setup 2FA Now",
-                "configure_title": "Configure Authenticator App",
-                "scan_desc": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
+                "setup_cta": "Setup 2FA now",
+                "configure_title": "Configure authenticator app",
+                "scan_desc": "Scan this QR code with your authenticator app (google authenticator, authy, etc.)",
                 "enter_code": "Enter 6-digit code",
                 "enable_btn": "Enable 2FA",
                 "active_msg": "2FA is active",
                 "disable_btn": "Disable 2FA",
-                "confirm_disable": "Confirm Disable",
+                "confirm_disable": "Confirm disable",
                 "confirm_password_label": "Confirm with your password",
                 "verifying": "Verifying...",
                 "cancel": "Cancel",
@@ -420,14 +420,14 @@
                 "secret_copied": "Secret copied"
             },
             "password": {
-                "title": "Password Management",
+                "title": "Password management",
                 "description": "Update your password to keep your account secure.",
-                "current": "Current Password",
-                "new": "New Password",
-                "change_btn": "Change Password",
+                "current": "Current password",
+                "new": "New password",
+                "change_btn": "Change password",
                 "updating": "Updating...",
                 "success": "Password changed successfully",
-                "error": "Failed to change password. check current password.",
+                "error": "Failed to change password. Check current password.",
                 "validation": {
                     "required": "Required",
                     "min_length": "Min 8 characters"
@@ -436,7 +436,7 @@
         },
         "sidebar": {
             "home": "Dashboard",
-            "add_study": "Add Study",
+            "add_study": "Add study",
             "create_project": "CREATE NEW PROJECT",
             "dashboard": "Dashboard",
             "design": "Design",
@@ -445,25 +445,24 @@
             "team": "Team",
             "settings": "Settings",
             "workspace_settings": "Settings",
-            "study_tools": "Study Tools",
+            "study_tools": "Study tools",
             "workspace": "Workspace",
-
             "documentation": "Documentation",
             "support": "Support",
-            "study_management": "Study Management",
+            "study_management": "Study management",
             "search": "Search...",
             "studies": "Studies",
-            "select_study": "Select Study",
+            "select_study": "Select study",
             "select_study_msg": "Please select or create a study to begin.",
-            "view_all_studies": "All Studies",
+            "view_all_studies": "All studies",
             "study": "Study",
-            "select_workspace": "Select Workspace"
+            "select_workspace": "Select workspace"
         },
         "workspace": {
             "switcher": {
-                "settings": "Workspace Settings",
-                "settings_desc": "Members & Profiles",
-                "new_workspace": "New Workspace",
+                "settings": "Workspace settings",
+                "settings_desc": "Members & profiles",
+                "new_workspace": "New workspace",
                 "new_workspace_desc": "Create a new organization"
             },
             "roles": {
@@ -480,59 +479,58 @@
                 "closed": "Closed"
             },
             "create": {
-                "title": "Create Workspace",
+                "title": "Create workspace",
                 "description": "Create a new organization to manage your studies and team.",
-                "card_title": "Workspace Details",
+                "card_title": "Workspace details",
                 "card_description": "Enter the name and URL slug for your new workspace.",
-                "name_label": "Workspace Name",
-                "name_placeholder": "My University Research Group",
+                "name_label": "Workspace name",
+                "name_placeholder": "My university research group",
                 "url_label": "Workspace URL",
-                "url_placeholder": "my-research-group",
+                "url_placeholder": "My-research-group",
                 "url_description": "This will be used in your workspace URL.",
                 "cancel": "Cancel",
-                "create_button": "Create Workspace",
+                "create_button": "Create workspace",
                 "creating": "Creating...",
                 "success": "Workspace created successfully",
                 "error": "Failed to create workspace"
             }
         },
-
         "recruitment": {
             "title": "Recruitment",
             "description": "Generate secure links for your participants and monitor real-time recruitment efficiency.",
-            "new_link": "New Access Link",
-            "create_title": "Create Access Links",
+            "new_link": "New access link",
+            "create_title": "Create access links",
             "create_description": "Target specific cohorts or create general access. Each link type has different security and usage properties.",
-            "link_type": "Access Strategy",
+            "link_type": "Access strategy",
             "select_type": "Choose a recruitment type...",
-            "campaign_name": "Channel / Campaign Name",
-            "name_placeholder": "e.g. LinkedIn, Email Batch A, Student List...",
-            "link_count": "Batch Size",
-            "capacity_label": "Max Submissions",
-            "generate_links": "Provision Links",
+            "campaign_name": "Channel / campaign name",
+            "name_placeholder": "E.g. LinkedIn, email batch a, student list...",
+            "link_count": "Batch size",
+            "capacity_label": "Max submissions",
+            "generate_links": "Provision links",
             "no_links": "No recruitment links generated yet.",
-            "unnamed": "Unnamed Channel",
-            "revoked": "Access Revoked",
-            "qr_title": "Share Access Code",
+            "unnamed": "Unnamed channel",
+            "revoked": "Access revoked",
+            "qr_title": "Share access code",
             "qr_desc": "Participants can scan this code to leap directly into the study.",
-            "copy_link": "Copy Secure URL",
-            "table_title": "Access Control Panel",
+            "copy_link": "Copy secure URL",
+            "table_title": "Access control panel",
             "table_description": "Active channels and link lifecycle management.",
             "share_title": "Share study",
             "share_desc": "Distribute your study URL to invite participants.",
-            "public_url_label": "Public Participation URL",
+            "public_url_label": "Public participation URL",
             "hide_qr": "Hide QR",
             "show_qr": "Show QR",
-            "live_study": "Live Study",
-            "download_qr": "Download Image",
+            "live_study": "Live study",
+            "download_qr": "Download image",
             "qr_print_hint": "Scan or print this code for physical recruitment materials (flyers, posters).",
-            "analytics_title": "Campaign Analytics",
-            "analytics_desc": "Direct links and QR scans are automatically tracked in the Health Dashboard above.",
+            "analytics_title": "Campaign analytics",
+            "analytics_desc": "Direct links and QR scans are automatically tracked in the health dashboard above.",
             "copy_success": "Study link copied to clipboard",
             "types": {
-                "public": "Open Access (Public)",
-                "individual": "Single-Use Passcode",
-                "limited": "Capped Participation"
+                "public": "Open access (public)",
+                "individual": "Single-Use passcode",
+                "limited": "Capped participation"
             },
             "guidance": {
                 "public": "Best for high-volume recruitment. A single URL for all participants.",
@@ -540,19 +538,19 @@
                 "limited": "Controlled access. One link that stops working after a fixed number of submissions."
             },
             "stats": {
-                "total_links": "Total Channels",
+                "total_links": "Total channels",
                 "active_channels": "Active recruitment lots",
-                "started": "Total Sessions",
+                "started": "Total sessions",
                 "engagements": "Participants who started",
-                "submitted": "Valid Data",
+                "submitted": "Valid data",
                 "completions": "Finished submissions",
-                "conversion": "Capture Rate",
+                "conversion": "Capture rate",
                 "efficiency": "Final data yield"
             },
             "table": {
-                "name": "Campaign / Lot",
-                "type": "Entry Type",
-                "token": "Security Token",
+                "name": "Campaign / lot",
+                "type": "Entry type",
+                "token": "Security token",
                 "usage": "Capacity",
                 "status": "State",
                 "actions": "Manage"
@@ -572,18 +570,18 @@
         "analytics": {
             "charts": {
                 "recruitment_funnel": {
-                    "title": "Recruitment Funnel",
+                    "title": "Recruitment funnel",
                     "subtitle": "Aggregate conversion performance",
-                    "initial_contact": "Initial Contact",
+                    "initial_contact": "Initial contact",
                     "completion": "Completion",
-                    "started_study": "Started Study",
+                    "started_study": "Started study",
                     "submitted": "Submitted",
                     "yield": "Yield",
-                    "success_rate": "Success Rate",
+                    "success_rate": "Success rate",
                     "completion_rate": "{{rate}}% of starters completed"
                 },
                 "link_performance": {
-                    "title": "Link Performance Tracking",
+                    "title": "Link performance tracking",
                     "subtitle": "Monitor individual recruitment channel effectiveness",
                     "volume": "Volume",
                     "yield": "Yield",
@@ -604,12 +602,12 @@
             "settings": "Settings"
         },
         "command_menu": {
-            "title": "Global Command Menu",
+            "title": "Global command menu",
             "placeholder": "Type a command or search...",
             "no_results": "No results found.",
-            "switch_workspace": "Switch Workspace",
-            "switch_study": "Switch Study",
-            "study_actions": "Study Actions",
+            "switch_workspace": "Switch workspace",
+            "switch_study": "Switch study",
+            "study_actions": "Study actions",
             "system": "System",
             "no_studies": "No studies in this workspace.",
             "open_dashboard": "Open dashboard",
@@ -619,31 +617,31 @@
             "toggle_theme": "Toggle theme",
             "logout": "Log out",
             "search_label": "Search or run commands",
-            "to_open": "to open",
+            "to_open": "To open",
             "active": "Active"
         },
         "dashboard": {
-            "title": "Workspace Dashboard",
+            "title": "Workspace dashboard",
             "welcome": "Welcome back,",
             "snapshot": "Here's a snapshot of your research activity.",
-            "create_study": "Create Study",
-            "total_studies": "Total Studies",
+            "create_study": "Create study",
+            "total_studies": "Total studies",
             "across_statuses": "Across all statuses",
-            "active_data_collection": "Active Data Collection",
+            "active_data_collection": "Active data collection",
             "receiving_responses": "Studies receiving responses",
-            "recent_studies": "Recent Studies",
+            "recent_studies": "Recent studies",
             "recent_description": "A list of your most recently updated studies.",
             "created": "Created",
             "no_studies": "No studies found. Create your first study to get started!",
-            "import_study": "Import Study",
+            "import_study": "Import study",
             "timeline": {
-                "title": "Submissions Timeline",
+                "title": "Submissions timeline",
                 "subtitle": "Daily participation trends",
                 "started": "Started",
                 "completed": "Completed"
             },
             "devices": {
-                "title": "Device Distribution",
+                "title": "Device distribution",
                 "subtitle": "How participants access your study",
                 "types": {
                     "desktop": "Desktop",
@@ -654,36 +652,36 @@
             }
         },
         "export": {
-            "config": "Export Configuration",
+            "config": "Export configuration",
             "exporting": "Exporting...",
             "config_success": "Configuration exported successfully",
             "config_error": "Failed to export configuration"
         },
         "import": {
-            "title": "Import Study Configuration",
+            "title": "Import study configuration",
             "upload_desc": "Upload a previously exported study configuration file",
             "validate_desc": "Review configuration and provide a unique slug",
             "creating_desc": "Creating study...",
-            "file_upload": "File Upload",
+            "file_upload": "File upload",
             "paste_json": "Paste JSON",
             "drop_here": "Drop file here",
             "drag_drop": "Drag & drop JSON file or click to browse",
             "supported": "Supported format: .json",
             "paste_label": "Paste JSON configuration",
-            "validate": "Validate & Continue",
+            "validate": "Validate & continue",
             "valid": "Configuration is valid",
             "invalid": "Configuration has errors",
             "errors": "Errors",
             "warnings": "Warnings",
-            "summary": "Study Summary",
+            "summary": "Study summary",
             "title_field": "Title",
             "languages": "Languages",
             "statements": "Statements",
-            "grid": "Grid Range",
-            "new_slug": "New Study Slug",
+            "grid": "Grid range",
+            "new_slug": "New study slug",
             "slug_help": "Must be unique, 3-100 characters, lowercase letters, numbers, and hyphens only",
             "creating": "Creating study from configuration...",
-            "create_study": "Create Study",
+            "create_study": "Create study",
             "invalid_json": "Invalid JSON",
             "validation_failed": "Validation failed",
             "success": "Study imported successfully",
@@ -706,22 +704,22 @@
                 "warnings": {
                     "grid_capacity_mismatch": "Statement count ({{count}}) doesn't match grid capacity ({{capacity}})",
                     "missing_consent_draft": "Consent title or description missing (draft study)",
-                    "external_branding_logo": "Branding logo uses an external URL: {{url}}",
-                    "external_partner_logo": "Partner logo for '{{name}}' uses an external URL: {{url}}",
+                    "external_branding_logo": "Branding logo uses an external URL: {{URL}}",
+                    "external_partner_logo": "Partner logo for '{{name}}' uses an external URL: {{URL}}",
                     "external_logo": "Logo URL references external resource - may not be accessible"
                 }
             }
         },
         "dialogs": {
             "create_study": {
-                "title": "Create New Study",
-                "description": "Start a new Q-Methodology study. You can configure statements and settings later.",
-                "study_title": "Study Title",
-                "study_title_placeholder": "e.g. Perspectives on AI",
-                "url_slug": "URL Slug",
+                "title": "Create new study",
+                "description": "Start a new q-methodology study. You can configure statements and settings later.",
+                "study_title": "Study title",
+                "study_title_placeholder": "E.g. Perspectives on AI",
+                "url_slug": "URL slug",
                 "url_slug_placeholder": "e.g. ai-perspectives-2025",
                 "cancel": "Cancel",
-                "create": "Create Study",
+                "create": "Create study",
                 "success": "Study created successfully",
                 "error": "Failed to create study",
                 "languages": "Languages",
@@ -736,34 +734,34 @@
         "study_overview": {
             "title": "Overview",
             "subtitle": "Real-time analytics and participant overview for this study.",
-            "back_to_overview": "Back to Overview",
-            "sample_size": "Sample Size (N)",
+            "back_to_overview": "Back to overview",
+            "sample_size": "Sample size (n)",
             "valid": "valid",
-            "completion_rate": "Completion Rate",
+            "completion_rate": "Completion rate",
             "active": "active",
             "mobile": "mobile",
-            "median_duration": "Median Duration",
+            "median_duration": "Median duration",
             "suspect": "Suspect",
             "time_to_complete": "Time to complete",
-            "recent_activity": "Recent Activity",
+            "recent_activity": "Recent activity",
             "latest_submissions": "Latest submissions (last {{count}} of {{total}})",
-            "recently_completed": "Recently Completed",
-            "in_progress": "In Progress",
+            "recently_completed": "Recently completed",
+            "in_progress": "In progress",
             "discarded": "Discarded",
             "started": "Started",
             "view_all": "View all participants and data details",
             "no_participants": "No participants yet.",
             "view_data": "View",
             "submitted": "Submitted",
-            "edit_design": "Edit Design",
+            "edit_design": "Edit design",
             "steps": {
                 "welcome": "Welcome",
                 "consent": "Consent",
-                "rough_sort": "Rough Sort",
-                "fine_sort": "Q-Sort",
-                "final": "Final Steps"
+                "rough_sort": "Rough sort",
+                "fine_sort": "Q-sort",
+                "final": "Final steps"
             },
-            "reset_participants": "Reset Data",
+            "reset_participants": "Reset data",
             "reset_title": "Reset all participations?",
             "reset_description": "This action cannot be undone. This will permanently delete all participant data and Q-sort submissions for this study.",
             "reset_success": "Participants reset successfully",
@@ -772,24 +770,24 @@
         "study_status": {
             "dialog": {
                 "draft": {
-                    "title": "Revert to Draft?",
+                    "title": "Revert to draft?",
                     "desc": "This will stop data collection but allow you to modify the study design. Existing data is preserved.",
-                    "action": "Revert to Draft"
+                    "action": "Revert to draft"
                 },
                 "active": {
-                    "title": "Launch Study?",
+                    "title": "Launch study?",
                     "desc": "Activating the study will open it to participants.",
-                    "action": "Set to Active"
+                    "action": "Set to active"
                 },
                 "paused": {
-                    "title": "Pause Study?",
+                    "title": "Pause study?",
                     "desc": "Participants will not be able to enter the study while it is paused. You can resume later.",
-                    "action": "Pause Study"
+                    "action": "Pause study"
                 },
                 "closed": {
-                    "title": "Close Study?",
+                    "title": "Close study?",
                     "desc": "This will prevent new participants from entering. Existing sessions can still finish. You can reopen later.",
-                    "action": "Close Study"
+                    "action": "Close study"
                 }
             },
             "steps": {
@@ -811,8 +809,8 @@
                 }
             },
             "state": {
-                "activate": "Activate Study",
-                "manage": "Manage Status"
+                "activate": "Activate study",
+                "manage": "Manage status"
             },
             "notifications": {
                 "success": {
@@ -826,14 +824,14 @@
             }
         },
         "team": {
-            "title": "Research Team",
+            "title": "Research team",
             "description": "Manage collaborators and study-level access control.",
-            "invite_title": "Invite Collaborator",
+            "invite_title": "Invite collaborator",
             "invite_description": "Generate a secure link to invite a new member to this study.",
-            "email_label": "Email Address",
+            "email_label": "Email address",
             "role_label": "Role",
             "select_role": "Select a role",
-            "generate_link": "Generate Link",
+            "generate_link": "Generate link",
             "share_label": "Share this link with the invitee:",
             "copy_success": "Link copied to clipboard",
             "invite_success": "Invitation link generated!",
@@ -847,9 +845,9 @@
                 "actions": "Actions"
             },
             "roles": {
-                "owner": "Owner (Full Control)",
-                "editor": "Editor (Design & Analysis)",
-                "viewer": "Viewer (Read-only)",
+                "owner": "Owner (full control)",
+                "editor": "Editor (design & analysis)",
+                "viewer": "Viewer (read-only)",
                 "owner_badge": "OWNER",
                 "editor_badge": "EDITOR",
                 "viewer_badge": "VIEWER"
@@ -860,44 +858,43 @@
                 "viewer": "Read-only access to all modules."
             }
         },
-
         "design": {
-            "title": "Study Design",
-            "translation_needed": "Review required (Copy)",
+            "title": "Study design",
+            "translation_needed": "Review required (copy)",
             "translation_needed_desc": "This content was automatically copied from another language. Please review and localize it.",
-            "reset_defaults": "Reset to Defaults",
+            "reset_defaults": "Reset to defaults",
             "guidance": {
-                "title": "Design Guidance",
-                "intro_title": "Welcome to the Studio",
+                "title": "Design guidance",
+                "intro_title": "Welcome to the studio",
                 "intro_desc": "Start by defining the purpose of your study. This information will be shown to participants before they begin the sorting process.",
-                "qsort_title": "Statement & Grid Balance",
+                "qsort_title": "Statement & grid balance",
                 "qsort_desc": "Ensure your grid capacity exactly matches the number of statements. A balanced Q-set usually follows a quasi-normal (bell curve) distribution."
             },
             "checklist": {
                 "title": "Checklist",
                 "statements": "Statements",
                 "grid_balance": "Grid balanced",
-                "branding": "Logo & Colors",
+                "branding": "Logo & colors",
                 "instructions": "Instructions",
                 "ready": "All essential parts are ready. You can now launch your study!",
                 "pending": "Complete the required steps above to enable study activation.",
-                "study_title": "Study Title",
-                "consent_defined": "Consent Form",
+                "study_title": "Study title",
+                "consent_defined": "Consent form",
                 "progress": "Progress",
                 "languages": "Languages",
                 "status_ready": "Ready",
                 "status_pending": "Pending",
                 "required": "Required",
-                "reset_defaults": "Reset to Defaults"
+                "reset_defaults": "Reset to defaults"
             },
             "unsaved_changes": {
-                "title": "Unsaved Changes",
+                "title": "Unsaved changes",
                 "description": "You have unsaved changes in your study design. If you leave now, these changes will be lost.",
                 "confirm": "Leave without saving",
                 "cancel": "Keep editing"
             },
             "tips": {
-                "title": "Quick Tip",
+                "title": "Quick tip",
                 "pilot": "Always run a test sort yourself before sharing the link with participants."
             },
             "toolbar": {
@@ -911,7 +908,7 @@
                 "save": "Save",
                 "saved": "Saved",
                 "closed": "Closed",
-                "back_to_study": "Back to Study",
+                "back_to_study": "Back to study",
                 "editing_language": "Editing language",
                 "manage_langs": "Manage languages",
                 "select_lang": "Select language"
@@ -921,15 +918,15 @@
                 "error": "Save error",
                 "modified": "Unsaved changes",
                 "synced": "Changes saved",
-                "wait_save": "Saving in progress... please wait a moment.",
+                "wait_save": "Saving in progress... Please wait a moment.",
                 "recovered": "Draft recovered from local backup!",
-                "recovery_title": "Unsaved Changes Found",
+                "recovery_title": "Unsaved changes found",
                 "recovery_desc": "We found a local version of this study that is more recent than the one on the server. Would you like to restore it?",
                 "recovery_restore": "Restore local version",
                 "recovery_discard": "Discard local version"
             },
             "validation": {
-                "failed_title": "Configuration Incomplete",
+                "failed_title": "Configuration incomplete",
                 "failed_desc": "Your study cannot be activated yet. Please fix the following issues:",
                 "errors": {
                     "no_statements": "Study must have at least one statement.",
@@ -947,15 +944,15 @@
                 }
             },
             "languages": {
-                "manage_title": "Manage Languages",
+                "manage_title": "Manage languages",
                 "manage_desc": "Enable or disable languages available for participants to see in this study.",
-                "auto_translate": "Automatic Translation",
+                "auto_translate": "Automatic translation",
                 "auto_translate_desc": "Soon you will be able to use AI to automatically translate your study into 30+ languages.",
-                "activate_title": "Activate Language",
+                "activate_title": "Activate language",
                 "activate_desc": "Choose a source language to copy translations from. This prevents empty fields for participants.",
-                "source_label": "Source Language",
+                "source_label": "Source language",
                 "copy_notice": "All fields will be copied. You will see a visual indicator on fields that still need your translation.",
-                "confirm_activate": "Activate & Copy"
+                "confirm_activate": "Activate & copy"
             },
             "tabs": {
                 "welcome": "Welcome",
@@ -977,14 +974,14 @@
             },
             "intro": {
                 "welcome_title": "Welcome message",
-                "process_title": "Study Steps Overview",
+                "process_title": "Study steps overview",
                 "process_steps": {
-                    "title": "Study Steps Overview",
+                    "title": "Study steps overview",
                     "desc": "Define the phases shown to participants on the welcome page. If left empty, default steps will be used.",
                     "add_step": "Add step",
                     "empty": {
                         "title": "No custom steps defined",
-                        "desc": "The study will use the standard Q-methodology workflow (Meet, First impressions, Perspective, Why)."
+                        "desc": "The study will use the standard q-methodology workflow (meet, first impressions, perspective, why)."
                     },
                     "fields": {
                         "title": "Step title",
@@ -997,15 +994,15 @@
                         "new_desc": "Explain what the participant will do in this phase."
                     },
                     "reset": {
-                        "instructions": "Reset Instructions",
-                        "consent_title": "Reset Consent Title",
-                        "consent_description": "Reset Consent Description",
-                        "process_steps": "Reset Process Steps",
+                        "instructions": "Reset instructions",
+                        "consent_title": "Reset consent title",
+                        "consent_description": "Reset consent description",
+                        "process_steps": "Reset process steps",
                         "process_steps_confirm": "Are you sure you want to reset all process steps to defaults? This will replace your custom steps."
                     }
                 },
-                "consent_title": "Consent Form",
-                "reset": "Reset Instruction",
+                "consent_title": "Consent form",
+                "reset": "Reset instruction",
                 "consent_details": "Consent form details",
                 "fields": {
                     "title": "Study title",
@@ -1023,26 +1020,26 @@
                 "consent_desc": "Participants must agree to these terms before starting."
             },
             "condition": {
-                "title": "Condition of Instruction",
-                "label": "Define Condition of Instruction",
+                "title": "Condition of instruction",
+                "label": "Define condition of instruction",
                 "desc": "This is the core prompt that guides participants throughout the sorting process.",
-                "field_label": "Instruction Text",
-                "placeholder": "e.g. Please rank the following statements from those you most agree with to those you most disagree with",
-                "grid_title": "Grid Sort Instruction",
+                "field_label": "Instruction text",
+                "placeholder": "E.g. Please rank the following statements from those you most agree with to those you most disagree with",
+                "grid_title": "Grid sort instruction",
                 "grid_desc": "This is the core instruction guiding participants during the grid sorting process.",
-                "pre_title": "Preliminary Sort Instruction",
+                "pre_title": "Preliminary sort instruction",
                 "pre_desc": "Instruction given to participants during the initial rough sort.",
-                "pre_field_label": "Instruction Text",
-                "pre_placeholder": "e.g. Based on your personal point of view; divide the cards into three piles...",
-                "enable_pre": "Enable Pre-instruction step",
-                "pre_label": "Pre-instruction Content",
+                "pre_field_label": "Instruction text",
+                "pre_placeholder": "E.g. Based on your personal point of view; divide the cards into three piles...",
+                "enable_pre": "Enable pre-instruction step",
+                "pre_label": "Pre-instruction content",
                 "tips": {
                     "title": "Why is this important?",
-                    "desc": "In Q-methodology, the 'Condition of Instruction' determines the point of view from which the participant sorts the items. It should be clear, singular, and consistent across all sorting phases."
+                    "desc": "In q-methodology, the 'condition of instruction' determines the point of view from which the participant sorts the items. It should be clear, singular, and consistent across all sorting phases."
                 }
             },
             "questions": {
-                "enable_presort": "Enable Pre-sort Survey",
+                "enable_presort": "Enable pre-sort survey",
                 "enable_presort_desc": "Collect demographic information or other data before the sorting task.",
                 "add_field": "Add a new field",
                 "basic_fields": "Basic fields",
@@ -1051,8 +1048,8 @@
                     "question": "Question label",
                     "required": "Required field",
                     "options": "Options",
-                    "multiple": "(multiple selection allowed)",
-                    "single": "(single selection)",
+                    "multiple": "(Multiple selection allowed)",
+                    "single": "(Single selection)",
                     "placeholder": "Enter your question here..."
                 },
                 "types": {
@@ -1079,7 +1076,7 @@
                     "add_option": "Add option"
                 },
                 "logic": {
-                    "title": "Visibility Logic",
+                    "title": "Visibility logic",
                     "enable": "Add visibility condition",
                     "depends_on": "Show this question only if...",
                     "select_placeholder": "Select a parent question",
@@ -1101,18 +1098,18 @@
                 },
                 "bulk": {
                     "title": "Bulk editor (quick paste)",
-                    "desc": "One statement per line. Supports \"Code: Text\" and Excel copy-paste (multi-language).",
+                    "desc": "One statement per line. Supports \"code: text\" and excel copy-paste (multi-language).",
                     "replace_all": "Replace all",
                     "append": "Append to list",
                     "sync_by_code": "Sync/Merge by code",
-                    "placeholder": "Simple: \n1. My statement\n\nExpert (Excel paste with headers): \ncode\ten\tfr\ns1\tHello\tSalut",
+                    "placeholder": "Simple:. My statement",
                     "detected": "{{count}} statements detected",
                     "process_replace": "Process & replace statements",
                     "process_append": "Process & append statements",
                     "process_sync": "Process & sync translations",
                     "detected_format": {
-                        "excel": "Excel format detected (Tabs)",
-                        "list": "List format detected (Code: Text)",
+                        "excel": "Excel format detected (tabs)",
+                        "list": "List format detected (code: text)",
                         "simple": "Simple list detected (one per line)",
                         "multi_lang": "Multi-language: {{langs}}",
                         "with_codes": "With custom codes"
@@ -1125,7 +1122,7 @@
                     "updated": "Statement updated",
                     "cleared": "All statements cleared",
                     "imported": "Successfully imported {{count}} statements",
-                    "reset_codes": "Reset Codes",
+                    "reset_codes": "Reset codes",
                     "confirm_reset_codes": "Are you sure you want to re-sequence all statement codes (s1, s2, s3...)?",
                     "codes_reset": "Statement codes re-sequenced"
                 },
@@ -1142,14 +1139,14 @@
                     "desc": "The grid shape forces participants to discriminate between statements, approximating a normal distribution.",
                     "slot_count": "{{count}} slots allocated",
                     "stat_count": "{{count}} statements",
-                    "perfect": "Perfect Balance",
+                    "perfect": "Perfect balance",
                     "too_many": "{{count}} too many statements",
                     "too_few": "{{count}} statements missing",
                     "min_reached": "Minimum range reached (±2)",
                     "max_reached": "Maximum range reached (±6)",
                     "remove_extreme_columns": "Remove extreme columns",
                     "add_extreme_columns": "Add extreme columns",
-                    "symmetry_lock": "Symmetry Lock",
+                    "symmetry_lock": "Symmetry lock",
                     "symmetry_lock_desc": "Automatically apply changes to opposite columns to maintain a balanced distribution.",
                     "auto_balance": "Auto-Balance",
                     "auto_balance_desc": "Reshape grid to a balanced semi-normal distribution",
@@ -1157,21 +1154,21 @@
                     "balanced": "Grid balanced to standard distribution",
                     "no_statements": "Add statements first to auto-shape the grid",
                     "statements": "statements",
-                    "ideal_shape": "Ideal Shape",
+                    "ideal_shape": "Ideal shape",
                     "symmetric": "Symmetric",
                     "asymmetric": "Asymmetric",
                     "tooltip_title": "Why forced distribution?",
                     "tooltip_desc": "Q-methodology uses a quasi-normal distribution (kurtosis > 0) to ensure participants make meaningful distinctions. The pyramid shape prevents central tendency bias.",
-                    "locked": "Design Locked",
+                    "locked": "Design locked",
                     "locked_desc": "Structural changes (statement codes, grid) are disabled because the study has collected data or is no longer in draft mode. You can still edit text translations.",
-                    "locked_active": "Study is Active",
+                    "locked_active": "Study is active",
                     "locked_active_desc": "The study is currently collecting data. To modify the design, you must first revert it to draft mode (warning: this may invalidate existing results).",
-                    "locked_paused": "Study is Paused",
+                    "locked_paused": "Study is paused",
                     "locked_paused_desc": "The study is currently paused. Design remains locked to protect existing data.",
-                    "locked_closed": "Study is Closed",
+                    "locked_closed": "Study is closed",
                     "locked_closed_desc": "This study is completed. The design is archived and cannot be changed.",
                     "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match.",
-                    "unlock_hint": "Go to Data Explorer to purge sessions and unlock structure"
+                    "unlock_hint": "Go to data explorer to purge sessions and unlock structure"
                 }
             },
             "postsort": {
@@ -1195,17 +1192,17 @@
                     "desc": "Add custom questions to the post-sort survey."
                 },
                 "missing": {
-                    "title": "Missing Statements?",
+                    "title": "Missing statements?",
                     "desc": "Are there any ideas that are important to you and that you feel are missing from this set of statements?",
-                    "prompt_label": "Prompt Text",
+                    "prompt_label": "Prompt text",
                     "prompt_placeholder": "Please feel free to suggest and explain."
                 },
                 "steps": {
-                    "step1": "Step 1: Feedback",
-                    "step2": "Step 2: Questions"
+                    "step1": "Step 1: feedback",
+                    "step2": "Step 2: questions"
                 },
                 "email": {
-                    "title": "Participant Follow-up",
+                    "title": "Participant follow-up",
                     "desc": "Collect email addresses for follow-up or research results.",
                     "interview": "Offer follow-up",
                     "results": "Offer to subscribe to a mailing list about study outcomes",
@@ -1215,13 +1212,13 @@
             },
             "interface": {
                 "title": "Interface customization",
-                "desc": "Customize the buttons and labels of the interface to match your study's tone (e.g., changing \"Agree/Disagree\" to \"Like/Dislike\").",
+                "desc": "Customize the buttons and labels of the interface to match your study's tone (e.g., changing \"agree/disagree\" to \"like/dislike\").",
                 "nav": {
-                    "title": "Navigation Buttons",
-                    "start": "Start Button",
-                    "next": "Next Step Button",
-                    "submit": "Submit Button",
-                    "confirm": "Confirm Sort Button",
+                    "title": "Navigation buttons",
+                    "start": "Start button",
+                    "next": "Next step button",
+                    "submit": "Submit button",
+                    "confirm": "Confirm sort button",
                     "tooltips": {
                         "start": "Button that starts the study",
                         "next": "Move to the next step",
@@ -1232,23 +1229,23 @@
                 "terms": {
                     "title": "Sorting terminology",
                     "desc": "Define the labels for the spontaneous sort and the grid spectrum.",
-                    "rough": "Rough Sort Labels",
+                    "rough": "Rough sort labels",
                     "agree": "Agree",
                     "neutral": "Neutral",
                     "disagree": "Disagree",
-                    "grid": "Grid Legends (extremes)",
-                    "most_agree": "Most Agree",
-                    "most_disagree": "Most Disagree"
+                    "grid": "Grid legends (extremes)",
+                    "most_agree": "Most agree",
+                    "most_disagree": "Most disagree"
                 },
                 "hints": {
-                    "title": "Methodology Tips",
+                    "title": "Methodology tips",
                     "desc": "Add or modify floating hints to help participants during the grid sort phase.",
                     "placeholder": "Enter a methodology tip...",
-                    "add": "Add Tip",
-                    "reset": "Reset to Defaults"
+                    "add": "Add tip",
+                    "reset": "Reset to defaults"
                 },
                 "help": {
-                    "title": "Step Guidance (What/Why)",
+                    "title": "Step guidance (what/why)",
                     "desc": "Customize the context-sensitive help available to participants at each step via the '?' overlay."
                 }
             },
@@ -1270,22 +1267,22 @@
                     "help_desc": "The logo is displayed at the top of every study page (navigation bar) and on the welcome page. It reinforces your project's visual identity."
                 },
                 "partners": {
-                    "title": "Institutional Partners",
+                    "title": "Institutional partners",
                     "desc": "Add logos of supporting institutions or partners.",
-                    "add": "Add Partner",
-                    "name_label": "Partner Name",
-                    "name_placeholder": "Institution Name",
+                    "add": "Add partner",
+                    "name_label": "Partner name",
+                    "name_placeholder": "Institution name",
                     "logo_label": "Logo URL",
-                    "url_label": "Website (Optional)",
-                    "url_placeholder": "https://...",
-                    "help_title": "Display of Logos",
+                    "url_label": "Website (optional)",
+                    "url_placeholder": "Https://...",
+                    "help_title": "Display of logos",
                     "help_desc": "Partner logos are displayed on the landing page as well as in the study header, next to the main logo."
                 },
                 "upload": {
                     "upload": "Upload",
                     "recommended": "Recommended",
                     "invalid_type": "Invalid file type. Use PNG, JPG, or SVG.",
-                    "file_too_large": "File too large. Maximum size: {{size}}KB.",
+                    "file_too_large": "File too large. Maximum size: {{size}}kb.",
                     "conversion_error": "Failed to process image.",
                     "processing": "Processing image...",
                     "drag_drop": "Drag & drop or click to upload",
@@ -1294,21 +1291,21 @@
             }
         },
         "data": {
-            "title": "Data Explorer",
+            "title": "Data explorer",
             "description": "Monitor real-time participation, analyze data quality, and manage research sessions.",
             "stats": {
-                "email_collection": "Email Collection",
+                "email_collection": "Email collection",
                 "participants": "total",
-                "newsletter": "Newsletter Consent",
-                "opt_in": "response rate",
-                "follow_up": "Follow-up Potential",
+                "newsletter": "Newsletter consent",
+                "opt_in": "Response rate",
+                "follow_up": "Follow-up potential",
                 "interested": "interested"
             },
             "tabs": {
-                "live": "Live Participants",
-                "test": "Test Sessions",
-                "browse": "Interactive View",
-                "export": "Export Hub"
+                "live": "Live participants",
+                "test": "Test sessions",
+                "browse": "Interactive view",
+                "export": "Export hub"
             },
             "status": {
                 "started": "started",
@@ -1316,11 +1313,11 @@
                 "discarded": "discarded"
             },
             "actions": {
-                "clear_test_runs": "Purge Test Data",
+                "clear_test_runs": "Purge test data",
                 "clear_test_runs_confirm": "Delete all test sessions? This action is irreversible and for maintenance only.",
-                "clear_test_runs_success": "Pipeline cleaned: Test data purged",
-                "clear_test_runs_error": "System failure: Could not purge test data",
-                "clear_all_data": "Clear All Data",
+                "clear_test_runs_success": "Pipeline cleaned: test data purged",
+                "clear_test_runs_error": "System failure: could not purge test data",
+                "clear_all_data": "Clear all data",
                 "clear_all_confirm": "Are you sure you want to delete ALL responses for this study? This will unlock the study structure and allow you to modify the grid or statement codes again. This action cannot be undone.",
                 "clear_all_success": "All participants successfully cleared!",
                 "clear_all_error": "Failed to clear participants"
@@ -1329,81 +1326,81 @@
                 "title": "Format guide",
                 "csv": {
                     "title": "Universal CSV",
-                    "desc": "Raw rectangular data. Best for R, Python, SPSS, or Excel analysis. Includes all metadata."
+                    "desc": "Raw rectangular data. Best for r, python, SPSS, or excel analysis. Includes all metadata."
                 },
                 "json": {
                     "title": "KenQ JSON",
-                    "desc": "Optimized for the Web-KenQ analysis tool. Contains study definition and sorts."
+                    "desc": "Optimized for the web-kenq analysis tool. Contains study definition and sorts."
                 },
                 "zip": {
-                    "title": "PQMethod Bundle (ZIP)",
+                    "title": "PQMethod bundle (ZIP)",
                     "desc": "Contains legacy .DAT and .STA files for DOS PQMethod analysis."
                 }
             },
             "table": {
-                "participant": "Participant Identity",
-                "id_token": "ID / Token",
+                "participant": "Participant identity",
+                "id_token": "ID / token",
                 "lang": "Locale",
-                "flags": "Data Quality",
-                "duration": "Effort / Duration",
+                "flags": "Data quality",
+                "duration": "Effort / duration",
                 "actions": "Details",
                 "submitted": "Submitted",
                 "status": "State"
             },
             "tooltips": {
-                "suspect": "Suspect: Completion time unusually fast",
+                "suspect": "Suspect: completion time unusually fast",
                 "has_comments": "Contains qualitative insights"
             },
             "filter": {
                 "show_discarded": "Include discarded records",
-                "all_states": "All States",
-                "only_active": "Only Active",
-                "only_flagged": "Flagged Quality"
+                "all_states": "All states",
+                "only_active": "Only active",
+                "only_flagged": "Flagged quality"
             },
             "search": {
                 "placeholder": "Search by ID or recruitment token...",
-                "records_found": "records detected",
+                "records_found": "Records detected",
                 "no_results": "No records match your query"
             },
             "errors": {
                 "load_failed": "Cloud sync interrupted. Please check your connection."
             },
             "detail": {
-                "title": "Participant Profile",
+                "title": "Participant profile",
                 "session": "Session",
                 "discarded_badge": "Discarded",
-                "description": "Comprehensive Q-Sort results and metadata.",
+                "description": "Comprehensive Q-sort results and metadata.",
                 "stats": {
-                    "duration": "Total Duration",
-                    "language": "Language Used"
+                    "duration": "Total duration",
+                    "language": "Language used"
                 },
                 "actions": {
-                    "discard": "Discard Participant",
-                    "restore": "Restore Participant"
+                    "discard": "Discard participant",
+                    "restore": "Restore participant"
                 },
-                "sort_config": "Sort Configuration",
+                "sort_config": "Sort configuration",
                 "survey": {
-                    "title": "Survey Responses",
+                    "title": "Survey responses",
                     "csv_note": "Full survey answers available in CSV export."
                 }
             },
             "team": {
-                "title": "Study Team",
+                "title": "Study team",
                 "description": "Manage collaborators and study-level access control.",
-                "invite_title": "Invite Collaborator",
+                "invite_title": "Invite collaborator",
                 "invite_description": "Generate a secure link to invite a new member to this study.",
-                "email_label": "Email Address",
+                "email_label": "Email address",
                 "role_label": "Role",
                 "select_role": "Select a role",
-                "generate_link": "Generate Link",
+                "generate_link": "Generate link",
                 "invite_success": "Invitation link generated!",
                 "invite_error": "Failed to generate invitation",
                 "copy_success": "Link copied to clipboard",
                 "share_label": "Share this link with the invitee:",
-                "collab_overview": "Collaboration Overview",
-                "active_members": "Active Members",
-                "permissions_info": "Permissions Info",
-                "list_title": "Research Team",
+                "collab_overview": "Collaboration overview",
+                "active_members": "Active members",
+                "permissions_info": "Permissions info",
+                "list_title": "Research team",
                 "list_description": "Manage access for existing collaborators.",
                 "added_on": "Added on",
                 "headers": {
@@ -1412,9 +1409,9 @@
                     "actions": "Actions"
                 },
                 "roles": {
-                    "owner": "Owner (Full Control)",
-                    "editor": "Editor (Design & Analysis)",
-                    "viewer": "Viewer (Read-only)",
+                    "owner": "Owner (full control)",
+                    "editor": "Editor (design & analysis)",
+                    "viewer": "Viewer (read-only)",
                     "owner_badge": "OWNER",
                     "editor_badge": "EDITOR",
                     "viewer_badge": "VIEWER"
@@ -1429,7 +1426,7 @@
                 "participants": {
                     "title": "Ready to launch?",
                     "desc": "Share your study link to start collecting responses. Your first participant is just a click away.",
-                    "action": "Copy Study Link",
+                    "action": "Copy study link",
                     "hint": "Or scan the QR code",
                     "copy_success": "Study link copied to clipboard!"
                 },
@@ -1439,9 +1436,9 @@
                     "action": "Invite your first collaborator"
                 },
                 "designer": {
-                    "title": "Tabula Rasa",
+                    "title": "Tabula rasa",
                     "desc": "This study has no statements yet. Add your Q-set items to begin designing your sort.",
-                    "action": "Load Example Q-Set"
+                    "action": "Load example Q-set"
                 }
             }
         },
@@ -1452,44 +1449,44 @@
             "draft": "Draft"
         },
         "settings": {
-            "title": "General Settings",
+            "title": "General settings",
             "description": "Manage basic study configuration, URL slug, and lifecycle states.",
             "basic": {
-                "title": "Basic Information",
+                "title": "Basic information",
                 "description": "Configure the study identity and availability window.",
-                "slug_label": "URL Slug",
+                "slug_label": "URL slug",
                 "slug_description": "The unique identifier used in the URL.",
-                "start_date_label": "Start Date (Optional)",
+                "start_date_label": "Start date (optional)",
                 "start_date_description": "Automatically opens the study on this date.",
-                "end_date_label": "End Date (Optional)",
+                "end_date_label": "End date (optional)",
                 "end_date_description": "Automatically closes the study on this date.",
                 "pick_date": "Pick a date"
             },
             "lifecycle": {
                 "title": "Archiving",
                 "description": "Archive the study to make it read-only for everyone.",
-                "notice": "To archive a study, it must first be Closed. Once archived, no further changes can be made.",
-                "archived_status": "Study is Archived",
-                "archive_button": "Archive Study",
-                "current_state": "Current State"
+                "notice": "To archive a study, it must first be closed. Once archived, no further changes can be made.",
+                "archived_status": "Study is archived",
+                "archive_button": "Archive study",
+                "current_state": "Current state"
             },
             "danger": {
-                "title": "Danger Zone",
+                "title": "Danger zone",
                 "description": "Actions here are irreversible.",
-                "notice": "Deleting a study removes ALL data (participants, answers, config) permanently. Study must be Archived before deletion.",
-                "delete_button": "Delete Study",
+                "notice": "Deleting a study removes ALL data (participants, answers, config) permanently. Study must be archived before deletion.",
+                "delete_button": "Delete study",
                 "delete_confirm": "Are you sure? This action is IRREVERSIBLE."
             },
-            "save_button": "Save Changes",
+            "save_button": "Save changes",
             "save_success": "Settings updated",
             "save_success_desc": "Study settings have been saved.",
             "save_error": "Error updating settings",
             "save_error_desc": "Failed to update settings. Slug might be taken.",
-            "archive_success": "Study Archived",
+            "archive_success": "Study archived",
             "archive_success_desc": "The study is now archived and read-only.",
             "archive_error": "Error archiving study",
             "archive_error_desc": "Failed to archive study. Is it closed?",
-            "delete_success": "Study Deleted",
+            "delete_success": "Study deleted",
             "delete_success_desc": "The study has been permanently removed.",
             "delete_error": "Error deleting study",
             "delete_error_desc": "Failed to delete study."
@@ -1497,24 +1494,24 @@
         "workspaces": {
             "title": "Workspaces",
             "settings": {
-                "title": "Workspace Settings",
+                "title": "Workspace settings",
                 "identity_desc": "Manage workspace identity and team access control.",
                 "general": {
-                    "title": "General Settings",
+                    "title": "General settings",
                     "desc": "Identity and primary identification of your workspace.",
-                    "label_title": "Workspace Title",
-                    "placeholder_title": "My Awesome Lab",
-                    "label_slug": "URL Slug",
-                    "placeholder_slug": "my-lab",
+                    "label_title": "Workspace title",
+                    "placeholder_title": "My awesome lab",
+                    "label_slug": "URL slug",
+                    "placeholder_slug": "My-lab",
                     "slug_hint": "Changing the slug will update all your research dashboard links.",
-                    "save": "Save Changes",
+                    "save": "Save changes",
                     "save_success": "Workspace updated successfully",
                     "save_error": "Failed to update workspace."
                 },
-                "team_growth_title": "Team Management",
+                "team_growth_title": "Team management",
                 "team_growth_desc": "Need more researchers? You can invite collaborators to your workspace. They will be able to manage all studies within this workspace.",
                 "team": {
-                    "title": "Team Members",
+                    "title": "Team members",
                     "desc": "List of users with access to this workspace.",
                     "col_user": "User",
                     "col_role": "Role",
@@ -1523,14 +1520,14 @@
                     "remove_confirm": "Are you sure you want to remove this member?",
                     "remove_success": "Member removed successfully",
                     "remove_error": "Failed to remove member",
-                    "growth_title": "Team Growth",
+                    "growth_title": "Team growth",
                     "growth_desc": "Need more researchers? You can invite collaborators to your workspace. They will be able to manage all studies within this workspace.",
-                    "invite_button": "Invite Collaborator",
+                    "invite_button": "Invite collaborator",
                     "permissions_matrix": {
-                        "title": "Permissions Matrix",
+                        "title": "Permissions matrix",
                         "admin": {
                             "label": "Admin",
-                            "badge": "Full Access",
+                            "badge": "Full access",
                             "desc": "Can manage workspace settings, members, and all studies."
                         },
                         "researcher": {
@@ -1540,19 +1537,19 @@
                         },
                         "viewer": {
                             "label": "Viewer",
-                            "badge": "Read Only",
+                            "badge": "Read only",
                             "desc": "Read-only access to all studies and data in the workspace."
                         }
                     },
-                    "coming_soon": "Coming Soon",
+                    "coming_soon": "Coming soon",
                     "invite_modal": {
-                        "title": "Invite Collaborator",
+                        "title": "Invite collaborator",
                         "desc": "Send a secure invitation to join your research team.",
-                        "email_label": "Collaborator Email",
-                        "role_label": "Assigned Role",
+                        "email_label": "Collaborator email",
+                        "role_label": "Assigned role",
                         "success": "Invitation link generated!",
                         "error": "Failed to create invitation.",
-                        "send": "Create & Send Invitation",
+                        "send": "Create & send invitation",
                         "copy_success": "Link copied to clipboard!",
                         "copy_hint": "Copy this link and send it manually if the email fails."
                     }

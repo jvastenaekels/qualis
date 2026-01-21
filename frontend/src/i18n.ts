@@ -29,7 +29,7 @@ i18n
         },
 
         backend: {
-            loadPath: '/locales/{{lng}}/{{ns}}.json?v=20260121_v2',
+            loadPath: '/locales/{{lng}}/{{ns}}.json?v=20260122_v1',
         },
 
         detection: {
