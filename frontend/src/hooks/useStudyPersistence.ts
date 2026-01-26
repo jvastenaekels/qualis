@@ -14,7 +14,8 @@ import { toast } from 'sonner';
  */
 export function useStudyPersistence() {
     const { t } = useTranslation();
-    const { slug } = useParams<{ slug: string }>();
+    const { slug, studySlug } = useParams<{ slug: string; studySlug: string }>();
+    const effectiveSlug = studySlug || slug;
     const {
         draft,
         original,
@@ -57,7 +58,7 @@ export function useStudyPersistence() {
 
     // 4. Change Detection Logic
     useEffect(() => {
-        if (!draft || !slug) return;
+        if (!draft || !effectiveSlug) return;
 
         // Detect if something actually changed relative to what's on server or last saved
         const originalDraft = original ? projectStudyToUpdate(original) : null;
@@ -90,16 +91,19 @@ export function useStudyPersistence() {
                     _study_id: original?.id,
                     _backup_at: new Date().toISOString(),
                 };
-                localStorage.setItem(`open-q-draft-backup-${slug}`, JSON.stringify(backupData));
+                localStorage.setItem(
+                    `open-q-draft-backup-${effectiveSlug}`,
+                    JSON.stringify(backupData)
+                );
             }
         }, 1000); // Debounce backup
 
         return () => clearTimeout(backupTimer);
-    }, [draft, slug, original, setSyncStatus, syncStatus]);
+    }, [draft, effectiveSlug, original, setSyncStatus, syncStatus]);
 
     // 5. Manual Save Function
     const save = useCallback(async () => {
-        if (!draft || !slug || syncStatus === 'saving') return;
+        if (!draft || !effectiveSlug || syncStatus === 'saving') return;
 
         const draftJson = JSON.stringify(draft);
 
@@ -113,7 +117,7 @@ export function useStudyPersistence() {
 
         try {
             const result = await updateMutation.mutateAsync({
-                slug,
+                slug: effectiveSlug as string,
                 data: draft as StudyUpdate,
             });
 
@@ -199,7 +203,7 @@ export function useStudyPersistence() {
         }
     }, [
         draft,
-        slug,
+        effectiveSlug,
         syncStatus,
         setSyncStatus,
         updateMutation,

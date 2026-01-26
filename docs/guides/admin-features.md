@@ -213,11 +213,23 @@ Identify the most significant patterns in your Q-set:
 
 **Location**: `/admin/studies/{slug}/exports` (Click any participant ID)
 
-Inspect individual perspectives with high-fidelity visualizations:
+Inspect individual perspectives with a high-fidelity, tabbed interface:
+
+### 1. Visual Sort
 
 - **Grid Reconstruction**: See the participant's exact sorting layout in a 2D pyramid grid matching the study design.
 - **Interactive Tooltips**: Hover over statements in the grid to read their full text and see their original code.
-- **Metadata Inspection**: View duration, user agent, and survey responses alongside the visual sort.
+- **Contextual Awareness**: The grid highlights consensus and controversy items directly in the participant's layout.
+
+### 2. Survey Responses
+
+- **Demographics & Follow-up**: View all answers from the Pre-sort and Post-sort surveys in a clean, searchable table.
+- **Heterogeneous Data Support**: Gracefully handles different question types (text, choice, scale).
+
+### 3. Environment & Metadata
+
+- **Technical Footprint**: Detailed breakdown of the participant's device, OS, and browser (parsed via `ua-parser-js`).
+- **Session Info**: Total duration, completion timestamps, and hashed IP address for privacy-preserving auditing.
 
 ---
 

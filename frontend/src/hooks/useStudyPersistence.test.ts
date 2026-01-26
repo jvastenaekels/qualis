@@ -14,7 +14,7 @@ vi.mock('@/utils/mergeStudy', () => ({
     })),
 }));
 vi.mock('react-router-dom', () => ({
-    useParams: () => ({ slug: 'test-study' }),
+    useParams: () => ({ studySlug: 'test-study' }),
     useBlocker: vi.fn(() => ({ state: 'unblocked', proceed: vi.fn(), reset: vi.fn() })),
 }));
 

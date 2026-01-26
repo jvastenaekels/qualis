@@ -11,6 +11,16 @@ graph TD
     subgraph "Page Components"
         RSP[RoughSortPage]
         FSP[FineSortPage]
+        PDP[ParticipantDetailsPage]
+    end
+
+    subgraph "Admin Components"
+        PDC[ParticipantDetailContent]
+        PDC_V[VisualSortTab]
+        PDC_R[ResponsesTab]
+        PDC_E[EnvironmentTab]
+        SRT[SurveyResponseTable]
+        PMC[ParticipantMetadataCard]
     end
 
     subgraph "Core Components"
@@ -24,6 +34,12 @@ graph TD
         CP[CardPile]
         WB[WorkbenchPanel]
     end
+
+    PDP --> PDC
+    PDC --> PDC_V & PDC_R & PDC_E
+    PDC_V --> GS
+    PDC_R --> SRT
+    PDC_E --> PMC
 
     RSP --> CS
     CS --> SC
@@ -155,6 +171,28 @@ Displays a stack of cards in a pile with count badge.
 | `type`    | `'agree' \| 'disagree' \| 'neutral'` | Pile category             |
 | `count`   | `number`                             | Number of cards remaining |
 | `topCard` | `Card \| undefined`                  | Card to display on top    |
+
+---
+
+## Admin Components
+
+### ParticipantDetailContent
+
+**Location:** `src/components/admin/exports/ParticipantDetailContent.tsx`
+
+The primary container for inspecting a participant session. Organizes content into three tabs: **Visual Sort**, **Responses**, and **Environment**.
+
+### SurveyResponseTable
+
+**Location:** `src/components/admin/exports/SurveyResponseTable.tsx`
+
+A dynamic table that displays Pre-sort and Post-sort data. It handles heterogeneous key-value pairs and applies automatic label mapping via i18n keys if available.
+
+### ParticipantMetadataCard
+
+**Location:** `src/components/admin/exports/ParticipantMetadataCard.tsx`
+
+Displays technical session details including OS, Browser (v), IP, and duration. It uses `ua-parser-js` (via backend) to provide human-readable device information.
 
 ---
 

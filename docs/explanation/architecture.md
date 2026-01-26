@@ -31,7 +31,17 @@ graph LR
     Query -->|REST| API
     API <--> ORM
     ORM <--> DB
+
+    style API stroke:#3b82f6,stroke-width:2px
 ```
+
+### Workspace-First Flow
+
+Open-Q 2.0 introduces a **Workspace-First** architecture.
+
+- Most API requests are scoped by a mandatory `X-Workspace-ID` header.
+- The `useAdminStore` maintains the global selection context (Active Workspace + Study) across all admin pages.
+- Access control is inherited from the Workspace level, ensuring researchers only see the studies and data they are authorized to manage.
 
 ---
 
@@ -47,6 +57,8 @@ Three atomic stores are used for clean separation of concerns:
 ```mermaid
 flowchart TD
     subgraph "Zustand Stores"
+        Auth["useAuthStore<br/>👤 User, Workspaces, MFA"]
+        Admin["useAdminStore<br/>🏢 Active Workspace, Study Selection"]
         Config["useConfigStore<br/>📄 Study config, statements, grid"]
         Session["useSessionStore<br/>🔐 Step, consent, language"]
         Response["useResponseStore<br/>📝 Rough sort, Q-sort, post-sort"]
@@ -61,23 +73,29 @@ flowchart TD
         Post[PostSortPage]
     end
 
+    Admin --> Config
+    Auth --> Admin
     Config --> WP & PS & RS & FS & Post
     Session --> WP & PS & RS & FS & Post
     Response --> RS & FS & Post
     UI --> FS
 
+    style Auth fill:#fee2e2
+    style Admin fill:#e0f2fe
     style Config fill:#dbeafe
     style Session fill:#fef3c7
     style Response fill:#dcfce7
     style UI fill:#f3e8ff
 ```
 
-| Store              | Purpose                                      | Persisted       |
-| ------------------ | -------------------------------------------- | --------------- |
-| `useConfigStore`   | Study configuration, statements, grid layout | ❌              |
-| `useSessionStore`  | Current step, consent status, language       | ✅ localStorage |
-| `useResponseStore` | Participant data (rough, qsort, postsort)    | ✅ localStorage |
-| `useUIStore`       | Transient UI state (zoomed card)             | ❌              |
+| Store              | Purpose                                       | Persisted       |
+| ------------------ | --------------------------------------------- | --------------- |
+| `useAuthStore`     | Current authenticated user and workspace list | ✅ localStorage |
+| `useAdminStore`    | Active workspace and study selection context  | ✅ localStorage |
+| `useConfigStore`   | Study configuration, statements, grid layout  | ❌              |
+| `useSessionStore`  | Current step, consent status, language        | ✅ localStorage |
+| `useResponseStore` | Participant data (rough, qsort, postsort)     | ✅ localStorage |
+| `useUIStore`       | Transient UI state (zoomed card)              | ❌              |
 
 ---
 
@@ -304,6 +322,7 @@ frontend/src/
 │   ├── FineSortPage.tsx
 │   └── PostSortPage.tsx
 ├── components/         # Reusable UI
+│   ├── admin/          # Admin-specific UI (Dashboards, Team, Analytics)
 │   ├── GridSort.tsx    # Q-grid with zoom/pan
 │   ├── CardStack.tsx   # Swipeable card deck
 │   ├── SortableCard.tsx

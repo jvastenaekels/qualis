@@ -148,12 +148,16 @@ curl -X POST "http://localhost:8000/api/token" \
 
 ### 2. Use the Token
 
-Include the token in the `Authorization` header for all requests to `/api/admin/*`:
-`Authorization: Bearer <your_token>`
+### Authentication & Headers
+
+Administrative endpoints require two layers of identification:
+
+1.  **JWT Token**: Provided in the `Authorization: Bearer <token>` header.
+2.  **Workspace ID**: Provided in the `X-Workspace-ID` header. This is mandatory for all requests targeting studies, recruitment, or exports.
 
 ---
 
-## Administrative API
+## 🏗️ Administrative API
 
 The Administrative API allows researchers to manage studies, users, and data.
 
