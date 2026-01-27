@@ -146,8 +146,8 @@
         },
         "steps": {
             "presort": "Esikysely",
-            "rough": "Karkea lajittelu",
-            "fine": "Ruudukkoasettelu",
+            "rough": "Alustava lajittelu",
+            "fine": "Tarkka lajittelu",
             "post": "Lopullinen arviointi"
         }
     },
@@ -371,9 +371,9 @@
             "click_to_edit": "Napsauta muokataksesi"
         },
         "layout": {
-            "title": "Admin",
+            "title": "Ylläpito",
             "back_home": "Palaa etusivulle",
-            "beta": "Tutkimus beta",
+            "beta": "Tutkimuksen beta-versio",
             "logout": "Kirjaudu ulos",
             "profile": "Profiili",
             "admin_user": "Ylläpitäjä"
@@ -433,7 +433,7 @@
             "home": "Hallintapaneeli",
             "add_study": "Lisää tutkimus",
             "create_project": "LUO UUSI PROJEKTI",
-            "dashboard": "Kojelauta",
+            "dashboard": "Yhteenveto",
             "design": "Suunnittelu",
             "recruit": "Rekrytointi",
             "data": "Tiedot",
@@ -586,7 +586,7 @@
             }
         },
         "breadcrumbs": {
-            "admin": "Admin",
+            "admin": "Ylläpito",
             "dashboard": "Yhteenveto",
             "study_dashboard": "Yhteenveto",
             "design": "Suunnittelu",
@@ -616,7 +616,7 @@
             "active": "Aktiivinen"
         },
         "dashboard": {
-            "title": "Työtilan kojelauta",
+            "title": "Työtilan yhteenveto",
             "welcome": "Tervetuloa takaisin,",
             "snapshot": "Tässä on yhteenveto tutkimustoiminnastasi.",
             "create_study": "Luo tutkimus",
@@ -753,7 +753,7 @@
                 "welcome": "Tervetuloa",
                 "consent": "Suostumus",
                 "rough_sort": "Alustava lajittelu",
-                "fine_sort": "Hieno lajittelu",
+                "fine_sort": "Tarkka lajittelu",
                 "final": "Viimeiset vaiheet"
             },
             "reset_participants": "Nollaa tiedot",
@@ -888,8 +888,8 @@
                 "cancel": "Jatka muokkaamista"
             },
             "tips": {
-                "title": "Quick Tip",
-                "pilot": "Always run a test sort yourself before sharing the link with participants."
+                "title": "Pikavinkki",
+                "pilot": "Tee aina testilajittelu itse ennen linkin jakamista osallistujille."
             },
             "toolbar": {
                 "title": "Suunnittelu",
@@ -972,28 +972,28 @@
                 "process_title": "Vaiheiden yleiskatsaus",
                 "process_steps": {
                     "title": "Vaiheiden yleiskatsaus",
-                    "desc": "Define the phases shown to participants on the welcome page. If left empty, default steps will be used.",
-                    "add_step": "Add step",
+                    "desc": "Määritä osallistujille tervetulosivulla näytettävät vaiheet. Jos jätät tyhjäksi, käytetään oletusvaiheita.",
+                    "add_step": "Lisää vaihe",
                     "empty": {
-                        "title": "No custom steps defined",
-                        "desc": "The study will use the standard Q-methodology workflow (Meet, First impressions, Perspective, Why)."
+                        "title": "Mukautettuja vaiheita ei ole määritelty",
+                        "desc": "Tutkimus käyttää normaalia Q-metodologian työnkulkua (aloitus, ensivaikutelmat, näkökulma, perustelut)."
                     },
                     "fields": {
-                        "title": "Step title",
-                        "description": "Short description",
-                        "icon": "Icon",
+                        "title": "Vaiheen otsikko",
+                        "description": "Lyhyt kuvaus",
+                        "icon": "Kuvake",
                         "toggle": "Vaihda"
                     },
                     "defaults": {
-                        "new_step": "New study step",
-                        "new_desc": "Explain what the participant will do in this phase."
+                        "new_step": "Uusi tutkimusvaihe",
+                        "new_desc": "Selitä, mitä osallistuja tekee tässä vaiheessa."
                     },
                     "reset": {
-                        "instructions": "Nollaa ohjeet",
-                        "consent_title": "Nollaa suostumuksen otsikko",
-                        "consent_description": "Nollaa suostumuksen kuvaus",
-                        "process_steps": "Nollaa vaiheet",
-                        "process_steps_confirm": "Haluatko varmasti palauttaa kaikki vaiheet oletusarvoihin? Tämä korvaa omat vaiheesi."
+                        "instructions": "Palauta ohjeet",
+                        "consent_title": "Palauta suostumusotsikko",
+                        "consent_description": "Palauta suostumuskuvaus",
+                        "process_steps": "Palauta prosessin vaiheet",
+                        "process_steps_confirm": "Oletko varma, että haluat palauttaa kaikki prosessivaiheet oletusarvoihin? Tämä korvaa mukautetut vaiheet."
                     }
                 },
                 "consent_title": "Suostumuslomake",
@@ -1444,47 +1444,47 @@
             "draft": "Luonnos"
         },
         "settings": {
-            "title": "General Settings",
-            "description": "Manage basic study configuration, URL slug, and lifecycle states.",
+            "title": "Yleiset asetukset",
+            "description": "Hallitse tutkimuksen perusasetuksia, URL-tunnistetta ja elinkaaren tiloja.",
             "basic": {
-                "title": "Basic Information",
-                "description": "Configure the study identity and availability window.",
-                "slug_label": "URL Slug",
-                "slug_description": "The unique identifier used in the URL.",
-                "start_date_label": "Start Date (Optional)",
-                "start_date_description": "Automatically opens the study on this date.",
-                "end_date_label": "End Date (Optional)",
-                "end_date_description": "Automatically closes the study on this date.",
-                "pick_date": "Pick a date"
+                "title": "Perustiedot",
+                "description": "Määritä tutkimuksen tunnistetiedot ja saatavuus.",
+                "slug_label": "URL-tunniste",
+                "slug_description": "Yksilöllinen tunniste, jota käytetään URL-osoitteessa.",
+                "start_date_label": "Aloituspäivämäärä (valinnainen)",
+                "start_date_description": "Avaa tutkimuksen automaattisesti tänä päivänä.",
+                "end_date_label": "Lopetuspäivämäärä (valinnainen)",
+                "end_date_description": "Sulkee tutkimuksen automaattisesti tänä päivänä.",
+                "pick_date": "Valitse päivämäärä"
             },
             "lifecycle": {
-                "title": "Archiving",
-                "description": "Archive the study to make it read-only for everyone.",
-                "notice": "To archive a study, it must first be Closed. Once archived, no further changes can be made.",
-                "archived_status": "Study is Archived",
-                "archive_button": "Archive Study",
-                "current_state": "Current State"
+                "title": "Arkistointi",
+                "description": "Arkistoi tutkimus tehdäksesi siitä vain luku -tilaan kaikille.",
+                "notice": "Tutkimus on ensin suljettava ennen arkistointia. Kun se on arkistoitu, muutoksia ei voi enää tehdä.",
+                "archived_status": "Tutkimus on arkistoitu",
+                "archive_button": "Arkistoi tutkimus",
+                "current_state": "Nykyinen tila"
             },
             "danger": {
-                "title": "Danger Zone",
-                "description": "Actions here are irreversible.",
-                "notice": "Deleting a study removes ALL data (participants, answers, config) permanently. Study must be Archived before deletion.",
-                "delete_button": "Delete Study",
-                "delete_confirm": "Are you sure? This action is IRREVERSIBLE."
+                "title": "Vaaravyöhyke",
+                "description": "Nämä toiminnot ovat peruuttamattomia.",
+                "notice": "Tutkimuksen poistaminen poistaa KAIKKI tiedot (osallistujat, vastaukset, asetukset) pysyvästi. Tutkimus on arkistoitava ennen poistamista.",
+                "delete_button": "Poista tutkimus",
+                "delete_confirm": "Oletko varma? Tätä toimintoa EI VOI PERUUTTAA."
             },
-            "save_button": "Save Changes",
-            "save_success": "Settings updated",
-            "save_success_desc": "Study settings have been saved.",
-            "save_error": "Error updating settings",
-            "save_error_desc": "Failed to update settings. Slug might be taken.",
-            "archive_success": "Study Archived",
-            "archive_success_desc": "The study is now archived and read-only.",
-            "archive_error": "Error archiving study",
-            "archive_error_desc": "Failed to archive study. Is it closed?",
-            "delete_success": "Study Deleted",
-            "delete_success_desc": "The study has been permanently removed.",
-            "delete_error": "Error deleting study",
-            "delete_error_desc": "Failed to delete study."
+            "save_button": "Tallenna muutokset",
+            "save_success": "Asetukset päivitetty",
+            "save_success_desc": "Tutkimuksen asetukset on tallennettu.",
+            "save_error": "Virhe asetusten päivittämisessä",
+            "save_error_desc": "Asetusten päivitys epäonnistui. Tunniste saattaa olla jo käytössä.",
+            "archive_success": "Tutkimus arkistoitu",
+            "archive_success_desc": "Tutkimus on nyt arkistoitu ja vain luku -tilassa.",
+            "archive_error": "Virhe tutkimuksen arkistoinnissa",
+            "archive_error_desc": "Tutkimuksen arkistointi epäonnistui. Onko se suljettu?",
+            "delete_success": "Tutkimus poistettu",
+            "delete_success_desc": "Tutkimus on poistettu pysyvästi.",
+            "delete_error": "Virhe tutkimuksen poistamisessa",
+            "delete_error_desc": "Tutkimuksen poistaminen epäonnistui."
         },
         "workspaces": {
             "title": "Työtilat",
