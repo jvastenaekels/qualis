@@ -125,6 +125,8 @@ export const useStudyConfig = () => {
                     setConfigLoading(false);
                 }
             } else {
+                console.warn(`[useStudyConfig] No draft found in localStorage for ${slug}`);
+                setConfigError('common.errors.not_found');
                 setConfigLoading(false);
             }
         };
