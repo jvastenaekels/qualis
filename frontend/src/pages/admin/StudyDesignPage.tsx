@@ -318,6 +318,12 @@ const StudyDesignPage = () => {
         };
 
         // 2. Persist to localStorage
+        console.log(`[StudyDesignPage] Saving test draft for slug: ${effectiveSlug}`);
+        console.log(
+            `[StudyDesignPage] Draft translations:`,
+            draft.translations?.map((t) => t.language_code)
+        );
+
         localStorage.setItem(`open-q-test-draft-${effectiveSlug}`, JSON.stringify(draft));
         localStorage.setItem(
             `open-q-test-config-${effectiveSlug}`,
@@ -326,7 +332,9 @@ const StudyDesignPage = () => {
         localStorage.setItem(`open-q-pilot-reset-${effectiveSlug}`, 'true');
 
         // 3. Open in new tab with mode=test
-        window.open(`/study/${effectiveSlug}?mode=test`, '_blank');
+        const testUrl = `/study/${effectiveSlug}?mode=test`;
+        console.log(`[StudyDesignPage] Opening test run: ${testUrl}`);
+        window.open(testUrl, '_blank');
         toast.info(`${t('admin.design.toolbar.test_run')}...`);
     };
 

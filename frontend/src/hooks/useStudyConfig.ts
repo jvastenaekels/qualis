@@ -75,10 +75,14 @@ export const useStudyConfig = () => {
             const draftJson = localStorage.getItem(draftKey);
             const legacyJson = localStorage.getItem(legacyKey);
 
-            console.log(`[useStudyConfig] Pilot mode loading for slug: ${slug}`);
-            if (!draftJson && !legacyJson) {
-                console.warn(`[useStudyConfig] No draft found in localStorage for ${slug}`);
-            }
+            console.log(`[useStudyConfig] Participant tab slug: ${slug}`);
+            console.log(
+                `[useStudyConfig] Keys in localStorage:`,
+                Object.keys(localStorage).filter((k) => k.startsWith('open-q-test-'))
+            );
+            console.log(
+                `[useStudyConfig] draftJson: ${draftJson ? 'found' : 'null'}, legacyJson: ${legacyJson ? 'found' : 'null'}`
+            );
 
             if (draftJson || legacyJson) {
                 try {
