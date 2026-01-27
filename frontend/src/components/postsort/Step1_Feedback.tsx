@@ -248,12 +248,15 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 <div className="space-y-6">
                     <div className="space-y-1">
                         <h2 className="text-xl font-bold text-slate-800">
-                            {t('post.optional.title', 'Additional Comments (Optional)')}
+                            {t(
+                                'post.optional.title',
+                                'Did any statements feel particularly surprising, unclear, or confusing to you? If so, why?'
+                            )}
                         </h2>
                         <p className="text-slate-600">
                             {t(
                                 'post.optional.description',
-                                'Feel free to add comments to any other statement.'
+                                'You are also welcome to add comments to any other statement if you would like to further explain your choices.'
                             )}
                         </p>
                     </div>
@@ -374,12 +377,15 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                             htmlFor="missing-statements"
                             className="text-xl font-bold text-slate-800 block"
                         >
-                            {t('admin.design.postsort.missing.title', 'Missing Statements')}
+                            {t(
+                                'admin.design.postsort.missing.title',
+                                'Were there any important perspectives, issues, or statements that you felt were missing from this set?'
+                            )}
                         </Label>
                         <p className="text-slate-600">
                             {t(
                                 'admin.design.postsort.missing.desc',
-                                'Were there any ideas or perspectives you felt were missing from this set of statements?'
+                                'If yes, please describe them briefly.'
                             )}
                         </p>
                         <div className="relative">

@@ -100,7 +100,7 @@ describe('PostSortPage', () => {
         // Step 1 content
         expect(await screen.findByText(/Key Choices/i)).toBeInTheDocument();
         // Check for Additional Comments section
-        expect(await screen.findByText(/Additional Comments/i)).toBeInTheDocument();
+        expect(await screen.findByText(/surprising, unclear, or confusing/i)).toBeInTheDocument();
     });
 
     it('Validates Step 1 before proceeding to Step 2 (Updated)', async () => {

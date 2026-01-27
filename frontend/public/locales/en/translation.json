@@ -318,8 +318,8 @@
             "label_disagree": "Strongest disagreement"
         },
         "optional": {
-            "title": "Additional comments (optional)",
-            "description": "Feel free to add comments to any other statement if you wish to elaborate on your choices.",
+            "title": "Did any statements feel particularly surprising, unclear, or confusing to you? If so, why?",
+            "description": "You are also welcome to add comments to any other statement if you would like to further explain your choices.",
             "select_placeholder": "Select a statement to comment...",
             "placeholder": "Your comment here..."
         },
@@ -1192,8 +1192,8 @@
                     "desc": "Add custom questions to the post-sort survey."
                 },
                 "missing": {
-                    "title": "Missing statements?",
-                    "desc": "Are there any ideas that are important to you and that you feel are missing from this set of statements?",
+                    "title": "Were there any important perspectives, issues, or statements that you felt were missing from this set?",
+                    "desc": "If yes, please describe them briefly.",
                     "prompt_label": "Prompt text",
                     "prompt_placeholder": "Please feel free to suggest and explain."
                 },

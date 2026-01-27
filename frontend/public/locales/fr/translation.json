@@ -318,8 +318,8 @@
             "label_disagree": "Le plus en désaccord"
         },
         "optional": {
-            "title": "Commentaires additionnels (optionnel)",
-            "description": "N'hésitez pas à commenter d'autres énoncés pour préciser vos choix.",
+            "title": "Certains énoncés vous ont-ils semblé particulièrement surprenants, ambigus ou déroutants ? Si oui, pourquoi ?",
+            "description": "Vous pouvez également ajouter des commentaires à n'importe quel autre énoncé si vous souhaitez expliquer davantage vos choix.",
             "select_placeholder": "Choisir un énoncé...",
             "placeholder": "Votre commentaire ici..."
         },
@@ -1183,8 +1183,8 @@
                     "desc": "Ajouter des questions personnalisées au questionnaire post-tri."
                 },
                 "missing": {
-                    "title": "Des énoncés manquants ?",
-                    "desc": "Y a-t-il des idées qui vous tiennent à cœur et qui vous semblent absentes de cet ensemble d'énoncés ?",
+                    "title": "Y a-t-il des perspectives, enjeux ou énoncés importants qui vous ont semblé faire défaut dans cet ensemble ?",
+                    "desc": "Si oui, veuillez les décrire brièvement.",
                     "prompt_label": "Texte de l'invite",
                     "prompt_placeholder": "N'hésitez pas à nous en faire part et à expliquer pourquoi."
                 },

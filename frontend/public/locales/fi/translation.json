@@ -318,8 +318,8 @@
             "label_disagree": "Vahvimmin eri mieltä"
         },
         "optional": {
-            "title": "Lisäkommentit (valinnainen)",
-            "description": "Voit vapaasti kommentoida muita väitteitä tarkentaaksesi valintojasi.",
+            "title": "Tuntuivatko jotkin väitteet erityisen yllättäviltä, epäselviltä tai hämmentäviltä? Jos kyllä, miksi?",
+            "description": "Voit myös lisätä kommentteja muihin väitteisiin, jos haluat selittää valintojasi tarkemmin.",
             "select_placeholder": "Valitse kommentoitava väite...",
             "placeholder": "Kommenttisi tähän..."
         },
@@ -1183,8 +1183,8 @@
                     "desc": "Lisää mukautettuja kysymyksiä jälkikyselyyn."
                 },
                 "missing": {
-                    "title": "Puuttuuko väitteitä?",
-                    "desc": "Onko mielessäsi tärkeitä ajatuksia, jotka mielestäsi puuttuvat tästä väitejoukosta?",
+                    "title": "Oliko joukossa tärkeitä näkökulmia, asioita tai väitteitä, joiden koit puuttuvan tästä joukosta?",
+                    "desc": "Jos kyllä, kuvaile ne lyhyesti.",
                     "prompt_label": "Kehotteen teksti",
                     "prompt_placeholder": "Kerro tähän vapaasti, mitä jäit kaipaamaan ja miksi."
                 },

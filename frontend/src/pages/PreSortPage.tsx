@@ -60,54 +60,92 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
                 const isVisible = evaluateVisibilityCondition(field.visibility_condition, data);
                 let fieldSchema: z.ZodTypeAny;
 
-                if (field.type === 'number') {
-                    fieldSchema = z.coerce.number();
-                    if (field.min !== undefined)
-                        fieldSchema = (fieldSchema as z.ZodNumber).min(
-                            field.min,
-                            t('common.errors.min', { min: field.min })
-                        );
-                    if (field.max !== undefined)
-                        fieldSchema = (fieldSchema as z.ZodNumber).max(
-                            field.max,
-                            t('common.errors.max', { max: field.max })
-                        );
-                } else if (field.type === 'email') {
-                    fieldSchema = z.string().email(t('common.errors.email'));
-                } else if (field.type === 'date') {
-                    fieldSchema = z.string();
-                } else if (field.type === 'checkbox') {
-                    fieldSchema = z.array(z.string());
-                } else {
-                    fieldSchema = z.string();
-                    if (field.minLength !== undefined) {
-                        fieldSchema = (fieldSchema as z.ZodString).min(
-                            field.minLength,
-                            t('common.errors.min_length', { count: field.minLength })
-                        );
-                    }
-                    if (field.maxLength !== undefined) {
-                        fieldSchema = (fieldSchema as z.ZodString).max(
-                            field.maxLength,
-                            t('common.errors.max_length', { count: field.maxLength })
-                        );
-                    }
-                }
-
                 if (field.required && isVisible) {
                     if (field.type === 'checkbox') {
-                        fieldSchema = (fieldSchema as z.ZodArray<z.ZodString>).min(
-                            1,
-                            t('presort.error_required')
-                        );
-                    } else if (field.type !== 'number') {
-                        fieldSchema = (fieldSchema as z.ZodString).min(
-                            1,
-                            t('presort.error_required')
+                        fieldSchema = z.array(z.string()).min(1, t('presort.error_required'));
+                    } else if (field.type === 'number') {
+                        let numSchema = z.number({
+                            required_error: t('presort.error_required'),
+                            invalid_type_error: t('presort.error_required'),
+                        });
+                        if (field.min !== undefined) {
+                            numSchema = numSchema.min(
+                                field.min,
+                                t('common.errors.min', { min: field.min })
+                            );
+                        }
+                        if (field.max !== undefined) {
+                            numSchema = numSchema.max(
+                                field.max,
+                                t('common.errors.max', { max: field.max })
+                            );
+                        }
+                        fieldSchema = z.preprocess((val) => {
+                            if (val === '' || val === null || val === undefined) return undefined;
+                            const num = Number(val);
+                            return isNaN(num) ? val : num;
+                        }, numSchema);
+                    } else {
+                        const isTextual = ['text', 'textarea', 'email'].includes(field.type);
+                        const errorMsg = isTextual
+                            ? t('post.extreme.min_chars')
+                            : t('presort.error_required');
+
+                        let s = z.string().min(1, errorMsg);
+                        if (field.type === 'email') {
+                            s = s.email(t('common.errors.email'));
+                        }
+                        if (field.minLength !== undefined) {
+                            s = s.min(
+                                field.minLength,
+                                t('common.errors.min_length', { count: field.minLength })
+                            );
+                        }
+                        if (field.maxLength !== undefined) {
+                            s = s.max(
+                                field.maxLength,
+                                t('common.errors.max_length', { count: field.maxLength })
+                            );
+                        }
+
+                        fieldSchema = z.preprocess(
+                            (val) => (val === null || val === undefined ? '' : val),
+                            s
                         );
                     }
                 } else {
-                    fieldSchema = fieldSchema.optional().nullable();
+                    // Non-required fields
+                    if (field.type === 'number') {
+                        fieldSchema = z.preprocess((val) => {
+                            if (val === '' || val === null || val === undefined) return null;
+                            const num = Number(val);
+                            return isNaN(num) ? val : num;
+                        }, z.number().optional().nullable());
+                    } else if (field.type === 'email') {
+                        fieldSchema = z.preprocess(
+                            (val) => (val === '' || val === null || val === undefined ? null : val),
+                            z.string().email(t('common.errors.email')).optional().nullable()
+                        );
+                    } else if (field.type === 'checkbox') {
+                        fieldSchema = z.array(z.string()).optional().nullable();
+                    } else {
+                        let s = z.string().optional().nullable();
+                        if (field.minLength !== undefined) {
+                            // biome-ignore lint/suspicious/noExplicitAny: complex union
+                            s = (s as any).min(
+                                field.minLength,
+                                t('common.errors.min_length', { count: field.minLength })
+                            );
+                        }
+                        if (field.maxLength !== undefined) {
+                            // biome-ignore lint/suspicious/noExplicitAny: complex union
+                            s = (s as any).max(
+                                field.maxLength,
+                                t('common.errors.max_length', { count: field.maxLength })
+                            );
+                        }
+                        fieldSchema = s;
+                    }
                 }
 
                 shape[key] = fieldSchema;
