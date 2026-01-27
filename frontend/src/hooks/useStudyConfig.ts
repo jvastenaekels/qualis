@@ -8,6 +8,7 @@ import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
 import { localizeStudy } from '../utils/studyLocalization';
 import { useGetStudyConfig } from './useGetStudyConfig';
+import i18n from '../i18n';
 
 export const useStudyConfig = () => {
     const { slug } = useParams();
@@ -57,7 +58,7 @@ export const useStudyConfig = () => {
     useEffect(() => {
         if (!isTestMode || !slug) return;
 
-        const loadFromStorage = () => {
+        const loadFromStorage = async () => {
             resetConfig(); // Clear previous study config
             setConfigLoading(true);
 
@@ -106,19 +107,16 @@ export const useStudyConfig = () => {
                         '[useStudyConfig] Localized Config Languages:',
                         config.available_languages
                     );
-                    setConfig(config);
+                    if (config.language) {
+                        await i18n.changeLanguage(config.language);
+                        setLanguage(config.language);
+                    }
 
                     if (config.ui_labels) {
                         applyStudyOverrides(config.language || 'en', config.ui_labels);
                     }
 
-                    if (
-                        !sessionLanguage ||
-                        (config.language && sessionLanguage !== config.language)
-                    ) {
-                        setLanguage(config.language || 'en');
-                    }
-
+                    setConfig(config);
                     setConfigError(null);
                     setConfigLoading(false);
                 } catch (e) {
