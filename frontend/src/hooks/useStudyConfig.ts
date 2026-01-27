@@ -75,15 +75,19 @@ export const useStudyConfig = () => {
             const draftJson = localStorage.getItem(draftKey);
             const legacyJson = localStorage.getItem(legacyKey);
 
+            console.log(`[useStudyConfig] Pilot mode loading for slug: ${slug}`);
+            if (!draftJson && !legacyJson) {
+                console.warn(`[useStudyConfig] No draft found in localStorage for ${slug}`);
+            }
+
             if (draftJson || legacyJson) {
                 try {
                     let config: any;
                     if (draftJson) {
                         const fullDraft = JSON.parse(draftJson);
                         console.log(
-                            '[useStudyConfig] Loaded draft with',
-                            fullDraft.translations?.length,
-                            'translations'
+                            '[useStudyConfig] Found test draft. Translations:',
+                            fullDraft.translations?.map((tr: any) => tr.language_code)
                         );
                         // Dynamically localize based on current session language
                         config = localizeStudy(
@@ -95,7 +99,7 @@ export const useStudyConfig = () => {
                     }
 
                     console.log(
-                        '[useStudyConfig] Configured languages:',
+                        '[useStudyConfig] Localized Config Languages:',
                         config.available_languages
                     );
                     setConfig(config);
