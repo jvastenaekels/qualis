@@ -187,8 +187,16 @@ const StudyLayoutContent: React.FC = () => {
         );
     }
 
+    // Study State Check (Draft, Paused, Closed)
+    // Pilot mode allows viewing regardless of study state
+    const isPilotModePersistent =
+        isPilotMode ||
+        new URLSearchParams(location.search).get('mode') === 'test' ||
+        sessionStorage.getItem('open-q-pilot-mode') === 'true';
+
     // Hard Loading State (Initial Fetch)
-    if (!config && configLoading) {
+    // In pilot mode, treat missing config as loading to prevent flash of raw keys
+    if ((!config && configLoading) || (isPilotModePersistent && !config)) {
         return (
             <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 space-y-6">
                 <div
@@ -210,13 +218,6 @@ const StudyLayoutContent: React.FC = () => {
             </div>
         );
     }
-
-    // Study State Check (Draft, Paused, Closed)
-    // Pilot mode allows viewing regardless of study state
-    const isPilotModePersistent =
-        isPilotMode ||
-        new URLSearchParams(location.search).get('mode') === 'test' ||
-        sessionStorage.getItem('open-q-pilot-mode') === 'true';
 
     if (!isPilotModePersistent && config?.state && config.state !== 'active') {
         return <StudyStatusPage type={config.state as StudyStatusType} onRetry={retry} />;

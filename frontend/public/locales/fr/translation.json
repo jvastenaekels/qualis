@@ -654,6 +654,7 @@
         },
         "import": {
             "title": "Importer une configuration d'étude",
+            "config": "Importer une configuration",
             "upload_desc": "Téléchargez un fichier de configuration d'étude précédemment exporté",
             "validate_desc": "Vérifiez la configuration et fournissez un slug unique",
             "creating_desc": "Création de l'étude...",

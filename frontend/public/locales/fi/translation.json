@@ -654,6 +654,7 @@
         },
         "import": {
             "title": "Tuo tutkimusasetukset",
+            "config": "Tuo asetukset",
             "upload_desc": "Lataa aiemmin viety tutkimuksen asetustiedosto",
             "validate_desc": "Tarkista asetukset ja anna yksilöllinen tunniste",
             "creating_desc": "Luodaan tutkimusta...",

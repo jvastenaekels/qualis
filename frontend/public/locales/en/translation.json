@@ -662,6 +662,7 @@
         },
         "import": {
             "title": "Import study configuration",
+            "config": "Import Configuration",
             "upload_desc": "Upload a previously exported study configuration file",
             "validate_desc": "Review configuration and provide a unique slug",
             "creating_desc": "Creating study...",
