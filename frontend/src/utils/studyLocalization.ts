@@ -35,6 +35,9 @@ export function localizeStudy(draft: StudyUpdate, lang: string): any {
         process_steps: t?.process_steps || [],
         methodology_tips: t?.methodology_tips || [],
         step_help: t?.step_help || {},
+        available_languages:
+            draft.translations?.map((tr: any) => tr.language_code) ||
+            (draft.default_language ? [draft.default_language] : ['en']),
         language: lang,
 
         statements: (draft.statements || []).map((s: any, index: number) => {

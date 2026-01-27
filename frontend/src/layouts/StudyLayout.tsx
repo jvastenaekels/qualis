@@ -581,14 +581,13 @@ const StudyLayoutContent: React.FC = () => {
                                     {(config?.available_languages &&
                                     config.available_languages.length > 0
                                         ? config.available_languages
-                                        : ['en', 'fr', 'fi']
+                                        : ['en']
                                     ).map((lang) => (
                                         <button
                                             key={lang}
                                             type="button"
                                             onClick={() => {
-                                                i18n.changeLanguage(lang); // Immediate UI update
-                                                changeLanguage(lang); // Persist and refetch
+                                                changeLanguage(lang); // Persist and refetch (sync effect handles i18n)
                                             }}
                                             style={{
                                                 color: i18n.language?.startsWith(lang)

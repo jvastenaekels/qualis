@@ -58,6 +58,7 @@ export const useStudyConfig = () => {
         if (!isTestMode || !slug) return;
 
         const loadFromStorage = () => {
+            setConfigLoading(true);
             // Check if we need a fresh start (set by StudyDesignPage)
             if (localStorage.getItem(`open-q-pilot-reset-${slug}`)) {
                 resetSession();
@@ -103,7 +104,10 @@ export const useStudyConfig = () => {
                 } catch (e) {
                     console.error('Failed to parse test config from localStorage', e);
                     setConfigError('common.errors.validation');
+                    setConfigLoading(false);
                 }
+            } else {
+                setConfigLoading(false);
             }
         };
 
@@ -146,6 +150,13 @@ export const useStudyConfig = () => {
             setConfigLoading(isLoading);
         }
     }, [isLoading, setConfigLoading, isTestMode]);
+
+    // --- Effect: Reset Pilot Language on Mode Change ---
+    useEffect(() => {
+        if (isTestMode && !sessionLanguage && config?.language) {
+            setLanguage(config.language);
+        }
+    }, [isTestMode, sessionLanguage, config?.language, setLanguage]);
 
     // --- Effect: Handle Stale Language (Show loader while switching) ---
     useEffect(() => {
