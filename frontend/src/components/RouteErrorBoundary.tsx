@@ -37,6 +37,22 @@ const RouteErrorBoundary = () => {
     }
 
     if (error instanceof Error) {
+        // Handle chunk load errors after new deployments
+        if (
+            error.message.includes('Failed to fetch dynamically imported module') ||
+            error.message.includes('Importing a module script failed')
+        ) {
+            console.warn('Chunk load error detected in RouteErrorBoundary. Reloading...');
+            const storageKey = 'chunk_load_error_reload';
+            const lastReload = sessionStorage.getItem(storageKey);
+            const now = Date.now();
+
+            if (!lastReload || now - Number.parseInt(lastReload, 10) > 10000) {
+                sessionStorage.setItem(storageKey, now.toString());
+                window.location.reload();
+                return null;
+            }
+        }
         return <ErrorPage error={error} />;
     }
 

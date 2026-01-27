@@ -114,6 +114,7 @@ const router = createBrowserRouter([
             {
                 element: <WorkspaceLayout />,
                 HydrateFallback: DesignerSkeleton,
+                errorElement: <RouteErrorBoundary />,
                 children: [
                     {
                         element: <AdminLayout />,
@@ -198,6 +199,7 @@ const router = createBrowserRouter([
     {
         path: '/app',
         element: <RequireAdmin />,
+        errorElement: <RouteErrorBoundary />,
         children: [
             {
                 element: <AdminLayout />,
