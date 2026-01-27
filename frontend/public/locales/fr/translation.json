@@ -108,10 +108,10 @@
         "change_lang_title": "Changer de langue",
         "steps": {
             "welcome": "Bienvenue",
-            "presort": "Pré-sort",
-            "rough": "Tri rapide",
-            "fine": "Tri sur grille",
-            "review": "Post-sort"
+            "consent": "Confidentialité & Consentement",
+            "rough": "Premières impressions",
+            "fine": "Grille de tri",
+            "post": "Dernières questions"
         },
         "mobile_step": "Étape",
         "navigation": "Navigation",

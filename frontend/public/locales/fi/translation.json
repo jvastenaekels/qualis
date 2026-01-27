@@ -108,10 +108,10 @@
         "change_lang_title": "Vaihda kieli",
         "steps": {
             "welcome": "Tervetuloa",
-            "presort": "Pre-sort",
-            "rough": "Karkea lajittelu",
-            "fine": "Hieno lajittelu",
-            "review": "Post-sort"
+            "consent": "Yksityisyys & Suostumus",
+            "rough": "Ensivaikutelmat",
+            "fine": "Lajitteluruudukko",
+            "post": "Viimeiset kysymykset"
         },
         "mobile_step": "Vaihe",
         "navigation": "Navigointi",

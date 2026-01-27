@@ -108,10 +108,10 @@
         "change_lang_title": "Change language",
         "steps": {
             "welcome": "Welcome",
-            "presort": "Pre-sort",
-            "rough": "Rough sort",
-            "fine": "Fine sort",
-            "review": "Post-sort"
+            "consent": "Privacy & Consent",
+            "rough": "First impressions",
+            "fine": "Sorting grid",
+            "post": "Final questions"
         },
         "mobile_step": "Step",
         "navigation": "Navigation",

@@ -6,6 +6,7 @@ import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { applyStudyOverrides } from '../utils/i18nOverrides';
+import { localizeStudy } from '../utils/studyLocalization';
 import { useGetStudyConfig } from './useGetStudyConfig';
 
 export const useStudyConfig = () => {
@@ -62,24 +63,45 @@ export const useStudyConfig = () => {
                 localStorage.removeItem(`open-q-pilot-reset-${slug}`);
             }
 
-            const draftKey = `open-q-test-config-${slug}`;
+            const draftKey = `open-q-test-draft-${slug}`;
+            const legacyKey = `open-q-test-config-${slug}`;
+
             const draftJson = localStorage.getItem(draftKey);
-            if (draftJson) {
+            const legacyJson = localStorage.getItem(legacyKey);
+
+            if (draftJson || legacyJson) {
                 try {
-                    const draft = JSON.parse(draftJson);
-                    setConfig(draft);
-                    if (draft.ui_labels) {
-                        applyStudyOverrides(draft.language || 'en', draft.ui_labels);
+                    let config: any;
+                    if (draftJson) {
+                        const fullDraft = JSON.parse(draftJson);
+                        // Dynamically localize based on current session language
+                        config = localizeStudy(
+                            fullDraft,
+                            sessionLanguage || fullDraft.language || 'en'
+                        );
+                    } else {
+                        config = JSON.parse(legacyJson!);
                     }
+
+                    setConfig(config);
+
+                    if (config.ui_labels) {
+                        applyStudyOverrides(config.language || 'en', config.ui_labels);
+                    }
+
                     if (
                         !sessionLanguage ||
-                        (draft.language && sessionLanguage !== draft.language)
+                        (config.language && sessionLanguage !== config.language)
                     ) {
-                        setLanguage(draft.language || 'en');
+                        setLanguage(config.language || 'en');
                     }
+
                     setConfigError(null);
                     setConfigLoading(false);
-                    console.log('Loaded study config from localStorage (Test Mode)');
+                    console.log(
+                        'Loaded study config from localStorage (Test Mode)',
+                        draftJson ? '(Full Draft)' : '(Legacy)'
+                    );
                 } catch (e) {
                     console.error('Failed to parse test config from localStorage', e);
                     setConfigError('common.errors.validation');
@@ -116,6 +138,13 @@ export const useStudyConfig = () => {
             setConfigLoading(isLoading);
         }
     }, [isLoading, setConfigLoading, isTestMode]);
+
+    // --- Effect: Handle Stale Language (Show loader while switching) ---
+    useEffect(() => {
+        if (!isTestMode && sessionLanguage && config && config.language !== sessionLanguage) {
+            setConfigLoading(true);
+        }
+    }, [sessionLanguage, config, setConfigLoading, isTestMode]);
 
     // --- Effect: Sync Data on Success ---
     useEffect(() => {

@@ -318,6 +318,7 @@ const StudyDesignPage = () => {
         };
 
         // 2. Persist to localStorage
+        localStorage.setItem(`open-q-test-draft-${slug}`, JSON.stringify(draft));
         localStorage.setItem(`open-q-test-config-${slug}`, JSON.stringify(syntheticConfig));
         localStorage.setItem(`open-q-pilot-reset-${slug}`, 'true');
 
