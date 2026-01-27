@@ -210,23 +210,23 @@
         "conducted_by": "Mené par",
         "instructions_label": "Déroulement",
         "how_it_works": "Déroulement",
-        "default_instructions": "1. **Faisons connaissance :** quelques questions rapides pour mieux comprendre où se situe votre point de vue.\n2. **Vos premières impressions :** découvrez les énoncés et donnez votre première impression (d'accord, neutre ou pas d'accord).\n3. **Placement sur la grille :** affinez votre perspective en classant chaque énoncé sur la grille pour refléter plus précisément ce que vous pensez.\n4. **Presque fini ! :** quelques mots pour nous expliquer vos choix les plus importants.",
+        "default_instructions": "1. **Faisons connaissance :** Tout d'abord, vous devrez répondre à quelques questions préliminaires courtes.\n2. **Premières impressions :** Vous allez lire les différents énoncés et les classer approximativement selon votre point de vue personnel : si vous avez tendance à être d'accord, neutre ou en désaccord avec eux.\n3. **Votre perspective :** Lors de l'étape du classement, vous placerez les énoncés sur une grille pour affiner votre point de vue. Vous classerez et rangerez les énoncés de « tout à fait d'accord » à « pas du tout d'accord » en plaçant chaque énoncé dans la case correspondante.\n4. **Pourquoi :** Avant la fin de la session, vous devrez répondre à quelques questions de clarification pour nous aider à mieux comprendre vos choix les plus significatifs.",
         "steps": {
             "profile": {
-                "title": "Quelques questions",
-                "description": "Quelques questions rapides pour mieux comprendre votre parcours."
+                "title": "Faisons connaissance",
+                "description": "Tout d'abord, vous devrez répondre à quelques questions préliminaires courtes."
             },
             "rough": {
                 "title": "Premières impressions",
-                "description": "Découvrez les énoncés et donnez votre réaction immédiate (d'accord, neutre ou pas d'accord)."
+                "description": "Vous allez lire les différents énoncés et les classer approximativement selon votre point de vue personnel : si vous avez tendance à être d'accord, neutre ou en désaccord avec eux. Cela facilitera la tâche suivante."
             },
             "fine": {
-                "title": "Placement sur la grille",
-                "description": "Placez les énoncés sur la grille pour affiner votre point de vue, en priorisant ce qui compte le plus pour vous."
+                "title": "Votre perspective",
+                "description": "Lors de l'étape du classement, vous placerez les énoncés sur une grille pour affiner votre point de vue. Vous classerez et rangerez les énoncés de « tout à fait d'accord » à « pas du tout d’accord » en plaçant chaque énoncé dans la case correspondante. Il n'y a pas de bonnes ou de mauvaises réponses. La meilleure réponse est celle qui reflète votre opinion ou vos convictions."
             },
             "post": {
-                "title": "Presque fini !",
-                "description": "Quelques mots pour expliquer vos choix les plus significatifs."
+                "title": "Pourquoi",
+                "description": "Avant la fin de la session, vous devrez répondre à quelques questions de clarification pour nous aider à mieux comprendre vos choix les plus significatifs, ainsi qu'à quelques questions sur votre parcours."
             }
         }
     },

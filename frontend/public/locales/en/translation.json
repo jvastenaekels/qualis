@@ -210,23 +210,23 @@
         "how_it_works": "Process",
         "objective_label": "Study objective",
         "instructions_label": "Process",
-        "default_instructions": "1. **Let's meet:** a few quick questions to better understand your background.\n2. **First impressions:** discover the statements and give your immediate reaction (agree, neutral, or disagree).\n3. **Grid sorting:** refine your thoughts by placing each statement on the grid to reflect your exact viewpoint.\n4. **Almost done!:** a few words to explain your most significant choices.",
+        "default_instructions": "1. **Let's meet:** First, you will be asked a few short, preliminary questions.\n2. **First impressions:** You will read through the different statements and roughly sort them according to your personal viewpoint: whether you tend to agree, feel neutral, or disagree with them.\n3. **Your perspective:** During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box.\n4. **Why:** Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices.",
         "steps": {
             "profile": {
                 "title": "Let's meet",
-                "description": "A few quick questions to better understand your background."
+                "description": "First, you will be asked a few short, preliminary questions."
             },
             "rough": {
                 "title": "First impressions",
-                "description": "Discover the statements and give your immediate reaction (agree, neutral, or disagree)."
+                "description": "You will read through the different statements and roughly sort them according to your personal viewpoint: whether you tend to agree, feel neutral, or disagree with them. It will make the next task easier."
             },
             "fine": {
-                "title": "Grid sorting",
-                "description": "Place the statements onto the grid to refine your point of view, prioritizing what matters most to you."
+                "title": "Your perspective",
+                "description": "During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box. There are no right or wrong answers. The best answer is the one that reflects your opinion, or beliefs."
             },
             "post": {
-                "title": "Almost done!",
-                "description": "A few words to explain your most significant choices."
+                "title": "Why",
+                "description": "Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices, as well as a few questions about your background."
             }
         }
     },

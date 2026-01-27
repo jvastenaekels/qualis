@@ -210,23 +210,23 @@
         "how_it_works": "Tutkimuksen kulku",
         "objective_label": "Tutkimuksen tavoite",
         "instructions_label": "Kulku",
-        "default_instructions": "1. **Tutustutaanpa hieman:** muutamia nopeita kysymyksiä, jotta ymmärrämme paremmin taustaasi.\n2. **Ensimmäiset mielikuvat:** tutustu väitteisiin ja kerro välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).\n3. **Oma näkemyksesi:** tarkenna ajatuksiasi asettamalla kukin väite ruudukkoon niin, että se heijastaa juuri sinun näkökulmaasi.\n4. **Perustelut:** muutama sana tärkeimpien valintojesi selittämiseksi.",
+        "default_instructions": "1. **Tutustutaan :** Ensin sinulta kysytään muutamia lyhyitä taustakysymyksiä.\n2. **Ensivaikutelmat :** Luet läpi erilaisia väittämiä ja lajittelet ne karkeasti oman näkemyksesi mukaan: oletko niiden kanssa samaa mieltä, neutraali vai eri mieltä.\n3. **Näkökulmasi :** Lajitteluvaiheen aikana asetat väittämät ruudukkoon tarkentaaksesi näkökulmaasi. Järjestät väittämät \"eniten samaa mieltä\" -vaihtoehdosta \"eniten eri mieltä\" -vaihtoehtoon.\n4. **Miksi :** Ennen istunnon päättymistä sinulta kysytään muutamia tarkentavia kysymyksiä tiedonkeruun helpottamiseksi.",
         "steps": {
             "profile": {
                 "title": "Tutustutaan",
-                "description": "Muutama nopea kysymys taustasi ymmärtämiseksi."
+                "description": "Ensin sinulta kysytään muutamia lyhyitä taustakysymyksiä."
             },
             "rough": {
-                "title": "Ensivaikutelma",
-                "description": "Tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä)."
+                "title": "Ensivaikutelmat",
+                "description": "Luet läpi erilaisia väittämiä ja lajittelet ne karkeasti oman näkemyksesi mukaan: oletko niiden kanssa samaa mieltä, neutraali vai eri mieltä. Tämä helpottaa seuraavaa tehtävää."
             },
             "fine": {
-                "title": "Ruudukkoasettelu",
-                "description": "Aseta väittämät ruudukkoon tarkentaaksesi näkökulmaasi, priorisoimalla itsellesi tärkeimmät asiat."
+                "title": "Näkökulmasi",
+                "description": "Lajitteluvaiheen aikana asetat väittämät ruudukkoon tarkentaaksesi näkökulmaasi. Järjestät väittämät \"eniten samaa mieltä\" -vaihtoehdosta \"eniten eri mieltä\" -vaihtoehtoon asettamalla kunkin väittämän vastaavaan ruutuun. Oikeita tai vääriä vastauksia ei ole. Paras vastaus on se, joka heijastaa omaa mielipidettäsi tai uskomuksiasi."
             },
             "post": {
-                "title": "Melkein valmista!",
-                "description": "Muutama sana perustellaksesi merkittävimmät valintasi."
+                "title": "Miksi",
+                "description": "Ennen istunnon päättymistä sinulta kysytään muutamia tarkentavia kysymyksiä, jotka auttavat meitä ymmärtämään paremmin merkittävimmät valintasi, sekä muutamia kysymyksiä taustastasi."
             }
         }
     },

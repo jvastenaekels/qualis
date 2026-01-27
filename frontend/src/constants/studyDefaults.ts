@@ -15,7 +15,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             {
                 id: 'profile',
                 title: "Let's meet",
-                description: 'A few quick questions to better understand your background.',
+                description: 'First, you will be asked a few short, preliminary questions.',
                 icon: 'User',
                 color: '#3b82f6',
             },
@@ -23,22 +23,23 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
                 id: 'rough',
                 title: 'First impressions',
                 description:
-                    'Discover the statements and give your immediate reaction (agree, neutral, or disagree).',
+                    'You will read through the different statements and roughly sort them according to your personal viewpoint: whether you tend to agree, feel neutral, or disagree with them. It will make the next task easier.',
                 icon: 'Zap',
                 color: '#f59e0b',
             },
             {
                 id: 'fine',
-                title: 'Grid Sorting',
+                title: 'Your perspective',
                 description:
-                    'Place the statements onto the grid to refine your point of view, prioritizing what matters most to you.',
+                    'During the sorting stage, you will place the statements on a grid to refine your viewpoint. You will sort and rank the statements from “most agree” to “most disagree” by placing each statement in the corresponding box. There are no right or wrong answers. The best answer is the one that reflects your opinion, or beliefs.',
                 icon: 'Target',
                 color: '#8b5cf6',
             },
             {
                 id: 'post',
-                title: 'Almost done!',
-                description: 'A few words to explain your most significant choices.',
+                title: 'Why',
+                description:
+                    'Before the session ends, you will be asked a few clarifying questions to help us better understand your most significant choices, as well as a few questions about your background.',
                 icon: 'MessageSquare',
                 color: '#10b981',
             },
@@ -67,7 +68,8 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             {
                 id: 'profile',
                 title: 'Faisons connaissance',
-                description: 'Quelques questions rapides pour mieux comprendre votre parcours.',
+                description:
+                    'Tout d’abord, vous devrez répondre à quelques questions préliminaires courtes.',
                 icon: 'User',
                 color: '#3b82f6',
             },
@@ -75,22 +77,23 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
                 id: 'rough',
                 title: 'Premières impressions',
                 description:
-                    "Découvrez les énoncés et donnez votre réaction immédiate (d'accord, neutre ou pas d'accord).",
+                    'Vous allez lire les différents énoncés et les classer approximativement selon votre point de vue personnel : si vous avez tendance à être d’accord, neutre ou en désaccord avec eux. Cela facilitera la tâche suivante.',
                 icon: 'Zap',
                 color: '#f59e0b',
             },
             {
                 id: 'fine',
-                title: 'Placement sur la grille',
+                title: 'Votre perspective',
                 description:
-                    'Placez les énoncés sur la grille pour affiner votre point de vue, en priorisant ce qui compte le plus pour vous.',
+                    'Lors de l’étape du classement, vous placerez les énoncés sur une grille pour affiner votre point de vue. Vous classerez et rangerez les énoncés de « tout à fait d’accord » à « pas du tout d’accord » en plaçant chaque énoncé dans la case correspondante. Il n’y a pas de bonnes ou de mauvaises réponses. La meilleure réponse est celle qui reflète votre opinion ou vos convictions.',
                 icon: 'Target',
                 color: '#8b5cf6',
             },
             {
                 id: 'post',
-                title: 'Presque fini !',
-                description: 'Quelques mots pour expliquer vos choix les plus significatifs.',
+                title: 'Pourquoi',
+                description:
+                    'Avant la fin de la session, vous devrez répondre à quelques questions de clarification pour nous aider à mieux comprendre vos choix les plus significatifs, ainsi qu’à quelques questions sur votre parcours.',
                 icon: 'MessageSquare',
                 color: '#10b981',
             },
@@ -119,7 +122,7 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
             {
                 id: 'profile',
                 title: 'Tutustutaan',
-                description: 'Muutama nopea kysymys taustasi ymmärtämiseksi.',
+                description: 'Ensin sinulta kysytään muutamia lyhyitä taustakysymyksiä.',
                 icon: 'User',
                 color: '#3b82f6',
             },
@@ -127,22 +130,23 @@ export const DEFAULT_STUDY_CONTENT: Record<string, any> = {
                 id: 'rough',
                 title: 'Ensivaikutelmat',
                 description:
-                    'Tutustu väittämiin ja anna välitön reaktiosi (samaa mieltä, neutraali tai eri mieltä).',
+                    'Luet läpi erilaisia väittämiä ja lajittelet ne karkeasti oman näkemyksesi mukaan: oletko niiden kanssa samaa mieltä, neutraali vai eri mieltä. Tämä helpottaa seuraavaa tehtävää.',
                 icon: 'Zap',
                 color: '#f59e0b',
             },
             {
                 id: 'fine',
-                title: 'Ruudukkoasettelu',
+                title: 'Näkökulmasi',
                 description:
-                    'Aseta väittämät ruudukkoon tarkentaaksesi näkökulmaasi ja priorisoidaksesi sinulle tärkeimmät asiat.',
+                    'Lajitteluvaiheen aikana asetat väittämät ruudukkoon tarkentaaksesi näkökulmaasi. Järjestät väittämät "eniten samaa mieltä" -vaihtoehdosta "eniten eri mieltä" -vaihtoehtoon asettamalla kunkin väittämän vastaavaan ruutuun. Oikeita tai vääriä vastauksia ei ole. Paras vastaus on se, joka heijastaa omaa mielipidettäsi tai uskomuksiasi.',
                 icon: 'Target',
                 color: '#8b5cf6',
             },
             {
                 id: 'post',
-                title: 'Melkein valmista!',
-                description: 'Muutama sana merkittävimpien valintojesi selittämiseksi.',
+                title: 'Miksi',
+                description:
+                    'Ennen istunnon päättymistä sinulta kysytään muutamia tarkentavia kysymyksiä, jotka auttavat meitä ymmärtämään paremmin merkittävimmät valintasi, sekä muutamia kysymyksiä taustastasi.',
                 icon: 'MessageSquare',
                 color: '#10b981',
             },
