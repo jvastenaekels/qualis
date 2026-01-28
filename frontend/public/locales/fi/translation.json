@@ -1071,7 +1071,9 @@
                     "untitled": "Nimetön kysymys"
                 },
                 "actions": {
-                    "add_option": "Lisää vaihtoehto"
+                    "add_option": "Lisää vaihtoehto",
+                    "copy_from": "Kopioi kielestä",
+                    "copy_success": "Kopioitu"
                 },
                 "logic": {
                     "title": "Näkyvyyslogiikka",

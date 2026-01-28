@@ -1071,7 +1071,9 @@
                     "untitled": "Question sans titre"
                 },
                 "actions": {
-                    "add_option": "Ajouter une option"
+                    "add_option": "Ajouter une option",
+                    "copy_from": "Importer d'une langue",
+                    "copy_success": "Importé"
                 },
                 "logic": {
                     "title": "Logique d'affichage",

@@ -33,6 +33,7 @@ import {
     Mail,
     AlignLeft,
     Circle,
+    Languages,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -44,6 +45,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import {
     Select,
     SelectContent,
@@ -51,6 +53,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 type QuestionType =
     | 'text'
@@ -89,6 +97,7 @@ interface QuestionItemProps {
     readOnly?: boolean;
     structureLocked?: boolean;
     availableQuestions: { id: string; label: string | Record<string, string> }[];
+    availableLanguages: string[];
 }
 
 const QuestionItem = ({
@@ -100,6 +109,7 @@ const QuestionItem = ({
     readOnly,
     structureLocked,
     availableQuestions,
+    availableLanguages,
 }: QuestionItemProps) => {
     const { t } = useTranslation();
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -119,13 +129,58 @@ const QuestionItem = ({
 
     const handleLabelChange = (val: string) => {
         if (readOnly) return;
+
+        // If it's a string, we transform it into a dictionary to avoid syncing across languages
+        const newLabel =
+            typeof question.label === 'string'
+                ? { en: question.label, [activeLocale]: val }
+                : { ...question.label, [activeLocale]: val };
+
         onUpdate({
             ...question,
-            label:
-                typeof question.label === 'string'
-                    ? val
-                    : { ...question.label, [activeLocale]: val },
+            label: newLabel,
         });
+    };
+
+    const handleCopyFrom = (sourceLang: string) => {
+        if (readOnly) return;
+
+        const newQuestion = { ...question };
+
+        // Copy label
+        if (typeof question.label === 'object') {
+            newQuestion.label = {
+                ...question.label,
+                [activeLocale]: question.label[sourceLang] || '',
+            };
+        }
+
+        // Copy placeholder
+        if (question.placeholder && typeof question.placeholder === 'object') {
+            newQuestion.placeholder = {
+                ...question.placeholder,
+                [activeLocale]: question.placeholder[sourceLang] || '',
+            };
+        }
+
+        // Copy options
+        if (question.options) {
+            newQuestion.options = question.options.map((opt) => {
+                if (typeof opt === 'string') {
+                    return opt; // String options are inherently shared, but copying wouldn't change anything
+                }
+                return {
+                    ...opt,
+                    label: {
+                        ...opt.label,
+                        [activeLocale]: opt.label[sourceLang] || '',
+                    },
+                };
+            });
+        }
+
+        onUpdate(newQuestion);
+        toast.success(t('admin.design.questions.actions.copy_success'));
     };
 
     return (
@@ -196,6 +251,39 @@ const QuestionItem = ({
                                 </AccordionTrigger>
                                 {!readOnly && !structureLocked && (
                                     <div className="flex items-center gap-2">
+                                        {!readOnly && availableLanguages.length > 1 && (
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-9 w-9 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                                                        onClick={(e) => e.stopPropagation()}
+                                                    >
+                                                        <Languages className="h-4 w-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end" className="w-56">
+                                                    <div className="px-2 py-1.5 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                        {t(
+                                                            'admin.design.questions.actions.copy_from'
+                                                        )}
+                                                    </div>
+                                                    {availableLanguages
+                                                        .filter((l) => l !== activeLocale)
+                                                        .map((lang) => (
+                                                            <DropdownMenuItem
+                                                                key={lang}
+                                                                onClick={() => handleCopyFrom(lang)}
+                                                                className="flex items-center gap-2 cursor-pointer font-bold text-slate-700"
+                                                            >
+                                                                <div className="size-2 rounded-full bg-indigo-400" />
+                                                                {lang.toUpperCase()}
+                                                            </DropdownMenuItem>
+                                                        ))}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        )}
                                         <Button
                                             variant="ghost"
                                             size="icon"
@@ -471,7 +559,15 @@ const QuestionItem = ({
                                                                 ...(question.options || []),
                                                             ];
                                                             if (typeof opt === 'string') {
-                                                                newOpts[idx] = e.target.value;
+                                                                // Convert to dictionary format to avoid syncing across languages
+                                                                newOpts[idx] = {
+                                                                    label: {
+                                                                        en: opt,
+                                                                        [activeLocale]:
+                                                                            e.target.value,
+                                                                    },
+                                                                    value: e.target.value,
+                                                                };
                                                             } else {
                                                                 newOpts[idx] = {
                                                                     ...opt,
@@ -659,8 +755,22 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
             options:
                 qType === 'select' || qType === 'checkbox' || qType === 'radio'
                     ? [
-                          `${t('admin.design.questions.defaults.option')} 1`,
-                          `${t('admin.design.questions.defaults.option')} 2`,
+                          {
+                              label: {
+                                  [activeLocale]: `${t(
+                                      'admin.design.questions.defaults.option'
+                                  )} 1`,
+                              },
+                              value: 'opt_1',
+                          },
+                          {
+                              label: {
+                                  [activeLocale]: `${t(
+                                      'admin.design.questions.defaults.option'
+                                  )} 2`,
+                              },
+                              value: 'opt_2',
+                          },
                       ]
                     : undefined,
             placeholder:
@@ -827,6 +937,10 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                             readOnly={readOnly}
                                             structureLocked={structureLocked}
                                             availableQuestions={questions.slice(0, index)}
+                                            availableLanguages={
+                                                draft?.translations?.map((t) => t.language_code) ||
+                                                []
+                                            }
                                             onUpdate={(data: QuestionConfig) => {
                                                 // biome-ignore lint/suspicious/noExplicitAny: dynamic draft update
                                                 updateDraft((d: any) => {

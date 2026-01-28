@@ -1080,7 +1080,9 @@
                     "untitled": "Untitled question"
                 },
                 "actions": {
-                    "add_option": "Add option"
+                    "add_option": "Add option",
+                    "copy_from": "Import from language",
+                    "copy_success": "Imported"
                 },
                 "logic": {
                     "title": "Visibility logic",
