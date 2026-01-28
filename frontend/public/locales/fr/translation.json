@@ -311,6 +311,7 @@
         "step2_title": "Presque fini !",
         "step2_description": "Veuillez répondre à ces dernières questions pour terminer l'étude.",
         "extreme": {
+            "title": "Choix principaux",
             "why": "Pourquoi avez-vous choisi de placer cet énoncé ici ? En quoi est-il significatif pour vous ?",
             "placeholder": "Ex: Un événement vécu, une conviction forte, ou un mot précis dans la phrase...",
             "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",

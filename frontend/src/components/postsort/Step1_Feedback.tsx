@@ -77,11 +77,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
 
     const handleCommentChange = (id: number, val: string) => {
         const current = { ...(postsort.card_comments || {}) };
-        if (val) {
-            current[id] = val;
-        } else {
-            delete current[id];
-        }
+        current[id] = val;
         setPostSortResponse('card_comments', current);
     };
 

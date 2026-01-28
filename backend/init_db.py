@@ -21,20 +21,21 @@ async def reset_schema():
     """Drop and recreate public schema (required for clean PostgreSQL reset)."""
     print("DEBUG: Starting reset_schema...")
     print("0. Dropping all existing tables (--reset flag)...")
-    
+
     async with engine.begin() as conn:
         print(f"DEBUG: Engine connected. Connection: {conn}")
         from sqlalchemy import text
+
         await conn.execute(text("DROP SCHEMA public CASCADE"))
         await conn.execute(text("CREATE SCHEMA public"))
         print("   Tables dropped.")
-    
+
     await engine.dispose()
 
 
 def run_migrations():
     """Run database migrations via Alembic.
-    
+
     This function must be run synchronously and OUTSIDE of any existing asyncio loop,
     because Alembic's env.py invokes asyncio.run() internally.
     """
@@ -119,15 +120,15 @@ async def seed_data():
 def main():
     print("--- Initializing Database Infrastructure ---")
     reset_flag = "--reset" in sys.argv
-    
+
     if reset_flag:
         print("⚠️  WARNING: This will drop all existing data!")
         # 1. Reset Schema (Async)
         asyncio.run(reset_schema())
-    
+
     # 2. Run Migrations (Sync - creates new loop internally)
     run_migrations()
-    
+
     # 3. Seed Data (Async)
     asyncio.run(seed_data())
 

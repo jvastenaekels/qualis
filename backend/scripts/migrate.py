@@ -22,7 +22,7 @@ def run_alembic_upgrade():
 
         alembic_cfg = Config("alembic.ini")
         command.upgrade(alembic_cfg, "head")
-        
+
         print("✓ Database migrations completed successfully.")
     except Exception as e:
         print(f"✗ An error occurred: {e}")

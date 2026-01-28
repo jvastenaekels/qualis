@@ -311,6 +311,7 @@
         "step2_title": "Melkein valmista!",
         "step2_description": "Vastaa vielä näihin viimeisiin kysymyksiin viimeistelläksesi tutkimuksen.",
         "extreme": {
+            "title": "Keskeiset valinnat",
             "why": "Miksi valitsit tämän väittämän juuri tähän? Miten se on merkityksellinen sinulle?",
             "placeholder": "Esim. tietty tapahtuma, vahva uskomus tai tietty sana väitteessä...",
             "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",

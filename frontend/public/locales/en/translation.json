@@ -311,6 +311,7 @@
         "step2_title": "Almost done!",
         "step2_description": "Please answer these final questions to complete the study.",
         "extreme": {
+            "title": "Key Choices",
             "why": "Why did you choose to place this statement here? How is it significant to you?",
             "placeholder": "E.g., a specific event, a strong belief, or a particular word in the statement...",
             "min_chars": "A few words are enough to help us understand the context.",

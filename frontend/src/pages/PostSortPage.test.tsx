@@ -177,4 +177,60 @@ describe('PostSortPage', () => {
         // Expect Step 1 again
         expect(await screen.findByText(/Your Perspective/i)).toBeInTheDocument();
     });
+
+    it('Allows selecting a statement from the optional comments dropdown', async () => {
+        const user = userEvent.setup();
+
+        // Set state BEFORE rendering
+        useConfigStore.setState({
+            config: {
+                statements: [
+                    { id: 1, text: 'S1' },
+                    { id: 2, text: 'S2' },
+                    { id: 3, text: 'S3 text content' },
+                ],
+                title: 'Test Study',
+                slug: 'demo',
+                grid_config: [
+                    { score: -1, capacity: 1 },
+                    { score: 0, capacity: 1 },
+                    { score: 1, capacity: 1 },
+                ],
+                state: 'active',
+                postsort_config: {
+                    extreme_columns: [-1, 1],
+                    allow_random_comments: true,
+                },
+            } as any,
+        });
+
+        useResponseStore.setState({
+            qsort: [
+                { statementId: 1, col: 0, row: 0 },
+                { statementId: 2, col: 2, row: 0 },
+                { statementId: 3, col: 1, row: 0 },
+            ],
+            postsort: { card_comments: {} } as any,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/demo/post-sort'] }
+        );
+
+        // Find the dropdown
+        const select = screen.getByDisplayValue(/Select a statement/i);
+
+        // Selection by label
+        const option = screen.getByText(/S3: S3 text content/i) as HTMLOptionElement;
+        await user.selectOptions(select, option);
+
+        // Verify it's in the store
+        expect(useResponseStore.getState().postsort.card_comments?.[3]).toBe('');
+
+        // Now check the document
+        expect(await screen.findByText(/S3 text content/i)).toBeInTheDocument();
+    });
 });
