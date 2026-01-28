@@ -936,7 +936,9 @@
                     "missing_grid_instructions": "Les instructions de tri pour la grille sont manquantes pour la langue '{{lang}}'.",
                     "missing_step_title": "Le titre de l'étape {{index}} est manquant pour la langue '{{lang}}'.",
                     "missing_statement_translation": "L'énoncé '{{code}}' n'a pas de traduction pour : {{missing}}.",
-                    "empty_statement_text": "L'énoncé '{{code}}' a un texte vide pour la langue '{{lang}}'."
+                    "empty_statement_text": "L'énoncé '{{code}}' a un texte vide pour la langue '{{lang}}'.",
+                    "missing_question_label": "La question '{{id}}' n'a pas de libellé pour la langue '{{lang}}' ({{section}}).",
+                    "missing_option_label": "L'option {{index}} de la question '{{id}}' n'a pas de libellé pour la langue '{{lang}}' ({{section}})."
                 }
             },
             "languages": {

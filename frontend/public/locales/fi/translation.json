@@ -936,7 +936,9 @@
                     "missing_grid_instructions": "Ruudukon lajitteluohjeet puuttuvat kieleltä '{{lang}}'.",
                     "missing_step_title": "Vaiheen {{index}} otsikko puuttuu kieleltä '{{lang}}'.",
                     "missing_statement_translation": "Väitteeltä '{{code}}' puuttuu käännökset kielille: {{missing}}.",
-                    "empty_statement_text": "Väitteellä '{{code}}' on tyhjä teksti kielellä '{{lang}}'."
+                    "empty_statement_text": "Väitteellä '{{code}}' on tyhjä teksti kielellä '{{lang}}'.",
+                    "missing_question_label": "Kysymykseltä '{{id}}' puuttuu otsikko kielelle '{{lang}}' ({{section}}).",
+                    "missing_option_label": "Kysymyksen '{{id}}' vaihtoehdolta {{index}} puuttuu otsikko kielelle '{{lang}}' ({{section}})."
                 }
             },
             "languages": {

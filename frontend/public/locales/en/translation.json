@@ -945,7 +945,9 @@
                     "missing_grid_instructions": "Grid sort instructions are missing for language '{{lang}}'.",
                     "missing_step_title": "Step {{index}} title is missing for language '{{lang}}'.",
                     "missing_statement_translation": "Statement '{{code}}' is missing translations for: {{missing}}.",
-                    "empty_statement_text": "Statement '{{code}}' has empty text for language '{{lang}}'."
+                    "empty_statement_text": "Statement '{{code}}' has empty text for language '{{lang}}'.",
+                    "missing_question_label": "Question '{{id}}' is missing a label for language '{{lang}}' ({{section}}).",
+                    "missing_option_label": "Option {{index}} of question '{{id}}' is missing a label for language '{{lang}}' ({{section}})."
                 }
             },
             "languages": {
