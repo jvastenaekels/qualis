@@ -148,19 +148,25 @@ const QuestionItem = ({
         const newQuestion = { ...question };
 
         // Copy label
-        if (typeof question.label === 'object') {
-            newQuestion.label = {
-                ...question.label,
-                [activeLocale]: question.label[sourceLang] || '',
-            };
-        }
+        const sourceLabel =
+            typeof question.label === 'string' ? question.label : question.label[sourceLang] || '';
+
+        newQuestion.label =
+            typeof question.label === 'string'
+                ? { en: question.label, [activeLocale]: sourceLabel }
+                : { ...question.label, [activeLocale]: sourceLabel };
 
         // Copy placeholder
-        if (question.placeholder && typeof question.placeholder === 'object') {
-            newQuestion.placeholder = {
-                ...question.placeholder,
-                [activeLocale]: question.placeholder[sourceLang] || '',
-            };
+        if (question.placeholder) {
+            const sourcePlaceholder =
+                typeof question.placeholder === 'string'
+                    ? question.placeholder
+                    : question.placeholder[sourceLang] || '';
+
+            newQuestion.placeholder =
+                typeof question.placeholder === 'string'
+                    ? { en: question.placeholder, [activeLocale]: sourcePlaceholder }
+                    : { ...question.placeholder, [activeLocale]: sourcePlaceholder };
         }
 
         // Copy options
@@ -208,13 +214,13 @@ const QuestionItem = ({
                 <div className="flex-1 min-w-0">
                     <Accordion type="single" collapsible className="w-full">
                         <AccordionItem value="item-1" className="border-none">
-                            <div className="flex items-center justify-between w-full pr-2">
+                            <div className="flex items-center justify-between w-full pr-2 gap-2">
                                 <AccordionTrigger
                                     data-testid="question-accordion-trigger"
-                                    className="flex-1 py-2 hover:no-underline px-2 hover:bg-slate-50/50 rounded-xl transition-all text-left"
+                                    className="flex-1 min-w-0 py-2 hover:no-underline px-2 hover:bg-slate-50/50 rounded-xl transition-all text-left overflow-hidden"
                                 >
-                                    <div className="flex items-center gap-3 overflow-hidden">
-                                        <div className="p-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-600">
+                                    <div className="flex items-center gap-3 w-full overflow-hidden">
+                                        <div className="shrink-0 p-2 bg-slate-50 border border-slate-100 rounded-xl text-slate-600">
                                             {question.type === 'text' && (
                                                 <Type className="h-4 w-4" />
                                             )}
