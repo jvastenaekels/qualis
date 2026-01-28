@@ -1188,7 +1188,7 @@
                     "desc": "Lisää mukautettuja kysymyksiä jälkikyselyyn."
                 },
                 "missing": {
-                    "title": "Oliko joukossa tärkeitä näkökulmia, asioita tai väitteitä, joiden koit puuttuvan tästä joukosta?",
+                    "title": "Oliko mielestäsi tärkeitä näkökulmia, asioita tai väitteitä, jotka puuttuivat tästä joukosta?",
                     "desc": "Jos kyllä, kuvaile ne lyhyesti.",
                     "prompt_label": "Kehotteen teksti",
                     "prompt_placeholder": "Kerro tähän vapaasti, mitä jäit kaipaamaan ja miksi."
