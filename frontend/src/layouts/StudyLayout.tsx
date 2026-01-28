@@ -123,7 +123,18 @@ const StudyLayoutContent: React.FC = () => {
         };
     }, []);
 
-    // Sync i18n with Store (Persistence Source of Truth) - Atomic update with config
+    // URL Language Override (e.g. ?lang=fr)
+    useEffect(() => {
+        const urlLang = new URLSearchParams(location.search).get('lang');
+        const availableLangs = config?.available_languages || ['en'];
+
+        if (urlLang && availableLangs.includes(urlLang) && urlLang !== sessionLanguage) {
+            // Apply language immediately
+            changeLanguage(urlLang);
+        }
+    }, [location.search, config?.available_languages, sessionLanguage]);
+
+    // Sync i18n with Store
     useEffect(() => {
         if (sessionLanguage && sessionLanguage !== i18n.language && !configLoading) {
             i18n.changeLanguage(sessionLanguage);
