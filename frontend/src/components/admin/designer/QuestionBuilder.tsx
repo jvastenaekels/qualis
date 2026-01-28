@@ -149,37 +149,43 @@ const QuestionItem = ({
 
         // Copy label
         const sourceLabel =
-            typeof question.label === 'string' ? question.label : question.label[sourceLang] || '';
+            typeof question.label === 'object'
+                ? question.label[sourceLang] || ''
+                : question.label || '';
 
         newQuestion.label =
-            typeof question.label === 'string'
-                ? { en: question.label, [activeLocale]: sourceLabel }
-                : { ...question.label, [activeLocale]: sourceLabel };
+            typeof question.label === 'object'
+                ? { ...question.label, [activeLocale]: sourceLabel }
+                : { en: question.label || '', [activeLocale]: sourceLabel };
 
         // Copy placeholder
         if (question.placeholder) {
             const sourcePlaceholder =
-                typeof question.placeholder === 'string'
-                    ? question.placeholder
-                    : question.placeholder[sourceLang] || '';
+                typeof question.placeholder === 'object'
+                    ? question.placeholder[sourceLang] || ''
+                    : question.placeholder || '';
 
             newQuestion.placeholder =
-                typeof question.placeholder === 'string'
-                    ? { en: question.placeholder, [activeLocale]: sourcePlaceholder }
-                    : { ...question.placeholder, [activeLocale]: sourcePlaceholder };
+                typeof question.placeholder === 'object'
+                    ? { ...question.placeholder, [activeLocale]: sourcePlaceholder }
+                    : { en: question.placeholder || '', [activeLocale]: sourcePlaceholder };
         }
 
         // Copy options
         if (question.options) {
             newQuestion.options = question.options.map((opt) => {
                 if (typeof opt === 'string') {
-                    return opt; // String options are inherently shared, but copying wouldn't change anything
+                    return {
+                        label: { en: opt, [activeLocale]: opt },
+                        value: opt,
+                    };
                 }
+                const sourceOptLabel = opt.label[sourceLang] || '';
                 return {
                     ...opt,
                     label: {
                         ...opt.label,
-                        [activeLocale]: opt.label[sourceLang] || '',
+                        [activeLocale]: sourceOptLabel,
                     },
                 };
             });

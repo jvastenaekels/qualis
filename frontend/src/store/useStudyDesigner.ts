@@ -109,6 +109,124 @@ function stripInternalFields(obj: any): any {
 }
 
 /**
+ * Normalizes a localized field (label, placeholder, etc.) from a legacy string
+ * or partially populated object to a fully populated localized object.
+ */
+function normalizeLocalizedField(
+    // biome-ignore lint/suspicious/noExplicitAny: can be string or object
+    field: any,
+    availableLanguages: string[],
+    defaultLang = 'en'
+): Record<string, string> {
+    const result: Record<string, string> = {};
+
+    if (typeof field === 'string') {
+        // Legacy format: convert string to object for all languages
+        for (const lang of availableLanguages) {
+            result[lang] = field;
+        }
+        // Ensure default language is set if not in available
+        if (!result[defaultLang]) result[defaultLang] = field;
+    } else if (field && typeof field === 'object') {
+        const sourceVal = field[defaultLang] || Object.values(field)[0] || '';
+        for (const lang of availableLanguages) {
+            result[lang] = field[lang] !== undefined ? field[lang] : sourceVal;
+        }
+    } else {
+        // Empty case
+        for (const lang of availableLanguages) {
+            result[lang] = '';
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Traverses study configuration to normalize all recursive question fields.
+ */
+function normalizeStudyData(draft: StudyUpdate) {
+    const availableLanguages = (draft.translations || []).map((t) => t.language_code);
+    const defaultLang = draft.default_language || 'en';
+
+    if (!availableLanguages.includes(defaultLang)) {
+        availableLanguages.push(defaultLang);
+    }
+
+    // --- Normalize Pre-Sort ---
+    if (draft.presort_config) {
+        // biome-ignore lint/suspicious/noExplicitAny: config traversal
+        const fields = (draft.presort_config as any).fields || {};
+        for (const qId in fields) {
+            const q = fields[qId];
+            q.label = normalizeLocalizedField(q.label, availableLanguages, defaultLang);
+            if (q.placeholder) {
+                q.placeholder = normalizeLocalizedField(
+                    q.placeholder,
+                    availableLanguages,
+                    defaultLang
+                );
+            }
+            if (Array.isArray(q.options)) {
+                // biome-ignore lint/suspicious/noExplicitAny: options can be strings or objects
+                q.options = q.options.map((opt: any) => {
+                    if (typeof opt === 'string') {
+                        return {
+                            label: normalizeLocalizedField(opt, availableLanguages, defaultLang),
+                            value: opt,
+                        };
+                    }
+                    if (opt?.label) {
+                        opt.label = normalizeLocalizedField(
+                            opt.label,
+                            availableLanguages,
+                            defaultLang
+                        );
+                    }
+                    return opt;
+                });
+            }
+        }
+    }
+
+    // --- Normalize Post-Sort ---
+    if (draft.postsort_config) {
+        // biome-ignore lint/suspicious/noExplicitAny: config traversal
+        const questions = (draft.postsort_config as any).questions || {};
+        for (const qId in questions) {
+            const q = questions[qId];
+            q.label = normalizeLocalizedField(q.label, availableLanguages, defaultLang);
+            if (q.placeholder) {
+                q.placeholder = normalizeLocalizedField(
+                    q.placeholder,
+                    availableLanguages,
+                    defaultLang
+                );
+            }
+            if (Array.isArray(q.options)) {
+                // biome-ignore lint/suspicious/noExplicitAny: options can be strings or objects
+                q.options = q.options.map((opt: any) => {
+                    if (typeof opt === 'string') {
+                        return {
+                            label: normalizeLocalizedField(opt, availableLanguages, defaultLang),
+                            value: opt,
+                        };
+                    }
+                    if (opt?.label) {
+                        opt.label = normalizeLocalizedField(
+                            opt.label,
+                            availableLanguages,
+                            defaultLang
+                        );
+                    }
+                    return opt;
+                });
+            }
+        }
+    }
+}
+
+/**
  * Compares two study objects by ignoring internal state fields.
  */
 export function areStudiesEqual(a: StudyUpdate | null, b: StudyUpdate | null): boolean {
@@ -146,16 +264,21 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
     syncStatus: 'synced',
     lastSavedAt: null,
 
-    setStudy: (study: StudyRead) =>
+    setStudy: (study: StudyRead) => {
+        const draft = projectStudyToUpdate(study);
+        normalizeStudyData(draft);
         set({
             original: study,
-            draft: projectStudyToUpdate(study),
-        }),
+            draft,
+        });
+    },
 
     updateDraft: (fn: (d: StudyUpdate) => void) =>
         set((state: StudyDesignerState) => {
             if (!state.draft) return state;
-            return { draft: produce(state.draft, fn) };
+            const newDraft = produce(state.draft, fn);
+            normalizeStudyData(newDraft);
+            return { draft: newDraft };
         }),
 
     // biome-ignore lint/suspicious/noExplicitAny: complex translation type
@@ -260,6 +383,7 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
                     }
                 }
 
+                normalizeStudyData(state.draft);
                 state.syncStatus = 'modified';
             })
         ),
