@@ -260,10 +260,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                                         className="text-red-500 text-xs mt-1"
                                         data-testid="postsort-email-error"
                                     >
-                                        {t(
-                                            'post.contact.error_invalid_email',
-                                            'Please enter a valid email address'
-                                        )}
+                                        {t('post.contact.error_invalid_email')}
                                     </p>
                                 )}
                             </div>

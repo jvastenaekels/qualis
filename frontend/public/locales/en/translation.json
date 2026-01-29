@@ -341,7 +341,8 @@
             "interview_consent": "I agree to be contacted by the researcher for follow-up.",
             "newsletter_consent": "I wish to be informed about the study results.",
             "gdpr_note": "Your email will never be publicly shared. Providing it ensures pseudonymization: your data remains identifiable only for research purposes by the investigator.",
-            "pseudonymization_note": "Agreeing to be contacted implies that the researcher can link your perspective to your email (pseudonymization) for this specific follow-up."
+            "pseudonymization_note": "Agreeing to be contacted implies that the researcher can link your perspective to your email (pseudonymization) for this specific follow-up.",
+            "error_invalid_email": "Please enter a valid email address"
         }
     },
     "admin": {

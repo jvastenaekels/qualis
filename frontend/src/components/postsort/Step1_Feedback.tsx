@@ -132,7 +132,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                         {t('post.extreme.title', 'Key Choices')}
                     </h2>
                     <span className="text-sm text-slate-500 font-medium">
-                        {extremeCards.length} {t('common.items', 'items')}
+                        {extremeCards.length} {t('common.cards')}
                     </span>
                 </div>
 
