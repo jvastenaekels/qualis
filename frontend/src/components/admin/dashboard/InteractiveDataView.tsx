@@ -102,6 +102,7 @@ export interface DumpResponse {
         statements: DumpStatement[];
         translations: { lang: string; title: string }[];
         grid_config?: Record<string, number> | { score: number; capacity: number }[];
+        presort_config?: Record<string, any>;
         postsort_config?: {
             email_collection_enabled?: boolean;
             newsletter_consent_enabled?: boolean;
@@ -683,9 +684,9 @@ export default function InteractiveDataView({
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
-                                                      header.column.columnDef.header,
-                                                      header.getContext()
-                                                  )}
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
                                         </TableHead>
                                     ))}
                                 </TableRow>
@@ -699,7 +700,7 @@ export default function InteractiveDataView({
                                         className={cn(
                                             'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
                                             !!row.original.is_discarded &&
-                                                'opacity-60 grayscale-[0.5]'
+                                            'opacity-60 grayscale-[0.5]'
                                         )}
                                         onClick={() => handleViewParticipant(row.original)}
                                     >
