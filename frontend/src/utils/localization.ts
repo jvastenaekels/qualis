@@ -29,7 +29,7 @@ export const getLocalizedText = (
     if (text[language]) return text[language];
 
     // 2. English fallback
-    if (text['en']) return text['en'];
+    if (text.en) return text.en;
 
     // 3. First available
     const availableLangs = Object.keys(text);

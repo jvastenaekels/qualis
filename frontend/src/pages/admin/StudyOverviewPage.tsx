@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
 
 import type { StudyRead, ParticipantRead, StudyStatsRead } from '@/api/model';
+import { ParticipantStatus } from '@/api/model/participantStatus';
 import { AdminService } from '@/api/admin';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
 
@@ -449,7 +450,9 @@ const StudyOverviewPage = () => {
                                         {/* In Progress Section */}
                                         {recentParticipants.filter(
                                             // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
-                                            (p: any) => !p.completed && !p.is_discarded
+                                            (p: any) =>
+                                                p.status === ParticipantStatus.started &&
+                                                !p.is_discarded
                                         ).length > 0 && (
                                             <div className="p-3">
                                                 <div className="flex items-center text-xs font-semibold text-slate-500 mb-3 px-1">
@@ -463,7 +466,9 @@ const StudyOverviewPage = () => {
                                                         recentParticipants.filter(
                                                             // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
                                                             (p: any) =>
-                                                                !p.completed && !p.is_discarded
+                                                                p.status ===
+                                                                    ParticipantStatus.started &&
+                                                                !p.is_discarded
                                                         ).length
                                                     }
                                                     )
@@ -473,7 +478,9 @@ const StudyOverviewPage = () => {
                                                         .filter(
                                                             // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
                                                             (p: any) =>
-                                                                !p.completed && !p.is_discarded
+                                                                p.status ===
+                                                                    ParticipantStatus.started &&
+                                                                !p.is_discarded
                                                         )
                                                         .map((p) => (
                                                             <div
