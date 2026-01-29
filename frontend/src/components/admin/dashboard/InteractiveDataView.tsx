@@ -603,6 +603,30 @@ export default function InteractiveDataView({
                                 <DropdownMenuItem
                                     onClick={async () => {
                                         try {
+                                            const blob =
+                                                await AdminService.exportResearchPackage(slug);
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = `${slug}_research_package.zip`;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            window.URL.revokeObjectURL(url);
+                                            toast.success(
+                                                t('admin.export.success', 'Export successful')
+                                            );
+                                        } catch (_e) {
+                                            toast.error(t('admin.export.error', 'Export failed'));
+                                        }
+                                    }}
+                                    className="font-bold cursor-pointer text-indigo-600 bg-indigo-50/50"
+                                >
+                                    <Download className="h-3.5 w-3.5 mr-2" />
+                                    {t('admin.export.formats.package', 'Research Package (ZIP)')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={async () => {
+                                        try {
                                             const blob = await AdminService.exportCSV(slug);
                                             const url = window.URL.createObjectURL(blob);
                                             const a = document.createElement('a');
@@ -665,6 +689,34 @@ export default function InteractiveDataView({
                                     className="font-medium cursor-pointer"
                                 >
                                     {t('admin.export.formats.rkit', 'R-Kit (ZIP)')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={async () => {
+                                        try {
+                                            // Using the existing dump API but for download
+                                            const blob = new Blob(
+                                                [JSON.stringify(rawData, null, 2)],
+                                                {
+                                                    type: 'application/json',
+                                                }
+                                            );
+                                            const url = window.URL.createObjectURL(blob);
+                                            const a = document.createElement('a');
+                                            a.href = url;
+                                            a.download = `${slug}_dump.json`;
+                                            document.body.appendChild(a);
+                                            a.click();
+                                            window.URL.revokeObjectURL(url);
+                                            toast.success(
+                                                t('admin.export.success', 'Export successful')
+                                            );
+                                        } catch (_e) {
+                                            toast.error(t('admin.export.error', 'Export failed'));
+                                        }
+                                    }}
+                                    className="font-medium cursor-pointer"
+                                >
+                                    {t('admin.export.formats.json', 'JSON Dump')}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

@@ -163,4 +163,17 @@ export const AdminService = {
         if (!response.ok) throw new Error('Failed to export participant JSON');
         return response.json();
     },
+
+    /**
+     * Export complete research package (ZIP)
+     */
+    exportResearchPackage: async (slug: string) => {
+        const response = await fetch(`/api/admin/studies/${slug}/export/package`, {
+            headers: {
+                Authorization: `Bearer ${useAuthStore.getState().token}`,
+            },
+        });
+        if (!response.ok) throw new Error('Failed to export research package');
+        return response.blob();
+    },
 };

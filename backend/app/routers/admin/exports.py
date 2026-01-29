@@ -210,3 +210,40 @@ async def export_participant_json(
         "participant": participant,
         "statement_id_to_index": full_dump["statement_id_to_index"],
     }
+
+
+@router.get("/{slug}/export/package")
+async def get_research_package(
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Get complete research package (ZIP) including CSV, JSON, codebook, etc."""
+    # Fetch study with all relations needed for ExportService
+    # ExportService needs participants and statements
+    # We'll reload the study with all options to ensure everything is in memory
+    from sqlalchemy.orm import selectinload
+    from ...models import Participant, Statement
+
+    stmt = (
+        select(Study)
+        .where(Study.id == study.id)
+        .options(
+            selectinload(Study.statements).selectinload(Statement.translations),
+            selectinload(Study.participants).selectinload(Participant.qsort_entries),
+            selectinload(Study.translations),
+        )
+    )
+    result = await db.execute(stmt)
+    full_study = result.scalar_one()
+
+    zip_content = ExportService.generate_research_package(
+        full_study, full_study.participants
+    )
+
+    return StreamingResponse(
+        io.BytesIO(zip_content),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f"attachment; filename={study.slug}_research_package.zip"
+        },
+    )

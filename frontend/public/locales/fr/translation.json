@@ -670,7 +670,9 @@
             "formats": {
                 "csv": "CSV",
                 "pqmethod": "PQMethod (ZIP)",
-                "rkit": "R-Kit (ZIP)"
+                "rkit": "R-Kit (ZIP)",
+                "package": "Pack de recherche (ZIP)",
+                "json": "Dump JSON"
             }
         },
         "import": {

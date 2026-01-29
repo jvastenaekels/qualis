@@ -1,6 +1,8 @@
 """Consolidated integration tests for data exports (CSV, JSON)."""
 
 import pytest
+import io
+import zipfile
 from httpx import AsyncClient
 
 from datetime import datetime, timezone
@@ -250,6 +252,62 @@ class TestExports:
         assert data["participant"]["presort"]["age"] == 25
         assert data["study"]["slug"] == study.slug
         assert "statement_id_to_index" in data
+
+    async def test_export_research_package_success(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        workspace_factory,
+        study_factory,
+        auth_token_factory,
+        db,
+    ):
+        """Test that the full research package ZIP is generated correctly."""
+        # 1. Setup Study with statements and participants
+        ws = await workspace_factory(owner=test_user)
+        study = await study_factory(workspace=ws, owner=test_user)
+
+        # Add a statement and participant to ensure ZIP has content
+        from app.models import Statement, StatementTranslation
+
+        stmt = Statement(study_id=study.id, code="S1")
+        db.add(stmt)
+        await db.commit()
+        db.add(
+            StatementTranslation(
+                statement_id=stmt.id, language_code="en", text="Statement 1"
+            )
+        )
+
+        p = Participant(
+            study_id=study.id,
+            session_token=uuid.uuid4(),
+            status=ParticipantStatus.completed,
+            language_used="en",
+        )
+        db.add(p)
+        await db.commit()
+        await db.refresh(study)
+
+        headers = auth_token_factory(test_user)
+
+        # 2. Export Research Package
+        response = await client.get(
+            f"/api/admin/studies/{study.slug}/export/package",
+            headers=headers,
+        )
+        assert response.status_code == 200
+        assert "application/zip" in response.headers["content-type"]
+
+        # 3. Verify ZIP Content
+        zip_content = io.BytesIO(response.content)
+        with zipfile.ZipFile(zip_content, "r") as z:
+            filenames = z.namelist()
+            assert "data_all.csv" in filenames
+            assert "codebook.txt" in filenames
+            assert "statements.csv" in filenames
+            assert f"pqmethod/{study.slug}.sta" in filenames
+            assert "r_kit/analysis.R" in filenames
 
     async def test_export_participant_csv_not_found(
         self,

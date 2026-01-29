@@ -3517,6 +3517,415 @@ export function useExportParticipantCsvApiAdminStudiesSlugParticipantsParticipan
 }
 
 /**
+ * Export single participant results as JSON.
+ * @summary Export Participant Json
+ */
+export const exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet = (
+    slug: string,
+    participantId: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/studies/${slug}/participants/${participantId}/export/json`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetQueryKey =
+    (slug?: string, participantId?: number) => {
+        return [`/api/admin/studies/${slug}/participants/${participantId}/export/json`] as const;
+    };
+
+export const getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetQueryOptions =
+    <
+        TData = Awaited<
+            ReturnType<
+                typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+            >
+        >,
+        TError = HTTPValidationError,
+    >(
+        slug: string,
+        participantId: number,
+        options?: {
+            query?: Partial<
+                UseQueryOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                        >
+                    >,
+                    TError,
+                    TData
+                >
+            >;
+        }
+    ) => {
+        const { query: queryOptions } = options ?? {};
+
+        const queryKey =
+            queryOptions?.queryKey ??
+            getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetQueryKey(
+                slug,
+                participantId
+            );
+
+        const queryFn: QueryFunction<
+            Awaited<
+                ReturnType<
+                    typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                >
+            >
+        > = ({ signal }) =>
+            exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet(
+                slug,
+                participantId,
+                signal
+            );
+
+        return {
+            queryKey,
+            queryFn,
+            enabled: !!(slug && participantId),
+            ...queryOptions,
+        } as UseQueryOptions<
+            Awaited<
+                ReturnType<
+                    typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                >
+            >,
+            TError,
+            TData
+        > & { queryKey: DataTag<QueryKey, TData, TError> };
+    };
+
+export type ExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetQueryResult =
+    NonNullable<
+        Awaited<
+            ReturnType<
+                typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+            >
+        >
+    >;
+export type ExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetQueryError =
+    HTTPValidationError;
+
+export function useExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Export Participant Json
+ */
+
+export function useExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions =
+        getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetQueryOptions(
+            slug,
+            participantId,
+            options
+        );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Get complete research package (ZIP) including CSV, JSON, codebook, etc.
+ * @summary Get Research Package
+ */
+export const getResearchPackageApiAdminStudiesSlugExportPackageGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/studies/${slug}/export/package`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryKey = (slug?: string) => {
+    return [`/api/admin/studies/${slug}/export/package`] as const;
+};
+
+export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>
+    > = ({ signal }) => getResearchPackageApiAdminStudiesSlugExportPackageGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetResearchPackageApiAdminStudiesSlugExportPackageGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>
+>;
+export type GetResearchPackageApiAdminStudiesSlugExportPackageGetQueryError = HTTPValidationError;
+
+export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
+    TData = Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
+    TData = Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
+    TData = Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Research Package
+ */
+
+export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
+    TData = Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * Verify an invitation token and return details including workspace name.
  * @summary Verify Invitation
  */
@@ -9130,6 +9539,43 @@ export const getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantId
         );
     };
 
+export const getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetMockHandler =
+    (
+        overrideResponse?:
+            | unknown
+            | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+        options?: RequestHandlerOptions
+    ) => {
+        return http.get(
+            '*/api/admin/studies/:slug/participants/:participantId/export/json',
+            async (info) => {
+                if (typeof overrideResponse === 'function') {
+                    await overrideResponse(info);
+                }
+                return new HttpResponse(null, { status: 200 });
+            },
+            options
+        );
+    };
+
+export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/export/package',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
 export const getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -9786,6 +10232,8 @@ export const getOpenQAPIMock = () => [
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),
     getGetStudyDumpApiAdminStudiesSlugDumpGetMockHandler(),
     getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetMockHandler(),
+    getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetMockHandler(),
+    getGetResearchPackageApiAdminStudiesSlugExportPackageGetMockHandler(),
     getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler(),
     getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler(),
     getListUsersApiAdminUsersGetMockHandler(),

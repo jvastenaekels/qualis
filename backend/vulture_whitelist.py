@@ -49,6 +49,8 @@ export_pqmethod
 export_r_kit
 get_study_dump
 export_participant_csv
+export_participant_json
+get_research_package
 
 # admin/invitations.py
 verify_invitation

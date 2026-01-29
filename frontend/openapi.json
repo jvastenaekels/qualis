@@ -1495,6 +1495,113 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/participants/{participant_id}/export/json": {
+      "get": {
+        "tags": [
+          "admin-exports",
+          "Admin Exports"
+        ],
+        "summary": "Export Participant Json",
+        "description": "Export single participant results as JSON.",
+        "operationId": "export_participant_json_api_admin_studies__slug__participants__participant_id__export_json_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "participant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Participant Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/export/package": {
+      "get": {
+        "tags": [
+          "admin-exports",
+          "Admin Exports"
+        ],
+        "summary": "Get Research Package",
+        "description": "Get complete research package (ZIP) including CSV, JSON, codebook, etc.",
+        "operationId": "get_research_package_api_admin_studies__slug__export_package_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/invitations/verify": {
       "get": {
         "tags": [
