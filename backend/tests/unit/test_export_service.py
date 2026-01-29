@@ -50,7 +50,12 @@ class MockParticipant:
         self.language_used = "en"
         self.status = MagicMock(value="completed")
         self.submitted_at = None
+        self.consented_at = None
         self.ip_address = "hashed"
+        self.user_agent = "mock-agent"
+        self.is_discarded = False
+        self.discard_reason = None
+        self.is_test_run = False
         self.presort_answers: dict[str, Any] = {}
         self.postsort_answers: dict[str, Any] = {}
         self.qsort_entries = entries
