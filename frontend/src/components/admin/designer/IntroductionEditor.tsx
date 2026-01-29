@@ -2,15 +2,22 @@ import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Hand, Clipboard, ShieldCheck } from 'lucide-react';
+import { Hand, Clipboard, ShieldCheck, Settings2, RotateCcw } from 'lucide-react';
 import type React from 'react';
 import MarkdownEditor from './MarkdownEditor';
 import { ProcessStepEditor } from './ProcessStepEditor';
 import { useTranslation } from 'react-i18next';
 import type { StudyTranslationRead } from '@/api/model';
-import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { SUPPORTED_LANGUAGES, type Language } from '@/constants/languages';
 
 const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { t } = useTranslation();
@@ -41,6 +48,60 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
 
     return (
         <div className="space-y-12 pb-12">
+            {/* General Settings */}
+            <section className="space-y-6">
+                <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">
+                    <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
+                        <Settings2 className="h-5 w-5 text-indigo-600" />
+                    </div>
+                    {t('admin.design.intro.general_settings')}
+                </div>
+
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                    <CardContent className="pt-6 space-y-6">
+                        <div className="grid gap-2.5">
+                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                {t('admin.design.intro.fields.default_lang')}
+                            </Label>
+                            <Select
+                                value={draft.default_language || 'en'}
+                                onValueChange={(val) =>
+                                    updateDraft((d) => {
+                                        d.default_language = val;
+                                    })
+                                }
+                                disabled={readOnly}
+                            >
+                                <SelectTrigger className="w-full h-11 rounded-xl font-medium">
+                                    <SelectValue
+                                        placeholder={t('admin.design.toolbar.select_lang')}
+                                    />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-xl">
+                                    {draft.translations?.map((trans) => {
+                                        const lang = SUPPORTED_LANGUAGES.find(
+                                            (l: Language) => l.code === trans.language_code
+                                        );
+                                        return (
+                                            <SelectItem
+                                                key={trans.language_code}
+                                                value={trans.language_code}
+                                                className="rounded-lg"
+                                            >
+                                                {lang?.label || trans.language_code}
+                                            </SelectItem>
+                                        );
+                                    })}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-[11px] text-slate-500 font-medium px-1">
+                                {t('admin.design.intro.fields.default_lang_help')}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </section>
+
             {/* Welcome Section */}
             <section className="space-y-6">
                 <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight">

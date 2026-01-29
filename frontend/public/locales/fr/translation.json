@@ -953,7 +953,7 @@
                 "confirm_activate": "Activer et copier"
             },
             "tabs": {
-                "welcome": "Bienvenue",
+                "welcome": "Général",
                 "presort": "Pré-tri",
                 "condition": "Consigne",
                 "qsort": "Q-tri",
@@ -971,6 +971,7 @@
                 "desktop": "Vue bureau"
             },
             "intro": {
+                "general_settings": "Paramètres généraux",
                 "welcome_title": "Présentation de l'étude",
                 "process_title": "Aperçu du déroulement",
                 "reset": "Réinitialiser",
@@ -1003,6 +1004,8 @@
                 "consent_title": "Formulaire de consentement",
                 "consent_details": "Détails du consentement",
                 "fields": {
+                    "default_lang": "Langue par défaut",
+                    "default_lang_help": "Cette langue sera affichée par défaut aux participants si la langue de leur navigateur n'est pas supportée.",
                     "title": "Titre",
                     "title_placeholder": "ex: Étude sur le développement durable",
                     "subtitle": "Sous-titre",

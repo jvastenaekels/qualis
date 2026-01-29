@@ -20,18 +20,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-
-interface Language {
-    code: string;
-    label: string;
-    flag: string;
-}
-
-const UI_LANGUAGES: Language[] = [
-    { code: 'en', label: 'English', flag: 'EN' },
-    { code: 'fr', label: 'Français', flag: 'FR' },
-    { code: 'fi', label: 'Suomi', flag: 'FI' },
-];
+import { SUPPORTED_LANGUAGES, type Language } from '@/constants/languages';
 
 interface LanguageManagerModalProps {
     isOpen: boolean;
@@ -136,7 +125,7 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
 
                 <div className="py-6 space-y-4">
                     <div className="grid gap-3">
-                        {UI_LANGUAGES.map((lang) => {
+                        {SUPPORTED_LANGUAGES.map((lang: Language) => {
                             const isActive = activeLanguageCodes.includes(lang.code);
 
                             return (
@@ -226,9 +215,12 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
                                     {activeLanguageCodes.map((code) => (
                                         <SelectItem key={code} value={code}>
                                             <span className="flex items-center gap-2">
-                                                {UI_LANGUAGES.find((l) => l.code === code)?.flag}{' '}
-                                                {UI_LANGUAGES.find((l) => l.code === code)?.label ||
-                                                    code}
+                                                {
+                                                    SUPPORTED_LANGUAGES.find((l) => l.code === code)
+                                                        ?.flag
+                                                }{' '}
+                                                {SUPPORTED_LANGUAGES.find((l) => l.code === code)
+                                                    ?.label || code}
                                             </span>
                                         </SelectItem>
                                     ))}

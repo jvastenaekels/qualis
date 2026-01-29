@@ -962,7 +962,7 @@
                 "confirm_activate": "Activate & copy"
             },
             "tabs": {
-                "welcome": "Welcome",
+                "welcome": "General",
                 "presort": "Pre-sort",
                 "condition": "Condition",
                 "qsort": "Q-sort",
@@ -980,6 +980,7 @@
                 "desktop": "Desktop view"
             },
             "intro": {
+                "general_settings": "General Settings",
                 "welcome_title": "Welcome message",
                 "process_title": "Study steps overview",
                 "process_steps": {
@@ -1012,6 +1013,8 @@
                 "reset": "Reset instruction",
                 "consent_details": "Consent form details",
                 "fields": {
+                    "default_lang": "Default Language",
+                    "default_lang_help": "This language will be shown to participants by default if their browser language is not supported.",
                     "title": "Study title",
                     "title_placeholder": "Enter public title...",
                     "subtitle": "Subtitle (optional)",

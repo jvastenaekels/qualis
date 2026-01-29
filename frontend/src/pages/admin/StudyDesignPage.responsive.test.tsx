@@ -108,7 +108,7 @@ describe('StudyDesignPage Responsive Layout', () => {
 
         // Wait for page to load
         const welcomeTab = await screen.findByRole('tab', {
-            name: /(Welcome|admin\.design\.tabs\.welcome)/i,
+            name: /(General|admin\.design\.tabs\.welcome)/i,
         });
         expect(welcomeTab).toBeTruthy();
 
@@ -128,7 +128,7 @@ describe('StudyDesignPage Responsive Layout', () => {
 
         await screen.findByRole(
             'tab',
-            { name: /(Welcome|admin\.design\.tabs\.welcome)/i },
+            { name: /(General|admin\.design\.tabs\.welcome)/i },
             { timeout: 5000 }
         );
 

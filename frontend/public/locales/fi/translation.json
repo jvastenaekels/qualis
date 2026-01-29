@@ -953,7 +953,7 @@
                 "confirm_activate": "Aktivoi ja kopioi"
             },
             "tabs": {
-                "welcome": "Tervetuloa",
+                "welcome": "Yleistä",
                 "presort": "Esikysely",
                 "condition": "Ehto",
                 "qsort": "Q-lajittelu",
@@ -971,6 +971,7 @@
                 "desktop": "Työpöytänäkymä"
             },
             "intro": {
+                "general_settings": "Yleisasetukset",
                 "welcome_title": "Tervetuloviesti",
                 "reset": "Nollaa ohje",
                 "process_title": "Vaiheiden yleiskatsaus",
@@ -1003,6 +1004,8 @@
                 "consent_title": "Suostumuslomake",
                 "consent_details": "Suostumuksen tiedot",
                 "fields": {
+                    "default_lang": "Oletuskieli",
+                    "default_lang_help": "Tämä kieli näytetään osallistujille oletuksena, jos heidän selaimensa kieltä ei tueta.",
                     "title": "Tutkimuksen otsikko",
                     "title_placeholder": "Syötä julkinen otsikko...",
                     "subtitle": "Alaotsikko (valinnainen)",

@@ -60,7 +60,7 @@ import LanguageManagerModal from '@/components/admin/designer/LanguageManagerMod
 import { CircleCheck, CircleDashed, ArrowLeft, CheckCircle } from 'lucide-react';
 
 const DESIGN_STEPS = [
-    { id: 'intro', label: 'Welcome' },
+    { id: 'intro', label: 'General' },
     { id: 'pre-sort', label: 'Presort' },
     { id: 'condition', label: 'Instruction' },
     { id: 'q-sort', label: 'Grid & Q-Set' },

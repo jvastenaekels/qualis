@@ -28,9 +28,9 @@ export function SurveyResponseTable({
     const questions = Array.isArray(rawQuestions)
         ? rawQuestions
         : Object.entries(rawQuestions).map(([id, q]: [string, any]) => ({
-            id,
-            ...(q as any),
-        }));
+              id,
+              ...(q as any),
+          }));
 
     // If questions is an object (legacy/simple), convert to array-like entries
     // based on the answers keys to ensure everything is shown even if missing in config

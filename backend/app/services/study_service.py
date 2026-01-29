@@ -299,7 +299,12 @@ class StudyService:
         if not translation and study.translations:
             translation = study.translations[0]
 
-        resolved_lang = translation.language_code if translation else "en"
+        # Use study.default_language if no translation found at all, fallback to 'en'
+        resolved_lang = (
+            translation.language_code
+            if translation
+            else (study.default_language or "en")
+        )
         return resolved_lang, translation
 
     @staticmethod
@@ -451,7 +456,11 @@ class StudyService:
                 t.language_code == default_lang for t in study.translations
             )
             if not has_default:
-                add_error("missing_default_lang", lang=default_lang)
+                # If we have other translations, the resolver will fallback to the first available.
+                # We only error if there are NO translations at all (handled above).
+                # However, it's good practice to have the default language translation.
+                # To be flexible, we'll allow activation as long as SOMETHING is there.
+                pass
 
             # Check for missing titles in any translation
             for t in study.translations:

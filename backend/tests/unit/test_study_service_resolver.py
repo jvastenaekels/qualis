@@ -53,3 +53,14 @@ def test_resolve_translation_none():
     lang, trans = StudyService.resolve_translation(study, "fr")
     assert lang == "en"
     assert trans is None
+
+
+def test_resolve_translation_missing_english_and_default():
+    """Should fallback to first available if both default and English are missing."""
+    t_fr = StudyTranslation(language_code="fr", title="French")
+    study = Study(translations=[t_fr], default_language="en")
+
+    # Requested 'de' -> Default 'en' (missing) -> English (missing) -> First available 'fr'
+    lang, trans = StudyService.resolve_translation(study, "de")
+    assert lang == "fr"
+    assert trans == t_fr

@@ -114,10 +114,10 @@ export default function ParticipantDetailsPage() {
             duration_seconds:
                 participant.submitted_at && participant.created_at
                     ? Math.floor(
-                        (new Date(participant.submitted_at).getTime() -
-                            new Date(participant.created_at).getTime()) /
-                        1000
-                    )
+                          (new Date(participant.submitted_at).getTime() -
+                              new Date(participant.created_at).getTime()) /
+                              1000
+                      )
                     : null,
             scores,
             placements,
@@ -216,8 +216,9 @@ export default function ParticipantDetailsPage() {
 
                 <StudyPageHeader
                     title={t('admin.data.detail.title', 'Participant Details')}
-                    description={`${t('admin.sidebar.study', 'Study')}: ${study?.translations?.[0]?.title || study?.slug
-                        }`}
+                    description={`${t('admin.sidebar.study', 'Study')}: ${
+                        study?.translations?.[0]?.title || study?.slug
+                    }`}
                     icon={User}
                 />
             </div>
