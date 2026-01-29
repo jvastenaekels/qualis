@@ -1,5 +1,6 @@
 {
     "common": {
+        "placeholders": { "text_response": "Kirjoita vastauksesi..." },
         "add": "Lisää",
         "delete": "Poista",
         "all": "Kaikki",

@@ -662,7 +662,11 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
     const { draft, updateDraft, activeLocale } = useStudyDesigner();
 
     const sensors = useSensors(
-        useSensor(PointerSensor),
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
         useSensor(KeyboardSensor, {
             coordinateGetter: sortableKeyboardCoordinates,
         })
@@ -787,14 +791,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                           },
                       ]
                     : undefined,
-            placeholder:
-                qType === 'text' || qType === 'email' || qType === 'textarea'
-                    ? {
-                          [activeLocale]: t('admin.design.questions.defaults.enter_answer', {
-                              lng: activeLocale,
-                          }),
-                      }
-                    : undefined,
+            placeholder: undefined,
             rows: qType === 'textarea' ? 4 : undefined,
         };
 

@@ -24,10 +24,10 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
 
     const commonClasses =
         'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[var(--brand-accent)] focus:ring-[var(--brand-accent)] min-h-[44px] text-base';
-    const labelText = getLocalizedText(fieldConfig.label);
+
     const placeholderText = fieldConfig.placeholder
         ? getLocalizedText(fieldConfig.placeholder)
-        : labelText;
+        : t('common.placeholders.text_response');
 
     switch (fieldConfig.type) {
         case 'number':

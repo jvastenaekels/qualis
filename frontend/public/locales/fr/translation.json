@@ -1,5 +1,6 @@
 {
     "common": {
+        "placeholders": { "text_response": "Saisissez votre réponse..." },
         "add": "Ajouter",
         "all": "Tout",
         "agree": "Plutôt d'accord",

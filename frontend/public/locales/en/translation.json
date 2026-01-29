@@ -1,5 +1,6 @@
 {
     "common": {
+        "placeholders": { "text_response": "Enter your answer..." },
         "add": "Add",
         "all": "All",
         "agree": "Somewhat agree",
