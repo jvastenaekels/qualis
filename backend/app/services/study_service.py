@@ -34,7 +34,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
     "en": [
         {
             "id": "profile",
-            "icon": "Contact",
+            "icon": "User",
             "title": "Let's meet",
             "description": "A few quick questions to better understand your background.",
             "color": "#3b82f6",
@@ -55,7 +55,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
         },
         {
             "id": "post",
-            "icon": "MessageSquareQuote",
+            "icon": "MessageSquare",
             "title": "Why",
             "description": "A few words to explain your most significant choices.",
             "color": "#10b981",
@@ -64,7 +64,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
     "fr": [
         {
             "id": "profile",
-            "icon": "Contact",
+            "icon": "User",
             "title": "Faisons connaissance",
             "description": "Quelques questions rapides pour mieux comprendre votre parcours.",
             "color": "#3b82f6",
@@ -85,7 +85,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
         },
         {
             "id": "post",
-            "icon": "MessageSquareQuote",
+            "icon": "MessageSquare",
             "title": "Pourquoi",
             "description": "Quelques mots pour expliquer vos choix les plus significatifs.",
             "color": "#10b981",
@@ -94,7 +94,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
     "fi": [
         {
             "id": "profile",
-            "icon": "Contact",
+            "icon": "User",
             "title": "Tutustutaan",
             "description": "Muutama nopea kysymys taustasi ymmärtämiseksi.",
             "color": "#3b82f6",
@@ -115,7 +115,7 @@ DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
         },
         {
             "id": "post",
-            "icon": "MessageSquareQuote",
+            "icon": "MessageSquare",
             "title": "Miksi",
             "description": "Muutama sana perustellaksesi merkittävimmät valintasi.",
             "color": "#10b981",
@@ -137,6 +137,28 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, dict[str, Any]] = {
             "Feel free to zoom in on different parts of the grid for better visibility.",
             "Nothing is final: you can move cards or put them back in the deck at any time.",
         ],
+        "step_help": {
+            "1": {
+                "what": "Read the research objectives and the specific instructions for participation.",
+                "why": "Beyond standard ethical consent, this ensures you grasp the specific 'condition of instruction'—the precise lens or scenario you must adopt to evaluate the statements—which is essential for data validity.",
+            },
+            "2": {
+                "what": "Provide background information to help characterize your participant profile.",
+                "why": "This context allows the research team to analyze how distinct viewpoints (factors) may or may not correlate with specific demographic variables or professional backgrounds within the participant group.",
+            },
+            "3": {
+                "what": "Sort the deck of statements into three initial piles based on your immediate reaction.",
+                "why": "This preparatory step is designed to reduce cognitive load; it allows you to familiarize yourself with the full range of the topic (the Q-set) before the more demanding task of comparative ranking begins.",
+            },
+            "4": {
+                "what": "Place the statements onto the grid structure, moving from the extremes toward the center.",
+                "why": "The grid's structure imposes a 'forced distribution' that prevents you from rating everything as equally important; it compels you to make trade-offs, thereby modelling the relative significance of each idea in your specific belief system.",
+            },
+            "5": {
+                "what": "Confirm your grid arrangement and add comments explaining your strongest choices.",
+                "why": "Your qualitative explanations are critical for validating the statistical analysis; they help the researchers interpret the data through your logic rather than imposing their own assumptions on your choices.",
+            },
+        },
     },
     "fr": {
         "instructions": "Cette étude consiste à exprimer votre point de vue personnel à travers un processus de classement. Il n'y a pas de bonnes ou de mauvaises réponses ; nous sommes simplement intéressés par votre perspective.",
@@ -152,6 +174,28 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, dict[str, Any]] = {
             "N'hésitez pas à zoomer sur différents coins de la grille pour plus de confort (surtout sur mobile).",
             "Rien n'est définitif : vous pouvez déplacer les cartes ou les remettre dans la pile à tout moment.",
         ],
+        "step_help": {
+            "1": {
+                "what": "Lisez les objectifs de l'étude et les instructions spécifiques de participation.",
+                "why": "Au-delà du consentement éthique, cela garantit que vous saisissez bien la « consigne spécifique » (l'angle précis sous lequel vous devez évaluer les énoncés), ce qui est essentiel à la validité des données.",
+            },
+            "2": {
+                "what": "Renseignez les informations d'arrière-plan pour aider à caractériser votre profil.",
+                "why": "Ce contexte permet à l'équipe de recherche d'analyser comment des points de vue distincts peuvent être corrélés (ou non) avec certaines variables démographiques ou professionnelles au sein du groupe de participants.",
+            },
+            "3": {
+                "what": "Triez le jeu d'énoncés en trois piles initiales basées sur votre réaction immédiate.",
+                "why": "Cette étape préparatoire vise à réduire la charge cognitive ; elle vous permet de vous familiariser avec l'ensemble du sujet avant d'entamer la tâche plus exigeante du classement comparatif.",
+            },
+            "4": {
+                "what": "Placez les énoncés sur la grille, en allant des extrêmes vers le centre.",
+                "why": "La structure de la grille impose une « distribution forcée » qui vous empêche de tout noter au même niveau ; elle vous oblige à faire des arbitrages, modélisant ainsi l'importance relative de chaque idée dans votre système de pensée.",
+            },
+            "5": {
+                "what": "Confirmez la disposition de votre grille et ajoutez des commentaires expliquant vos choix les plus marqués.",
+                "why": "Vos explications qualitatives sont cruciales pour valider l'analyse statistique ; elles aident les chercheurs à interpréter les données selon votre logique propre, plutôt que de plaquer leurs hypothèses sur vos choix.",
+            },
+        },
     },
     "fi": {
         "instructions": "Tämä tutkimus käsittää oman näkökulmasi ilmaisemisen lajitteluprosessin kautta. Oikeita tai vääriä vastauksia ei ole; olemme kiinnostuneita vain sinun näkökulmastasi.",
@@ -167,6 +211,28 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, dict[str, Any]] = {
             "Voit zoomata ruudukon eri osiin nähdäksesi paremmin.",
             "Mikään ei ole lopullista: voit siirtää kortteja tai palauttaa ne pakkaan milloin tahansa.",
         ],
+        "step_help": {
+            "1": {
+                "what": "Lue tutkimuksen tavoitteet ja osallistumisohjeet huolellisesti.",
+                "why": "Eettisen suostumuksen lisäksi tämä varmistaa, että ymmärrät 'ohjeistuksen ehdon' (tietty näkökulma, jonka kautta väittämiä tulee arvioida), mikä on välttämätöntä tiedon luotettavuuden kannalta.",
+            },
+            "2": {
+                "what": "Anna taustatietoja profiilisi määrittelemiseksi.",
+                "why": "Tämä taustoitus mahdollistaa sen, että tutkijat voivat analysoida, miten erilaiset näkökulmat (faktorits) korreloivat osallistujaryhmän taustamuuttujien kanssa.",
+            },
+            "3": {
+                "what": "Lajittele väittämät kolmeen alustavaan pinoon välittömän reaktiosi perusteella.",
+                "why": "Tämä valmisteleva vaihe on suunniteltu vähentämään kognitiivista kuormitusta; sen avulla voit tutustua aihepiiriin kokonaisuudessaan ennen vaativampaa vertailevaa järjestämistä.",
+            },
+            "4": {
+                "what": "Asettele väittämät ruudukkoon siirtymällä ääripäistä kohti keskustaa.",
+                "why": "Ruudukon rakenne asettaa 'pakotetun jakauman', joka estää pitämästä kaikkia asioita yhtä tärkeinä; se pakottaa tekemään arvovalintoja, mikä mallintaa kunkin idean suhteellista merkitystä ajattelussasi.",
+            },
+            "5": {
+                "what": "Vahvista ruudukon järjestys ja lisää kommentteja, joissa selität vahvimmat valintasi.",
+                "why": "Laadulliset selityksesi ovat kriittisiä tilastollisen analyysin validoimiseksi; ne auttavat tutkijoita tulkitsemaan tietoja sinun logiikkasi kautta sen sijaan, että he tekisivät omia oletuksiaan valinnoistasi.",
+            },
+        },
     },
 }
 
@@ -317,17 +383,33 @@ class StudyService:
         resolved_lang, translation = StudyService.resolve_translation(study, lang)
 
         # Transform to Frontend Format
-        title = getattr(translation, "title", study.slug)
-        description = getattr(translation, "description", "")
-        instructions = getattr(translation, "instructions", "")
+        # Get defaults for the resolved language (try full code, then base lang, then English)
+        base_lang = resolved_lang.split("-")[0]
+        lang_defaults = (
+            DEFAULT_TRANSLATION_CONTENT.get(resolved_lang)
+            or DEFAULT_TRANSLATION_CONTENT.get(base_lang)
+            or DEFAULT_TRANSLATION_CONTENT.get("en", {})
+        )
+
+        title = getattr(translation, "title", "") or study.slug
+        description = getattr(translation, "description", "") or lang_defaults.get(
+            "description", ""
+        )
+        instructions = getattr(translation, "instructions", "") or lang_defaults.get(
+            "instructions", ""
+        )
         condition_of_instruction = getattr(
             translation, "condition_of_instruction", None
+        ) or lang_defaults.get(
+            "condition_of_instruction", "What is your stance on this statement?"
         )
-        if not condition_of_instruction:
-            condition_of_instruction = "What is your stance on this statement?"
 
-        subtitle = getattr(translation, "subtitle", None)
-        objective = getattr(translation, "objective", None)
+        subtitle = getattr(translation, "subtitle", None) or lang_defaults.get(
+            "subtitle", None
+        )
+        objective = getattr(translation, "objective", None) or lang_defaults.get(
+            "objective", None
+        )
 
         statements_data = []
         for s in study.statements:
@@ -392,22 +474,30 @@ class StudyService:
             "postsort_config": study.postsort_config,
             "grid_config": study.grid_config,
             "statements": statements_data,
-            "process_steps": getattr(translation, "process_steps", []) or [],
+            "process_steps": (getattr(translation, "process_steps", []) or [])
+            or DEFAULT_PROCESS_STEPS.get(resolved_lang)
+            or DEFAULT_PROCESS_STEPS.get(base_lang)
+            or DEFAULT_PROCESS_STEPS.get("en", []),
             "consent": {
-                "title": get_t_attr("consent_title"),
-                "description": get_t_attr("consent_description"),
+                "title": get_t_attr("consent_title")
+                or lang_defaults.get("consent_title"),
+                "description": get_t_attr("consent_description")
+                or lang_defaults.get("consent_description"),
             },
             "condition_of_instruction": condition_of_instruction,
-            "pre_instruction": getattr(translation, "pre_instruction", None),
+            "pre_instruction": getattr(translation, "pre_instruction", None)
+            or lang_defaults.get("pre_instruction"),
             "available_languages": [t.language_code for t in study.translations],
             "language": resolved_lang,
             "default_language": study.default_language,
             "show_statement_codes": study.show_statement_codes,
             "randomize_statement_order": study.randomize_statement_order,
             "ui_labels": get_t_attr("ui_labels", {}) or {},
-            "methodology_tips": getattr(translation, "methodology_tips", []) or [],
+            "methodology_tips": (getattr(translation, "methodology_tips", []) or [])
+            or lang_defaults.get("methodology_tips", []),
             "state": effective_state,
-            "step_help": getattr(translation, "step_help", {}) or {},
+            "step_help": (getattr(translation, "step_help", {}) or {})
+            or lang_defaults.get("step_help", {}),
             "requires_password": False,
             "start_date": study.start_date,
             "end_date": study.end_date,
