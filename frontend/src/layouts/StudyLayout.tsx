@@ -172,10 +172,6 @@ const StudyLayoutContent: React.FC = () => {
         }
     }, [study, setConfig, isPilotMode]);
 
-    useEffect(() => {
-        console.log('[StudyLayout] ConfigStore:', config);
-    }, [config]);
-
     const mainRef = useRef<HTMLElement>(null);
 
     // Scroll to top on route change
@@ -183,6 +179,7 @@ const StudyLayoutContent: React.FC = () => {
         if (mainRef.current && typeof mainRef.current.scrollTo === 'function') {
             mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
         }
+        // biome-ignore lint/correctness/useExhaustiveDependencies: Re-run on route change to scroll to top
     }, [location.pathname]);
 
     // Full Page Error State (if we have no config at all)
@@ -573,7 +570,7 @@ const StudyLayoutContent: React.FC = () => {
                                                 ? 'font-bold text-slate-800 opacity-100 max-w-full'
                                                 : status === 'completed'
                                                   ? 'font-medium text-slate-500 opacity-100 hidden lg:block'
-                                                  : 'font-normal text-slate-300 opacity-100 hidden xl:block'
+                                                  : 'font-normal text-slate-500 opacity-100 hidden xl:block'
                                         }`}
                                     >
                                         {stepLabel}

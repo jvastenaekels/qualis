@@ -68,7 +68,7 @@ export function AdminDashboard() {
                     <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900">
                         {t('admin.dashboard.title')}
                     </h1>
-                    <p className="text-sm md:text-lg text-slate-500 font-medium">
+                    <p className="text-sm md:text-lg text-slate-600 font-medium">
                         {t('admin.dashboard.welcome')}{' '}
                         <span className="text-indigo-600 font-bold">
                             {user?.email.split('@')[0]}
@@ -100,7 +100,7 @@ export function AdminDashboard() {
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden group">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-[10px] font-black uppercase text-slate-500 tracking-wider">
+                        <CardTitle className="text-[10px] font-black uppercase text-slate-600 tracking-wider">
                             {t('admin.dashboard.active_data_collection')}
                         </CardTitle>
                         <TrendingUp className="h-4 w-4 text-indigo-500" />
@@ -109,7 +109,7 @@ export function AdminDashboard() {
                         <div className="text-3xl font-black text-indigo-600">
                             {activeStudiesCount}
                         </div>
-                        <p className="text-[10px] font-black text-slate-400 mt-1 uppercase tracking-wider">
+                        <p className="text-[10px] font-black text-slate-600 mt-1 uppercase tracking-wider">
                             {t('admin.dashboard.receiving_responses')}
                         </p>
                     </CardContent>
@@ -123,7 +123,7 @@ export function AdminDashboard() {
                     <CardTitle className="text-lg font-black text-slate-900">
                         {t('admin.dashboard.recent_studies')}
                     </CardTitle>
-                    <CardDescription className="text-sm font-medium text-slate-500">
+                    <CardDescription className="text-sm font-medium text-slate-600">
                         {t('admin.dashboard.recent_description')}
                     </CardDescription>
                 </CardHeader>
@@ -151,7 +151,7 @@ export function AdminDashboard() {
                                             <p className="font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
                                                 {study.slug}
                                             </p>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mt-0.5">
+                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-wider mt-0.5">
                                                 {t('admin.dashboard.created')}{' '}
                                                 {formatDistanceToNow(new Date(study.created_at), {
                                                     addSuffix: true,
@@ -166,7 +166,7 @@ export function AdminDashboard() {
                                                 'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm',
                                                 study.state === 'active'
                                                     ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 ring-2 ring-emerald-500/20 animate-pulse-slow'
-                                                    : 'bg-slate-50 text-slate-500 border border-slate-100'
+                                                    : 'bg-slate-50 text-slate-600 border border-slate-100'
                                             )}
                                         >
                                             {study.state}
@@ -183,7 +183,7 @@ export function AdminDashboard() {
                             <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 mb-4">
                                 <Layout className="h-6 w-6 text-slate-400" />
                             </div>
-                            <p className="text-sm font-semibold text-slate-500">
+                            <p className="text-sm font-semibold text-slate-600">
                                 {t('admin.dashboard.no_studies')}
                             </p>
                         </div>

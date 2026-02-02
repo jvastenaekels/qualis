@@ -86,12 +86,22 @@ export default defineConfig({
             testMatch: /study\/.*\.spec\.ts/,
             use: { ...devices['Pixel 5'] },
         },
+        {
+            name: 'Accessibility Tests',
+            testMatch: /accessibility\/.*\.spec\.ts/,
+            use: { ...devices['Desktop Chrome'] },
+        },
+        {
+            name: 'Visual Tests',
+            testMatch: /visual\/.*\.spec\.ts/,
+            use: { ...devices['Desktop Chrome'] },
+        },
     ],
 
     /* Run both frontend and backend servers before starting tests */
     webServer: [
         {
-            command: 'cd ../backend && uv run uvicorn app.main:app --port 8000',
+            command: 'cd ../backend && TESTING=true uv run uvicorn app.main:app --port 8000',
             url: 'http://127.0.0.1:8000/health',
             reuseExistingServer: true,
             timeout: 120 * 1000,

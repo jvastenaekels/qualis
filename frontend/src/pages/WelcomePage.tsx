@@ -138,10 +138,10 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                             className="absolute top-0 left-0 w-1 h-full"
                             style={{ backgroundColor: 'var(--brand-accent)' }}
                         ></div>
-                        <h4 className="text-xs uppercase font-bold text-slate-500 mb-4 tracking-wider flex items-center gap-2">
+                        <h2 className="text-xs uppercase font-bold text-slate-500 mb-4 tracking-wider flex items-center gap-2">
                             <Target size={16} style={{ color: 'var(--brand-accent)' }} />
                             {t('welcome.objective_label', 'Objective of the study')}
-                        </h4>
+                        </h2>
                         <div className="prose prose-slate prose-base max-w-none text-slate-800 leading-relaxed">
                             <SafeMarkdown>{study.objective}</SafeMarkdown>
                         </div>
@@ -194,16 +194,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                                 'color-mix(in srgb, var(--brand-accent), transparent 95%)',
                         }}
                     >
-                        <div
-                            className="uppercase tracking-wider text-xs font-bold mb-4 w-fit px-3 py-1.5 rounded-md border"
-                            style={{
-                                color: 'var(--brand-accent)',
-                                backgroundColor:
-                                    'color-mix(in srgb, var(--brand-accent), transparent 90%)',
-                                borderColor:
-                                    'color-mix(in srgb, var(--brand-accent), transparent 80%)',
-                            }}
-                        >
+                        <div className="uppercase tracking-wider text-xs font-bold mb-4 w-fit px-3 py-1.5 rounded-md border text-slate-700 bg-slate-50 border-slate-200">
                             {t('welcome.how_it_works', 'How it works')}
                         </div>
 
@@ -238,7 +229,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                                         />
                                     </div>
                                     <div className="pt-0.5">
-                                        <h4
+                                        <h3
                                             className="text-slate-900 font-bold text-lg leading-tight mb-1 transition-colors"
                                             style={{
                                                 color: step.color
@@ -247,7 +238,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                                             }}
                                         >
                                             {step.title}
-                                        </h4>
+                                        </h3>
                                         <p className="text-slate-600 leading-relaxed text-[0.95rem]">
                                             {step.description}
                                         </p>

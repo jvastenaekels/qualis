@@ -1,6 +1,11 @@
 {
-    "entry": ["src/main.tsx", "src/i18n.ts"],
-    "project": ["src/**/*.{ts,tsx}"],
+    "entry": [
+        "src/main.tsx",
+        "src/i18n.ts"
+    ],
+    "project": [
+        "src/**/*.{ts,tsx}"
+    ],
     "ignore": [
         "src/**/*.test.{ts,tsx}",
         "src/test/**",
@@ -13,13 +18,16 @@
         "src/styles/**",
         "e2e/**"
     ],
-    "ignoreBinaries": ["python3"],
+    "ignoreBinaries": [
+        "python3"
+    ],
     "ignoreDependencies": [
         "@fontsource/google-sans-flex",
         "@dnd-kit/modifiers",
         "@radix-ui/react-collapsible",
         "next-themes",
         "vaul",
-        "@types/dompurify"
+        "@types/dompurify",
+        "@axe-core/playwright"
     ]
 }

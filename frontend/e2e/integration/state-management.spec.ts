@@ -125,7 +125,9 @@ test.describe('State Management Flow Tests', () => {
             await adminPage.goto(`/app/${workspaceSlug}/studies/${study.slug}`);
             // Wait for study page to load by checking h1 (Title is "Overview" + Badge)
             await expect(adminPage.locator('h1')).toContainText('Overview');
-            await expect(adminPage).toHaveURL(new RegExp(`/app/${workspaceSlug}/studies/${study.slug}`));
+            await expect(adminPage).toHaveURL(
+                new RegExp(`/app/${workspaceSlug}/studies/${study.slug}`)
+            );
 
             // Participant: Access study
             await participantPage.goto(`/study/${study.slug}`);
@@ -404,7 +406,7 @@ test.describe('State Management Flow Tests', () => {
             }
 
             // Verify completion page
-            await expect(page.locator('text=Thank you')).toBeVisible();
+            await expect(page.getByTestId('thank-you-message')).toBeVisible();
 
             // Verify submission was recorded in database
             const response = await fetch(participantApiUrl, {

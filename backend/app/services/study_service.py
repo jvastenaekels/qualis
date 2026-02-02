@@ -138,23 +138,23 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, dict[str, Any]] = {
             "Nothing is final: you can move cards or put them back in the deck at any time.",
         ],
         "step_help": {
-            "1": {
+            "welcome": {
                 "what": "Read the research objectives and the specific instructions for participation.",
                 "why": "Beyond standard ethical consent, this ensures you grasp the specific 'condition of instruction'—the precise lens or scenario you must adopt to evaluate the statements—which is essential for data validity.",
             },
-            "2": {
+            "presort": {
                 "what": "Provide background information to help characterize your participant profile.",
                 "why": "This context allows the research team to analyze how distinct viewpoints (factors) may or may not correlate with specific demographic variables or professional backgrounds within the participant group.",
             },
-            "3": {
+            "rough": {
                 "what": "Sort the deck of statements into three initial piles based on your immediate reaction.",
                 "why": "This preparatory step is designed to reduce cognitive load; it allows you to familiarize yourself with the full range of the topic (the Q-set) before the more demanding task of comparative ranking begins.",
             },
-            "4": {
+            "fine": {
                 "what": "Place the statements onto the grid structure, moving from the extremes toward the center.",
                 "why": "The grid's structure imposes a 'forced distribution' that prevents you from rating everything as equally important; it compels you to make trade-offs, thereby modelling the relative significance of each idea in your specific belief system.",
             },
-            "5": {
+            "post": {
                 "what": "Confirm your grid arrangement and add comments explaining your strongest choices.",
                 "why": "Your qualitative explanations are critical for validating the statistical analysis; they help the researchers interpret the data through your logic rather than imposing their own assumptions on your choices.",
             },
@@ -175,23 +175,23 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, dict[str, Any]] = {
             "Rien n'est définitif : vous pouvez déplacer les cartes ou les remettre dans la pile à tout moment.",
         ],
         "step_help": {
-            "1": {
+            "welcome": {
                 "what": "Lisez les objectifs de l'étude et les instructions spécifiques de participation.",
                 "why": "Au-delà du consentement éthique, cela garantit que vous saisissez bien la « consigne spécifique » (l'angle précis sous lequel vous devez évaluer les énoncés), ce qui est essentiel à la validité des données.",
             },
-            "2": {
+            "presort": {
                 "what": "Renseignez les informations d'arrière-plan pour aider à caractériser votre profil.",
                 "why": "Ce contexte permet à l'équipe de recherche d'analyser comment des points de vue distincts peuvent être corrélés (ou non) avec certaines variables démographiques ou professionnelles au sein du groupe de participants.",
             },
-            "3": {
+            "rough": {
                 "what": "Triez le jeu d'énoncés en trois piles initiales basées sur votre réaction immédiate.",
                 "why": "Cette étape préparatoire vise à réduire la charge cognitive ; elle vous permet de vous familiariser avec l'ensemble du sujet avant d'entamer la tâche plus exigeante du classement comparatif.",
             },
-            "4": {
+            "fine": {
                 "what": "Placez les énoncés sur la grille, en allant des extrêmes vers le centre.",
                 "why": "La structure de la grille impose une « distribution forcée » qui vous empêche de tout noter au même niveau ; elle vous oblige à faire des arbitrages, modélisant ainsi l'importance relative de chaque idée dans votre système de pensée.",
             },
-            "5": {
+            "post": {
                 "what": "Confirmez la disposition de votre grille et ajoutez des commentaires expliquant vos choix les plus marqués.",
                 "why": "Vos explications qualitatives sont cruciales pour valider l'analyse statistique ; elles aident les chercheurs à interpréter les données selon votre logique propre, plutôt que de plaquer leurs hypothèses sur vos choix.",
             },
@@ -212,23 +212,23 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, dict[str, Any]] = {
             "Mikään ei ole lopullista: voit siirtää kortteja tai palauttaa ne pakkaan milloin tahansa.",
         ],
         "step_help": {
-            "1": {
+            "welcome": {
                 "what": "Lue tutkimuksen tavoitteet ja osallistumisohjeet huolellisesti.",
                 "why": "Eettisen suostumuksen lisäksi tämä varmistaa, että ymmärrät 'ohjeistuksen ehdon' (tietty näkökulma, jonka kautta väittämiä tulee arvioida), mikä on välttämätöntä tiedon luotettavuuden kannalta.",
             },
-            "2": {
+            "presort": {
                 "what": "Anna taustatietoja profiilisi määrittelemiseksi.",
                 "why": "Tämä taustoitus mahdollistaa sen, että tutkijat voivat analysoida, miten erilaiset näkökulmat (faktorits) korreloivat osallistujaryhmän taustamuuttujien kanssa.",
             },
-            "3": {
+            "rough": {
                 "what": "Lajittele väittämät kolmeen alustavaan pinoon välittömän reaktiosi perusteella.",
                 "why": "Tämä valmisteleva vaihe on suunniteltu vähentämään kognitiivista kuormitusta; sen avulla voit tutustua aihepiiriin kokonaisuudessaan ennen vaativampaa vertailevaa järjestämistä.",
             },
-            "4": {
+            "fine": {
                 "what": "Asettele väittämät ruudukkoon siirtymällä ääripäistä kohti keskustaa.",
                 "why": "Ruudukon rakenne asettaa 'pakotetun jakauman', joka estää pitämästä kaikkia asioita yhtä tärkeinä; se pakottaa tekemään arvovalintoja, mikä mallintaa kunkin idean suhteellista merkitystä ajattelussasi.",
             },
-            "5": {
+            "post": {
                 "what": "Vahvista ruudukon järjestys ja lisää kommentteja, joissa selität vahvimmat valintasi.",
                 "why": "Laadulliset selityksesi ovat kriittisiä tilastollisen analyysin validoimiseksi; ne auttavat tutkijoita tulkitsemaan tietoja sinun logiikkasi kautta sen sijaan, että he tekisivät omia oletuksiaan valinnoistasi.",
             },

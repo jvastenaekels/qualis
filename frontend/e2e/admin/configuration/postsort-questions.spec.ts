@@ -125,6 +125,14 @@ test.describe('Post-Sort Configuration Testing', () => {
 
             // Try invalid email
             await page.fill('input[type="email"]', 'not-an-email');
+
+            // Skip comment step (Step 1) to get to submission on Step 2 (if separate) or just submit
+            // Note: Email is on Step 2 in current design or Step 1? The test failure suggests we need to navigate.
+            // If email is on step 2, we must click Next first.
+            if (await page.getByTestId('postsort-step1-next-btn').isVisible()) {
+                await page.getByTestId('postsort-step1-next-btn').click();
+            }
+
             await page.getByTestId('postsort-submit-btn').click();
 
             // Verify validation error
@@ -389,6 +397,9 @@ test.describe('Post-Sort Configuration Testing', () => {
                     // Navigate to post-sort
                     await page.goto(`/study/${studySlug}`);
 
+                    // Skip comment step (Step 1)
+                    await page.getByTestId('postsort-step1-next-btn').click();
+
                     // Verify question renders
                     await expect(
                         page.locator(`text=Participant ${questionType} Test`)
@@ -431,7 +442,10 @@ test.describe('Post-Sort Configuration Testing', () => {
                     // Navigate to post-sort
                     await page.goto(`/study/${studySlug}`);
 
-                    // Try to submit without answering
+                    // Skip comment step (Step 1)
+                    await page.getByTestId('postsort-step1-next-btn').click();
+
+                    // Try to submit without answering (Step 2)
                     await page.getByTestId('postsort-submit-btn').click();
 
                     // Verify validation error

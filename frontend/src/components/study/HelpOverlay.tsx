@@ -42,7 +42,7 @@ const HelpOverlay: React.FC = () => {
     };
 
     const stepKey = stepIdMap[currentStep] || 'rough';
-    const customHelp = config?.step_help?.[currentStep.toString()];
+    const customHelp = config?.step_help?.[stepKey];
 
     const what = customHelp?.what || t(`study.help.step_${stepKey}.what`);
     const why = customHelp?.why || t(`study.help.step_${stepKey}.why`);

@@ -54,6 +54,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
             window.removeEventListener('resize', checkOverflow);
             clearTimeout(timer);
         };
+        // biome-ignore lint/correctness/useExhaustiveDependencies: Re-run when text changes to recalculate overflow
     }, [displayCard?.text]); // Re-run when text changes
 
     const ScrollIndicator = () => (

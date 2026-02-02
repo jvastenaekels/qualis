@@ -112,7 +112,7 @@ test.describe('Interface Customization Testing', () => {
 
             // Try to clear a label
             await page.fill('input[name="common.agree"]', '');
-            await page.blur('input[name="common.agree"]');
+            await page.locator('input[name="common.agree"]').blur();
 
             // Verify validation error or default value restored
             const value = await page.locator('input[name="common.agree"]').inputValue();
@@ -202,6 +202,7 @@ test.describe('Interface Customization Testing', () => {
             testDb,
             authToken,
         }) => {
+            await page.setViewportSize({ width: 1600, height: 1200 });
             await testDb.updateStudy(authToken, studySlug, {
                 translations: [
                     {
@@ -209,21 +210,22 @@ test.describe('Interface Customization Testing', () => {
                         title: 'Test Study',
                         process_steps: [
                             {
+                                id: 'profile',
+                                title: 'Custom Demographics',
+                                description: 'Desc',
+                                icon: 'User',
+                            },
+                            {
                                 id: 'rough',
                                 title: 'Custom Rough Sort',
                                 description: 'Desc',
                                 icon: 'Zap',
                             },
-                            {
-                                id: 'fine',
-                                title: 'Custom Fine Sort',
-                                description: 'Desc',
-                                icon: 'Target',
-                            },
                         ],
                     },
                 ],
                 state: 'active',
+                presort_config: { enabled: true, fields: {} },
             });
 
             await page.goto(`/study/${studySlug}`);
@@ -233,11 +235,9 @@ test.describe('Interface Customization Testing', () => {
             await page.click('[data-testid="consent-accept-btn"]');
 
             // Check if custom step names appear in progress/breadcrumb
-            // (Implementation-specific)
-            const hasCustomLabel = await page
-                .locator('text=Custom Rough Sort, text=Custom Fine Sort')
-                .count();
-            expect(hasCustomLabel).toBeGreaterThan(0);
+            // Narrow down to the sidebar/navigation area if possible, or just check visibility
+            await expect(page.getByText('Custom Demographics')).toBeVisible();
+            await expect(page.getByText('Custom Rough Sort')).toBeVisible();
         });
     });
 
@@ -265,23 +265,30 @@ test.describe('Interface Customization Testing', () => {
                 .click();
             await page.getByTestId('tab-interface').click();
 
-            // Add help text
-            await page.fill(
-                'textarea[name="help_roughsort"]',
-                'Sort statements into three piles...'
-            );
-            await page.fill('textarea[name="help_finesort"]', 'Arrange statements in the grid...');
+            // Add help text for Rough Sort
+            const roughContainer = page.locator('.space-y-6').filter({ hasText: /Rough Sort|Step 2/ });
+            const roughWhatInput = roughContainer.getByRole('textbox').first();
+            await roughWhatInput.fill('Sort statements into three piles...');
 
-            // Verify
-            await expect(page.locator('textarea[name="help_finesort"]')).toHaveValue(
-                'Arrange statements in the grid...'
-            );
+            // Add help text for Fine Sort
+            const fineContainer = page.locator('.space-y-6').filter({ hasText: /Fine Sort|Step 3/ });
+            const fineWhatInput = fineContainer.getByRole('textbox').first();
+            await fineWhatInput.fill('Arrange statements in the grid...');
+
+            // Wait for auto-save (debounced)
+            await page.waitForTimeout(1000);
+
+            // Verify persistence after reload
+            await page.reload();
+            await page.getByTestId('tab-interface').click();
+            await expect(roughWhatInput).toHaveValue('Sort statements into three piles...');
+            await expect(fineWhatInput).toHaveValue('Arrange statements in the grid...');
         });
 
         test('API: Help text saves correctly', async ({ testDb, authToken }) => {
             const stepHelp = {
-                roughsort: 'Rough sort instructions here',
-                finesort: 'Fine sort instructions here',
+                rough: { what: 'Rough sort instructions here', why: 'Because...' },
+                fine: { what: 'Fine sort instructions here', why: 'Because...' },
             };
 
             await testDb.updateStudy(authToken, studySlug, {
@@ -297,7 +304,8 @@ test.describe('Interface Customization Testing', () => {
             const study = await testDb.getStudy(authToken, studySlug);
             const enTranslation = study.translations.find((t) => t.language_code === 'en');
 
-            expect(enTranslation.step_help.roughsort).toBe('Rough sort instructions here');
+            // Access using semantic keys
+            expect(enTranslation.step_help.rough.what).toBe('Rough sort instructions here');
         });
 
         test('Participant: Help text appears in steps', async ({ page, testDb, authToken }) => {
@@ -307,7 +315,7 @@ test.describe('Interface Customization Testing', () => {
                         language_code: 'en',
                         title: 'Test Study',
                         step_help: {
-                            roughsort: 'Custom help for rough sort',
+                            rough: { what: 'Custom help for rough sort', why: 'Why explanation' },
                         },
                     },
                 ],
@@ -318,9 +326,14 @@ test.describe('Interface Customization Testing', () => {
             // Accept consent (New Flow)
             await page.click('[data-testid="start-btn"]');
             await page.check('[data-testid="consent-checkbox"]');
-            await page.click('[data-testid="consent-accept-btn"]');
+            await page.getByTestId('consent-accept-btn').click();
 
-            // Navigate to rough sort
+            // Wait for navigation to rough sort
+            await page.waitForURL(/.*\/rough-sort/);
+
+            // Open Help Overlay
+            await page.getByRole('button', { name: 'Help' }).click();
+
             // Verify help text appears
             await expect(page.locator('text=Custom help for rough sort')).toBeVisible();
         });

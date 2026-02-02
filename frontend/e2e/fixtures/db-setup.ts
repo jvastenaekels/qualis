@@ -11,6 +11,41 @@ export class TestDatabase {
         this.baseUrl = process.env.API_BASE_URL || 'http://127.0.0.1:8000';
     }
 
+    /**
+     * Helper: Fetch with retry logic for transient errors (ECONNREFUSED, etc.)
+     */
+    private async fetchWithRetry(
+        url: string,
+        options: RequestInit = {},
+        retries = 5,
+        backoff = 1000
+    ): Promise<Response> {
+        for (let i = 0; i < retries; i++) {
+            try {
+                // @ts-expect-error
+                const response = await fetch(url, options);
+                return response;
+            } catch (error: any) {
+                // Retry on connection refused or generic fetch failing (which might be network)
+                const isConnectionError =
+                    error.code === 'ECONNREFUSED' ||
+                    error.cause?.code === 'ECONNREFUSED' ||
+                    error.message.includes('fetch failed');
+
+                if (i === retries - 1 || !isConnectionError) {
+                    throw error;
+                }
+
+                console.log(
+                    `[TestDatabase] Fetch failed to ${url} (attempt ${i + 1}/${retries}), retrying in ${backoff}ms... Error: ${error.message}`
+                );
+                await new Promise((resolve) => setTimeout(resolve, backoff));
+                backoff *= 1.5; // Exponential backoff
+            }
+        }
+        throw new Error(`Failed to fetch ${url} after ${retries} retries`);
+    }
+
     getUserEmail() {
         if (!this.uniqueUserEmail) {
             throw new Error('Test user not initialized');
@@ -105,7 +140,7 @@ export class TestDatabase {
     private async seedUniqueData(testId: string) {
         try {
             const workspaceSlug = `workspace-${testId}`;
-            const response = await fetch(`${this.baseUrl}/api/test/seed`, {
+            const response = await this.fetchWithRetry(`${this.baseUrl}/api/test/seed`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -146,7 +181,7 @@ export class TestDatabase {
         if (!this.uniqueUserEmail) {
             throw new Error('Test user not initialized. Did setup() run?');
         }
-        const response = await fetch(`${this.baseUrl}/api/token`, {
+        const response = await this.fetchWithRetry(`${this.baseUrl}/api/token`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
@@ -171,7 +206,7 @@ export class TestDatabase {
             throw new Error('Workspace ID not initialized. Did setup() run?');
         }
         const cleanBaseUrl = this.baseUrl.replace(/\/$/, '');
-        const response = await fetch(`${cleanBaseUrl}/api/admin/studies`, {
+        const response = await this.fetchWithRetry(`${cleanBaseUrl}/api/admin/studies`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -227,7 +262,7 @@ export class TestDatabase {
      * Change study state
      */
     async updateStudyState(token: string, slug: string, newState: string) {
-        const response = await fetch(
+        const response = await this.fetchWithRetry(
             `${this.baseUrl}/api/admin/studies/${slug}/state?new_state=${newState}`,
             {
                 method: 'POST',
@@ -249,7 +284,7 @@ export class TestDatabase {
      * Get study by slug
      */
     async getStudy(token: string, slug: string) {
-        const response = await fetch(`${this.baseUrl}/api/admin/studies/${slug}`, {
+        const response = await this.fetchWithRetry(`${this.baseUrl}/api/admin/studies/${slug}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -264,7 +299,7 @@ export class TestDatabase {
      * Update study configuration
      */
     async updateStudy(token: string, slug: string, updates: Partial<any>) {
-        const response = await fetch(`${this.baseUrl}/api/admin/studies/${slug}`, {
+        const response = await this.fetchWithRetry(`${this.baseUrl}/api/admin/studies/${slug}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -289,7 +324,7 @@ export class TestDatabase {
         const sessionToken = crypto.randomUUID();
 
         // Fetch the public study config to get valid statement IDs
-        const publicConfigRes = await fetch(`${this.baseUrl}/api/study/${studySlug}`);
+        const publicConfigRes = await this.fetchWithRetry(`${this.baseUrl}/api/study/${studySlug}`);
         if (!publicConfigRes.ok) {
             throw new Error(`Failed to fetch public study config: ${await publicConfigRes.text()}`);
         }
@@ -333,7 +368,7 @@ export class TestDatabase {
             ...overrides,
         };
 
-        const response = await fetch(`${this.baseUrl}/api/submit`, {
+        const response = await this.fetchWithRetry(`${this.baseUrl}/api/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(submission),

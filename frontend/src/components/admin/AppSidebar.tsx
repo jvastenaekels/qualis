@@ -333,7 +333,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 <SidebarMenuItem className="px-2 mb-4">
                                     <SidebarMenuButton
                                         size="sm"
-                                        className="bg-muted/50 hover:bg-muted border border-border/50 text-muted-foreground transition-all duration-200"
+                                        className="bg-muted/50 hover:bg-muted border border-border/50 text-slate-700 transition-all duration-200"
                                         onClick={() => {
                                             window.dispatchEvent(
                                                 new CustomEvent('open-command-menu')
@@ -350,7 +350,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             </SidebarMenu>
-                            <SidebarGroupLabel className="px-2 text-xs font-semibold text-muted-foreground/70">
+                            <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
                                 {t('admin.sidebar.study_tools', 'Study Tools')}
                             </SidebarGroupLabel>
                             <SidebarMenu>
@@ -376,7 +376,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 <SidebarMenuItem className="px-2 mb-4">
                                     <SidebarMenuButton
                                         size="sm"
-                                        className="bg-muted/50 hover:bg-muted border border-border/50 text-muted-foreground transition-all duration-200"
+                                        className="bg-muted/50 hover:bg-muted border border-border/50 text-slate-700 transition-all duration-200"
                                         onClick={() => {
                                             window.dispatchEvent(
                                                 new CustomEvent('open-command-menu')
@@ -391,7 +391,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             </SidebarMenu>
-                            <SidebarGroupLabel className="px-2 text-xs font-semibold text-muted-foreground/70">
+                            <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
                                 {t('admin.sidebar.workspace', 'Workspace')}
                             </SidebarGroupLabel>
                             <SidebarMenu>
@@ -447,7 +447,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                             <SidebarMenuItem className="px-2 mb-4">
                                 <SidebarMenuButton
                                     size="sm"
-                                    className="bg-muted/50 hover:bg-muted border border-border/50 text-muted-foreground transition-all duration-200"
+                                    className="bg-muted/50 hover:bg-muted border border-border/50 text-slate-700 transition-all duration-200"
                                     onClick={() => {
                                         window.dispatchEvent(new CustomEvent('open-command-menu'));
                                     }}
