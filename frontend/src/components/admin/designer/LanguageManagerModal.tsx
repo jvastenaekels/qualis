@@ -29,7 +29,7 @@ interface LanguageManagerModalProps {
 
 const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) => {
     const { t } = useTranslation();
-    const { draft, updateDraft } = useStudyDesigner();
+    const { draft, original, updateDraft } = useStudyDesigner();
     const [isActivating, setIsActivating] = useState<string | null>(null);
     const [sourceLang, setSourceLang] = useState<string>('en');
 
@@ -38,6 +38,56 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
     const activeLanguageCodes = (draft.translations || []).map((t) => t.language_code);
 
     const handleActivate = (langCode: string) => {
+        // Check if this language exists in the original (saved) study
+        // If so, restore it instead of copying from source
+        const existingTranslation = original?.translations?.find(
+            (t) => t.language_code === langCode
+        );
+
+        if (existingTranslation) {
+            updateDraft((d) => {
+                // 1. Restore translation object
+                // biome-ignore lint/suspicious/noExplicitAny: internal flag injection
+                d.translations?.push({
+                    ...existingTranslation,
+                    // Ensure we reset any copy flag if it existed
+                    _is_copy: false,
+                } as any);
+
+                // 2. Restore statement translations
+                if (d.statements) {
+                    for (const s of d.statements) {
+                        // Find the original statement to get its translation
+                        // We match by code, assuming code is stable.
+                        // If statement was added in draft (no original), it won't have an original translation.
+                        const originalStmt = original?.statements?.find((os) => os.code === s.code);
+
+                        const originalStmtTrans = originalStmt?.translations?.find(
+                            (st) => st.language_code === langCode
+                        );
+
+                        if (originalStmtTrans) {
+                            s.translations?.push({
+                                language_code: langCode,
+                                text: originalStmtTrans.text,
+                            });
+                        } else {
+                            // If no original translation (e.g. statement is new),
+                            // we might want to copy from source?
+                            // But here we are "restoring" the language.
+                            // If the statement is new, it has no translation in this restored language.
+                            // Default to empty string.
+                            s.translations?.push({
+                                language_code: langCode,
+                                text: '',
+                            });
+                        }
+                    }
+                }
+            });
+            return;
+        }
+
         setIsActivating(langCode);
         // Default source language to English or the first active language
         setSourceLang(activeLanguageCodes.includes('en') ? 'en' : activeLanguageCodes[0] || 'en');
