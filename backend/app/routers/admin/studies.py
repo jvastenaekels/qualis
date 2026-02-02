@@ -676,6 +676,7 @@ async def export_study_config(
         .options(
             selectinload(Study.translations),
             selectinload(Study.statements).selectinload(Statement.translations),
+            selectinload(Study.recruitment_links),
         )
     )
     res = await db.execute(stmt)
@@ -731,6 +732,17 @@ async def export_study_config(
                     ],
                 }
                 for s in study.statements
+            ],
+            "recruitment_links": [
+                {
+                    "type": link.type.value,
+                    "name": link.name,
+                    "capacity": link.capacity,
+                    "is_active": link.is_active,
+                    # We do not export tokens as they are secrets/unique
+                    # We do not export usage stats
+                }
+                for link in study.recruitment_links
             ],
         },
     }
@@ -878,6 +890,15 @@ async def validate_study_import(
                     f"Partner '{partner.get('name', 'Unknown')}' logo references external resource"
                 )
 
+    # Check recruitment links
+    recruitment_links = study_data.get("recruitment_links", [])
+    if recruitment_links and not isinstance(recruitment_links, list):
+        add_error("invalid_recruitment_links")
+    elif recruitment_links:
+        for i, link in enumerate(recruitment_links):
+            if not isinstance(link, dict) or not link.get("name"):
+                add_error("invalid_recruitment_link_structure", index=i + 1)
+
     # Summary
     summary = None
     if not errors:
@@ -1003,6 +1024,28 @@ async def import_study_config(
                         text=st_data.get("text"),
                     )
                 )
+
+        # Recruitment Links
+        # We need to generate new unique tokens for each link
+        import secrets
+
+        for link_data in study_data.get("recruitment_links", []):
+            # Generate a new token
+            token = secrets.token_urlsafe(16)
+
+            # Ensure uniqueness (simple check)
+            from app.models import RecruitmentLink
+
+            db.add(
+                RecruitmentLink(
+                    study_id=db_study.id,
+                    type=link_data.get("type", "public"),
+                    name=link_data.get("name"),
+                    capacity=link_data.get("capacity"),
+                    is_active=link_data.get("is_active", True),
+                    token=token,
+                )
+            )
 
         await db.commit()
     except Exception as e:

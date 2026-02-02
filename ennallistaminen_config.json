@@ -1,0 +1,469 @@
+{
+    "version": "1.0",
+    "exported_at": "2026-02-02T15:00:00.000000+00:00",
+    "exported_by": "julien.vastenaekels@univ-reims.fr",
+    "study": {
+        "slug": "ennallistaminen",
+        "default_language": "en",
+        "show_statement_codes": false,
+        "randomize_statement_order": false,
+        "symmetry_lock": true,
+        "grid_config": [
+            {
+                "score": -5,
+                "capacity": 2
+            },
+            {
+                "score": -4,
+                "capacity": 3
+            },
+            {
+                "score": -3,
+                "capacity": 4
+            },
+            {
+                "score": -2,
+                "capacity": 5
+            },
+            {
+                "score": -1,
+                "capacity": 5
+            },
+            {
+                "score": 0,
+                "capacity": 7
+            },
+            {
+                "score": 1,
+                "capacity": 5
+            },
+            {
+                "score": 2,
+                "capacity": 5
+            },
+            {
+                "score": 3,
+                "capacity": 4
+            },
+            {
+                "score": 4,
+                "capacity": 3
+            },
+            {
+                "score": 5,
+                "capacity": 2
+            }
+        ],
+        "presort_config": {
+            "enabled": true,
+            "fields": {
+                "q_1768832064954": {
+                    "id": "q_1768832064954",
+                    "type": "radio",
+                    "label": {
+                        "en": "Do you currently live in North Karelia, work there, own land there, or regularly use natural areas there (e.g., for forestry, farming, hunting/fishing, recreation)?",
+                        "fi": "Asutko tällä hetkellä Pohjois-Karjalassa, työskenteletkö siellä, omistatko siellä maata tai käytätkö alueen luonnonympäristöjä säännöllisesti (esimerkiksi metsätalouteen, maatalouteen, metsästykseen/kalastukseen tai virkistykseen)?"
+                    },
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "yes",
+                            "label": {
+                                "en": "Yes",
+                                "fi": "Kyllä"
+                            }
+                        },
+                        {
+                            "value": "no",
+                            "label": {
+                                "en": "No",
+                                "fi": "Ei"
+                            }
+                        }
+                    ]
+                },
+                "q_1769534710172": {
+                    "id": "q_1769534710172",
+                    "type": "radio",
+                    "label": {
+                        "en": "Have you heard of any ecological restoration, nature improvement projects, or rewilding actions in North Karelia before today (e.g., peatland restoration, river restoration, or forest restoration)?",
+                        "fi": "Oletko ennen tätä päivää kuullut Pohjois-Karjalassa toteutettavista ekologisista ennallistamis-, luonnon tilan parantamishankkeista tai rewilding-toimista (esimerkiksi soiden ennallistamisesta, jokien ennallistamisesta tai metsien ennallistamisesta)?"
+                    },
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "yes",
+                            "label": {
+                                "en": "Yes",
+                                "fi": "Kyllä"
+                            }
+                        },
+                        {
+                            "value": "no",
+                            "label": {
+                                "en": "No",
+                                "fi": "Ei"
+                            }
+                        },
+                        {
+                            "value": "somewhat",
+                            "label": {
+                                "en": "Somewhat",
+                                "fi": "Vähän"
+                            }
+                        }
+                    ]
+                }
+            }
+        },
+        "postsort_config": {
+            "email_collection_enabled": true,
+            "email": {
+                "enabled": false
+            },
+            "consent": {
+                "enabled": false
+            },
+            "extreme_columns": [
+                -5,
+                5
+            ],
+            "questions": {
+                "q_1769511156910": {
+                    "type": "radio",
+                    "label": {
+                        "en": "Are you aware of any restoration or renaturation project in North Karelia or nearby?",
+                        "fi": "Tiedätkö Pohjois-Karjalassa tai lähialueilla toteutettavia ennallistamis-, luonnon tilan parantamishankkeita tai rewilding-toimia?"
+                    },
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "yes",
+                            "label": {
+                                "en": "Yes",
+                                "fi": "Kyllä"
+                            }
+                        },
+                        {
+                            "value": "no",
+                            "label": {
+                                "en": "No",
+                                "fi": "Ei"
+                            }
+                        }
+                    ]
+                },
+                "q_1769511205264": {
+                    "id": "q_1769511205264",
+                    "type": "text",
+                    "label": {
+                        "en": "If yes, please name or briefly describe it:",
+                        "fi": "Jos kyllä, voitko nimetä tai lyhyesti kuvata hankkeen tai toimenpiteen:"
+                    },
+                    "required": false,
+                    "placeholder": {
+                        "en": "Enter your answer...",
+                        "fi": "Kirjoita vastauksesi..."
+                    },
+                    "visibility_condition": {
+                        "depends_on": "q_1769511156910",
+                        "operator": "equals",
+                        "value": "yes"
+                    }
+                },
+                "q_1768898178743": {
+                    "type": "radio",
+                    "label": {
+                        "en": "Have you personally been involved in, affected by, or consulted on any renaturation-related actions?",
+                        "fi": "Oletko itse ollut mukana, joutunut vaikutuksen kohteeksi tai tullut kuulluksi tällaisissa hankkeissa tai toimissa?"
+                    },
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "yes",
+                            "label": {
+                                "en": "Yes",
+                                "fi": "Kyllä"
+                            }
+                        },
+                        {
+                            "value": "no",
+                            "label": {
+                                "en": "No",
+                                "fi": "Ei"
+                            }
+                        },
+                        {
+                            "value": "unsure",
+                            "label": {
+                                "en": "Not sure",
+                                "fi": "En ole varma"
+                            }
+                        }
+                    ]
+                },
+                "q_1769511694180": {
+                    "type": "textarea",
+                    "label": {
+                        "en": "If yes, could you briefly explain how?",
+                        "fi": "Jos kyllä, voitko lyhyesti selittää miten?"
+                    },
+                    "required": false,
+                    "placeholder": {
+                        "en": "Enter your answer...",
+                        "fi": "Kirjoita vastauksesi..."
+                    },
+                    "rows": 4,
+                    "visibility_condition": {
+                        "depends_on": "q_1768898178743",
+                        "operator": "equals",
+                        "value": "yes"
+                    }
+                },
+                "q_1769511255081": {
+                    "type": "radio",
+                    "label": {
+                        "en": "Which role best describes your relationship to the territory?",
+                        "fi": "Mikä seuraavista kuvaa parhaiten rooliasi suhteessa alueeseen?"
+                    },
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "resident",
+                            "label": {
+                                "en": "Local resident",
+                                "fi": "Paikallinen asukas"
+                            }
+                        },
+                        {
+                            "value": "farmer",
+                            "label": {
+                                "en": "Farmer or agricultural land user",
+                                "fi": "Maatalouden harjoittaja tai maatalousmaan käyttäjä"
+                            }
+                        },
+                        {
+                            "value": "landowner",
+                            "label": {
+                                "en": "Landowner",
+                                "fi": "Maanomistaja"
+                            }
+                        },
+                        {
+                            "value": "ngo_member",
+                            "label": {
+                                "en": "Member of an NGO or local association",
+                                "fi": "Kansalaisjärjestön tai paikallisen yhdistyksen jäsen"
+                            }
+                        },
+                        {
+                            "value": "hunter_fisher",
+                            "label": {
+                                "en": "Hunter and/or recreational fisher",
+                                "fi": "Metsästäjä ja/tai vapaa-ajankalastaja"
+                            }
+                        },
+                        {
+                            "value": "business",
+                            "label": {
+                                "en": "Economic operator or business representative",
+                                "fi": "Taloudellinen toimija tai elinkeinoelämän edustaja"
+                            }
+                        },
+                        {
+                            "value": "pro_org",
+                            "label": {
+                                "en": "Member of a professional organization",
+                                "fi": "Ammatillisen järjestön jäsen"
+                            }
+                        },
+                        {
+                            "value": "env_org",
+                            "label": {
+                                "en": "Member of an environmental organization or other NGO",
+                                "fi": "Ympäristöjärjestön tai muun kansalaisjärjestön"
+                            }
+                        },
+                        {
+                            "value": "public_authority",
+                            "label": {
+                                "en": "Representative of an authority or public institution",
+                                "fi": "Viranomaisen tai julkisen instituution edustaja"
+                            }
+                        },
+                        {
+                            "value": "researcher",
+                            "label": {
+                                "en": "Researcher or expert",
+                                "fi": "Tutkija tai asiantuntija"
+                            }
+                        },
+                        {
+                            "value": "other",
+                            "label": {
+                                "en": "Other",
+                                "fi": "Muu"
+                            }
+                        }
+                    ]
+                },
+                "q_1769511368366": {
+                    "type": "text",
+                    "label": {
+                        "en": "Please specify:",
+                        "fi": "Ole hyvä ja täsmennä:"
+                    },
+                    "required": false,
+                    "placeholder": {
+                        "en": "Enter your answer...",
+                        "fi": "Kirjoita vastauksesi..."
+                    },
+                    "visibility_condition": {
+                        "depends_on": "q_1769511255081",
+                        "operator": "equals",
+                        "value": "other"
+                    }
+                },
+                "q_1769511415005": {
+                    "type": "text",
+                    "label": {
+                        "en": "Would you like to add anything to better describe your role or connection to the territory?",
+                        "fi": "Haluatko lisätä jotakin, joka kuvaa paremmin rooliasi tai yhteyttäsi alueeseen?"
+                    },
+                    "required": false,
+                    "placeholder": {
+                        "en": "Enter your answer...",
+                        "fi": "Kirjoita vastauksesi..."
+                    }
+                },
+                "q_1769539982435": {
+                    "id": "q_1769539982435",
+                    "type": "radio",
+                    "label": {
+                        "en": "Are you currently affiliated with or acting on behalf of any organization or institution operating in North Karelia? (e.g., local associations, NGOs, businesses, authorities)",
+                        "fi": "Oletko tällä hetkellä sidoksissa johonkin Pohjois-Karjalassa toimivaan organisaatioon tai instituutioon tai toimitko sellaisen puolesta? (esim. paikalliset yhdistykset, kansalaisjärjestöt, yritykset, viranomaiset)"
+                    },
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "yes",
+                            "label": {
+                                "en": "Yes",
+                                "fi": "Kyllä"
+                            }
+                        },
+                        {
+                            "value": "no",
+                            "label": {
+                                "en": "No",
+                                "fi": "Ei"
+                            }
+                        }
+                    ]
+                },
+                "q_1769511489110": {
+                    "id": "q_1769511489110",
+                    "type": "text",
+                    "label": {
+                        "en": "If yes, please specify the organization or institution:",
+                        "fi": "Jos kyllä, täsmennä organisaatio tai instituutio:"
+                    },
+                    "required": false,
+                    "placeholder": {
+                        "en": "Enter your answer...",
+                        "fi": "Kirjoita vastauksesi..."
+                    },
+                    "visibility_condition": {
+                        "depends_on": "q_1769539982435",
+                        "operator": "equals",
+                        "value": "yes"
+                    }
+                },
+                "q_1769511545179": {
+                    "id": "q_1769511545179",
+                    "type": "radio",
+                    "label": {
+                        "en": "How do you describe your gender?",
+                        "fi": "Miten määrittelisit sukupuolesi?"
+                    },
+                    "required": true,
+                    "options": [
+                        {
+                            "value": "female",
+                            "label": {
+                                "en": "Female",
+                                "fi": "Nainen"
+                            }
+                        },
+                        {
+                            "value": "male",
+                            "label": {
+                                "en": "Male",
+                                "fi": "Mies"
+                            }
+                        },
+                        {
+                            "value": "non_binary",
+                            "label": {
+                                "en": "Non-binary",
+                                "fi": "Muunsukupuolinen"
+                            }
+                        },
+                        {
+                            "value": "prefer_not_say",
+                            "label": {
+                                "en": "Prefer not to say",
+                                "fi": "En halua vastata"
+                            }
+                        }
+                    ]
+                },
+                "q_1769511590690": {
+                    "id": "q_1769511590690",
+                    "type": "number",
+                    "label": {
+                        "en": "What is your year of birth? (YYYY)",
+                        "fi": "Mikä on syntymävuotesi? (VVVV)"
+                    },
+                    "required": true
+                },
+                "q_1769540171236": {
+                    "id": "q_1769540171236",
+                    "type": "textarea",
+                    "label": {
+                        "en": "Would you like to add any other comments about this study? (e.g., was the process clear, did you encounter difficulties, or do you have suggestions for improvement)",
+                        "fi": "Haluatko lisätä muita kommentteja tästä tutkimuksesta? (Esimerkiksi: oliko prosessi selkeä, kohtasitko vaikeuksia, tai onko sinulla parannusehdotuksia)"
+                    },
+                    "required": false,
+                    "placeholder": {
+                        "en": "Enter your answer...",
+                        "fi": "Kirjoita vastauksesi..."
+                    },
+                    "rows": 4
+                }
+            },
+            "prompts": {
+                "extreme_positive": {
+                    "en": "Why did you choose to place this statement in this position? What makes this statement particularly salient or meaningful to you?",
+                    "fi": "Miksi päätit sijoittaa tämän väittämän juuri tähän kohtaan? Mikä tekee tästä väittämästä sinulle erityisen merkityksellisen tai huomionarvoisen?"
+                },
+                "extreme_negative": {
+                    "en": "Why did you choose to place this statement in this position? What makes this statement particularly salient or meaningful to you?",
+                    "fi": "Miksi päätit sijoittaa tämän väittämän juuri tähän kohtaan? Mikä tekee tästä väittämästä sinulle erityisen merkityksellisen tai huomionarvoisen?"
+                }
+            }
+        },
+        "branding": {
+            "logo_url": null,
+            "accent_color": "#4f46e5",
+            "primary_color": null,
+            "partners": [
+                {
+                    "id": "3c0799d0-e914-42a1-9e8c-51a43f233165",
+                    "name": "URCA",
+                    "logo_url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAxMAAAHHCAYAAADEagVAAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYxIDY0LjE0MDk0OSwgMjAxMC8xMi8wNy0xMDo1NzowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpGNzdGMTE3NDA3MjA2ODExOEE2REM1RDNFOEQxRDdCMCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpCQ0FGQTJGMDRCNzkxMUUzOTIwNkM1RTI3MTUyMzE5MSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpCQ0FGQTJFRjRCNzkxMUUzOTIwNkM1RTI3MTUyMzE5MSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBJbkRlc2lnbiBDUzUuNSAoNy41LjMpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InV1aWQ6MmI2M2UzZDItODQ3OC00NzQxLThjNzItMTU4MjkyODE1Y2Y4IiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkY3N0YxMTc0MDcyMDY4MTE4QTZEQzVEM0U4RDFEN0IwIi8+IDwvcmRmOkRlc2NyaXB0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"
+                }
+            ]
+        }
+    }
+}
