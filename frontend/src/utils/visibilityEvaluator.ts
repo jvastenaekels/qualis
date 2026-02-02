@@ -74,6 +74,9 @@ export function evaluateVisibilityCondition(
     if (isMatch) return true;
 
     // Fallback: Check localized labels if standard check failed
+    // This handles two scenarios:
+    // A) Config has internal ID (e.g. "yes_val") but user submitted localized label ("Oui")
+    // B) Config has localized Label (e.g. "Yes") but user submitted internal ID ("Kyllä")
     if (
         questionsConfig &&
         condition.operator === 'equals' &&
@@ -82,18 +85,38 @@ export function evaluateVisibilityCondition(
     ) {
         const question = questionsConfig[condition.depends_on];
         if (question && Array.isArray(question.options)) {
-            // Find option that matches the CONDITION's target value
+            // 1. Find the "Target Option" by checking if 'targetValue' matches EITHER the option's value OR any of its labels
             // biome-ignore lint/suspicious/noExplicitAny: dynamic option type
             const targetOption = question.options.find((opt: any) => {
                 const optVal = typeof opt === 'string' ? opt : opt.value;
-                return String(optVal) === String(targetValue);
+
+                // Match against VALUE
+                if (String(optVal) === String(targetValue)) return true;
+
+                // Match against LABELS
+                if (typeof opt === 'object' && opt.label) {
+                    const labels = Object.values(opt.label);
+                    if (labels.some((l) => String(l) === String(targetValue))) {
+                        return true;
+                    }
+                }
+                return false;
             });
 
-            if (targetOption && typeof targetOption === 'object' && targetOption.label) {
-                // Check if ACTUAL value matches any of the labels for this option
-                const labels = Object.values(targetOption.label);
-                if (labels.some((l) => String(l) === String(actualValue))) {
-                    return true;
+            if (targetOption) {
+                const optVal = typeof targetOption === 'string' ? targetOption : targetOption.value;
+
+                // 2. Check if 'actualValue' matches EITHER the Target Option's value OR any of its labels
+
+                // Check Value
+                if (String(optVal) === String(actualValue)) return true;
+
+                // Check Labels
+                if (typeof targetOption === 'object' && targetOption.label) {
+                    const labels = Object.values(targetOption.label);
+                    if (labels.some((l) => String(l) === String(actualValue))) {
+                        return true;
+                    }
                 }
             }
         }

@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { evaluateVisibilityCondition } from './visibilityEvaluator';
 
 describe('evaluateVisibilityCondition', () => {
-    // ... existing tests ...
     it('should return true when values match exactly', () => {
         const result = evaluateVisibilityCondition(
             { depends_on: 'q1', operator: 'equals', value: 'Yes' },
@@ -27,7 +26,6 @@ describe('evaluateVisibilityCondition', () => {
         expect(result).toBe(true);
     });
 
-    // NEW TEST CASE
     it('should match against localized labels if exact match fails (Workaround)', () => {
         const questionsConfig = {
             q1: {
@@ -69,5 +67,27 @@ describe('evaluateVisibilityCondition', () => {
         );
 
         expect(result).toBe(false);
+    });
+
+    it('should match when option VALUE is localized ("Kyllä") but condition expects English LABEL ("Yes")', () => {
+        // Regression test for user reported issue
+        const questionsConfig = {
+            q1: {
+                type: 'radio',
+                options: [
+                    { value: 'Kyllä', label: { en: 'Yes' } },
+                    { value: 'Ei', label: { en: 'No' } },
+                ],
+            },
+        };
+
+        const result = evaluateVisibilityCondition(
+            { depends_on: 'q1', operator: 'equals', value: 'Yes' }, // Condition expects Label
+            { q1: 'Kyllä' }, // Actual value is Value
+            // biome-ignore lint/suspicious/noExplicitAny: mock config
+            questionsConfig as any
+        );
+
+        expect(result).toBe(true);
     });
 });
