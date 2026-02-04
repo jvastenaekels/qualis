@@ -173,10 +173,10 @@ const InstructionHeader: React.FC<{
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         onClick={() => setIsMinimized(false)}
-                        className="absolute top-[96px] left-1/2 -translate-x-1/2 z-[60] bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide"
+                        className="absolute top-[96px] inset-x-0 mx-auto w-fit z-[60] bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide"
                         aria-label="Expand instructions"
                     >
-                        <Target size={12} />
+                        <Target size={14} />
                         <span>Instruction</span>
                         <ChevronsUp size={14} />
                     </motion.button>
