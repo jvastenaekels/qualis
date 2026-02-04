@@ -8476,11 +8476,12 @@ export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetRespons
         grid_score: faker.number.int({ min: undefined, max: undefined }),
         card_comment: faker.helpers.arrayElement([
             faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 2000 } }),
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
                 null,
             ]),
             undefined,
         ]),
+        statement_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
     })),
     ...overrideResponse,
 });

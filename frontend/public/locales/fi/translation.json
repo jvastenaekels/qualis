@@ -1603,6 +1603,27 @@
                 "duration": "Kesto",
                 "actions": "Toiminnot"
             }
+        },
+        "participant": {
+            "grid": {
+                "detail_view": "Tarkastelunäkymä",
+                "no_comment": "Ei kommenttia",
+                "read_only_mode": "Vain luku -tila",
+                "score": "Pisteet",
+                "select_instruction": "Valitse kortti nähdäksesi tiedot"
+            },
+            "metadata": {
+                "recruitment_token": "Rekrytointitunnus"
+            },
+            "survey": {
+                "postsort": "Jälkilajittelu",
+                "presort": "Esilajittelu"
+            },
+            "tabs": {
+                "grid": "Lajitteluruudukko",
+                "postsort": "Jälkilajittelu",
+                "presort": "Esilajittelu"
+            }
         }
     }
 }

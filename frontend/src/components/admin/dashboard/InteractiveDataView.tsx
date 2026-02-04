@@ -73,7 +73,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { format } from 'date-fns';
 
 // Types representing the backend dump response structure
-export interface DumpStatement {
+interface DumpStatement {
     id: number;
     code?: string;
     translations: { lang: string; text: string }[];
@@ -103,6 +103,9 @@ export interface DumpParticipant {
     submitted_at?: string;
     recruitment_token?: string;
     status: string;
+    user_agent?: string;
+    created_at?: string;
+    ip_address?: string;
 }
 
 export interface DumpResponse {

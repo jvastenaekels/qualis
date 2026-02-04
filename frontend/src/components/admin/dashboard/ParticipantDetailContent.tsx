@@ -86,11 +86,11 @@ export function ParticipantDetailContent({
         const rawConfig = (studyData.study.grid_config as any) || [];
         const config: { score: number; capacity: number; id: string }[] = Array.isArray(rawConfig)
             ? // biome-ignore lint/suspicious/noExplicitAny: dynamic mapping
-            rawConfig.map((c: any) => ({
-                score: c.score,
-                capacity: c.capacity,
-                id: String(c.score),
-            }))
+              rawConfig.map((c: any) => ({
+                  score: c.score,
+                  capacity: c.capacity,
+                  id: String(c.score),
+              }))
             : [];
 
         // Build score -> column index map
@@ -238,8 +238,8 @@ export function ParticipantDetailContent({
                                     tab === 'presort'
                                         ? 'Pre-Sort'
                                         : tab === 'grid'
-                                            ? 'Q-Sort Grid'
-                                            : 'Post-Sort'
+                                          ? 'Q-Sort Grid'
+                                          : 'Post-Sort'
                                 )}
                             </TabsTrigger>
                         ))}
@@ -279,13 +279,12 @@ export function ParticipantDetailContent({
                                 <ParticipantMetadataCard
                                     participant={{
                                         ...participant,
-                                        // biome-ignore lint/suspicious/noExplicitAny: raw API data
-                                        user_agent: (participant as any).user_agent,
-                                        // biome-ignore lint/suspicious/noExplicitAny: raw API data
-                                        created_at: (participant as any).created_at,
-                                        // biome-ignore lint/suspicious/noExplicitAny: raw API data
-                                        ip_address: (participant as any).ip_address,
+                                        user_agent: participant.user_agent,
+                                        created_at: participant.created_at || '',
+                                        ip_address: participant.ip_address,
                                     }}
+                                    onToggleDiscard={onToggleDiscard}
+                                    isDiscardPending={isDiscardPending}
                                 />
                                 <div className="space-y-4">
                                     <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">

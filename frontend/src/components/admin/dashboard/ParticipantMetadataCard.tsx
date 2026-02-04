@@ -1,4 +1,5 @@
 import { parseUA } from '@/utils/uaParser';
+import { Button } from '@/components/ui/button';
 import {
     Monitor,
     Smartphone,
@@ -29,9 +30,16 @@ interface ParticipantMetadataCardProps {
         is_test_run?: boolean;
     };
     className?: string;
+    onToggleDiscard?: (discarded: boolean) => void;
+    isDiscardPending?: boolean;
 }
 
-export function ParticipantMetadataCard({ participant, className }: ParticipantMetadataCardProps) {
+export function ParticipantMetadataCard({
+    participant,
+    className,
+    onToggleDiscard,
+    isDiscardPending,
+}: ParticipantMetadataCardProps) {
     const { t } = useTranslation();
     const uaInfo = parseUA(participant.user_agent || '');
 
@@ -53,7 +61,31 @@ export function ParticipantMetadataCard({ participant, className }: ParticipantM
                             {t('admin.participant.metadata.title', 'Session Metadata')}
                         </CardTitle>
                     </div>
+
                     <div className="flex items-center gap-2">
+                        {onToggleDiscard && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                    onToggleDiscard(
+                                        !participant.status.includes('discarded') &&
+                                            participant.status !== 'discarded'
+                                    )
+                                } // Simple check, ideally check is_discarded but status usually reflects it
+                                disabled={isDiscardPending}
+                                className={cn(
+                                    'h-6 px-2 text-[10px] font-bold uppercase tracking-wider',
+                                    participant.status === 'discarded'
+                                        ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'
+                                        : 'text-red-500 hover:text-red-600 hover:bg-red-50'
+                                )}
+                            >
+                                {participant.status === 'discarded'
+                                    ? t('admin.data.actions.restore', 'Restore')
+                                    : t('admin.data.actions.discard', 'Discard')}
+                            </Button>
+                        )}
                         {participant.is_test_run && (
                             <Badge
                                 variant="outline"
@@ -121,17 +153,15 @@ export function ParticipantMetadataCard({ participant, className }: ParticipantM
                             </div>
                             <div>
                                 <p className="text-xs font-black text-slate-900 leading-none">
-                                    {participant.ip_address || '---'}
+                                    participant.ip_address || '---'
                                 </p>
                                 <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
-                                    {t('admin.participant.metadata.ip_address', 'IP Address')}
+                                    t('admin.participant.metadata.ip_address', 'IP Address')
                                 </p>
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* Duration & IDs */}
                 <div className="space-y-4">
                     <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                         {t('admin.participant.metadata.session', 'Session Details')}

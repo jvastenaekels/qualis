@@ -11,7 +11,7 @@ import type { ParticipantDetailReadUserAgent } from './participantDetailReadUser
 import type { ParticipantDetailReadRecruitmentToken } from './participantDetailReadRecruitmentToken';
 import type { ParticipantDetailReadPresortAnswers } from './participantDetailReadPresortAnswers';
 import type { ParticipantDetailReadPostsortAnswers } from './participantDetailReadPostsortAnswers';
-import type { QSortEntryInput } from './qSortEntryInput';
+import type { QSortEntryRead } from './qSortEntryRead';
 
 /**
  * Schema for detailed participant view including responses.
@@ -31,5 +31,5 @@ export interface ParticipantDetailRead {
     recruitment_token?: ParticipantDetailReadRecruitmentToken;
     presort_answers: ParticipantDetailReadPresortAnswers;
     postsort_answers: ParticipantDetailReadPostsortAnswers;
-    qsort_entries: QSortEntryInput[];
+    qsort_entries: QSortEntryRead[];
 }

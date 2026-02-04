@@ -51,6 +51,8 @@ export * from './processStep';
 export * from './processStepColor';
 export * from './qSortEntryInput';
 export * from './qSortEntryInputCardComment';
+export * from './qSortEntryRead';
+export * from './qSortEntryReadCardComment';
 export * from './recruitmentLinkCreate';
 export * from './recruitmentLinkCreateCapacity';
 export * from './recruitmentLinkCreateExpiresAt';

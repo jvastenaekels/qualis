@@ -3341,7 +3341,7 @@
           },
           "qsort_entries": {
             "items": {
-              "$ref": "#/components/schemas/QSortEntryInput"
+              "$ref": "#/components/schemas/QSortEntryRead"
             },
             "type": "array",
             "title": "Qsort Entries"
@@ -3630,6 +3630,41 @@
         ],
         "title": "QSortEntryInput",
         "description": "Schema for individual statement placement during submission."
+      },
+      "QSortEntryRead": {
+        "properties": {
+          "statement_id": {
+            "type": "integer",
+            "title": "Statement Id"
+          },
+          "grid_score": {
+            "type": "integer",
+            "title": "Grid Score"
+          },
+          "card_comment": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Card Comment"
+          },
+          "statement_code": {
+            "type": "string",
+            "title": "Statement Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "statement_id",
+          "grid_score",
+          "statement_code"
+        ],
+        "title": "QSortEntryRead",
+        "description": "Schema for reading individual statement placement."
       },
       "RecruitmentLinkCreate": {
         "properties": {
