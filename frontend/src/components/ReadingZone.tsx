@@ -107,12 +107,12 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
 
     if (variant === 'mobile') {
         return (
-            <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative overflow-hidden h-20">
+            <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative overflow-hidden h-28">
                 {/* Card Content Layer */}
                 <div
                     ref={textRef}
                     className={cn(
-                        'transition-opacity duration-300 absolute inset-0 p-3 overflow-y-auto custom-scrollbar',
+                        'transition-opacity duration-300 absolute inset-0 pl-3 pr-28 py-3 overflow-y-auto custom-scrollbar',
                         displayCard
                             ? 'opacity-100 z-10'
                             : 'opacity-0 z-0 pointer-events-none invisible'
@@ -139,7 +139,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                 {/* Tips Layer */}
                 <div
                     className={cn(
-                        'transition-opacity duration-500 absolute inset-0 p-3 flex items-center justify-center',
+                        'transition-opacity duration-500 absolute inset-0 px-12 py-3 flex items-center justify-center',
                         !displayCard
                             ? 'opacity-100 z-10 delay-100'
                             : 'opacity-0 z-0 pointer-events-none invisible'
