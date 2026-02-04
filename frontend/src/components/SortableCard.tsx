@@ -15,7 +15,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion } from 'framer-motion';
-import { Eye } from 'lucide-react';
+import { Eye, MessageSquare } from 'lucide-react';
 import React from 'react';
 import { SafeMarkdown } from './SafeMarkdown';
 import { useUIStore } from '../store/useUIStore';
@@ -35,6 +35,8 @@ interface SortableCardProps {
     aspectRatio?: number | 'auto';
     disableHoverZoom?: boolean;
     allowScroll?: boolean;
+    hasComment?: boolean;
+    readOnly?: boolean;
 }
 
 const CARD_SPRING_TRANSITION = {
@@ -130,9 +132,11 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
         aspectRatio,
         disableHoverZoom = false,
         allowScroll = false,
+        hasComment = false,
+        readOnly = false,
     }) => {
         const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-            useSortable({ id });
+            useSortable({ id, disabled: readOnly });
 
         const setHoveredCard = useUIStore((state) => state.setHoveredCard);
         const hoverTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -287,6 +291,14 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-70 transition-opacity">
                             <div className="bg-indigo-50/50 p-1 rounded-full text-indigo-400">
                                 <Eye size={14} strokeWidth={2.5} />
+                            </div>
+                        </div>
+                    )}
+
+                    {hasComment && (
+                        <div className="absolute bottom-1.5 right-1.5 z-10">
+                            <div className="bg-indigo-100/90 p-1 rounded-full text-indigo-600 shadow-sm backdrop-blur-[1px] ring-1 ring-white/50">
+                                <MessageSquare size={10} strokeWidth={3} />
                             </div>
                         </div>
                     )}

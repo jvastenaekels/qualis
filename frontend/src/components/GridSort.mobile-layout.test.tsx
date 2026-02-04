@@ -5,7 +5,7 @@
  */
 
 import { DndContext } from '@dnd-kit/core';
-import { renderWithProviders as render, screen } from '../test-utils/test-utils';
+import { fireEvent, renderWithProviders as render, screen } from '../test-utils/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import GridSort from './GridSort';
 
@@ -130,5 +130,50 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         expect(footer).toBeInTheDocument();
         expect(footer?.className).toContain('flex-none');
         expect(footer?.className).toContain('z-[100]');
+    });
+
+    // NEW TESTS: Instruction Overlay & Toggle
+    it('renders instruction header as an overlay (absolute) on mobile', () => {
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        // Find the minimize button (it's visible initially in expanded state)
+        const minimizeBtn = screen.getByLabelText('Minimize instructions');
+        expect(minimizeBtn).toBeInTheDocument();
+
+        // Check if the container is absolute
+        // We look for the container div. It has "absolute top-0 left-0..."
+        // We can traverse up from the button
+        const container = minimizeBtn.closest('div.absolute');
+        expect(container).toBeInTheDocument();
+        expect(container?.className).toContain('z-[60]');
+    });
+
+    it('toggles instruction minimization on click', async () => {
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        // Initial State: Expanded -> Minimize Button Visible
+        const minimizeBtn = screen.getByLabelText('Minimize instructions');
+        fireEvent.click(minimizeBtn);
+
+        // Expect: Minimized Button ("Expand instructions") to appear
+        // Use findBy because of AnimatePresence / React updates
+        const expandBtn = await screen.findByLabelText('Expand instructions');
+        expect(expandBtn).toBeInTheDocument();
+        expect(screen.queryByLabelText('Minimize instructions')).not.toBeInTheDocument();
+
+        // Click Expand
+        fireEvent.click(expandBtn);
+
+        // Expect: Minimize Button to reappear
+        const minimizeBtnAgain = await screen.findByLabelText('Minimize instructions');
+        expect(minimizeBtnAgain).toBeInTheDocument();
     });
 });

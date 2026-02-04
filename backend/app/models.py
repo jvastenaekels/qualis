@@ -387,6 +387,10 @@ class QSortEntry(Base):
         ),
     )
 
+    @property
+    def statement_code(self) -> str:
+        return self.statement.code if self.statement else ""
+
 
 class RecruitmentLink(Base):
     """SQLAlchemy model for recruitment links."""

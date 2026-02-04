@@ -1603,6 +1603,27 @@
                 "duration": "Durée",
                 "actions": "Actions"
             }
+        },
+        "participant": {
+            "tabs": {
+                "presort": "Pré-Sort",
+                "grid": "Grille Q-Sort",
+                "postsort": "Post-Sort"
+            },
+            "grid": {
+                "detail_view": "Détails de la carte",
+                "no_comment": "Aucun commentaire.",
+                "select_instruction": "Sélectionnez une carte sur la grille pour voir les détails.",
+                "read_only_mode": "Mode visualisation",
+                "score": "Score"
+            },
+            "metadata": {
+                "recruitment_token": "Jeton de recrutement"
+            },
+            "survey": {
+                "presort": "Questions Pré-Sort",
+                "postsort": "Questions Post-Sort"
+            }
         }
     }
 }

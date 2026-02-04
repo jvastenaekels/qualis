@@ -525,12 +525,22 @@ class ParticipantRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class QSortEntryRead(BaseModel):
+    """Schema for reading individual statement placement."""
+
+    statement_id: int
+    grid_score: int
+    card_comment: str | None = None
+    statement_code: str
+    model_config = ConfigDict(from_attributes=True)
+
+
 class ParticipantDetailRead(ParticipantRead):
     """Schema for detailed participant view including responses."""
 
     presort_answers: dict[str, Any]
     postsort_answers: dict[str, Any]
-    qsort_entries: list[QSortEntryInput]
+    qsort_entries: list[QSortEntryRead]
     model_config = ConfigDict(from_attributes=True)
 
 

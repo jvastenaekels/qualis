@@ -1603,6 +1603,27 @@
                 "duration": "Duration",
                 "actions": "Actions"
             }
+        },
+        "participant": {
+            "tabs": {
+                "presort": "Pre-Sort",
+                "grid": "Q-Sort Grid",
+                "postsort": "Post-Sort"
+            },
+            "grid": {
+                "detail_view": "Card Details",
+                "no_comment": "No comment provided.",
+                "select_instruction": "Select a card on the grid to view details.",
+                "read_only_mode": "Viewer Mode",
+                "score": "Score"
+            },
+            "metadata": {
+                "recruitment_token": "Recruitment Token"
+            },
+            "survey": {
+                "presort": "Pre-Sort Questions",
+                "postsort": "Post-Sort Questions"
+            }
         }
     }
 }

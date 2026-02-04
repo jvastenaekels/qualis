@@ -96,8 +96,12 @@ export default function ParticipantDetailsPage() {
 
         // 2. Adapt Participant
         const placements: Record<string, number> = {};
+        const card_comments: Record<string, string> = {};
         participant.qsort_entries?.forEach((entry) => {
             placements[entry.statement_id] = entry.grid_score;
+            if (entry.card_comment) {
+                card_comments[entry.statement_id] = entry.card_comment;
+            }
         });
 
         const scores: (number | null)[] = sortedStatements.map((s) => {
@@ -114,17 +118,21 @@ export default function ParticipantDetailsPage() {
             duration_seconds:
                 participant.submitted_at && participant.created_at
                     ? Math.floor(
-                          (new Date(participant.submitted_at).getTime() -
-                              new Date(participant.created_at).getTime()) /
-                              1000
-                      )
+                        (new Date(participant.submitted_at).getTime() -
+                            new Date(participant.created_at).getTime()) /
+                        1000
+                    )
                     : null,
             scores,
             placements,
             // biome-ignore lint/suspicious/noExplicitAny: generic cast
             presort: (participant.presort_answers as any) || {},
             // biome-ignore lint/suspicious/noExplicitAny: generic cast
-            postsort: (participant.postsort_answers as any) || {},
+
+            postsort: {
+                ...((participant.postsort_answers as any) || {}),
+                card_comments,
+            },
             language: participant.language_used || 'en',
             is_discarded: participant.is_discarded,
             is_test_run: participant.is_test_run,
@@ -216,9 +224,8 @@ export default function ParticipantDetailsPage() {
 
                 <StudyPageHeader
                     title={t('admin.data.detail.title', 'Participant Details')}
-                    description={`${t('admin.sidebar.study', 'Study')}: ${
-                        study?.translations?.[0]?.title || study?.slug
-                    }`}
+                    description={`${t('admin.sidebar.study', 'Study')}: ${study?.translations?.[0]?.title || study?.slug
+                        }`}
                     icon={User}
                 />
             </div>

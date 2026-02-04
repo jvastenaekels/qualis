@@ -180,4 +180,23 @@ describe('GridSort Detailed UI Verification', () => {
         expect(screen.queryByTestId('reading-zone-desktop')).not.toBeInTheDocument();
         expect(screen.getByTestId('reading-zone-mobile')).toBeInTheDocument();
     });
+
+    it('renders instruction header in flow (relative) without toggle on desktop', () => {
+        // Force Desktop width
+        window.innerWidth = 1200;
+        window.dispatchEvent(new Event('resize'));
+
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        // Should NOT have the toggle buttons
+        expect(screen.queryByLabelText('Minimize instructions')).not.toBeInTheDocument();
+        expect(screen.queryByLabelText('Expand instructions')).not.toBeInTheDocument();
+
+        // Check the text is still there
+        expect(screen.getByText('fine.workbench.initial_instruction')).toBeInTheDocument();
+    });
 });

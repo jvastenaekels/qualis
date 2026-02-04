@@ -35,7 +35,7 @@
 - **Q-Grid:** Forced distribution table following a bell curve (e.g., -3 to +3, 9 slots total).
 - **Ipsative Data:** Each card's position is relative to other cards in *that user's* sort.
 - **Validation Rule:** A sort is invalid if any grid slot is empty or contains duplicate cards—submission is rejected until perfectly filled.
-- **Workflow:** Consent → Rough Sort (3-way bucket) → Fine Sort (grid) → Post-Sort Survey → Submission.
+- **Workflow:** Consent → Preliminary Questions → Rough Sort (3-way bucket) → Fine Sort (grid) → Post-Sort Survey → Submission.
 
 ## Key Development Workflows
 

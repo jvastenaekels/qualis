@@ -5,9 +5,20 @@
  */
 
 import { useDroppable } from '@dnd-kit/core';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { cva } from 'class-variance-authority';
-import { Check, Frown, Meh, RotateCcw, Smile, Target, ZoomIn, ZoomOut } from 'lucide-react';
+import {
+    Check,
+    ChevronDown,
+    ChevronUp,
+    Frown,
+    Meh,
+    RotateCcw,
+    Smile,
+    Target,
+    ZoomIn,
+    ZoomOut,
+} from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from './SafeMarkdown';
@@ -123,20 +134,92 @@ const pileBadgeVariants = cva(
 const InstructionHeader: React.FC<{
     instruction: string | null;
     defaultText: string;
-}> = React.memo(({ instruction, defaultText }) => (
-    <div
-        className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3"
-        role="status"
-        aria-live="polite"
-    >
-        <Target size={14} className="text-indigo-400 opacity-60 flex-none" aria-hidden="true" />
-        <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900">
-            <SafeMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
-                {instruction || defaultText}
-            </SafeMarkdown>
-        </div>
-    </div>
-));
+}> = React.memo(({ instruction, defaultText }) => {
+    const { isMobile } = useViewport();
+    // Default to visible on first load
+    const [isMinimized, setIsMinimized] = useState(false);
+
+    // Desktop: Regular flow
+    if (!isMobile) {
+        return (
+            <div
+                className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3"
+                role="status"
+                aria-live="polite"
+            >
+                <Target
+                    size={14}
+                    className="text-indigo-400 opacity-60 flex-none"
+                    aria-hidden="true"
+                />
+                <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900">
+                    <SafeMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                        {instruction || defaultText}
+                    </SafeMarkdown>
+                </div>
+            </div>
+        );
+    }
+
+    // Mobile: Overlay with Toggle
+    return (
+        <React.Fragment>
+            {/* Minimized State (Always present to allow expanding) */}
+            <AnimatePresence mode="wait">
+                {isMinimized ? (
+                    <motion.button
+                        key="minimized"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        onClick={() => setIsMinimized(false)}
+                        className="absolute top-2 left-1/2 -translate-x-1/2 z-[60] bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide"
+                        aria-label="Expand instructions"
+                    >
+                        <Target size={12} />
+                        <span>Instruction</span>
+                        <ChevronDown size={14} />
+                    </motion.button>
+                ) : (
+                    <motion.div
+                        key="expanded"
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="absolute top-0 left-0 right-0 z-[60] bg-white/95 backdrop-blur-md shadow-md border-b border-slate-100/50 flex flex-col items-center p-3 gap-2"
+                    >
+                        <div
+                            className="flex items-start justify-center gap-3 w-full"
+                            role="status"
+                            aria-live="polite"
+                        >
+                            <Target
+                                size={14}
+                                className="text-indigo-400 opacity-60 flex-none mt-1"
+                                aria-hidden="true"
+                            />
+                            <div className="text-sm font-medium text-slate-700 text-center leading-relaxed max-w-[90%] [&_strong]:font-bold [&_strong]:text-indigo-700">
+                                <SafeMarkdown
+                                    components={{ p: ({ children }) => <span>{children}</span> }}
+                                >
+                                    {instruction || defaultText}
+                                </SafeMarkdown>
+                            </div>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setIsMinimized(true)}
+                            className="w-full flex items-center justify-center pt-1 pb-1 text-slate-400 hover:text-slate-600 transition-colors"
+                            aria-label="Minimize instructions"
+                        >
+                            <ChevronUp size={16} />
+                        </button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </React.Fragment>
+    );
+});
 
 const GridToolbar: React.FC<{
     onZoomIn: () => void;
@@ -400,6 +483,8 @@ interface GridSortProps {
     highlightKey?: string | null;
     conditionOfInstruction?: string | null;
     uiLabels?: Record<string, string>;
+    readOnly?: boolean;
+    sidebarContent?: React.ReactNode;
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -439,7 +524,10 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         showCodes,
         highlightKey,
         conditionOfInstruction,
+
         uiLabels,
+        readOnly = false,
+        sidebarContent,
     }) => {
         const { t } = useTranslation();
 
@@ -724,35 +812,75 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                     tabIndex={-1}
                                                 >
                                                     {Array.from({ length: col.capacity }).map(
-                                                        (_, rowIndex) => (
-                                                            <DroppableSlot
-                                                                key={`${colIndex}-${rowIndex}`}
-                                                                id={`slot_${colIndex}_${rowIndex}`}
-                                                                role="gridcell"
-                                                                onClick={() =>
-                                                                    onSlotClick?.(
+                                                        (_, rowIndex) =>
+                                                            readOnly ? (
+                                                                <div
+                                                                    key={`${colIndex}-${rowIndex}`}
+                                                                    className={cn(
+                                                                        'border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center bg-opacity-40 transition-all duration-300 shadow-sm',
+                                                                        getColumnTint(col.score),
+                                                                        selectedCardId &&
+                                                                            'ring-2 ring-[var(--brand-accent)] ring-opacity-50 bg-[color-mix(in_srgb,var(--brand-accent),transparent_95%)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--brand-accent),transparent_90%)] hover:ring-opacity-80 hover:scale-[1.02]'
+                                                                    )}
+                                                                    style={{
+                                                                        width: cardDimensions.width,
+                                                                        height: cardDimensions.height,
+                                                                    }}
+                                                                    role="button"
+                                                                    tabIndex={0}
+                                                                    onClick={() =>
+                                                                        onSlotClick?.(
+                                                                            colIndex,
+                                                                            rowIndex
+                                                                        )
+                                                                    }
+                                                                    onKeyDown={(e) => {
+                                                                        if (
+                                                                            e.key === 'Enter' ||
+                                                                            e.key === ' '
+                                                                        ) {
+                                                                            onSlotClick?.(
+                                                                                colIndex,
+                                                                                rowIndex
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {renderSlotContent(
                                                                         colIndex,
-                                                                        rowIndex
-                                                                    )
-                                                                }
-                                                                style={{
-                                                                    width: cardDimensions.width,
-                                                                    height: cardDimensions.height,
-                                                                }}
-                                                                className={cn(
-                                                                    'border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center bg-opacity-40 transition-all duration-300 shadow-sm',
-                                                                    getColumnTint(col.score),
-                                                                    selectedCardId &&
-                                                                        'ring-2 ring-[var(--brand-accent)] ring-opacity-50 bg-[color-mix(in_srgb,var(--brand-accent),transparent_95%)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--brand-accent),transparent_90%)] hover:ring-opacity-80 hover:scale-[1.02]'
-                                                                )}
-                                                            >
-                                                                {renderSlotContent(
-                                                                    colIndex,
-                                                                    rowIndex,
-                                                                    cardDimensions
-                                                                )}
-                                                            </DroppableSlot>
-                                                        )
+                                                                        rowIndex,
+                                                                        cardDimensions
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <DroppableSlot
+                                                                    key={`${colIndex}-${rowIndex}`}
+                                                                    id={`slot_${colIndex}_${rowIndex}`}
+                                                                    role="gridcell"
+                                                                    onClick={() =>
+                                                                        onSlotClick?.(
+                                                                            colIndex,
+                                                                            rowIndex
+                                                                        )
+                                                                    }
+                                                                    style={{
+                                                                        width: cardDimensions.width,
+                                                                        height: cardDimensions.height,
+                                                                    }}
+                                                                    className={cn(
+                                                                        'border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center bg-opacity-40 transition-all duration-300 shadow-sm',
+                                                                        getColumnTint(col.score),
+                                                                        selectedCardId &&
+                                                                            'ring-2 ring-[var(--brand-accent)] ring-opacity-50 bg-[color-mix(in_srgb,var(--brand-accent),transparent_95%)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--brand-accent),transparent_90%)] hover:ring-opacity-80 hover:scale-[1.02]'
+                                                                    )}
+                                                                >
+                                                                    {renderSlotContent(
+                                                                        colIndex,
+                                                                        rowIndex,
+                                                                        cardDimensions
+                                                                    )}
+                                                                </DroppableSlot>
+                                                            )
                                                     )}
                                                 </div>
                                                 <ScoreLabel
@@ -782,64 +910,76 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         isMobile ? 'h-auto' : 'h-full'
                     )}
                 >
-                    {!isMobile && (
-                        <div className="flex-none p-4 pb-0">
-                            <ReadingZone variant="desktop" />
+                    {readOnly && sidebarContent ? (
+                        <div className="h-full w-full overflow-hidden flex flex-col">
+                            {sidebarContent}
                         </div>
-                    )}
-
-                    {/* Category selector (Piles) */}
-                    <div className="flex-none p-3 pb-1.5 lg:p-4 lg:pb-2">
-                        <div className="flex w-full gap-2 lg:grid lg:grid-cols-3" role="tablist">
-                            {(['disagree', 'neutral', 'agree'] as const).map((pile) => (
-                                <PileTab
-                                    key={pile}
-                                    pile={pile}
-                                    isActive={activePile === pile}
-                                    count={
-                                        pile === 'disagree'
-                                            ? disagreeCards.length
-                                            : pile === 'agree'
-                                              ? agreeCards.length
-                                              : neutralCards.length
-                                    }
-                                    label={t(`common.${pile}`)}
-                                    cardsLabel={t('common.cards')}
-                                    onClick={() => {
-                                        setActivePile(pile);
-                                        if (isMobile) setHasPerformedZonalFocus(true);
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    <DroppableDeckArea
-                        id={`deck-area-${activePile}`}
-                        className={cn(
-                            'flex-col overflow-hidden relative',
-                            isMobile ? 'h-[120px] flex-none' : 'flex-1 min-h-0 flex'
-                        )}
-                    >
-                        <div
-                            key={activePile}
-                            className={cn(
-                                'flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-stretch justify-start custom-scrollbar lg:grid lg:grid-cols-2 lg:gap-2 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:p-3',
-                                activeCards.length === 0 && 'justify-center lg:place-content-center'
+                    ) : (
+                        <>
+                            {!isMobile && (
+                                <div className="flex-none p-4 pb-0">
+                                    <ReadingZone variant="desktop" />
+                                </div>
                             )}
-                            data-testid="deck-cards-container"
-                        >
-                            {renderDeckCards()}
-                        </div>
-                    </DroppableDeckArea>
 
-                    <ValidationFooter
-                        isAllPlaced={isAllPlaced}
-                        selectedCardId={selectedCardId}
-                        onValidate={onValidate || (() => {})}
-                        labels={inventoryLabels}
-                        highlightKey={highlightKey}
-                    />
+                            {/* Category selector (Piles) */}
+                            <div className="flex-none p-3 pb-1.5 lg:p-4 lg:pb-2">
+                                <div
+                                    className="flex w-full gap-2 lg:grid lg:grid-cols-3"
+                                    role="tablist"
+                                >
+                                    {(['disagree', 'neutral', 'agree'] as const).map((pile) => (
+                                        <PileTab
+                                            key={pile}
+                                            pile={pile}
+                                            isActive={activePile === pile}
+                                            count={
+                                                pile === 'disagree'
+                                                    ? disagreeCards.length
+                                                    : pile === 'agree'
+                                                      ? agreeCards.length
+                                                      : neutralCards.length
+                                            }
+                                            label={t(`common.${pile}`)}
+                                            cardsLabel={t('common.cards')}
+                                            onClick={() => {
+                                                setActivePile(pile);
+                                                if (isMobile) setHasPerformedZonalFocus(true);
+                                            }}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            <DroppableDeckArea
+                                id={`deck-area-${activePile}`}
+                                className={cn(
+                                    'flex-col overflow-hidden relative',
+                                    isMobile ? 'h-[120px] flex-none' : 'flex-1 min-h-0 flex'
+                                )}
+                            >
+                                <div
+                                    key={activePile}
+                                    className={cn(
+                                        'flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-stretch justify-start custom-scrollbar lg:grid lg:grid-cols-2 lg:gap-2 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:p-3',
+                                        activeCards.length === 0 &&
+                                            'justify-center lg:place-content-center'
+                                    )}
+                                    data-testid="deck-cards-container"
+                                >
+                                    {renderDeckCards()}
+                                </div>
+                            </DroppableDeckArea>
+
+                            <ValidationFooter
+                                isAllPlaced={isAllPlaced}
+                                selectedCardId={selectedCardId}
+                                onValidate={onValidate || (() => {})}
+                                labels={inventoryLabels}
+                                highlightKey={highlightKey}
+                            />
+                        </>
+                    )}
                 </div>
             </div>
         );
