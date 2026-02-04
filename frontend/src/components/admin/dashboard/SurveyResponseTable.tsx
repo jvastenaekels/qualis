@@ -1,7 +1,20 @@
 import type { StudyRead } from '@/api/model';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { HelpCircle, CheckSquare } from 'lucide-react';
+import {
+    User as UserIcon,
+    ClipboardList as SurveyIcon,
+    MessageSquare as MessageIcon,
+    HelpCircle as FeedbackIcon,
+} from 'lucide-react';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
+import { getLocalizedText } from '@/utils/localization';
 
 interface SurveyResponseTableProps {
     study: StudyRead;
@@ -21,24 +34,7 @@ export function SurveyResponseTable({
 }: SurveyResponseTableProps) {
     const { t } = useTranslation();
 
-    // Extract questions from config
-    const config = (type === 'presort' ? study.presort_config : study.postsort_config) || {};
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic config structure
-    const rawQuestions = (config as any)?.questions || (config as any)?.fields || [];
-    const questions = Array.isArray(rawQuestions)
-        ? rawQuestions
-        : // biome-ignore lint/suspicious/noExplicitAny: legacy map
-          Object.entries(rawQuestions).map(([id, q]: [string, any]) => ({
-              id,
-              // biome-ignore lint/suspicious/noExplicitAny: legacy map
-              ...(q as any),
-          }));
-
-    // If questions is an object (legacy/simple), convert to array-like entries
-    // based on the answers keys to ensure everything is shown even if missing in config
-    const answerKeys = Object.keys(answers || {});
-
-    if (answerKeys.length === 0) {
+    if (!answers || Object.keys(answers).length === 0) {
         return (
             <div
                 className={cn(
@@ -46,7 +42,7 @@ export function SurveyResponseTable({
                     className
                 )}
             >
-                <HelpCircle className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                <FeedbackIcon className="h-8 w-8 text-slate-300 mx-auto mb-2" />
                 <p className="text-sm font-medium text-slate-500">
                     {t(
                         'admin.participant.survey.no_answers',
@@ -57,85 +53,270 @@ export function SurveyResponseTable({
         );
     }
 
-    const resolveLabel = (key: string) => {
-        // 1. Try to find in questions array
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic question structure
-        const q = questions.find((qIdx: any) => qIdx.id === key || String(qIdx.id) === String(key));
+    // --- Config & Question Logic ---
+    const config = (type === 'presort' ? study.presort_config : study.postsort_config) || {};
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic config structure
+    const cfg = config as any;
+    const rawQuestions = cfg?.questions || cfg?.fields || (Array.isArray(cfg) ? cfg : []);
+
+    // Transform questions into a map for fast lookup
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic config
+    const questionsMap: Record<string, any> = {};
+    if (Array.isArray(rawQuestions)) {
+        for (const q of rawQuestions) {
+            questionsMap[String(q.id)] = q;
+        }
+    } else if (typeof rawQuestions === 'object') {
+        for (const [id, q] of Object.entries(rawQuestions)) {
+            // biome-ignore lint/suspicious/noExplicitAny: dynamic config
+            questionsMap[id] = { id, ...(q as any) };
+        }
+    }
+
+    // --- Helpers ---
+    const getResolvedLabel = (key: string) => {
+        const q = questionsMap[key];
         if (q) {
-            // Handle new structure where label is an object
-            if (q.label && typeof q.label === 'object') {
-                return q.label[language] || q.label.en || Object.values(q.label)[0] || key;
-            }
-            // Handle legacy structure where text or label is a string/object
-            if (q.text) {
-                return typeof q.text === 'object' ? q.text[language] || q.text.en || key : q.text;
-            }
-            if (q.label) return q.label;
+            return getLocalizedText(q.label || q.text, language, key);
         }
 
-        // 2. Try to find directly in config object (if it's a map)
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic config structure
-        const directQ = (config as any)[key] || (config as any).fields?.[key];
-        if (directQ?.label) {
-            return typeof directQ.label === 'object'
-                ? directQ.label[language] || directQ.label.en || key
-                : directQ.label;
-        }
-
-        // 3. Special cases for hardcoded post-sort fields
-        if (key === 'feedback') return t('admin.participant.survey.feedback', 'General Feedback');
-        if (key === 'email') return t('admin.participant.survey.email', 'Email Address');
-        if (key === 'newsletter_consent')
-            return t('admin.participant.survey.newsletter', 'Newsletter Consent');
+        // Special Post-Sort Fields
+        if (key === 'email') return t('post.contact.email_label', 'Email Address');
+        if (key === 'interview_consent') return t('post.contact.interview_consent', 'Interview');
+        if (key === 'newsletter_consent') return t('post.contact.newsletter_consent', 'Newsletter');
+        if (key === '_recruitment_token')
+            return t('admin.participant.metadata.recruitment_token', 'Ref');
+        if (key === 'missing_statement')
+            return t('post.extreme.missing_statement', 'Missing Statement');
+        if (key === 'general_comment') return t('post.extreme.general_comment', 'General Comment');
 
         return key;
     };
 
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic survey value types
-    const renderValue = (value: any) => {
-        if (value === true) return <CheckSquare className="h-4 w-4 text-emerald-500" />;
-        if (value === false) return <span className="text-slate-300">—</span>;
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic survey values
+    const getResolvedValue = (key: string, value: any) => {
+        if (value === true)
+            return (
+                <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50">
+                    Yes
+                </Badge>
+            );
+        if (value === false)
+            return (
+                <Badge variant="outline" className="text-slate-400 border-slate-200">
+                    No
+                </Badge>
+            );
+        if (value === null || value === undefined || value === '')
+            return <span className="text-slate-300">—</span>;
+
+        const q = questionsMap[key];
+        if (q?.options && Array.isArray(q.options)) {
+            // Resolve options for single or multi choice
+            const resolveOptionNode = (val: string | number) => {
+                // biome-ignore lint/suspicious/noExplicitAny: dynamic option structure
+                const opt = q.options.find((o: any) =>
+                    typeof o === 'object'
+                        ? String(o.value) === String(val)
+                        : String(o) === String(val)
+                );
+                if (opt) {
+                    return typeof opt === 'object'
+                        ? getLocalizedText(opt.label, language, String(val))
+                        : String(opt);
+                }
+                return String(val);
+            };
+
+            if (Array.isArray(value)) {
+                return (
+                    <div className="flex flex-wrap gap-1">
+                        {value.map((v) => (
+                            <Badge
+                                key={v}
+                                variant="secondary"
+                                className="text-[10px] font-medium bg-indigo-50 text-indigo-700 border-indigo-100"
+                            >
+                                {resolveOptionNode(v)}
+                            </Badge>
+                        ))}
+                    </div>
+                );
+            }
+            return resolveOptionNode(value);
+        }
+
         if (Array.isArray(value)) return value.join(', ');
         if (typeof value === 'object') return JSON.stringify(value);
         return String(value);
     };
 
+    // --- Grouping Logic ---
+    const groups: {
+        id: string;
+        title: string;
+        icon: React.ReactNode;
+        items: { key: string; label: string; value: React.ReactNode; id?: string }[];
+    }[] = [];
+
+    // biome-ignore lint/suspicious/noExplicitAny: generic value
+    const addItem = (groupId: string, key: string, val: any) => {
+        const group = groups.find((g) => g.id === groupId);
+        if (group) {
+            group.items.push({
+                key,
+                label: getResolvedLabel(key),
+                value: getResolvedValue(key, val),
+                id: key,
+            });
+        }
+    };
+
+    // Define potential groups
+    groups.push({
+        id: 'identity',
+        title: t('admin.participant.survey.categories.identity', 'Identity & Contact'),
+        icon: <UserIcon className="w-4 h-4" />,
+        items: [],
+    });
+    groups.push({
+        id: 'questions',
+        title: t('admin.participant.survey.categories.questions', 'Questionnaire Responses'),
+        icon: <SurveyIcon className="w-4 h-4" />,
+        items: [],
+    });
+    groups.push({
+        id: 'comments',
+        title: t('admin.participant.survey.categories.comments', 'Card Comments'),
+        icon: <MessageIcon className="w-4 h-4" />,
+        items: [],
+    });
+    groups.push({
+        id: 'feedback',
+        title: t('admin.participant.survey.categories.feedback', 'General Feedback'),
+        icon: <FeedbackIcon className="w-4 h-4" />,
+        items: [],
+    });
+
+    // Populate from answers
+    const processedKeys = new Set<string>();
+
+    // 1. Explicitly handle nested objects first (typical of postsort)
+    if (type === 'postsort') {
+        // questions_answers
+        if (answers.questions_answers && typeof answers.questions_answers === 'object') {
+            for (const [k, v] of Object.entries(answers.questions_answers)) {
+                addItem('questions', k, v);
+            }
+            processedKeys.add('questions_answers');
+        }
+
+        // card_comments
+        if (answers.card_comments && typeof answers.card_comments === 'object') {
+            const commentsContainer = groups.find((g) => g.id === 'comments');
+            if (commentsContainer) {
+                for (const [sIdStr, comment] of Object.entries(answers.card_comments)) {
+                    if (!comment) continue;
+                    const sId = Number(sIdStr);
+                    const statement = study.statements?.find((s) => s.id === sId);
+                    const statementText = statement
+                        ? statement.translations?.find((t) => t.language_code === language)?.text ||
+                          statement.translations?.[0]?.text ||
+                          statement.code
+                        : `ID: ${sId}`;
+
+                    commentsContainer.items.push({
+                        key: sIdStr,
+                        label: statementText,
+                        value: (
+                            <p className="italic text-indigo-900 bg-indigo-50/30 p-3 rounded-lg border border-indigo-100/50">
+                                "{comment as string}"
+                            </p>
+                        ),
+                        id: sIdStr,
+                    });
+                }
+            }
+            processedKeys.add('card_comments');
+        }
+    }
+
+    // 2. Map other top-level keys
+    for (const [key, val] of Object.entries(answers)) {
+        if (processedKeys.has(key)) continue;
+
+        if (
+            key === 'email' ||
+            key === 'interview_consent' ||
+            key === 'newsletter_consent' ||
+            key === '_recruitment_token'
+        ) {
+            addItem('identity', key, val);
+        } else if (key === 'missing_statement' || key === 'general_comment') {
+            addItem('feedback', key, val);
+        } else {
+            // Fallback for flat presort or unexpected postsort keys
+            addItem('questions', key, val);
+        }
+    }
+
+    // Filter empty groups
+    const activeGroups = groups.filter((g) => g.items.length > 0);
+
     return (
-        <div
-            className={cn(
-                'overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm',
-                className
-            )}
-        >
-            <table className="w-full text-left border-collapse">
-                <thead>
-                    <tr className="bg-slate-50/50 border-b border-slate-100">
-                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500 w-1/2">
-                            {t('admin.participant.survey.question', 'Question / Field')}
-                        </th>
-                        <th className="px-6 py-4 text-[10px] font-black uppercase tracking-wider text-slate-500">
-                            {t('admin.participant.survey.answer', 'Response')}
-                        </th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                    {answerKeys.map((key) => (
-                        <tr key={key} className="group hover:bg-slate-50/30 transition-colors">
-                            <td className="px-6 py-4">
-                                <p className="text-sm font-bold text-slate-900 leading-tight">
-                                    {resolveLabel(key)}
-                                </p>
-                                <p className="text-[10px] font-mono text-slate-400 mt-1 uppercase tracking-tighter">
-                                    ID: {key}
-                                </p>
-                            </td>
-                            <td className="px-6 py-4 text-sm text-slate-600 font-medium">
-                                {renderValue(answers[key])}
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+        <div className={cn('w-full space-y-4', className)}>
+            <Accordion
+                type="multiple"
+                defaultValue={activeGroups.map((g) => g.id)}
+                className="space-y-4"
+            >
+                {activeGroups.map((group) => (
+                    <AccordionItem
+                        key={group.id}
+                        value={group.id}
+                        className="border border-slate-100 bg-white rounded-2xl shadow-sm overflow-hidden"
+                    >
+                        <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-slate-50/50 transition-all group active:scale-[0.99]">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-slate-100 rounded-xl text-slate-500 group-data-[state=open]:bg-indigo-100 group-data-[state=open]:text-indigo-600 transition-colors">
+                                    {group.icon}
+                                </div>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-500 group-data-[state=open]:text-slate-900 transition-colors">
+                                    {group.title}
+                                </span>
+                                <Badge
+                                    variant="secondary"
+                                    className="ml-2 bg-slate-100 text-slate-400 group-data-[state=open]:bg-indigo-50 group-data-[state=open]:text-indigo-400"
+                                >
+                                    {group.items.length}
+                                </Badge>
+                            </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="px-0 pb-0 border-t border-slate-50">
+                            <div className="divide-y divide-slate-50">
+                                {group.items.map((item) => (
+                                    <div
+                                        key={item.key}
+                                        className="px-6 py-4 flex flex-col md:flex-row md:items-start gap-4 hover:bg-slate-50/30 transition-colors"
+                                    >
+                                        <div className="md:w-1/2">
+                                            <p className="text-sm font-bold text-slate-800 leading-snug">
+                                                {item.label}
+                                            </p>
+                                            <p className="text-[10px] font-mono text-slate-400 mt-1 uppercase tracking-tighter opacity-70">
+                                                ID: {item.id || item.key}
+                                            </p>
+                                        </div>
+                                        <div className="md:w-1/2 text-sm text-slate-600 font-medium">
+                                            {item.value}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                ))}
+            </Accordion>
         </div>
     );
 }

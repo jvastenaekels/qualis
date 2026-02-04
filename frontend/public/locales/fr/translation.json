@@ -1606,6 +1606,7 @@
         },
         "participant": {
             "tabs": {
+                "session": "Méta-données",
                 "presort": "Pré-Sort",
                 "grid": "Grille Q-Sort",
                 "postsort": "Post-Sort"
@@ -1622,7 +1623,13 @@
             },
             "survey": {
                 "presort": "Questions Pré-Sort",
-                "postsort": "Questions Post-Sort"
+                "postsort": "Questions Post-Sort",
+                "categories": {
+                    "identity": "Identité & Contact",
+                    "questions": "Réponses au questionnaire",
+                    "comments": "Commentaires sur les cartes",
+                    "feedback": "Remarques générales"
+                }
             }
         }
     }

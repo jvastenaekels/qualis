@@ -4,7 +4,15 @@ import type {
 } from '@/components/admin/dashboard/InteractiveDataView';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MessageSquare, MousePointer2, FileJson, FileSpreadsheet } from 'lucide-react';
+import {
+    MessageSquare,
+    MousePointer2,
+    FileJson,
+    FileSpreadsheet,
+    Fingerprint,
+    ClipboardList,
+    LayoutGrid,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ParticipantMetadataCard } from './ParticipantMetadataCard';
@@ -224,23 +232,33 @@ export function ParticipantDetailContent({
             {/* Header / Identity is handled by Page Header usually, keeping simplified actions or removing */}
             {/* Note: User requested enriched header, we can rely on Page header or add detail here. */}
 
-            <Tabs defaultValue="presort" className="flex-1 flex flex-col">
+            <Tabs defaultValue="session" className="flex-1 flex flex-col">
                 <div className="flex items-center justify-between px-6 border-b border-slate-50 bg-white sticky top-0 z-10">
                     <TabsList className="h-14 bg-transparent p-0 gap-6">
-                        {['presort', 'grid', 'postsort'].map((tab) => (
+                        {['session', 'presort', 'grid', 'postsort'].map((tab) => (
                             <TabsTrigger
                                 key={tab}
                                 value={tab}
                                 className="h-14 rounded-none border-b-2 border-transparent px-0 text-xs font-black uppercase tracking-widest text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
                             >
-                                {t(
-                                    `admin.participant.tabs.${tab}`,
-                                    tab === 'presort'
-                                        ? 'Pre-Sort'
-                                        : tab === 'grid'
-                                          ? 'Q-Sort Grid'
-                                          : 'Post-Sort'
-                                )}
+                                <div className="flex items-center gap-2">
+                                    {tab === 'session' && <Fingerprint className="w-3.5 h-3.5" />}
+                                    {tab === 'presort' && <ClipboardList className="w-3.5 h-3.5" />}
+                                    {tab === 'grid' && <LayoutGrid className="w-3.5 h-3.5" />}
+                                    {tab === 'postsort' && (
+                                        <MessageSquare className="w-3.5 h-3.5" />
+                                    )}
+                                    {t(
+                                        `admin.participant.tabs.${tab}`,
+                                        tab === 'presort'
+                                            ? 'Pre-Sort'
+                                            : tab === 'grid'
+                                              ? 'Q-Sort Grid'
+                                              : tab === 'session'
+                                                ? 'Session Metadata'
+                                                : 'Post-Sort'
+                                    )}
+                                </div>
                             </TabsTrigger>
                         ))}
                     </TabsList>
@@ -270,11 +288,11 @@ export function ParticipantDetailContent({
 
                 <div className="flex-1 overflow-y-auto bg-slate-50/30">
                     <AnimatePresence mode="wait">
-                        <TabsContent value="presort" className="h-full mt-0 outline-none p-6">
+                        <TabsContent value="session" className="h-full mt-0 outline-none p-6">
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="space-y-6 max-w-4xl mx-auto"
+                                className="space-y-6 max-w-7xl mx-auto"
                             >
                                 <ParticipantMetadataCard
                                     participant={{
@@ -286,6 +304,15 @@ export function ParticipantDetailContent({
                                     onToggleDiscard={onToggleDiscard}
                                     isDiscardPending={isDiscardPending}
                                 />
+                            </motion.div>
+                        </TabsContent>
+
+                        <TabsContent value="presort" className="h-full mt-0 outline-none p-6">
+                            <motion.div
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="space-y-6 max-w-7xl mx-auto"
+                            >
                                 <div className="space-y-4">
                                     <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
@@ -350,7 +377,7 @@ export function ParticipantDetailContent({
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="space-y-8 max-w-4xl mx-auto"
+                                className="space-y-8 max-w-7xl mx-auto"
                             >
                                 <div className="space-y-4">
                                     <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">

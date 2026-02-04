@@ -231,7 +231,7 @@ export default function ParticipantDetailsPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 pb-6">
-                <div className="bg-white rounded-2xl border-none shadow-sm max-w-5xl mx-auto min-h-[500px]">
+                <div className="bg-white rounded-2xl border-none shadow-sm max-w-7xl mx-auto min-h-[500px]">
                     <ParticipantDetailContent
                         participant={participantData}
                         studyData={studyData}

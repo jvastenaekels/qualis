@@ -8,7 +8,6 @@ import {
     Fingerprint,
     Clock,
     Activity,
-    Shield,
     Hash,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -144,19 +143,6 @@ export function ParticipantMetadataCard({
                                 </p>
                                 <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
                                     {t('admin.participant.metadata.browser', 'Browser')}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <div className="p-2 bg-slate-50 rounded-lg">
-                                <Shield className="h-4 w-4 text-slate-500" />
-                            </div>
-                            <div>
-                                <p className="text-xs font-black text-slate-900 leading-none">
-                                    participant.ip_address || '---'
-                                </p>
-                                <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
-                                    t('admin.participant.metadata.ip_address', 'IP Address')
                                 </p>
                             </div>
                         </div>

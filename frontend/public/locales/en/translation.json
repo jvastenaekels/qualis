@@ -1606,6 +1606,7 @@
         },
         "participant": {
             "tabs": {
+                "session": "Metadata",
                 "presort": "Pre-Sort",
                 "grid": "Q-Sort Grid",
                 "postsort": "Post-Sort"
@@ -1622,7 +1623,13 @@
             },
             "survey": {
                 "presort": "Pre-Sort Questions",
-                "postsort": "Post-Sort Questions"
+                "postsort": "Post-Sort Questions",
+                "categories": {
+                    "identity": "Identity & Contact",
+                    "questions": "Questionnaire Responses",
+                    "comments": "Card Comments",
+                    "feedback": "General Feedback"
+                }
             }
         }
     }
