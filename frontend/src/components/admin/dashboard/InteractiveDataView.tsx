@@ -71,6 +71,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { format } from 'date-fns';
+import { enUS, fr, fi } from 'date-fns/locale';
 
 // Types representing the backend dump response structure
 interface DumpStatement {
@@ -137,10 +138,14 @@ export default function InteractiveDataView({
     slug,
     participants: initialParticipants,
 }: InteractiveDataViewProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
     const queryClient = useQueryClient();
+
+    // biome-ignore lint/suspicious/noExplicitAny: complex locale types
+    const dateLocales: Record<string, any> = { en: enUS, fr, fi };
+    const currentLocale = dateLocales[i18n.language] || enUS;
 
     const { data: rawData, isLoading, error } = useGetStudyDumpApiAdminStudiesSlugDumpGet(slug);
 
@@ -360,12 +365,19 @@ export default function InteractiveDataView({
                 cell: (info) => {
                     const seconds = info.getValue();
                     if (seconds === null) return <span className="text-slate-300">—</span>;
-                    const mins = Math.floor(Math.abs(seconds) / 60);
-                    const secs = Math.round(Math.abs(seconds) % 60);
                     return (
                         <div className="flex items-center gap-1.5 font-mono text-xs text-slate-600">
                             <Clock className="w-3 h-3 text-slate-400" />
-                            {mins}m {secs.toString().padStart(2, '0')}s
+                            {seconds >= 3600
+                                ? t('common.duration_long', '{{h}}h {{m}}m {{s}}s', {
+                                      h: Math.floor(seconds / 3600),
+                                      m: Math.floor((seconds % 3600) / 60),
+                                      s: seconds % 60,
+                                  })
+                                : t('common.duration_short', '{{m}}m {{s}}s', {
+                                      m: Math.floor(seconds / 60),
+                                      s: seconds % 60,
+                                  })}
                         </div>
                     );
                 },
@@ -389,10 +401,10 @@ export default function InteractiveDataView({
                         <div className="flex flex-col text-[10px] text-slate-500 font-medium leading-none gap-1">
                             <div className="flex items-center gap-1 text-slate-700">
                                 <Calendar className="w-3 h-3 text-slate-300" />
-                                {format(new Date(val), 'MMM dd, yyyy')}
+                                {format(new Date(val), 'P', { locale: currentLocale })}
                             </div>
                             <span className="pl-4 opacity-70">
-                                {format(new Date(val), 'HH:mm')}
+                                {format(new Date(val), 'p', { locale: currentLocale })}
                             </span>
                         </div>
                     );
@@ -774,10 +786,7 @@ export default function InteractiveDataView({
                                     >
                                         <Trash2 className="h-4 w-4" />
                                         <span className="hidden sm:inline">
-                                            {t(
-                                                'admin.data.actions.clear_all_data',
-                                                'Clear All Data'
-                                            )}
+                                            {t('admin.data.actions.clear_all')}
                                         </span>
                                     </Button>
                                 </AlertDialogTrigger>
@@ -787,16 +796,10 @@ export default function InteractiveDataView({
                                             <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">
                                                 <Trash2 className="w-5 h-5" />
                                             </div>
-                                            {t(
-                                                'admin.data.actions.clear_all_data',
-                                                'Clear All Data'
-                                            )}
+                                            {t('admin.data.actions.clear_all')}
                                         </AlertDialogTitle>
                                         <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
-                                            {t(
-                                                'admin.data.actions.clear_all_confirm',
-                                                'Are you sure you want to delete ALL responses for this study? This will unlock the study structure and allow you to modify the grid or statement codes again. This action cannot be undone.'
-                                            )}
+                                            {t('admin.data.actions.clear_all_confirm')}
                                         </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter className="gap-2">

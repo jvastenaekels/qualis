@@ -162,7 +162,8 @@ export function ParticipantDetailContent({
                         <div className="space-y-2">
                             <div className="flex items-center justify-between">
                                 <Badge variant="outline" className="font-mono text-xs">
-                                    {detailStatement.code || `ID:${detailStatement.id}`}
+                                    {detailStatement.code ||
+                                        `${t('admin.participant.metadata.id', 'ID')}: ${detailStatement.id}`}
                                 </Badge>
                                 <span className="text-xs font-medium text-slate-400">
                                     {t('common.score', 'Score')}:{' '}

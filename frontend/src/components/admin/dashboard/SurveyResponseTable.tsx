@@ -98,13 +98,13 @@ export function SurveyResponseTable({
         if (value === true)
             return (
                 <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-50">
-                    Yes
+                    {t('common.yes', 'Yes')}
                 </Badge>
             );
         if (value === false)
             return (
                 <Badge variant="outline" className="text-slate-400 border-slate-200">
-                    No
+                    {t('common.no', 'No')}
                 </Badge>
             );
         if (value === null || value === undefined || value === '')
@@ -223,7 +223,7 @@ export function SurveyResponseTable({
                         ? statement.translations?.find((t) => t.language_code === language)?.text ||
                           statement.translations?.[0]?.text ||
                           statement.code
-                        : `ID: ${sId}`;
+                        : `${t('admin.participant.metadata.id', 'ID')}: ${sId}`;
 
                     commentsContainer.items.push({
                         key: sIdStr,
@@ -304,7 +304,8 @@ export function SurveyResponseTable({
                                                 {item.label}
                                             </p>
                                             <p className="text-[10px] font-mono text-slate-400 mt-1 uppercase tracking-tighter opacity-70">
-                                                ID: {item.id || item.key}
+                                                {t('admin.participant.metadata.id', 'ID')}:{' '}
+                                                {item.id || item.key}
                                             </p>
                                         </div>
                                         <div className="md:w-1/2 text-sm text-slate-600 font-medium">

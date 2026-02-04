@@ -23,6 +23,9 @@
         "cards": "statements",
         "close": "Close",
         "unknown_card": "Unknown Card",
+        "unknown": "Unknown",
+        "duration_short": "{{m}}m {{s}}s",
+        "duration_long": "{{h}}h {{m}}m {{s}}s",
         "optional": "Optional",
         "processing": "Processing...",
         "statement": "Statement",
@@ -34,6 +37,10 @@
         "workspace_label": "Workspace",
         "reduce": "Reduce",
         "expand": "Expand",
+        "yes": "Yes",
+        "no": "No",
+        "score": "Score",
+        "comment": "Comment",
         "errors": {
             "network": "Network connection error. Please check your internet connection.",
             "not_found": "Study not found.",
@@ -321,7 +328,9 @@
             "min_chars": "A few words are enough to help us understand the context.",
             "label_agree": "Strongest agreement",
             "label_disagree": "Strongest disagreement",
-            "label_neutral": "Neutral"
+            "label_neutral": "Neutral",
+            "missing_statement": "Missing Statement",
+            "general_comment": "General Comment"
         },
         "optional": {
             "title": "Did any statements feel particularly surprising, unclear, or confusing to you? If so, why?",
@@ -852,41 +861,6 @@
                 "state_changed_active": "Study is now active!"
             }
         },
-        "team": {
-            "title": "Research team",
-            "description": "Manage collaborators and study-level access control.",
-            "invite_title": "Invite collaborator",
-            "invite_description": "Generate a secure link to invite a new member to this study.",
-            "email_label": "Email address",
-            "role_label": "Role",
-            "select_role": "Select a role",
-            "generate_link": "Generate link",
-            "share_label": "Share this link with the invitee:",
-            "copy_success": "Link copied to clipboard",
-            "invite_success": "Invitation link generated!",
-            "invite_error": "Failed to generate invitation",
-            "list_title": "Collaborators",
-            "list_description": "Manage access for existing collaborators.",
-            "added_on": "Added on",
-            "headers": {
-                "collaborator": "Collaborator",
-                "role": "Role",
-                "actions": "Actions"
-            },
-            "roles": {
-                "owner": "Owner (full control)",
-                "editor": "Editor (design & analysis)",
-                "viewer": "Viewer (read-only)",
-                "owner_badge": "OWNER",
-                "editor_badge": "EDITOR",
-                "viewer_badge": "VIEWER"
-            },
-            "permissions": {
-                "owner": "Can delete the study and manage team.",
-                "editor": "Can modify design and view results.",
-                "viewer": "Read-only access to all modules."
-            }
-        },
         "design": {
             "title": "Study design",
             "translation_needed": "Review required (copy)",
@@ -1349,14 +1323,16 @@
                 "discarded": "discarded"
             },
             "actions": {
-                "clear_test_runs": "Purge test data",
-                "clear_test_runs_confirm": "Delete all test sessions? This action is irreversible and for maintenance only.",
-                "clear_test_runs_success": "Pipeline cleaned: test data purged",
-                "clear_test_runs_error": "System failure: could not purge test data",
-                "clear_all_data": "Clear all data",
-                "clear_all_confirm": "Are you sure you want to delete ALL responses for this study? This will unlock the study structure and allow you to modify the grid or statement codes again. This action cannot be undone.",
-                "clear_all_success": "All participants successfully cleared!",
-                "clear_all_error": "Failed to clear participants"
+                "discard": "Discard",
+                "restore": "Restore",
+                "clear_test_runs": "Clear test runs",
+                "clear_test_runs_confirm": "Are you sure you want to delete all test submissions? This cannot be undone.",
+                "clear_test_runs_success": "Test runs cleared",
+                "clear_test_runs_error": "Failed to clear test runs",
+                "clear_all": "Reset all data",
+                "clear_all_confirm": "DANGER: This will permanently delete ALL participant data for this study. This cannot be undone.",
+                "clear_all_success": "All data cleared",
+                "clear_all_error": "Failed to clear data"
             },
             "guide": {
                 "title": "Format guide",
@@ -1374,32 +1350,17 @@
                 }
             },
             "table": {
-                "participant": "Participant identity",
-                "id_token": "ID / token",
-                "lang": "Locale",
-                "flags": "Data quality",
-                "duration": "Effort / duration",
-                "actions": "Details",
+                "participant": "Participant",
+                "lang": "Lang",
+                "status": "Status",
+                "flags": "Flags",
+                "duration": "Duration",
                 "submitted": "Submitted",
-                "status": "State"
+                "actions": "Details"
             },
             "tooltips": {
-                "suspect": "Suspect: completion time unusually fast",
-                "has_comments": "Contains qualitative insights"
-            },
-            "filter": {
-                "show_discarded": "Include discarded records",
-                "all_states": "All states",
-                "only_active": "Only active",
-                "only_flagged": "Flagged quality"
-            },
-            "search": {
-                "placeholder": "Search by ID or recruitment token...",
-                "records_found": "Records detected",
-                "no_results": "No records match your query"
-            },
-            "errors": {
-                "load_failed": "Cloud sync interrupted. Please check your connection."
+                "suspect": "Potentially suspect: session duration < 2 minutes",
+                "has_comments": "Contains participant comments on cards"
             },
             "detail": {
                 "title": "Participant profile",
@@ -1416,66 +1377,80 @@
                 },
                 "sort_config": "Sort configuration",
                 "survey": {
-                    "title": "Survey responses",
-                    "csv_note": "Full survey answers available in CSV export."
+                    "title": "Questionnaire responses",
+                    "csv_note": "Full responses available in CSV export."
                 }
+            },
+            "filter": {
+                "show_discarded": "Include discarded records",
+                "all_states": "All states",
+                "only_active": "Only active",
+                "only_flagged": "Flagged quality"
+            },
+            "search": {
+                "placeholder": "Search by ID or recruitment token...",
+                "records_found": "Records detected",
+                "no_results": "No records match your query"
+            },
+            "errors": {
+                "load_failed": "Cloud sync interrupted. Please check your connection."
+            }
+        },
+        "team": {
+            "title": "Study team",
+            "description": "Manage collaborators and study-level access control.",
+            "invite_title": "Invite collaborator",
+            "invite_description": "Generate a secure link to invite a new member to this study.",
+            "email_label": "Email address",
+            "role_label": "Role",
+            "select_role": "Select a role",
+            "generate_link": "Generate link",
+            "invite_success": "Invitation link generated!",
+            "invite_error": "Failed to generate invitation",
+            "copy_success": "Link copied to clipboard",
+            "share_label": "Share this link with the invitee:",
+            "collab_overview": "Collaboration overview",
+            "active_members": "Active members",
+            "permissions_info": "Permissions info",
+            "list_title": "Research team",
+            "list_description": "Manage access for existing collaborators.",
+            "added_on": "Added on",
+            "headers": {
+                "collaborator": "Collaborator",
+                "role": "Role",
+                "actions": "Actions"
+            },
+            "roles": {
+                "owner": "Owner (full control)",
+                "editor": "Editor (design & analysis)",
+                "viewer": "Viewer (read-only)",
+                "owner_badge": "OWNER",
+                "editor_badge": "EDITOR",
+                "viewer_badge": "VIEWER"
+            },
+            "permissions": {
+                "owner": "Can delete the study and manage team.",
+                "editor": "Can modify design and view results.",
+                "viewer": "Read-only access to all modules."
+            }
+        },
+        "empty_states": {
+            "participants": {
+                "title": "Ready to launch?",
+                "desc": "Share your study link to start collecting responses. Your first participant is just a click away.",
+                "action": "Copy study link",
+                "hint": "Or scan the QR code",
+                "copy_success": "Study link copied to clipboard!"
             },
             "team": {
-                "title": "Study team",
-                "description": "Manage collaborators and study-level access control.",
-                "invite_title": "Invite collaborator",
-                "invite_description": "Generate a secure link to invite a new member to this study.",
-                "email_label": "Email address",
-                "role_label": "Role",
-                "select_role": "Select a role",
-                "generate_link": "Generate link",
-                "invite_success": "Invitation link generated!",
-                "invite_error": "Failed to generate invitation",
-                "copy_success": "Link copied to clipboard",
-                "share_label": "Share this link with the invitee:",
-                "collab_overview": "Collaboration overview",
-                "active_members": "Active members",
-                "permissions_info": "Permissions info",
-                "list_title": "Research team",
-                "list_description": "Manage access for existing collaborators.",
-                "added_on": "Added on",
-                "headers": {
-                    "collaborator": "Collaborator",
-                    "role": "Role",
-                    "actions": "Actions"
-                },
-                "roles": {
-                    "owner": "Owner (full control)",
-                    "editor": "Editor (design & analysis)",
-                    "viewer": "Viewer (read-only)",
-                    "owner_badge": "OWNER",
-                    "editor_badge": "EDITOR",
-                    "viewer_badge": "VIEWER"
-                },
-                "permissions": {
-                    "owner": "Can delete the study and manage team.",
-                    "editor": "Can modify design and view results.",
-                    "viewer": "Read-only access to all modules."
-                }
+                "title": "You're flying solo",
+                "desc": "Invite collaborators to help manage this study. They can view data, edit the design, or just observe.",
+                "action": "Invite your first collaborator"
             },
-            "empty_states": {
-                "participants": {
-                    "title": "Ready to launch?",
-                    "desc": "Share your study link to start collecting responses. Your first participant is just a click away.",
-                    "action": "Copy study link",
-                    "hint": "Or scan the QR code",
-                    "copy_success": "Study link copied to clipboard!"
-                },
-                "team": {
-                    "title": "You're flying solo",
-                    "desc": "Invite collaborators to help manage this study. They can view data, edit the design, or just observe.",
-                    "action": "Invite your first collaborator"
-                },
-                "designer": {
-                    "title": "Tabula rasa",
-                    "desc": "This study has no statements yet. Add your Q-set items to begin designing your sort.",
-                    "action": "Load example Q-set"
-                }
+            "designer": {
+                "title": "Tabula rasa",
+                "desc": "This study has no statements yet. Add your Q-set items to begin designing your sort.",
+                "action": "Load example Q-set"
             }
         },
         "status": {
@@ -1619,11 +1594,30 @@
                 "score": "Score"
             },
             "metadata": {
-                "recruitment_token": "Recruitment Token"
+                "title": "Session Metadata",
+                "technology": "Technology",
+                "browser": "Browser",
+                "session": "Session Details",
+                "duration": "Total Duration",
+                "started": "Started",
+                "id": "Internal ID",
+                "test_run": "Test Run",
+                "recruitment_token": "Recruitment Token",
+                "device": {
+                    "mobile": "Mobile",
+                    "tablet": "Tablet",
+                    "desktop": "Desktop"
+                }
+            },
+            "status": {
+                "completed": "Completed",
+                "discarded": "Discarded",
+                "in_progress": "In Progress"
             },
             "survey": {
                 "presort": "Pre-Sort Questions",
                 "postsort": "Post-Sort Questions",
+                "no_answers": "No answers recorded for this section.",
                 "categories": {
                     "identity": "Identity & Contact",
                     "questions": "Questionnaire Responses",

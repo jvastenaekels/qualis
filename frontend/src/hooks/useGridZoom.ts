@@ -159,6 +159,22 @@ export const useGridZoom = ({
         };
     }, [performAutoFit, width, height]);
 
+    // Handle container visibility/resize (important for Tab switching)
+    useEffect(() => {
+        if (!wrapperRef.current) return;
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+                    performAutoFit();
+                }
+            }
+        });
+
+        resizeObserver.observe(wrapperRef.current);
+        return () => resizeObserver.disconnect();
+    }, [performAutoFit, wrapperRef]);
+
     // Zonal Focus Logic (Anti-Bias: Sector Panning)
     // 2-step animation: First show entire pyramid, then zoom to zone
     useEffect(() => {

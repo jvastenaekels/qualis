@@ -28,12 +28,19 @@
         "cards": "énoncés",
         "close": "Fermer",
         "unknown_card": "Carte inconnue",
+        "unknown": "Inconnu",
+        "duration_short": "{{m}} min {{s}} s",
+        "duration_long": "{{h}} h {{m}} min {{s}} s",
         "optional": "Optionnel",
         "processing": "Traitement en cours...",
         "statement": "Énoncé",
         "step": "Étape",
         "slots": "emplacements",
         "workspace_label": "Esp. de travail",
+        "yes": "Oui",
+        "no": "Non",
+        "score": "Score",
+        "comment": "Commentaire",
         "errors": {
             "network": "Erreur de connexion réseau. Veuillez vérifier votre connexion internet.",
             "not_found": "Étude non trouvée.",
@@ -321,7 +328,9 @@
             "min_chars": "Quelques mots suffisent pour nous aider à comprendre le contexte.",
             "label_agree": "Le plus en accord",
             "label_disagree": "Le plus en désaccord",
-            "label_neutral": "Neutre"
+            "label_neutral": "Neutre",
+            "missing_statement": "Énoncé manquant",
+            "general_comment": "Commentaire général"
         },
         "optional": {
             "title": "Certains énoncés vous ont-ils semblé particulièrement surprenants, ambigus ou déroutants ? Si oui, pourquoi ?",
@@ -845,19 +854,22 @@
             }
         },
         "team": {
-            "title": "Équipe de recherche",
-            "description": "Gérez les collaborateurs et le contrôle d'accès de l'étude.",
+            "title": "Équipe de l'étude",
+            "description": "Gérez les collaborateurs et le contrôle d'accès au niveau de l'étude.",
             "invite_title": "Inviter un collaborateur",
             "invite_description": "Générez un lien sécurisé pour inviter un nouveau membre à cette étude.",
-            "email_label": "Adresse e-mail",
+            "email_label": "Adresse E-mail",
             "role_label": "Rôle",
-            "select_role": "Sélectionnez un rôle",
+            "select_role": "Sélectionner un rôle",
             "generate_link": "Générer le lien",
-            "share_label": "Partagez ce lien avec l'invité :",
-            "copy_success": "Lien copié dans le presse-papier",
             "invite_success": "Lien d'invitation généré !",
             "invite_error": "Échec de la génération de l'invitation",
-            "list_title": "Collaborateurs",
+            "copy_success": "Lien copié dans le presse-papiers",
+            "share_label": "Partagez ce lien avec l'invité :",
+            "collab_overview": "Aperçu de la collaboration",
+            "active_members": "Membres actifs",
+            "permissions_info": "Infos sur les permissions",
+            "list_title": "Équipe de recherche",
             "list_description": "Gérez l'accès des collaborateurs existants.",
             "added_on": "Ajouté le",
             "headers": {
@@ -1341,14 +1353,16 @@
                 "discarded": "rejeté"
             },
             "actions": {
-                "clear_test_runs": "Purger les tests",
-                "clear_test_runs_confirm": "Supprimer toutes les sessions de test ? Cette action est irréversible et réservée à la maintenance.",
-                "clear_test_runs_success": "Pipeline nettoyé : données de test purgées",
-                "clear_test_runs_error": "Échec système : impossible de purger les tests",
-                "clear_all_data": "Effacer toutes les données",
-                "clear_all_confirm": "Voulez-vous vraiment supprimer TOUTES les réponses pour cette étude ? Cela débloquera la structure de l'étude et vous permettra de modifier à nouveau la grille ou les codes des énoncés. Cette action est irréversible.",
-                "clear_all_success": "Toutes les participations ont été effacées !",
-                "clear_all_error": "Échec de la suppression des participations"
+                "discard": "Écarter",
+                "restore": "Restaurer",
+                "clear_test_runs": "Effacer les tests",
+                "clear_test_runs_confirm": "Êtes-vous sûr de vouloir supprimer tous les tests ? Cette action est irréversible.",
+                "clear_test_runs_success": "Tests effacés",
+                "clear_test_runs_error": "Erreur lors de l'effacement des tests",
+                "clear_all": "Réinitialiser toutes les données",
+                "clear_all_confirm": "DANGER : Cela supprimera définitivement TOUTES les données des participants pour cette étude. Cette action est irréversible.",
+                "clear_all_success": "Toutes les données ont été effacées",
+                "clear_all_error": "Erreur lors de l'effacement des données"
             },
             "guide": {
                 "title": "Guide des formats",
@@ -1366,37 +1380,22 @@
                 }
             },
             "table": {
-                "participant": "Identité participant",
-                "id_token": "ID / jeton",
-                "lang": "Localisation",
-                "flags": "Qualité de donnée",
+                "participant": "Participant",
+                "lang": "Lang.",
+                "status": "Statut",
+                "flags": "Indicateurs",
                 "duration": "Durée",
-                "actions": "Détails",
-                "submitted": "Soumis le",
-                "status": "État"
+                "submitted": "Soumis",
+                "actions": "Détails"
             },
             "tooltips": {
-                "suspect": "Suspect : Temps de complétion anormalement rapide",
-                "has_comments": "Contient des insights qualitatifs"
-            },
-            "filter": {
-                "show_discarded": "Inclure les enregistrements rejetés",
-                "all_states": "Tous les états",
-                "only_active": "Actifs uniquement",
-                "only_flagged": "Qualité signalée"
-            },
-            "search": {
-                "placeholder": "Chercher par ID ou jeton...",
-                "records_found": "enregistrements détectés",
-                "no_results": "Aucun enregistrement ne correspond à votre requête"
-            },
-            "errors": {
-                "load_failed": "Synchronisation interrompue. Vérifiez votre connexion."
+                "suspect": "Potentiellement suspect : durée de session < 2 minutes",
+                "has_comments": "Contient des commentaires du participant sur les cartes"
             },
             "detail": {
-                "title": "Vue de la participation",
+                "title": "Profil participant",
                 "session": "Session",
-                "discarded_badge": "Rejeté",
+                "discarded_badge": "Écarté",
                 "description": "Résultats complets du Q-Sort et métadonnées.",
                 "stats": {
                     "duration": "Durée totale",
@@ -1412,62 +1411,38 @@
                     "csv_note": "Réponses complètes disponibles dans l'export CSV."
                 }
             },
-            "team": {
-                "title": "Équipe de l'étude",
-                "description": "Gérez les collaborateurs et le contrôle d'accès au niveau de l'étude.",
-                "invite_title": "Inviter un collaborateur",
-                "invite_description": "Générez un lien sécurisé pour inviter un nouveau membre à cette étude.",
-                "email_label": "Adresse E-mail",
-                "role_label": "Rôle",
-                "select_role": "Sélectionner un rôle",
-                "generate_link": "Générer le lien",
-                "invite_success": "Lien d'invitation généré !",
-                "invite_error": "Échec de la génération de l'invitation",
-                "copy_success": "Lien copié dans le presse-papiers",
-                "share_label": "Partagez ce lien avec l'invité :",
-                "collab_overview": "Aperçu de la collaboration",
-                "active_members": "Membres actifs",
-                "permissions_info": "Infos sur les permissions",
-                "list_title": "Équipe de recherche",
-                "list_description": "Gérez l'accès des collaborateurs existants.",
-                "added_on": "Ajouté le",
-                "headers": {
-                    "collaborator": "Collaborateur",
-                    "role": "Rôle",
-                    "actions": "Actions"
-                },
-                "roles": {
-                    "owner": "Propriétaire (Contrôle total)",
-                    "editor": "Éditeur (Conception & Analyse)",
-                    "viewer": "Lecteur (Lecture seule)",
-                    "owner_badge": "PROPRIÉTAIRE",
-                    "editor_badge": "ÉDITEUR",
-                    "viewer_badge": "LECTEUR"
-                },
-                "permissions": {
-                    "owner": "Peut supprimer l'étude et gérer l'équipe.",
-                    "editor": "Peut modifier la conception et voir les résultats.",
-                    "viewer": "Accès en lecture seule à tous les modules."
-                }
+            "filter": {
+                "show_discarded": "Inclure les enregistrements rejetés",
+                "all_states": "Tous les états",
+                "only_active": "Actifs uniquement",
+                "only_flagged": "Qualité signalée"
             },
-            "empty_states": {
-                "participants": {
-                    "title": "Aucune réponse collectée pour le moment",
-                    "desc": "Les participants apparaîtront ici une fois qu'ils auront terminé l'étude.",
-                    "action": "Copier le lien de l'étude",
-                    "hint": "Ou scannez le code QR",
-                    "copy_success": "Lien de l'étude copié dans le presse-papiers !"
-                },
-                "team": {
-                    "title": "Aucun collaborateur identifié",
-                    "desc": "Invitez des collaborateurs pour aider à gérer cette étude. Ils peuvent consulter les données, modifier la conception ou simplement observer.",
-                    "action": "Ajouter un collaborateur"
-                },
-                "designer": {
-                    "title": "Configuration initiale (Vierge)",
-                    "desc": "Cette étude n'a pas encore de propositions. Ajoutez vos items de Q-set pour commencer la conception de votre tri.",
-                    "action": "Charger un exemple de Q-Set"
-                }
+            "search": {
+                "placeholder": "Chercher par ID ou jeton...",
+                "records_found": "enregistrements détectés",
+                "no_results": "Aucun enregistrement ne correspond à votre requête"
+            },
+            "errors": {
+                "load_failed": "Synchronisation interrompue. Vérifiez votre connexion."
+            }
+        },
+        "empty_states": {
+            "participants": {
+                "title": "Aucune réponse collectée pour le moment",
+                "desc": "Les participants apparaîtront ici une fois qu'ils auront terminé l'étude.",
+                "action": "Copier le lien de l'étude",
+                "hint": "Ou scannez le code QR",
+                "copy_success": "Lien de l'étude copié dans le presse-papiers !"
+            },
+            "team": {
+                "title": "Aucun collaborateur identifié",
+                "desc": "Invitez des collaborateurs pour aider à gérer cette étude. Ils peuvent consulter les données, modifier la conception ou simplement observer.",
+                "action": "Ajouter un collaborateur"
+            },
+            "designer": {
+                "title": "Configuration initiale (Vierge)",
+                "desc": "Cette étude n'a pas encore de propositions. Ajoutez vos items de Q-set pour commencer la conception de votre tri.",
+                "action": "Charger un exemple de Q-Set"
             }
         },
         "status": {
@@ -1619,11 +1594,30 @@
                 "score": "Score"
             },
             "metadata": {
-                "recruitment_token": "Jeton de recrutement"
+                "title": "Métadonnées de la session",
+                "technology": "Technologie",
+                "browser": "Navigateur",
+                "session": "Détails de la session",
+                "duration": "Durée totale",
+                "started": "Commencé",
+                "id": "ID interne",
+                "test_run": "Test",
+                "recruitment_token": "Jeton de recrutement",
+                "device": {
+                    "mobile": "Mobile",
+                    "tablet": "Tablette",
+                    "desktop": "Ordinateur"
+                }
+            },
+            "status": {
+                "completed": "Terminé",
+                "discarded": "Écarté",
+                "in_progress": "En cours"
             },
             "survey": {
                 "presort": "Questions Pré-Sort",
                 "postsort": "Questions Post-Sort",
+                "no_answers": "Aucune réponse enregistrée pour cette section.",
                 "categories": {
                     "identity": "Identité & Contact",
                     "questions": "Réponses au questionnaire",

@@ -24,6 +24,9 @@
         "cards": "väitettä",
         "close": "Sulje",
         "unknown_card": "Tuntematon kortti",
+        "unknown": "Tuntematon",
+        "duration_short": "{{m}} min {{s}} s",
+        "duration_long": "{{h}} t {{m}} min {{s}} s",
         "optional": "Valinnainen",
         "processing": "Käsitellään...",
         "statement": "Väite",
@@ -34,6 +37,10 @@
         "workspace_label": "Työtila",
         "reduce": "Vähennä",
         "expand": "Laajenna",
+        "yes": "Kyllä",
+        "no": "Ei",
+        "score": "Pisteet",
+        "comment": "Kommentti",
         "errors": {
             "network": "Verkkoyhteysvirhe. Tarkista internetyhteytesi.",
             "not_found": "Tutkimusta ei löytynyt.",
@@ -321,7 +328,9 @@
             "min_chars": "Muutama sana riittää auttamaan meitä ymmärtämään taustan.",
             "label_agree": "Vahvimmin samaa mieltä",
             "label_disagree": "Vahvin eri mieltä oleminen",
-            "label_neutral": "Neutraali"
+            "label_neutral": "Neutraali",
+            "missing_statement": "Puuttuva väite",
+            "general_comment": "Yleinen kommentti"
         },
         "optional": {
             "title": "Tuntuivatko jotkin väitteet erityisen yllättäviltä, epäselviltä tai hämmentäviltä? Jos kyllä, miksi?",
@@ -844,41 +853,6 @@
                 "manage": "Hallitse tilaa"
             }
         },
-        "team": {
-            "title": "Tutkimusryhmä",
-            "description": "Hallitse yhteistyökumppaneita ja tutkimustason pääsynhallintaa.",
-            "invite_title": "Kutsu yhteistyökumppani",
-            "invite_description": "Luo turvallinen linkki kutsuaksesi uuden jäsenen tähän tutkimukseen.",
-            "email_label": "Sähköpostiosoite",
-            "role_label": "Rooli",
-            "select_role": "Valitse rooli",
-            "generate_link": "Luo linkki",
-            "share_label": "Jaa tämä linkki kutsutun kanssa:",
-            "copy_success": "Linkki kopioitu leikepöydälle",
-            "invite_success": "Kutsulinkki luotu!",
-            "invite_error": "Kutsun luominen epäonnistui",
-            "list_title": "Yhteistyökumppanit",
-            "list_description": "Hallitse olemassa olevien yhteistyökumppaneiden pääsyä.",
-            "added_on": "Lisätty",
-            "headers": {
-                "collaborator": "Yhteistyökumppani",
-                "role": "Rooli",
-                "actions": "Toiminnot"
-            },
-            "roles": {
-                "owner": "Omistaja (täysi hallinta)",
-                "editor": "Muokkaaja (suunnittelu ja analyysi)",
-                "viewer": "Katselija (vain luku)",
-                "owner_badge": "OMISTAJA",
-                "editor_badge": "MUOKKAAJA",
-                "viewer_badge": "KATSELIJA"
-            },
-            "permissions": {
-                "owner": "Voi poistaa tutkimuksen ja hallita tiimiä.",
-                "editor": "Voi muokata suunnittelua ja tarkastella tuloksia.",
-                "viewer": "Vain luku -oikeus kaikkiin moduuleihin."
-            }
-        },
         "design": {
             "translation_needed": "Tarkistus vaaditaan (Kopio)",
             "translation_needed_desc": "Tämä sisältö on kopioitu automaattisesti toisesta kielestä. Tarkista ja lokalisoi se.",
@@ -1341,14 +1315,16 @@
                 "discarded": "hylätty"
             },
             "actions": {
-                "clear_test_runs": "Puhdista testitiedot",
-                "clear_test_runs_confirm": "Poistetaanko kaikki testi-istunnot? Tätä toimintoa ei voi peruuttaa.",
-                "clear_test_runs_success": "Testitiedot puhdistettu onnistuneesti",
-                "clear_test_runs_error": "Testitietojen puhdistus epäonnistui",
-                "clear_all_data": "Tyhjennä kaikki tiedot",
-                "clear_all_confirm": "Haluatko varmasti poistaa KAIKKI vastaukset tästä tutkimuksesta? Tämä avaa tutkimuksen rakenteen ja mahdollistaa ruudukon tai väittämien koodien muokkaamisen uudelleen. Tätä toimintoa ei voi peruuttaa.",
-                "clear_all_success": "Kaikki vastaukset tyhjennetty onnistuneesti!",
-                "clear_all_error": "Vastausten tyhjennys epäonnistui"
+                "discard": "Hylkää",
+                "restore": "Palauta",
+                "clear_test_runs": "Poista testiajot",
+                "clear_test_runs_confirm": "Oletko varma, että haluat poistaa kaikki testivastaukset? Tätä ei voi peruuttaa.",
+                "clear_test_runs_success": "Testiajot poistettu",
+                "clear_test_runs_error": "Testiajoja ei voitu poistaa",
+                "clear_all": "Nollaa kaikki tiedot",
+                "clear_all_confirm": "VAARA: Tämä poistaa pysyvästi KAIKKI tämän tutkimuksen osallistujatiedot. Tätä ei voi peruuttaa.",
+                "clear_all_success": "Kaikki tiedot poistettu",
+                "clear_all_error": "Tietojen poistaminen epäonnistui"
             },
             "guide": {
                 "title": "Muoto-opas",
@@ -1366,32 +1342,17 @@
                 }
             },
             "table": {
-                "participant": "Osallistujan identiteetti",
-                "id_token": "ID / Tunniste",
+                "participant": "Osallistuja",
                 "lang": "Kieli",
-                "flags": "Tiedon laatu",
-                "duration": "Kesto / Vaiva",
-                "actions": "Tiedot",
+                "status": "Tila",
+                "flags": "Liput",
+                "duration": "Kesto",
                 "submitted": "Lähetetty",
-                "status": "Tila"
+                "actions": "Tiedot"
             },
             "tooltips": {
-                "suspect": "Epäilyttävä (Nopea suoritus)",
-                "has_comments": "Sisältää laadullisia kommentteja"
-            },
-            "filter": {
-                "show_discarded": "Näytä hylätyt tietueet",
-                "all_states": "Kaikki tilat",
-                "only_active": "Vain aktiiviset",
-                "only_flagged": "Merkitty laatu"
-            },
-            "search": {
-                "placeholder": "Hae ID:llä...",
-                "records_found": "tulosta löytyi",
-                "no_results": "Ei tuloksia"
-            },
-            "errors": {
-                "load_failed": "Tietojen lataus epäonnistui. Päivitä sivu."
+                "suspect": "Mahdollisesti epäilyttävä: istunnon kesto < 2 minuuttia",
+                "has_comments": "Sisältää osallistujan kommentteja korteista"
             },
             "detail": {
                 "title": "Osallistujan profiili",
@@ -1412,62 +1373,76 @@
                     "csv_note": "Täydelliset vastaukset saatavilla CSV-viennissä."
                 }
             },
-            "team": {
-                "title": "Tutkimustiimi",
-                "description": "Hallitse yhteistyökumppaneita ja tutkimustason pääsynhallintaa.",
-                "invite_title": "Kutsu yhteistyökumppani",
-                "invite_description": "Luo turvallinen linkki uuden jäsenen kutsumiseksi tähän tutkimukseen.",
-                "email_label": "Sähköpostiosoite",
-                "role_label": "Rooli",
-                "select_role": "Valitse rooli",
-                "generate_link": "Luo linkki",
-                "invite_success": "Kutsulinkki luotu!",
-                "invite_error": "Kutsun luominen epäonnistui",
-                "copy_success": "Linkki kopioitu leikepöydälle",
-                "share_label": "Jaa tämä linkki kutsuttavan kanssa:",
-                "collab_overview": "Yhteistyön yleiskatsaus",
-                "active_members": "Aktiiviset jäsenet",
-                "permissions_info": "Lupatiedot",
-                "list_title": "Tutkimustiimi",
-                "list_description": "Hallitse olemassa olevien yhteistyökumppaneiden pääsyä.",
-                "added_on": "Lisätty",
-                "headers": {
-                    "collaborator": "Yhteistyökumppani",
-                    "role": "Rooli",
-                    "actions": "Toiminnot"
-                },
-                "roles": {
-                    "owner": "Omistaja (Täydet oikeudet)",
-                    "editor": "Muokkaja (Suunnittelu ja analyysi)",
-                    "viewer": "Katsoja (Vain luku)",
-                    "owner_badge": "OMISTAJA",
-                    "editor_badge": "MUOKKAAJA",
-                    "viewer_badge": "KATSOJA"
-                },
-                "permissions": {
-                    "owner": "Voi poistaa tutkimuksen ja hallinnoida tiimiä.",
-                    "editor": "Voi muokata suunnitelmaa ja tarkastella tuloksia.",
-                    "viewer": "Vain luku -pääsy kaikkiin moduuleihin."
-                }
+            "filter": {
+                "show_discarded": "Näytä hylätyt tietueet",
+                "all_states": "Kaikki tilat",
+                "only_active": "Vain aktiiviset",
+                "only_flagged": "Merkitty laatu"
             },
-            "empty_states": {
-                "participants": {
-                    "title": "Valmiina julkaisuun?",
-                    "desc": "Jaa tutkimuslinkkisi aloittaaksesi vastausten keräämisen. Ensimmäinen osallistuja on vain klikkauksen päässä.",
-                    "action": "Kopioi tutkimuslinkki",
-                    "hint": "Tai skannaa QR-koodi",
-                    "copy_success": "Tutkimuslinkki kopioitu leikepöydälle!"
-                },
-                "team": {
-                    "title": "Työskentelet yksin",
-                    "desc": "Kutsu yhteistyökumppaneita auttamaan tämän tutkimuksen hallinnassa. He voivat tarkastella tietoja, muokata suunnitelmaa tai vain seurata.",
-                    "action": "Kutsu ensimmäinen yhteistyökumppanisi"
-                },
-                "designer": {
-                    "title": "Tabula Rasa",
-                    "desc": "Tässä tutkimuksessa ei ole vielä väitteitä. Lisää Q-set-kohtia aloittaaksesi lajittelun suunnittelun.",
-                    "action": "Lataa esimerkki Q-Set"
-                }
+            "search": {
+                "placeholder": "Hae ID:llä tai tunnisteella...",
+                "records_found": "tulosta löytyi",
+                "no_results": "Ei tuloksia"
+            },
+            "errors": {
+                "load_failed": "Tietojen lataus epäonnistui. Päivitä sivu."
+            }
+        },
+        "team": {
+            "title": "Tutkimustiimi",
+            "description": "Hallitse yhteistyökumppaneita ja tutkimustason pääsynhallintaa.",
+            "invite_title": "Kutsu yhteistyökumppani",
+            "invite_description": "Luo turvallinen linkki uuden jäsenen kutsumiseksi tähän tutkimukseen.",
+            "email_label": "Sähköpostiosoite",
+            "role_label": "Rooli",
+            "select_role": "Valitse rooli",
+            "generate_link": "Luo linkki",
+            "invite_success": "Kutsulinkki luotu!",
+            "invite_error": "Kutsun luominen epäonnistui",
+            "copy_success": "Linkki kopioitu leikepöydälle",
+            "share_label": "Jaa tämä linkki kutsuttavan kanssa:",
+            "collab_overview": "Yhteistyön yleiskatsaus",
+            "active_members": "Aktiiviset jäsenet",
+            "permissions_info": "Lupatiedot",
+            "list_title": "Tutkimustiimi",
+            "list_description": "Hallitse olemassa olevien yhteistyökumppaneiden pääsyä.",
+            "added_on": "Lisätty",
+            "headers": {
+                "collaborator": "Yhteistyökumppani",
+                "role": "Rooli",
+                "actions": "Toiminnot"
+            },
+            "roles": {
+                "owner": "Omistaja (Täydet oikeudet)",
+                "editor": "Muokkaja (Suunnittelu ja analyysi)",
+                "viewer": "Katsoja (Vain luku)",
+                "owner_badge": "OMISTAJA",
+                "editor_badge": "MUOKKAAJA",
+                "viewer_badge": "KATSOJA"
+            },
+            "permissions": {
+                "owner": "Voi poistaa tutkimuksen ja hallinnoida tiimiä.",
+                "editor": "Voi muokata suunnitelmaa ja tarkastella tuloksia.",
+                "viewer": "Vain luku -pääsy kaikkiin moduuleihin."
+            }
+        },
+        "empty_states": {
+            "participants": {
+                "title": "Valmiina julkaisuun?",
+                "desc": "Jaa tutkimuslinkkisi aloittaaksesi vastausten keräämisen. Ensimmäinen osallistuja on vain klikkauksen päässä.",
+                "action": "Kopioi tutkimuslinkki",
+                "hint": "Tai skannaa QR-koodi",
+                "copy_success": "Tutkimuslinkki kopioitu leikepöydälle!"
+            },
+            "team": {
+                "title": "Työskentelet yksin",
+                "desc": "Kutsu yhteistyökumppaneita auttamaan tämän tutkimuksen hallinnassa. He voivat tarkastella tietoja, muokata suunnitelmaa tai vain seurata.",
+                "action": "Kutsu ensimmäinen yhteistyökumppanisi"
+            },
+            "designer": {
+                "title": "Tabula Rasa",
+                "desc": "Tässä tutkimuksessa ei ole vielä väitteitä. Lisää Q-set-kohtia aloittaaksesi lajittelun suunnittelun.",
+                "action": "Lataa esimerkki Q-Set"
             }
         },
         "status": {
@@ -1613,11 +1588,30 @@
                 "select_instruction": "Valitse kortti nähdäksesi tiedot"
             },
             "metadata": {
-                "recruitment_token": "Rekrytointitunnus"
+                "title": "Istunnon metatiedot",
+                "technology": "Teknologia",
+                "browser": "Selain",
+                "session": "Istunnon tiedot",
+                "duration": "Kokonaiskesto",
+                "started": "Aloitettu",
+                "id": "Sisäinen ID",
+                "test_run": "Testiajo",
+                "recruitment_token": "Rekrytointitunnus",
+                "device": {
+                    "mobile": "Mobiili",
+                    "tablet": "Tabletti",
+                    "desktop": "Työpöytä"
+                }
+            },
+            "status": {
+                "completed": "Valmis",
+                "discarded": "Hylätty",
+                "in_progress": "Käynnissä"
             },
             "survey": {
                 "postsort": "Jälkilajittelu",
                 "presort": "Esilajittelu",
+                "no_answers": "Tähän osioon ei ole kirjattu vastauksia.",
                 "categories": {
                     "identity": "Henkilö- ja yhteystiedot",
                     "questions": "Kyselyvastaukset",

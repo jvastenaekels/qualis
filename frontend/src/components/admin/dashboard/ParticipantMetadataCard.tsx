@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
+import { enUS, fr, fi } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 interface ParticipantMetadataCardProps {
@@ -39,8 +40,16 @@ export function ParticipantMetadataCard({
     onToggleDiscard,
     isDiscardPending,
 }: ParticipantMetadataCardProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const uaInfo = parseUA(participant.user_agent || '');
+
+    // biome-ignore lint/suspicious/noExplicitAny: library locale types are complex
+    const dateLocales: Record<string, any> = {
+        en: enUS,
+        fr: fr,
+        fi: fi,
+    };
+    const currentLocale = dateLocales[i18n.language] || enUS;
 
     const DeviceIcon = {
         mobile: Smartphone,
@@ -123,13 +132,17 @@ export function ParticipantMetadataCard({
                             </div>
                             <div>
                                 <p className="text-xs font-black text-slate-900 leading-none">
-                                    {uaInfo.os}
+                                    {uaInfo.os === 'Unknown'
+                                        ? t('common.unknown', 'Unknown')
+                                        : uaInfo.os}
                                 </p>
                                 <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
-                                    {t(
-                                        `admin.participant.metadata.device.${uaInfo.device}`,
-                                        uaInfo.device
-                                    )}
+                                    {uaInfo.device === 'desktop' &&
+                                        t('admin.participant.metadata.device.desktop', 'Desktop')}
+                                    {uaInfo.device === 'mobile' &&
+                                        t('admin.participant.metadata.device.mobile', 'Mobile')}
+                                    {uaInfo.device === 'tablet' &&
+                                        t('admin.participant.metadata.device.tablet', 'Tablet')}
                                 </p>
                             </div>
                         </div>
@@ -139,7 +152,9 @@ export function ParticipantMetadataCard({
                             </div>
                             <div>
                                 <p className="text-xs font-black text-slate-900 leading-none">
-                                    {uaInfo.browser}
+                                    {uaInfo.browser === 'Unknown'
+                                        ? t('common.unknown', 'Unknown')
+                                        : uaInfo.browser}
                                 </p>
                                 <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
                                     {t('admin.participant.metadata.browser', 'Browser')}
@@ -160,7 +175,20 @@ export function ParticipantMetadataCard({
                             <div>
                                 <p className="text-xs font-black text-slate-900 leading-none">
                                     {participant.duration_seconds
-                                        ? `${Math.floor(participant.duration_seconds / 60)}m ${participant.duration_seconds % 60}s`
+                                        ? participant.duration_seconds >= 3600
+                                            ? t('common.duration_long', '{{h}}h {{m}}m {{s}}s', {
+                                                  h: Math.floor(
+                                                      participant.duration_seconds / 3600
+                                                  ),
+                                                  m: Math.floor(
+                                                      (participant.duration_seconds % 3600) / 60
+                                                  ),
+                                                  s: participant.duration_seconds % 60,
+                                              })
+                                            : t('common.duration_short', '{{m}}m {{s}}s', {
+                                                  m: Math.floor(participant.duration_seconds / 60),
+                                                  s: participant.duration_seconds % 60,
+                                              })
                                         : '---'}
                                 </p>
                                 <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
@@ -176,6 +204,7 @@ export function ParticipantMetadataCard({
                                 <p className="text-xs font-black text-slate-900 leading-none">
                                     {formatDistanceToNow(new Date(participant.created_at), {
                                         addSuffix: true,
+                                        locale: currentLocale,
                                     })}
                                 </p>
                                 <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
