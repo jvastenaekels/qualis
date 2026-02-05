@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import {
@@ -11,15 +10,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Plus, Languages, AlertCircle } from 'lucide-react';
+import { Check, Plus, Languages } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { SUPPORTED_LANGUAGES, type Language } from '@/constants/languages';
 
 interface LanguageManagerModalProps {
@@ -30,8 +22,6 @@ interface LanguageManagerModalProps {
 const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) => {
     const { t } = useTranslation();
     const { draft, original, updateDraft } = useStudyDesigner();
-    const [isActivating, setIsActivating] = useState<string | null>(null);
-    const [sourceLang, setSourceLang] = useState<string>('en');
 
     if (!draft) return null;
 
@@ -89,51 +79,36 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
             return;
         }
 
-        setIsActivating(langCode);
-        // Default source language to English or the first active language
-        setSourceLang(activeLanguageCodes.includes('en') ? 'en' : activeLanguageCodes[0] || 'en');
-    };
-
-    const confirmActivation = () => {
-        if (!isActivating) return;
-
         updateDraft((d) => {
-            // 1. Find source translation
-            const sourceTrans = d.translations?.find((t) => t.language_code === sourceLang);
+            // 1. Create a minimal translation object if it doesn't exist
+            // (Note: updateDraft already runs normalizeStudyData which ensures translations exist)
+            // But we want to explicitly add it here if it's missing from the array
+            const exists = d.translations?.some((t) => t.language_code === langCode);
+            if (!exists) {
+                d.translations?.push({
+                    language_code: langCode,
+                    title: '',
+                    subtitle: '',
+                    description: '',
+                    instructions: '',
+                    condition_of_instruction: '',
+                    // biome-ignore lint/suspicious/noExplicitAny: explicit bypass for draft update
+                } as any);
+            }
 
-            // 2. Create new translation
-            const newTrans = {
-                ...(sourceTrans || {}),
-                language_code: isActivating,
-                // Add a marker that it's a copy
-                _is_copy: true,
-                title: sourceTrans?.title ? `${sourceTrans.title} [COPY]` : '',
-            };
-            // biome-ignore lint/suspicious/noExplicitAny: translation type mismatch
-            d.translations?.push(newTrans as any);
-
-            // 3. Update statements
+            // 2. Initialize statement translations if missing
             if (d.statements) {
                 for (const s of d.statements) {
-                    const sSourceTrans = s.translations?.find(
-                        (st) => st.language_code === sourceLang
-                    );
-                    if (sSourceTrans) {
+                    const hasTrans = s.translations?.some((st) => st.language_code === langCode);
+                    if (!hasTrans) {
                         s.translations?.push({
-                            language_code: isActivating,
-                            text: sSourceTrans.text,
-                        });
-                    } else {
-                        s.translations?.push({
-                            language_code: isActivating,
+                            language_code: langCode,
                             text: '',
                         });
                     }
                 }
             }
         });
-
-        setIsActivating(null);
     };
 
     const handleDeactivate = (langCode: string) => {
@@ -235,79 +210,6 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
                     </Button>
                 </DialogFooter>
             </DialogContent>
-
-            {/* Activation Sub-Modal (Langue Source) */}
-            <Dialog open={!!isActivating} onOpenChange={() => setIsActivating(null)}>
-                <DialogContent className="sm:max-w-[400px]">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-2 font-black">
-                            <Plus className="h-5 w-5 text-indigo-600" />
-                            {t('admin.design.languages.activate_title', 'Activate Language')}
-                        </DialogTitle>
-                        <DialogDescription>
-                            {t(
-                                'admin.design.languages.activate_desc',
-                                'Choose a source language to copy translations from. This prevents empty fields for participants.'
-                            )}
-                        </DialogDescription>
-                    </DialogHeader>
-
-                    <div className="py-4 space-y-4">
-                        <div className="space-y-2">
-                            <label
-                                htmlFor="source-lang-select"
-                                className="text-xs font-bold uppercase text-slate-500 tracking-wider"
-                            >
-                                {t('admin.design.languages.source_label', 'Source Language')}
-                            </label>
-                            <Select value={sourceLang} onValueChange={setSourceLang}>
-                                <SelectTrigger
-                                    id="source-lang-select"
-                                    className="w-full bg-slate-50 border-slate-200 font-medium"
-                                >
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {activeLanguageCodes.map((code) => (
-                                        <SelectItem key={code} value={code}>
-                                            <span className="flex items-center gap-2">
-                                                {
-                                                    SUPPORTED_LANGUAGES.find((l) => l.code === code)
-                                                        ?.flag
-                                                }{' '}
-                                                {SUPPORTED_LANGUAGES.find((l) => l.code === code)
-                                                    ?.label || code}
-                                            </span>
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg flex items-start gap-2">
-                            <AlertCircle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                            <p className="text-[11px] text-amber-800 leading-relaxed">
-                                {t(
-                                    'admin.design.languages.copy_notice',
-                                    'All fields will be copied. You will see a visual indicator on fields that still need your translation.'
-                                )}
-                            </p>
-                        </div>
-                    </div>
-
-                    <DialogFooter>
-                        <Button variant="ghost" onClick={() => setIsActivating(null)}>
-                            {t('common.cancel')}
-                        </Button>
-                        <Button
-                            className="bg-indigo-600 hover:bg-indigo-700 font-bold"
-                            onClick={confirmActivation}
-                        >
-                            {t('admin.design.languages.confirm_activate', 'Activate & Copy')}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
         </Dialog>
     );
 };

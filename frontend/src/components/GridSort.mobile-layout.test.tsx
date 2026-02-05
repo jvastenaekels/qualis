@@ -35,11 +35,13 @@ interface SortableCardProps {
     // Add any other props SortableCard might receive
 }
 
-const MockSortableCard = vi.fn(({ aspectRatio, ...rest }: SortableCardProps) => (
-    <div data-testid={rest['data-testid'] || 'mock-card'} data-aspect={aspectRatio} {...rest}>
-        Card
-    </div>
-));
+const MockSortableCard = vi.fn(
+    ({ aspectRatio, isSelected, onAction, disableHoverZoom, ...rest }: SortableCardProps) => (
+        <div data-testid={rest['data-testid'] || 'mock-card'} data-aspect={aspectRatio} {...rest}>
+            Card
+        </div>
+    )
+);
 vi.mock('./SortableCard', () => ({
     default: (props: SortableCardProps) => <MockSortableCard {...props} />,
 }));

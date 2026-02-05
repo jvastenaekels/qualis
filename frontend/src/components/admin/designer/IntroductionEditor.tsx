@@ -18,6 +18,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { SUPPORTED_LANGUAGES, type Language } from '@/constants/languages';
+import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 
 const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { t } = useTranslation();
@@ -120,9 +121,21 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                         <div className="grid gap-2.5">
                             <Label
                                 htmlFor="title"
-                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-2"
                             >
                                 {t('admin.design.intro.fields.title')}
+                                <MultiLangFieldIcon
+                                    activeLocale={activeLocale}
+                                    translations={
+                                        draft.translations?.reduce(
+                                            (acc, tr) => {
+                                                if (tr.title) acc[tr.language_code] = tr.title;
+                                                return acc;
+                                            },
+                                            {} as Record<string, string>
+                                        ) || {}
+                                    }
+                                />
                             </Label>
                             <Input
                                 id="title"
@@ -138,9 +151,22 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                         <div className="grid gap-2.5">
                             <Label
                                 htmlFor="subtitle"
-                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-2"
                             >
                                 {t('admin.design.intro.fields.subtitle')}
+                                <MultiLangFieldIcon
+                                    activeLocale={activeLocale}
+                                    translations={
+                                        draft.translations?.reduce(
+                                            (acc, tr) => {
+                                                if (tr.subtitle)
+                                                    acc[tr.language_code] = tr.subtitle;
+                                                return acc;
+                                            },
+                                            {} as Record<string, string>
+                                        ) || {}
+                                    }
+                                />
                             </Label>
                             <Input
                                 id="subtitle"
@@ -153,16 +179,31 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 disabled={readOnly}
                             />
                         </div>
-                        <div className="grid gap-2.5">
-                            <MarkdownEditor
-                                id="objective"
-                                label={t('admin.design.intro.fields.objective')}
-                                value={translation?.objective || ''}
-                                onChange={(val: string) => handleChange('objective', val)}
-                                placeholder={t('admin.design.intro.fields.objective_placeholder')}
-                                readOnly={readOnly}
+                        <div className="flex items-center gap-2 mb-2">
+                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                {t('admin.design.intro.fields.objective')}
+                            </Label>
+                            <MultiLangFieldIcon
+                                activeLocale={activeLocale}
+                                translations={
+                                    draft.translations?.reduce(
+                                        (acc, tr) => {
+                                            if (tr.objective) acc[tr.language_code] = tr.objective;
+                                            return acc;
+                                        },
+                                        {} as Record<string, string>
+                                    ) || {}
+                                }
                             />
                         </div>
+                        <MarkdownEditor
+                            id="objective"
+                            label=""
+                            value={translation?.objective || ''}
+                            onChange={(val: string) => handleChange('objective', val)}
+                            placeholder={t('admin.design.intro.fields.objective_placeholder')}
+                            readOnly={readOnly}
+                        />
                     </CardContent>
                 </Card>
             </section>
@@ -180,9 +221,24 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     <CardContent className="pt-6">
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                    {t('admin.design.intro.fields.task_overview')}
-                                </Label>
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        {t('admin.design.intro.fields.task_overview')}
+                                    </Label>
+                                    <MultiLangFieldIcon
+                                        activeLocale={activeLocale}
+                                        translations={
+                                            draft.translations?.reduce(
+                                                (acc, tr) => {
+                                                    if (tr.instructions)
+                                                        acc[tr.language_code] = tr.instructions;
+                                                    return acc;
+                                                },
+                                                {} as Record<string, string>
+                                            ) || {}
+                                        }
+                                    />
+                                </div>
                                 {!readOnly && (
                                     <button
                                         type="button"
@@ -250,9 +306,22 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                         <div className="grid gap-2.5">
                             <Label
                                 htmlFor="consent-title"
-                                className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-2"
                             >
                                 {t('admin.design.intro.fields.consent_title_label')}
+                                <MultiLangFieldIcon
+                                    activeLocale={activeLocale}
+                                    translations={
+                                        draft.translations?.reduce(
+                                            (acc, tr) => {
+                                                if (tr.consent_title)
+                                                    acc[tr.language_code] = tr.consent_title;
+                                                return acc;
+                                            },
+                                            {} as Record<string, string>
+                                        ) || {}
+                                    }
+                                />
                             </Label>
                             <Input
                                 id="consent-title"
@@ -264,16 +333,32 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 disabled={readOnly}
                             />
                         </div>
-                        <div className="grid gap-2.5">
-                            <MarkdownEditor
-                                id="consent-description"
-                                label={t('admin.design.intro.fields.legal_text')}
-                                value={translation?.consent_description || ''}
-                                onChange={(val: string) => handleChange('consent_description', val)}
-                                placeholder={t('admin.design.intro.fields.legal_placeholder')}
-                                readOnly={readOnly}
+                        <div className="flex items-center gap-2 mb-2">
+                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                {t('admin.design.intro.fields.legal_text')}
+                            </Label>
+                            <MultiLangFieldIcon
+                                activeLocale={activeLocale}
+                                translations={
+                                    draft.translations?.reduce(
+                                        (acc, tr) => {
+                                            if (tr.consent_description)
+                                                acc[tr.language_code] = tr.consent_description;
+                                            return acc;
+                                        },
+                                        {} as Record<string, string>
+                                    ) || {}
+                                }
                             />
                         </div>
+                        <MarkdownEditor
+                            id="consent-description"
+                            label=""
+                            value={translation?.consent_description || ''}
+                            onChange={(val: string) => handleChange('consent_description', val)}
+                            placeholder={t('admin.design.intro.fields.legal_placeholder')}
+                            readOnly={readOnly}
+                        />
                     </CardContent>
                 </Card>
             </section>

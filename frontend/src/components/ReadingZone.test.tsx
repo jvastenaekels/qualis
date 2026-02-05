@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { act, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import ReadingZone from './ReadingZone';
 

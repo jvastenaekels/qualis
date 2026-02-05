@@ -25,6 +25,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Switch } from '@/components/ui/switch';
 import { useTranslation } from 'react-i18next';
+import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 
 import type { StatementRead, StatementTranslationRead, GridColumn } from '@/api/model';
 
@@ -766,9 +767,15 @@ const QSortEditor = ({
                                             className="w-16 h-8 text-[10px] font-black font-mono text-center p-0 rounded-lg border-indigo-200 focus:ring-indigo-500/20"
                                         />
                                     ) : (
-                                        <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg min-w-[36px] text-center font-mono border border-indigo-100">
-                                            {item.code}
-                                        </span>
+                                        <div className="flex items-center gap-1">
+                                            <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg min-w-[36px] text-center font-mono border border-indigo-100">
+                                                {item.code}
+                                            </span>
+                                            <MultiLangFieldIcon
+                                                activeLocale={activeLocale}
+                                                translations={statements[idx].translations || []}
+                                            />
+                                        </div>
                                     )}
 
                                     {isEditing ? (

@@ -67,6 +67,7 @@ describe('PreSortPage', () => {
         renderWithProviders(
             <Routes>
                 <Route path="/study/:slug/presort" element={<PreSortPage />} />
+                <Route path="/study/:slug/rough-sort" element={<div>Rough Sort Page</div>} />
             </Routes>,
             { initialEntries: ['/study/test/presort'] }
         );

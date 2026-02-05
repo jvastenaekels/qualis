@@ -18,6 +18,7 @@ import {
 import QuestionBuilder from './QuestionBuilder';
 
 import { useTranslation } from 'react-i18next';
+import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 
 const PostSortConfigEditor = ({
     readOnly,
@@ -254,12 +255,22 @@ const PostSortConfigEditor = ({
 
                             {positiveColumns.length > 0 && (
                                 <div className="pt-6 border-t border-slate-100 space-y-4">
-                                    <Label
-                                        htmlFor="extreme-prompt-positive"
-                                        className="text-[10px] font-black uppercase tracking-wider text-green-700"
-                                    >
-                                        {t('admin.design.postsort.extreme.prompt_label')} (+)
-                                    </Label>
+                                    <div className="flex items-center gap-2">
+                                        <Label
+                                            htmlFor="extreme-prompt-positive"
+                                            className="text-[10px] font-black uppercase tracking-wider text-green-700"
+                                        >
+                                            {t('admin.design.postsort.extreme.prompt_label')} (+)
+                                        </Label>
+                                        <MultiLangFieldIcon
+                                            activeLocale={activeLocale}
+                                            translations={
+                                                typeof prompts.extreme_positive === 'object'
+                                                    ? prompts.extreme_positive
+                                                    : { en: prompts.extreme_positive || '' }
+                                            }
+                                        />
+                                    </div>
                                     <Textarea
                                         id="extreme-prompt-positive"
                                         value={
@@ -282,12 +293,22 @@ const PostSortConfigEditor = ({
 
                             {neutralColumns.length > 0 && (
                                 <div className="pt-6 border-t border-slate-100 space-y-4">
-                                    <Label
-                                        htmlFor="extreme-prompt-neutral"
-                                        className="text-[10px] font-black uppercase tracking-wider text-slate-600"
-                                    >
-                                        {t('admin.design.postsort.extreme.prompt_label')} (0)
-                                    </Label>
+                                    <div className="flex items-center gap-2">
+                                        <Label
+                                            htmlFor="extreme-prompt-neutral"
+                                            className="text-[10px] font-black uppercase tracking-wider text-slate-600"
+                                        >
+                                            {t('admin.design.postsort.extreme.prompt_label')} (0)
+                                        </Label>
+                                        <MultiLangFieldIcon
+                                            activeLocale={activeLocale}
+                                            translations={
+                                                typeof prompts.extreme_neutral === 'object'
+                                                    ? prompts.extreme_neutral
+                                                    : { en: prompts.extreme_neutral || '' }
+                                            }
+                                        />
+                                    </div>
                                     <Textarea
                                         id="extreme-prompt-neutral"
                                         value={
@@ -310,12 +331,22 @@ const PostSortConfigEditor = ({
 
                             {negativeColumns.length > 0 && (
                                 <div className="pt-6 border-t border-slate-100 space-y-4">
-                                    <Label
-                                        htmlFor="extreme-prompt-negative"
-                                        className="text-[10px] font-black uppercase tracking-wider text-red-700"
-                                    >
-                                        {t('admin.design.postsort.extreme.prompt_label')} (-)
-                                    </Label>
+                                    <div className="flex items-center gap-2">
+                                        <Label
+                                            htmlFor="extreme-prompt-negative"
+                                            className="text-[10px] font-black uppercase tracking-wider text-red-700"
+                                        >
+                                            {t('admin.design.postsort.extreme.prompt_label')} (-)
+                                        </Label>
+                                        <MultiLangFieldIcon
+                                            activeLocale={activeLocale}
+                                            translations={
+                                                typeof prompts.extreme_negative === 'object'
+                                                    ? prompts.extreme_negative
+                                                    : { en: prompts.extreme_negative || '' }
+                                            }
+                                        />
+                                    </div>
                                     <Textarea
                                         id="extreme-prompt-negative"
                                         value={
@@ -364,12 +395,22 @@ const PostSortConfigEditor = ({
                         {allowRandomComments && (
                             <CardContent className="pt-0">
                                 <div className="space-y-4">
-                                    <Label
-                                        htmlFor="random-comments-prompt"
-                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
-                                    >
-                                        {t('admin.design.postsort.missing.prompt_label')}
-                                    </Label>
+                                    <div className="flex items-center gap-2">
+                                        <Label
+                                            htmlFor="random-comments-prompt"
+                                            className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                        >
+                                            {t('admin.design.postsort.missing.prompt_label')}
+                                        </Label>
+                                        <MultiLangFieldIcon
+                                            activeLocale={activeLocale}
+                                            translations={
+                                                typeof prompts.random_comments_label === 'object'
+                                                    ? prompts.random_comments_label
+                                                    : { en: prompts.random_comments_label || '' }
+                                            }
+                                        />
+                                    </div>
                                     <Textarea
                                         id="random-comments-prompt"
                                         value={
@@ -414,12 +455,22 @@ const PostSortConfigEditor = ({
                         {allowMissingStatements && (
                             <CardContent className="pt-0">
                                 <div className="space-y-4">
-                                    <Label
-                                        htmlFor="missing-prompt"
-                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
-                                    >
-                                        {t('admin.design.postsort.missing.prompt_label')}
-                                    </Label>
+                                    <div className="flex items-center gap-2">
+                                        <Label
+                                            htmlFor="missing-prompt"
+                                            className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                        >
+                                            {t('admin.design.postsort.missing.prompt_label')}
+                                        </Label>
+                                        <MultiLangFieldIcon
+                                            activeLocale={activeLocale}
+                                            translations={
+                                                typeof prompts.missing_statements_label === 'object'
+                                                    ? prompts.missing_statements_label
+                                                    : { en: prompts.missing_statements_label || '' }
+                                            }
+                                        />
+                                    </div>
                                     <Textarea
                                         id="missing-prompt"
                                         value={

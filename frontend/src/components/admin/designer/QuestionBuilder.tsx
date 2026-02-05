@@ -46,6 +46,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
+import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 import {
     Select,
     SelectContent,
@@ -313,9 +314,19 @@ const QuestionItem = ({
 
                             <AccordionContent className="pt-6 pb-2 space-y-6">
                                 <div className="grid gap-2.5">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
-                                        {t('admin.design.questions.labels.question')}
-                                    </Label>
+                                    <div className="flex items-center gap-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                            {t('admin.design.questions.labels.question')}
+                                        </Label>
+                                        <MultiLangFieldIcon
+                                            activeLocale={activeLocale}
+                                            translations={
+                                                typeof question.label === 'object'
+                                                    ? question.label
+                                                    : { en: question.label || '' }
+                                            }
+                                        />
+                                    </div>
                                     <Input
                                         value={label}
                                         readOnly={readOnly}
@@ -549,55 +560,64 @@ const QuestionItem = ({
                                                     className="flex gap-3 items-center group/opt"
                                                 >
                                                     <div className="size-1.5 rounded-full bg-slate-300 group-hover/opt:bg-indigo-400 transition-colors" />
-                                                    <Input
-                                                        className={cn(
-                                                            'h-10 text-sm font-medium rounded-xl border-slate-200 focus:border-indigo-500 transition-all bg-white',
-                                                            readOnly &&
-                                                                'cursor-not-allowed opacity-70'
-                                                        )}
-                                                        value={
-                                                            typeof opt === 'string'
-                                                                ? opt
-                                                                : opt.label?.[activeLocale] ||
-                                                                  opt.label?.en ||
-                                                                  ''
-                                                        }
-                                                        readOnly={readOnly}
-                                                        onChange={(
-                                                            e: React.ChangeEvent<HTMLInputElement>
-                                                        ) => {
-                                                            if (readOnly) return;
-                                                            const newOpts = [
-                                                                ...(question.options || []),
-                                                            ];
-                                                            if (typeof opt === 'string') {
-                                                                // Convert to dictionary format to avoid syncing across languages
-                                                                newOpts[idx] = {
-                                                                    label: {
-                                                                        en: opt,
-                                                                        [activeLocale]:
-                                                                            e.target.value,
-                                                                    },
-                                                                    value: opt, // Preserve original value
-                                                                };
-                                                            } else {
-                                                                newOpts[idx] = {
-                                                                    ...opt,
-                                                                    label: {
-                                                                        ...opt.label,
-                                                                        [activeLocale]:
-                                                                            e.target.value,
-                                                                    },
-                                                                    value:
-                                                                        opt.value || e.target.value,
-                                                                };
+                                                    <div className="flex-1 flex items-center gap-2">
+                                                        <Input
+                                                            className={cn(
+                                                                'h-10 text-sm font-medium rounded-xl border-slate-200 focus:border-indigo-500 transition-all bg-white',
+                                                                readOnly &&
+                                                                    'cursor-not-allowed opacity-70'
+                                                            )}
+                                                            value={
+                                                                typeof opt === 'string'
+                                                                    ? opt
+                                                                    : opt.label?.[activeLocale] ||
+                                                                      opt.label?.en ||
+                                                                      ''
                                                             }
-                                                            onUpdate({
-                                                                ...question,
-                                                                options: newOpts,
-                                                            });
-                                                        }}
-                                                    />
+                                                            readOnly={readOnly}
+                                                            onChange={(
+                                                                e: React.ChangeEvent<HTMLInputElement>
+                                                            ) => {
+                                                                if (readOnly) return;
+                                                                const newOpts = [
+                                                                    ...(question.options || []),
+                                                                ];
+                                                                if (typeof opt === 'string') {
+                                                                    // Convert to dictionary format to avoid syncing across languages
+                                                                    newOpts[idx] = {
+                                                                        label: {
+                                                                            en: opt,
+                                                                            [activeLocale]:
+                                                                                e.target.value,
+                                                                        },
+                                                                        value: opt, // Preserve original value
+                                                                    };
+                                                                } else {
+                                                                    newOpts[idx] = {
+                                                                        ...opt,
+                                                                        label: {
+                                                                            ...opt.label,
+                                                                            [activeLocale]:
+                                                                                e.target.value,
+                                                                        },
+                                                                        value:
+                                                                            opt.value ||
+                                                                            e.target.value,
+                                                                    };
+                                                                }
+                                                                onUpdate({
+                                                                    ...question,
+                                                                    options: newOpts,
+                                                                });
+                                                            }}
+                                                        />
+                                                        {typeof opt !== 'string' && (
+                                                            <MultiLangFieldIcon
+                                                                activeLocale={activeLocale}
+                                                                translations={opt.label}
+                                                            />
+                                                        )}
+                                                    </div>
                                                     {!readOnly && (
                                                         <Button
                                                             variant="ghost"

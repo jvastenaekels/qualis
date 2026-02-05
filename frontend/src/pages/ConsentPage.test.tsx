@@ -12,9 +12,19 @@ import { useSessionStore } from '../store/useSessionStore';
 import { renderWithProviders } from '../test-utils/test-utils';
 import ConsentPage from './ConsentPage';
 
+vi.mock('../api/generated', () => ({
+    useRecordConsentApiStudySlugConsentPost: () => ({
+        mutateAsync: vi.fn().mockResolvedValue({}),
+    }),
+}));
+
 vi.mock('react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => key,
+        i18n: {
+            language: 'en',
+            changeLanguage: vi.fn(),
+        },
     }),
     I18nextProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));

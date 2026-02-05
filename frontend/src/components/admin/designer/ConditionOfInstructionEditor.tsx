@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Target, RotateCcw } from 'lucide-react';
 import type React from 'react';
 import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
+import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 
 const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { t } = useTranslation();
@@ -54,15 +55,30 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     <CardContent className="space-y-6">
                         <div className="grid gap-3">
                             <div className="flex items-center justify-between">
-                                <Label
-                                    htmlFor="pre_instruction"
-                                    className="text-[10px] font-black uppercase tracking-wider text-slate-500"
-                                >
-                                    {t(
-                                        'admin.design.condition.pre_field_label',
-                                        'Instruction Text'
-                                    )}
-                                </Label>
+                                <div className="flex items-center gap-2">
+                                    <Label
+                                        htmlFor="pre_instruction"
+                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                    >
+                                        {t(
+                                            'admin.design.condition.pre_field_label',
+                                            'Instruction Text'
+                                        )}
+                                    </Label>
+                                    <MultiLangFieldIcon
+                                        activeLocale={activeLocale}
+                                        translations={
+                                            draft.translations?.reduce(
+                                                (acc, tr) => {
+                                                    if (tr.pre_instruction)
+                                                        acc[tr.language_code] = tr.pre_instruction;
+                                                    return acc;
+                                                },
+                                                {} as Record<string, string>
+                                            ) || {}
+                                        }
+                                    />
+                                </div>
                                 {!readOnly && (
                                     <button
                                         type="button"
@@ -109,12 +125,31 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     <CardContent className="space-y-6">
                         <div className="grid gap-3">
                             <div className="flex items-center justify-between">
-                                <Label
-                                    htmlFor="condition_of_instruction"
-                                    className="text-[10px] font-black uppercase tracking-wider text-slate-500"
-                                >
-                                    {t('admin.design.condition.field_label', 'Instruction Text')}
-                                </Label>
+                                <div className="flex items-center gap-2">
+                                    <Label
+                                        htmlFor="condition_of_instruction"
+                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                    >
+                                        {t(
+                                            'admin.design.condition.field_label',
+                                            'Instruction Text'
+                                        )}
+                                    </Label>
+                                    <MultiLangFieldIcon
+                                        activeLocale={activeLocale}
+                                        translations={
+                                            draft.translations?.reduce(
+                                                (acc, tr) => {
+                                                    if (tr.condition_of_instruction)
+                                                        acc[tr.language_code] =
+                                                            tr.condition_of_instruction;
+                                                    return acc;
+                                                },
+                                                {} as Record<string, string>
+                                            ) || {}
+                                        }
+                                    />
+                                </div>
                                 {!readOnly && (
                                     <button
                                         type="button"

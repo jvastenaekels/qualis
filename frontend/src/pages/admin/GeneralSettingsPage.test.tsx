@@ -30,6 +30,7 @@ vi.mock('react-router-dom', async () => {
         ...actual,
         useLoaderData: vi.fn(),
         useNavigate: () => mockNavigate,
+        useParams: vi.fn(),
     };
 });
 
@@ -47,6 +48,10 @@ describe('GeneralSettingsPage', () => {
         vi.mocked(router.useLoaderData).mockReturnValue({
             study: mockStudy,
             slug: 'test-study',
+        });
+        vi.mocked(router.useParams).mockReturnValue({
+            workspaceSlug: 'test-workspace',
+            studySlug: 'test-study',
         });
 
         useAuthStore.setState({
@@ -116,7 +121,7 @@ describe('GeneralSettingsPage', () => {
         });
 
         // Should navigate to new slug
-        expect(mockNavigate).toHaveBeenCalledWith('/admin/studies/new-slug/settings');
+        expect(mockNavigate).toHaveBeenCalledWith('/app/test-workspace/studies/new-slug/settings');
     });
 
     it('allows archiving the study', async () => {
