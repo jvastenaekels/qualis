@@ -151,7 +151,7 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, dict[str, Any]] = {
                 "why": "This preparatory step is designed to reduce cognitive load; it allows you to familiarize yourself with the full range of the topic (the Q-set) before the more demanding task of comparative ranking begins.",
             },
             "fine": {
-                "what": "Place the statements onto the grid structure, moving from the extremes toward the center.",
+                "what": "Place the statements on the grid by ranking them relative to one another, from those you most agree with (to the right) to those you most disagree with (to the left). Starting with the extremes might help you in this task.",
                 "why": "The grid's structure imposes a 'forced distribution' that prevents you from rating everything as equally important; it compels you to make trade-offs, thereby modelling the relative significance of each idea in your specific belief system.",
             },
             "post": {

@@ -147,7 +147,7 @@
                 "why": "Tämä valmisteleva vaihe on suunniteltu vähentämään kognitiivista kuormitusta; sen avulla voit tutustua aihepiiriin kokonaisuudessaan ennen vaativampaa vertailevaa järjestämistä."
             },
             "step_fine": {
-                "what": "Asettele väittämät ruudukkoon siirtymällä ääripäistä kohti keskustaa.",
+                "what": "Asettele väittämät ruudukkoon järjestämällä ne suhteessa toisiinsa: oikealle ne, joista olet eniten samaa mieltä, ja vasemmalle ne, joista olet eniten eri mieltä. Ääripäistä aloittaminen voi helpottaa tehtävää.",
                 "why": "Ruudukon rakenne asettaa 'pakotetun jakauman', joka estää pitämästä kaikkia asioita yhtä tärkeinä; se pakottaa tekemään arvovalintoja, mikä mallintaa kunkin idean suhteellista merkitystä ajattelussasi."
             },
             "step_post": {
@@ -305,7 +305,7 @@
             "active_card": "Aktiivinen väite",
             "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
             "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
-            "initial_instruction": "Vedä tai napauta väitettä",
+            "initial_instruction": "Napauta (tai vedä) väitettä",
             "help": "Miten tämä toimii?",
             "methodology": {
                 "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",

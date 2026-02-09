@@ -147,7 +147,7 @@
                 "why": "Cette étape préparatoire vise à réduire la charge cognitive ; elle vous permet de vous familiariser avec l'ensemble du sujet avant d'entamer la tâche plus exigeante du classement comparatif."
             },
             "step_fine": {
-                "what": "Placez les énoncés sur la grille, en allant des extrêmes vers le centre.",
+                "what": "Placez les énoncés sur la grille en les classant les uns par rapport aux autres, de ceux avec lesquels vous êtes le plus d'accord (à droite) à ceux avec lesquels vous êtes le moins d'accord (à gauche). Commencer par les extrêmes peut vous aider dans cette tâche.",
                 "why": "La structure de la grille impose une « distribution forcée » qui vous empêche de tout noter au même niveau ; elle vous oblige à faire des arbitrages, modélisant ainsi l'importance relative de chaque idée dans votre système de pensée."
             },
             "step_post": {
@@ -305,7 +305,7 @@
             "active_card": "Énoncé actif",
             "place_on_grid": "Touchez un emplacement sur la grille pour placer l'énoncé",
             "drag_or_tap": "Glissez ou touchez une case",
-            "initial_instruction": "Glissez ou touchez un énoncé",
+            "initial_instruction": "Touchez (ou glissez) un énoncé",
             "help": "Comment faire ?",
             "methodology": {
                 "extremes": "Astuce : commencez par ce qui est le plus évident pour vous (les extrêmes).",
