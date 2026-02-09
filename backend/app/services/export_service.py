@@ -502,6 +502,13 @@ class ExportService:
     @staticmethod
     def _generate_r_script(study: Study) -> str:
         """Generates a dynamic R script for qmethod package."""
+        # Calculate actual metadata column count
+        presort_fields = study.presort_config or {}
+        n_presort = len(presort_fields)
+        n_fixed_meta = 11  # Participant_UID through Is_Test_Run
+        n_meta = n_fixed_meta + n_presort
+        n_items = len(study.statements)
+
         return f"""# Libre-Q Automatic Analysis Script
 # Required: install.packages("qmethod")
 
@@ -511,20 +518,34 @@ library(qmethod)
 data <- read.csv("q_data.csv", check.names = FALSE)
 
 # 2. Extract Q-Sorts
-# (Assuming statement codes start at column 7)
-n_meta <- 6
-n_items <- {len(study.statements)}
-q_sorts <- data[, (n_meta + 1):(n_meta + n_items)]
+# CSV Structure: {n_meta} metadata columns ({n_fixed_meta} fixed + {n_presort} presort)
+# Each statement has 5 columns: score, comment, audio_url, audio_duration, audio_size
+# We extract only the score columns (every 5th column starting from first statement)
+
+n_meta <- {n_meta}
+n_items <- {n_items}
+
+# Extract only score columns: S1, S2, S3, ... (skipping comments and audio metadata)
+score_cols <- seq(n_meta + 1, n_meta + (n_items * 5), by = 5)
+q_sorts <- data[, score_cols]
+
+# Set row names to participant UIDs
 rownames(q_sorts) <- data$Participant_UID
-colnames(q_sorts) <- colnames(data)[(n_meta + 1):(n_meta + n_items)]
+
+# Set column names to statement codes
+statement_cols <- colnames(data)[score_cols]
+colnames(q_sorts) <- statement_cols
 
 # 3. Basic Analysis
+# Extract 3 factors using varimax rotation (adjust nfactors as needed)
 results <- qmethod(q_sorts, nfactors = 3, rotation = "varimax")
 
 # 4. View Summary
 summary(results)
 plot(results)
 
-# Export results to CSV
-# write.csv(results$qsorts, "factor_scores.csv")
+# 5. Export Results (uncomment to save)
+# write.csv(results$zsc, "factor_z_scores.csv")
+# write.csv(results$f_char$characteristics, "factor_characteristics.csv")
+# write.csv(results$loa, "factor_loadings.csv")
 """

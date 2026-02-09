@@ -367,6 +367,87 @@ class TestExports:
         assert response.status_code == 200
         assert "application/zip" in response.headers["content-type"]
 
+    async def test_rkit_export_column_offset(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        workspace_factory,
+        study_factory,
+        auth_token_factory,
+        db,
+    ):
+        """Test that R-Kit export generates correct column offset in R script."""
+        # 1. Setup Study with multiple presort questions
+        ws = await workspace_factory(owner=test_user)
+        study = await study_factory(workspace=ws, owner=test_user)
+
+        # Add presort config with 3 questions
+        study.presort_config = {
+            "age": {"type": "number", "label": {"en": "Age"}, "required": True},
+            "gender": {"type": "select", "options": [], "label": {"en": "Gender"}},
+            "education": {
+                "type": "select",
+                "options": [],
+                "label": {"en": "Education"},
+            },
+        }
+        db.add(study)
+        await db.commit()
+        await db.refresh(study)
+
+        # Add statements
+        from app.models import Statement, StatementTranslation
+
+        s1 = Statement(study_id=study.id, code="S1")
+        s2 = Statement(study_id=study.id, code="S2")
+        db.add_all([s1, s2])
+        await db.flush()
+
+        db.add_all(
+            [
+                StatementTranslation(
+                    statement_id=s1.id, language_code="en", text="Statement 1"
+                ),
+                StatementTranslation(
+                    statement_id=s2.id, language_code="en", text="Statement 2"
+                ),
+            ]
+        )
+        await db.commit()
+
+        headers = auth_token_factory(test_user)
+
+        # 2. Export R-Kit
+        response = await client.get(
+            f"/api/admin/studies/{study.slug}/export/r-kit", headers=headers
+        )
+        assert response.status_code == 200
+        assert "application/zip" in response.headers["content-type"]
+
+        # 3. Extract and verify R script
+        import zipfile
+        from io import BytesIO
+
+        zip_content = BytesIO(response.content)
+        with zipfile.ZipFile(zip_content, "r") as z:
+            r_script = z.read("analysis.R").decode("utf-8")
+
+            # Verify dynamic column offset calculation
+            # Should be: 11 fixed metadata + 3 presort = 14
+            assert (
+                "n_meta <- 14" in r_script
+            ), "Column offset should be 14 (11 fixed + 3 presort)"
+
+            # Verify it extracts only score columns (every 5th)
+            assert "seq(n_meta + 1, n_meta + (n_items * 5), by = 5)" in r_script
+
+            # Verify number of items is correct
+            assert "n_items <- 2" in r_script
+
+            # Verify it includes helpful comments
+            assert "CSV Structure" in r_script
+            assert "score columns" in r_script
+
     async def test_export_unauthorized(
         self, client: AsyncClient, user_factory, seed_study: Study, auth_token_factory
     ):

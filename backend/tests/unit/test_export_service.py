@@ -39,6 +39,7 @@ class MockQSortEntry:
     def __init__(self, statement_id: int, grid_score: int):
         self.statement_id = statement_id
         self.grid_score = grid_score
+        self.card_comment = None  # Optional card comment
 
 
 class MockParticipant:
@@ -59,6 +60,7 @@ class MockParticipant:
         self.presort_answers: dict[str, Any] = {}
         self.postsort_answers: dict[str, Any] = {}
         self.qsort_entries = entries
+        self.audio_recordings: list[Any] = []
 
 
 class MockStudy:
