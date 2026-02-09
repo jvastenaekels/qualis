@@ -49,6 +49,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
     const animationFrameRef = useRef<number | null>(null);
+    const permissionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const [audioLevels, setAudioLevels] = useState<number[]>([0, 0, 0, 0, 0]);
     const [urlExpiresAt, setUrlExpiresAt] = useState<number | null>(null);
@@ -162,6 +163,8 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     useEffect(() => {
         return () => {
             if (timerRef.current) clearInterval(timerRef.current);
+            if (permissionCheckIntervalRef.current)
+                clearInterval(permissionCheckIntervalRef.current);
             if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
             if (audioContextRef.current?.state !== 'closed') {
                 audioContextRef.current?.close();
@@ -250,8 +253,34 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 }
             };
 
+            // Handle MediaRecorder errors (e.g., codec issues, stream failures)
+            mediaRecorder.onerror = (event) => {
+                console.error('MediaRecorder error:', event);
+                toast.error(t('audio.recording_error', 'Recording error - please try again'));
+                stopRecording();
+            };
+
             mediaRecorder.onstop = async () => {
                 const blob = new Blob(audioChunksRef.current, { type: mimeType });
+
+                // Validate blob before upload (prevent corrupt/empty audio)
+                if (blob.size === 0 || blob.size < 100) {
+                    console.error('Audio blob is empty or too small:', blob.size, 'bytes');
+                    toast.error(
+                        t('audio.invalid_recording', 'Recording failed - no audio data captured')
+                    );
+                    setState('idle');
+                    setAudioUrl(null);
+                    setDuration(0);
+
+                    // Stop all tracks
+                    stream.getTracks().forEach((track) => {
+                        track.stop();
+                    });
+                    streamRef.current = null;
+                    return; // Don't upload
+                }
+
                 setAudioBlob(blob);
 
                 const url = URL.createObjectURL(blob);
@@ -285,6 +314,44 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             setState('recording');
             setDuration(0);
 
+            // Monitor stream tracks for ended event (permission revoked or mic disconnected)
+            stream.getTracks().forEach((track) => {
+                track.onended = () => {
+                    console.warn('Microphone track ended - permission may have been revoked');
+                    toast.error(
+                        t('audio.permission_revoked', 'Microphone access lost - recording stopped')
+                    );
+                    stopRecording();
+                };
+            });
+
+            // Periodic permission check (Permissions API)
+            // Check every 2 seconds during recording
+            if ('permissions' in navigator) {
+                permissionCheckIntervalRef.current = setInterval(async () => {
+                    try {
+                        const permissionStatus = await navigator.permissions.query({
+                            name: 'microphone' as PermissionName,
+                        });
+
+                        if (permissionStatus.state === 'denied') {
+                            console.warn('Microphone permission was revoked during recording');
+                            toast.error(
+                                t(
+                                    'audio.permission_revoked',
+                                    'Microphone access lost - recording stopped'
+                                )
+                            );
+                            stopRecording();
+                        }
+                    } catch (error) {
+                        // Permissions API not supported in some browsers (Safari)
+                        // Rely on track.onended handler instead
+                        console.debug('Permissions API check failed:', error);
+                    }
+                }, 2000);
+            }
+
             // Start timer
             timerRef.current = setInterval(() => {
                 setDuration((prev) => {
@@ -310,6 +377,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             if (timerRef.current) {
                 clearInterval(timerRef.current);
                 timerRef.current = null;
+            }
+            if (permissionCheckIntervalRef.current) {
+                clearInterval(permissionCheckIntervalRef.current);
+                permissionCheckIntervalRef.current = null;
             }
             if (animationFrameRef.current) {
                 cancelAnimationFrame(animationFrameRef.current);
