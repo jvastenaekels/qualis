@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, Square, Play, Pause, Trash2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -16,8 +16,10 @@ interface AudioRecorderProps {
         presigned_url: string;
         duration_seconds: number;
         file_size_bytes: number;
+        created_at: string;
     } | null;
     disabled?: boolean;
+    sessionToken?: string; // For refreshing presigned URLs
 }
 
 type RecorderState = 'idle' | 'recording' | 'stopped' | 'playing' | 'uploading';
@@ -29,6 +31,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     onRecordingDeleted,
     existingRecording,
     disabled = false,
+    sessionToken,
 }) => {
     const { t } = useTranslation();
 
@@ -47,6 +50,35 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const animationFrameRef = useRef<number | null>(null);
 
     const [audioLevels, setAudioLevels] = useState<number[]>([0, 0, 0, 0, 0]);
+    const [urlExpiresAt, setUrlExpiresAt] = useState<number | null>(null);
+
+    // Function to refresh presigned URL (must be defined before useEffect)
+    const refreshPresignedUrl = useCallback(async () => {
+        if (!existingRecording || !sessionToken) return;
+
+        try {
+            // Import the API function dynamically to avoid circular dependencies
+            const { getAudioUrlApiAudioRecordingIdUrlGet } = await import('@/api/generated');
+
+            const response = await getAudioUrlApiAudioRecordingIdUrlGet(existingRecording.id, {
+                session_token: sessionToken,
+            });
+
+            if (response.presigned_url) {
+                setAudioUrl(response.presigned_url);
+
+                // Update expiration time
+                const now = Date.now();
+                const newExpiresAt = now + 3600 * 1000; // 1 hour from now
+                setUrlExpiresAt(newExpiresAt);
+
+                console.log('Presigned URL refreshed successfully');
+            }
+        } catch (error) {
+            console.error('Failed to refresh presigned URL:', error);
+            // Don't show error toast - it's a background operation
+        }
+    }, [existingRecording, sessionToken]);
 
     // Initialize with existing recording
     useEffect(() => {
@@ -54,8 +86,36 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             setAudioUrl(existingRecording.presigned_url);
             setDuration(Math.round(existingRecording.duration_seconds));
             setState('stopped');
+
+            // Calculate expiration time (presigned URLs are valid for 1 hour)
+            const createdAt = new Date(existingRecording.created_at).getTime();
+            const expiresAt = createdAt + 3600 * 1000; // 1 hour from creation
+            setUrlExpiresAt(expiresAt);
         }
     }, [existingRecording]);
+
+    // Check URL expiration and refresh if needed
+    useEffect(() => {
+        if (!existingRecording || !urlExpiresAt || state !== 'stopped') return;
+
+        const checkExpiration = () => {
+            const now = Date.now();
+            const timeUntilExpiry = urlExpiresAt - now;
+
+            // Refresh URL if it expires in less than 5 minutes (buffer time)
+            if (timeUntilExpiry < 5 * 60 * 1000 && timeUntilExpiry > 0) {
+                refreshPresignedUrl();
+            }
+        };
+
+        // Check immediately
+        checkExpiration();
+
+        // Check every minute
+        const interval = setInterval(checkExpiration, 60 * 1000);
+
+        return () => clearInterval(interval);
+    }, [existingRecording, urlExpiresAt, state, refreshPresignedUrl]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -75,6 +135,36 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             }
         };
     }, [audioUrl, existingRecording]);
+
+    // Keyboard shortcuts
+    useEffect(() => {
+        if (disabled) return;
+
+        const handleKeyDown = (event: KeyboardEvent) => {
+            // Only handle if Space is pressed and not in an input field
+            if (
+                event.code === 'Space' &&
+                event.target instanceof HTMLElement &&
+                !['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)
+            ) {
+                event.preventDefault();
+
+                if (state === 'idle') {
+                    startRecording();
+                } else if (state === 'recording') {
+                    stopRecording();
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+        // Functions intentionally use closure over current state
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [state, disabled]);
 
     const startRecording = async () => {
         try {
@@ -125,20 +215,22 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 const url = URL.createObjectURL(blob);
                 setAudioUrl(url);
 
-                setState('uploading');
+                // Immediately transition to stopped state (don't block UI)
+                setState('stopped');
 
-                // Upload to backend
-                try {
-                    await onRecordingComplete(blob, duration);
-                    setState('stopped');
-                    toast.success(t('audio.upload_success', 'Audio uploaded successfully'));
-                } catch (error) {
-                    console.error('Upload failed:', error);
-                    toast.error(t('audio.upload_failed', 'Upload failed'));
-                    setState('idle');
-                    setAudioUrl(null);
-                    setDuration(0);
-                }
+                // Upload in background
+                onRecordingComplete(blob, duration)
+                    .then(() => {
+                        toast.success(t('audio.upload_success', 'Audio uploaded successfully'));
+                    })
+                    .catch((error) => {
+                        console.error('Upload failed:', error);
+                        toast.error(t('audio.upload_failed', 'Upload failed'));
+                        // Revert state on failure
+                        setState('idle');
+                        setAudioUrl(null);
+                        setDuration(0);
+                    });
 
                 // Stop all tracks
                 stream.getTracks().forEach((track) => {

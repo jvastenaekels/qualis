@@ -503,6 +503,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                             existingRecording={getAudioRecording(
                                                 `card_${card.statementId}`
                                             )}
+                                            sessionToken={token || undefined}
                                         />
                                     </TabsContent>
                                 </Tabs>
@@ -724,6 +725,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                                     await handleAudioDelete(`card_${id}`);
                                                 }}
                                                 existingRecording={getAudioRecording(`card_${id}`)}
+                                                sessionToken={token || undefined}
                                             />
                                         </TabsContent>
                                     </Tabs>
@@ -839,6 +841,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         await handleAudioDelete('missing_statement');
                                     }}
                                     existingRecording={getAudioRecording('missing_statement')}
+                                    sessionToken={token || undefined}
                                 />
                             </TabsContent>
                         </Tabs>
