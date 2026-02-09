@@ -66,20 +66,10 @@ export const useSubmitStudy = () => {
                 };
 
                 if (isTestMode) {
-                    // Send to backend anyway but with is_test_run: true
-                    const data = await submitStudyMutation({
-                        data: { ...payload, is_test_run: true },
-                    });
-
+                    // Pilot mode: skip backend entirely — no data stored
                     if (status === 'completed') {
                         setIsSuccess(true);
-                        // biome-ignore lint/suspicious/noExplicitAny: API types
-                        const responseData = data as any;
-                        const code =
-                            responseData?.confirmation_code ||
-                            responseData?.data?.confirmation_code ||
-                            `PILOT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-
+                        const code = `PILOT-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
                         setConfirmationCode(code);
                         session.completeSession(code);
                     }

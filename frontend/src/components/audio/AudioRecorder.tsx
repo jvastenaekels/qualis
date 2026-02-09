@@ -1,6 +1,6 @@
 import type React from 'react';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Mic, Square, Play, Pause, Trash2, Loader2 } from 'lucide-react';
+import { Mic, Square, Play, Pause, Trash2, Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
@@ -21,6 +21,9 @@ interface AudioRecorderProps {
     } | null;
     disabled?: boolean;
     sessionToken?: string; // For refreshing presigned URLs
+    onError?: (
+        type: 'mic_denied' | 'mic_revoked' | 'recorder_error' | 'empty_blob' | 'unsupported'
+    ) => void;
 }
 
 type RecorderState = 'idle' | 'recording' | 'stopped' | 'playing' | 'uploading';
@@ -33,6 +36,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     existingRecording,
     disabled = false,
     sessionToken,
+    onError,
 }) => {
     const { t } = useTranslation();
 
@@ -53,6 +57,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const [audioLevels, setAudioLevels] = useState<number[]>([0, 0, 0, 0, 0]);
     const [urlExpiresAt, setUrlExpiresAt] = useState<number | null>(null);
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
+    const [playbackPosition, setPlaybackPosition] = useState(0);
+    const [uploadFailed, setUploadFailed] = useState(false);
+    const pendingBlobRef = useRef<Blob | null>(null);
 
     // Function to refresh presigned URL (must be defined before useEffect)
     const refreshPresignedUrl = useCallback(async () => {
@@ -210,6 +217,15 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     }, [state, disabled]);
 
     const startRecording = async () => {
+        // Check browser support before attempting anything
+        if (typeof MediaRecorder === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+            toast.error(
+                t('audio.unsupported', 'Audio recording is not supported in this browser.')
+            );
+            onError?.('unsupported');
+            return;
+        }
+
         try {
             // Request microphone permission
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -253,20 +269,42 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
             // Handle MediaRecorder errors (e.g., codec issues, stream failures)
             mediaRecorder.onerror = (event) => {
-                console.error('MediaRecorder error:', event);
-                toast.error(t('audio.recording_error', 'Recording error - please try again'));
+                const mediaError = (event as { error?: DOMException }).error;
+                const errorName = mediaError?.name || 'unknown';
+                console.error('MediaRecorder error:', errorName, mediaError);
+
+                let message: string;
+                switch (errorName) {
+                    case 'SecurityError':
+                        message = t(
+                            'audio.error.security',
+                            'Recording blocked by browser security settings'
+                        );
+                        break;
+                    case 'InvalidStateError':
+                        message = t(
+                            'audio.error.invalid_state',
+                            'Recording encountered an internal error'
+                        );
+                        break;
+                    default:
+                        message = t('audio.recording_error', 'Recording error - please try again');
+                }
+                toast.error(message);
+                onError?.('recorder_error');
                 stopRecording();
             };
 
             mediaRecorder.onstop = async () => {
                 const blob = new Blob(audioChunksRef.current, { type: mimeType });
 
-                // Validate blob before upload (prevent corrupt/empty audio)
-                if (blob.size === 0 || blob.size < 100) {
-                    console.error('Audio blob is empty or too small:', blob.size, 'bytes');
+                // Validate blob before upload (prevent empty audio)
+                if (blob.size === 0) {
+                    console.error('Audio blob is empty:', blob.size, 'bytes');
                     toast.error(
                         t('audio.invalid_recording', 'Recording failed - no audio data captured')
                     );
+                    onError?.('empty_blob');
                     setState('idle');
                     setAudioUrl(null);
                     setDuration(0);
@@ -281,6 +319,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
                 const url = URL.createObjectURL(blob);
                 setAudioUrl(url);
+                pendingBlobRef.current = blob;
 
                 // Immediately transition to stopped state (don't block UI)
                 setState('stopped');
@@ -288,15 +327,20 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 // Upload in background
                 onRecordingComplete(blob, duration)
                     .then(() => {
-                        toast.success(t('audio.upload_success', 'Audio uploaded successfully'));
+                        // Upload succeeded — clear pending blob
+                        pendingBlobRef.current = null;
+                        setUploadFailed(false);
                     })
                     .catch((error) => {
                         console.error('Upload failed:', error);
-                        toast.error(t('audio.upload_failed', 'Upload failed'));
-                        // Revert state on failure
-                        setState('idle');
-                        setAudioUrl(null);
-                        setDuration(0);
+                        // Only show generic toast if parent didn't already show a specific one
+                        // (ApiError instances with status >= 400 are handled by the parent)
+                        if (!error?.status) {
+                            toast.error(t('audio.upload_failed', 'Upload failed'));
+                        }
+                        // Keep blob URL and duration for retry — don't revert to idle
+                        setState('stopped');
+                        setUploadFailed(true);
                     });
 
                 // Stop all tracks
@@ -309,6 +353,8 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             mediaRecorder.start();
             setState('recording');
             setDuration(0);
+            setUploadFailed(false);
+            pendingBlobRef.current = null;
 
             // Monitor stream tracks for ended event (permission revoked or mic disconnected)
             stream.getTracks().forEach((track) => {
@@ -317,6 +363,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     toast.error(
                         t('audio.permission_revoked', 'Microphone access lost - recording stopped')
                     );
+                    onError?.('mic_revoked');
                     stopRecording();
                 };
             });
@@ -363,7 +410,13 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             }, 1000);
         } catch (error) {
             console.error('Microphone access denied:', error);
-            toast.error(t('audio.permission_denied', 'Microphone permission denied'));
+            toast.error(
+                t(
+                    'audio.permission_denied_with_guidance',
+                    'Microphone permission denied. Check your browser settings to allow microphone access, then try again.'
+                )
+            );
+            onError?.('mic_denied');
         }
     };
 
@@ -465,6 +518,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         audio.onended = () => {
             setState('stopped');
             setAudioLevels([0, 0, 0, 0, 0]);
+            setPlaybackPosition(0);
 
             // Cleanup Web Audio API
             if (animationFrameRef.current) {
@@ -475,6 +529,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 audioContextRef.current.close();
                 audioContextRef.current = null;
             }
+        };
+
+        audio.ontimeupdate = () => {
+            setPlaybackPosition(audio.currentTime);
         };
 
         audio.play();
@@ -499,6 +557,24 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         }
     };
 
+    const retryUpload = async () => {
+        if (!pendingBlobRef.current) return;
+        setUploadFailed(false);
+        setState('uploading');
+        try {
+            await onRecordingComplete(pendingBlobRef.current, duration);
+            pendingBlobRef.current = null;
+            toast.success(t('audio.upload_success', 'Audio uploaded successfully'));
+        } catch (error) {
+            console.error('Retry upload failed:', error);
+            if (!(error as { status?: number })?.status) {
+                toast.error(t('audio.upload_failed', 'Upload failed'));
+            }
+            setState('stopped');
+            setUploadFailed(true);
+        }
+    };
+
     const deleteRecording = async () => {
         if (timerRef.current) clearInterval(timerRef.current);
         if (animationFrameRef.current) {
@@ -509,6 +585,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             audioContextRef.current.close();
             audioContextRef.current = null;
         }
+
+        // Save state for restoration on failure
+        const savedAudioUrl = audioUrl;
+        const savedDuration = duration;
 
         setState('uploading');
 
@@ -523,11 +603,16 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             setDuration(0);
             setAudioLevels([0, 0, 0, 0, 0]);
             setState('idle');
+            setUploadFailed(false);
+            pendingBlobRef.current = null;
 
             toast.success(t('audio.deleted', 'Audio deleted'));
         } catch (error) {
             console.error('Delete failed:', error);
             toast.error(t('audio.delete_failed', 'Delete failed'));
+            // Restore previous state
+            setAudioUrl(savedAudioUrl);
+            setDuration(savedDuration);
             setState('stopped');
         }
     };
@@ -551,7 +636,13 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                             </span>
                         )}
                         <span
-                            className={`text-sm font-medium ${state === 'recording' ? 'text-red-600' : 'text-slate-700'}`}
+                            className={`text-sm font-medium ${
+                                state === 'recording' && maxDurationSeconds - duration <= 15
+                                    ? 'text-amber-600 animate-pulse'
+                                    : state === 'recording'
+                                      ? 'text-red-600'
+                                      : 'text-slate-700'
+                            }`}
                         >
                             {state === 'recording' && t('audio.recording', 'Recording...')}
                             {state === 'stopped' && t('audio.recorded', 'Recorded')}
@@ -560,25 +651,55 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                             {state === 'idle' && t('audio.ready', 'Ready to record')}
                         </span>
                     </div>
-                    <span className="text-sm font-mono text-slate-600">
-                        {formatTime(duration)} / {formatTime(maxDurationSeconds)}
+                    <span
+                        className={`text-sm font-mono ${
+                            state === 'recording' && maxDurationSeconds - duration <= 15
+                                ? 'text-amber-600 font-bold'
+                                : 'text-slate-600'
+                        }`}
+                    >
+                        {state === 'playing'
+                            ? `${formatTime(Math.floor(playbackPosition))} / ${formatTime(duration)}`
+                            : `${formatTime(duration)} / ${formatTime(maxDurationSeconds)}`}
                     </span>
                 </div>
 
                 {/* Waveform Visualization during recording and playback */}
                 {state === 'recording' || state === 'playing' ? (
-                    <div className="flex items-center justify-center gap-1 h-12 bg-slate-100 rounded-md">
-                        {audioLevels.map((level, i) => (
-                            <div
-                                key={i}
-                                className={`w-1.5 rounded-full transition-all duration-100 ${
-                                    state === 'recording' ? 'bg-red-500' : 'bg-blue-500'
-                                }`}
-                                style={{
-                                    height: `${Math.max(4, (level / 255) * 48)}px`,
-                                }}
+                    <div className="space-y-1">
+                        <div
+                            className="flex items-center justify-center gap-1 h-12 bg-slate-100 rounded-md"
+                            role="img"
+                            aria-label={
+                                state === 'recording'
+                                    ? t(
+                                          'audio.waveform.recording',
+                                          'Audio waveform - recording in progress'
+                                      )
+                                    : t(
+                                          'audio.waveform.playing',
+                                          'Audio waveform - playing back recording'
+                                      )
+                            }
+                        >
+                            {audioLevels.map((level, i) => (
+                                <div
+                                    key={i}
+                                    className={`w-1.5 rounded-full transition-all duration-100 ${
+                                        state === 'recording' ? 'bg-red-500' : 'bg-blue-500'
+                                    }`}
+                                    style={{
+                                        height: `${Math.max(4, (level / 255) * 48)}px`,
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        {state === 'playing' && duration > 0 && (
+                            <Progress
+                                value={(playbackPosition / duration) * 100}
+                                className="h-1.5"
                             />
-                        ))}
+                        )}
                     </div>
                 ) : (
                     <Progress value={(duration / maxDurationSeconds) * 100} className="h-2" />
@@ -586,17 +707,22 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             </div>
 
             {/* Controls */}
-            <div className="flex gap-2 justify-center">
+            <div className="flex gap-2 justify-center items-center flex-wrap">
                 {state === 'idle' && (
-                    <Button
-                        onClick={startRecording}
-                        disabled={disabled}
-                        className="flex items-center gap-2"
-                        variant="default"
-                    >
-                        <Mic className="w-4 h-4" />
-                        {t('audio.start_recording', 'Start Recording')}
-                    </Button>
+                    <>
+                        <Button
+                            onClick={startRecording}
+                            disabled={disabled}
+                            className="flex items-center gap-2"
+                            variant="default"
+                        >
+                            <Mic className="w-4 h-4" />
+                            {t('audio.start_recording', 'Start Recording')}
+                        </Button>
+                        <span className="text-xs text-slate-400 hidden sm:inline">
+                            {t('audio.space_shortcut', 'or press Space')}
+                        </span>
+                    </>
                 )}
 
                 {state === 'recording' && (
@@ -644,7 +770,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                                     }}
                                     variant="ghost"
                                     size="sm"
-                                    className={`px-2 py-1 h-auto text-xs font-medium ${
+                                    className={`px-2 py-1 h-auto text-xs font-medium focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 ${
                                         playbackSpeed === speed
                                             ? 'bg-slate-100 text-slate-900'
                                             : 'text-slate-600 hover:text-slate-900'
@@ -664,6 +790,17 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                             {t('audio.delete', 'Delete')}
                         </Button>
                     </>
+                )}
+
+                {uploadFailed && state === 'stopped' && (
+                    <Button
+                        onClick={retryUpload}
+                        className="flex items-center gap-2"
+                        variant="default"
+                    >
+                        <RefreshCw className="w-4 h-4" />
+                        {t('audio.retry_upload', 'Retry Upload')}
+                    </Button>
                 )}
 
                 {state === 'uploading' && (

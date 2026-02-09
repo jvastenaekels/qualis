@@ -136,6 +136,14 @@ async def upload_audio(
             status_code=403, detail="Audio recording not enabled for this study"
         )
 
+    # Validate duration against study config
+    max_allowed = audio_config.get("max_duration_seconds", 600)
+    if duration_seconds is not None and duration_seconds > max_allowed:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Recording duration ({duration_seconds:.0f}s) exceeds maximum ({max_allowed}s)",
+        )
+
     # Check storage quota
     content = await file.read()
     await file.seek(0)

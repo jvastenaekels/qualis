@@ -78,25 +78,27 @@ const ConsentPage: React.FC = () => {
                 setToken(token);
             }
 
-            // Record proof of consent in DB
-            try {
-                const consentText = config.consent?.description || t('consent.default_text');
-                const consentHash = await hashConsent(consentText);
+            // Record proof of consent in DB (skip in pilot mode — no backend persistence)
+            if (!session.isPilotMode) {
+                try {
+                    const consentText = config.consent?.description || t('consent.default_text');
+                    const consentHash = await hashConsent(consentText);
 
-                await recordConsentMutation({
-                    slug: slug || '',
-                    data: {
-                        study_slug: slug || '',
-                        session_token: token,
-                        language_code: i18n.language,
-                        consent_hash: consentHash,
-                        is_test_run: session.isPilotMode,
-                    },
-                });
-            } catch (err) {
-                // Non-blocking: we still allow user to proceed but log the error
-                console.error('Failed to record consent proof:', err);
-                reportBug(err as Error, { context: 'ConsentPage' });
+                    await recordConsentMutation({
+                        slug: slug || '',
+                        data: {
+                            study_slug: slug || '',
+                            session_token: token,
+                            language_code: i18n.language,
+                            consent_hash: consentHash,
+                            is_test_run: false,
+                        },
+                    });
+                } catch (err) {
+                    // Non-blocking: we still allow user to proceed but log the error
+                    console.error('Failed to record consent proof:', err);
+                    reportBug(err as Error, { context: 'ConsentPage' });
+                }
             }
 
             // Determine next step

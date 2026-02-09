@@ -357,6 +357,59 @@
             "gdpr_note": "Sähköpostiosoitettasi ei koskaan jaeta julkisesti. Sen antaminen varmistaa pseudonymisoinnin: tietosi säilyvät tunnistettavina vain tutkijan tutkimustarkoituksia varten.",
             "pseudonymization_note": "Yhteydenottoon suostuminen tarkoittaa, että tutkija voi yhdistää näkökulmasi sähköpostiisi (pseudonymisointi) tätä nimenomaista seurantaa varten.",
             "error_invalid_email": "Syötä voimassa oleva sähköpostiosoite"
+        },
+        "audio": {
+            "info": "Voit vastata kuhunkin kysymykseen tekstillä, äänitallenteella tai molemmilla.",
+            "section_label": "Äänivastaus (valinnainen)"
+        }
+    },
+    "audio": {
+        "recording": "Tallennetaan...",
+        "recorded": "Tallennettu",
+        "playing": "Toistetaan...",
+        "uploading": "Lähetetään...",
+        "ready": "Valmis tallentamaan",
+        "start_recording": "Aloita tallennus",
+        "stop_recording": "Lopeta",
+        "pause": "Tauko",
+        "play": "Toista",
+        "delete": "Poista",
+        "deleted": "Ääni poistettu",
+        "delete_failed": "Poisto epäonnistui",
+        "file_size": "Tiedostokoko",
+        "upload_success": "Ääni lähetetty onnistuneesti",
+        "upload_failed": "Lähetys epäonnistui",
+        "upload_cancelled": "Tallennus peruutettu",
+        "recording_error": "Tallennusvirhe - yritä uudelleen",
+        "invalid_recording": "Tallennus epäonnistui - äänitietoja ei tallennettu",
+        "permission_denied": "Mikrofonin käyttöoikeus evätty",
+        "unsupported": "Äänen tallennus ei ole tuettu tässä selaimessa.",
+        "permission_revoked": "Mikrofonin käyttöoikeus menetetty - tallennus pysäytetty",
+        "refresh_failed": "Äänen URL-osoitteen päivitys epäonnistui",
+        "refreshing": "Päivitetään ääntä...",
+        "playback_failed": "Äänen toisto epäonnistui",
+        "error": {
+            "no_token": "Istuntotunnus puuttuu",
+            "quota_exceeded": "Tallennustilakiintiö ylitetty. Poista olemassa oleva tallenne tai käytä tekstiä.",
+            "file_too_large": "Äänitiedosto on liian suuri. Kokeile lyhyempää tallennetta.",
+            "server_error": "Palvelinvirhe. Yritä uudelleen hetken kuluttua.",
+            "upload_in_progress": "Odota, äänen lähettäminen on vielä kesken.",
+            "security": "Tallennus estettiin selaimen suojausasetuksilla",
+            "invalid_state": "Tallennuksessa tapahtui sisäinen virhe"
+        },
+        "fallback": {
+            "toast": "Ääni on poistettu käytöstä toistuvien virheiden vuoksi. Käytä tekstiä.",
+            "banner_title": "Ääni ei käytettävissä",
+            "banner_description": "Äänitallennuksessa ilmeni toistuvia virheitä. Voit jatkaa tekstivastauksilla.",
+            "try_again": "Yritä uudelleen",
+            "inline": "Ääni ei tilapäisesti käytettävissä."
+        },
+        "permission_denied_with_guidance": "Mikrofonin käyttöoikeus evätty. Tarkista selaimen asetukset salliaksesi mikrofonin käytön ja yritä uudelleen.",
+        "retry_upload": "Yritä lähettää uudelleen",
+        "space_shortcut": "tai paina välilyöntiä",
+        "waveform": {
+            "recording": "Äänen aaltomuoto - tallennus käynnissä",
+            "playing": "Äänen aaltomuoto - tallenteen toisto"
         }
     },
     "admin": {
@@ -1219,7 +1272,7 @@
                     "max_duration_help": "Tallennuksen enimmäiskesto per kysymys (30–600 sekuntia).",
                     "storage_quota": "Tallennustilakiintiö",
                     "storage_quota_help": "Enimmäisäänisäilytystila per tutkimus (Mt).",
-                    "participant_choice_info": "Osallistujat voivat valita vastaavansa tekstillä tai äänellä kuhunkin kysymykseen, mutta eivät molemmilla."
+                    "participant_choice_info": "Osallistujat voivat vastata tekstillä, äänellä tai molemmilla kuhunkin kysymykseen."
                 }
             },
             "interface": {
@@ -1414,7 +1467,14 @@
             "errors": {
                 "load_failed": "Tietojen lataus epäonnistui. Päivitä sivu."
             },
-            "export_emails_success": "Sähköpostit viety onnistuneesti"
+            "export_emails_success": "Sähköpostit viety onnistuneesti",
+            "empty": {
+                "no_participants_title": "Ei vielä osallistujia",
+                "no_participants_desc": "Jaa tutkimuksesi linkki aloittaaksesi vastausten keräämisen."
+            },
+            "pagination": {
+                "showing": "Näytetään {{from}}\u2013{{to}} / {{total}}"
+            }
         },
         "team": {
             "title": "Tutkimustiimi",

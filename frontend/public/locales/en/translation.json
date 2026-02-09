@@ -357,6 +357,59 @@
             "gdpr_note": "Your email will never be publicly shared. Providing it ensures pseudonymization: your data remains identifiable only for research purposes by the investigator.",
             "pseudonymization_note": "Agreeing to be contacted implies that the researcher can link your perspective to your email (pseudonymization) for this specific follow-up.",
             "error_invalid_email": "Please enter a valid email address"
+        },
+        "audio": {
+            "info": "For each question, you can respond with text, an audio recording, or both.",
+            "section_label": "Audio response (optional)"
+        }
+    },
+    "audio": {
+        "recording": "Recording...",
+        "recorded": "Recorded",
+        "playing": "Playing...",
+        "uploading": "Uploading...",
+        "ready": "Ready to record",
+        "start_recording": "Start Recording",
+        "stop_recording": "Stop",
+        "pause": "Pause",
+        "play": "Play",
+        "delete": "Delete",
+        "deleted": "Audio deleted",
+        "delete_failed": "Delete failed",
+        "file_size": "File size",
+        "upload_success": "Audio uploaded successfully",
+        "upload_failed": "Upload failed",
+        "upload_cancelled": "Recording cancelled",
+        "recording_error": "Recording error - please try again",
+        "invalid_recording": "Recording failed - no audio data captured",
+        "permission_denied": "Microphone permission denied",
+        "unsupported": "Audio recording is not supported in this browser.",
+        "permission_revoked": "Microphone access lost - recording stopped",
+        "refresh_failed": "Failed to refresh audio URL",
+        "refreshing": "Refreshing audio...",
+        "playback_failed": "Failed to play audio",
+        "error": {
+            "no_token": "Session token missing",
+            "quota_exceeded": "Storage quota exceeded. Please delete an existing recording or use text instead.",
+            "file_too_large": "Recording file is too large. Try a shorter recording.",
+            "server_error": "Server error. Please try again in a moment.",
+            "upload_in_progress": "Please wait for audio upload to finish.",
+            "security": "Recording blocked by browser security settings",
+            "invalid_state": "Recording encountered an internal error"
+        },
+        "fallback": {
+            "toast": "Audio has been disabled due to repeated errors. Please use text.",
+            "banner_title": "Audio unavailable",
+            "banner_description": "Audio recording encountered repeated errors. You can continue with text responses.",
+            "try_again": "Try again",
+            "inline": "Audio temporarily unavailable."
+        },
+        "permission_denied_with_guidance": "Microphone permission denied. Check your browser settings to allow microphone access, then try again.",
+        "retry_upload": "Retry Upload",
+        "space_shortcut": "or press Space",
+        "waveform": {
+            "recording": "Audio waveform - recording in progress",
+            "playing": "Audio waveform - playing back recording"
         }
     },
     "admin": {
@@ -1228,7 +1281,7 @@
                     "max_duration_help": "Maximum recording time per question (30–600 seconds).",
                     "storage_quota": "Storage Quota",
                     "storage_quota_help": "Maximum total audio storage per study (in MB).",
-                    "participant_choice_info": "Participants can choose to respond with either text or audio for each question, but not both."
+                    "participant_choice_info": "Participants can respond with text, audio, or both for each question."
                 }
             },
             "interface": {
@@ -1422,7 +1475,14 @@
             "errors": {
                 "load_failed": "Cloud sync interrupted. Please check your connection."
             },
-            "export_emails_success": "Emails exported successfully"
+            "export_emails_success": "Emails exported successfully",
+            "empty": {
+                "no_participants_title": "No participants yet",
+                "no_participants_desc": "Share your study link to start collecting responses."
+            },
+            "pagination": {
+                "showing": "Showing {{from}}\u2013{{to}} of {{total}}"
+            }
         },
         "team": {
             "title": "Study team",

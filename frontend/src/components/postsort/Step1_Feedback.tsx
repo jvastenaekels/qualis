@@ -1,21 +1,10 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { AlertCircle, ArrowRight, Mic } from 'lucide-react';
+import { AlertCircle, AlertTriangle, ArrowRight, Info, Mic } from 'lucide-react';
 import { SafeMarkdown } from '../SafeMarkdown';
 import { AudioRecorder } from '@/components/audio/AudioRecorder';
 import { useResponseStore } from '@/store/useResponseStore';
@@ -28,6 +17,7 @@ import {
     deleteAudioRecordingApiAudioRecordingIdDelete,
 } from '@/api/generated';
 import { toast } from 'sonner';
+import { ApiError } from '@/api/client';
 
 interface Step1Props {
     onNext: () => void;
@@ -52,23 +42,8 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [validationError, setValidationError] = useState<string | null>(null);
 
-    // Tab state for controlled tabs
-    const [activeTabs, setActiveTabs] = useState<Record<string, 'text' | 'audio'>>({});
-
-    // Confirmation dialog state
-    const [confirmDialog, setConfirmDialog] = useState<{
-        open: boolean;
-        questionKey: string;
-        blob: Blob | null;
-        duration: number;
-        existingContent: string;
-    }>({
-        open: false,
-        questionKey: '',
-        blob: null,
-        duration: 0,
-        existingContent: '',
-    });
+    // Track in-progress uploads to block validation/navigation
+    const [uploadingKeys, setUploadingKeys] = useState<Set<string>>(new Set());
 
     // --- Configuration Handling ---
     const gridColumns = config?.grid_config || [];
@@ -80,6 +55,44 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const audioConfig = config?.postsort_config?.audio;
     const isAudioEnabled = audioConfig?.enabled ?? false;
     const maxDurationSeconds = audioConfig?.max_duration_seconds ?? 180;
+
+    // Audio fallback: auto-switch to text-only after persistent errors
+    const AUDIO_FALLBACK_THRESHOLD = 2;
+    const [audioFallbackActive, setAudioFallbackActive] = useState(false);
+    const audioFailureCountRef = useRef(0);
+    const isAudioEffectivelyEnabled = isAudioEnabled && !audioFallbackActive;
+
+    const activateAudioFallback = useCallback(() => {
+        if (audioFallbackActive) return;
+        setAudioFallbackActive(true);
+        toast.warning(
+            t(
+                'audio.fallback.toast',
+                'Audio has been disabled due to repeated errors. Please use text.'
+            )
+        );
+    }, [audioFallbackActive, t]);
+
+    const resetAudioFallback = useCallback(() => {
+        setAudioFallbackActive(false);
+        audioFailureCountRef.current = 0;
+    }, []);
+
+    const handleAudioError = useCallback(
+        (type: 'mic_denied' | 'mic_revoked' | 'recorder_error' | 'empty_blob' | 'unsupported') => {
+            // Unsupported browser → immediate fallback (no recovery possible)
+            if (type === 'unsupported') {
+                activateAudioFallback();
+                return;
+            }
+            // All other errors (including mic_denied) → count toward threshold
+            audioFailureCountRef.current += 1;
+            if (audioFailureCountRef.current >= AUDIO_FALLBACK_THRESHOLD) {
+                activateAudioFallback();
+            }
+        },
+        [activateAudioFallback]
+    );
 
     // --- Data Preparation ---
     const extremeCards = qsort
@@ -120,39 +133,33 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
         return t(defaultTextKey, { defaultValue });
     };
 
+    const isPilotMode = useSessionStore((state) => state.isPilotMode);
+
     // --- Audio Handlers ---
     const handleAudioUpload = async (questionKey: string, blob: Blob, duration: number) => {
+        // Pilot mode: store fake metadata locally, skip backend upload
+        if (isPilotMode) {
+            setAudioRecording(questionKey, {
+                id: -1,
+                question_key: questionKey,
+                file_size_bytes: blob.size,
+                duration_seconds: duration,
+                presigned_url: URL.createObjectURL(blob),
+                created_at: new Date().toISOString(),
+                url_expires_at: undefined,
+            });
+            return;
+        }
+
         if (!token) {
             toast.error(t('audio.error.no_token', 'Session token missing'));
             return;
         }
-
-        // Check if text exists and needs confirmation
-        let existingText = '';
-        if (questionKey.startsWith('card_')) {
-            const statementId = Number.parseInt(questionKey.replace('card_', ''), 10);
-            existingText = postsort.card_comments?.[statementId] || '';
-        } else if (questionKey === 'missing_statement') {
-            existingText = postsort.missing_statement || '';
-        }
-
-        // Show confirmation dialog if text exists (length >= 2)
-        if (existingText.length >= 2) {
-            setConfirmDialog({
-                open: true,
-                questionKey,
-                blob,
-                duration,
-                existingContent: existingText,
-            });
-            return; // Wait for confirmation
-        }
-
-        // No text exists or user confirmed, proceed with upload
         await performAudioUpload(questionKey, blob, duration);
     };
 
     const performAudioUpload = async (questionKey: string, blob: Blob, duration: number) => {
+        setUploadingKeys((prev) => new Set(prev).add(questionKey));
         try {
             // Create File from Blob (orval expects File, not Blob)
             const file = new File([blob], `recording_${Date.now()}.webm`, {
@@ -181,52 +188,64 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 url_expires_at: new Date(Date.now() + 3600 * 1000).toISOString(), // 1 hour from now
             });
 
-            // Clear text comment (exclusive choice)
-            if (questionKey.startsWith('card_')) {
-                const statementId = Number.parseInt(questionKey.replace('card_', ''), 10);
-                if (!Number.isNaN(statementId)) {
-                    handleCommentChange(statementId, '');
-                }
-            } else if (questionKey === 'missing_statement') {
-                setPostSortResponse('missing_statement', '');
-            }
-
+            audioFailureCountRef.current = 0; // Reset on success
             toast.success(t('audio.upload_success', 'Audio uploaded successfully'));
         } catch (error) {
             console.error('Audio upload failed:', error);
-            throw error; // Let AudioRecorder handle the error display
+
+            // Show specific error messages for known failure modes
+            if (error instanceof ApiError) {
+                if (error.status === 507) {
+                    toast.error(
+                        t(
+                            'audio.error.quota_exceeded',
+                            'Storage quota exceeded. Please delete an existing recording or use text instead.'
+                        )
+                    );
+                    // Don't activate fallback — user can free quota by deleting recordings
+                } else if (error.status === 413) {
+                    toast.error(
+                        t(
+                            'audio.error.file_too_large',
+                            'Recording file is too large. Try a shorter recording.'
+                        )
+                    );
+                } else if (error.status >= 500) {
+                    toast.error(
+                        t('audio.error.server_error', 'Server error. Please try again in a moment.')
+                    );
+                } else {
+                    toast.error(t('audio.upload_failed', 'Upload failed'));
+                }
+            }
+
+            // Track consecutive upload failures for fallback threshold
+            audioFailureCountRef.current += 1;
+            if (audioFailureCountRef.current >= AUDIO_FALLBACK_THRESHOLD) {
+                activateAudioFallback();
+            }
+
+            throw error; // Let AudioRecorder reset its state
+        } finally {
+            setUploadingKeys((prev) => {
+                const next = new Set(prev);
+                next.delete(questionKey);
+                return next;
+            });
         }
-    };
-
-    const handleConfirmReplace = async () => {
-        const { questionKey, blob, duration } = confirmDialog;
-        setConfirmDialog({
-            open: false,
-            questionKey: '',
-            blob: null,
-            duration: 0,
-            existingContent: '',
-        });
-
-        if (blob) {
-            await performAudioUpload(questionKey, blob, duration);
-        }
-    };
-
-    const handleCancelReplace = () => {
-        setConfirmDialog({
-            open: false,
-            questionKey: '',
-            blob: null,
-            duration: 0,
-            existingContent: '',
-        });
-        toast.info(t('audio.upload_cancelled', 'Recording cancelled'));
     };
 
     const handleAudioDelete = async (questionKey: string) => {
         const recording = getAudioRecording(questionKey);
-        if (!recording || !token) return;
+        if (!recording) return;
+
+        // Pilot mode: just clear local state, no backend call
+        if (isPilotMode) {
+            deleteAudioRecording(questionKey);
+            return;
+        }
+
+        if (!token) return;
 
         try {
             await deleteAudioRecordingApiAudioRecordingIdDelete(recording.id, {
@@ -249,37 +268,14 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
         const comment = postsort.card_comments?.[id] || '';
         const hasText = comment.length >= 2;
         const hasAudio = !!getAudioRecording(`card_${id}`);
-        return hasText || hasAudio; // Valid if either text OR audio exists
+        const isUploading = uploadingKeys.has(`card_${id}`);
+        return hasText || hasAudio || isUploading; // Valid if text, audio, or upload in progress
     };
 
-    // Helper to get active tab with smart default
-    const getActiveTab = (questionKey: string): 'text' | 'audio' => {
-        // If tab explicitly set, use it
-        if (activeTabs[questionKey]) {
-            return activeTabs[questionKey];
-        }
-
-        // Smart default: audio if recording exists, otherwise text
-        const hasAudio = !!getAudioRecording(questionKey);
-        return hasAudio ? 'audio' : 'text';
-    };
-
-    // Helper to check if content exists for visual indicators
-    const hasTextContent = (questionKey: string): boolean => {
-        if (questionKey.startsWith('card_')) {
-            const statementId = Number.parseInt(questionKey.replace('card_', ''), 10);
-            const text = postsort.card_comments?.[statementId] || '';
-            return text.length >= 2;
-        }
-        if (questionKey === 'missing_statement') {
-            return (postsort.missing_statement || '').length >= 2;
-        }
-        return false;
-    };
-
-    const hasAudioContent = (questionKey: string): boolean => {
-        return !!getAudioRecording(questionKey);
-    };
+    // Whether to show the audio section for a given question
+    // True when audio is working, OR when there's an existing recording to play/manage
+    const showAudioSection = (questionKey: string): boolean =>
+        isAudioEffectivelyEnabled || !!getAudioRecording(questionKey);
 
     const validateStep1 = () => {
         let valid = true;
@@ -296,7 +292,15 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
         return valid;
     };
 
+    const isUploadInProgress = uploadingKeys.size > 0;
+
     const handleNext = () => {
+        if (isUploadInProgress) {
+            toast.info(
+                t('audio.error.upload_in_progress', 'Please wait for audio upload to finish.')
+            );
+            return;
+        }
         if (validateStep1()) {
             setValidationError(null);
             onNext();
@@ -320,6 +324,43 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                         <p className="font-bold">{t('common.attention', 'Attention')}</p>
                         <p className="text-sm">{validationError}</p>
                     </div>
+                </div>
+            )}
+
+            {isAudioEnabled && !audioFallbackActive && (
+                <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center gap-3 text-indigo-800">
+                    <Info size={20} className="shrink-0" />
+                    <p className="text-sm">
+                        {t(
+                            'post.audio.info',
+                            'For each question, you can respond with text, an audio recording, or both.'
+                        )}
+                    </p>
+                </div>
+            )}
+
+            {audioFallbackActive && (
+                <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3 text-amber-800">
+                    <AlertTriangle size={20} className="shrink-0 mt-0.5" />
+                    <div className="flex-1">
+                        <p className="font-semibold text-sm">
+                            {t('audio.fallback.banner_title', 'Audio unavailable')}
+                        </p>
+                        <p className="text-sm">
+                            {t(
+                                'audio.fallback.banner_description',
+                                'Audio recording encountered repeated errors. You can continue with text responses.'
+                            )}
+                        </p>
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={resetAudioFallback}
+                        className="shrink-0 text-amber-800 border-amber-300 hover:bg-amber-100"
+                    >
+                        {t('audio.fallback.try_again', 'Try again')}
+                    </Button>
                 </div>
             )}
 
@@ -397,117 +438,70 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                     )}
                                 </Label>
 
-                                <Tabs
-                                    value={getActiveTab(`card_${card.statementId}`)}
-                                    onValueChange={(value) => {
-                                        setActiveTabs((prev) => ({
-                                            ...prev,
-                                            [`card_${card.statementId}`]: value as 'text' | 'audio',
-                                        }));
-                                        setTouched((prev) => ({
-                                            ...prev,
-                                            [card.statementId]: true,
-                                        }));
-                                    }}
-                                    className="w-full"
-                                >
-                                    <TabsList className="grid w-full grid-cols-2">
-                                        <TabsTrigger
-                                            value="text"
-                                            className="relative"
-                                            title={
-                                                hasTextContent(`card_${card.statementId}`)
-                                                    ? t(
-                                                          'post.content.has_text',
-                                                          'Has text response'
-                                                      )
-                                                    : undefined
-                                            }
-                                        >
-                                            {t('post.response_type.text', 'Text')}
-                                            {hasTextContent(`card_${card.statementId}`) && (
-                                                <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
-                                            )}
-                                        </TabsTrigger>
-                                        <TabsTrigger
-                                            value="audio"
-                                            disabled={!isAudioEnabled}
-                                            className="relative"
-                                            title={
-                                                hasAudioContent(`card_${card.statementId}`)
-                                                    ? t(
-                                                          'post.content.has_audio',
-                                                          'Has audio response'
-                                                      )
-                                                    : undefined
-                                            }
-                                        >
-                                            <Mic className="w-4 h-4 mr-1" />
-                                            {t('post.response_type.audio', 'Audio')}
-                                            {hasAudioContent(`card_${card.statementId}`) && (
-                                                <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
-                                            )}
-                                        </TabsTrigger>
-                                    </TabsList>
+                                <div className="space-y-4">
+                                    <Textarea
+                                        id={`comment-${card.statementId}`}
+                                        value={postsort.card_comments?.[card.statementId] || ''}
+                                        onChange={(e) =>
+                                            handleCommentChange(card.statementId, e.target.value)
+                                        }
+                                        onBlur={() =>
+                                            setTouched((prev) => ({
+                                                ...prev,
+                                                [card.statementId]: true,
+                                            }))
+                                        }
+                                        className={`min-h-[100px] text-base border-slate-300 ${!isValid && isTouched ? 'border-red-400 focus:ring-red-200 bg-red-50' : ''}`}
+                                        placeholder={t('post.extreme.placeholder')}
+                                        data-testid="extreme-comment-input"
+                                    />
 
-                                    <TabsContent value="text" className="space-y-2 mt-3">
-                                        <Textarea
-                                            id={`comment-${card.statementId}`}
-                                            value={postsort.card_comments?.[card.statementId] || ''}
-                                            onChange={(e) =>
-                                                handleCommentChange(
-                                                    card.statementId,
-                                                    e.target.value
-                                                )
-                                            }
-                                            onBlur={() =>
-                                                setTouched((prev) => ({
-                                                    ...prev,
-                                                    [card.statementId]: true,
-                                                }))
-                                            }
-                                            className={`
-                                                min-h-[100px] text-base border-slate-300
-                                                ${!isValid && isTouched ? 'border-red-400 focus:ring-red-200 bg-red-50' : ''}
-                                            `}
-                                            placeholder={t('post.extreme.placeholder')}
-                                            disabled={
-                                                !!getAudioRecording(`card_${card.statementId}`)
-                                            }
-                                            data-testid="extreme-comment-input"
-                                        />
-                                        {getAudioRecording(`card_${card.statementId}`) && (
-                                            <p className="text-sm text-amber-600 flex items-center gap-1.5">
-                                                <AlertCircle size={14} />
-                                                {t(
-                                                    'post.audio.text_disabled',
-                                                    'Audio response recorded. Delete audio to edit text.'
-                                                )}
-                                            </p>
-                                        )}
-                                    </TabsContent>
-
-                                    <TabsContent value="audio" className="space-y-2 mt-3">
-                                        <AudioRecorder
-                                            questionKey={`card_${card.statementId}`}
-                                            maxDurationSeconds={maxDurationSeconds}
-                                            onRecordingComplete={async (blob, duration) => {
-                                                await handleAudioUpload(
-                                                    `card_${card.statementId}`,
-                                                    blob,
-                                                    duration
-                                                );
-                                            }}
-                                            onRecordingDeleted={async () => {
-                                                await handleAudioDelete(`card_${card.statementId}`);
-                                            }}
-                                            existingRecording={getAudioRecording(
-                                                `card_${card.statementId}`
+                                    {showAudioSection(`card_${card.statementId}`) && (
+                                        <div className="space-y-2">
+                                            <div className="flex items-center gap-2">
+                                                <Mic className="w-4 h-4 text-slate-500" />
+                                                <span className="text-sm font-medium text-slate-600">
+                                                    {t(
+                                                        'post.audio.section_label',
+                                                        'Audio response (optional)'
+                                                    )}
+                                                </span>
+                                            </div>
+                                            {audioFallbackActive &&
+                                            !getAudioRecording(`card_${card.statementId}`) ? (
+                                                <p className="text-sm text-amber-700 italic">
+                                                    {t(
+                                                        'audio.fallback.inline',
+                                                        'Audio temporarily unavailable.'
+                                                    )}
+                                                </p>
+                                            ) : (
+                                                <AudioRecorder
+                                                    questionKey={`card_${card.statementId}`}
+                                                    maxDurationSeconds={maxDurationSeconds}
+                                                    disabled={audioFallbackActive}
+                                                    onRecordingComplete={async (blob, duration) => {
+                                                        await handleAudioUpload(
+                                                            `card_${card.statementId}`,
+                                                            blob,
+                                                            duration
+                                                        );
+                                                    }}
+                                                    onRecordingDeleted={async () => {
+                                                        await handleAudioDelete(
+                                                            `card_${card.statementId}`
+                                                        );
+                                                    }}
+                                                    existingRecording={getAudioRecording(
+                                                        `card_${card.statementId}`
+                                                    )}
+                                                    sessionToken={token || undefined}
+                                                    onError={handleAudioError}
+                                                />
                                             )}
-                                            sessionToken={token || undefined}
-                                        />
-                                    </TabsContent>
-                                </Tabs>
+                                        </div>
+                                    )}
+                                </div>
 
                                 {!isValid && isTouched && (
                                     <div className="flex items-center gap-1.5 mt-2 text-red-600 text-sm animate-in fade-in slide-in-from-top-1">
@@ -641,95 +635,63 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         </SafeMarkdown>
                                     </blockquote>
 
-                                    <Tabs
-                                        value={getActiveTab(`card_${id}`)}
-                                        onValueChange={(value) => {
-                                            setActiveTabs((prev) => ({
-                                                ...prev,
-                                                [`card_${id}`]: value as 'text' | 'audio',
-                                            }));
-                                        }}
-                                        className="w-full"
-                                    >
-                                        <TabsList className="grid w-full grid-cols-2">
-                                            <TabsTrigger
-                                                value="text"
-                                                className="relative"
-                                                title={
-                                                    hasTextContent(`card_${id}`)
-                                                        ? t(
-                                                              'post.content.has_text',
-                                                              'Has text response'
-                                                          )
-                                                        : undefined
-                                                }
-                                            >
-                                                {t('post.response_type.text', 'Text')}
-                                                {hasTextContent(`card_${id}`) && (
-                                                    <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
-                                                )}
-                                            </TabsTrigger>
-                                            <TabsTrigger
-                                                value="audio"
-                                                disabled={!isAudioEnabled}
-                                                className="relative"
-                                                title={
-                                                    hasAudioContent(`card_${id}`)
-                                                        ? t(
-                                                              'post.content.has_audio',
-                                                              'Has audio response'
-                                                          )
-                                                        : undefined
-                                                }
-                                            >
-                                                <Mic className="w-4 h-4 mr-1" />
-                                                {t('post.response_type.audio', 'Audio')}
-                                                {hasAudioContent(`card_${id}`) && (
-                                                    <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
-                                                )}
-                                            </TabsTrigger>
-                                        </TabsList>
+                                    <div className="space-y-4">
+                                        <Textarea
+                                            value={postsort.card_comments[id]}
+                                            onChange={(e) =>
+                                                handleCommentChange(id, e.target.value)
+                                            }
+                                            placeholder={t('post.optional.placeholder')}
+                                            className="min-h-[100px] border-slate-300"
+                                        />
 
-                                        <TabsContent value="text" className="space-y-2 mt-3">
-                                            <Textarea
-                                                value={postsort.card_comments[id]}
-                                                onChange={(e) =>
-                                                    handleCommentChange(id, e.target.value)
-                                                }
-                                                placeholder={t('post.optional.placeholder')}
-                                                className="min-h-[100px] border-slate-300"
-                                                disabled={!!getAudioRecording(`card_${id}`)}
-                                            />
-                                            {getAudioRecording(`card_${id}`) && (
-                                                <p className="text-sm text-amber-600 flex items-center gap-1.5">
-                                                    <AlertCircle size={14} />
-                                                    {t(
-                                                        'post.audio.text_disabled',
-                                                        'Audio response recorded. Delete audio to edit text.'
-                                                    )}
-                                                </p>
-                                            )}
-                                        </TabsContent>
-
-                                        <TabsContent value="audio" className="space-y-2 mt-3">
-                                            <AudioRecorder
-                                                questionKey={`card_${id}`}
-                                                maxDurationSeconds={maxDurationSeconds}
-                                                onRecordingComplete={async (blob, duration) => {
-                                                    await handleAudioUpload(
-                                                        `card_${id}`,
-                                                        blob,
-                                                        duration
-                                                    );
-                                                }}
-                                                onRecordingDeleted={async () => {
-                                                    await handleAudioDelete(`card_${id}`);
-                                                }}
-                                                existingRecording={getAudioRecording(`card_${id}`)}
-                                                sessionToken={token || undefined}
-                                            />
-                                        </TabsContent>
-                                    </Tabs>
+                                        {showAudioSection(`card_${id}`) && (
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Mic className="w-4 h-4 text-slate-500" />
+                                                    <span className="text-sm font-medium text-slate-600">
+                                                        {t(
+                                                            'post.audio.section_label',
+                                                            'Audio response (optional)'
+                                                        )}
+                                                    </span>
+                                                </div>
+                                                {audioFallbackActive &&
+                                                !getAudioRecording(`card_${id}`) ? (
+                                                    <p className="text-sm text-amber-700 italic">
+                                                        {t(
+                                                            'audio.fallback.inline',
+                                                            'Audio temporarily unavailable.'
+                                                        )}
+                                                    </p>
+                                                ) : (
+                                                    <AudioRecorder
+                                                        questionKey={`card_${id}`}
+                                                        maxDurationSeconds={maxDurationSeconds}
+                                                        disabled={audioFallbackActive}
+                                                        onRecordingComplete={async (
+                                                            blob,
+                                                            duration
+                                                        ) => {
+                                                            await handleAudioUpload(
+                                                                `card_${id}`,
+                                                                blob,
+                                                                duration
+                                                            );
+                                                        }}
+                                                        onRecordingDeleted={async () => {
+                                                            await handleAudioDelete(`card_${id}`);
+                                                        }}
+                                                        existingRecording={getAudioRecording(
+                                                            `card_${id}`
+                                                        )}
+                                                        sessionToken={token || undefined}
+                                                        onError={handleAudioError}
+                                                    />
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             );
                         })}
@@ -756,96 +718,64 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                             )}
                         </p>
 
-                        <Tabs
-                            value={getActiveTab('missing_statement')}
-                            onValueChange={(value) => {
-                                setActiveTabs((prev) => ({
-                                    ...prev,
-                                    missing_statement: value as 'text' | 'audio',
-                                }));
-                            }}
-                            className="w-full"
-                        >
-                            <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger
-                                    value="text"
-                                    className="relative"
-                                    title={
-                                        hasTextContent('missing_statement')
-                                            ? t('post.content.has_text', 'Has text response')
-                                            : undefined
-                                    }
-                                >
-                                    {t('post.response_type.text', 'Text')}
-                                    {hasTextContent('missing_statement') && (
-                                        <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
-                                    )}
-                                </TabsTrigger>
-                                <TabsTrigger
-                                    value="audio"
-                                    disabled={!isAudioEnabled}
-                                    className="relative"
-                                    title={
-                                        hasAudioContent('missing_statement')
-                                            ? t('post.content.has_audio', 'Has audio response')
-                                            : undefined
-                                    }
-                                >
-                                    <Mic className="w-4 h-4 mr-1" />
-                                    {t('post.response_type.audio', 'Audio')}
-                                    {hasAudioContent('missing_statement') && (
-                                        <span className="ml-1.5 w-2 h-2 rounded-full bg-blue-500" />
-                                    )}
-                                </TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent value="text" className="space-y-2 mt-3">
-                                <Label className="sr-only" htmlFor="missing-statements">
-                                    Missing Statements Input
-                                </Label>
-                                <Textarea
-                                    id="missing-statements"
-                                    value={postsort.missing_statement || ''}
-                                    onChange={(e) =>
-                                        setPostSortResponse('missing_statement', e.target.value)
-                                    }
-                                    placeholder={getPrompt(
-                                        'missing_statements',
-                                        'admin.design.postsort.missing.prompt_placeholder'
-                                    )}
-                                    className="min-h-[120px] text-base border-slate-300"
-                                    disabled={!!getAudioRecording('missing_statement')}
-                                />
-                                {getAudioRecording('missing_statement') && (
-                                    <p className="text-sm text-amber-600 flex items-center gap-1.5">
-                                        <AlertCircle size={14} />
-                                        {t(
-                                            'post.audio.text_disabled',
-                                            'Audio response recorded. Delete audio to edit text.'
-                                        )}
-                                    </p>
+                        <div className="space-y-4">
+                            <Textarea
+                                id="missing-statements"
+                                value={postsort.missing_statement || ''}
+                                onChange={(e) =>
+                                    setPostSortResponse('missing_statement', e.target.value)
+                                }
+                                placeholder={getPrompt(
+                                    'missing_statements',
+                                    'admin.design.postsort.missing.prompt_placeholder'
                                 )}
-                            </TabsContent>
+                                className="min-h-[120px] text-base border-slate-300"
+                            />
 
-                            <TabsContent value="audio" className="space-y-2 mt-3">
-                                <AudioRecorder
-                                    questionKey="missing_statement"
-                                    maxDurationSeconds={maxDurationSeconds}
-                                    onRecordingComplete={async (blob, duration) => {
-                                        await handleAudioUpload(
-                                            'missing_statement',
-                                            blob,
-                                            duration
-                                        );
-                                    }}
-                                    onRecordingDeleted={async () => {
-                                        await handleAudioDelete('missing_statement');
-                                    }}
-                                    existingRecording={getAudioRecording('missing_statement')}
-                                    sessionToken={token || undefined}
-                                />
-                            </TabsContent>
-                        </Tabs>
+                            {showAudioSection('missing_statement') && (
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <Mic className="w-4 h-4 text-slate-500" />
+                                        <span className="text-sm font-medium text-slate-600">
+                                            {t(
+                                                'post.audio.section_label',
+                                                'Audio response (optional)'
+                                            )}
+                                        </span>
+                                    </div>
+                                    {audioFallbackActive &&
+                                    !getAudioRecording('missing_statement') ? (
+                                        <p className="text-sm text-amber-700 italic">
+                                            {t(
+                                                'audio.fallback.inline',
+                                                'Audio temporarily unavailable.'
+                                            )}
+                                        </p>
+                                    ) : (
+                                        <AudioRecorder
+                                            questionKey="missing_statement"
+                                            maxDurationSeconds={maxDurationSeconds}
+                                            disabled={audioFallbackActive}
+                                            onRecordingComplete={async (blob, duration) => {
+                                                await handleAudioUpload(
+                                                    'missing_statement',
+                                                    blob,
+                                                    duration
+                                                );
+                                            }}
+                                            onRecordingDeleted={async () => {
+                                                await handleAudioDelete('missing_statement');
+                                            }}
+                                            existingRecording={getAudioRecording(
+                                                'missing_statement'
+                                            )}
+                                            sessionToken={token || undefined}
+                                            onError={handleAudioError}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </>
             )}
@@ -857,58 +787,15 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 </Button>
                 <Button
                     onClick={handleNext}
+                    disabled={isUploadInProgress}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[140px] shadow-md shadow-indigo-200"
                 >
-                    {t('common.next', 'Next Step')} <ArrowRight size={18} className="ml-2" />
+                    {isUploadInProgress
+                        ? t('audio.uploading', 'Uploading...')
+                        : t('common.next', 'Next Step')}
+                    {!isUploadInProgress && <ArrowRight size={18} className="ml-2" />}
                 </Button>
             </div>
-
-            {/* Confirmation Dialog */}
-            <AlertDialog
-                open={confirmDialog.open}
-                onOpenChange={(open) => !open && handleCancelReplace()}
-            >
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            {t('post.audio.replace_title', 'Replace text with audio?')}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="space-y-3">
-                            <p>
-                                {t(
-                                    'post.audio.replace_description',
-                                    'You have already written a text response for this question. Recording audio will replace your text.'
-                                )}
-                            </p>
-                            <div className="p-3 bg-amber-50 border border-amber-200 rounded-md">
-                                <p className="text-sm font-medium text-amber-900 mb-1">
-                                    {t('post.audio.existing_text', 'Your existing text:')}
-                                </p>
-                                <p className="text-sm text-amber-800 italic line-clamp-3">
-                                    "{confirmDialog.existingContent}"
-                                </p>
-                            </div>
-                            <p className="text-sm text-slate-600">
-                                {t(
-                                    'post.audio.replace_warning',
-                                    'This action cannot be undone. You can delete the audio later to write text again.'
-                                )}
-                            </p>
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={handleCancelReplace}>
-                            {t('common.cancel', 'Cancel')}
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleConfirmReplace}
-                            className="bg-indigo-600 hover:bg-indigo-700"
-                        >
-                            {t('post.audio.confirm_replace', 'Record Audio')}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
         </div>
     );
 };

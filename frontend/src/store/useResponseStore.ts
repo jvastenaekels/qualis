@@ -278,7 +278,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             },
 
             getAudioRecording: (questionKey) => {
-                return get().postsort.audio_recordings[questionKey] || null;
+                return get().postsort.audio_recordings?.[questionKey] || null;
             },
 
             resetResponses: () => set(initialResponses),

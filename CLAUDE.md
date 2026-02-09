@@ -50,6 +50,13 @@ make migration-new    # Create a new Alembic migration
 - Frontend: Vitest with `renderWithStore` helper. Use `waitFor` for async state assertions.
 - Use `make ci` as the quality gate — never push if it fails.
 
+### Database Migrations (Alembic)
+- Generate: `make migration-new` (auto-generates from model changes)
+- **Always review generated migrations** — auto-generation against a blank or out-of-sync DB will include unrelated tables. The migration must only contain the intended schema change.
+- Migrations run automatically on deploy via `Procfile` release phase (`python scripts/migrate.py`)
+- Migration chain: `initial_schema` → `rename_randomize...` → `remove_consent_buttons` → `add_pre_instruction` → `add_is_test_run` → `add_audio_recordings_table`
+- PostgreSQL DDL is transactional: a failed migration rolls back entirely, leaving `alembic_version` unchanged
+
 ### API Changes
 - After modifying backend schemas/routes, run `make generate-api` to regenerate the frontend client
 - Run `make check-api` to verify the generated client is committed and up to date

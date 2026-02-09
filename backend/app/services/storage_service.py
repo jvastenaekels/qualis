@@ -4,14 +4,19 @@
 
 """S3/Cellar storage service for audio file management."""
 
+import asyncio
+import logging
+from datetime import datetime
+from typing import Any
+from uuid import UUID
+
 import boto3  # type: ignore
 from botocore.exceptions import ClientError  # type: ignore
 from fastapi import UploadFile, HTTPException
-from datetime import datetime
-from uuid import UUID
-from typing import Any
 
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 
 class StorageService:
@@ -81,21 +86,43 @@ class StorageService:
         extension = self._get_extension(content_type)
         s3_key = f"audio/{study_slug}/{participant_token}/{timestamp}_{question_key}{extension}"
 
-        # Upload to S3
-        try:
-            self.s3_client.put_object(
-                Bucket=self.bucket_name,
-                Key=s3_key,
-                Body=content,
-                ContentType=content_type,
-                Metadata={
-                    "study": study_slug,
-                    "participant": str(participant_token),
-                    "question": question_key,
-                },
-            )
-        except ClientError as e:
-            raise HTTPException(status_code=500, detail=f"S3 upload failed: {str(e)}")
+        # Upload to S3 with retry for transient failures
+        max_retries = 2
+        for attempt in range(max_retries + 1):
+            try:
+                self.s3_client.put_object(
+                    Bucket=self.bucket_name,
+                    Key=s3_key,
+                    Body=content,
+                    ContentType=content_type,
+                    Metadata={
+                        "study": study_slug,
+                        "participant": str(participant_token),
+                        "question": question_key,
+                    },
+                )
+                break
+            except ClientError as e:
+                error_code = e.response.get("Error", {}).get("Code", "")
+                if attempt < max_retries and error_code in (
+                    "RequestTimeout",
+                    "ServiceUnavailable",
+                    "InternalError",
+                    "SlowDown",
+                ):
+                    delay = 1.0 * (2**attempt)
+                    logger.warning(
+                        "S3 upload attempt %d/%d failed (%s), retrying in %.1fs",
+                        attempt + 1,
+                        max_retries + 1,
+                        error_code,
+                        delay,
+                    )
+                    await asyncio.sleep(delay)
+                else:
+                    raise HTTPException(
+                        status_code=500, detail=f"S3 upload failed: {str(e)}"
+                    )
 
         return {
             "s3_bucket": self.bucket_name,

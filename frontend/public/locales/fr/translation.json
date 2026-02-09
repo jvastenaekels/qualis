@@ -357,6 +357,59 @@
             "gdpr_note": "Votre e-mail ne sera jamais partagé publiquement. Le fournir permet d'assurer la pseudonymisation : vos données ne restent identifiables qu'à des fins de recherche par l'investigateur.",
             "pseudonymization_note": "Accepter d'être contacté implique que le chercheur puisse lier votre perspective à votre e-mail (pseudonymisation) pour ce suivi spécifique.",
             "error_invalid_email": "Veuillez saisir une adresse e-mail valide"
+        },
+        "audio": {
+            "info": "Pour chaque question, vous pouvez répondre par écrit, par un enregistrement audio, ou les deux.",
+            "section_label": "Réponse audio (optionnel)"
+        }
+    },
+    "audio": {
+        "recording": "Enregistrement...",
+        "recorded": "Enregistré",
+        "playing": "Lecture...",
+        "uploading": "Envoi en cours...",
+        "ready": "Prêt à enregistrer",
+        "start_recording": "Commencer l'enregistrement",
+        "stop_recording": "Arrêter",
+        "pause": "Pause",
+        "play": "Écouter",
+        "delete": "Supprimer",
+        "deleted": "Audio supprimé",
+        "delete_failed": "Échec de la suppression",
+        "file_size": "Taille du fichier",
+        "upload_success": "Audio envoyé avec succès",
+        "upload_failed": "Échec de l'envoi",
+        "upload_cancelled": "Enregistrement annulé",
+        "recording_error": "Erreur d'enregistrement - veuillez réessayer",
+        "invalid_recording": "L'enregistrement a échoué - aucune donnée audio capturée",
+        "permission_denied": "Accès au microphone refusé",
+        "unsupported": "L'enregistrement audio n'est pas pris en charge par ce navigateur.",
+        "permission_revoked": "Accès au microphone perdu - enregistrement arrêté",
+        "refresh_failed": "Échec du rafraîchissement de l'URL audio",
+        "refreshing": "Rafraîchissement de l'audio...",
+        "playback_failed": "Échec de la lecture audio",
+        "error": {
+            "no_token": "Jeton de session manquant",
+            "quota_exceeded": "Quota de stockage dépassé. Veuillez supprimer un enregistrement existant ou répondre par écrit.",
+            "file_too_large": "Le fichier audio est trop volumineux. Essayez un enregistrement plus court.",
+            "server_error": "Erreur serveur. Veuillez réessayer dans un instant.",
+            "upload_in_progress": "Veuillez patienter, l'envoi de l'audio est en cours.",
+            "security": "Enregistrement bloqué par les paramètres de sécurité du navigateur",
+            "invalid_state": "L'enregistrement a rencontré une erreur interne"
+        },
+        "fallback": {
+            "toast": "L'audio a été désactivé suite à des erreurs répétées. Veuillez utiliser le texte.",
+            "banner_title": "Audio indisponible",
+            "banner_description": "L'enregistrement audio a rencontré des erreurs répétées. Vous pouvez continuer avec des réponses textuelles.",
+            "try_again": "Réessayer",
+            "inline": "Audio temporairement indisponible."
+        },
+        "permission_denied_with_guidance": "Accès au microphone refusé. Vérifiez les paramètres de votre navigateur pour autoriser l'accès au microphone, puis réessayez.",
+        "retry_upload": "Réessayer l'envoi",
+        "space_shortcut": "ou appuyez sur Espace",
+        "waveform": {
+            "recording": "Forme d'onde audio - enregistrement en cours",
+            "playing": "Forme d'onde audio - lecture de l'enregistrement"
         }
     },
     "admin": {
@@ -1257,7 +1310,7 @@
                     "max_duration_help": "Durée maximale d'enregistrement par question (30–600 secondes).",
                     "storage_quota": "Quota de stockage",
                     "storage_quota_help": "Espace de stockage audio maximal par étude (en Mo).",
-                    "participant_choice_info": "Les participants peuvent choisir de répondre par texte ou par audio pour chaque question, mais pas les deux."
+                    "participant_choice_info": "Les participants peuvent répondre par texte, par audio, ou les deux pour chaque question."
                 }
             },
             "interface": {
@@ -1452,7 +1505,14 @@
             "errors": {
                 "load_failed": "Synchronisation interrompue. Vérifiez votre connexion."
             },
-            "export_emails_success": "Emails exportés avec succès"
+            "export_emails_success": "Emails exportés avec succès",
+            "empty": {
+                "no_participants_title": "Aucun participant pour l'instant",
+                "no_participants_desc": "Partagez le lien de votre étude pour commencer à collecter des réponses."
+            },
+            "pagination": {
+                "showing": "{{from}}\u2013{{to}} sur {{total}}"
+            }
         },
         "empty_states": {
             "participants": {

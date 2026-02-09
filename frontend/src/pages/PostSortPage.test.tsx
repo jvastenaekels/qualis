@@ -66,6 +66,7 @@ describe('PostSortPage', () => {
                 missing_statement: '',
                 general_comment: '',
                 questions_answers: {},
+                audio_recordings: {},
             },
         });
 
@@ -143,7 +144,7 @@ describe('PostSortPage', () => {
             { initialEntries: ['/study/demo/post-sort'] }
         );
 
-        const missingInput = screen.getByLabelText('Missing Statements Input');
+        const missingInput = document.getElementById('missing-statements') as HTMLTextAreaElement;
         await user.type(missingInput, 'I missed the topic of AI safety.');
 
         expect(useResponseStore.getState().postsort.missing_statement).toBe(

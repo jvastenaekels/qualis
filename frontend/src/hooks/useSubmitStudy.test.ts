@@ -100,6 +100,7 @@ describe('useSubmitStudy', () => {
                 { statement_id: 2, grid_score: 4, card_comment: 'Why 4' },
             ],
             postsort_answers: {
+                audio_recordings: {},
                 card_comments: { 1: 'Why -4', 2: 'Why 4' },
                 missing_statement: 'Missed this',
                 general_comment: 'Good study',

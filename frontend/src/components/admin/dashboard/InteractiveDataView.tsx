@@ -5,6 +5,7 @@ import {
     getCoreRowModel,
     getSortedRowModel,
     getFilteredRowModel,
+    getPaginationRowModel,
     flexRender,
     createColumnHelper,
     type SortingState,
@@ -22,8 +23,11 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
     ArrowUpDown,
+    ArrowUp,
+    ArrowDown,
     Clock,
     Globe,
+    ChevronLeft,
     ChevronRight,
     AlertTriangle,
     MessageSquare,
@@ -33,9 +37,7 @@ import {
     Users,
     Trash2,
     Beaker,
-    Filter,
     Calendar,
-    MousePointer2,
     Download,
     X,
     Mic,
@@ -47,6 +49,11 @@ import {
     FileCode,
     Sparkles,
     FilterX,
+    Tag,
+    Briefcase,
+    Loader2,
+    MoreVertical,
+    Inbox,
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -75,7 +82,6 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-    AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
@@ -148,6 +154,9 @@ interface InteractiveDataViewProps {
 
 type ConsentFilter = 'email' | 'newsletter' | 'interview' | null;
 
+const SUSPECT_DURATION_THRESHOLD = 120;
+const PAGE_SIZE = 25;
+
 export default function InteractiveDataView({
     slug,
     participants: initialParticipants,
@@ -168,6 +177,10 @@ export default function InteractiveDataView({
     const [activeTab, setActiveTab] = useState<'live' | 'test'>('live');
     const [qualityFilter, setQualityFilter] = useState<'all' | 'flagged'>('all');
     const [consentFilter, setConsentFilter] = useState<ConsentFilter>(null);
+    const [isExportLoading, setIsExportLoading] = useState(false);
+    const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: PAGE_SIZE });
+    const [clearTestDialogOpen, setClearTestDialogOpen] = useState(false);
+    const [clearAllDialogOpen, setClearAllDialogOpen] = useState(false);
 
     const effectiveParticipants = useMemo(() => {
         const dumpData = rawData as unknown as DumpResponse | null;
@@ -248,12 +261,18 @@ export default function InteractiveDataView({
     const newsletterCount = liveParticipants.filter((p) => p.postsort.newsletter_consent).length;
     const interviewCount = liveParticipants.filter((p) => p.postsort.interview_consent).length;
 
+    const hasParticipantsForTab = activeTab === 'live' ? liveCount > 0 : testCount > 0;
+    const hasActiveFilters =
+        consentFilter !== null || qualityFilter === 'flagged' || globalFilter !== '';
+
     const filteredParticipants = useMemo(() => {
         return effectiveParticipants.filter((p) => {
             const matchesTab = activeTab === 'test' ? p.is_test_run : !p.is_test_run;
             const matchesQuality =
                 qualityFilter === 'flagged'
-                    ? (p.duration_seconds !== null && p.duration_seconds < 120) || p.is_discarded
+                    ? (p.duration_seconds !== null &&
+                          p.duration_seconds < SUSPECT_DURATION_THRESHOLD) ||
+                      p.is_discarded
                     : true;
 
             let matchesConsent = true;
@@ -297,6 +316,32 @@ export default function InteractiveDataView({
         toast.success(t('admin.data.export_emails_success', 'Emails exported successfully'));
     }, [liveParticipants, slug, t]);
 
+    const runExport = useCallback(
+        async (exportFn: () => Promise<void>) => {
+            setIsExportLoading(true);
+            try {
+                await exportFn();
+                toast.success(t('admin.export.success', 'Export successful'));
+            } catch (_e) {
+                toast.error(t('admin.export.error', 'Export failed'));
+            } finally {
+                setIsExportLoading(false);
+            }
+        },
+        [t]
+    );
+
+    const downloadBlob = useCallback((blob: Blob, filename: string) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    }, []);
+
     const columnHelper = createColumnHelper<DumpParticipant>();
 
     const columns = useMemo(
@@ -327,7 +372,7 @@ export default function InteractiveDataView({
                             </div>
                             {p.recruitment_token && (
                                 <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
-                                    <Users className="w-3 h-3" />
+                                    <Tag className="w-3 h-3" />
                                     {p.recruitment_token}
                                 </span>
                             )}
@@ -422,7 +467,7 @@ export default function InteractiveDataView({
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <div className="p-1 bg-amber-50 rounded text-amber-600 border border-amber-100">
-                                                <Users className="h-3 w-3" />
+                                                <Briefcase className="h-3 w-3" />
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -455,7 +500,9 @@ export default function InteractiveDataView({
                 ),
                 cell: ({ row }) => {
                     const p = row.original;
-                    const isSuspect = p.duration_seconds !== null && p.duration_seconds < 120;
+                    const isSuspect =
+                        p.duration_seconds !== null &&
+                        p.duration_seconds < SUSPECT_DURATION_THRESHOLD;
                     const hasComments = Object.keys(p.postsort.card_comments || {}).length > 0;
                     const hasAudio =
                         p.audio_recordings && Object.keys(p.audio_recordings).length > 0;
@@ -517,11 +564,17 @@ export default function InteractiveDataView({
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                        className="h-8 text-xs font-bold p-0 hover:bg-transparent flex items-center gap-1.5"
+                        className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
                     >
                         <Clock className="w-3.5 h-3.5 text-slate-400" />
                         {t('admin.data.table.duration')}
-                        <ArrowUpDown className="ml-2 h-3 w-3" />
+                        {column.getIsSorted() === 'asc' ? (
+                            <ArrowUp className="ml-2 h-3 w-3 text-indigo-500" />
+                        ) : column.getIsSorted() === 'desc' ? (
+                            <ArrowDown className="ml-2 h-3 w-3 text-indigo-500" />
+                        ) : (
+                            <ArrowUpDown className="ml-2 h-3 w-3 text-slate-300" />
+                        )}
                     </Button>
                 ),
                 cell: (info) => {
@@ -550,18 +603,24 @@ export default function InteractiveDataView({
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                        className="h-8 text-xs font-bold p-0 hover:bg-transparent flex items-center gap-1.5"
+                        className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
                     >
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
                         {t('admin.data.table.submitted')}
-                        <ArrowUpDown className="ml-2 h-3 w-3" />
+                        {column.getIsSorted() === 'asc' ? (
+                            <ArrowUp className="ml-2 h-3 w-3 text-indigo-500" />
+                        ) : column.getIsSorted() === 'desc' ? (
+                            <ArrowDown className="ml-2 h-3 w-3 text-indigo-500" />
+                        ) : (
+                            <ArrowUpDown className="ml-2 h-3 w-3 text-slate-300" />
+                        )}
                     </Button>
                 ),
                 cell: (info) => {
                     const val = info.getValue();
                     if (!val) return <span className="text-slate-300">—</span>;
                     return (
-                        <div className="flex flex-col text-[10px] text-slate-500 font-medium leading-none gap-1">
+                        <div className="flex flex-col text-xs text-slate-500 font-medium leading-none gap-1">
                             <div className="flex items-center gap-1 text-slate-700">
                                 <Calendar className="w-3 h-3 text-slate-300" />
                                 {format(new Date(val), 'P', { locale: currentLocale })}
@@ -575,6 +634,9 @@ export default function InteractiveDataView({
             }),
             columnHelper.display({
                 id: 'actions',
+                header: () => (
+                    <span className="sr-only">{t('admin.data.table.actions', 'Details')}</span>
+                ),
                 cell: ({ row }) => (
                     <div className="flex justify-end">
                         <Button
@@ -602,9 +664,11 @@ export default function InteractiveDataView({
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
         onGlobalFilterChange: setGlobalFilter,
-        state: { sorting, globalFilter },
+        onPaginationChange: setPagination,
+        state: { sorting, globalFilter, pagination },
     });
 
     if (isLoading && !data) {
@@ -647,143 +711,147 @@ export default function InteractiveDataView({
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Interactive Summary Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {/* Email Collection Card */}
-                <button
-                    type="button"
-                    onClick={() => setConsentFilter(consentFilter === 'email' ? null : 'email')}
-                    className={cn(
-                        'group bg-white p-6 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
-                        consentFilter === 'email'
-                            ? 'border-indigo-400 ring-4 ring-indigo-100 shadow-indigo-200'
-                            : 'border-slate-200 hover:border-indigo-200'
-                    )}
-                >
-                    <div className="flex items-start justify-between mb-4">
-                        <div
-                            className={cn(
-                                'p-3 rounded-xl transition-colors',
-                                consentFilter === 'email'
-                                    ? 'bg-indigo-600 text-white'
-                                    : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'
+            {liveCount > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {/* Email Collection Card */}
+                    <button
+                        type="button"
+                        onClick={() => setConsentFilter(consentFilter === 'email' ? null : 'email')}
+                        className={cn(
+                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            consentFilter === 'email'
+                                ? 'border-indigo-400 ring-4 ring-indigo-100 shadow-indigo-200'
+                                : 'border-slate-200 hover:border-indigo-200'
+                        )}
+                    >
+                        <div className="flex items-start justify-between mb-2">
+                            <div
+                                className={cn(
+                                    'p-2.5 rounded-xl transition-colors',
+                                    consentFilter === 'email'
+                                        ? 'bg-indigo-600 text-white'
+                                        : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'
+                                )}
+                            >
+                                <Mail className="w-4 h-4" />
+                            </div>
+                            {emailCount > 0 && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleExportEmails();
+                                    }}
+                                    className="h-7 px-2 hover:bg-indigo-50 text-indigo-600 font-semibold text-xs"
+                                >
+                                    <Download className="w-3 h-3 mr-1" />
+                                    {t('admin.data.actions.export', 'Export')}
+                                </Button>
                             )}
-                        >
-                            <Mail className="w-5 h-5" />
+                        </div>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
+                            {t('admin.data.stats.email_collection')}
+                        </p>
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span className="text-3xl font-black text-slate-900 leading-none">
+                                {emailCount}
+                            </span>
+                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
                         </div>
                         {emailCount > 0 && (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleExportEmails();
-                                }}
-                                className="h-8 px-2 hover:bg-indigo-50 text-indigo-600 font-semibold"
-                            >
-                                <Download className="w-3.5 h-3.5 mr-1.5" />
-                                {t('admin.data.actions.export', 'Export')}
-                            </Button>
+                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                                <ArrowRight className="w-3 h-3" />
+                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                            </p>
                         )}
-                    </div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
-                        {t('admin.data.stats.email_collection')}
-                    </p>
-                    <div className="flex items-baseline gap-2 mb-2">
-                        <span className="text-4xl font-black text-slate-900 leading-none">
-                            {emailCount}
-                        </span>
-                        <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
-                    </div>
-                    {emailCount > 0 && (
-                        <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
-                            <ArrowRight className="w-3 h-3" />
-                            {t('admin.data.stats.click_to_filter', 'Click to filter')}
-                        </p>
-                    )}
-                </button>
+                    </button>
 
-                {/* Newsletter Consent Card */}
-                <button
-                    type="button"
-                    onClick={() =>
-                        setConsentFilter(consentFilter === 'newsletter' ? null : 'newsletter')
-                    }
-                    className={cn(
-                        'group bg-white p-6 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
-                        consentFilter === 'newsletter'
-                            ? 'border-emerald-400 ring-4 ring-emerald-100 shadow-emerald-200'
-                            : 'border-slate-200 hover:border-emerald-200'
-                    )}
-                >
-                    <div className="flex items-center justify-between mb-4">
-                        <div
-                            className={cn(
-                                'p-3 rounded-xl transition-colors',
-                                consentFilter === 'newsletter'
-                                    ? 'bg-emerald-600 text-white'
-                                    : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
-                            )}
-                        >
-                            <Bell className="w-5 h-5" />
+                    {/* Newsletter Consent Card */}
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setConsentFilter(consentFilter === 'newsletter' ? null : 'newsletter')
+                        }
+                        className={cn(
+                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            consentFilter === 'newsletter'
+                                ? 'border-emerald-400 ring-4 ring-emerald-100 shadow-emerald-200'
+                                : 'border-slate-200 hover:border-emerald-200'
+                        )}
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div
+                                className={cn(
+                                    'p-2.5 rounded-xl transition-colors',
+                                    consentFilter === 'newsletter'
+                                        ? 'bg-emerald-600 text-white'
+                                        : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
+                                )}
+                            >
+                                <Bell className="w-4 h-4" />
+                            </div>
                         </div>
-                    </div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
-                        {t('admin.data.stats.newsletter')}
-                    </p>
-                    <div className="flex items-baseline gap-2 mb-2">
-                        <span className="text-4xl font-black text-slate-900 leading-none">
-                            {newsletterCount}
-                        </span>
-                    </div>
-                    {newsletterCount > 0 && (
-                        <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
-                            <ArrowRight className="w-3 h-3" />
-                            {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
+                            {t('admin.data.stats.newsletter')}
                         </p>
-                    )}
-                </button>
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span className="text-3xl font-black text-slate-900 leading-none">
+                                {newsletterCount}
+                            </span>
+                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
+                        </div>
+                        {newsletterCount > 0 && (
+                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                                <ArrowRight className="w-3 h-3" />
+                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                            </p>
+                        )}
+                    </button>
 
-                {/* Interview Consent Card */}
-                <button
-                    type="button"
-                    onClick={() =>
-                        setConsentFilter(consentFilter === 'interview' ? null : 'interview')
-                    }
-                    className={cn(
-                        'group bg-white p-6 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
-                        consentFilter === 'interview'
-                            ? 'border-amber-400 ring-4 ring-amber-100 shadow-amber-200'
-                            : 'border-slate-200 hover:border-amber-200'
-                    )}
-                >
-                    <div className="flex items-center justify-between mb-4">
-                        <div
-                            className={cn(
-                                'p-3 rounded-xl transition-colors',
-                                consentFilter === 'interview'
-                                    ? 'bg-amber-600 text-white'
-                                    : 'bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white'
-                            )}
-                        >
-                            <Users className="w-5 h-5" />
+                    {/* Interview Consent Card */}
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setConsentFilter(consentFilter === 'interview' ? null : 'interview')
+                        }
+                        className={cn(
+                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            consentFilter === 'interview'
+                                ? 'border-amber-400 ring-4 ring-amber-100 shadow-amber-200'
+                                : 'border-slate-200 hover:border-amber-200'
+                        )}
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div
+                                className={cn(
+                                    'p-2.5 rounded-xl transition-colors',
+                                    consentFilter === 'interview'
+                                        ? 'bg-amber-600 text-white'
+                                        : 'bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white'
+                                )}
+                            >
+                                <Briefcase className="w-4 h-4" />
+                            </div>
                         </div>
-                    </div>
-                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
-                        {t('admin.data.stats.follow_up')}
-                    </p>
-                    <div className="flex items-baseline gap-2 mb-2">
-                        <span className="text-4xl font-black text-slate-900 leading-none">
-                            {interviewCount}
-                        </span>
-                    </div>
-                    {interviewCount > 0 && (
-                        <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
-                            <ArrowRight className="w-3 h-3" />
-                            {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
+                            {t('admin.data.stats.follow_up')}
                         </p>
-                    )}
-                </button>
-            </div>
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span className="text-3xl font-black text-slate-900 leading-none">
+                                {interviewCount}
+                            </span>
+                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
+                        </div>
+                        {interviewCount > 0 && (
+                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                                <ArrowRight className="w-3 h-3" />
+                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                            </p>
+                        )}
+                    </button>
+                </div>
+            )}
 
             {/* Active Filters */}
             {(consentFilter || qualityFilter === 'flagged') && (
@@ -810,7 +878,7 @@ export default function InteractiveDataView({
                             )}
                             {consentFilter === 'interview' && (
                                 <>
-                                    <Users className="w-3 h-3" />
+                                    <Briefcase className="w-3 h-3" />
                                     {t('admin.data.filters.interview', 'Interview consent')}
                                 </>
                             )}
@@ -859,18 +927,18 @@ export default function InteractiveDataView({
                 onValueChange={(v) => setActiveTab(v as 'live' | 'test')}
                 className="w-full"
             >
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
                     <TabsList className="bg-slate-100/80 p-1 rounded-xl h-11 border border-slate-200/50">
                         <TabsTrigger
                             value="live"
-                            className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                            className="rounded-lg px-4 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm"
                         >
                             <div className="flex items-center gap-2">
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 {t('admin.data.tabs.live')}
                                 <Badge
                                     variant="secondary"
-                                    className="ml-1.5 h-5 px-1.5 bg-slate-200/50 text-slate-600 border-none font-bold"
+                                    className="ml-1.5 h-5 px-1.5 bg-slate-200/50 text-slate-600 border-none font-semibold"
                                 >
                                     {liveCount}
                                 </Badge>
@@ -880,12 +948,12 @@ export default function InteractiveDataView({
                         {testCount > 0 && (
                             <TabsTrigger
                                 value="test"
-                                className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                                className="rounded-lg px-4 font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm"
                             >
                                 <div className="flex items-center gap-2">
                                     <Beaker className="w-3.5 h-3.5" />
                                     {t('admin.data.tabs.test')}
-                                    <span className="ml-1.5 text-slate-400 font-bold">
+                                    <span className="ml-1.5 text-slate-400 font-semibold">
                                         {testCount}
                                     </span>
                                 </div>
@@ -893,7 +961,7 @@ export default function InteractiveDataView({
                         )}
                     </TabsList>
 
-                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <div className="flex items-center gap-3 w-full lg:w-auto flex-wrap">
                         <div className="relative group flex-1 sm:flex-initial">
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
                             <Input
@@ -906,28 +974,35 @@ export default function InteractiveDataView({
 
                         <Button
                             variant="outline"
-                            size="icon"
                             onClick={() =>
                                 setQualityFilter((prev) => (prev === 'all' ? 'flagged' : 'all'))
                             }
                             className={cn(
-                                'h-11 w-11 rounded-xl transition-all border-slate-200',
+                                'h-11 rounded-xl transition-all border-slate-200 gap-2 font-semibold',
                                 qualityFilter === 'flagged'
                                     ? 'bg-amber-50 border-amber-200 text-amber-600 shadow-inner'
                                     : 'bg-white hover:bg-slate-50'
                             )}
                             title={t('admin.data.filter.only_flagged')}
                         >
-                            <Filter className="h-4 w-4" />
+                            <AlertTriangle className="h-4 w-4" />
+                            <span className="hidden sm:inline text-xs">
+                                {t('admin.data.filters.flagged', 'Flagged')}
+                            </span>
                         </Button>
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
                                     variant="outline"
-                                    className="h-11 rounded-xl border-slate-200 bg-white font-bold gap-2 shadow-sm whitespace-nowrap"
+                                    className="h-11 rounded-xl border-slate-200 bg-white font-semibold gap-2 shadow-sm whitespace-nowrap"
+                                    disabled={isExportLoading}
                                 >
-                                    <Download className="h-4 w-4" />
+                                    {isExportLoading ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Download className="h-4 w-4" />
+                                    )}
                                     <span className="hidden sm:inline">
                                         {t('admin.export.label', 'Export')}
                                     </span>
@@ -935,122 +1010,69 @@ export default function InteractiveDataView({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-56 rounded-xl">
                                 <DropdownMenuItem
-                                    onClick={async () => {
-                                        try {
+                                    disabled={isExportLoading}
+                                    onClick={() =>
+                                        runExport(async () => {
                                             const blob =
                                                 await AdminService.exportResearchPackage(slug);
-                                            const url = window.URL.createObjectURL(blob);
-                                            const a = document.createElement('a');
-                                            a.href = url;
-                                            a.download = `${slug}_research_package.zip`;
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            window.URL.revokeObjectURL(url);
-                                            toast.success(
-                                                t('admin.export.success', 'Export successful')
-                                            );
-                                        } catch (_e) {
-                                            toast.error(t('admin.export.error', 'Export failed'));
-                                        }
-                                    }}
+                                            downloadBlob(blob, `${slug}_research_package.zip`);
+                                        })
+                                    }
                                     className="font-bold cursor-pointer text-indigo-600 bg-indigo-50/50 gap-2"
                                 >
                                     <Package className="h-4 w-4" />
                                     {t('admin.export.formats.package', 'Research Package (ZIP)')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={async () => {
-                                        try {
+                                    disabled={isExportLoading}
+                                    onClick={() =>
+                                        runExport(async () => {
                                             const blob = await AdminService.exportCSV(slug);
-                                            const url = window.URL.createObjectURL(blob);
-                                            const a = document.createElement('a');
-                                            a.href = url;
-                                            a.download = `${slug}_data.csv`;
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            window.URL.revokeObjectURL(url);
-                                            toast.success(
-                                                t('admin.export.success', 'Export successful')
-                                            );
-                                        } catch (_e) {
-                                            toast.error(t('admin.export.error', 'Export failed'));
-                                        }
-                                    }}
+                                            downloadBlob(blob, `${slug}_data.csv`);
+                                        })
+                                    }
                                     className="font-medium cursor-pointer gap-2"
                                 >
                                     <FileSpreadsheet className="h-4 w-4" />
                                     {t('admin.export.formats.csv', 'CSV')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={async () => {
-                                        try {
+                                    disabled={isExportLoading}
+                                    onClick={() =>
+                                        runExport(async () => {
                                             const blob = await AdminService.exportPQMethod(slug);
-                                            const url = window.URL.createObjectURL(blob);
-                                            const a = document.createElement('a');
-                                            a.href = url;
-                                            a.download = `${slug}_pqmethod.zip`;
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            window.URL.revokeObjectURL(url);
-                                            toast.success(
-                                                t('admin.export.success', 'Export successful')
-                                            );
-                                        } catch (_e) {
-                                            toast.error(t('admin.export.error', 'Export failed'));
-                                        }
-                                    }}
+                                            downloadBlob(blob, `${slug}_pqmethod.zip`);
+                                        })
+                                    }
                                     className="font-medium cursor-pointer gap-2"
                                 >
                                     <Database className="h-4 w-4" />
                                     {t('admin.export.formats.pqmethod', 'PQMethod (ZIP)')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={async () => {
-                                        try {
+                                    disabled={isExportLoading}
+                                    onClick={() =>
+                                        runExport(async () => {
                                             const blob = await AdminService.exportRKit(slug);
-                                            const url = window.URL.createObjectURL(blob);
-                                            const a = document.createElement('a');
-                                            a.href = url;
-                                            a.download = `${slug}_r_kit.zip`;
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            window.URL.revokeObjectURL(url);
-                                            toast.success(
-                                                t('admin.export.success', 'Export successful')
-                                            );
-                                        } catch (_e) {
-                                            toast.error(t('admin.export.error', 'Export failed'));
-                                        }
-                                    }}
+                                            downloadBlob(blob, `${slug}_r_kit.zip`);
+                                        })
+                                    }
                                     className="font-medium cursor-pointer gap-2"
                                 >
                                     <FileCode className="h-4 w-4" />
                                     {t('admin.export.formats.rkit', 'R-Kit (ZIP)')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
-                                    onClick={async () => {
-                                        try {
-                                            // Using the existing dump API but for download
+                                    disabled={isExportLoading}
+                                    onClick={() =>
+                                        runExport(async () => {
                                             const blob = new Blob(
                                                 [JSON.stringify(rawData, null, 2)],
-                                                {
-                                                    type: 'application/json',
-                                                }
+                                                { type: 'application/json' }
                                             );
-                                            const url = window.URL.createObjectURL(blob);
-                                            const a = document.createElement('a');
-                                            a.href = url;
-                                            a.download = `${slug}_dump.json`;
-                                            document.body.appendChild(a);
-                                            a.click();
-                                            window.URL.revokeObjectURL(url);
-                                            toast.success(
-                                                t('admin.export.success', 'Export successful')
-                                            );
-                                        } catch (_e) {
-                                            toast.error(t('admin.export.error', 'Export failed'));
-                                        }
-                                    }}
+                                            downloadBlob(blob, `${slug}_dump.json`);
+                                        })
+                                    }
                                     className="font-medium cursor-pointer gap-2"
                                 >
                                     <FileCode className="h-4 w-4" />
@@ -1059,90 +1081,107 @@ export default function InteractiveDataView({
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        {activeTab === 'test' && testCount > 0 && (
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
+                        {((activeTab === 'test' && testCount > 0) ||
+                            (activeTab === 'live' &&
+                                liveCount > 0 &&
+                                data.study.state === 'draft')) && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
                                     <Button
-                                        variant="outline"
-                                        className="h-11 rounded-xl border-red-100 bg-red-50 text-red-600 hover:bg-red-100 hover:border-red-200 font-bold gap-2 shadow-sm"
-                                        disabled={isClearing}
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-11 w-11 rounded-xl text-slate-400 hover:text-slate-600"
                                     >
-                                        <Trash2 className="h-4 w-4" />
-                                        <span className="hidden sm:inline">
-                                            {t('admin.data.actions.clear_test_runs')}
-                                        </span>
+                                        <MoreVertical className="h-4 w-4" />
                                     </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
-                                            <div className="p-2 bg-red-100 text-red-600 rounded-xl">
-                                                <Trash2 className="w-5 h-5" />
-                                            </div>
-                                            {t('admin.data.actions.clear_test_runs')}
-                                        </AlertDialogTitle>
-                                        <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
-                                            {t('admin.data.actions.clear_test_runs_confirm')}
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter className="gap-2">
-                                        <AlertDialogCancel className="rounded-2xl font-bold h-12">
-                                            {t('common.cancel')}
-                                        </AlertDialogCancel>
-                                        <AlertDialogAction
-                                            onClick={handleClearTestRuns}
-                                            className="rounded-2xl font-bold h-12 bg-red-600 hover:bg-red-700"
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-52 rounded-xl">
+                                    {activeTab === 'test' && testCount > 0 && (
+                                        <DropdownMenuItem
+                                            disabled={isClearing}
+                                            onClick={() => setClearTestDialogOpen(true)}
+                                            className="font-semibold cursor-pointer gap-2 text-red-600 focus:text-red-600 focus:bg-red-50"
                                         >
-                                            {t('common.confirm_delete')}
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
+                                            <Trash2 className="h-4 w-4" />
+                                            {t('admin.data.actions.clear_test_runs')}
+                                        </DropdownMenuItem>
+                                    )}
+                                    {activeTab === 'live' &&
+                                        liveCount > 0 &&
+                                        data.study.state === 'draft' && (
+                                            <DropdownMenuItem
+                                                onClick={() => setClearAllDialogOpen(true)}
+                                                className="font-semibold cursor-pointer gap-2 text-rose-600 focus:text-rose-600 focus:bg-rose-50"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                                {t('admin.data.actions.clear_all')}
+                                            </DropdownMenuItem>
+                                        )}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         )}
 
-                        {activeTab === 'live' && liveCount > 0 && data.study.state === 'draft' && (
-                            <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className="h-11 rounded-xl border-rose-100 bg-rose-50 text-rose-600 hover:bg-rose-100 hover:border-rose-200 font-bold gap-2 shadow-sm"
+                        {/* Controlled confirmation dialogs */}
+                        <AlertDialog
+                            open={clearTestDialogOpen}
+                            onOpenChange={setClearTestDialogOpen}
+                        >
+                            <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                                        <div className="p-2 bg-red-100 text-red-600 rounded-xl">
+                                            <Trash2 className="w-5 h-5" />
+                                        </div>
+                                        {t('admin.data.actions.clear_test_runs')}
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
+                                        {t('admin.data.actions.clear_test_runs_confirm')}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="gap-2">
+                                    <AlertDialogCancel className="rounded-2xl font-bold h-12">
+                                        {t('common.cancel')}
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleClearTestRuns}
+                                        className="rounded-2xl font-bold h-12 bg-red-600 hover:bg-red-700"
                                     >
-                                        <Trash2 className="h-4 w-4" />
-                                        <span className="hidden sm:inline">
-                                            {t('admin.data.actions.clear_all')}
-                                        </span>
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
-                                            <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">
-                                                <Trash2 className="w-5 h-5" />
-                                            </div>
-                                            {t('admin.data.actions.clear_all')}
-                                        </AlertDialogTitle>
-                                        <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
-                                            {t('admin.data.actions.clear_all_confirm')}
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter className="gap-2">
-                                        <AlertDialogCancel className="rounded-2xl font-bold h-12">
-                                            {t('common.cancel')}
-                                        </AlertDialogCancel>
-                                        <AlertDialogAction
-                                            onClick={handleClearAllParticipants}
-                                            className="rounded-2xl font-bold h-12 bg-rose-600 hover:bg-rose-700"
-                                        >
-                                            {t('common.confirm_delete')}
-                                        </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        )}
+                                        {t('common.confirm_delete')}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
+                        <AlertDialog open={clearAllDialogOpen} onOpenChange={setClearAllDialogOpen}>
+                            <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                                        <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">
+                                            <Trash2 className="w-5 h-5" />
+                                        </div>
+                                        {t('admin.data.actions.clear_all')}
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
+                                        {t('admin.data.actions.clear_all_confirm')}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter className="gap-2">
+                                    <AlertDialogCancel className="rounded-2xl font-bold h-12">
+                                        {t('common.cancel')}
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                        onClick={handleClearAllParticipants}
+                                        className="rounded-2xl font-bold h-12 bg-rose-600 hover:bg-rose-700"
+                                    >
+                                        {t('common.confirm_delete')}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-[2rem] border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden ring-1 ring-slate-100">
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden ring-1 ring-slate-100">
                     <Table>
                         <TableHeader className="bg-slate-50/80">
                             {table.getHeaderGroups().map((headerGroup) => (
@@ -1194,35 +1233,101 @@ export default function InteractiveDataView({
                                         colSpan={columns.length}
                                         className="h-64 text-center"
                                     >
-                                        <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
-                                            <div className="p-4 bg-slate-50 rounded-full">
-                                                <MousePointer2 className="w-8 h-8 opacity-20" />
+                                        {!hasParticipantsForTab ? (
+                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                                                <div className="p-4 bg-slate-50 rounded-full">
+                                                    <Inbox className="w-8 h-8 opacity-30" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="font-bold text-slate-600">
+                                                        {t(
+                                                            'admin.data.empty.no_participants_title',
+                                                            'No participants yet'
+                                                        )}
+                                                    </p>
+                                                    <p className="text-sm text-slate-400 max-w-xs mx-auto">
+                                                        {t(
+                                                            'admin.data.empty.no_participants_desc',
+                                                            'Share your study link to start collecting responses.'
+                                                        )}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <p className="font-bold">
-                                                {t('admin.data.search.no_results')}
-                                            </p>
-                                            {(consentFilter || qualityFilter === 'flagged') && (
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        setConsentFilter(null);
-                                                        setQualityFilter('all');
-                                                    }}
-                                                    className="mt-2"
-                                                >
-                                                    {t(
-                                                        'admin.data.filters.clear_all',
-                                                        'Clear filters'
-                                                    )}
-                                                </Button>
-                                            )}
-                                        </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                                                <div className="p-4 bg-slate-50 rounded-full">
+                                                    <Search className="w-8 h-8 opacity-20" />
+                                                </div>
+                                                <p className="font-bold">
+                                                    {t('admin.data.search.no_results')}
+                                                </p>
+                                                {hasActiveFilters && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setConsentFilter(null);
+                                                            setQualityFilter('all');
+                                                            setGlobalFilter('');
+                                                        }}
+                                                        className="mt-2"
+                                                    >
+                                                        {t(
+                                                            'admin.data.filters.clear_all',
+                                                            'Clear filters'
+                                                        )}
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             )}
                         </TableBody>
                     </Table>
+
+                    {/* Pagination */}
+                    {table.getPageCount() > 1 && (
+                        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100">
+                            <p className="text-xs text-slate-500 font-medium">
+                                {t(
+                                    'admin.data.pagination.showing',
+                                    'Showing {{from}}\u2013{{to}} of {{total}}',
+                                    {
+                                        from: pagination.pageIndex * pagination.pageSize + 1,
+                                        to: Math.min(
+                                            (pagination.pageIndex + 1) * pagination.pageSize,
+                                            table.getFilteredRowModel().rows.length
+                                        ),
+                                        total: table.getFilteredRowModel().rows.length,
+                                    }
+                                )}
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => table.previousPage()}
+                                    disabled={!table.getCanPreviousPage()}
+                                    className="h-8 w-8 p-0 rounded-lg"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <span className="text-xs font-bold text-slate-600 min-w-[4rem] text-center">
+                                    {pagination.pageIndex + 1} / {table.getPageCount()}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => table.nextPage()}
+                                    disabled={!table.getCanNextPage()}
+                                    className="h-8 w-8 p-0 rounded-lg"
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Tabs>
         </div>
