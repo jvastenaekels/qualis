@@ -47,7 +47,21 @@ import type { StudyRead, StudyUpdate } from '@/api/model';
 import * as z from 'zod';
 import { AdminService } from '@/api/admin';
 import { parseApiErrorSync } from '@/lib/error-utils';
-import { Loader2, Globe, Archive, Trash2, Save, Info, ShieldAlert, Settings } from 'lucide-react';
+import {
+    Loader2,
+    Globe,
+    Archive,
+    Trash2,
+    Save,
+    Info,
+    ShieldAlert,
+    Settings,
+    HardDrive,
+    AlertTriangle,
+} from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet } from '@/api/generated';
+import { Progress } from '@/components/ui/progress';
 
 // Removing useAdminStudy as we use loader now
 
@@ -60,6 +74,16 @@ const studyFormSchema = z.object({
 });
 
 type StudyFormValues = z.infer<typeof studyFormSchema>;
+
+// Storage usage response type
+interface StorageUsageResponse {
+    total_bytes: number;
+    total_mb: number;
+    file_count: number;
+    quota_mb: number;
+    quota_bytes: number;
+    usage_percent: number;
+}
 
 export default function GeneralSettingsPage() {
     const navigate = useNavigate();
@@ -205,6 +229,26 @@ export default function GeneralSettingsPage() {
     const isClosed = study.state === 'closed';
     const isArchived = study.state === 'archived';
 
+    // Check if audio is enabled for this study
+    const audioConfig = (study?.postsort_config as { audio?: { enabled?: boolean } })?.audio;
+    const isAudioEnabled = audioConfig?.enabled ?? false;
+
+    // Fetch storage usage if audio is enabled
+    const {
+        data: storageUsage,
+        isLoading: isLoadingStorage,
+        error: storageError,
+    } = useQuery<StorageUsageResponse>({
+        queryKey: ['storage-usage', slug],
+        queryFn: async () => {
+            if (!slug) throw new Error('No slug');
+            const response = await getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet(slug);
+            return response as StorageUsageResponse;
+        },
+        enabled: !!slug && isAudioEnabled,
+        refetchInterval: 30000, // Refresh every 30s
+    });
+
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
@@ -277,6 +321,94 @@ export default function GeneralSettingsPage() {
                         </Card>
                     </form>
                 </Form>
+
+                {/* Storage Usage Card - Only shown if audio is enabled */}
+                {isAudioEnabled && (
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                        <CardHeader className="border-b border-slate-50 pb-4">
+                            <div className="flex items-center gap-2 mb-1">
+                                <HardDrive className="h-5 w-5 text-indigo-500" />
+                                <CardTitle className="text-lg font-black text-slate-900">
+                                    {t('admin.settings.storage.title', 'Audio Storage Usage')}
+                                </CardTitle>
+                            </div>
+                            <CardDescription className="text-sm font-medium text-slate-500">
+                                {t(
+                                    'admin.settings.storage.description',
+                                    'Monitor audio recording storage for this study'
+                                )}
+                            </CardDescription>
+                        </CardHeader>
+
+                        <CardContent className="p-6">
+                            {isLoadingStorage ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
+                                </div>
+                            ) : storageError ? (
+                                <Alert className="bg-red-50 border-red-200">
+                                    <AlertTriangle className="h-4 w-4 text-red-600" />
+                                    <AlertDescription className="text-red-800">
+                                        {t(
+                                            'admin.settings.storage.error',
+                                            'Failed to load storage usage'
+                                        )}
+                                    </AlertDescription>
+                                </Alert>
+                            ) : storageUsage ? (
+                                <div className="space-y-4">
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-baseline">
+                                            <span className="text-sm font-medium text-slate-700">
+                                                {t('admin.settings.storage.used', 'Storage Used')}
+                                            </span>
+                                            <span className="text-2xl font-bold text-slate-900">
+                                                {storageUsage.total_mb.toFixed(2)} MB
+                                            </span>
+                                        </div>
+
+                                        <div className="flex justify-between items-baseline">
+                                            <span className="text-sm text-slate-600">
+                                                {t('admin.settings.storage.quota', 'Quota')}
+                                            </span>
+                                            <span className="text-sm font-medium text-slate-700">
+                                                {storageUsage.quota_mb} MB
+                                            </span>
+                                        </div>
+
+                                        <Progress
+                                            value={storageUsage.usage_percent}
+                                            className="h-3"
+                                        />
+
+                                        <div className="flex justify-between text-xs text-slate-500">
+                                            <span>
+                                                {t('admin.settings.storage.files_count', 'Files')}:{' '}
+                                                {storageUsage.file_count}
+                                            </span>
+                                            <span>
+                                                {storageUsage.usage_percent.toFixed(1)}%{' '}
+                                                {t('admin.settings.storage.used_lowercase', 'used')}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    {storageUsage.usage_percent > 80 && (
+                                        <Alert className="bg-amber-50 border-amber-200">
+                                            <AlertTriangle className="h-4 w-4 text-amber-600" />
+                                            <AlertDescription className="text-amber-800 text-sm">
+                                                {t(
+                                                    'admin.settings.storage.warning_high_usage',
+                                                    'Storage usage is high. Consider increasing the quota or removing old recordings.'
+                                                )}
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+                                </div>
+                            ) : null}
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* Archiving Section */}
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-8">

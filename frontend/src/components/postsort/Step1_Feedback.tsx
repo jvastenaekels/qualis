@@ -4,12 +4,20 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, ArrowRight } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AlertCircle, ArrowRight, Mic } from 'lucide-react';
 import { SafeMarkdown } from '../SafeMarkdown';
+import { AudioRecorder } from '@/components/audio/AudioRecorder';
 import { useResponseStore } from '@/store/useResponseStore';
 import { useConfigStore } from '@/store/useConfigStore';
+import { useSessionStore } from '@/store/useSessionStore';
 import { useNavigate } from 'react-router-dom';
 import { useViewport } from '@/contexts/ViewportContext';
+import {
+    uploadAudioApiAudioUploadPost,
+    deleteAudioRecordingApiAudioRecordingIdDelete,
+} from '@/api/generated';
+import { toast } from 'sonner';
 
 interface Step1Props {
     onNext: () => void;
@@ -21,11 +29,15 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const navigate = useNavigate();
 
     const config = useConfigStore((state) => state.config);
+    const token = useSessionStore((state) => state.token);
     const { qsort, postsort } = useResponseStore((state) => ({
         qsort: state.qsort,
         postsort: state.postsort,
     }));
     const setPostSortResponse = useResponseStore((state) => state.setPostSortResponse);
+    const setAudioRecording = useResponseStore((state) => state.setAudioRecording);
+    const deleteAudioRecording = useResponseStore((state) => state.deleteAudioRecording);
+    const getAudioRecording = useResponseStore((state) => state.getAudioRecording);
 
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [validationError, setValidationError] = useState<string | null>(null);
@@ -35,6 +47,11 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const extremeCols = config?.postsort_config?.extreme_columns || [-4, 4];
     const allowRandomComments = config?.postsort_config?.allow_random_comments ?? true;
     const allowMissingStatements = config?.postsort_config?.missing_statements_enabled ?? true;
+
+    // Audio configuration
+    const audioConfig = config?.postsort_config?.audio;
+    const isAudioEnabled = audioConfig?.enabled ?? false;
+    const maxDurationSeconds = audioConfig?.max_duration_seconds ?? 180;
 
     // --- Data Preparation ---
     const extremeCards = qsort
@@ -75,6 +92,66 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
         return t(defaultTextKey, { defaultValue });
     };
 
+    // --- Audio Handlers ---
+    const handleAudioUpload = async (questionKey: string, blob: Blob, duration: number) => {
+        if (!token) {
+            toast.error(t('audio.error.no_token', 'Session token missing'));
+            return;
+        }
+
+        try {
+            // Create File from Blob (orval expects File, not Blob)
+            const file = new File([blob], `recording_${Date.now()}.webm`, {
+                type: blob.type,
+            });
+
+            const response = await uploadAudioApiAudioUploadPost({
+                file,
+                session_token: token,
+                question_key: questionKey,
+                duration_seconds: duration,
+            });
+
+            // Store metadata in Zustand
+            setAudioRecording(questionKey, {
+                id: response.recording_id,
+                question_key: questionKey,
+                file_size_bytes: response.file_size_bytes,
+                duration_seconds: duration,
+                presigned_url: response.presigned_url,
+                created_at: new Date().toISOString(),
+            });
+
+            // Clear text comment (exclusive choice)
+            if (questionKey.startsWith('card_')) {
+                const statementId = Number.parseInt(questionKey.replace('card_', ''), 10);
+                if (!Number.isNaN(statementId)) {
+                    handleCommentChange(statementId, '');
+                }
+            } else if (questionKey === 'missing_statement') {
+                setPostSortResponse('missing_statement', '');
+            }
+        } catch (error) {
+            console.error('Audio upload failed:', error);
+            throw error; // Let AudioRecorder handle the error display
+        }
+    };
+
+    const handleAudioDelete = async (questionKey: string) => {
+        const recording = getAudioRecording(questionKey);
+        if (!recording || !token) return;
+
+        try {
+            await deleteAudioRecordingApiAudioRecordingIdDelete(recording.id, {
+                session_token: token,
+            });
+            deleteAudioRecording(questionKey);
+        } catch (error) {
+            console.error('Audio deletion failed:', error);
+            throw error; // Let AudioRecorder handle the error display
+        }
+    };
+
     const handleCommentChange = (id: number, val: string) => {
         const current = { ...(postsort.card_comments || {}) };
         current[id] = val;
@@ -83,7 +160,9 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
 
     const isCommentValid = (id: number) => {
         const comment = postsort.card_comments?.[id] || '';
-        return comment.length >= 2; // Min length 2 chars
+        const hasText = comment.length >= 2;
+        const hasAudio = !!getAudioRecording(`card_${id}`);
+        return hasText || hasAudio; // Valid if either text OR audio exists
     };
 
     const validateStep1 = () => {
@@ -190,11 +269,8 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                 </SafeMarkdown>
                             </blockquote>
 
-                            <div className="relative">
-                                <Label
-                                    htmlFor={`comment-${card.statementId}`}
-                                    className="block text-sm font-semibold text-slate-700 mb-2"
-                                >
+                            <div className="relative space-y-3">
+                                <Label className="block text-sm font-semibold text-slate-700">
                                     {getPrompt(
                                         isPositive
                                             ? ['extreme_positive', 'extreme']
@@ -204,32 +280,92 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         t('post.extreme.why')
                                     )}
                                 </Label>
-                                <Textarea
-                                    id={`comment-${card.statementId}`}
-                                    value={postsort.card_comments?.[card.statementId] || ''}
-                                    onChange={(e) =>
-                                        handleCommentChange(card.statementId, e.target.value)
-                                    }
-                                    onBlur={() =>
+
+                                <Tabs
+                                    defaultValue="text"
+                                    className="w-full"
+                                    onValueChange={() =>
                                         setTouched((prev) => ({
                                             ...prev,
                                             [card.statementId]: true,
                                         }))
                                     }
-                                    className={`
-                                        min-h-[100px] text-base border-slate-300
-                                        ${!isValid && isTouched ? 'border-red-400 focus:ring-red-200 bg-red-50' : ''}
-                                    `}
-                                    placeholder={t('post.extreme.placeholder')}
-                                    data-testid="extreme-comment-input"
-                                />
+                                >
+                                    <TabsList className="grid w-full grid-cols-2">
+                                        <TabsTrigger value="text">
+                                            {t('post.response_type.text', 'Text')}
+                                        </TabsTrigger>
+                                        <TabsTrigger value="audio" disabled={!isAudioEnabled}>
+                                            <Mic className="w-4 h-4 mr-1" />
+                                            {t('post.response_type.audio', 'Audio')}
+                                        </TabsTrigger>
+                                    </TabsList>
+
+                                    <TabsContent value="text" className="space-y-2 mt-3">
+                                        <Textarea
+                                            id={`comment-${card.statementId}`}
+                                            value={postsort.card_comments?.[card.statementId] || ''}
+                                            onChange={(e) =>
+                                                handleCommentChange(
+                                                    card.statementId,
+                                                    e.target.value
+                                                )
+                                            }
+                                            onBlur={() =>
+                                                setTouched((prev) => ({
+                                                    ...prev,
+                                                    [card.statementId]: true,
+                                                }))
+                                            }
+                                            className={`
+                                                min-h-[100px] text-base border-slate-300
+                                                ${!isValid && isTouched ? 'border-red-400 focus:ring-red-200 bg-red-50' : ''}
+                                            `}
+                                            placeholder={t('post.extreme.placeholder')}
+                                            disabled={
+                                                !!getAudioRecording(`card_${card.statementId}`)
+                                            }
+                                            data-testid="extreme-comment-input"
+                                        />
+                                        {getAudioRecording(`card_${card.statementId}`) && (
+                                            <p className="text-sm text-amber-600 flex items-center gap-1.5">
+                                                <AlertCircle size={14} />
+                                                {t(
+                                                    'post.audio.text_disabled',
+                                                    'Audio response recorded. Delete audio to edit text.'
+                                                )}
+                                            </p>
+                                        )}
+                                    </TabsContent>
+
+                                    <TabsContent value="audio" className="space-y-2 mt-3">
+                                        <AudioRecorder
+                                            questionKey={`card_${card.statementId}`}
+                                            maxDurationSeconds={maxDurationSeconds}
+                                            onRecordingComplete={async (blob, duration) => {
+                                                await handleAudioUpload(
+                                                    `card_${card.statementId}`,
+                                                    blob,
+                                                    duration
+                                                );
+                                            }}
+                                            onRecordingDeleted={async () => {
+                                                await handleAudioDelete(`card_${card.statementId}`);
+                                            }}
+                                            existingRecording={getAudioRecording(
+                                                `card_${card.statementId}`
+                                            )}
+                                        />
+                                    </TabsContent>
+                                </Tabs>
+
                                 {!isValid && isTouched && (
                                     <div className="flex items-center gap-1.5 mt-2 text-red-600 text-sm animate-in fade-in slide-in-from-top-1">
                                         <AlertCircle size={16} />
                                         <span>
                                             {t(
-                                                'post.extreme.min_chars',
-                                                'This field requires at least a few characters.'
+                                                'post.extreme.required',
+                                                'Please provide either a text or audio response.'
                                             )}
                                         </span>
                                     </div>
@@ -355,12 +491,56 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                         </SafeMarkdown>
                                     </blockquote>
 
-                                    <Textarea
-                                        value={postsort.card_comments[id]}
-                                        onChange={(e) => handleCommentChange(id, e.target.value)}
-                                        placeholder={t('post.optional.placeholder')}
-                                        className="min-h-[100px] border-slate-300"
-                                    />
+                                    <Tabs defaultValue="text" className="w-full">
+                                        <TabsList className="grid w-full grid-cols-2">
+                                            <TabsTrigger value="text">
+                                                {t('post.response_type.text', 'Text')}
+                                            </TabsTrigger>
+                                            <TabsTrigger value="audio" disabled={!isAudioEnabled}>
+                                                <Mic className="w-4 h-4 mr-1" />
+                                                {t('post.response_type.audio', 'Audio')}
+                                            </TabsTrigger>
+                                        </TabsList>
+
+                                        <TabsContent value="text" className="space-y-2 mt-3">
+                                            <Textarea
+                                                value={postsort.card_comments[id]}
+                                                onChange={(e) =>
+                                                    handleCommentChange(id, e.target.value)
+                                                }
+                                                placeholder={t('post.optional.placeholder')}
+                                                className="min-h-[100px] border-slate-300"
+                                                disabled={!!getAudioRecording(`card_${id}`)}
+                                            />
+                                            {getAudioRecording(`card_${id}`) && (
+                                                <p className="text-sm text-amber-600 flex items-center gap-1.5">
+                                                    <AlertCircle size={14} />
+                                                    {t(
+                                                        'post.audio.text_disabled',
+                                                        'Audio response recorded. Delete audio to edit text.'
+                                                    )}
+                                                </p>
+                                            )}
+                                        </TabsContent>
+
+                                        <TabsContent value="audio" className="space-y-2 mt-3">
+                                            <AudioRecorder
+                                                questionKey={`card_${id}`}
+                                                maxDurationSeconds={maxDurationSeconds}
+                                                onRecordingComplete={async (blob, duration) => {
+                                                    await handleAudioUpload(
+                                                        `card_${id}`,
+                                                        blob,
+                                                        duration
+                                                    );
+                                                }}
+                                                onRecordingDeleted={async () => {
+                                                    await handleAudioDelete(`card_${id}`);
+                                                }}
+                                                existingRecording={getAudioRecording(`card_${id}`)}
+                                            />
+                                        </TabsContent>
+                                    </Tabs>
                                 </div>
                             );
                         })}
@@ -373,10 +553,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 <>
                     <hr className="border-slate-200" />
                     <div className="space-y-4">
-                        <Label
-                            htmlFor="missing-statements"
-                            className="text-xl font-bold text-slate-800 block"
-                        >
+                        <Label className="text-xl font-bold text-slate-800 block">
                             {getPrompt(
                                 'missing_statements_label',
                                 'admin.design.postsort.missing.title',
@@ -389,23 +566,64 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                 'If yes, please describe them briefly.'
                             )}
                         </p>
-                        <div className="relative">
-                            <Label className="sr-only" htmlFor="missing-statements">
-                                Missing Statements Input
-                            </Label>
-                            <Textarea
-                                id="missing-statements"
-                                value={postsort.missing_statement || ''}
-                                onChange={(e) =>
-                                    setPostSortResponse('missing_statement', e.target.value)
-                                }
-                                placeholder={getPrompt(
-                                    'missing_statements',
-                                    'admin.design.postsort.missing.prompt_placeholder'
+
+                        <Tabs defaultValue="text" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2">
+                                <TabsTrigger value="text">
+                                    {t('post.response_type.text', 'Text')}
+                                </TabsTrigger>
+                                <TabsTrigger value="audio" disabled={!isAudioEnabled}>
+                                    <Mic className="w-4 h-4 mr-1" />
+                                    {t('post.response_type.audio', 'Audio')}
+                                </TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="text" className="space-y-2 mt-3">
+                                <Label className="sr-only" htmlFor="missing-statements">
+                                    Missing Statements Input
+                                </Label>
+                                <Textarea
+                                    id="missing-statements"
+                                    value={postsort.missing_statement || ''}
+                                    onChange={(e) =>
+                                        setPostSortResponse('missing_statement', e.target.value)
+                                    }
+                                    placeholder={getPrompt(
+                                        'missing_statements',
+                                        'admin.design.postsort.missing.prompt_placeholder'
+                                    )}
+                                    className="min-h-[120px] text-base border-slate-300"
+                                    disabled={!!getAudioRecording('missing_statement')}
+                                />
+                                {getAudioRecording('missing_statement') && (
+                                    <p className="text-sm text-amber-600 flex items-center gap-1.5">
+                                        <AlertCircle size={14} />
+                                        {t(
+                                            'post.audio.text_disabled',
+                                            'Audio response recorded. Delete audio to edit text.'
+                                        )}
+                                    </p>
                                 )}
-                                className="min-h-[120px] text-base border-slate-300"
-                            />
-                        </div>
+                            </TabsContent>
+
+                            <TabsContent value="audio" className="space-y-2 mt-3">
+                                <AudioRecorder
+                                    questionKey="missing_statement"
+                                    maxDurationSeconds={maxDurationSeconds}
+                                    onRecordingComplete={async (blob, duration) => {
+                                        await handleAudioUpload(
+                                            'missing_statement',
+                                            blob,
+                                            duration
+                                        );
+                                    }}
+                                    onRecordingDeleted={async () => {
+                                        await handleAudioDelete('missing_statement');
+                                    }}
+                                    existingRecording={getAudioRecording('missing_statement')}
+                                />
+                            </TabsContent>
+                        </Tabs>
                     </div>
                 </>
             )}
