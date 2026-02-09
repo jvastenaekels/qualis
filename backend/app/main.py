@@ -21,7 +21,7 @@ from app.middleware.errors import (
     validation_exception_handler,
 )
 from app.middleware.security import SecurityHeadersMiddleware
-from app.routers import auth, logs, participants, submissions
+from app.routers import audio, auth, logs, participants, submissions
 from app.routers.admin import exports as admin_exports
 from app.routers.admin import invitations as admin_invitations
 from app.routers.admin import recruitment as admin_recruitment
@@ -141,6 +141,7 @@ app.include_router(
     participants.router, prefix="/api/study/{slug}", tags=["participants"]
 )
 app.include_router(logs.router, prefix="/api", tags=["logs"])
+app.include_router(audio.router)
 
 # Include test router (only active in test/dev environments)
 if settings.ENVIRONMENT in ["test", "development"]:

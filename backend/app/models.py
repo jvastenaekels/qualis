@@ -13,6 +13,7 @@ from sqlalchemy import (
     JSON,
     Boolean,
     DateTime,
+    Float,
     ForeignKey,
     Integer,
     String,
@@ -348,6 +349,9 @@ class Participant(Base):
     qsort_entries: Mapped[list["QSortEntry"]] = relationship(
         back_populates="participant", cascade="all, delete-orphan", lazy="selectin"
     )
+    audio_recordings: Mapped[list["AudioRecording"]] = relationship(
+        back_populates="participant", cascade="all, delete-orphan", lazy="selectin"
+    )
 
     @property
     def recruitment_token(self) -> str | None:
@@ -390,6 +394,45 @@ class QSortEntry(Base):
     @property
     def statement_code(self) -> str:
         return self.statement.code if self.statement else ""
+
+
+class AudioRecording(Base):
+    """SQLAlchemy model for audio recording metadata stored in S3."""
+
+    __tablename__ = "audio_recordings"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    participant_id: Mapped[int] = mapped_column(
+        ForeignKey("participants.id", ondelete="CASCADE"), index=True
+    )
+    question_key: Mapped[str] = mapped_column(
+        String
+    )  # e.g., "card_123", "missing_statement"
+
+    # S3 Storage
+    s3_bucket: Mapped[str] = mapped_column(String)
+    s3_key: Mapped[str] = mapped_column(String, unique=True, index=True)
+
+    # Metadata
+    file_size_bytes: Mapped[int] = mapped_column(Integer)
+    duration_seconds: Mapped[float | None] = mapped_column(Float, nullable=True)
+    mime_type: Mapped[str] = mapped_column(String)  # "audio/webm" or "audio/mp4"
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+
+    # Relationships
+    participant: Mapped["Participant"] = relationship(
+        back_populates="audio_recordings", lazy="selectin"
+    )
+
+    __table_args__ = (
+        # One audio per question per participant
+        UniqueConstraint(
+            "participant_id", "question_key", name="uq_participant_question_audio"
+        ),
+    )
 
 
 class RecruitmentLink(Base):

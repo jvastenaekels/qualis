@@ -115,6 +115,13 @@ export const StudyConfigSchema = z.object({
             email_collection_enabled: z.boolean().optional(),
             interview_consent_enabled: z.boolean().optional(),
             newsletter_consent_enabled: z.boolean().optional(),
+            audio: z
+                .object({
+                    enabled: z.boolean(),
+                    max_duration_seconds: z.number().optional(),
+                    max_storage_mb: z.number().optional(),
+                })
+                .optional(),
         })
         .optional(),
     statements: z.array(StatementSchema),

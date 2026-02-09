@@ -1241,6 +1241,54 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/storage-usage": {
+      "get": {
+        "tags": [
+          "admin-studies"
+        ],
+        "summary": "Get Study Storage Usage",
+        "description": "Get audio storage usage statistics for a study.\n\nReturns:\n    Dictionary with total_bytes, total_mb, file_count, quota_mb, quota_bytes, usage_percent",
+        "operationId": "get_study_storage_usage_api_admin_studies__slug__storage_usage_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/export/csv": {
       "get": {
         "tags": [
@@ -2744,6 +2792,152 @@
         }
       }
     },
+    "/api/audio/upload": {
+      "post": {
+        "tags": [
+          "audio"
+        ],
+        "summary": "Upload Audio",
+        "description": "Upload audio recording for a participant response.\n\nArgs:\n    file: Audio file (WebM or MP4/AAC)\n    session_token: Participant session UUID\n    question_key: Question identifier (e.g., \"card_123\", \"missing_statement\")\n    duration_seconds: Optional recording duration\n\nReturns:\n    AudioUploadResponse with recording metadata and presigned URL\n\nRaises:\n    HTTPException: If validation fails, quota exceeded, or upload fails",
+        "operationId": "upload_audio_api_audio_upload_post",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_audio_api_audio_upload_post"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioUploadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/audio/{recording_id}": {
+      "delete": {
+        "tags": [
+          "audio"
+        ],
+        "summary": "Delete Audio Recording",
+        "description": "Delete an audio recording (before submission only).\n\nArgs:\n    recording_id: ID of the recording to delete\n    session_token: Participant session token (query parameter)\n\nArgs:\n    recording_id: ID of recording to delete\n    session_token: Participant session token for authorization\n\nReturns:\n    Success message\n\nRaises:\n    HTTPException: If not authorized or already submitted",
+        "operationId": "delete_audio_recording_api_audio__recording_id__delete",
+        "parameters": [
+          {
+            "name": "recording_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Recording Id"
+            }
+          },
+          {
+            "name": "session_token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/audio/{recording_id}/url": {
+      "get": {
+        "tags": [
+          "audio"
+        ],
+        "summary": "Get Audio Url",
+        "description": "Get presigned URL for audio playback.\n\nArgs:\n    recording_id: ID of recording\n    session_token: Participant session token for authorization\n\nReturns:\n    AudioRecordingRead with presigned URL\n\nRaises:\n    HTTPException: If not found or not authorized",
+        "operationId": "get_audio_url_api_audio__recording_id__url_get",
+        "parameters": [
+          {
+            "name": "recording_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Recording Id"
+            }
+          },
+          {
+            "name": "session_token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AudioRecordingRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/test/init": {
       "post": {
         "tags": [
@@ -2962,6 +3156,102 @@
   },
   "components": {
     "schemas": {
+      "AudioRecordingRead": {
+        "properties": {
+          "question_key": {
+            "type": "string",
+            "title": "Question Key"
+          },
+          "mime_type": {
+            "type": "string",
+            "title": "Mime Type"
+          },
+          "file_size_bytes": {
+            "type": "integer",
+            "title": "File Size Bytes"
+          },
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Seconds"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "presigned_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presigned Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question_key",
+          "mime_type",
+          "file_size_bytes",
+          "id",
+          "s3_key",
+          "created_at"
+        ],
+        "title": "AudioRecordingRead",
+        "description": "Schema for reading audio recording metadata."
+      },
+      "AudioUploadResponse": {
+        "properties": {
+          "recording_id": {
+            "type": "integer",
+            "title": "Recording Id"
+          },
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key"
+          },
+          "file_size_bytes": {
+            "type": "integer",
+            "title": "File Size Bytes"
+          },
+          "presigned_url": {
+            "type": "string",
+            "title": "Presigned Url"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "default": "Audio uploaded successfully"
+          }
+        },
+        "type": "object",
+        "required": [
+          "recording_id",
+          "s3_key",
+          "file_size_bytes",
+          "presigned_url"
+        ],
+        "title": "AudioUploadResponse",
+        "description": "Schema for audio upload response."
+      },
       "Body_login_for_access_token_api_token_post": {
         "properties": {
           "grant_type": {
@@ -3020,6 +3310,42 @@
           "password"
         ],
         "title": "Body_login_for_access_token_api_token_post"
+      },
+      "Body_upload_audio_api_audio_upload_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "session_token": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Token"
+          },
+          "question_key": {
+            "type": "string",
+            "title": "Question Key"
+          },
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Seconds"
+          }
+        },
+        "type": "object",
+        "required": [
+          "file",
+          "session_token",
+          "question_key"
+        ],
+        "title": "Body_upload_audio_api_audio_upload_post"
       },
       "BrandingBase": {
         "properties": {

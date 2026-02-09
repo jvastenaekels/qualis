@@ -298,3 +298,5 @@ websockets==16.0
     # via uvicorn
 wrapt==2.0.1
     # via deprecated
+boto3==1.36.17
+python-magic==0.4.27

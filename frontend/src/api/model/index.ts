@@ -5,10 +5,16 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './audioRecordingRead';
+export * from './audioRecordingReadDurationSeconds';
+export * from './audioRecordingReadPresignedUrl';
+export * from './audioUploadResponse';
 export * from './bodyLoginForAccessTokenApiTokenPost';
 export * from './bodyLoginForAccessTokenApiTokenPostClientId';
 export * from './bodyLoginForAccessTokenApiTokenPostClientSecret';
 export * from './bodyLoginForAccessTokenApiTokenPostGrantType';
+export * from './bodyUploadAudioApiAudioUploadPost';
+export * from './bodyUploadAudioApiAudioUploadPostDurationSeconds';
 export * from './brandingBase';
 export * from './brandingBaseAccentColor';
 export * from './brandingBaseLogoUrl';
@@ -17,6 +23,8 @@ export * from './changeStudyStateApiAdminStudiesSlugStatePostParams';
 export * from './consentInput';
 export * from './consentInputConsentHash';
 export * from './createRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams';
+export * from './deleteAudioRecordingApiAudioRecordingIdDeleteParams';
+export * from './getAudioUrlApiAudioRecordingIdUrlGetParams';
 export * from './getStudyApiStudySlugGetParams';
 export * from './gridColumn';
 export * from './hTTPValidationError';

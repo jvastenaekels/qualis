@@ -21,6 +21,7 @@ assemble_db_url
 cls
 model_config
 effective_emails_from_name
+AUDIO_MAX_DURATION_SECONDS
 
 # --- app/models.py (SQLAlchemy Models) ---
 individual
@@ -41,6 +42,8 @@ start_count
 Invitation
 accepted_at
 participant_count
+audio_recordings
+s3_bucket
 
 # --- app/routers/ (FastAPI endpoints) ---
 # admin/exports.py
@@ -80,6 +83,12 @@ validate_study_import
 import_study_config
 clear_test_runs
 clear_all_participants
+get_study_storage_usage
+
+# audio.py
+upload_audio
+delete_audio_recording
+get_audio_url
 
 # admin/users.py
 list_users
@@ -156,6 +165,7 @@ SchemaValidationError
 # --- app/services/ ---
 _.start_count
 delete_link
+get_storage_service
 
 # --- app/utils/script_utils.py ---
 sync_study_from_file

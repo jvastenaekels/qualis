@@ -1,6 +1,6 @@
 """Application configuration."""
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
@@ -32,6 +32,22 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str | None = None
     EMAILS_FROM_EMAIL: str | None = None
     EMAILS_FROM_NAME: str | None = None
+
+    # S3/Cellar Storage
+    S3_ENDPOINT_URL: str | None = (
+        None  # e.g., https://cellar-c2.services.clever-cloud.com
+    )
+    S3_REGION: str = "us-east-1"
+    S3_BUCKET_NAME: str | None = None
+    S3_ACCESS_KEY_ID: str | None = None
+    S3_SECRET_ACCESS_KEY: str | None = None
+
+    # Audio Recording Limits
+    AUDIO_MAX_FILE_SIZE_MB: int = 10
+    AUDIO_MAX_DURATION_SECONDS: int = 300  # 5 minutes
+    AUDIO_ALLOWED_MIME_TYPES: list[str] = Field(
+        default=["audio/webm", "audio/mp4", "audio/mpeg"]
+    )
 
     @field_validator("DATABASE_URL", mode="before")
     @classmethod

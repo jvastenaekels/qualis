@@ -22,9 +22,12 @@ import type {
 
 import type {
     BodyLoginForAccessTokenApiTokenPost,
+    BodyUploadAudioApiAudioUploadPost,
     ChangeStudyStateApiAdminStudiesSlugStatePostParams,
     ConsentInput,
     CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
+    DeleteAudioRecordingApiAudioRecordingIdDeleteParams,
+    GetAudioUrlApiAudioRecordingIdUrlGetParams,
     GetStudyApiStudySlugGetParams,
     HTTPValidationError,
     InvitationAccept,
@@ -57,6 +60,8 @@ import type { RequestHandlerOptions } from 'msw';
 
 import { ParticipantStatus, RecruitmentLinkType, StudyState, WorkspaceRole } from './model';
 import type {
+    AudioRecordingRead,
+    AudioUploadResponse,
     InvitationLink,
     ParticipantDetailRead,
     ParticipantRead,
@@ -2673,6 +2678,173 @@ export const useClearTestRunsApiAdminStudiesSlugTestRunsDelete = <
 
     return useMutation(mutationOptions, queryClient);
 };
+
+/**
+ * Get audio storage usage statistics for a study.
+
+Returns:
+    Dictionary with total_bytes, total_mb, file_count, quota_mb, quota_bytes, usage_percent
+ * @summary Get Study Storage Usage
+ */
+export const getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/studies/${slug}/storage-usage`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetQueryKey = (
+    slug?: string
+) => {
+    return [`/api/admin/studies/${slug}/storage-usage`] as const;
+};
+
+export const getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>
+    > = ({ signal }) => getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>
+>;
+export type GetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetQueryError = HTTPValidationError;
+
+export function useGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGet<
+    TData = Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGet<
+    TData = Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGet<
+    TData = Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Study Storage Usage
+ */
+
+export function useGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGet<
+    TData = Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
 
 /**
  * Export study results as CSV.
@@ -6212,6 +6384,383 @@ export const useReportLogApiLogsPost = <TError = HTTPValidationError, TContext =
 };
 
 /**
+ * Upload audio recording for a participant response.
+
+Args:
+    file: Audio file (WebM or MP4/AAC)
+    session_token: Participant session UUID
+    question_key: Question identifier (e.g., "card_123", "missing_statement")
+    duration_seconds: Optional recording duration
+
+Returns:
+    AudioUploadResponse with recording metadata and presigned URL
+
+Raises:
+    HTTPException: If validation fails, quota exceeded, or upload fails
+ * @summary Upload Audio
+ */
+export const uploadAudioApiAudioUploadPost = (
+    bodyUploadAudioApiAudioUploadPost: BodyUploadAudioApiAudioUploadPost,
+    signal?: AbortSignal
+) => {
+    const formData = new FormData();
+    formData.append(`file`, bodyUploadAudioApiAudioUploadPost.file);
+    formData.append(`session_token`, bodyUploadAudioApiAudioUploadPost.session_token);
+    formData.append(`question_key`, bodyUploadAudioApiAudioUploadPost.question_key);
+    if (
+        bodyUploadAudioApiAudioUploadPost.duration_seconds !== undefined &&
+        bodyUploadAudioApiAudioUploadPost.duration_seconds !== null
+    ) {
+        formData.append(
+            `duration_seconds`,
+            bodyUploadAudioApiAudioUploadPost.duration_seconds.toString()
+        );
+    }
+
+    return customInstance<AudioUploadResponse>({
+        url: `/api/audio/upload`,
+        method: 'POST',
+        headers: { 'Content-Type': 'multipart/form-data' },
+        data: formData,
+        signal,
+    });
+};
+
+export const getUploadAudioApiAudioUploadPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof uploadAudioApiAudioUploadPost>>,
+        TError,
+        { data: BodyUploadAudioApiAudioUploadPost },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof uploadAudioApiAudioUploadPost>>,
+    TError,
+    { data: BodyUploadAudioApiAudioUploadPost },
+    TContext
+> => {
+    const mutationKey = ['uploadAudioApiAudioUploadPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof uploadAudioApiAudioUploadPost>>,
+        { data: BodyUploadAudioApiAudioUploadPost }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return uploadAudioApiAudioUploadPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UploadAudioApiAudioUploadPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof uploadAudioApiAudioUploadPost>>
+>;
+export type UploadAudioApiAudioUploadPostMutationBody = BodyUploadAudioApiAudioUploadPost;
+export type UploadAudioApiAudioUploadPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Upload Audio
+ */
+export const useUploadAudioApiAudioUploadPost = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof uploadAudioApiAudioUploadPost>>,
+            TError,
+            { data: BodyUploadAudioApiAudioUploadPost },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof uploadAudioApiAudioUploadPost>>,
+    TError,
+    { data: BodyUploadAudioApiAudioUploadPost },
+    TContext
+> => {
+    const mutationOptions = getUploadAudioApiAudioUploadPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Delete an audio recording (before submission only).
+
+Args:
+    recording_id: ID of the recording to delete
+    session_token: Participant session token (query parameter)
+
+Args:
+    recording_id: ID of recording to delete
+    session_token: Participant session token for authorization
+
+Returns:
+    Success message
+
+Raises:
+    HTTPException: If not authorized or already submitted
+ * @summary Delete Audio Recording
+ */
+export const deleteAudioRecordingApiAudioRecordingIdDelete = (
+    recordingId: number,
+    params: DeleteAudioRecordingApiAudioRecordingIdDeleteParams
+) => {
+    return customInstance<unknown>({ url: `/api/audio/${recordingId}`, method: 'DELETE', params });
+};
+
+export const getDeleteAudioRecordingApiAudioRecordingIdDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof deleteAudioRecordingApiAudioRecordingIdDelete>>,
+        TError,
+        { recordingId: number; params: DeleteAudioRecordingApiAudioRecordingIdDeleteParams },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof deleteAudioRecordingApiAudioRecordingIdDelete>>,
+    TError,
+    { recordingId: number; params: DeleteAudioRecordingApiAudioRecordingIdDeleteParams },
+    TContext
+> => {
+    const mutationKey = ['deleteAudioRecordingApiAudioRecordingIdDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof deleteAudioRecordingApiAudioRecordingIdDelete>>,
+        { recordingId: number; params: DeleteAudioRecordingApiAudioRecordingIdDeleteParams }
+    > = (props) => {
+        const { recordingId, params } = props ?? {};
+
+        return deleteAudioRecordingApiAudioRecordingIdDelete(recordingId, params);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteAudioRecordingApiAudioRecordingIdDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteAudioRecordingApiAudioRecordingIdDelete>>
+>;
+
+export type DeleteAudioRecordingApiAudioRecordingIdDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Delete Audio Recording
+ */
+export const useDeleteAudioRecordingApiAudioRecordingIdDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof deleteAudioRecordingApiAudioRecordingIdDelete>>,
+            TError,
+            { recordingId: number; params: DeleteAudioRecordingApiAudioRecordingIdDeleteParams },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof deleteAudioRecordingApiAudioRecordingIdDelete>>,
+    TError,
+    { recordingId: number; params: DeleteAudioRecordingApiAudioRecordingIdDeleteParams },
+    TContext
+> => {
+    const mutationOptions =
+        getDeleteAudioRecordingApiAudioRecordingIdDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Get presigned URL for audio playback.
+
+Args:
+    recording_id: ID of recording
+    session_token: Participant session token for authorization
+
+Returns:
+    AudioRecordingRead with presigned URL
+
+Raises:
+    HTTPException: If not found or not authorized
+ * @summary Get Audio Url
+ */
+export const getAudioUrlApiAudioRecordingIdUrlGet = (
+    recordingId: number,
+    params: GetAudioUrlApiAudioRecordingIdUrlGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<AudioRecordingRead>({
+        url: `/api/audio/${recordingId}/url`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getGetAudioUrlApiAudioRecordingIdUrlGetQueryKey = (
+    recordingId?: number,
+    params?: GetAudioUrlApiAudioRecordingIdUrlGetParams
+) => {
+    return [`/api/audio/${recordingId}/url`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetAudioUrlApiAudioRecordingIdUrlGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+    TError = HTTPValidationError,
+>(
+    recordingId: number,
+    params: GetAudioUrlApiAudioRecordingIdUrlGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getGetAudioUrlApiAudioRecordingIdUrlGetQueryKey(recordingId, params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>
+    > = ({ signal }) => getAudioUrlApiAudioRecordingIdUrlGet(recordingId, params, signal);
+
+    return { queryKey, queryFn, enabled: !!recordingId, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAudioUrlApiAudioRecordingIdUrlGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>
+>;
+export type GetAudioUrlApiAudioRecordingIdUrlGetQueryError = HTTPValidationError;
+
+export function useGetAudioUrlApiAudioRecordingIdUrlGet<
+    TData = Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+    TError = HTTPValidationError,
+>(
+    recordingId: number,
+    params: GetAudioUrlApiAudioRecordingIdUrlGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAudioUrlApiAudioRecordingIdUrlGet<
+    TData = Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+    TError = HTTPValidationError,
+>(
+    recordingId: number,
+    params: GetAudioUrlApiAudioRecordingIdUrlGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAudioUrlApiAudioRecordingIdUrlGet<
+    TData = Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+    TError = HTTPValidationError,
+>(
+    recordingId: number,
+    params: GetAudioUrlApiAudioRecordingIdUrlGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Audio Url
+ */
+
+export function useGetAudioUrlApiAudioRecordingIdUrlGet<
+    TData = Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+    TError = HTTPValidationError,
+>(
+    recordingId: number,
+    params: GetAudioUrlApiAudioRecordingIdUrlGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getAudioUrlApiAudioRecordingIdUrlGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetAudioUrlApiAudioRecordingIdUrlGetQueryOptions(
+        recordingId,
+        params,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * Initialize test database - ensure tables exist
 This is typically handled by app startup, but useful for explicit initialization
  * @summary Init Test Db
@@ -8876,6 +9425,43 @@ export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostResponseMoc
     ...overrideResponse,
 });
 
+export const getUploadAudioApiAudioUploadPostResponseMock = (
+    overrideResponse: Partial<AudioUploadResponse> = {}
+): AudioUploadResponse => ({
+    recording_id: faker.number.int({ min: undefined, max: undefined }),
+    s3_key: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    file_size_bytes: faker.number.int({ min: undefined, max: undefined }),
+    presigned_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    message: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getGetAudioUrlApiAudioRecordingIdUrlGetResponseMock = (
+    overrideResponse: Partial<AudioRecordingRead> = {}
+): AudioRecordingRead => ({
+    question_key: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    mime_type: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    file_size_bytes: faker.number.int({ min: undefined, max: undefined }),
+    duration_seconds: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+            null,
+        ]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    s3_key: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    presigned_url: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
 export const getReadUsersMeApiMeGetMockHandler = (
     overrideResponse?:
         | UserRead
@@ -9444,6 +10030,24 @@ export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler = (
                 await overrideResponse(info);
             }
             return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/storage-usage',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
         },
         options
     );
@@ -10059,6 +10663,76 @@ export const getReportLogApiLogsPostMockHandler = (
     );
 };
 
+export const getUploadAudioApiAudioUploadPostMockHandler = (
+    overrideResponse?:
+        | AudioUploadResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AudioUploadResponse> | AudioUploadResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/audio/upload',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUploadAudioApiAudioUploadPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteAudioRecordingApiAudioRecordingIdDeleteMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/audio/:recordingId',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getGetAudioUrlApiAudioRecordingIdUrlGetMockHandler = (
+    overrideResponse?:
+        | AudioRecordingRead
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<AudioRecordingRead> | AudioRecordingRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/audio/:recordingId/url',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetAudioUrlApiAudioRecordingIdUrlGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getInitTestDbApiTestInitPostMockHandler = (
     overrideResponse?:
         | unknown
@@ -10228,6 +10902,7 @@ export const getLibreQAPIMock = () => [
     getValidateStudyImportApiAdminStudiesValidateImportPostMockHandler(),
     getImportStudyConfigApiAdminStudiesImportPostMockHandler(),
     getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler(),
+    getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetMockHandler(),
     getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
     getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),
@@ -10257,6 +10932,9 @@ export const getLibreQAPIMock = () => [
     getUnlockStudyApiStudySlugUnlockPostMockHandler(),
     getRecordConsentApiStudySlugConsentPostMockHandler(),
     getReportLogApiLogsPostMockHandler(),
+    getUploadAudioApiAudioUploadPostMockHandler(),
+    getDeleteAudioRecordingApiAudioRecordingIdDeleteMockHandler(),
+    getGetAudioUrlApiAudioRecordingIdUrlGetMockHandler(),
     getInitTestDbApiTestInitPostMockHandler(),
     getSeedTestDataApiTestSeedPostMockHandler(),
     getAddTestMemberApiTestMembersPostMockHandler(),

@@ -5,8 +5,10 @@ import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Info, Plus, X } from 'lucide-react';
+import { Info, Plus, X, Mic } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
     Select,
@@ -488,6 +490,143 @@ const PostSortConfigEditor = ({
                                         className="min-h-[80px] rounded-2xl border-slate-300 focus:ring-slate-500/20 focus:border-slate-500 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
                                     />
                                 </div>
+                            </CardContent>
+                        )}
+                    </Card>
+
+                    {/* Audio Recording Section */}
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <CardTitle className="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                        <Mic className="w-5 h-5 text-indigo-600" />
+                                        {t('admin.design.postsort.audio.title') ||
+                                            'Audio Recording'}
+                                    </CardTitle>
+                                    <CardDescription className="text-sm font-medium text-slate-500 leading-relaxed">
+                                        {t('admin.design.postsort.audio.desc') ||
+                                            'Allow participants to record audio responses instead of text'}
+                                    </CardDescription>
+                                </div>
+                                <Switch
+                                    data-testid="audio-recording-toggle"
+                                    checked={config?.audio?.enabled || false}
+                                    onCheckedChange={(checked: boolean) => {
+                                        if (checked === (config?.audio?.enabled || false)) return;
+                                        updateDraft((d) => {
+                                            if (!d.postsort_config) d.postsort_config = {};
+                                            // biome-ignore lint/suspicious/noExplicitAny: complex config
+                                            const ps = d.postsort_config as any;
+                                            if (!ps.audio) ps.audio = {};
+                                            ps.audio.enabled = checked;
+                                            // Set defaults when enabling
+                                            if (checked) {
+                                                if (!ps.audio.max_duration_seconds) {
+                                                    ps.audio.max_duration_seconds = 180;
+                                                }
+                                                if (!ps.audio.max_storage_mb) {
+                                                    ps.audio.max_storage_mb = 100;
+                                                }
+                                            }
+                                        });
+                                    }}
+                                    disabled={readOnly || structureLocked}
+                                />
+                            </div>
+                        </CardHeader>
+                        {config?.audio?.enabled && (
+                            <CardContent className="pt-0 space-y-6">
+                                {/* Max Duration */}
+                                <div className="space-y-3">
+                                    <Label
+                                        htmlFor="audio-max-duration"
+                                        className="text-sm font-bold text-slate-700"
+                                    >
+                                        {t('admin.design.postsort.audio.max_duration') ||
+                                            'Maximum Duration'}
+                                    </Label>
+                                    <div className="flex items-center gap-3">
+                                        <Input
+                                            id="audio-max-duration"
+                                            type="number"
+                                            min={30}
+                                            max={600}
+                                            step={30}
+                                            value={config?.audio?.max_duration_seconds ?? 180}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value);
+                                                if (value < 30 || value > 600) return;
+                                                updateDraft((d) => {
+                                                    if (!d.postsort_config) d.postsort_config = {};
+                                                    // biome-ignore lint/suspicious/noExplicitAny: complex config
+                                                    const ps = d.postsort_config as any;
+                                                    if (!ps.audio) ps.audio = {};
+                                                    ps.audio.max_duration_seconds = value;
+                                                });
+                                            }}
+                                            disabled={readOnly}
+                                            className="w-32 rounded-xl border-slate-300"
+                                        />
+                                        <span className="text-sm text-slate-600 font-medium">
+                                            {t('admin.design.postsort.audio.seconds') || 'seconds'}
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-500 leading-relaxed">
+                                        {t('admin.design.postsort.audio.max_duration_help') ||
+                                            'Maximum recording length per question (30-600 seconds)'}
+                                    </p>
+                                </div>
+
+                                {/* Storage Quota */}
+                                <div className="space-y-3">
+                                    <Label
+                                        htmlFor="audio-storage-quota"
+                                        className="text-sm font-bold text-slate-700"
+                                    >
+                                        {t('admin.design.postsort.audio.storage_quota') ||
+                                            'Storage Quota'}
+                                    </Label>
+                                    <div className="flex items-center gap-3">
+                                        <Input
+                                            id="audio-storage-quota"
+                                            type="number"
+                                            min={10}
+                                            max={1000}
+                                            step={10}
+                                            value={config?.audio?.max_storage_mb ?? 100}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value);
+                                                if (value < 10 || value > 1000) return;
+                                                updateDraft((d) => {
+                                                    if (!d.postsort_config) d.postsort_config = {};
+                                                    // biome-ignore lint/suspicious/noExplicitAny: complex config
+                                                    const ps = d.postsort_config as any;
+                                                    if (!ps.audio) ps.audio = {};
+                                                    ps.audio.max_storage_mb = value;
+                                                });
+                                            }}
+                                            disabled={readOnly}
+                                            className="w-32 rounded-xl border-slate-300"
+                                        />
+                                        <span className="text-sm text-slate-600 font-medium">
+                                            MB
+                                        </span>
+                                    </div>
+                                    <p className="text-xs text-slate-500 leading-relaxed">
+                                        {t('admin.design.postsort.audio.storage_quota_help') ||
+                                            'Maximum total audio storage for this study (10-1000 MB)'}
+                                    </p>
+                                </div>
+
+                                {/* Info Alert */}
+                                <Alert className="border-indigo-200 bg-indigo-50/50">
+                                    <Info className="h-4 w-4 text-indigo-600" />
+                                    <AlertDescription className="text-sm text-indigo-900">
+                                        {t('admin.design.postsort.audio.participant_choice_info') ||
+                                            'Participants can choose to respond with either text OR audio for each question, but not both.'}
+                                    </AlertDescription>
+                                </Alert>
                             </CardContent>
                         )}
                     </Card>

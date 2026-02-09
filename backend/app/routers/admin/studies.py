@@ -16,6 +16,7 @@ from app.dependencies import (
     get_current_workspace,
 )
 from app.models import (
+    AudioRecording,
     Participant,
     Study,
     StudyRole,
@@ -1103,3 +1104,48 @@ async def clear_all_participants(
     await db.execute(delete(Participant).where(Participant.study_id == study.id))
     await db.commit()
     return None
+
+
+@router.get("/{slug}/storage-usage")
+async def get_study_storage_usage(
+    slug: str,
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Get audio storage usage statistics for a study.
+
+    Returns:
+        Dictionary with total_bytes, total_mb, file_count, quota_mb, quota_bytes, usage_percent
+    """
+    # Total storage used
+    result = await db.execute(
+        select(
+            func.coalesce(func.sum(AudioRecording.file_size_bytes), 0).label(
+                "total_bytes"
+            ),
+            func.count(AudioRecording.id).label("file_count"),
+        )
+        .join(Participant)
+        .where(Participant.study_id == study.id)
+    )
+    stats = result.first()
+
+    # Get quota from config
+    audio_config = study.postsort_config.get("audio", {})
+    quota_mb = audio_config.get("max_storage_mb", 100)
+
+    # Handle case where no recordings exist yet
+    total_bytes = stats.total_bytes if stats else 0
+    file_count = stats.file_count if stats else 0
+
+    return {
+        "total_bytes": total_bytes,
+        "total_mb": round(total_bytes / 1024 / 1024, 2),
+        "file_count": file_count,
+        "quota_mb": quota_mb,
+        "quota_bytes": quota_mb * 1024 * 1024,
+        "usage_percent": round((total_bytes / (quota_mb * 1024 * 1024)) * 100, 2)
+        if quota_mb > 0
+        else 0,
+    }

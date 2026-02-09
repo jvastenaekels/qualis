@@ -20,6 +20,8 @@ dependencies = [
     "pyotp>=2.9.0",
     "alembic>=1.18.1",
     "python-multipart>=0.0.22",
+    "boto3>=1.36.17",
+    "python-magic>=0.4.27",
 ]
 
 [dependency-groups]
@@ -55,6 +57,7 @@ known_first_party = ["app"]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
+DEP003 = ["botocore"]  # Transitive dependency of boto3
 
 [tool.importlinter]
 root_package = "app"

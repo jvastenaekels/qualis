@@ -3,6 +3,15 @@ import { persist } from 'zustand/middleware';
 import { useConfigStore } from './useConfigStore';
 import { useSessionStore } from './useSessionStore';
 
+interface AudioRecordingMetadata {
+    id: number;
+    question_key: string;
+    file_size_bytes: number;
+    duration_seconds: number;
+    presigned_url: string;
+    created_at: string;
+}
+
 interface Responses {
     presort: Record<string, string | number | boolean>;
     rough: {
@@ -20,6 +29,7 @@ interface Responses {
         email?: string;
         interview_consent?: boolean;
         newsletter_consent?: boolean;
+        audio_recordings: Record<string, AudioRecordingMetadata>;
     };
 }
 
@@ -43,6 +53,11 @@ interface ResponseActions {
         value: string | Record<number, string> | boolean | number
     ) => void;
 
+    // Audio Recordings
+    setAudioRecording: (questionKey: string, metadata: AudioRecordingMetadata) => void;
+    deleteAudioRecording: (questionKey: string) => void;
+    getAudioRecording: (questionKey: string) => AudioRecordingMetadata | null;
+
     resetResponses: () => void;
 }
 
@@ -55,6 +70,7 @@ const initialResponses: Responses = {
         missing_statement: '',
         general_comment: '',
         questions_answers: {},
+        audio_recordings: {},
     },
 };
 
@@ -234,11 +250,41 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                 triggerAutoSave();
             },
 
+            setAudioRecording: (questionKey, metadata) => {
+                set((state) => ({
+                    postsort: {
+                        ...state.postsort,
+                        audio_recordings: {
+                            ...state.postsort.audio_recordings,
+                            [questionKey]: metadata,
+                        },
+                    },
+                }));
+                triggerAutoSave();
+            },
+
+            deleteAudioRecording: (questionKey) => {
+                set((state) => {
+                    const { [questionKey]: _, ...rest } = state.postsort.audio_recordings;
+                    return {
+                        postsort: {
+                            ...state.postsort,
+                            audio_recordings: rest,
+                        },
+                    };
+                });
+                triggerAutoSave();
+            },
+
+            getAudioRecording: (questionKey) => {
+                return get().postsort.audio_recordings[questionKey] || null;
+            },
+
             resetResponses: () => set(initialResponses),
         }),
         {
             name: isPilot() ? 'libre-q-pilot-responses' : 'libre-q-responses',
-            version: 1,
+            version: 2,
         }
     )
 );
