@@ -57,14 +57,29 @@ export const customInstance = async <T>({
 
     try {
         const isFormData = data instanceof URLSearchParams || data instanceof FormData;
+
+        // Prepare headers
+        const requestHeaders: Record<string, string> = {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
+            ...(headers as Record<string, string>),
+        };
+
+        // If it's FormData, let the browser set Content-Type (with boundary)
+        // If it's NOT FormData, default to application/json UNLESS explicitly set in headers
+        if (isFormData) {
+            // CRITICAL: specific check to remove Content-Type if it is set to multipart/form-data
+            // because manually setting it kills the boundary needed for the backend to parse it
+            if (requestHeaders['Content-Type']?.includes('multipart/form-data')) {
+                delete requestHeaders['Content-Type'];
+            }
+        } else if (!requestHeaders['Content-Type']) {
+            requestHeaders['Content-Type'] = 'application/json';
+        }
+
         const response = await fetch(fullUrl, {
             method,
-            headers: {
-                ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
-                ...(headers as Record<string, string>),
-            },
+            headers: requestHeaders,
             body: data ? (isFormData ? (data as BodyInit) : JSON.stringify(data)) : undefined,
             signal: controller.signal,
         });
