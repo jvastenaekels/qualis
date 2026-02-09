@@ -3,7 +3,10 @@
 
 In an async context, lazy="select" (the default) triggers synchronous I/O
 during serialization, leading to Internal Server Errors.
-This script mandates lazy="selectin" or other async-safe strategies.
+This script mandates lazy="selectin", lazy="raise", or other async-safe strategies.
+
+lazy="raise" is the recommended strategy for back-references and relationships
+that should only be accessed via explicit selectinload() in queries.
 """
 
 import ast
@@ -11,7 +14,7 @@ import sys
 from pathlib import Path
 
 # Config
-ASYNC_SAFE_STRATEGIES = {"selectin", "joined", "subquery", "noload"}
+ASYNC_SAFE_STRATEGIES = {"selectin", "joined", "subquery", "noload", "raise"}
 MANUALLY_EXEMPTED: set[str] = set()
 
 

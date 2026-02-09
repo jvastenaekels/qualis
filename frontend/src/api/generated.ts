@@ -7650,31 +7650,6 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
                 title: faker.string.alpha({ length: { min: 10, max: 20 } }),
                 slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
                 created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                members: faker.helpers.arrayElement([
-                    Array.from(
-                        { length: faker.number.int({ min: 1, max: 10 }) },
-                        (_, i) => i + 1
-                    ).map(() => ({
-                        user_id: faker.number.int({ min: undefined, max: undefined }),
-                        user: {
-                            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            full_name: faker.helpers.arrayElement([
-                                faker.helpers.arrayElement([
-                                    faker.string.alpha({ length: { min: 10, max: 100 } }),
-                                    null,
-                                ]),
-                                undefined,
-                            ]),
-                            id: faker.number.int({ min: undefined, max: undefined }),
-                            is_active: faker.datatype.boolean(),
-                            is_superuser: faker.datatype.boolean(),
-                            is_totp_enabled: faker.datatype.boolean(),
-                        },
-                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
-                        joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                    })),
-                    undefined,
-                ]),
             },
             null,
         ]),
@@ -7932,31 +7907,6 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (): StudyRead[] =>
                     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
                     slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
                     created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                    members: faker.helpers.arrayElement([
-                        Array.from(
-                            { length: faker.number.int({ min: 1, max: 10 }) },
-                            (_, i) => i + 1
-                        ).map(() => ({
-                            user_id: faker.number.int({ min: undefined, max: undefined }),
-                            user: {
-                                email: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                                full_name: faker.helpers.arrayElement([
-                                    faker.helpers.arrayElement([
-                                        faker.string.alpha({ length: { min: 10, max: 100 } }),
-                                        null,
-                                    ]),
-                                    undefined,
-                                ]),
-                                id: faker.number.int({ min: undefined, max: undefined }),
-                                is_active: faker.datatype.boolean(),
-                                is_superuser: faker.datatype.boolean(),
-                                is_totp_enabled: faker.datatype.boolean(),
-                            },
-                            role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
-                            joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                        })),
-                        undefined,
-                    ]),
                 },
                 null,
             ]),
@@ -8219,31 +8169,6 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
                 title: faker.string.alpha({ length: { min: 10, max: 20 } }),
                 slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
                 created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                members: faker.helpers.arrayElement([
-                    Array.from(
-                        { length: faker.number.int({ min: 1, max: 10 }) },
-                        (_, i) => i + 1
-                    ).map(() => ({
-                        user_id: faker.number.int({ min: undefined, max: undefined }),
-                        user: {
-                            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            full_name: faker.helpers.arrayElement([
-                                faker.helpers.arrayElement([
-                                    faker.string.alpha({ length: { min: 10, max: 100 } }),
-                                    null,
-                                ]),
-                                undefined,
-                            ]),
-                            id: faker.number.int({ min: undefined, max: undefined }),
-                            is_active: faker.datatype.boolean(),
-                            is_superuser: faker.datatype.boolean(),
-                            is_totp_enabled: faker.datatype.boolean(),
-                        },
-                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
-                        joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                    })),
-                    undefined,
-                ]),
             },
             null,
         ]),
@@ -8498,31 +8423,6 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
                 title: faker.string.alpha({ length: { min: 10, max: 20 } }),
                 slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
                 created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                members: faker.helpers.arrayElement([
-                    Array.from(
-                        { length: faker.number.int({ min: 1, max: 10 }) },
-                        (_, i) => i + 1
-                    ).map(() => ({
-                        user_id: faker.number.int({ min: undefined, max: undefined }),
-                        user: {
-                            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            full_name: faker.helpers.arrayElement([
-                                faker.helpers.arrayElement([
-                                    faker.string.alpha({ length: { min: 10, max: 100 } }),
-                                    null,
-                                ]),
-                                undefined,
-                            ]),
-                            id: faker.number.int({ min: undefined, max: undefined }),
-                            is_active: faker.datatype.boolean(),
-                            is_superuser: faker.datatype.boolean(),
-                            is_totp_enabled: faker.datatype.boolean(),
-                        },
-                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
-                        joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                    })),
-                    undefined,
-                ]),
             },
             null,
         ]),
@@ -8780,31 +8680,6 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
                 title: faker.string.alpha({ length: { min: 10, max: 20 } }),
                 slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
                 created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                members: faker.helpers.arrayElement([
-                    Array.from(
-                        { length: faker.number.int({ min: 1, max: 10 }) },
-                        (_, i) => i + 1
-                    ).map(() => ({
-                        user_id: faker.number.int({ min: undefined, max: undefined }),
-                        user: {
-                            email: faker.string.alpha({ length: { min: 10, max: 20 } }),
-                            full_name: faker.helpers.arrayElement([
-                                faker.helpers.arrayElement([
-                                    faker.string.alpha({ length: { min: 10, max: 100 } }),
-                                    null,
-                                ]),
-                                undefined,
-                            ]),
-                            id: faker.number.int({ min: undefined, max: undefined }),
-                            is_active: faker.datatype.boolean(),
-                            is_superuser: faker.datatype.boolean(),
-                            is_totp_enabled: faker.datatype.boolean(),
-                        },
-                        role: faker.helpers.arrayElement(Object.values(WorkspaceRole)),
-                        joined_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
-                    })),
-                    undefined,
-                ]),
             },
             null,
         ]),

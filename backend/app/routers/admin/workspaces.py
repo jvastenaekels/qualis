@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Path
 from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 import logging
 
 from app.dependencies import (
@@ -42,9 +43,10 @@ async def list_workspaces(
         select(Workspace, WorkspaceMember.role)
         .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
         .where(WorkspaceMember.user_id == current_user.id)
+        .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
     )
     result = await db.execute(query)
-    rows = result.all()
+    rows = result.unique().all()
 
     # Map to schema
     return [
@@ -104,7 +106,14 @@ async def create_workspace(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while creating the workspace",
         )
-    await db.refresh(workspace)
+    # Re-query with members loaded for WorkspaceRead serialization
+    query = (
+        select(Workspace)
+        .where(Workspace.id == workspace.id)
+        .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
+    )
+    result = await db.execute(query)
+    workspace = result.scalar_one()
 
     return workspace
 
@@ -124,10 +133,11 @@ async def get_workspace(
         .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
         .where(Workspace.slug == slug)
         .where(WorkspaceMember.user_id == current_user.id)
+        .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
     )
 
     result = await db.execute(query)
-    row = result.one_or_none()
+    row = result.unique().one_or_none()
 
     if not row:
         raise HTTPException(
@@ -179,7 +189,14 @@ async def update_workspace(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while updating the workspace",
         )
-    await db.refresh(workspace)
+    # Re-query with members loaded for WorkspaceRead serialization
+    query = (
+        select(Workspace)
+        .where(Workspace.id == workspace.id)
+        .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
+    )
+    result = await db.execute(query)
+    workspace = result.scalar_one()
     return workspace
 
 
@@ -216,8 +233,13 @@ async def update_workspace_member(
     """
     Update a workspace member's role.
     """
-    query = select(WorkspaceMember).where(
-        WorkspaceMember.workspace_id == workspace.id, WorkspaceMember.user_id == user_id
+    query = (
+        select(WorkspaceMember)
+        .where(
+            WorkspaceMember.workspace_id == workspace.id,
+            WorkspaceMember.user_id == user_id,
+        )
+        .options(selectinload(WorkspaceMember.user))
     )
     result = await db.execute(query)
     member = result.scalar_one_or_none()
@@ -237,7 +259,7 @@ async def update_workspace_member(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while updating member role",
         )
-    await db.refresh(member)
+    await db.refresh(member, attribute_names=["role"])
     return member
 
 

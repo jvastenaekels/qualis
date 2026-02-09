@@ -85,10 +85,10 @@ class Workspace(Base):
 
     # Relationships
     studies: Mapped[list["Study"]] = relationship(
-        back_populates="workspace", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
     )
     members: Mapped[list["WorkspaceMember"]] = relationship(
-        back_populates="workspace", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
     )
 
 
@@ -111,9 +111,9 @@ class WorkspaceMember(Base):
     )
 
     workspace: Mapped["Workspace"] = relationship(
-        back_populates="members", lazy="selectin"
+        back_populates="members", lazy="raise"
     )
-    user: Mapped["User"] = relationship(back_populates="memberships", lazy="selectin")
+    user: Mapped["User"] = relationship(back_populates="memberships", lazy="raise")
 
 
 # StudyCollaborator model removed (RBAC Refactor)
@@ -140,7 +140,7 @@ class User(Base):
     memberships: Mapped[list["WorkspaceMember"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
-        lazy="selectin",
+        lazy="raise",
     )
 
 
@@ -250,9 +250,7 @@ class StudyTranslation(Base):
     methodology_tips: Mapped[list[str]] = mapped_column(JSON, default=list)
     step_help: Mapped[dict] = mapped_column(JSON, default=dict)
 
-    study: Mapped["Study"] = relationship(
-        back_populates="translations", lazy="selectin"
-    )
+    study: Mapped["Study"] = relationship(back_populates="translations", lazy="raise")
 
     __table_args__ = (
         UniqueConstraint("study_id", "language_code", name="uq_study_lang"),
@@ -271,7 +269,7 @@ class Statement(Base):
     )
     code: Mapped[str] = mapped_column(String)  # "S1", "S2"...
 
-    study: Mapped["Study"] = relationship(back_populates="statements", lazy="selectin")
+    study: Mapped["Study"] = relationship(back_populates="statements", lazy="raise")
     translations: Mapped[list["StatementTranslation"]] = relationship(
         back_populates="statement", cascade="all, delete-orphan", lazy="selectin"
     )
@@ -292,7 +290,7 @@ class StatementTranslation(Base):
     text: Mapped[str] = mapped_column(String)
 
     statement: Mapped["Statement"] = relationship(
-        back_populates="translations", lazy="selectin"
+        back_populates="translations", lazy="raise"
     )
 
     __table_args__ = (
@@ -343,14 +341,12 @@ class Participant(Base):
     presort_answers: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     postsort_answers: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
-    study: Mapped["Study"] = relationship(
-        back_populates="participants", lazy="selectin"
-    )
+    study: Mapped["Study"] = relationship(back_populates="participants", lazy="raise")
     qsort_entries: Mapped[list["QSortEntry"]] = relationship(
-        back_populates="participant", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="participant", cascade="all, delete-orphan", lazy="raise"
     )
     audio_recordings: Mapped[list["AudioRecording"]] = relationship(
-        back_populates="participant", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="participant", cascade="all, delete-orphan", lazy="raise"
     )
 
     @property
@@ -378,7 +374,7 @@ class QSortEntry(Base):
     card_comment: Mapped[str | None] = mapped_column(String, nullable=True)
 
     participant: Mapped["Participant"] = relationship(
-        back_populates="qsort_entries", lazy="selectin"
+        back_populates="qsort_entries", lazy="raise"
     )
     statement: Mapped["Statement"] = relationship(lazy="selectin")
 
@@ -424,7 +420,7 @@ class AudioRecording(Base):
 
     # Relationships
     participant: Mapped["Participant"] = relationship(
-        back_populates="audio_recordings", lazy="selectin"
+        back_populates="audio_recordings", lazy="raise"
     )
 
     __table_args__ = (
@@ -463,7 +459,7 @@ class RecruitmentLink(Base):
     )
 
     study: Mapped["Study"] = relationship(
-        back_populates="recruitment_links", lazy="selectin"
+        back_populates="recruitment_links", lazy="raise"
     )
 
 
@@ -494,4 +490,4 @@ class Invitation(Base):
         DateTime(timezone=True), nullable=True
     )
 
-    workspace: Mapped["Workspace"] = relationship(lazy="selectin")
+    workspace: Mapped["Workspace"] = relationship(lazy="raise")

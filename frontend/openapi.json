@@ -4542,7 +4542,7 @@
           "workspace": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/WorkspaceRead"
+                "$ref": "#/components/schemas/WorkspaceBrief"
               },
               {
                 "type": "null"
@@ -5651,6 +5651,36 @@
         ],
         "title": "ValidationSummary"
       },
+      "WorkspaceBrief": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "created_at"
+        ],
+        "title": "WorkspaceBrief",
+        "description": "Lightweight workspace schema (no members) for nested use in StudyRead."
+      },
       "WorkspaceCreate": {
         "properties": {
           "title": {
@@ -5769,7 +5799,7 @@
           "created_at"
         ],
         "title": "WorkspaceRead",
-        "description": "Schema for reading a workspace."
+        "description": "Schema for reading a workspace with members."
       },
       "WorkspaceRole": {
         "type": "string",

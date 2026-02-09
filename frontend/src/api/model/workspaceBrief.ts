@@ -4,15 +4,13 @@
  * Libre-Q API
  * OpenAPI spec version: 0.1.0
  */
-import type { WorkspaceMemberRead } from './workspaceMemberRead';
 
 /**
- * Schema for reading a workspace with members.
+ * Lightweight workspace schema (no members) for nested use in StudyRead.
  */
-export interface WorkspaceRead {
+export interface WorkspaceBrief {
     id: number;
     title: string;
     slug: string;
     created_at: string;
-    members?: WorkspaceMemberRead[];
 }

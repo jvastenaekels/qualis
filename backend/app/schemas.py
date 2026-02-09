@@ -107,15 +107,20 @@ class WorkspaceMemberRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class WorkspaceRead(BaseModel):
-    """Schema for reading a workspace."""
+class WorkspaceBrief(BaseModel):
+    """Lightweight workspace schema (no members) for nested use in StudyRead."""
 
     id: int
     title: str
     slug: str
     created_at: datetime
-    members: list[WorkspaceMemberRead] = []
     model_config = ConfigDict(from_attributes=True)
+
+
+class WorkspaceRead(WorkspaceBrief):
+    """Schema for reading a workspace with members."""
+
+    members: list[WorkspaceMemberRead] = []
 
 
 class WorkspaceWithRole(WorkspaceRead):
@@ -385,7 +390,7 @@ class StudyRead(StudyBase):
 
     id: int
     workspace_id: int
-    workspace: WorkspaceRead | None = None
+    workspace: WorkspaceBrief | None = None
     created_at: datetime
     updated_at: datetime
     start_date: datetime | None = None

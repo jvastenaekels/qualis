@@ -170,6 +170,7 @@ export * from './validationResult';
 export * from './validationResultSummary';
 export * from './validationSummary';
 export * from './verifyInvitationApiAdminInvitationsVerifyGetParams';
+export * from './workspaceBrief';
 export * from './workspaceCreate';
 export * from './workspaceInvitationCreate';
 export * from './workspaceMemberRead';
