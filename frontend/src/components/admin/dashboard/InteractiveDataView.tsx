@@ -4,7 +4,6 @@ import {
     useReactTable,
     getCoreRowModel,
     getSortedRowModel,
-    getFilteredRowModel,
     getPaginationRowModel,
     flexRender,
     createColumnHelper,
@@ -53,6 +52,7 @@ import {
     Loader2,
     MoreVertical,
     Inbox,
+    CheckCircle2,
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -149,9 +149,20 @@ interface InteractiveDataViewProps {
     participants?: ParticipantRead[];
 }
 
-type ConsentFilter = 'email' | 'newsletter' | 'interview' | null;
+type ConsentType = 'email' | 'newsletter' | 'interview';
+type StatusFilter = 'all' | 'completed' | 'in_progress' | 'abandoned';
 
 const SUSPECT_DURATION_THRESHOLD = 120;
+const ABANDONED_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
+
+function getDisplayStatus(p: DumpParticipant): 'completed' | 'in_progress' | 'abandoned' {
+    if (p.status === 'completed') return 'completed';
+    if (p.created_at) {
+        const age = Date.now() - new Date(p.created_at).getTime();
+        if (age > ABANDONED_THRESHOLD_MS) return 'abandoned';
+    }
+    return 'in_progress';
+}
 const PAGE_SIZE = 25;
 
 export default function InteractiveDataView({
@@ -172,10 +183,27 @@ export default function InteractiveDataView({
     const [sorting, setSorting] = useState<SortingState>([{ id: 'submitted_at', desc: true }]);
     const [globalFilter, setGlobalFilter] = useState('');
     const [qualityFilter, setQualityFilter] = useState<'all' | 'flagged'>('all');
-    const [consentFilter, setConsentFilter] = useState<ConsentFilter>(null);
+    const [consentFilters, setConsentFilters] = useState<Set<ConsentType>>(new Set());
+    const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
     const [isExportLoading, setIsExportLoading] = useState(false);
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: PAGE_SIZE });
     const [clearAllDialogOpen, setClearAllDialogOpen] = useState(false);
+
+    const toggleConsent = useCallback((type: ConsentType) => {
+        setConsentFilters((prev) => {
+            const next = new Set(prev);
+            if (next.has(type)) next.delete(type);
+            else next.add(type);
+            return next;
+        });
+    }, []);
+
+    const clearAllFilters = useCallback(() => {
+        setConsentFilters(new Set());
+        setQualityFilter('all');
+        setStatusFilter('all');
+        setGlobalFilter('');
+    }, []);
 
     const effectiveParticipants = useMemo(() => {
         const dumpData = rawData as unknown as DumpResponse | null;
@@ -237,9 +265,21 @@ export default function InteractiveDataView({
     const emailCount = liveParticipants.filter((p) => p.postsort.email).length;
     const newsletterCount = liveParticipants.filter((p) => p.postsort.newsletter_consent).length;
     const interviewCount = liveParticipants.filter((p) => p.postsort.interview_consent).length;
+    const completedCount = liveParticipants.filter(
+        (p) => getDisplayStatus(p) === 'completed'
+    ).length;
+    const inProgressCount = liveParticipants.filter(
+        (p) => getDisplayStatus(p) === 'in_progress'
+    ).length;
+    const abandonedCount = liveParticipants.filter(
+        (p) => getDisplayStatus(p) === 'abandoned'
+    ).length;
 
     const hasActiveFilters =
-        consentFilter !== null || qualityFilter === 'flagged' || globalFilter !== '';
+        consentFilters.size > 0 ||
+        qualityFilter === 'flagged' ||
+        statusFilter !== 'all' ||
+        globalFilter !== '';
 
     const filteredParticipants = useMemo(() => {
         return liveParticipants.filter((p) => {
@@ -250,18 +290,33 @@ export default function InteractiveDataView({
                       p.is_discarded
                     : true;
 
-            let matchesConsent = true;
-            if (consentFilter === 'email') {
-                matchesConsent = !!p.postsort.email;
-            } else if (consentFilter === 'newsletter') {
-                matchesConsent = !!p.postsort.newsletter_consent;
-            } else if (consentFilter === 'interview') {
-                matchesConsent = !!p.postsort.interview_consent;
-            }
+            const matchesConsent =
+                consentFilters.size === 0 ||
+                [...consentFilters].every((f) => {
+                    if (f === 'email') return !!p.postsort.email;
+                    if (f === 'newsletter') return !!p.postsort.newsletter_consent;
+                    if (f === 'interview') return !!p.postsort.interview_consent;
+                    return true;
+                });
 
-            return matchesQuality && matchesConsent;
+            const matchesStatus = statusFilter === 'all' || getDisplayStatus(p) === statusFilter;
+
+            const matchesSearch =
+                !globalFilter ||
+                (() => {
+                    const q = globalFilter.toLowerCase();
+                    return (
+                        p.id.toLowerCase().includes(q) ||
+                        (p.language || '').toLowerCase().includes(q) ||
+                        (p.status || '').toLowerCase().includes(q) ||
+                        (p.postsort?.email || '').toLowerCase().includes(q) ||
+                        (p.recruitment_token || '').toLowerCase().includes(q)
+                    );
+                })();
+
+            return matchesQuality && matchesConsent && matchesStatus && matchesSearch;
         });
-    }, [liveParticipants, qualityFilter, consentFilter]);
+    }, [liveParticipants, qualityFilter, consentFilters, statusFilter, globalFilter]);
 
     const handleViewParticipant = useCallback(
         (participant: DumpParticipant) => {
@@ -356,11 +411,22 @@ export default function InteractiveDataView({
                 },
             }),
             columnHelper.accessor('language', {
-                header: () => (
-                    <div className="flex items-center gap-1.5">
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
+                    >
                         <Globe className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{t('admin.data.table.lang')}</span>
-                    </div>
+                        {t('admin.data.table.lang')}
+                        {column.getIsSorted() === 'asc' ? (
+                            <ArrowUp className="ml-2 h-3 w-3 text-indigo-500" />
+                        ) : column.getIsSorted() === 'desc' ? (
+                            <ArrowDown className="ml-2 h-3 w-3 text-indigo-500" />
+                        ) : (
+                            <ArrowUpDown className="ml-2 h-3 w-3 text-slate-300" />
+                        )}
+                    </Button>
                 ),
                 cell: (info) => (
                     <div className="flex items-center gap-2 text-slate-600 font-medium">
@@ -372,25 +438,38 @@ export default function InteractiveDataView({
                 ),
             }),
             columnHelper.accessor('status', {
-                header: () => (
-                    <div className="flex items-center gap-1.5">
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                        className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
+                    >
                         <Sparkles className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{t('admin.data.table.status', 'Status')}</span>
-                    </div>
+                        {t('admin.data.table.status', 'Status')}
+                        {column.getIsSorted() === 'asc' ? (
+                            <ArrowUp className="ml-2 h-3 w-3 text-indigo-500" />
+                        ) : column.getIsSorted() === 'desc' ? (
+                            <ArrowDown className="ml-2 h-3 w-3 text-indigo-500" />
+                        ) : (
+                            <ArrowUpDown className="ml-2 h-3 w-3 text-slate-300" />
+                        )}
+                    </Button>
                 ),
-                cell: (info) => {
-                    const status = info.getValue() as string;
+                cell: ({ row }) => {
+                    const displayStatus = getDisplayStatus(row.original);
                     return (
                         <Badge
                             variant="outline"
                             className={cn(
                                 'h-5 text-[10px] px-2 font-semibold border-none',
-                                status === 'completed'
+                                displayStatus === 'completed'
                                     ? 'bg-emerald-50 text-emerald-600'
-                                    : 'bg-slate-50 text-slate-400'
+                                    : displayStatus === 'abandoned'
+                                      ? 'bg-rose-50 text-rose-500'
+                                      : 'bg-sky-50 text-sky-600'
                             )}
                         >
-                            {t(`admin.data.status.${status}`, status)}
+                            {t(`admin.data.status.${displayStatus}`, displayStatus)}
                         </Badge>
                     );
                 },
@@ -638,19 +717,17 @@ export default function InteractiveDataView({
         columns,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         onSortingChange: setSorting,
-        onGlobalFilterChange: setGlobalFilter,
         onPaginationChange: setPagination,
-        state: { sorting, globalFilter, pagination },
+        state: { sorting, pagination },
     });
 
     if (isLoading && !data) {
         return (
             <div className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {[1, 2, 3].map((i) => (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+                    {[1, 2, 3, 4, 5].map((i) => (
                         <Skeleton key={i} className="h-32 w-full rounded-2xl" />
                     ))}
                 </div>
@@ -687,14 +764,124 @@ export default function InteractiveDataView({
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Interactive Summary Grid */}
             {liveCount > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    {/* Completed Card */}
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setStatusFilter((prev) => (prev === 'completed' ? 'all' : 'completed'))
+                        }
+                        className={cn(
+                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            statusFilter === 'completed'
+                                ? 'border-emerald-400 ring-4 ring-emerald-100 shadow-emerald-200'
+                                : 'border-slate-200 hover:border-emerald-200'
+                        )}
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div
+                                className={cn(
+                                    'p-2.5 rounded-xl transition-colors',
+                                    statusFilter === 'completed'
+                                        ? 'bg-emerald-600 text-white'
+                                        : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
+                                )}
+                            >
+                                <CheckCircle2 className="w-4 h-4" />
+                            </div>
+                        </div>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
+                            {t('admin.data.stats.completed', 'Completed')}
+                        </p>
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span className="text-3xl font-black text-slate-900 leading-none">
+                                {completedCount}
+                            </span>
+                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
+                        </div>
+                        {completedCount > 0 && (
+                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                                <ArrowRight className="w-3 h-3" />
+                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                            </p>
+                        )}
+                    </button>
+
+                    {/* In Progress Card */}
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setStatusFilter((prev) =>
+                                prev === 'in_progress' ? 'all' : 'in_progress'
+                            )
+                        }
+                        className={cn(
+                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            statusFilter === 'in_progress'
+                                ? 'border-sky-400 ring-4 ring-sky-100 shadow-sky-200'
+                                : statusFilter === 'abandoned'
+                                  ? 'border-slate-200 hover:border-sky-200'
+                                  : 'border-slate-200 hover:border-sky-200'
+                        )}
+                    >
+                        <div className="flex items-center justify-between mb-2">
+                            <div
+                                className={cn(
+                                    'p-2.5 rounded-xl transition-colors',
+                                    statusFilter === 'in_progress'
+                                        ? 'bg-sky-600 text-white'
+                                        : 'bg-sky-50 text-sky-600 group-hover:bg-sky-600 group-hover:text-white'
+                                )}
+                            >
+                                <Clock className="w-4 h-4" />
+                            </div>
+                        </div>
+                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
+                            {t('admin.data.stats.in_progress', 'In progress')}
+                        </p>
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span className="text-3xl font-black text-slate-900 leading-none">
+                                {inProgressCount}
+                            </span>
+                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
+                        </div>
+                        {abandonedCount > 0 && (
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setStatusFilter((prev) =>
+                                        prev === 'abandoned' ? 'all' : 'abandoned'
+                                    );
+                                }}
+                                className={cn(
+                                    'text-[10px] font-semibold flex items-center gap-1 px-1.5 py-0.5 rounded-md transition-colors',
+                                    statusFilter === 'abandoned'
+                                        ? 'text-rose-700 bg-rose-100'
+                                        : 'text-rose-500 hover:bg-rose-50'
+                                )}
+                            >
+                                <AlertTriangle className="w-3 h-3" />
+                                {t('admin.data.stats.abandoned_count', '{{count}} abandoned', {
+                                    count: abandonedCount,
+                                })}
+                            </button>
+                        )}
+                        {abandonedCount === 0 && inProgressCount > 0 && (
+                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                                <ArrowRight className="w-3 h-3" />
+                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                            </p>
+                        )}
+                    </button>
+
                     {/* Email Collection Card */}
                     <button
                         type="button"
-                        onClick={() => setConsentFilter(consentFilter === 'email' ? null : 'email')}
+                        onClick={() => toggleConsent('email')}
                         className={cn(
                             'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
-                            consentFilter === 'email'
+                            consentFilters.has('email')
                                 ? 'border-indigo-400 ring-4 ring-indigo-100 shadow-indigo-200'
                                 : 'border-slate-200 hover:border-indigo-200'
                         )}
@@ -703,7 +890,7 @@ export default function InteractiveDataView({
                             <div
                                 className={cn(
                                     'p-2.5 rounded-xl transition-colors',
-                                    consentFilter === 'email'
+                                    consentFilters.has('email')
                                         ? 'bg-indigo-600 text-white'
                                         : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'
                                 )}
@@ -745,12 +932,10 @@ export default function InteractiveDataView({
                     {/* Newsletter Consent Card */}
                     <button
                         type="button"
-                        onClick={() =>
-                            setConsentFilter(consentFilter === 'newsletter' ? null : 'newsletter')
-                        }
+                        onClick={() => toggleConsent('newsletter')}
                         className={cn(
                             'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
-                            consentFilter === 'newsletter'
+                            consentFilters.has('newsletter')
                                 ? 'border-emerald-400 ring-4 ring-emerald-100 shadow-emerald-200'
                                 : 'border-slate-200 hover:border-emerald-200'
                         )}
@@ -759,7 +944,7 @@ export default function InteractiveDataView({
                             <div
                                 className={cn(
                                     'p-2.5 rounded-xl transition-colors',
-                                    consentFilter === 'newsletter'
+                                    consentFilters.has('newsletter')
                                         ? 'bg-emerald-600 text-white'
                                         : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
                                 )}
@@ -787,12 +972,10 @@ export default function InteractiveDataView({
                     {/* Interview Consent Card */}
                     <button
                         type="button"
-                        onClick={() =>
-                            setConsentFilter(consentFilter === 'interview' ? null : 'interview')
-                        }
+                        onClick={() => toggleConsent('interview')}
                         className={cn(
                             'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
-                            consentFilter === 'interview'
+                            consentFilters.has('interview')
                                 ? 'border-amber-400 ring-4 ring-amber-100 shadow-amber-200'
                                 : 'border-slate-200 hover:border-amber-200'
                         )}
@@ -801,7 +984,7 @@ export default function InteractiveDataView({
                             <div
                                 className={cn(
                                     'p-2.5 rounded-xl transition-colors',
-                                    consentFilter === 'interview'
+                                    consentFilters.has('interview')
                                         ? 'bg-amber-600 text-white'
                                         : 'bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white'
                                 )}
@@ -829,38 +1012,54 @@ export default function InteractiveDataView({
             )}
 
             {/* Active Filters */}
-            {(consentFilter || qualityFilter === 'flagged') && (
+            {hasActiveFilters && (
                 <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-semibold text-slate-600">
                         {t('admin.data.filters.active', 'Active filters')}:
                     </span>
-                    {consentFilter && (
+                    {consentFilters.has('email') && (
                         <Badge
                             variant="secondary"
                             className="h-7 px-3 gap-2 bg-indigo-100 text-indigo-700 border-indigo-200 font-semibold"
                         >
-                            {consentFilter === 'email' && (
-                                <>
-                                    <Mail className="w-3 h-3" />
-                                    {t('admin.data.filters.has_email', 'Has email')}
-                                </>
-                            )}
-                            {consentFilter === 'newsletter' && (
-                                <>
-                                    <Bell className="w-3 h-3" />
-                                    {t('admin.data.filters.newsletter', 'Newsletter consent')}
-                                </>
-                            )}
-                            {consentFilter === 'interview' && (
-                                <>
-                                    <Briefcase className="w-3 h-3" />
-                                    {t('admin.data.filters.interview', 'Interview consent')}
-                                </>
-                            )}
+                            <Mail className="w-3 h-3" />
+                            {t('admin.data.filters.has_email', 'Has email')}
                             <button
                                 type="button"
-                                onClick={() => setConsentFilter(null)}
+                                onClick={() => toggleConsent('email')}
                                 className="hover:bg-indigo-200 rounded-full p-0.5 transition-colors"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </Badge>
+                    )}
+                    {consentFilters.has('newsletter') && (
+                        <Badge
+                            variant="secondary"
+                            className="h-7 px-3 gap-2 bg-emerald-100 text-emerald-700 border-emerald-200 font-semibold"
+                        >
+                            <Bell className="w-3 h-3" />
+                            {t('admin.data.filters.newsletter', 'Newsletter consent')}
+                            <button
+                                type="button"
+                                onClick={() => toggleConsent('newsletter')}
+                                className="hover:bg-emerald-200 rounded-full p-0.5 transition-colors"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </Badge>
+                    )}
+                    {consentFilters.has('interview') && (
+                        <Badge
+                            variant="secondary"
+                            className="h-7 px-3 gap-2 bg-amber-100 text-amber-700 border-amber-200 font-semibold"
+                        >
+                            <Briefcase className="w-3 h-3" />
+                            {t('admin.data.filters.interview', 'Interview consent')}
+                            <button
+                                type="button"
+                                onClick={() => toggleConsent('interview')}
+                                className="hover:bg-amber-200 rounded-full p-0.5 transition-colors"
                             >
                                 <X className="w-3 h-3" />
                             </button>
@@ -882,13 +1081,56 @@ export default function InteractiveDataView({
                             </button>
                         </Badge>
                     )}
+                    {statusFilter !== 'all' && (
+                        <Badge
+                            variant="secondary"
+                            className={cn(
+                                'h-7 px-3 gap-2 font-semibold',
+                                statusFilter === 'completed'
+                                    ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                                    : statusFilter === 'in_progress'
+                                      ? 'bg-sky-100 text-sky-700 border-sky-200'
+                                      : 'bg-rose-100 text-rose-700 border-rose-200'
+                            )}
+                        >
+                            <Sparkles className="w-3 h-3" />
+                            {t(`admin.data.status.${statusFilter}`, statusFilter)}
+                            <button
+                                type="button"
+                                onClick={() => setStatusFilter('all')}
+                                className={cn(
+                                    'rounded-full p-0.5 transition-colors',
+                                    statusFilter === 'completed'
+                                        ? 'hover:bg-emerald-200'
+                                        : statusFilter === 'in_progress'
+                                          ? 'hover:bg-sky-200'
+                                          : 'hover:bg-rose-200'
+                                )}
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </Badge>
+                    )}
+                    {globalFilter && (
+                        <Badge
+                            variant="secondary"
+                            className="h-7 px-3 gap-2 bg-slate-100 text-slate-700 border-slate-200 font-semibold"
+                        >
+                            <Search className="w-3 h-3" />
+                            &ldquo;{globalFilter}&rdquo;
+                            <button
+                                type="button"
+                                onClick={() => setGlobalFilter('')}
+                                className="hover:bg-slate-200 rounded-full p-0.5 transition-colors"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </Badge>
+                    )}
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {
-                            setConsentFilter(null);
-                            setQualityFilter('all');
-                        }}
+                        onClick={clearAllFilters}
                         className="h-7 text-xs font-semibold text-slate-600 gap-1.5"
                     >
                         <FilterX className="w-3.5 h-3.5" />
@@ -939,6 +1181,39 @@ export default function InteractiveDataView({
                             <AlertTriangle className="h-4 w-4" />
                             <span className="hidden sm:inline text-xs">
                                 {t('admin.data.filters.flagged', 'Flagged')}
+                            </span>
+                        </Button>
+
+                        <Button
+                            variant="outline"
+                            onClick={() =>
+                                setStatusFilter((prev) =>
+                                    prev === 'all'
+                                        ? 'completed'
+                                        : prev === 'completed'
+                                          ? 'in_progress'
+                                          : prev === 'in_progress'
+                                            ? 'abandoned'
+                                            : 'all'
+                                )
+                            }
+                            className={cn(
+                                'h-11 rounded-xl transition-all border-slate-200 gap-2 font-semibold',
+                                statusFilter === 'completed'
+                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-600 shadow-inner'
+                                    : statusFilter === 'in_progress'
+                                      ? 'bg-sky-50 border-sky-200 text-sky-600 shadow-inner'
+                                      : statusFilter === 'abandoned'
+                                        ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-inner'
+                                        : 'bg-white hover:bg-slate-50'
+                            )}
+                            title={t('admin.data.filter.status', 'Filter by status')}
+                        >
+                            <Sparkles className="h-4 w-4" />
+                            <span className="hidden sm:inline text-xs">
+                                {statusFilter === 'all'
+                                    ? t('admin.data.table.status', 'Status')
+                                    : t(`admin.data.status.${statusFilter}`, statusFilter)}
                             </span>
                         </Button>
 
@@ -1168,11 +1443,7 @@ export default function InteractiveDataView({
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
-                                                        onClick={() => {
-                                                            setConsentFilter(null);
-                                                            setQualityFilter('all');
-                                                            setGlobalFilter('');
-                                                        }}
+                                                        onClick={clearAllFilters}
                                                         className="mt-2"
                                                     >
                                                         {t(
@@ -1200,9 +1471,9 @@ export default function InteractiveDataView({
                                         from: pagination.pageIndex * pagination.pageSize + 1,
                                         to: Math.min(
                                             (pagination.pageIndex + 1) * pagination.pageSize,
-                                            table.getFilteredRowModel().rows.length
+                                            table.getRowCount()
                                         ),
-                                        total: table.getFilteredRowModel().rows.length,
+                                        total: table.getRowCount(),
                                     }
                                 )}
                             </p>

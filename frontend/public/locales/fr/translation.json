@@ -1404,7 +1404,10 @@
                 "opt_in": "de participation",
                 "follow_up": "Suivi qualitatif",
                 "interested": "intéressés",
-                "click_to_filter": "Cliquez pour filtrer"
+                "click_to_filter": "Cliquez pour filtrer",
+                "completed": "Terminé",
+                "in_progress": "En cours",
+                "abandoned_count": "{{count}} abandonné(s)"
             },
             "tabs": {
                 "live": "Participants directs",
@@ -1414,7 +1417,9 @@
             },
             "status": {
                 "started": "en cours",
-                "completed": "terminé",
+                "completed": "Terminé",
+                "in_progress": "En cours",
+                "abandoned": "Abandonné",
                 "discarded": "rejeté"
             },
             "actions": {

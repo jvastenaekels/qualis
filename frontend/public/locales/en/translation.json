@@ -1374,7 +1374,10 @@
                 "opt_in": "Response rate",
                 "follow_up": "Follow-up potential",
                 "interested": "interested",
-                "click_to_filter": "Click to filter"
+                "click_to_filter": "Click to filter",
+                "completed": "Completed",
+                "in_progress": "In progress",
+                "abandoned_count": "{{count}} abandoned"
             },
             "tabs": {
                 "live": "Live participants",
@@ -1384,7 +1387,9 @@
             },
             "status": {
                 "started": "started",
-                "completed": "completed",
+                "completed": "Completed",
+                "in_progress": "In progress",
+                "abandoned": "Abandoned",
                 "discarded": "discarded"
             },
             "actions": {

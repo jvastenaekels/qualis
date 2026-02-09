@@ -1366,7 +1366,10 @@
                 "opt_in": "vastausosuus",
                 "follow_up": "Jatko-osallistuminen",
                 "interested": "kiinnostunutta",
-                "click_to_filter": "Klikkaa suodattaaksesi"
+                "click_to_filter": "Klikkaa suodattaaksesi",
+                "completed": "Valmis",
+                "in_progress": "Kesken",
+                "abandoned_count": "{{count}} hylätty(ä)"
             },
             "tabs": {
                 "live": "Live-osallistujat",
@@ -1376,7 +1379,9 @@
             },
             "status": {
                 "started": "aloitettu",
-                "completed": "valmis",
+                "completed": "Valmis",
+                "in_progress": "Kesken",
+                "abandoned": "Hylätty",
                 "discarded": "hylätty"
             },
             "actions": {

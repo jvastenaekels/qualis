@@ -477,7 +477,7 @@ const PostSortConfigEditor = ({
                                         id="missing-prompt"
                                         value={
                                             getPromptText('missing_statements_label') ||
-                                            tStudy('admin.design.postsort.missing.title')
+                                            tStudy('admin.study.postsort.missing.desc')
                                         }
                                         onChange={(e) =>
                                             setPromptText(
@@ -485,7 +485,7 @@ const PostSortConfigEditor = ({
                                                 e.target.value
                                             )
                                         }
-                                        placeholder={tStudy('admin.design.postsort.missing.title')}
+                                        placeholder={tStudy('admin.study.postsort.missing.desc')}
                                         readOnly={readOnly}
                                         className="min-h-[80px] rounded-2xl border-slate-300 focus:ring-slate-500/20 focus:border-slate-500 transition-all bg-slate-50/30 text-slate-700 leading-relaxed font-medium"
                                     />

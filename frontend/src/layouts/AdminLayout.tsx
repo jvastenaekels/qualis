@@ -83,14 +83,15 @@ export default function AdminLayout() {
                         <SidebarTrigger className="-ml-1" />
                         <Separator orientation="vertical" className="mr-2 h-4" />
                         <Breadcrumb className="min-w-0 flex-1 overflow-hidden">
-                            <BreadcrumbList className="flex-nowrap min-w-0 max-w-full">
+                            <BreadcrumbList className="flex-nowrap min-w-0">
                                 {/* Workspace Context (if available) */}
                                 {currentWorkspace && (
                                     <>
-                                        <BreadcrumbItem className="hidden md:block shrink-0">
+                                        <BreadcrumbItem className="hidden md:block min-w-0 max-w-[120px] lg:max-w-[180px]">
                                             <BreadcrumbLink
                                                 href={`/app/${currentWorkspace.slug}/dashboard`}
-                                                className="text-xs font-medium text-slate-500 hover:text-indigo-600 transition-colors"
+                                                className="text-xs font-medium text-slate-500 hover:text-indigo-600 transition-colors truncate block"
+                                                title={currentWorkspace.title}
                                             >
                                                 {currentWorkspace.title}
                                             </BreadcrumbLink>
@@ -102,10 +103,13 @@ export default function AdminLayout() {
                                 {/* Study Context (if on study page) */}
                                 {activeStudyId && study && (
                                     <>
-                                        <BreadcrumbItem className="hidden md:block min-w-0 flex-1 max-w-[200px] lg:max-w-[400px]">
+                                        <BreadcrumbItem className="hidden md:block min-w-0 max-w-[160px] lg:max-w-[280px]">
                                             <BreadcrumbLink
                                                 href={`/app/${currentWorkspace?.slug}/studies/${activeStudyId}`}
                                                 className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors truncate block"
+                                                title={
+                                                    study.translations?.[0]?.title || activeStudyId
+                                                }
                                             >
                                                 {study.translations?.[0]?.title || activeStudyId}
                                             </BreadcrumbLink>

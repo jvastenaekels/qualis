@@ -707,7 +707,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                         <Label className="text-xl font-bold text-slate-800 block">
                             {getPrompt(
                                 'missing_statements_label',
-                                'admin.design.postsort.missing.title',
+                                'admin.study.postsort.missing.desc',
                                 'Were there any important perspectives, issues, or statements that you felt were missing from this set?'
                             )}
                         </Label>
