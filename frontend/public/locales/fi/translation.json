@@ -1369,7 +1369,11 @@
                 "click_to_filter": "Klikkaa suodattaaksesi",
                 "completed": "Valmis",
                 "in_progress": "Kesken",
-                "abandoned_count": "{{count}} hylätty(ä)"
+                "abandoned_count": "{{count}} hylätty(ä)",
+                "interview_interested": "Avoin jatkohaastattelulle",
+                "interview": "Haastattelut",
+                "newsletter_interested": "Kiinnostunut uutiskirjeestä",
+                "email": "Sähköpostit"
             },
             "tabs": {
                 "live": "Live-osallistujat",
@@ -1462,7 +1466,9 @@
                 "newsletter": "Uutiskirjeen suostumus",
                 "interview": "Haastattelusuostumus",
                 "flagged": "Vain merkityt",
-                "clear_all": "Tyhjennä suodattimet"
+                "clear_all": "Tyhjennä suodattimet",
+                "all_statuses": "Kaikki tilat",
+                "all_consents": "Kaikki"
             },
             "search": {
                 "placeholder": "Hae ID:llä tai tunnisteella...",
@@ -1697,6 +1703,7 @@
                 }
             },
             "status": {
+                "started": "Aloitettu",
                 "completed": "Valmis",
                 "discarded": "Hylätty",
                 "in_progress": "Käynnissä"

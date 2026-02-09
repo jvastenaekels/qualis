@@ -780,12 +780,10 @@ export default function InteractiveDataView({
                             </div>
                         </div>
 
-                        {completedCount > 0 && (
-                            <div className="mt-4 flex items-center text-[11px] font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                                {t('admin.data.stats.click_to_filter', 'Filter table')}
-                                <ArrowRight className="w-3 h-3" />
-                            </div>
-                        )}
+                        <div className="mt-4 flex items-center text-[11px] font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            <ArrowRight className="w-3 h-3" />
+                        </div>
                     </button>
 
                     {/* In Progress Card */}
@@ -896,7 +894,10 @@ export default function InteractiveDataView({
                                     <Briefcase className="w-5 h-5" />
                                 </div>
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                    {t('admin.data.stats.interview', 'Accepted follow-up')}
+                                    {t(
+                                        'admin.data.stats.interview_interested',
+                                        'Accepted follow-up'
+                                    )}
                                 </span>
                             </div>
 

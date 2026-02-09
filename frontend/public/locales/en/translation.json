@@ -1377,7 +1377,11 @@
                 "click_to_filter": "Click to filter",
                 "completed": "Completed",
                 "in_progress": "In progress",
-                "abandoned_count": "{{count}} abandoned"
+                "abandoned_count": "{{count}} abandoned",
+                "interview_interested": "Accepted follow-up",
+                "interview": "Interviews",
+                "newsletter_interested": "Newsletter interest",
+                "email": "Emails"
             },
             "tabs": {
                 "live": "Live participants",
@@ -1470,7 +1474,9 @@
                 "newsletter": "Newsletter consent",
                 "interview": "Interview consent",
                 "flagged": "Flagged only",
-                "clear_all": "Clear filters"
+                "clear_all": "Clear filters",
+                "all_statuses": "All statuses",
+                "all_consents": "All"
             },
             "search": {
                 "placeholder": "Search by ID or recruitment token...",
@@ -1703,6 +1709,7 @@
                 }
             },
             "status": {
+                "started": "Started",
                 "completed": "Completed",
                 "discarded": "Discarded",
                 "in_progress": "In Progress"

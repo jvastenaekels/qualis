@@ -1407,7 +1407,11 @@
                 "click_to_filter": "Cliquez pour filtrer",
                 "completed": "Terminé",
                 "in_progress": "En cours",
-                "abandoned_count": "{{count}} abandonné(s)"
+                "abandoned_count": "{{count}} abandonné(s)",
+                "interview_interested": "Accord pour entretien",
+                "interview": "Entretiens",
+                "newsletter_interested": "Intérêt pour la newsletter",
+                "email": "Emails"
             },
             "tabs": {
                 "live": "Participants directs",
@@ -1500,7 +1504,9 @@
                 "newsletter": "Consentement newsletter",
                 "interview": "Consentement entretien",
                 "flagged": "Signalés uniquement",
-                "clear_all": "Effacer les filtres"
+                "clear_all": "Effacer les filtres",
+                "all_statuses": "Tous les statuts",
+                "all_consents": "Tous"
             },
             "search": {
                 "placeholder": "Chercher par ID ou jeton...",
@@ -1703,6 +1709,7 @@
                 }
             },
             "status": {
+                "started": "Commencé",
                 "completed": "Terminé",
                 "discarded": "Écarté",
                 "in_progress": "En cours"
