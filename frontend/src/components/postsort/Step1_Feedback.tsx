@@ -139,7 +139,8 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
         setUploadingKeys((prev) => new Set(prev).add(questionKey));
         try {
             // Create File from Blob (orval expects File, not Blob)
-            const file = new File([blob], `recording_${Date.now()}.webm`, {
+            const extension = blob.type.includes('mp4') ? 'mp4' : 'webm';
+            const file = new File([blob], `recording_${Date.now()}.${extension}`, {
                 type: blob.type,
             });
 

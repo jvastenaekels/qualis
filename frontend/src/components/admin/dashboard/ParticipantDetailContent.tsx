@@ -398,6 +398,8 @@ export function ParticipantDetailContent({
                                 sidebarContent={sidebarContent}
                                 onInteractionUtils={(utils) => {
                                     gridUtilsRef.current = utils;
+                                    // Force auto-fit on mount/tab switch
+                                    setTimeout(() => utils.performAutoFit(), 200);
                                 }}
                                 renderSlotContent={(colIdx, rowIdx, dims) => {
                                     const sId = cellContentMap[`${colIdx}-${rowIdx}`];

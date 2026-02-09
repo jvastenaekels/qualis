@@ -56,7 +56,7 @@ export const customInstance = async <T>({
     }
 
     try {
-        const isFormData = data instanceof URLSearchParams;
+        const isFormData = data instanceof URLSearchParams || data instanceof FormData;
         const response = await fetch(fullUrl, {
             method,
             headers: {
@@ -65,7 +65,7 @@ export const customInstance = async <T>({
                 ...(workspaceId ? { 'X-Workspace-ID': workspaceId } : {}),
                 ...(headers as Record<string, string>),
             },
-            body: data ? (isFormData ? data : JSON.stringify(data)) : undefined,
+            body: data ? (isFormData ? (data as BodyInit) : JSON.stringify(data)) : undefined,
             signal: controller.signal,
         });
 

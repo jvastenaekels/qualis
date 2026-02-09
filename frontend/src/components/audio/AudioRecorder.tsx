@@ -635,12 +635,12 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     type="button"
                     onClick={startRecording}
                     disabled={disabled}
-                    className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-indigo-600 transition-colors group disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2.5 w-full p-3 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 text-slate-600 font-medium hover:border-indigo-400 hover:text-indigo-600 hover:bg-indigo-50/50 hover:shadow-sm transition-all group disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                    <AudioLines className="w-4 h-4" />
-                    <span className="group-hover:underline underline-offset-2">
-                        {t('audio.record_prompt', 'Record audio response')}
-                    </span>
+                    <div className="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-indigo-200 group-hover:bg-indigo-50 transition-colors shadow-sm">
+                        <AudioLines className="w-4 h-4 text-slate-500 group-hover:text-indigo-500" />
+                    </div>
+                    <span>{t('audio.record_prompt', 'Record audio response')}</span>
                 </button>
             )}
 
