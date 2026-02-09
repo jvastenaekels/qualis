@@ -33,7 +33,10 @@ async def export_csv(
     query = (
         select(Participant)
         .where(Participant.study_id == study.id)
-        .options(selectinload(Participant.qsort_entries))
+        .options(
+            selectinload(Participant.qsort_entries),
+            selectinload(Participant.audio_recordings),
+        )
     )
     # Ensure study.statements are loaded
     # Re-fetch study with statements
@@ -77,7 +80,10 @@ async def export_pqmethod(
     query = (
         select(Participant)
         .where(Participant.study_id == study.id)
-        .options(selectinload(Participant.qsort_entries))
+        .options(
+            selectinload(Participant.qsort_entries),
+            selectinload(Participant.audio_recordings),
+        )
     )
     participant_res = await db.execute(query)
     participants = list(participant_res.scalars().all())
@@ -111,7 +117,10 @@ async def export_r_kit(
     query = (
         select(Participant)
         .where(Participant.study_id == study.id, Participant.is_discarded.is_(False))
-        .options(selectinload(Participant.qsort_entries))
+        .options(
+            selectinload(Participant.qsort_entries),
+            selectinload(Participant.audio_recordings),
+        )
     )
     participant_res = await db.execute(query)
     participants = list(participant_res.scalars().all())
@@ -145,14 +154,17 @@ async def export_participant_csv(
     """Export single participant results as CSV."""
     slug = study.slug
 
-    # Fetch participant with qsort entries
+    # Fetch participant with qsort entries and audio recordings
     query = (
         select(Participant)
         .where(
             Participant.id == participant_id,
             Participant.study_id == study.id,
         )
-        .options(selectinload(Participant.qsort_entries))
+        .options(
+            selectinload(Participant.qsort_entries),
+            selectinload(Participant.audio_recordings),
+        )
     )
     participant_res = await db.execute(query)
     participant = participant_res.scalar_one_or_none()
@@ -230,6 +242,7 @@ async def get_research_package(
         .options(
             selectinload(Study.statements).selectinload(Statement.translations),
             selectinload(Study.participants).selectinload(Participant.qsort_entries),
+            selectinload(Study.participants).selectinload(Participant.audio_recordings),
             selectinload(Study.translations),
         )
     )

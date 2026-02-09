@@ -542,6 +542,8 @@ async def get_participant(
 ):
     """Get detailed participant info including responses."""
     from app.models import Participant
+    from app.services.storage_service import storage_service
+    from datetime import datetime, timedelta, UTC
 
     stmt = (
         select(Participant)
@@ -554,7 +556,10 @@ async def get_participant(
             # Assuming Viewer can also view if they have study access.
             WorkspaceMember.role.in_([WorkspaceRole.owner, WorkspaceRole.researcher]),
         )
-        .options(selectinload(Participant.qsort_entries))
+        .options(
+            selectinload(Participant.qsort_entries),
+            selectinload(Participant.audio_recordings),
+        )
     )
     result = await db.execute(stmt)
     participant = result.scalar_one_or_none()
@@ -563,6 +568,21 @@ async def get_participant(
         raise HTTPException(
             status_code=404, detail="Participant not found or access denied"
         )
+
+    # Generate fresh presigned URLs for audio recordings (24h expiration)
+    for audio_rec in participant.audio_recordings:
+        try:
+            url = storage_service.generate_presigned_url(
+                audio_rec.s3_key, expiration=86400
+            )
+            # Set runtime attributes (not in model, only in schema)
+            setattr(audio_rec, "presigned_url", url)
+            setattr(
+                audio_rec, "url_expires_at", datetime.now(UTC) + timedelta(hours=24)
+            )
+        except Exception as e:
+            # Log error but don't fail the request
+            print(f"Failed to generate presigned URL for {audio_rec.s3_key}: {e}")
 
     return participant
 

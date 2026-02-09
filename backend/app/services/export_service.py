@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Any
 
 from ..models import Participant, Study, Statement
+from .storage_service import storage_service
 
 
 class ExportService:
@@ -77,7 +78,6 @@ class ExportService:
 
         # 2. Header Construction
         sorted_statements = sorted(study.statements, key=lambda s: s.id)
-        statement_codes = [s.code for s in sorted_statements]
 
         header = [
             "Participant_UID",
@@ -99,8 +99,13 @@ class ExportService:
             [f"Pre_{get_label(presort_fields, k, header_lang)}" for k in presort_keys]
         )
 
-        # Add Statement Scores
-        header.extend(statement_codes)
+        # Add Statement Scores + Card Comments + Audio
+        for s in sorted_statements:
+            header.append(s.code)  # Score
+            header.append(f"{s.code}_Comment")  # Text comment
+            header.append(f"{s.code}_Audio_URL")  # Audio presigned URL
+            header.append(f"{s.code}_Audio_Duration_Sec")  # Audio duration
+            header.append(f"{s.code}_Audio_FileSize_KB")  # Audio file size
 
         # Add Postsort questions with labels
         postsort_keys = list(postsort_fields.keys())
@@ -110,6 +115,23 @@ class ExportService:
                 for k in postsort_keys
             ]
         )
+
+        # Add audio columns for postsort questions (missing_statement, etc.)
+        # Check if audio is enabled in config
+        audio_enabled = False
+        if study.postsort_config and isinstance(study.postsort_config, dict):
+            audio_config = study.postsort_config.get("audio", {})
+            audio_enabled = audio_config.get("enabled", False)
+
+        if audio_enabled:
+            # Add columns for questions that might have audio recordings
+            header.extend(
+                [
+                    "Missing_Statement_Audio_URL",
+                    "Missing_Statement_Audio_Duration_Sec",
+                    "Missing_Statement_Audio_FileSize_KB",
+                ]
+            )
 
         writer.writerow(header)
 
@@ -138,18 +160,74 @@ class ExportService:
                 val = p.presort_answers.get(k)
                 row.append(get_value_label(presort_fields, k, val, header_lang))
 
-            # Q-Sort Scores
+            # Build audio recordings map by question_key
+            audio_map = {}
+            for audio_rec in p.audio_recordings:
+                # Generate fresh presigned URL (valid for 24 hours)
+                try:
+                    presigned_url = storage_service.generate_presigned_url(
+                        audio_rec.s3_key, expiration=86400
+                    )
+                    audio_map[audio_rec.question_key] = {
+                        "url": presigned_url,
+                        "duration": audio_rec.duration_seconds,
+                        "size_kb": round(audio_rec.file_size_bytes / 1024, 2),
+                    }
+                except Exception as e:
+                    # Log error but don't fail export
+                    print(
+                        f"Failed to generate presigned URL for {audio_rec.s3_key}: {e}"
+                    )
+
+            # Build card comments map from qsort_entries
+            comments_map = {
+                entry.statement_id: entry.card_comment or ""
+                for entry in p.qsort_entries
+            }
+
+            # Q-Sort Scores + Card Comments + Audio
             scores_map = {
                 entry.statement_id: entry.grid_score for entry in p.qsort_entries
             }
             for s in sorted_statements:
+                # Score
                 score = scores_map.get(s.id)
                 row.append(str(score) if score is not None else "")
+
+                # Text Comment
+                comment = comments_map.get(s.id, "")
+                row.append(comment)
+
+                # Audio (URL, Duration, FileSize)
+                audio_key = f"card_{s.id}"
+                audio_data = audio_map.get(audio_key)
+                if audio_data:
+                    row.append(str(audio_data["url"]))
+                    row.append(
+                        str(audio_data["duration"]) if audio_data["duration"] else ""
+                    )
+                    row.append(str(audio_data["size_kb"]))
+                else:
+                    row.extend(["", "", ""])  # No audio
 
             # Postsort
             for k in postsort_keys:
                 val = p.postsort_answers.get(k)
                 row.append(get_value_label(postsort_fields, k, val, header_lang))
+
+            # Postsort Audio (missing_statement, etc.)
+            if audio_enabled:
+                missing_audio = audio_map.get("missing_statement")
+                if missing_audio:
+                    row.append(str(missing_audio["url"]))
+                    row.append(
+                        str(missing_audio["duration"])
+                        if missing_audio["duration"]
+                        else ""
+                    )
+                    row.append(str(missing_audio["size_kb"]))
+                else:
+                    row.extend(["", "", ""])
 
             writer.writerow(row)
 

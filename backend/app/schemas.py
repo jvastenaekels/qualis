@@ -541,6 +541,7 @@ class ParticipantDetailRead(ParticipantRead):
     presort_answers: dict[str, Any]
     postsort_answers: dict[str, Any]
     qsort_entries: list[QSortEntryRead]
+    audio_recordings: list["AudioRecordingRead"] = []
     model_config = ConfigDict(from_attributes=True)
 
 
