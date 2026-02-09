@@ -83,7 +83,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
 
 // Types representing the backend dump response structure
@@ -618,7 +618,7 @@ export default function InteractiveDataView({
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                        className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
+                        className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center justify-end gap-1.5 w-full text-right"
                     >
                         <Clock className="w-3.5 h-3.5 text-slate-400" />
                         {t('admin.data.table.duration')}
@@ -633,19 +633,19 @@ export default function InteractiveDataView({
                 ),
                 cell: (info) => {
                     const seconds = info.getValue();
-                    if (seconds === null) return <span className="text-slate-300">—</span>;
+                    if (seconds === null)
+                        return <span className="text-slate-300 text-right block">—</span>;
                     return (
-                        <div className="flex items-center gap-1.5 font-mono text-xs text-slate-600">
-                            <Clock className="w-3 h-3 text-slate-400" />
+                        <div className="flex items-center justify-end gap-1.5 font-mono text-xs text-slate-600">
                             {seconds >= 3600
                                 ? t('common.duration_long', '{{h}}h {{m}}m {{s}}s', {
                                       h: Math.floor(seconds / 3600),
                                       m: Math.floor((seconds % 3600) / 60),
-                                      s: seconds % 60,
+                                      s: Math.floor(seconds % 60),
                                   })
                                 : t('common.duration_short', '{{m}}m {{s}}s', {
                                       m: Math.floor(seconds / 60),
-                                      s: seconds % 60,
+                                      s: Math.floor(seconds % 60),
                                   })}
                         </div>
                     );
@@ -674,42 +674,28 @@ export default function InteractiveDataView({
                     const val = info.getValue();
                     if (!val) return <span className="text-slate-300">—</span>;
                     return (
-                        <div className="flex flex-col text-xs text-slate-500 font-medium leading-none gap-1">
-                            <div className="flex items-center gap-1 text-slate-700">
-                                <Calendar className="w-3 h-3 text-slate-300" />
-                                {format(new Date(val), 'P', { locale: currentLocale })}
-                            </div>
-                            <span className="pl-4 opacity-70">
-                                {format(new Date(val), 'p', { locale: currentLocale })}
-                            </span>
-                        </div>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                    <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+                                        <span>
+                                            {formatDistanceToNow(new Date(val), {
+                                                addSuffix: true,
+                                                locale: currentLocale,
+                                            })}
+                                        </span>
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {format(new Date(val), 'PPpp', { locale: currentLocale })}
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     );
                 },
             }),
-            columnHelper.display({
-                id: 'actions',
-                header: () => (
-                    <span className="sr-only">{t('admin.data.table.actions', 'Details')}</span>
-                ),
-                cell: ({ row }) => (
-                    <div className="flex justify-end">
-                        <Button
-                            variant="default"
-                            size="sm"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleViewParticipant(row.original);
-                            }}
-                            className="h-8 px-3 rounded-lg font-bold shadow-sm transition-all hover:translate-x-0.5"
-                        >
-                            {t('admin.data.table.view', 'View')}
-                            <ChevronRight className="h-4 w-4 ml-1" />
-                        </Button>
-                    </div>
-                ),
-            }),
         ],
-        [columnHelper, t, handleViewParticipant, currentLocale]
+        [columnHelper, t, currentLocale]
     );
 
     const table = useReactTable({
@@ -764,7 +750,9 @@ export default function InteractiveDataView({
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Interactive Summary Grid */}
             {liveCount > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-12 gap-4">
+                    {/* Primary Metrics: Completed & In Progress */}
+
                     {/* Completed Card */}
                     <button
                         type="button"
@@ -772,38 +760,49 @@ export default function InteractiveDataView({
                             setStatusFilter((prev) => (prev === 'completed' ? 'all' : 'completed'))
                         }
                         className={cn(
-                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            'col-span-1 md:col-span-6 lg:col-span-3',
+                            'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
                             statusFilter === 'completed'
-                                ? 'border-emerald-400 ring-4 ring-emerald-100 shadow-emerald-200'
-                                : 'border-slate-200 hover:border-emerald-200'
+                                ? 'border-emerald-500 ring-4 ring-emerald-50/50'
+                                : 'border-slate-100 hover:border-emerald-200'
                         )}
                     >
-                        <div className="flex items-center justify-between mb-2">
-                            <div
-                                className={cn(
-                                    'p-2.5 rounded-xl transition-colors',
-                                    statusFilter === 'completed'
-                                        ? 'bg-emerald-600 text-white'
-                                        : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
-                                )}
-                            >
-                                <CheckCircle2 className="w-4 h-4" />
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <CheckCircle2 className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
+                        </div>
+
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div
+                                    className={cn(
+                                        'p-2 rounded-lg transition-colors',
+                                        statusFilter === 'completed'
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-emerald-50 text-emerald-600'
+                                    )}
+                                >
+                                    <CheckCircle2 className="w-5 h-5" />
+                                </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t('admin.data.stats.completed', 'Completed')}
+                                </span>
+                            </div>
+
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-4xl font-black text-slate-900 tracking-tight">
+                                    {completedCount}
+                                </span>
+                                <span className="text-sm font-semibold text-slate-400">
+                                    / {liveCount}
+                                </span>
                             </div>
                         </div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
-                            {t('admin.data.stats.completed', 'Completed')}
-                        </p>
-                        <div className="flex items-baseline gap-2 mb-1">
-                            <span className="text-3xl font-black text-slate-900 leading-none">
-                                {completedCount}
-                            </span>
-                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
-                        </div>
+
                         {completedCount > 0 && (
-                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
+                            <div className="mt-4 flex items-center text-[11px] font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                                {t('admin.data.stats.click_to_filter', 'Filter table')}
                                 <ArrowRight className="w-3 h-3" />
-                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
-                            </p>
+                            </div>
                         )}
                     </button>
 
@@ -816,117 +815,132 @@ export default function InteractiveDataView({
                             )
                         }
                         className={cn(
-                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            'col-span-1 md:col-span-6 lg:col-span-3',
+                            'group relative overflow-hidden bg-white p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[140px]',
                             statusFilter === 'in_progress'
-                                ? 'border-sky-400 ring-4 ring-sky-100 shadow-sky-200'
-                                : statusFilter === 'abandoned'
-                                  ? 'border-slate-200 hover:border-sky-200'
-                                  : 'border-slate-200 hover:border-sky-200'
+                                ? 'border-sky-500 ring-4 ring-sky-50/50'
+                                : 'border-slate-100 hover:border-sky-200'
                         )}
                     >
-                        <div className="flex items-center justify-between mb-2">
-                            <div
-                                className={cn(
-                                    'p-2.5 rounded-xl transition-colors',
-                                    statusFilter === 'in_progress'
-                                        ? 'bg-sky-600 text-white'
-                                        : 'bg-sky-50 text-sky-600 group-hover:bg-sky-600 group-hover:text-white'
-                                )}
-                            >
-                                <Clock className="w-4 h-4" />
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <Clock className="w-24 h-24 text-sky-500 -mr-6 -mt-6" />
+                        </div>
+
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div
+                                    className={cn(
+                                        'p-2 rounded-lg transition-colors',
+                                        statusFilter === 'in_progress'
+                                            ? 'bg-sky-100 text-sky-700'
+                                            : 'bg-sky-50 text-sky-600'
+                                    )}
+                                >
+                                    <Clock className="w-5 h-5" />
+                                </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t('admin.data.stats.in_progress', 'In Progress')}
+                                </span>
+                            </div>
+
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-4xl font-black text-slate-900 tracking-tight">
+                                    {inProgressCount}
+                                </span>
+                                <span className="text-sm font-semibold text-slate-400">
+                                    / {liveCount}
+                                </span>
                             </div>
                         </div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
-                            {t('admin.data.stats.in_progress', 'In progress')}
-                        </p>
-                        <div className="flex items-baseline gap-2 mb-1">
-                            <span className="text-3xl font-black text-slate-900 leading-none">
-                                {inProgressCount}
-                            </span>
-                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
+
+                        <div className="mt-4 h-5 flex items-center">
+                            {abandonedCount > 0 ? (
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setStatusFilter((prev) =>
+                                            prev === 'abandoned' ? 'all' : 'abandoned'
+                                        );
+                                    }}
+                                    className="z-10 cursor-pointer flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-rose-50 hover:bg-rose-100 border border-rose-100 transition-colors"
+                                >
+                                    <AlertTriangle className="w-3 h-3 text-rose-500" />
+                                    <span className="text-[10px] font-bold text-rose-600">
+                                        {t(
+                                            'admin.data.stats.abandoned_count',
+                                            '{{count}} abandoned',
+                                            {
+                                                count: abandonedCount,
+                                            }
+                                        )}
+                                    </span>
+                                </button>
+                            ) : (
+                                <div className="flex items-center text-[11px] font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                                    {t('admin.data.stats.click_to_filter', 'Filter table')}
+                                    <ArrowRight className="w-3 h-3" />
+                                </div>
+                            )}
                         </div>
-                        {abandonedCount > 0 && (
-                            <button
-                                type="button"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    setStatusFilter((prev) =>
-                                        prev === 'abandoned' ? 'all' : 'abandoned'
-                                    );
-                                }}
-                                className={cn(
-                                    'text-[10px] font-semibold flex items-center gap-1 px-1.5 py-0.5 rounded-md transition-colors',
-                                    statusFilter === 'abandoned'
-                                        ? 'text-rose-700 bg-rose-100'
-                                        : 'text-rose-500 hover:bg-rose-50'
-                                )}
-                            >
-                                <AlertTriangle className="w-3 h-3" />
-                                {t('admin.data.stats.abandoned_count', '{{count}} abandoned', {
-                                    count: abandonedCount,
-                                })}
-                            </button>
-                        )}
-                        {abandonedCount === 0 && inProgressCount > 0 && (
-                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
-                                <ArrowRight className="w-3 h-3" />
-                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
-                            </p>
-                        )}
                     </button>
+
+                    {/* Secondary Metrics: Consent & Quality */}
 
                     {/* Email Collection Card */}
                     <button
                         type="button"
                         onClick={() => toggleConsent('email')}
                         className={cn(
-                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            'col-span-2 md:col-span-4 lg:col-span-2',
+                            'group bg-white p-4 rounded-xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between',
                             consentFilters.has('email')
-                                ? 'border-indigo-400 ring-4 ring-indigo-100 shadow-indigo-200'
-                                : 'border-slate-200 hover:border-indigo-200'
+                                ? 'border-indigo-400 ring-4 ring-indigo-50/50'
+                                : 'border-slate-100 hover:border-indigo-100'
                         )}
                     >
-                        <div className="flex items-start justify-between mb-2">
-                            <div
-                                className={cn(
-                                    'p-2.5 rounded-xl transition-colors',
-                                    consentFilters.has('email')
-                                        ? 'bg-indigo-600 text-white'
-                                        : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'
-                                )}
-                            >
-                                <Mail className="w-4 h-4" />
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className={cn(
+                                        'p-1.5 rounded-md transition-colors',
+                                        consentFilters.has('email')
+                                            ? 'bg-indigo-100 text-indigo-700'
+                                            : 'bg-indigo-50 text-indigo-600'
+                                    )}
+                                >
+                                    <Mail className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">
+                                    {t('admin.data.stats.email_short', 'Emails')}
+                                </span>
                             </div>
+                        </div>
+
+                        <div className="flex items-end justify-between">
+                            <div className="flex items-baseline gap-1.5">
+                                <span className="text-2xl font-black text-slate-900">
+                                    {emailCount}
+                                </span>
+                                <span className="text-xs font-semibold text-slate-400">
+                                    / {liveCount}
+                                </span>
+                            </div>
+
                             {emailCount > 0 && (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
+                                <button
+                                    type="button"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         handleExportEmails();
                                     }}
-                                    className="h-7 px-2 hover:bg-indigo-50 text-indigo-600 font-semibold text-xs"
+                                    className="p-1.5 hover:bg-slate-100 rounded text-slate-400 hover:text-indigo-600 transition-colors"
+                                    title={t('admin.data.actions.export', 'Export')}
                                 >
-                                    <Download className="w-3 h-3 mr-1" />
-                                    {t('admin.data.actions.export', 'Export')}
-                                </Button>
+                                    <Download className="w-3.5 h-3.5" />
+                                </button>
                             )}
                         </div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
-                            {t('admin.data.stats.email_collection')}
-                        </p>
-                        <div className="flex items-baseline gap-2 mb-1">
-                            <span className="text-3xl font-black text-slate-900 leading-none">
-                                {emailCount}
-                            </span>
-                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
-                        </div>
-                        {emailCount > 0 && (
-                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
-                                <ArrowRight className="w-3 h-3" />
-                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
-                            </p>
-                        )}
                     </button>
 
                     {/* Newsletter Consent Card */}
@@ -934,39 +948,39 @@ export default function InteractiveDataView({
                         type="button"
                         onClick={() => toggleConsent('newsletter')}
                         className={cn(
-                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            'col-span-2 md:col-span-4 lg:col-span-2',
+                            'group bg-white p-4 rounded-xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between',
                             consentFilters.has('newsletter')
-                                ? 'border-emerald-400 ring-4 ring-emerald-100 shadow-emerald-200'
-                                : 'border-slate-200 hover:border-emerald-200'
+                                ? 'border-emerald-400 ring-4 ring-emerald-50/50'
+                                : 'border-slate-100 hover:border-emerald-100'
                         )}
                     >
-                        <div className="flex items-center justify-between mb-2">
-                            <div
-                                className={cn(
-                                    'p-2.5 rounded-xl transition-colors',
-                                    consentFilters.has('newsletter')
-                                        ? 'bg-emerald-600 text-white'
-                                        : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
-                                )}
-                            >
-                                <Bell className="w-4 h-4" />
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className={cn(
+                                        'p-1.5 rounded-md transition-colors',
+                                        consentFilters.has('newsletter')
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-emerald-50 text-emerald-600'
+                                    )}
+                                >
+                                    <Bell className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">
+                                    {t('admin.data.stats.newsletter_short', 'News.')}
+                                </span>
                             </div>
                         </div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
-                            {t('admin.data.stats.newsletter')}
-                        </p>
-                        <div className="flex items-baseline gap-2 mb-1">
-                            <span className="text-3xl font-black text-slate-900 leading-none">
+
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-2xl font-black text-slate-900">
                                 {newsletterCount}
                             </span>
-                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
+                            <span className="text-xs font-semibold text-slate-400">
+                                / {liveCount}
+                            </span>
                         </div>
-                        {newsletterCount > 0 && (
-                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
-                                <ArrowRight className="w-3 h-3" />
-                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
-                            </p>
-                        )}
                     </button>
 
                     {/* Interview Consent Card */}
@@ -974,39 +988,39 @@ export default function InteractiveDataView({
                         type="button"
                         onClick={() => toggleConsent('interview')}
                         className={cn(
-                            'group bg-white p-4 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                            'col-span-2 md:col-span-4 lg:col-span-2',
+                            'group bg-white p-4 rounded-xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between',
                             consentFilters.has('interview')
-                                ? 'border-amber-400 ring-4 ring-amber-100 shadow-amber-200'
-                                : 'border-slate-200 hover:border-amber-200'
+                                ? 'border-amber-400 ring-4 ring-amber-50/50'
+                                : 'border-slate-100 hover:border-amber-100'
                         )}
                     >
-                        <div className="flex items-center justify-between mb-2">
-                            <div
-                                className={cn(
-                                    'p-2.5 rounded-xl transition-colors',
-                                    consentFilters.has('interview')
-                                        ? 'bg-amber-600 text-white'
-                                        : 'bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white'
-                                )}
-                            >
-                                <Briefcase className="w-4 h-4" />
+                        <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className={cn(
+                                        'p-1.5 rounded-md transition-colors',
+                                        consentFilters.has('interview')
+                                            ? 'bg-amber-100 text-amber-700'
+                                            : 'bg-amber-50 text-amber-600'
+                                    )}
+                                >
+                                    <Briefcase className="w-4 h-4" />
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-500 uppercase">
+                                    {t('admin.data.stats.interview_short', 'Interviews')}
+                                </span>
                             </div>
                         </div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">
-                            {t('admin.data.stats.follow_up')}
-                        </p>
-                        <div className="flex items-baseline gap-2 mb-1">
-                            <span className="text-3xl font-black text-slate-900 leading-none">
+
+                        <div className="flex items-baseline gap-1.5">
+                            <span className="text-2xl font-black text-slate-900">
                                 {interviewCount}
                             </span>
-                            <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
+                            <span className="text-xs font-semibold text-slate-400">
+                                / {liveCount}
+                            </span>
                         </div>
-                        {interviewCount > 0 && (
-                            <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
-                                <ArrowRight className="w-3 h-3" />
-                                {t('admin.data.stats.click_to_filter', 'Click to filter')}
-                            </p>
-                        )}
                     </button>
                 </div>
             )}
@@ -1139,370 +1153,376 @@ export default function InteractiveDataView({
                 </div>
             )}
 
-            <div className="w-full space-y-4">
-                <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-                    <div className="flex items-center gap-2.5 h-11 px-4 rounded-xl bg-white border border-slate-200/50 shadow-sm">
-                        <Users className="w-4 h-4 text-slate-400" />
-                        <span className="text-sm font-semibold text-slate-700">
-                            {t('admin.data.tabs.live')}
-                        </span>
-                        <Badge
-                            variant="secondary"
-                            className="h-5 px-1.5 bg-slate-100 text-slate-600 border-none font-semibold"
-                        >
-                            {liveCount}
-                        </Badge>
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-4 w-full bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+                {/* Left Group: Search & Total */}
+                <div className="flex items-center gap-3 w-full lg:w-auto flex-1 lg:max-w-2xl px-2">
+                    <div className="relative group w-full">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
+                        <Input
+                            placeholder={t(
+                                'admin.data.search.placeholder',
+                                'Search participants by ID, email...'
+                            )}
+                            value={globalFilter ?? ''}
+                            onChange={(e) => setGlobalFilter(e.target.value)}
+                            className="pl-10 h-10 bg-slate-50 border-slate-200 focus-visible:ring-indigo-500 rounded-lg shadow-none focus:bg-white transition-all font-medium text-sm w-full"
+                        />
                     </div>
 
-                    <div className="flex items-center gap-3 w-full lg:w-auto flex-wrap">
-                        <div className="relative group flex-1 sm:flex-initial">
-                            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
-                            <Input
-                                placeholder={t('admin.data.search.placeholder')}
-                                value={globalFilter ?? ''}
-                                onChange={(e) => setGlobalFilter(e.target.value)}
-                                className="pl-10 h-11 bg-white border-slate-200 focus-visible:ring-indigo-500 rounded-xl shadow-sm font-medium text-sm sm:w-80 group-hover:border-slate-300 transition-all"
-                            />
-                        </div>
+                    <div className="hidden sm:flex items-center gap-2 h-8 px-3 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 whitespace-nowrap">
+                        <Users className="w-3.5 h-3.5 text-slate-500" />
+                        <span className="text-xs font-bold">{liveCount}</span>
+                    </div>
+                </div>
 
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                setQualityFilter((prev) => (prev === 'all' ? 'flagged' : 'all'))
-                            }
-                            className={cn(
-                                'h-11 rounded-xl transition-all border-slate-200 gap-2 font-semibold',
-                                qualityFilter === 'flagged'
-                                    ? 'bg-amber-50 border-amber-200 text-amber-600 shadow-inner'
-                                    : 'bg-white hover:bg-slate-50'
-                            )}
-                            title={t('admin.data.filter.only_flagged')}
-                        >
-                            <AlertTriangle className="h-4 w-4" />
-                            <span className="hidden sm:inline text-xs">
-                                {t('admin.data.filters.flagged', 'Flagged')}
-                            </span>
-                        </Button>
+                {/* Right Group: Filters & Actions */}
+                <div className="flex items-center gap-2 w-full lg:w-auto justify-end px-2">
+                    {/* Flagged Filter Toggle */}
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                            setQualityFilter((prev) => (prev === 'all' ? 'flagged' : 'all'))
+                        }
+                        className={cn(
+                            'h-9 border border-transparent font-medium text-xs',
+                            qualityFilter === 'flagged'
+                                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                                : 'text-slate-600 hover:bg-slate-100'
+                        )}
+                        title={t('admin.data.filter.only_flagged')}
+                    >
+                        <AlertTriangle className="h-3.5 w-3.5 mr-2" />
+                        {t('admin.data.filters.flagged', 'Flagged')}
+                    </Button>
 
-                        <Button
-                            variant="outline"
-                            onClick={() =>
-                                setStatusFilter((prev) =>
-                                    prev === 'all'
-                                        ? 'completed'
-                                        : prev === 'completed'
-                                          ? 'in_progress'
-                                          : prev === 'in_progress'
-                                            ? 'abandoned'
-                                            : 'all'
-                                )
-                            }
-                            className={cn(
-                                'h-11 rounded-xl transition-all border-slate-200 gap-2 font-semibold',
-                                statusFilter === 'completed'
-                                    ? 'bg-emerald-50 border-emerald-200 text-emerald-600 shadow-inner'
-                                    : statusFilter === 'in_progress'
-                                      ? 'bg-sky-50 border-sky-200 text-sky-600 shadow-inner'
-                                      : statusFilter === 'abandoned'
-                                        ? 'bg-rose-50 border-rose-200 text-rose-600 shadow-inner'
-                                        : 'bg-white hover:bg-slate-50'
-                            )}
-                            title={t('admin.data.filter.status', 'Filter by status')}
-                        >
-                            <Sparkles className="h-4 w-4" />
-                            <span className="hidden sm:inline text-xs">
+                    {/* Status Filter Dropdown */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className={cn(
+                                    'h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
+                                    statusFilter !== 'all' &&
+                                        'bg-indigo-50 text-indigo-700 border-indigo-100'
+                                )}
+                            >
+                                <Sparkles className="h-3.5 w-3.5" />
                                 {statusFilter === 'all'
                                     ? t('admin.data.table.status', 'Status')
                                     : t(`admin.data.status.${statusFilter}`, statusFilter)}
-                            </span>
-                        </Button>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48">
+                            <DropdownMenuItem onClick={() => setStatusFilter('all')}>
+                                {t('admin.data.filters.all_statuses', 'All Statuses')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => setStatusFilter('completed')}
+                                className="text-emerald-600"
+                            >
+                                <CheckCircle2 className="w-3.5 h-3.5 mr-2" />
+                                {t('admin.data.status.completed', 'Completed')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => setStatusFilter('in_progress')}
+                                className="text-sky-600"
+                            >
+                                <Clock className="w-3.5 h-3.5 mr-2" />
+                                {t('admin.data.status.in_progress', 'In Progress')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => setStatusFilter('abandoned')}
+                                className="text-rose-600"
+                            >
+                                <AlertTriangle className="w-3.5 h-3.5 mr-2" />
+                                {t('admin.data.status.abandoned', 'Abandoned')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
+                    <div className="h-6 w-px bg-slate-200 mx-2 hidden sm:block" />
+
+                    {/* Export Dropdown */}
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-sm gap-2 text-xs"
+                                disabled={isExportLoading}
+                            >
+                                {isExportLoading ? (
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                ) : (
+                                    <Download className="h-3.5 w-3.5" />
+                                )}
+                                <span className="hidden sm:inline">
+                                    {t('admin.export.label', 'Export')}
+                                </span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-56 rounded-xl">
+                            <DropdownMenuItem
+                                disabled={isExportLoading}
+                                onClick={() =>
+                                    runExport(async () => {
+                                        const blob = await AdminService.exportResearchPackage(slug);
+                                        downloadBlob(blob, `${slug}_research_package.zip`);
+                                    })
+                                }
+                                className="font-bold cursor-pointer text-indigo-600 bg-indigo-50/50 gap-2"
+                            >
+                                <Package className="h-4 w-4" />
+                                {t('admin.export.formats.package', 'Research Package (ZIP)')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                disabled={isExportLoading}
+                                onClick={() =>
+                                    runExport(async () => {
+                                        const blob = await AdminService.exportCSV(slug);
+                                        downloadBlob(blob, `${slug}_data.csv`);
+                                    })
+                                }
+                                className="font-medium cursor-pointer gap-2"
+                            >
+                                <FileSpreadsheet className="h-4 w-4" />
+                                {t('admin.export.formats.csv', 'CSV')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                disabled={isExportLoading}
+                                onClick={() =>
+                                    runExport(async () => {
+                                        const blob = await AdminService.exportPQMethod(slug);
+                                        downloadBlob(blob, `${slug}_pqmethod.zip`);
+                                    })
+                                }
+                                className="font-medium cursor-pointer gap-2"
+                            >
+                                <Database className="h-4 w-4" />
+                                {t('admin.export.formats.pqmethod', 'PQMethod (ZIP)')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                disabled={isExportLoading}
+                                onClick={() =>
+                                    runExport(async () => {
+                                        const blob = await AdminService.exportRKit(slug);
+                                        downloadBlob(blob, `${slug}_r_kit.zip`);
+                                    })
+                                }
+                                className="font-medium cursor-pointer gap-2"
+                            >
+                                <FileCode className="h-4 w-4" />
+                                {t('admin.export.formats.rkit', 'R-Kit (ZIP)')}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                disabled={isExportLoading}
+                                onClick={() =>
+                                    runExport(async () => {
+                                        const blob = new Blob([JSON.stringify(rawData, null, 2)], {
+                                            type: 'application/json',
+                                        });
+                                        downloadBlob(blob, `${slug}_dump.json`);
+                                    })
+                                }
+                                className="font-medium cursor-pointer gap-2"
+                            >
+                                <FileCode className="h-4 w-4" />
+                                {t('admin.export.formats.json', 'JSON Dump')}
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    {liveCount > 0 && data.study.state === 'draft' && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button
-                                    variant="outline"
-                                    className="h-11 rounded-xl border-slate-200 bg-white font-semibold gap-2 shadow-sm whitespace-nowrap"
-                                    disabled={isExportLoading}
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-9 w-9 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
                                 >
-                                    {isExportLoading ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <Download className="h-4 w-4" />
-                                    )}
-                                    <span className="hidden sm:inline">
-                                        {t('admin.export.label', 'Export')}
-                                    </span>
+                                    <MoreVertical className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56 rounded-xl">
+                            <DropdownMenuContent align="end" className="w-52 rounded-xl">
                                 <DropdownMenuItem
-                                    disabled={isExportLoading}
-                                    onClick={() =>
-                                        runExport(async () => {
-                                            const blob =
-                                                await AdminService.exportResearchPackage(slug);
-                                            downloadBlob(blob, `${slug}_research_package.zip`);
-                                        })
-                                    }
-                                    className="font-bold cursor-pointer text-indigo-600 bg-indigo-50/50 gap-2"
+                                    onClick={() => setClearAllDialogOpen(true)}
+                                    className="font-semibold cursor-pointer gap-2 text-rose-600 focus:text-rose-600 focus:bg-rose-50"
                                 >
-                                    <Package className="h-4 w-4" />
-                                    {t('admin.export.formats.package', 'Research Package (ZIP)')}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    disabled={isExportLoading}
-                                    onClick={() =>
-                                        runExport(async () => {
-                                            const blob = await AdminService.exportCSV(slug);
-                                            downloadBlob(blob, `${slug}_data.csv`);
-                                        })
-                                    }
-                                    className="font-medium cursor-pointer gap-2"
-                                >
-                                    <FileSpreadsheet className="h-4 w-4" />
-                                    {t('admin.export.formats.csv', 'CSV')}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    disabled={isExportLoading}
-                                    onClick={() =>
-                                        runExport(async () => {
-                                            const blob = await AdminService.exportPQMethod(slug);
-                                            downloadBlob(blob, `${slug}_pqmethod.zip`);
-                                        })
-                                    }
-                                    className="font-medium cursor-pointer gap-2"
-                                >
-                                    <Database className="h-4 w-4" />
-                                    {t('admin.export.formats.pqmethod', 'PQMethod (ZIP)')}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    disabled={isExportLoading}
-                                    onClick={() =>
-                                        runExport(async () => {
-                                            const blob = await AdminService.exportRKit(slug);
-                                            downloadBlob(blob, `${slug}_r_kit.zip`);
-                                        })
-                                    }
-                                    className="font-medium cursor-pointer gap-2"
-                                >
-                                    <FileCode className="h-4 w-4" />
-                                    {t('admin.export.formats.rkit', 'R-Kit (ZIP)')}
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    disabled={isExportLoading}
-                                    onClick={() =>
-                                        runExport(async () => {
-                                            const blob = new Blob(
-                                                [JSON.stringify(rawData, null, 2)],
-                                                { type: 'application/json' }
-                                            );
-                                            downloadBlob(blob, `${slug}_dump.json`);
-                                        })
-                                    }
-                                    className="font-medium cursor-pointer gap-2"
-                                >
-                                    <FileCode className="h-4 w-4" />
-                                    {t('admin.export.formats.json', 'JSON Dump')}
+                                    <Trash2 className="h-4 w-4" />
+                                    {t('admin.data.actions.clear_all')}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-
-                        {liveCount > 0 && data.study.state === 'draft' && (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-11 w-11 rounded-xl text-slate-400 hover:text-slate-600"
-                                    >
-                                        <MoreVertical className="h-4 w-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-52 rounded-xl">
-                                    <DropdownMenuItem
-                                        onClick={() => setClearAllDialogOpen(true)}
-                                        className="font-semibold cursor-pointer gap-2 text-rose-600 focus:text-rose-600 focus:bg-rose-50"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                        {t('admin.data.actions.clear_all')}
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        )}
-
-                        <AlertDialog open={clearAllDialogOpen} onOpenChange={setClearAllDialogOpen}>
-                            <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
-                                        <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">
-                                            <Trash2 className="w-5 h-5" />
-                                        </div>
-                                        {t('admin.data.actions.clear_all')}
-                                    </AlertDialogTitle>
-                                    <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
-                                        {t('admin.data.actions.clear_all_confirm')}
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter className="gap-2">
-                                    <AlertDialogCancel className="rounded-2xl font-bold h-12">
-                                        {t('common.cancel')}
-                                    </AlertDialogCancel>
-                                    <AlertDialogAction
-                                        onClick={handleClearAllParticipants}
-                                        className="rounded-2xl font-bold h-12 bg-rose-600 hover:bg-rose-700"
-                                    >
-                                        {t('common.confirm_delete')}
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    </div>
-                </div>
-
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden ring-1 ring-slate-100">
-                    <Table>
-                        <TableHeader className="bg-slate-50/80">
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow
-                                    key={headerGroup.id}
-                                    className="hover:bg-transparent border-slate-100"
-                                >
-                                    {headerGroup.headers.map((header) => (
-                                        <TableHead
-                                            key={header.id}
-                                            className="h-14 text-xs font-semibold text-slate-600 px-6"
-                                        >
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                      header.column.columnDef.header,
-                                                      header.getContext()
-                                                  )}
-                                        </TableHead>
-                                    ))}
-                                </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {table.getRowModel().rows.length ? (
-                                table.getRowModel().rows.map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        className={cn(
-                                            'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
-                                            !!row.original.is_discarded &&
-                                                'opacity-60 grayscale-[0.5]'
-                                        )}
-                                        onClick={() => handleViewParticipant(row.original)}
-                                    >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id} className="px-6 py-5">
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        className="h-64 text-center"
-                                    >
-                                        {liveCount === 0 ? (
-                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
-                                                <div className="p-4 bg-slate-50 rounded-full">
-                                                    <Inbox className="w-8 h-8 opacity-30" />
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <p className="font-bold text-slate-600">
-                                                        {t(
-                                                            'admin.data.empty.no_participants_title',
-                                                            'No participants yet'
-                                                        )}
-                                                    </p>
-                                                    <p className="text-sm text-slate-400 max-w-xs mx-auto">
-                                                        {t(
-                                                            'admin.data.empty.no_participants_desc',
-                                                            'Share your study link to start collecting responses.'
-                                                        )}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
-                                                <div className="p-4 bg-slate-50 rounded-full">
-                                                    <Search className="w-8 h-8 opacity-20" />
-                                                </div>
-                                                <p className="font-bold">
-                                                    {t('admin.data.search.no_results')}
-                                                </p>
-                                                {hasActiveFilters && (
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={clearAllFilters}
-                                                        className="mt-2"
-                                                    >
-                                                        {t(
-                                                            'admin.data.filters.clear_all',
-                                                            'Clear filters'
-                                                        )}
-                                                    </Button>
-                                                )}
-                                            </div>
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-
-                    {/* Pagination */}
-                    {table.getPageCount() > 1 && (
-                        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100">
-                            <p className="text-xs text-slate-500 font-medium">
-                                {t(
-                                    'admin.data.pagination.showing',
-                                    'Showing {{from}}\u2013{{to}} of {{total}}',
-                                    {
-                                        from: pagination.pageIndex * pagination.pageSize + 1,
-                                        to: Math.min(
-                                            (pagination.pageIndex + 1) * pagination.pageSize,
-                                            table.getRowCount()
-                                        ),
-                                        total: table.getRowCount(),
-                                    }
-                                )}
-                            </p>
-                            <div className="flex items-center gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => table.previousPage()}
-                                    disabled={!table.getCanPreviousPage()}
-                                    className="h-8 w-8 p-0 rounded-lg"
-                                >
-                                    <ChevronLeft className="h-4 w-4" />
-                                </Button>
-                                <span className="text-xs font-bold text-slate-600 min-w-[4rem] text-center">
-                                    {pagination.pageIndex + 1} / {table.getPageCount()}
-                                </span>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => table.nextPage()}
-                                    disabled={!table.getCanNextPage()}
-                                    className="h-8 w-8 p-0 rounded-lg"
-                                >
-                                    <ChevronRight className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
                     )}
                 </div>
+            </div>
+
+            <AlertDialog open={clearAllDialogOpen} onOpenChange={setClearAllDialogOpen}>
+                <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                            <div className="p-2 bg-rose-100 text-rose-600 rounded-xl">
+                                <Trash2 className="w-5 h-5" />
+                            </div>
+                            {t('admin.data.actions.clear_all')}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
+                            {t('admin.data.actions.clear_all_confirm')}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="gap-2">
+                        <AlertDialogCancel className="rounded-2xl font-bold h-12">
+                            {t('common.cancel')}
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleClearAllParticipants}
+                            className="rounded-2xl font-bold h-12 bg-rose-600 hover:bg-rose-700"
+                        >
+                            {t('common.confirm_delete')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden ring-1 ring-slate-100">
+                <Table>
+                    <TableHeader className="bg-slate-50/80">
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow
+                                key={headerGroup.id}
+                                className="hover:bg-transparent border-slate-100"
+                            >
+                                {headerGroup.headers.map((header) => (
+                                    <TableHead
+                                        key={header.id}
+                                        className="h-14 text-xs font-semibold text-slate-600 px-6"
+                                    >
+                                        {header.isPlaceholder
+                                            ? null
+                                            : flexRender(
+                                                  header.column.columnDef.header,
+                                                  header.getContext()
+                                              )}
+                                    </TableHead>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {table.getRowModel().rows.length ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow
+                                    key={row.id}
+                                    className={cn(
+                                        'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
+                                        !!row.original.is_discarded && 'opacity-60 grayscale-[0.5]'
+                                    )}
+                                    onClick={() => handleViewParticipant(row.original)}
+                                >
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id} className="px-6 py-5">
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="h-64 text-center">
+                                    {liveCount === 0 ? (
+                                        <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                                            <div className="p-4 bg-slate-50 rounded-full">
+                                                <Inbox className="w-8 h-8 opacity-30" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="font-bold text-slate-600">
+                                                    {t(
+                                                        'admin.data.empty.no_participants_title',
+                                                        'No participants yet'
+                                                    )}
+                                                </p>
+                                                <p className="text-sm text-slate-400 max-w-xs mx-auto">
+                                                    {t(
+                                                        'admin.data.empty.no_participants_desc',
+                                                        'Share your study link to start collecting responses.'
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                                            <div className="p-4 bg-slate-50 rounded-full">
+                                                <Search className="w-8 h-8 opacity-20" />
+                                            </div>
+                                            <p className="font-bold">
+                                                {t('admin.data.search.no_results')}
+                                            </p>
+                                            {hasActiveFilters && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={clearAllFilters}
+                                                    className="mt-2"
+                                                >
+                                                    {t(
+                                                        'admin.data.filters.clear_all',
+                                                        'Clear filters'
+                                                    )}
+                                                </Button>
+                                            )}
+                                        </div>
+                                    )}
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+
+                {/* Pagination */}
+                {table.getPageCount() > 1 && (
+                    <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100">
+                        <p className="text-xs text-slate-500 font-medium">
+                            {t(
+                                'admin.data.pagination.showing',
+                                'Showing {{from}}\u2013{{to}} of {{total}}',
+                                {
+                                    from: pagination.pageIndex * pagination.pageSize + 1,
+                                    to: Math.min(
+                                        (pagination.pageIndex + 1) * pagination.pageSize,
+                                        table.getRowCount()
+                                    ),
+                                    total: table.getRowCount(),
+                                }
+                            )}
+                        </p>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => table.previousPage()}
+                                disabled={!table.getCanPreviousPage()}
+                                className="h-8 w-8 p-0 rounded-lg"
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <span className="text-xs font-bold text-slate-600 min-w-[4rem] text-center">
+                                {pagination.pageIndex + 1} / {table.getPageCount()}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => table.nextPage()}
+                                disabled={!table.getCanNextPage()}
+                                className="h-8 w-8 p-0 rounded-lg"
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
