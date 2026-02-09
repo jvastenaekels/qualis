@@ -298,7 +298,8 @@
             "not_ready": "Place all statements to continue"
         },
         "header": {
-            "title": "Place statements on the grid"
+            "title": "Place statements on the grid",
+            "instruction_label": "Instruction"
         },
         "workbench": {
             "active_card": "Active statement",
@@ -1309,7 +1310,8 @@
                 "newsletter": "Newsletter consent",
                 "opt_in": "Response rate",
                 "follow_up": "Follow-up potential",
-                "interested": "interested"
+                "interested": "interested",
+                "click_to_filter": "Click to filter"
             },
             "tabs": {
                 "live": "Live participants",
@@ -1325,6 +1327,7 @@
             "actions": {
                 "discard": "Discard",
                 "restore": "Restore",
+                "export": "Export",
                 "clear_test_runs": "Clear test runs",
                 "clear_test_runs_confirm": "Are you sure you want to delete all test submissions? This cannot be undone.",
                 "clear_test_runs_success": "Test runs cleared",
@@ -1353,14 +1356,20 @@
                 "participant": "Participant",
                 "lang": "Lang",
                 "status": "Status",
+                "consent": "Consent",
                 "flags": "Flags",
                 "duration": "Duration",
                 "submitted": "Submitted",
+                "view": "View",
                 "actions": "Details"
             },
             "tooltips": {
                 "suspect": "Potentially suspect: session duration < 2 minutes",
-                "has_comments": "Contains participant comments on cards"
+                "has_comments": "Contains participant comments on cards",
+                "has_audio": "Has audio responses",
+                "email_provided": "Email provided",
+                "newsletter_consent": "Newsletter opt-in",
+                "interview_consent": "Open to follow-up interview"
             },
             "detail": {
                 "title": "Participant profile",
@@ -1387,6 +1396,14 @@
                 "only_active": "Only active",
                 "only_flagged": "Flagged quality"
             },
+            "filters": {
+                "active": "Active filters",
+                "has_email": "Has email",
+                "newsletter": "Newsletter consent",
+                "interview": "Interview consent",
+                "flagged": "Flagged only",
+                "clear_all": "Clear filters"
+            },
             "search": {
                 "placeholder": "Search by ID or recruitment token...",
                 "records_found": "Records detected",
@@ -1394,7 +1411,8 @@
             },
             "errors": {
                 "load_failed": "Cloud sync interrupted. Please check your connection."
-            }
+            },
+            "export_emails_success": "Emails exported successfully"
         },
         "team": {
             "title": "Study team",

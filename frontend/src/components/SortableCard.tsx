@@ -15,7 +15,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { motion } from 'framer-motion';
-import { Eye, MessageSquare } from 'lucide-react';
+import { Eye, MessageSquare, Mic } from 'lucide-react';
 import React from 'react';
 import { SafeMarkdown } from './SafeMarkdown';
 import { useUIStore } from '../store/useUIStore';
@@ -36,6 +36,7 @@ interface SortableCardProps {
     disableHoverZoom?: boolean;
     allowScroll?: boolean;
     hasComment?: boolean;
+    hasAudio?: boolean;
     readOnly?: boolean;
 }
 
@@ -133,6 +134,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
         disableHoverZoom = false,
         allowScroll = false,
         hasComment = false,
+        hasAudio = false,
         readOnly = false,
     }) => {
         const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
@@ -299,6 +301,14 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         <div className="absolute bottom-1.5 right-1.5 z-10">
                             <div className="bg-indigo-100/90 p-1 rounded-full text-indigo-600 shadow-sm backdrop-blur-[1px] ring-1 ring-white/50">
                                 <MessageSquare size={10} strokeWidth={3} />
+                            </div>
+                        </div>
+                    )}
+
+                    {hasAudio && (
+                        <div className="absolute bottom-1.5 left-1.5 z-10">
+                            <div className="bg-purple-100/90 p-1 rounded-full text-purple-600 shadow-sm backdrop-blur-[1px] ring-1 ring-white/50">
+                                <Mic size={10} strokeWidth={3} />
                             </div>
                         </div>
                     )}

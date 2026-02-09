@@ -37,6 +37,16 @@ import {
     Calendar,
     MousePointer2,
     Download,
+    X,
+    Mic,
+    UserCheck,
+    ArrowRight,
+    FileSpreadsheet,
+    Package,
+    Database,
+    FileCode,
+    Sparkles,
+    FilterX,
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -97,6 +107,8 @@ export interface DumpParticipant {
         card_comments?: Record<string, string>;
         // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
     } & Record<string, any>;
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
+    audio_recordings?: Record<string, any>;
     language: string;
     is_discarded: boolean;
     discard_reason: string | null;
@@ -134,6 +146,8 @@ interface InteractiveDataViewProps {
     participants?: ParticipantRead[];
 }
 
+type ConsentFilter = 'email' | 'newsletter' | 'interview' | null;
+
 export default function InteractiveDataView({
     slug,
     participants: initialParticipants,
@@ -153,6 +167,7 @@ export default function InteractiveDataView({
     const [globalFilter, setGlobalFilter] = useState('');
     const [activeTab, setActiveTab] = useState<'live' | 'test'>('live');
     const [qualityFilter, setQualityFilter] = useState<'all' | 'flagged'>('all');
+    const [consentFilter, setConsentFilter] = useState<ConsentFilter>(null);
 
     const effectiveParticipants = useMemo(() => {
         const dumpData = rawData as unknown as DumpResponse | null;
@@ -222,6 +237,17 @@ export default function InteractiveDataView({
         }
     }, [slug, queryClient, t]);
 
+    const liveParticipants = useMemo(
+        () => effectiveParticipants.filter((p) => !p.is_test_run),
+        [effectiveParticipants]
+    );
+
+    const liveCount = liveParticipants.length;
+    const testCount = effectiveParticipants.filter((p) => p.is_test_run).length;
+    const emailCount = liveParticipants.filter((p) => p.postsort.email).length;
+    const newsletterCount = liveParticipants.filter((p) => p.postsort.newsletter_consent).length;
+    const interviewCount = liveParticipants.filter((p) => p.postsort.interview_consent).length;
+
     const filteredParticipants = useMemo(() => {
         return effectiveParticipants.filter((p) => {
             const matchesTab = activeTab === 'test' ? p.is_test_run : !p.is_test_run;
@@ -229,9 +255,19 @@ export default function InteractiveDataView({
                 qualityFilter === 'flagged'
                     ? (p.duration_seconds !== null && p.duration_seconds < 120) || p.is_discarded
                     : true;
-            return matchesTab && matchesQuality;
+
+            let matchesConsent = true;
+            if (consentFilter === 'email') {
+                matchesConsent = !!p.postsort.email;
+            } else if (consentFilter === 'newsletter') {
+                matchesConsent = !!p.postsort.newsletter_consent;
+            } else if (consentFilter === 'interview') {
+                matchesConsent = !!p.postsort.interview_consent;
+            }
+
+            return matchesTab && matchesQuality && matchesConsent;
         });
-    }, [effectiveParticipants, activeTab, qualityFilter]);
+    }, [effectiveParticipants, activeTab, qualityFilter, consentFilter]);
 
     const handleViewParticipant = useCallback(
         (participant: DumpParticipant) => {
@@ -243,16 +279,39 @@ export default function InteractiveDataView({
         [navigate, slug, workspaceSlug]
     );
 
+    const handleExportEmails = useCallback(() => {
+        const emails = liveParticipants
+            .filter((p) => p.postsort.email)
+            .map((p) => p.postsort.email)
+            .join('\n');
+
+        const blob = new Blob([emails], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${slug}_emails.txt`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        toast.success(t('admin.data.export_emails_success', 'Emails exported successfully'));
+    }, [liveParticipants, slug, t]);
+
     const columnHelper = createColumnHelper<DumpParticipant>();
 
     const columns = useMemo(
         () => [
             columnHelper.accessor('id', {
-                header: t('admin.data.table.participant'),
+                header: () => (
+                    <div className="flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{t('admin.data.table.participant')}</span>
+                    </div>
+                ),
                 cell: (info) => {
                     const p = info.row.original;
                     return (
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1.5">
                             <div className="flex items-center gap-2">
                                 <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
                                     {info.getValue()}
@@ -277,7 +336,12 @@ export default function InteractiveDataView({
                 },
             }),
             columnHelper.accessor('language', {
-                header: t('admin.data.table.lang'),
+                header: () => (
+                    <div className="flex items-center gap-1.5">
+                        <Globe className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{t('admin.data.table.lang')}</span>
+                    </div>
+                ),
                 cell: (info) => (
                     <div className="flex items-center gap-2 text-slate-600 font-medium">
                         <Globe className="h-3.5 w-3.5 text-slate-300" />
@@ -288,7 +352,12 @@ export default function InteractiveDataView({
                 ),
             }),
             columnHelper.accessor('status', {
-                header: t('admin.data.table.status', 'Status'),
+                header: () => (
+                    <div className="flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{t('admin.data.table.status', 'Status')}</span>
+                    </div>
+                ),
                 cell: (info) => {
                     const status = info.getValue() as string;
                     return (
@@ -307,21 +376,98 @@ export default function InteractiveDataView({
                 },
             }),
             columnHelper.display({
+                id: 'consent_indicators',
+                header: () => (
+                    <div className="flex items-center gap-1.5">
+                        <UserCheck className="w-3.5 h-3.5" />
+                        <span>{t('admin.data.table.consent', 'Consent')}</span>
+                    </div>
+                ),
+                cell: ({ row }) => {
+                    const p = row.original;
+                    return (
+                        <TooltipProvider>
+                            <div className="flex items-center gap-1.5">
+                                {p.postsort.email && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="p-1 bg-indigo-50 rounded text-indigo-600 border border-indigo-100">
+                                                <Mail className="h-3 w-3" />
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t(
+                                                'admin.data.tooltips.email_provided',
+                                                'Email provided'
+                                            )}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                                {p.postsort.newsletter_consent && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="p-1 bg-emerald-50 rounded text-emerald-600 border border-emerald-100">
+                                                <Bell className="h-3 w-3" />
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t(
+                                                'admin.data.tooltips.newsletter_consent',
+                                                'Newsletter consent'
+                                            )}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                                {p.postsort.interview_consent && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="p-1 bg-amber-50 rounded text-amber-600 border border-amber-100">
+                                                <Users className="h-3 w-3" />
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t(
+                                                'admin.data.tooltips.interview_consent',
+                                                'Interview consent'
+                                            )}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                                {!p.postsort.email &&
+                                    !p.postsort.newsletter_consent &&
+                                    !p.postsort.interview_consent && (
+                                        <span className="text-[10px] text-slate-300 font-medium">
+                                            —
+                                        </span>
+                                    )}
+                            </div>
+                        </TooltipProvider>
+                    );
+                },
+            }),
+            columnHelper.display({
                 id: 'quality',
-                header: t('admin.data.table.flags'),
+                header: () => (
+                    <div className="flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{t('admin.data.table.flags')}</span>
+                    </div>
+                ),
                 cell: ({ row }) => {
                     const p = row.original;
                     const isSuspect = p.duration_seconds !== null && p.duration_seconds < 120;
                     const hasComments = Object.keys(p.postsort.card_comments || {}).length > 0;
+                    const hasAudio =
+                        p.audio_recordings && Object.keys(p.audio_recordings).length > 0;
 
                     return (
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                             <TooltipProvider>
                                 {isSuspect && (
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <div className="p-1.5 bg-amber-50 rounded-lg text-amber-500 border border-amber-100 shadow-sm transition-transform hover:scale-110">
-                                                <AlertTriangle className="h-3.5 w-3.5" />
+                                            <div className="p-1 bg-amber-50 rounded text-amber-500 border border-amber-100">
+                                                <AlertTriangle className="h-3 w-3" />
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -332,8 +478,8 @@ export default function InteractiveDataView({
                                 {hasComments && (
                                     <Tooltip>
                                         <TooltipTrigger>
-                                            <div className="p-1.5 bg-indigo-50 rounded-lg text-indigo-500 border border-indigo-100 shadow-sm transition-transform hover:scale-110">
-                                                <MessageSquare className="h-3.5 w-3.5" />
+                                            <div className="p-1 bg-blue-50 rounded text-blue-500 border border-blue-100">
+                                                <MessageSquare className="h-3 w-3" />
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -341,7 +487,22 @@ export default function InteractiveDataView({
                                         </TooltipContent>
                                     </Tooltip>
                                 )}
-                                {!isSuspect && !hasComments && (
+                                {hasAudio && (
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="p-1 bg-purple-50 rounded text-purple-500 border border-purple-100">
+                                                <Mic className="h-3 w-3" />
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t(
+                                                'admin.data.tooltips.has_audio',
+                                                'Has audio responses'
+                                            )}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+                                {!isSuspect && !hasComments && !hasAudio && (
                                     <span className="text-[10px] text-slate-300 font-medium">
                                         —
                                     </span>
@@ -356,8 +517,9 @@ export default function InteractiveDataView({
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                        className="h-8 text-xs font-bold p-0 hover:bg-transparent"
+                        className="h-8 text-xs font-bold p-0 hover:bg-transparent flex items-center gap-1.5"
                     >
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
                         {t('admin.data.table.duration')}
                         <ArrowUpDown className="ml-2 h-3 w-3" />
                     </Button>
@@ -388,8 +550,9 @@ export default function InteractiveDataView({
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                        className="h-8 text-xs font-bold p-0 hover:bg-transparent"
+                        className="h-8 text-xs font-bold p-0 hover:bg-transparent flex items-center gap-1.5"
                     >
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
                         {t('admin.data.table.submitted')}
                         <ArrowUpDown className="ml-2 h-3 w-3" />
                     </Button>
@@ -423,7 +586,7 @@ export default function InteractiveDataView({
                             }}
                             className="h-8 px-3 rounded-lg font-bold shadow-sm transition-all hover:translate-x-0.5"
                         >
-                            {t('admin.data.table.actions')}
+                            {t('admin.data.table.view', 'View')}
                             <ChevronRight className="h-4 w-4 ml-1" />
                         </Button>
                     </div>
@@ -449,7 +612,7 @@ export default function InteractiveDataView({
             <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {[1, 2, 3].map((i) => (
-                        <Skeleton key={i} className="h-24 w-full rounded-2xl" />
+                        <Skeleton key={i} className="h-32 w-full rounded-2xl" />
                     ))}
                 </div>
                 <div className="space-y-3">
@@ -481,64 +644,215 @@ export default function InteractiveDataView({
         );
     }
 
-    const liveCount = effectiveParticipants.filter((p) => !p.is_test_run).length;
-    const testCount = effectiveParticipants.filter((p) => p.is_test_run).length;
-
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* Summary Grid */}
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Interactive Summary Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-indigo-200 hover:shadow-md transition-all">
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                {/* Email Collection Card */}
+                <button
+                    type="button"
+                    onClick={() => setConsentFilter(consentFilter === 'email' ? null : 'email')}
+                    className={cn(
+                        'group bg-white p-6 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                        consentFilter === 'email'
+                            ? 'border-indigo-400 ring-4 ring-indigo-100 shadow-indigo-200'
+                            : 'border-slate-200 hover:border-indigo-200'
+                    )}
+                >
+                    <div className="flex items-start justify-between mb-4">
+                        <div
+                            className={cn(
+                                'p-3 rounded-xl transition-colors',
+                                consentFilter === 'email'
+                                    ? 'bg-indigo-600 text-white'
+                                    : 'bg-indigo-50 text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white'
+                            )}
+                        >
                             <Mail className="w-5 h-5" />
                         </div>
+                        {emailCount > 0 && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleExportEmails();
+                                }}
+                                className="h-8 px-2 hover:bg-indigo-50 text-indigo-600 font-semibold"
+                            >
+                                <Download className="w-3.5 h-3.5 mr-1.5" />
+                                {t('admin.data.actions.export', 'Export')}
+                            </Button>
+                        )}
                     </div>
-                    <p className="text-xs font-semibold text-slate-500 mb-1">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
                         {t('admin.data.stats.email_collection')}
                     </p>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-black text-slate-900 leading-none">
-                            {data.participants.filter((p) => p.postsort.email).length}
+                    <div className="flex items-baseline gap-2 mb-2">
+                        <span className="text-4xl font-black text-slate-900 leading-none">
+                            {emailCount}
                         </span>
-                        <span className="text-sm text-slate-400 font-bold">
-                            / {liveCount} {t('admin.data.stats.participants')}
-                        </span>
+                        <span className="text-sm text-slate-400 font-bold">/ {liveCount}</span>
                     </div>
-                </div>
+                    {emailCount > 0 && (
+                        <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
+                            <ArrowRight className="w-3 h-3" />
+                            {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                        </p>
+                    )}
+                </button>
 
-                <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-emerald-200 hover:shadow-md transition-all">
+                {/* Newsletter Consent Card */}
+                <button
+                    type="button"
+                    onClick={() =>
+                        setConsentFilter(consentFilter === 'newsletter' ? null : 'newsletter')
+                    }
+                    className={cn(
+                        'group bg-white p-6 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                        consentFilter === 'newsletter'
+                            ? 'border-emerald-400 ring-4 ring-emerald-100 shadow-emerald-200'
+                            : 'border-slate-200 hover:border-emerald-200'
+                    )}
+                >
                     <div className="flex items-center justify-between mb-4">
-                        <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <div
+                            className={cn(
+                                'p-3 rounded-xl transition-colors',
+                                consentFilter === 'newsletter'
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white'
+                            )}
+                        >
                             <Bell className="w-5 h-5" />
                         </div>
                     </div>
-                    <p className="text-xs font-semibold text-slate-500 mb-1">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
                         {t('admin.data.stats.newsletter')}
                     </p>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-black text-slate-900 leading-none">
-                            {data.participants.filter((p) => p.postsort.newsletter_consent).length}
+                    <div className="flex items-baseline gap-2 mb-2">
+                        <span className="text-4xl font-black text-slate-900 leading-none">
+                            {newsletterCount}
                         </span>
                     </div>
-                </div>
+                    {newsletterCount > 0 && (
+                        <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
+                            <ArrowRight className="w-3 h-3" />
+                            {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                        </p>
+                    )}
+                </button>
 
-                <div className="group bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-amber-200 hover:shadow-md transition-all">
+                {/* Interview Consent Card */}
+                <button
+                    type="button"
+                    onClick={() =>
+                        setConsentFilter(consentFilter === 'interview' ? null : 'interview')
+                    }
+                    className={cn(
+                        'group bg-white p-6 rounded-2xl border-2 shadow-sm hover:shadow-lg transition-all text-left',
+                        consentFilter === 'interview'
+                            ? 'border-amber-400 ring-4 ring-amber-100 shadow-amber-200'
+                            : 'border-slate-200 hover:border-amber-200'
+                    )}
+                >
                     <div className="flex items-center justify-between mb-4">
-                        <div className="p-2.5 bg-amber-50 text-amber-600 rounded-xl group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                        <div
+                            className={cn(
+                                'p-3 rounded-xl transition-colors',
+                                consentFilter === 'interview'
+                                    ? 'bg-amber-600 text-white'
+                                    : 'bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white'
+                            )}
+                        >
                             <Users className="w-5 h-5" />
                         </div>
                     </div>
-                    <p className="text-xs font-semibold text-slate-500 mb-1">
+                    <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mb-2">
                         {t('admin.data.stats.follow_up')}
                     </p>
-                    <div className="flex items-baseline gap-2">
-                        <span className="text-3xl font-black text-slate-900 leading-none">
-                            {data.participants.filter((p) => p.postsort.interview_consent).length}
+                    <div className="flex items-baseline gap-2 mb-2">
+                        <span className="text-4xl font-black text-slate-900 leading-none">
+                            {interviewCount}
                         </span>
                     </div>
-                </div>
+                    {interviewCount > 0 && (
+                        <p className="text-xs text-slate-500 font-medium flex items-center gap-1">
+                            <ArrowRight className="w-3 h-3" />
+                            {t('admin.data.stats.click_to_filter', 'Click to filter')}
+                        </p>
+                    )}
+                </button>
             </div>
+
+            {/* Active Filters */}
+            {(consentFilter || qualityFilter === 'flagged') && (
+                <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-semibold text-slate-600">
+                        {t('admin.data.filters.active', 'Active filters')}:
+                    </span>
+                    {consentFilter && (
+                        <Badge
+                            variant="secondary"
+                            className="h-7 px-3 gap-2 bg-indigo-100 text-indigo-700 border-indigo-200 font-semibold"
+                        >
+                            {consentFilter === 'email' && (
+                                <>
+                                    <Mail className="w-3 h-3" />
+                                    {t('admin.data.filters.has_email', 'Has email')}
+                                </>
+                            )}
+                            {consentFilter === 'newsletter' && (
+                                <>
+                                    <Bell className="w-3 h-3" />
+                                    {t('admin.data.filters.newsletter', 'Newsletter consent')}
+                                </>
+                            )}
+                            {consentFilter === 'interview' && (
+                                <>
+                                    <Users className="w-3 h-3" />
+                                    {t('admin.data.filters.interview', 'Interview consent')}
+                                </>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => setConsentFilter(null)}
+                                className="hover:bg-indigo-200 rounded-full p-0.5 transition-colors"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </Badge>
+                    )}
+                    {qualityFilter === 'flagged' && (
+                        <Badge
+                            variant="secondary"
+                            className="h-7 px-3 gap-2 bg-amber-100 text-amber-700 border-amber-200 font-semibold"
+                        >
+                            <AlertTriangle className="w-3 h-3" />
+                            {t('admin.data.filters.flagged', 'Flagged only')}
+                            <button
+                                type="button"
+                                onClick={() => setQualityFilter('all')}
+                                className="hover:bg-amber-200 rounded-full p-0.5 transition-colors"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </Badge>
+                    )}
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                            setConsentFilter(null);
+                            setQualityFilter('all');
+                        }}
+                        className="h-7 text-xs font-semibold text-slate-600 gap-1.5"
+                    >
+                        <FilterX className="w-3.5 h-3.5" />
+                        {t('admin.data.filters.clear_all', 'Clear all')}
+                    </Button>
+                </div>
+            )}
 
             <Tabs
                 value={activeTab}
@@ -562,16 +876,21 @@ export default function InteractiveDataView({
                                 </Badge>
                             </div>
                         </TabsTrigger>
-                        <TabsTrigger
-                            value="test"
-                            className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm"
-                        >
-                            <div className="flex items-center gap-2">
-                                <Beaker className="w-3.5 h-3.5" />
-                                {t('admin.data.tabs.test')}
-                                <span className="ml-1.5 text-slate-400 font-bold">{testCount}</span>
-                            </div>
-                        </TabsTrigger>
+                        {/* Only show test tab if there are test runs */}
+                        {testCount > 0 && (
+                            <TabsTrigger
+                                value="test"
+                                className="rounded-lg px-4 font-bold data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Beaker className="w-3.5 h-3.5" />
+                                    {t('admin.data.tabs.test')}
+                                    <span className="ml-1.5 text-slate-400 font-bold">
+                                        {testCount}
+                                    </span>
+                                </div>
+                            </TabsTrigger>
+                        )}
                     </TabsList>
 
                     <div className="flex items-center gap-3 w-full sm:w-auto">
@@ -614,7 +933,7 @@ export default function InteractiveDataView({
                                     </span>
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                            <DropdownMenuContent align="end" className="w-56 rounded-xl">
                                 <DropdownMenuItem
                                     onClick={async () => {
                                         try {
@@ -634,9 +953,9 @@ export default function InteractiveDataView({
                                             toast.error(t('admin.export.error', 'Export failed'));
                                         }
                                     }}
-                                    className="font-bold cursor-pointer text-indigo-600 bg-indigo-50/50"
+                                    className="font-bold cursor-pointer text-indigo-600 bg-indigo-50/50 gap-2"
                                 >
-                                    <Download className="h-3.5 w-3.5 mr-2" />
+                                    <Package className="h-4 w-4" />
                                     {t('admin.export.formats.package', 'Research Package (ZIP)')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -657,8 +976,9 @@ export default function InteractiveDataView({
                                             toast.error(t('admin.export.error', 'Export failed'));
                                         }
                                     }}
-                                    className="font-medium cursor-pointer"
+                                    className="font-medium cursor-pointer gap-2"
                                 >
+                                    <FileSpreadsheet className="h-4 w-4" />
                                     {t('admin.export.formats.csv', 'CSV')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -679,8 +999,9 @@ export default function InteractiveDataView({
                                             toast.error(t('admin.export.error', 'Export failed'));
                                         }
                                     }}
-                                    className="font-medium cursor-pointer"
+                                    className="font-medium cursor-pointer gap-2"
                                 >
+                                    <Database className="h-4 w-4" />
                                     {t('admin.export.formats.pqmethod', 'PQMethod (ZIP)')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -701,8 +1022,9 @@ export default function InteractiveDataView({
                                             toast.error(t('admin.export.error', 'Export failed'));
                                         }
                                     }}
-                                    className="font-medium cursor-pointer"
+                                    className="font-medium cursor-pointer gap-2"
                                 >
+                                    <FileCode className="h-4 w-4" />
                                     {t('admin.export.formats.rkit', 'R-Kit (ZIP)')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -729,8 +1051,9 @@ export default function InteractiveDataView({
                                             toast.error(t('admin.export.error', 'Export failed'));
                                         }
                                     }}
-                                    className="font-medium cursor-pointer"
+                                    className="font-medium cursor-pointer gap-2"
                                 >
+                                    <FileCode className="h-4 w-4" />
                                     {t('admin.export.formats.json', 'JSON Dump')}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -878,6 +1201,22 @@ export default function InteractiveDataView({
                                             <p className="font-bold">
                                                 {t('admin.data.search.no_results')}
                                             </p>
+                                            {(consentFilter || qualityFilter === 'flagged') && (
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        setConsentFilter(null);
+                                                        setQualityFilter('all');
+                                                    }}
+                                                    className="mt-2"
+                                                >
+                                                    {t(
+                                                        'admin.data.filters.clear_all',
+                                                        'Clear filters'
+                                                    )}
+                                                </Button>
+                                            )}
                                         </div>
                                     </TableCell>
                                 </TableRow>

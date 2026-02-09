@@ -298,7 +298,8 @@
             "not_ready": "Sijoita kaikki väitteet jatkaaksesi"
         },
         "header": {
-            "title": "Sijoita väitteet ruudukkoon"
+            "title": "Sijoita väitteet ruudukkoon",
+            "instruction_label": "Ohje"
         },
         "workbench": {
             "active_card": "Aktiivinen väite",
@@ -1301,7 +1302,8 @@
                 "newsletter": "Uutiskirjeen tilaus",
                 "opt_in": "vastausosuus",
                 "follow_up": "Jatko-osallistuminen",
-                "interested": "kiinnostunutta"
+                "interested": "kiinnostunutta",
+                "click_to_filter": "Klikkaa suodattaaksesi"
             },
             "tabs": {
                 "live": "Live-osallistujat",
@@ -1317,6 +1319,7 @@
             "actions": {
                 "discard": "Hylkää",
                 "restore": "Palauta",
+                "export": "Vie",
                 "clear_test_runs": "Poista testiajot",
                 "clear_test_runs_confirm": "Oletko varma, että haluat poistaa kaikki testivastaukset? Tätä ei voi peruuttaa.",
                 "clear_test_runs_success": "Testiajot poistettu",
@@ -1345,14 +1348,20 @@
                 "participant": "Osallistuja",
                 "lang": "Kieli",
                 "status": "Tila",
+                "consent": "Suostumus",
                 "flags": "Liput",
                 "duration": "Kesto",
                 "submitted": "Lähetetty",
+                "view": "Näytä",
                 "actions": "Tiedot"
             },
             "tooltips": {
                 "suspect": "Mahdollisesti epäilyttävä: istunnon kesto < 2 minuuttia",
-                "has_comments": "Sisältää osallistujan kommentteja korteista"
+                "has_comments": "Sisältää osallistujan kommentteja korteista",
+                "has_audio": "Sisältää äänivastauksia",
+                "email_provided": "Sähköposti annettu",
+                "newsletter_consent": "Uutiskirjeen tilaus",
+                "interview_consent": "Avoin jatkohaastattelulle"
             },
             "detail": {
                 "title": "Osallistujan profiili",
@@ -1379,6 +1388,14 @@
                 "only_active": "Vain aktiiviset",
                 "only_flagged": "Merkitty laatu"
             },
+            "filters": {
+                "active": "Aktiiviset suodattimet",
+                "has_email": "Sähköposti annettu",
+                "newsletter": "Uutiskirjeen suostumus",
+                "interview": "Haastattelusuostumus",
+                "flagged": "Vain merkityt",
+                "clear_all": "Tyhjennä suodattimet"
+            },
             "search": {
                 "placeholder": "Hae ID:llä tai tunnisteella...",
                 "records_found": "tulosta löytyi",
@@ -1386,7 +1403,8 @@
             },
             "errors": {
                 "load_failed": "Tietojen lataus epäonnistui. Päivitä sivu."
-            }
+            },
+            "export_emails_success": "Sähköpostit viety onnistuneesti"
         },
         "team": {
             "title": "Tutkimustiimi",

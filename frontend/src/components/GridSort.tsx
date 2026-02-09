@@ -10,7 +10,7 @@ import { cva } from 'class-variance-authority';
 import {
     Check,
     ChevronUp,
-    ChevronsUp,
+    Maximize2,
     Frown,
     Meh,
     RotateCcw,
@@ -136,6 +136,7 @@ const InstructionHeader: React.FC<{
     defaultText: string;
 }> = React.memo(({ instruction, defaultText }) => {
     const { isMobile } = useViewport();
+    const { t } = useTranslation();
     // Default to visible on first load
     const [isMinimized, setIsMinimized] = useState(false);
 
@@ -177,8 +178,8 @@ const InstructionHeader: React.FC<{
                         aria-label="Expand instructions"
                     >
                         <Target size={14} />
-                        <span>Instruction</span>
-                        <ChevronsUp size={14} />
+                        <span>{t('fine.header.instruction_label', 'Instruction')}</span>
+                        <Maximize2 size={14} />
                     </motion.button>
                 ) : (
                     <motion.div

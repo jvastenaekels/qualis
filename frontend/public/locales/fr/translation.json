@@ -298,7 +298,8 @@
             "not_ready": "Veuillez placer tous les énoncés pour continuer"
         },
         "header": {
-            "title": "Placez les énoncés sur la grille"
+            "title": "Placez les énoncés sur la grille",
+            "instruction_label": "Consigne"
         },
         "workbench": {
             "active_card": "Énoncé actif",
@@ -1339,7 +1340,8 @@
                 "newsletter": "Consentements newsletter",
                 "opt_in": "de participation",
                 "follow_up": "Suivi qualitatif",
-                "interested": "intéressés"
+                "interested": "intéressés",
+                "click_to_filter": "Cliquez pour filtrer"
             },
             "tabs": {
                 "live": "Participants directs",
@@ -1355,6 +1357,7 @@
             "actions": {
                 "discard": "Écarter",
                 "restore": "Restaurer",
+                "export": "Exporter",
                 "clear_test_runs": "Effacer les tests",
                 "clear_test_runs_confirm": "Êtes-vous sûr de vouloir supprimer tous les tests ? Cette action est irréversible.",
                 "clear_test_runs_success": "Tests effacés",
@@ -1383,14 +1386,20 @@
                 "participant": "Participant",
                 "lang": "Lang.",
                 "status": "Statut",
+                "consent": "Consentement",
                 "flags": "Indicateurs",
                 "duration": "Durée",
                 "submitted": "Soumis",
+                "view": "Voir",
                 "actions": "Détails"
             },
             "tooltips": {
                 "suspect": "Potentiellement suspect : durée de session < 2 minutes",
-                "has_comments": "Contient des commentaires du participant sur les cartes"
+                "has_comments": "Contient des commentaires du participant sur les cartes",
+                "has_audio": "A des réponses audio",
+                "email_provided": "Email fourni",
+                "newsletter_consent": "Accepte la newsletter",
+                "interview_consent": "Ouvert à un entretien de suivi"
             },
             "detail": {
                 "title": "Profil participant",
@@ -1417,6 +1426,14 @@
                 "only_active": "Actifs uniquement",
                 "only_flagged": "Qualité signalée"
             },
+            "filters": {
+                "active": "Filtres actifs",
+                "has_email": "A un email",
+                "newsletter": "Consentement newsletter",
+                "interview": "Consentement entretien",
+                "flagged": "Signalés uniquement",
+                "clear_all": "Effacer les filtres"
+            },
             "search": {
                 "placeholder": "Chercher par ID ou jeton...",
                 "records_found": "enregistrements détectés",
@@ -1424,7 +1441,8 @@
             },
             "errors": {
                 "load_failed": "Synchronisation interrompue. Vérifiez votre connexion."
-            }
+            },
+            "export_emails_success": "Emails exportés avec succès"
         },
         "empty_states": {
             "participants": {

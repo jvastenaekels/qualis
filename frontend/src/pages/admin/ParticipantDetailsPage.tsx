@@ -108,10 +108,25 @@ export default function ParticipantDetailsPage() {
             return placements[s.id] !== undefined ? placements[s.id] : null;
         });
 
+        // Build audio recordings map by question_key
+        // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
+        const audio_recordings: Record<string, any> = {};
+        participant.audio_recordings?.forEach((audio) => {
+            audio_recordings[audio.question_key] = {
+                id: audio.id,
+                duration_seconds: audio.duration_seconds,
+                file_size_bytes: audio.file_size_bytes,
+                presigned_url: audio.presigned_url,
+                created_at: audio.created_at,
+            };
+        });
+
         const adaptedParticipant: DumpParticipant & {
             user_agent?: string;
             created_at?: string;
             ip_address?: string;
+            // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
+            audio_recordings?: Record<string, any>;
         } = {
             id: participant.session_token,
             db_id: participant.id,
@@ -132,6 +147,7 @@ export default function ParticipantDetailsPage() {
                 ...((participant.postsort_answers as any) || {}),
                 card_comments,
             },
+            audio_recordings,
             language: participant.language_used || 'en',
             is_discarded: participant.is_discarded,
             is_test_run: participant.is_test_run,

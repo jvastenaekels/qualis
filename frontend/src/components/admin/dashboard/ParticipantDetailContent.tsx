@@ -12,6 +12,7 @@ import {
     Fingerprint,
     ClipboardList,
     LayoutGrid,
+    Mic,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -24,6 +25,7 @@ import { toast } from 'sonner';
 import { useState, useMemo } from 'react';
 import GridSort from '@/components/GridSort';
 import SortableCard from '@/components/SortableCard';
+import { AudioPlayer } from '@/components/admin/AudioPlayer';
 
 interface ParticipantDetailContentProps {
     participant: DumpParticipant;
@@ -147,6 +149,10 @@ export function ParticipantDetailContent({
     const detailComment = detailStatementId
         ? participant.postsort?.card_comments?.[String(detailStatementId)]
         : null;
+    const detailAudio = detailStatementId
+        ? // biome-ignore lint/suspicious/noExplicitAny: audio recordings type
+          (participant as any).audio_recordings?.[`card_${detailStatementId}`]
+        : null;
 
     // Sidebar Content Logic
     const sidebarContent = (
@@ -178,7 +184,8 @@ export function ParticipantDetailContent({
                             </div>
                         </div>
 
-                        {detailComment ? (
+                        {/* Text Comment */}
+                        {detailComment && (
                             <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100/50 space-y-2">
                                 <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-wider">
                                     <MessageSquare className="w-3.5 h-3.5" />
@@ -186,9 +193,31 @@ export function ParticipantDetailContent({
                                 </div>
                                 <p className="text-sm text-slate-700 italic">"{detailComment}"</p>
                             </div>
-                        ) : (
+                        )}
+
+                        {/* Audio Recording */}
+                        {detailAudio && (
+                            <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-wider">
+                                    <Mic className="w-3.5 h-3.5" />
+                                    {t('admin.audio.recording', 'Audio Recording')}
+                                </div>
+                                <AudioPlayer
+                                    url={detailAudio.presigned_url}
+                                    duration={detailAudio.duration_seconds}
+                                    fileName={`card_${detailStatementId}.webm`}
+                                />
+                                <p className="text-xs text-slate-500">
+                                    {t('admin.audio.file_size', 'File size')}:{' '}
+                                    {(detailAudio.file_size_bytes / 1024).toFixed(1)} KB
+                                </p>
+                            </div>
+                        )}
+
+                        {/* No Response */}
+                        {!detailComment && !detailAudio && (
                             <div className="text-center py-8 text-slate-400 text-sm">
-                                {t('admin.participant.grid.no_comment', 'No comment provided.')}
+                                {t('admin.participant.grid.no_response', 'No response provided.')}
                             </div>
                         )}
                     </div>
@@ -363,6 +392,12 @@ export function ParticipantDetailContent({
                                             readOnly={true}
                                             hasComment={
                                                 !!participant.postsort?.card_comments?.[String(sId)]
+                                            }
+                                            hasAudio={
+                                                // biome-ignore lint/suspicious/noExplicitAny: audio recordings type
+                                                !!(participant as any).audio_recordings?.[
+                                                    `card_${sId}`
+                                                ]
                                             }
                                             onClick={() => setDetailStatementId(sId)}
                                             isSelected={detailStatementId === sId}

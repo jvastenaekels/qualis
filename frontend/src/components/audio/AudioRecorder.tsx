@@ -182,6 +182,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     }, []); // Empty deps - only run on mount/unmount
 
     // Keyboard shortcuts
+    // biome-ignore lint/correctness/useExhaustiveDependencies: functions use closure intentionally
     useEffect(() => {
         if (disabled) return;
 
