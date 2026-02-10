@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { useConfigStore } from './useConfigStore';
 import { useSessionStore } from './useSessionStore';
+import { safeLocalStorage } from './safeStorage';
 
 interface AudioRecordingMetadata {
     id: number;
@@ -286,6 +287,7 @@ export const useResponseStore = create<Responses & ResponseActions>()(
         {
             name: isPilot() ? 'libre-q-pilot-responses' : 'libre-q-responses',
             version: 2,
+            storage: safeLocalStorage,
         }
     )
 );

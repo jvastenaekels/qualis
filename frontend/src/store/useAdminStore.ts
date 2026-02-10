@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { safeLocalStorage } from './safeStorage';
 
 interface AdminState {
     activeWorkspaceId: number | null;
@@ -30,6 +31,7 @@ export const useAdminStore = create<AdminState>()(
         }),
         {
             name: 'admin-storage',
+            storage: safeLocalStorage,
             partialize: (state) => ({
                 activeWorkspaceId: state.activeWorkspaceId,
                 activeStudyId: state.activeStudyId,

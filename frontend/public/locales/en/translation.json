@@ -121,7 +121,7 @@
             "welcome": "Welcome",
             "consent": "Privacy & Consent",
             "rough": "First impressions",
-            "fine": "Sorting grid",
+            "fine": "Q-Sort grid",
             "post": "Final questions"
         },
         "mobile_step": "Step",
@@ -280,7 +280,7 @@
             "label": "Grid controls"
         },
         "grid": {
-            "label": "Sorting grid",
+            "label": "Q-Sort grid",
             "column": "Column",
             "slot": "Slot",
             "in_column": "In column"
@@ -1000,7 +1000,7 @@
                     "missing_title": "Title is missing for language '{{lang}}'.",
                     "missing_consent_title": "Consent title is missing for language '{{lang}}'.",
                     "missing_consent_description": "Consent description is missing for language '{{lang}}'.",
-                    "missing_grid_instructions": "Grid sort instructions are missing for language '{{lang}}'.",
+                    "missing_grid_instructions": "Q-Sort instructions are missing for language '{{lang}}'.",
                     "missing_step_title": "Step {{index}} title is missing for language '{{lang}}'.",
                     "missing_statement_translation": "Statement '{{code}}' is missing translations for: {{missing}}.",
                     "empty_statement_text": "Statement '{{code}}' has empty text for language '{{lang}}'.",
@@ -1093,8 +1093,8 @@
                 "desc": "This is the core prompt that guides participants throughout the sorting process.",
                 "field_label": "Instruction text",
                 "placeholder": "E.g. Please rank the following statements from those you most agree with to those you most disagree with",
-                "grid_title": "Grid sort instruction",
-                "grid_desc": "This is the core instruction guiding participants during the grid sorting process.",
+                "grid_title": "Q-Sort instruction",
+                "grid_desc": "This is the core instruction guiding participants during the Q-Sort process.",
                 "pre_title": "Preliminary sort instruction",
                 "pre_desc": "Instruction given to participants during the initial rough sort.",
                 "pre_field_label": "Instruction text",
@@ -1205,7 +1205,7 @@
                     "randomize_desc": "Present statements in random order to each participant (consistent within session)"
                 },
                 "grid": {
-                    "title": "Forced distribution grid",
+                    "title": "Q-Sort distribution grid",
                     "desc": "The grid shape forces participants to discriminate between statements, approximating a normal distribution.",
                     "slot_count": "{{count}} slots allocated",
                     "stat_count": "{{count}} statements",
@@ -1414,6 +1414,14 @@
                 "clear_all_success": "All data cleared",
                 "clear_all_error": "Failed to clear data"
             },
+            "confirm_discard": {
+                "title": "Discard participant?",
+                "description": "This participant will be excluded from exports and analysis. You can restore them later."
+            },
+            "confirm_restore": {
+                "title": "Restore participant?",
+                "description": "This participant will be included in exports and analysis again."
+            },
             "guide": {
                 "title": "Format guide",
                 "csv": {
@@ -1438,7 +1446,9 @@
                 "duration": "Duration",
                 "submitted": "Submitted",
                 "view": "View",
-                "actions": "Details"
+                "actions": "Details",
+                "duplicate_ip": "Duplicate IP",
+                "duplicate_ip_hint": "Shares IP hash with other participants"
             },
             "tooltips": {
                 "suspect": "Potentially suspect: session duration < 2 minutes",
@@ -1449,6 +1459,8 @@
                 "interview_consent": "Open to follow-up interview"
             },
             "detail": {
+                "participant": "Participant",
+                "not_found": "Participant not found",
                 "title": "Participant profile",
                 "session": "Session",
                 "discarded_badge": "Discarded",
@@ -1705,6 +1717,7 @@
                 "duration": "Total Duration",
                 "started": "Started",
                 "id": "Internal ID",
+                "ip_hash": "IP Hash",
                 "test_run": "Test Run",
                 "recruitment_token": "Recruitment Token",
                 "device": {

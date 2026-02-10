@@ -1,5 +1,16 @@
+import { useState } from 'react';
 import { parseUA } from '@/utils/uaParser';
 import { Button } from '@/components/ui/button';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
     Monitor,
     Smartphone,
@@ -9,6 +20,7 @@ import {
     Clock,
     Activity,
     Hash,
+    AlertTriangle,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -41,7 +53,9 @@ export function ParticipantMetadataCard({
     isDiscardPending,
 }: ParticipantMetadataCardProps) {
     const { t, i18n } = useTranslation();
+    const [discardDialogOpen, setDiscardDialogOpen] = useState(false);
     const uaInfo = parseUA(participant.user_agent || '');
+    const isDiscarded = participant.status === 'discarded';
 
     // biome-ignore lint/suspicious/noExplicitAny: library locale types are complex
     const dateLocales: Record<string, any> = {
@@ -75,21 +89,16 @@ export function ParticipantMetadataCard({
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() =>
-                                    onToggleDiscard(
-                                        !participant.status.includes('discarded') &&
-                                            participant.status !== 'discarded'
-                                    )
-                                } // Simple check, ideally check is_discarded but status usually reflects it
+                                onClick={() => setDiscardDialogOpen(true)}
                                 disabled={isDiscardPending}
                                 className={cn(
                                     'h-6 px-2 text-[10px] font-bold uppercase tracking-wider',
-                                    participant.status === 'discarded'
+                                    isDiscarded
                                         ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'
                                         : 'text-red-500 hover:text-red-600 hover:bg-red-50'
                                 )}
                             >
-                                {participant.status === 'discarded'
+                                {isDiscarded
                                     ? t('admin.data.actions.restore', 'Restore')
                                     : t('admin.data.actions.discard', 'Discard')}
                             </Button>
@@ -225,9 +234,75 @@ export function ParticipantMetadataCard({
                                 </p>
                             </div>
                         </div>
+                        {participant.ip_address && (
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-slate-50 rounded-lg">
+                                    <Fingerprint className="h-4 w-4 text-slate-500" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-black text-slate-900 leading-none font-mono">
+                                        {participant.ip_address.substring(0, 16)}...
+                                    </p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                        {t('admin.participant.metadata.ip_hash', 'IP Hash')}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </CardContent>
+
+            <AlertDialog open={discardDialogOpen} onOpenChange={setDiscardDialogOpen}>
+                <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-2xl font-black text-slate-900 flex items-center gap-3">
+                            <div
+                                className={cn(
+                                    'p-2 rounded-xl',
+                                    isDiscarded
+                                        ? 'bg-emerald-100 text-emerald-600'
+                                        : 'bg-rose-100 text-rose-600'
+                                )}
+                            >
+                                <AlertTriangle className="w-5 h-5" />
+                            </div>
+                            {isDiscarded
+                                ? t('admin.data.confirm_restore.title', 'Restore participant?')
+                                : t('admin.data.confirm_discard.title', 'Discard participant?')}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-slate-500 font-semibold text-base py-4">
+                            {isDiscarded
+                                ? t(
+                                      'admin.data.confirm_restore.description',
+                                      'This participant will be included in exports and analysis again.'
+                                  )
+                                : t(
+                                      'admin.data.confirm_discard.description',
+                                      'This participant will be excluded from exports and analysis. You can restore them later.'
+                                  )}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter className="gap-2">
+                        <AlertDialogCancel className="rounded-2xl font-bold h-12">
+                            {t('common.cancel')}
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => onToggleDiscard?.(!isDiscarded)}
+                            className={cn(
+                                'rounded-2xl font-bold h-12',
+                                isDiscarded
+                                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                                    : 'bg-rose-600 hover:bg-rose-700'
+                            )}
+                        >
+                            {isDiscarded
+                                ? t('admin.data.actions.restore', 'Restore')
+                                : t('admin.data.actions.discard', 'Discard')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Card>
     );
 }

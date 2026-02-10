@@ -35,8 +35,8 @@ describe('ConditionOfInstructionEditor', () => {
     it('renders instruction input', () => {
         renderEditor();
 
-        // Check for Grid sort instruction
-        expect(screen.getByText('Grid sort instruction')).toBeInTheDocument();
+        // Check for Q-Sort instruction
+        expect(screen.getByText('Q-Sort instruction')).toBeInTheDocument();
 
         // Check for Preliminary sort instruction
         expect(screen.getByText('Preliminary sort instruction')).toBeInTheDocument();

@@ -113,12 +113,12 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardHeader className="pb-4">
                         <CardTitle className="text-base font-bold text-slate-900 tracking-tight">
-                            {t('admin.design.condition.grid_title', 'Grid Sort Instruction')}
+                            {t('admin.design.condition.grid_title', 'Q-Sort Instruction')}
                         </CardTitle>
                         <CardDescription className="text-sm font-medium text-slate-500 italic">
                             {t(
                                 'admin.design.condition.grid_desc',
-                                'This is the core instruction guiding participants during the grid sorting process.'
+                                'This is the core instruction guiding participants during the Q-Sort process.'
                             )}
                         </CardDescription>
                     </CardHeader>

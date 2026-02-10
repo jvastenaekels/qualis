@@ -86,63 +86,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { format, formatDistanceToNow } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
 
-// Types representing the backend dump response structure
-interface DumpStatement {
-    id: number;
-    code?: string;
-    translations: { lang: string; text: string }[];
-}
-
-export interface DumpParticipant {
-    id: string;
-    db_id: number;
-    duration_seconds: number | null;
-    scores: (number | null)[];
-    placements: Record<string, number>;
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
-    presort: Record<string, any>;
-    postsort: {
-        email?: string;
-        newsletter_consent?: boolean;
-        interview_consent?: boolean;
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
-        questions_answers?: Record<string, any>;
-        card_comments?: Record<string, string>;
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
-    } & Record<string, any>;
-    // biome-ignore lint/suspicious/noExplicitAny: dynamic structure
-    audio_recordings?: Record<string, any>;
-    language: string;
-    is_discarded: boolean;
-    discard_reason: string | null;
-    is_test_run: boolean;
-    submitted_at?: string;
-    recruitment_token?: string;
-    status: string;
-    user_agent?: string;
-    created_at?: string;
-    ip_address?: string;
-}
-
-export interface DumpResponse {
-    study: {
-        slug: string;
-        statements: DumpStatement[];
-        translations: { lang: string; title: string }[];
-        grid_config?: Record<string, number> | { score: number; capacity: number }[];
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic config
-        presort_config?: Record<string, any>;
-        postsort_config?: {
-            email_collection_enabled?: boolean;
-            newsletter_consent_enabled?: boolean;
-            interview_consent_enabled?: boolean;
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic config
-        } & Record<string, any>;
-        state: string;
-    };
-    participants: DumpParticipant[];
-    statement_id_to_index: Record<string, number>;
-}
+import type { DumpParticipant, DumpResponse } from './types';
 
 interface InteractiveDataViewProps {
     slug: string;
@@ -276,6 +220,21 @@ export default function InteractiveDataView({
         (p) => getDisplayStatus(p) === 'abandoned'
     ).length;
 
+    // Build set of IP hashes that appear more than once (potential duplicates)
+    const duplicateIps = useMemo(() => {
+        const ipCounts = new Map<string, number>();
+        for (const p of liveParticipants) {
+            if (p.ip_address) {
+                ipCounts.set(p.ip_address, (ipCounts.get(p.ip_address) || 0) + 1);
+            }
+        }
+        const dupes = new Set<string>();
+        for (const [ip, count] of ipCounts) {
+            if (count > 1) dupes.add(ip);
+        }
+        return dupes;
+    }, [liveParticipants]);
+
     const hasActiveFilters =
         consentFilters.size > 0 ||
         qualityFilter === 'flagged' ||
@@ -311,7 +270,8 @@ export default function InteractiveDataView({
                         (p.language || '').toLowerCase().includes(q) ||
                         (p.status || '').toLowerCase().includes(q) ||
                         (p.postsort?.email || '').toLowerCase().includes(q) ||
-                        (p.recruitment_token || '').toLowerCase().includes(q)
+                        (p.recruitment_token || '').toLowerCase().includes(q) ||
+                        (p.ip_address || '').toLowerCase().includes(q)
                     );
                 })();
 
@@ -381,6 +341,27 @@ export default function InteractiveDataView({
                                     </Badge>
                                 )}
                             </div>
+                            {p.ip_address && duplicateIps.has(p.ip_address) && (
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <Badge
+                                                variant="outline"
+                                                className="h-4 text-[10px] px-1.5 font-semibold bg-amber-50 text-amber-600 border-amber-200"
+                                            >
+                                                {t('admin.data.table.duplicate_ip', 'Duplicate IP')}
+                                            </Badge>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {t(
+                                                'admin.data.table.duplicate_ip_hint',
+                                                'Shares IP hash with other participants'
+                                            )}{' '}
+                                            ({p.ip_address.substring(0, 8)}...)
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            )}
                             {p.recruitment_token && (
                                 <span className="text-[10px] text-slate-400 font-medium flex items-center gap-1">
                                     <Tag className="w-3 h-3" />
@@ -676,7 +657,7 @@ export default function InteractiveDataView({
                 },
             }),
         ],
-        [t, currentLocale]
+        [t, currentLocale, duplicateIps]
     );
 
     const table = useReactTable({
@@ -1127,7 +1108,7 @@ export default function InteractiveDataView({
                             setQualityFilter((prev) => (prev === 'all' ? 'flagged' : 'all'))
                         }
                         className={cn(
-                            'h-9 border border-transparent font-medium text-xs',
+                            'h-10 sm:h-9 border border-transparent font-medium text-xs',
                             qualityFilter === 'flagged'
                                 ? 'bg-amber-50 text-amber-700 border-amber-200'
                                 : 'text-slate-600 hover:bg-slate-100'
@@ -1147,7 +1128,7 @@ export default function InteractiveDataView({
                                 variant="ghost"
                                 size="sm"
                                 className={cn(
-                                    'h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
+                                    'h-10 sm:h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
                                     statusFilter !== 'all' &&
                                         'bg-indigo-50 text-indigo-700 border-indigo-100'
                                 )}
@@ -1195,7 +1176,7 @@ export default function InteractiveDataView({
                                 variant="ghost"
                                 size="sm"
                                 className={cn(
-                                    'h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
+                                    'h-10 sm:h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
                                     consentFilters.size > 0 &&
                                         'bg-indigo-50 text-indigo-700 border-indigo-100'
                                 )}
@@ -1244,7 +1225,7 @@ export default function InteractiveDataView({
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
-                                className="h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-sm gap-2 text-xs"
+                                className="h-10 sm:h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-sm gap-2 text-xs"
                                 disabled={isExportLoading}
                             >
                                 {isExportLoading ? (
@@ -1500,7 +1481,7 @@ export default function InteractiveDataView({
                                 size="sm"
                                 onClick={() => table.previousPage()}
                                 disabled={!table.getCanPreviousPage()}
-                                className="h-8 w-8 p-0 rounded-lg"
+                                className="h-10 w-10 sm:h-8 sm:w-8 p-0 rounded-lg"
                             >
                                 <ChevronLeft className="h-4 w-4" />
                             </Button>
@@ -1512,7 +1493,7 @@ export default function InteractiveDataView({
                                 size="sm"
                                 onClick={() => table.nextPage()}
                                 disabled={!table.getCanNextPage()}
-                                className="h-8 w-8 p-0 rounded-lg"
+                                className="h-10 w-10 sm:h-8 sm:w-8 p-0 rounded-lg"
                             >
                                 <ChevronRight className="h-4 w-4" />
                             </Button>

@@ -8,6 +8,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { resetBaseLocales } from '../utils/i18nOverrides';
+import { safeLocalStorage } from './safeStorage';
 
 interface SessionState {
     token: string | null;
@@ -89,6 +90,7 @@ export const useSessionStore = create<SessionState>()(
         {
             name: isPilot() ? 'libre-q-pilot-session' : 'libre-q-session',
             version: 1,
+            storage: safeLocalStorage,
         }
     )
 );

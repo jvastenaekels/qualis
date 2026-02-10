@@ -121,7 +121,7 @@
             "welcome": "Tervetuloa",
             "consent": "Yksityisyys & Suostumus",
             "rough": "Ensivaikutelmat",
-            "fine": "Lajitteluruudukko",
+            "fine": "Q-lajitteluruudukko",
             "post": "Viimeiset kysymykset"
         },
         "mobile_step": "Vaihe",
@@ -280,7 +280,7 @@
             "label": "Grid controls"
         },
         "grid": {
-            "label": "Lajitteluruudukko",
+            "label": "Q-lajitteluruudukko",
             "column": "Sarake",
             "slot": "Paikka",
             "in_column": "sarakkeessa"
@@ -1084,8 +1084,8 @@
                 "desc": "Tämä on keskeinen kehote, joka ohjaa osallistujia koko lajitteluprosessin ajan.",
                 "field_label": "Ohjeteksti",
                 "placeholder": "esim. Ole hyvä ja järjestä seuraavat väittämät siitä, minkä kanssa olet eniten samaa mieltä, siihen, minkä kanssa olet eniten eri mieltä",
-                "grid_title": "Ohjeistuksen ehto (Ruudukkolajittelu)",
-                "grid_desc": "Tämä on keskeinen ohje, joka ohjaa osallistujia ruudukkolajittelun aikana.",
+                "grid_title": "Q-lajittelun ohje",
+                "grid_desc": "Tämä on keskeinen ohje, joka ohjaa osallistujia Q-lajitteluprosessin aikana.",
                 "pre_title": "Ohjeistus alustavaan lajitteluun",
                 "pre_desc": "Ohje, joka annetaan osallistujille alustavan ryhmittelyn aikana kolmeen pinoon.",
                 "pre_field_label": "Ohjeteksti",
@@ -1196,7 +1196,7 @@
                     "randomize_desc": "Esitä väittämät satunnaisessa järjestyksessä kullekin osallistujalle (pysyy samana istunnon sisällä)"
                 },
                 "grid": {
-                    "title": "Pakotettu jakauma -ruudukko",
+                    "title": "Q-lajittelun jakaumaruudukko",
                     "desc": "Ruudukon muoto pakottaa osallistujat erottelemaan väittämät toisistaan.",
                     "perfect": "Täydellinen tasapaino",
                     "too_many": "{{count}} väitettä liikaa",
@@ -1406,6 +1406,14 @@
                 "clear_all_success": "Kaikki tiedot poistettu",
                 "clear_all_error": "Tietojen poistaminen epäonnistui"
             },
+            "confirm_discard": {
+                "title": "Hylätäänkö osallistuja?",
+                "description": "Tämä osallistuja jätetään pois viennistä ja analyysistä. Voit palauttaa hänet myöhemmin."
+            },
+            "confirm_restore": {
+                "title": "Palautetaanko osallistuja?",
+                "description": "Tämä osallistuja sisällytetään jälleen vientiin ja analyysiin."
+            },
             "guide": {
                 "title": "Muoto-opas",
                 "csv": {
@@ -1430,7 +1438,9 @@
                 "duration": "Kesto",
                 "submitted": "Lähetetty",
                 "view": "Näytä",
-                "actions": "Tiedot"
+                "actions": "Tiedot",
+                "duplicate_ip": "Sama IP",
+                "duplicate_ip_hint": "Jakaa IP-tiivisteen muiden osallistujien kanssa"
             },
             "tooltips": {
                 "suspect": "Mahdollisesti epäilyttävä: istunnon kesto < 2 minuuttia",
@@ -1441,6 +1451,8 @@
                 "interview_consent": "Avoin jatkohaastattelulle"
             },
             "detail": {
+                "participant": "Osallistuja",
+                "not_found": "Osallistujaa ei löytynyt",
                 "title": "Osallistujan profiili",
                 "session": "Istunto",
                 "discarded_badge": "Hylätty",
@@ -1699,6 +1711,7 @@
                 "duration": "Kokonaiskesto",
                 "started": "Aloitettu",
                 "id": "Sisäinen ID",
+                "ip_hash": "IP-tiiviste",
                 "test_run": "Testiajo",
                 "recruitment_token": "Rekrytointitunnus",
                 "device": {

@@ -48,6 +48,19 @@ export function AudioPlayer({ url, duration, fileName = 'audio.webm' }: AudioPla
         };
     }, []);
 
+    // Reset playback state when URL changes — url triggers the effect even though
+    // the audio element's src is set via JSX; we need to pause and reset state.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: url triggers reset
+    useEffect(() => {
+        const audio = audioRef.current;
+        if (!audio) return;
+
+        audio.pause();
+        setIsPlaying(false);
+        setCurrentTime(0);
+        setAudioDuration(duration || 0);
+    }, [url, duration]);
+
     const togglePlay = () => {
         const audio = audioRef.current;
         if (!audio) return;

@@ -1,7 +1,4 @@
-import type {
-    DumpParticipant,
-    DumpResponse,
-} from '@/components/admin/dashboard/InteractiveDataView';
+import type { DumpParticipant, DumpResponse } from '@/components/admin/dashboard/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {

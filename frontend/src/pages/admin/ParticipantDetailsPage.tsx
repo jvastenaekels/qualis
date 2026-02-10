@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
     useGetStudyApiAdminStudiesSlugGet,
     useGetParticipantApiAdminStudiesParticipantsParticipantIdGet,
@@ -6,11 +6,16 @@ import {
 } from '@/api/generated';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Button } from '@/components/ui/button';
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { ArrowLeft, User } from 'lucide-react';
-import type {
-    DumpResponse,
-    DumpParticipant,
-} from '@/components/admin/dashboard/InteractiveDataView';
+import type { DumpResponse, DumpParticipant } from '@/components/admin/dashboard/types';
 import { ParticipantDetailContent } from '@/components/admin/dashboard/ParticipantDetailContent';
 import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -222,20 +227,36 @@ export default function ParticipantDetailsPage() {
 
     return (
         <div className="flex flex-1 flex-col h-full overflow-hidden bg-slate-50/30">
-            <div className="flex-none p-6 pb-0">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                        navigate(
-                            `/app/${currentWorkspace?.slug || 'default'}/studies/${effectiveSlug}/data`
-                        )
-                    }
-                    className="text-slate-500 hover:text-indigo-600 hover:bg-indigo-50/50 rounded-xl px-2 -ml-2"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    {t('common.back', 'Back')}
-                </Button>
+            <div className="flex-none p-6 pb-0 space-y-3">
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link
+                                    to={`/app/${currentWorkspace?.slug || 'default'}/studies/${effectiveSlug}`}
+                                >
+                                    {study?.translations?.[0]?.title || study?.slug}
+                                </Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link
+                                    to={`/app/${currentWorkspace?.slug || 'default'}/studies/${effectiveSlug}/data`}
+                                >
+                                    {t('admin.sidebar.data', 'Data')}
+                                </Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbPage>
+                                {t('admin.data.detail.participant', 'Participant')} #{participantId}
+                            </BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
 
                 <StudyPageHeader
                     title={t('admin.data.detail.title', 'Participant Details')}

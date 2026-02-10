@@ -131,17 +131,11 @@ export function AdminDashboard() {
                     {studies && studies.length > 0 ? (
                         <div className="space-y-3">
                             {studies.slice(0, 5).map((study) => (
-                                <div
+                                <button
                                     key={study.id}
-                                    role="button"
-                                    tabIndex={0}
-                                    className="flex items-center justify-between p-4 rounded-xl border border-transparent hover:border-indigo-500/20 hover:bg-white/60 hover:shadow-md transition-all duration-200 cursor-pointer group"
+                                    type="button"
+                                    className="flex w-full items-center justify-between p-4 rounded-xl border border-transparent hover:border-indigo-500/20 hover:bg-white/60 hover:shadow-md transition-all duration-200 cursor-pointer group text-left bg-transparent"
                                     onClick={() => handleOpenStudy(study.slug)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter' || e.key === ' ') {
-                                            handleOpenStudy(study.slug);
-                                        }
-                                    }}
                                 >
                                     <div className="flex items-center gap-5">
                                         <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/10 flex items-center justify-center text-indigo-600 font-black tracking-tighter text-lg shadow-inner group-hover:scale-110 transition-transform duration-300">
@@ -175,7 +169,7 @@ export function AdminDashboard() {
                                             <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
                                         </div>
                                     </div>
-                                </div>
+                                </button>
                             ))}
                         </div>
                     ) : (
