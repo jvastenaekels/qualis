@@ -116,6 +116,11 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const handleAudioUpload = async (questionKey: string, blob: Blob, duration: number) => {
         // Pilot mode: store fake metadata locally, skip backend upload
         if (isPilotMode) {
+            // Revoke previous blob URL if replacing a recording (prevent memory leak)
+            const existing = getAudioRecording(questionKey);
+            if (existing?.presigned_url?.startsWith('blob:')) {
+                URL.revokeObjectURL(existing.presigned_url);
+            }
             setAudioRecording(questionKey, {
                 id: -1,
                 question_key: questionKey,

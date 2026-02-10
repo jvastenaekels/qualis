@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from uuid import UUID
 from datetime import datetime, timedelta, UTC
+import re
 import magic
 
 from app.database import get_db
@@ -110,6 +111,10 @@ async def upload_audio(
     Raises:
         HTTPException: If validation fails, quota exceeded, or upload fails
     """
+    # Validate question_key format (alphanumeric, underscores, hyphens only)
+    if not re.match(r"^[a-zA-Z0-9_-]+$", question_key):
+        raise HTTPException(status_code=400, detail="Invalid question_key format")
+
     # Validate file
     await validate_audio_file(file)
 
@@ -146,6 +151,8 @@ async def upload_audio(
 
     # Read file content once for quota check and S3 upload
     content = await file.read()
+    if len(content) == 0:
+        raise HTTPException(status_code=400, detail="Empty audio file")
     content_type = file.content_type or "audio/webm"
 
     # Check storage quota

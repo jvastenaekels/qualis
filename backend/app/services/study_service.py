@@ -4,6 +4,7 @@
 
 """Service layer for Study-related operations."""
 
+import logging
 from collections import Counter
 from datetime import datetime, timezone
 from typing import Any, cast
@@ -28,6 +29,8 @@ from ..models import (
 from ..schemas import SubmissionInput
 from .recruitment_service import RecruitmentService
 from ..utils.crypto import hash_ip
+
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_PROCESS_STEPS: dict[str, list[dict[str, str]]] = {
@@ -1123,8 +1126,10 @@ class StudyService:
                     }
                 except Exception as e:
                     # Log but don't fail export
-                    print(
-                        f"Failed to generate presigned URL for {audio_rec.s3_key}: {e}"
+                    logger.warning(
+                        "Failed to generate presigned URL for %s: %s",
+                        audio_rec.s3_key,
+                        e,
                     )
 
             participant_data.append(

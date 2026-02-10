@@ -2,12 +2,15 @@
 
 import csv
 import io
+import logging
 import zipfile
 from datetime import datetime
 from typing import Any
 
 from ..models import Participant, Study, Statement
 from .storage_service import storage_service
+
+logger = logging.getLogger(__name__)
 
 
 class ExportService:
@@ -175,8 +178,10 @@ class ExportService:
                     }
                 except Exception as e:
                     # Log error but don't fail export
-                    print(
-                        f"Failed to generate presigned URL for {audio_rec.s3_key}: {e}"
+                    logger.warning(
+                        "Failed to generate presigned URL for %s: %s",
+                        audio_rec.s3_key,
+                        e,
                     )
 
             # Build card comments map from qsort_entries

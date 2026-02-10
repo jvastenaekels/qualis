@@ -281,6 +281,39 @@ class TestAudioValidation:
         assert response.status_code == 400
         assert "Invalid file type" in response.json()["message"]
 
+    async def test_upload_rejects_invalid_question_key(
+        self,
+        client: AsyncClient,
+        participant_token: tuple[uuid.UUID, Participant],
+    ):
+        """Test that question_key with path traversal characters is rejected."""
+        token, _ = participant_token
+        audio_data = b"fake audio"
+        files = {"file": ("recording.webm", BytesIO(audio_data), "audio/webm")}
+        data = {"session_token": str(token), "question_key": "../../etc/passwd"}
+
+        response = await client.post("/api/audio/upload", files=files, data=data)
+        assert response.status_code == 400
+        assert "question_key" in response.json()["message"].lower()
+
+    @patch("app.routers.audio.magic.from_buffer")
+    async def test_upload_rejects_empty_file(
+        self,
+        mock_magic,
+        client: AsyncClient,
+        participant_token: tuple[uuid.UUID, Participant],
+        mock_storage_service,
+    ):
+        """Test that empty audio files are rejected."""
+        mock_magic.return_value = "audio/webm"
+        token, _ = participant_token
+        files = {"file": ("empty.webm", BytesIO(b""), "audio/webm")}
+        data = {"session_token": str(token), "question_key": "card_1"}
+
+        response = await client.post("/api/audio/upload", files=files, data=data)
+        assert response.status_code == 400
+        assert "empty" in response.json()["message"].lower()
+
     @patch("app.routers.audio.magic.from_buffer")
     async def test_upload_file_too_large(
         self,

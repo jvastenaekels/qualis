@@ -582,7 +582,9 @@ async def get_participant(
             )
         except Exception as e:
             # Log error but don't fail the request
-            print(f"Failed to generate presigned URL for {audio_rec.s3_key}: {e}")
+            logger.warning(
+                "Failed to generate presigned URL for %s: %s", audio_rec.s3_key, e
+            )
 
     return participant
 

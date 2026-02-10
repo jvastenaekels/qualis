@@ -61,6 +61,8 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const [playbackPosition, setPlaybackPosition] = useState(0);
     const [uploadFailed, setUploadFailed] = useState(false);
     const pendingBlobRef = useRef<Blob | null>(null);
+    const playbackRetryRef = useRef(false);
+    const refreshFailCountRef = useRef(0);
 
     // Keep stateRef in sync so callbacks in stale closures read current state
     stateRef.current = state;
@@ -123,10 +125,19 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
             // Refresh if expires soon (<5 min) OR already expired (up to 24h old)
             // This allows recovery from expired URLs when user returns after long absence
-            if (timeUntilExpiry < 5 * 60 * 1000 && timeUntilExpiry > -24 * 60 * 60 * 1000) {
-                refreshPresignedUrl().catch((error) => {
-                    console.error('Background URL refresh failed:', error);
-                });
+            if (
+                timeUntilExpiry < 5 * 60 * 1000 &&
+                timeUntilExpiry > -24 * 60 * 60 * 1000 &&
+                refreshFailCountRef.current < 3
+            ) {
+                refreshPresignedUrl()
+                    .then(() => {
+                        refreshFailCountRef.current = 0;
+                    })
+                    .catch((error) => {
+                        refreshFailCountRef.current += 1;
+                        console.error('Background URL refresh failed:', error);
+                    });
             }
         };
 
@@ -449,6 +460,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     const playRecording = async () => {
         if (!audioUrl) return;
+        playbackRetryRef.current = false;
 
         // Proactively check if URL might be expired before playing
         if (urlExpiresAt && Date.now() > urlExpiresAt - 60 * 1000) {
@@ -470,6 +482,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         // Set playback speed
         audio.playbackRate = playbackSpeed;
 
+        // Close any existing AudioContext from a previous playback that errored
+        if (audioContextRef.current?.state !== 'closed') {
+            audioContextRef.current?.close();
+        }
+
         // Setup Web Audio API for playback waveform
         const audioContext = new AudioContext();
         const analyser = audioContext.createAnalyser();
@@ -486,7 +503,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         // Animate waveform during playback
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
         const updateWaveform = () => {
-            if (analyserRef.current && state === 'playing') {
+            if (analyserRef.current && stateRef.current === 'playing') {
                 analyserRef.current.getByteFrequencyData(dataArray);
                 setAudioLevels(Array.from(dataArray.slice(0, 5)));
                 animationFrameRef.current = requestAnimationFrame(updateWaveform);
@@ -498,12 +515,12 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         audio.onerror = async () => {
             console.error('Audio playback error - attempting URL refresh');
 
-            // Try refreshing URL and retrying once
-            if (existingRecording && sessionToken) {
+            // Try refreshing URL and retrying once (guard against infinite recursion)
+            if (existingRecording && sessionToken && !playbackRetryRef.current) {
+                playbackRetryRef.current = true;
                 toast.info(t('audio.refreshing', 'Refreshing audio...'));
                 try {
                     await refreshPresignedUrl();
-                    // Retry playback with new URL (recursive call, but only once)
                     if (!audioUrl.startsWith('blob:')) {
                         playRecording();
                     }
@@ -580,6 +597,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     const deleteRecording = async () => {
+        // Clear pending blob to prevent in-flight upload from storing stale metadata
+        pendingBlobRef.current = null;
+
         if (timerRef.current) clearInterval(timerRef.current);
         if (animationFrameRef.current) {
             cancelAnimationFrame(animationFrameRef.current);

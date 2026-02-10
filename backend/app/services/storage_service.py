@@ -11,6 +11,7 @@ from typing import Any
 from uuid import UUID
 
 import boto3  # type: ignore
+from botocore.config import Config as BotoConfig  # type: ignore
 from botocore.exceptions import ClientError  # type: ignore
 from fastapi import HTTPException
 
@@ -49,6 +50,10 @@ class StorageService:
             region_name=settings.S3_REGION,
             aws_access_key_id=settings.S3_ACCESS_KEY_ID,
             aws_secret_access_key=settings.S3_SECRET_ACCESS_KEY,
+            config=BotoConfig(
+                request_checksum_calculation="when_required",
+                response_checksum_validation="when_required",
+            ),
         )
         self.bucket_name = settings.S3_BUCKET_NAME
 
@@ -84,20 +89,24 @@ class StorageService:
         s3_key = f"audio/{study_slug}/{participant_token}/{timestamp}_{question_key}{extension}"
 
         # Upload to S3 with retry for transient failures
+        loop = asyncio.get_event_loop()
         max_retries = 2
         for attempt in range(max_retries + 1):
             try:
-                self.s3_client.put_object(
-                    Bucket=self.bucket_name,
-                    Key=s3_key,
-                    Body=content,
-                    ContentLength=file_size,
-                    ContentType=content_type,
-                    Metadata={
-                        "study": study_slug,
-                        "participant": str(participant_token),
-                        "question": question_key,
-                    },
+                await loop.run_in_executor(
+                    None,
+                    lambda: self.s3_client.put_object(
+                        Bucket=self.bucket_name,
+                        Key=s3_key,
+                        Body=content,
+                        ContentLength=file_size,
+                        ContentType=content_type,
+                        Metadata={
+                            "study": study_slug,
+                            "participant": str(participant_token),
+                            "question": question_key,
+                        },
+                    ),
                 )
                 break
             except ClientError as e:
@@ -166,10 +175,16 @@ class StorageService:
             Logs but doesn't fail if file doesn't exist (idempotent operation)
         """
         try:
-            self.s3_client.delete_object(Bucket=self.bucket_name, Key=s3_key)
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(
+                None,
+                lambda: self.s3_client.delete_object(
+                    Bucket=self.bucket_name, Key=s3_key
+                ),
+            )
         except ClientError as e:
             # Log but don't fail - file might already be deleted
-            print(f"S3 deletion warning for key {s3_key}: {e}")
+            logger.warning("S3 deletion warning for key %s: %s", s3_key, e)
 
     def _get_extension(self, mime_type: str) -> str:
         """
