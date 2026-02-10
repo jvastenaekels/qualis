@@ -6,6 +6,8 @@
 
 from starlette.types import ASGIApp, Receive, Scope, Send
 
+from app.core.config import settings
+
 
 class SecurityHeadersMiddleware:
     """Pure ASGI middleware to add security headers.
@@ -16,6 +18,19 @@ class SecurityHeadersMiddleware:
     def __init__(self, app: ASGIApp):
         """Initialize the middleware."""
         self.app = app
+        # Build media-src dynamically to include S3 endpoint for presigned URL playback
+        media_sources = "'self' blob:"
+        if settings.S3_ENDPOINT_URL:
+            media_sources += f" {settings.S3_ENDPOINT_URL}"
+        self._csp = (
+            f"default-src 'self'; script-src 'self'; "
+            f"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            f"img-src 'self' data: https:; "
+            f"font-src 'self' data: https: https://fonts.gstatic.com; "
+            f"connect-src 'self' https:; "
+            f"media-src {media_sources}; "
+            f"frame-ancestors 'none'; upgrade-insecure-requests;"
+        )
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send):
         """Handle the ASGI request."""
@@ -38,7 +53,7 @@ class SecurityHeadersMiddleware:
                     (b"X-XSS-Protection", b"1; mode=block"),
                     (
                         b"Content-Security-Policy",
-                        b"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https: https://fonts.gstatic.com; connect-src 'self' https:; media-src 'self' blob:; frame-ancestors 'none'; upgrade-insecure-requests;",
+                        self._csp.encode(),
                     ),
                     (b"Referrer-Policy", b"strict-origin-when-cross-origin"),
                     (

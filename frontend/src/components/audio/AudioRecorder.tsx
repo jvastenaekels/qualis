@@ -460,7 +460,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
     const playRecording = async () => {
         if (!audioUrl) return;
-        playbackRetryRef.current = false;
 
         // Proactively check if URL might be expired before playing
         if (urlExpiresAt && Date.now() > urlExpiresAt - 60 * 1000) {
@@ -715,7 +714,14 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-slate-200 bg-white shadow-sm">
                         <button
                             type="button"
-                            onClick={state === 'playing' ? pausePlayback : playRecording}
+                            onClick={
+                                state === 'playing'
+                                    ? pausePlayback
+                                    : () => {
+                                          playbackRetryRef.current = false;
+                                          playRecording();
+                                      }
+                            }
                             aria-label={
                                 state === 'playing'
                                     ? t('audio.pause', 'Pause')
