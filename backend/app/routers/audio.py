@@ -144,9 +144,11 @@ async def upload_audio(
             detail=f"Recording duration ({duration_seconds:.0f}s) exceeds maximum ({max_allowed}s)",
         )
 
-    # Check storage quota
+    # Read file content once for quota check and S3 upload
     content = await file.read()
-    await file.seek(0)
+    content_type = file.content_type or "audio/webm"
+
+    # Check storage quota
     await check_storage_quota(study, len(content), db)
 
     # Check if recording already exists for this question
@@ -166,7 +168,8 @@ async def upload_audio(
 
     # Upload to S3
     s3_metadata = await storage_service.upload_audio(
-        file=file,
+        content=content,
+        content_type=content_type,
         study_slug=study.slug,
         participant_token=participant.session_token,
         question_key=question_key,

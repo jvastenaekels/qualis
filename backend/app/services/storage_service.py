@@ -12,7 +12,7 @@ from uuid import UUID
 
 import boto3  # type: ignore
 from botocore.exceptions import ClientError  # type: ignore
-from fastapi import UploadFile, HTTPException
+from fastapi import HTTPException
 
 from app.core.config import settings
 
@@ -54,7 +54,8 @@ class StorageService:
 
     async def upload_audio(
         self,
-        file: UploadFile,
+        content: bytes,
+        content_type: str,
         study_slug: str,
         participant_token: UUID,
         question_key: str,
@@ -63,7 +64,8 @@ class StorageService:
         Upload audio file to S3 and return metadata.
 
         Args:
-            file: UploadFile object containing audio data
+            content: Audio file bytes
+            content_type: MIME type of the audio file
             study_slug: Study identifier
             participant_token: Participant session token
             question_key: Question identifier (e.g., "card_123", "missing_statement")
@@ -74,12 +76,7 @@ class StorageService:
         Raises:
             HTTPException: If upload fails
         """
-        # Read file content
-        content = await file.read()
         file_size = len(content)
-
-        # Get content type (default to webm if not provided)
-        content_type = file.content_type or "audio/webm"
 
         # Generate S3 key with timestamp for uniqueness
         timestamp = int(datetime.utcnow().timestamp())
