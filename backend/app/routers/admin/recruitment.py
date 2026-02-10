@@ -2,10 +2,11 @@
 
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.limiter import limiter
 from app.dependencies import (
     check_study_permission,
     get_current_user,
@@ -30,7 +31,9 @@ async def list_study_links(
 
 
 @router.post("/{slug}/links", response_model=List[RecruitmentLinkRead])
+@limiter.limit("30/minute")
 async def create_recruitment_links(
+    request: Request,
     data: RecruitmentLinkCreate,
     count: int = 1,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
@@ -55,7 +58,9 @@ async def create_recruitment_links(
 
 
 @router.delete("/links/{link_id}")
+@limiter.limit("30/minute")
 async def revoke_recruitment_link(
+    request: Request,
     link_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),

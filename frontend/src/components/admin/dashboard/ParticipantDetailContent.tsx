@@ -9,6 +9,7 @@ import {
     MousePointer2,
     FileJson,
     FileSpreadsheet,
+    FileArchive,
     Fingerprint,
     ClipboardList,
     LayoutGrid,
@@ -84,6 +85,37 @@ export function ParticipantDetailContent({
             const a = document.createElement('a');
             a.href = url;
             a.download = `${studySlug}_participant_${participant.db_id}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            toast.success(t('admin.export.success', 'Export successful'));
+        } catch (err) {
+            console.error(err);
+            toast.error(t('admin.export.error', 'Export failed'));
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
+    const hasAudioRecordings =
+        // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
+        (participant as any).audio_recordings &&
+        // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
+        Object.keys((participant as any).audio_recordings).length > 0;
+
+    const handleExportAudio = async () => {
+        if (!studySlug || !participant.db_id || !hasAudioRecordings) return;
+        setIsExporting(true);
+        try {
+            const blob = await AdminService.exportParticipantAudio(
+                studySlug,
+                participant.db_id as number
+            );
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${studySlug}_participant_${participant.db_id}_audio.zip`;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
@@ -337,6 +369,18 @@ export function ParticipantDetailContent({
                         >
                             <FileJson className="w-4 h-4" />
                         </Button>
+                        {hasAudioRecordings && (
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={isExporting}
+                                onClick={handleExportAudio}
+                                className="text-slate-400 hover:text-indigo-600"
+                                title={t('admin.export.audio', 'Export Audio (ZIP)')}
+                            >
+                                <FileArchive className="w-4 h-4" />
+                            </Button>
+                        )}
                     </div>
                 </div>
 

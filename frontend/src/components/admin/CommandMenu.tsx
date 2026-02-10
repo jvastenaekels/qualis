@@ -69,7 +69,7 @@ export const CommandMenu = () => {
         if (isValidStudy) {
             const link = `${window.location.origin}/study/${activeStudyId}/welcome`;
             navigator.clipboard.writeText(link);
-            toast.success('Study link copied!');
+            toast.success(t('admin.command_menu.link_copied', 'Study link copied!'));
         }
     };
 
@@ -77,7 +77,7 @@ export const CommandMenu = () => {
         logout();
         useSessionStore.getState().resetSession();
         navigate('/login');
-        toast.success('Logged out successfully');
+        toast.success(t('admin.command_menu.logged_out', 'Logged out successfully'));
     };
 
     return (
@@ -107,7 +107,7 @@ export const CommandMenu = () => {
                     {/* Workspaces */}
                     <Command.Group
                         heading={t('admin.command_menu.switch_workspace', 'Switch Workspace')}
-                        className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
+                        className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
                     >
                         {(Array.isArray(workspaces) ? workspaces : []).map((ws) => (
                             <div key={ws.id}>
@@ -118,7 +118,13 @@ export const CommandMenu = () => {
                                             setActiveWorkspace(ws.id);
                                             setCurrentWorkspace(ws);
                                             setActiveStudy(null);
-                                            toast.success(`Switched to ${ws.title}`);
+                                            toast.success(
+                                                t(
+                                                    'admin.command_menu.switched_workspace',
+                                                    'Switched to {{name}}',
+                                                    { name: ws.title }
+                                                )
+                                            );
                                         })
                                     }
                                     className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors aria-selected:bg-indigo-50 dark:aria-selected:bg-indigo-900/20 aria-selected:text-indigo-600 dark:aria-selected:text-indigo-400"
@@ -152,7 +158,7 @@ export const CommandMenu = () => {
                     {/* Studies (Filtered) */}
                     <Command.Group
                         heading={t('admin.command_menu.switch_study', 'Switch Study')}
-                        className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
+                        className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
                     >
                         {filteredStudies?.map((study) => (
                             <Command.Item
@@ -194,7 +200,7 @@ export const CommandMenu = () => {
                     {isValidStudy && (
                         <Command.Group
                             heading={t('admin.command_menu.study_actions', 'Study Actions')}
-                            className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
+                            className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
                         >
                             <Command.Item
                                 value="overview dashboard"
@@ -308,7 +314,7 @@ export const CommandMenu = () => {
                     {/* System Actions */}
                     <Command.Group
                         heading={t('admin.command_menu.system', 'System')}
-                        className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider"
+                        className="px-2 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
                     >
                         <Command.Item
                             value="logout sign out"

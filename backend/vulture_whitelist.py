@@ -53,6 +53,7 @@ export_r_kit
 get_study_dump
 export_participant_csv
 export_participant_json
+export_participant_audio
 get_research_package
 
 # admin/invitations.py

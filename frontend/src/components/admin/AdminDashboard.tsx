@@ -100,7 +100,7 @@ export function AdminDashboard() {
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden group">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-[10px] font-black uppercase text-slate-600 tracking-wider">
+                        <CardTitle className="text-[10px] font-black uppercase text-slate-600 tracking-widest">
                             {t('admin.dashboard.active_data_collection')}
                         </CardTitle>
                         <TrendingUp className="h-4 w-4 text-indigo-500" />
@@ -109,7 +109,7 @@ export function AdminDashboard() {
                         <div className="text-3xl font-black text-indigo-600">
                             {activeStudiesCount}
                         </div>
-                        <p className="text-[10px] font-black text-slate-600 mt-1 uppercase tracking-wider">
+                        <p className="text-[10px] font-black text-slate-600 mt-1 uppercase tracking-widest">
                             {t('admin.dashboard.receiving_responses')}
                         </p>
                     </CardContent>
@@ -151,7 +151,7 @@ export function AdminDashboard() {
                                             <p className="font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
                                                 {study.slug}
                                             </p>
-                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-wider mt-0.5">
+                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-0.5">
                                                 {t('admin.dashboard.created')}{' '}
                                                 {formatDistanceToNow(new Date(study.created_at), {
                                                     addSuffix: true,
@@ -163,7 +163,7 @@ export function AdminDashboard() {
                                     <div className="flex items-center gap-6">
                                         <div
                                             className={cn(
-                                                'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm',
+                                                'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm',
                                                 study.state === 'active'
                                                     ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 ring-2 ring-emerald-500/20 animate-pulse-slow'
                                                     : 'bg-slate-50 text-slate-600 border border-slate-100'

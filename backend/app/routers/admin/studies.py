@@ -2,7 +2,7 @@
 
 from typing import cast
 import logging
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
@@ -10,6 +10,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
+from app.limiter import limiter
 from app.dependencies import (
     check_study_permission,
     get_current_user,
@@ -47,7 +48,9 @@ logger = logging.getLogger(__name__)
 
 
 @router.post("", response_model=StudyRead, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute")
 async def create_study(
+    request: Request,
     study: StudyCreate,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
@@ -210,7 +213,9 @@ async def get_study(
 
 
 @router.patch("/{slug}", response_model=StudyRead)
+@limiter.limit("30/minute")
 async def update_study(
+    request: Request,
     study_update: StudyUpdate,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
@@ -423,7 +428,9 @@ async def update_study(
 
 
 @router.post("/{slug}/validate", response_model=list[str])
+@limiter.limit("30/minute")
 async def validate_study(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> list[str]:
@@ -439,7 +446,9 @@ async def validate_study(
 
 
 @router.post("/{slug}/state", response_model=StudyRead)
+@limiter.limit("30/minute")
 async def change_study_state(
+    request: Request,
     new_state: StudyState,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
@@ -486,7 +495,9 @@ async def change_study_state(
 
 
 @router.post("/{slug}/reset", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute")
 async def reset_study_participants(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.owner)),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -499,7 +510,9 @@ async def reset_study_participants(
 
 
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute")
 async def delete_study(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.owner)),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -594,7 +607,9 @@ async def get_participant(
 
 
 @router.patch("/participants/{participant_id}/discard", response_model=ParticipantRead)
+@limiter.limit("30/minute")
 async def discard_participant(
+    request: Request,
     participant_id: int,
     discard_data: ParticipantDiscardUpdate,
     current_user: User = Depends(get_current_user),
@@ -785,7 +800,9 @@ async def export_study_config(
 
 
 @router.post("/validate-import", response_model=ValidationResult)
+@limiter.limit("30/minute")
 async def validate_study_import(
+    request: Request,
     config: dict,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
@@ -970,8 +987,10 @@ class StudyImportResponse(BaseModel):
 
 
 @router.post("/import", response_model=StudyImportResponse)
+@limiter.limit("30/minute")
 async def import_study_config(
-    request: StudyImportRequest,
+    request: Request,
+    import_data: StudyImportRequest,
     current_user: User = Depends(get_current_user),
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
     db: AsyncSession = Depends(get_db),
@@ -989,7 +1008,7 @@ async def import_study_config(
             detail="You need to be an Admin or Researcher in this Workspace to import a study.",
         )
 
-    config = request.config
+    config = import_data.config
     version = config.get("version")
     if version != "1.0":
         raise HTTPException(
@@ -998,12 +1017,12 @@ async def import_study_config(
         )
 
     # Check slug uniqueness
-    query = select(Study).where(Study.slug == request.new_slug)
+    query = select(Study).where(Study.slug == import_data.new_slug)
     result = await db.execute(query)
     if result.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Study with slug '{request.new_slug}' already exists",
+            detail=f"Study with slug '{import_data.new_slug}' already exists",
         )
 
     study_data = config.get("study", {}).copy()
@@ -1013,7 +1032,7 @@ async def import_study_config(
         from app.models import StudyTranslation, Statement, StatementTranslation
 
         db_study = Study(
-            slug=request.new_slug,
+            slug=import_data.new_slug,
             workspace_id=workspace.id,
             state=StudyState.draft,
             grid_config=study_data.get("grid_config"),
@@ -1095,7 +1114,9 @@ async def import_study_config(
 
 
 @router.delete("/{slug}/test-runs", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute")
 async def clear_test_runs(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ):
@@ -1115,7 +1136,9 @@ async def clear_test_runs(
 
 
 @router.delete("/{slug}/participants", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute")
 async def clear_all_participants(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ):

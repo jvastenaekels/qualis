@@ -3936,6 +3936,253 @@ export function useExportParticipantJsonApiAdminStudiesSlugParticipantsParticipa
 }
 
 /**
+ * Export all audio recordings for a participant as a ZIP with metadata.
+ * @summary Export Participant Audio
+ */
+export const exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet = (
+    slug: string,
+    participantId: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<unknown>({
+        url: `/api/admin/studies/${slug}/participants/${participantId}/export/audio`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGetQueryKey =
+    (slug?: string, participantId?: number) => {
+        return [`/api/admin/studies/${slug}/participants/${participantId}/export/audio`] as const;
+    };
+
+export const getExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGetQueryOptions =
+    <
+        TData = Awaited<
+            ReturnType<
+                typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+            >
+        >,
+        TError = HTTPValidationError,
+    >(
+        slug: string,
+        participantId: number,
+        options?: {
+            query?: Partial<
+                UseQueryOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                        >
+                    >,
+                    TError,
+                    TData
+                >
+            >;
+        }
+    ) => {
+        const { query: queryOptions } = options ?? {};
+
+        const queryKey =
+            queryOptions?.queryKey ??
+            getExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGetQueryKey(
+                slug,
+                participantId
+            );
+
+        const queryFn: QueryFunction<
+            Awaited<
+                ReturnType<
+                    typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                >
+            >
+        > = ({ signal }) =>
+            exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet(
+                slug,
+                participantId,
+                signal
+            );
+
+        return {
+            queryKey,
+            queryFn,
+            enabled: !!(slug && participantId),
+            ...queryOptions,
+        } as UseQueryOptions<
+            Awaited<
+                ReturnType<
+                    typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                >
+            >,
+            TError,
+            TData
+        > & { queryKey: DataTag<QueryKey, TData, TError> };
+    };
+
+export type ExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGetQueryResult =
+    NonNullable<
+        Awaited<
+            ReturnType<
+                typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+            >
+        >
+    >;
+export type ExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGetQueryError =
+    HTTPValidationError;
+
+export function useExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Export Participant Audio
+ */
+
+export function useExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet<
+    TData = Awaited<
+        ReturnType<
+            typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+        >
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    participantId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions =
+        getExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGetQueryOptions(
+            slug,
+            participantId,
+            options
+        );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * Get complete research package (ZIP) including CSV, JSON, codebook, etc.
  * @summary Get Research Package
  */
@@ -10074,6 +10321,25 @@ export const getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantI
         );
     };
 
+export const getExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGetMockHandler =
+    (
+        overrideResponse?:
+            | unknown
+            | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+        options?: RequestHandlerOptions
+    ) => {
+        return http.get(
+            '*/api/admin/studies/:slug/participants/:participantId/export/audio',
+            async (info) => {
+                if (typeof overrideResponse === 'function') {
+                    await overrideResponse(info);
+                }
+                return new HttpResponse(null, { status: 200 });
+            },
+            options
+        );
+    };
+
 export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -10820,6 +11086,7 @@ export const getLibreQAPIMock = () => [
     getGetStudyDumpApiAdminStudiesSlugDumpGetMockHandler(),
     getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGetMockHandler(),
     getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetMockHandler(),
+    getExportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGetMockHandler(),
     getGetResearchPackageApiAdminStudiesSlugExportPackageGetMockHandler(),
     getVerifyInvitationApiAdminInvitationsVerifyGetMockHandler(),
     getAcceptInvitationApiAdminInvitationsAcceptPostMockHandler(),

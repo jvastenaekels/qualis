@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,11 +10,19 @@ from app.routers.admin.users import create_user, delete_user
 from fastapi import HTTPException, status
 
 
+def _mock_request():
+    """Create a minimal mock Request for rate-limited endpoints."""
+    req = MagicMock()
+    req.state = MagicMock()
+    return req
+
+
 @pytest.mark.asyncio
 async def test_create_user_success(db: AsyncSession):
     """Test successful user creation by an admin."""
     user_in = UserCreate(
         email="newuser@example.com",
+        full_name=None,
         password="securepassword",
         is_active=True,
         is_superuser=False,
@@ -21,7 +31,9 @@ async def test_create_user_success(db: AsyncSession):
     # Mock check_superuser dependency returning an admin user
     admin_user = User(id=1, email="admin@example.com", is_superuser=True)
 
-    result = await create_user(user_in=user_in, db=db, _admin=admin_user)
+    result = await create_user(
+        request=_mock_request(), user_in=user_in, db=db, _admin=admin_user
+    )
 
     assert result.email == "newuser@example.com"
     assert result.is_superuser is False
@@ -48,13 +60,18 @@ async def test_create_duplicate_user_fails(db: AsyncSession):
     await db.commit()
 
     user_in = UserCreate(
-        email="duplicate@example.com", password="newpassword", is_active=True
+        email="duplicate@example.com",
+        full_name=None,
+        password="newpassword",
+        is_active=True,
     )
 
     admin_user = User(id=1, is_superuser=True)
 
     with pytest.raises(HTTPException) as excinfo:
-        await create_user(user_in=user_in, db=db, _admin=admin_user)
+        await create_user(
+            request=_mock_request(), user_in=user_in, db=db, _admin=admin_user
+        )
 
     assert excinfo.value.status_code == status.HTTP_400_BAD_REQUEST
     assert "already exists" in excinfo.value.detail
@@ -74,7 +91,9 @@ async def test_delete_user_success(db: AsyncSession):
 
     admin_user = User(id=999, is_superuser=True)  # Use a far-off ID to avoid collision
 
-    await delete_user(user_id=target_user.id, db=db, current_user=admin_user)
+    await delete_user(
+        request=_mock_request(), user_id=target_user.id, db=db, current_user=admin_user
+    )
 
     # Verify deleted
     db_result = await db.execute(select(User).where(User.id == target_user.id))
@@ -95,7 +114,12 @@ async def test_delete_self_fails(db: AsyncSession):
     await db.refresh(admin_user)
 
     with pytest.raises(HTTPException) as excinfo:
-        await delete_user(user_id=admin_user.id, db=db, current_user=admin_user)
+        await delete_user(
+            request=_mock_request(),
+            user_id=admin_user.id,
+            db=db,
+            current_user=admin_user,
+        )
 
     assert excinfo.value.status_code == status.HTTP_400_BAD_REQUEST
     assert "own account" in excinfo.value.detail

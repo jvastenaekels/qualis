@@ -61,11 +61,15 @@ async def lifespan(app: FastAPI):
         # raise
 
     # Production Readiness Checks
-    if os.getenv("DATABASE_URL", "").startswith("postgre"):
-        salt = os.getenv("IP_HASH_SALT")
-        if not salt or salt == "default-salt-allow-override-in-prod":
-            logger.warning(
-                "CRITICAL SECURITY WARNING: IP_HASH_SALT is missing or using default value in production!"
+    if settings.ENVIRONMENT != "development":
+        if settings.SECRET_KEY == "CHANGEME-insecure-dev-only":
+            logger.critical(
+                "SECRET_KEY is using the insecure default! Set a strong random SECRET_KEY in environment variables."
+            )
+
+        if settings.IP_HASH_SALT == "CHANGEME-insecure-dev-only":
+            logger.critical(
+                "IP_HASH_SALT is using the insecure default! Set a unique IP_HASH_SALT in environment variables."
             )
 
         logger.info("Production environment detected. Security checks completed.")

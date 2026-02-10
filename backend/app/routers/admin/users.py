@@ -1,11 +1,12 @@
 """API router for administrative user management."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...database import get_db
 from ...dependencies import get_current_user
+from ...limiter import limiter
 from ...models import User
 from ...schemas import UserCreate, UserRead
 from ...utils.security import get_password_hash
@@ -34,7 +35,9 @@ async def list_users(
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute")
 async def create_user(
+    request: Request,
     user_in: UserCreate,
     db: AsyncSession = Depends(get_db),
     _admin: User = Depends(check_superuser),
@@ -61,7 +64,9 @@ async def create_user(
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute")
 async def delete_user(
+    request: Request,
     user_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(check_superuser),

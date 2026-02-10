@@ -162,6 +162,34 @@ class StorageService:
             logger.error("Presigned URL generation failed for key %s: %s", s3_key, e)
             raise HTTPException(status_code=500, detail="Failed to generate audio URL")
 
+    async def download_object(self, s3_key: str) -> bytes:
+        """
+        Download an object from S3 and return its bytes.
+
+        Args:
+            s3_key: S3 object key
+
+        Returns:
+            Object content as bytes
+
+        Raises:
+            HTTPException: If object not found or download fails
+        """
+        try:
+            loop = asyncio.get_running_loop()
+            response = await loop.run_in_executor(
+                None,
+                lambda: self.s3_client.get_object(Bucket=self.bucket_name, Key=s3_key),
+            )
+            return response["Body"].read()
+        except ClientError as e:
+            error_code = e.response.get("Error", {}).get("Code", "")
+            if error_code == "NoSuchKey":
+                logger.warning("S3 object not found: %s", s3_key)
+                raise HTTPException(status_code=404, detail="Audio file not found")
+            logger.error("S3 download failed for key %s: %s", s3_key, e)
+            raise HTTPException(status_code=500, detail="Audio download failed")
+
     async def delete_audio(self, s3_key: str) -> None:
         """
         Delete audio file from S3.

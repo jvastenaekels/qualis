@@ -1,28 +1,38 @@
 """API router for study data exports."""
 
 import io
+import json
+import logging
+import zipfile
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from ...database import get_db
+from ...limiter import limiter
 from ...dependencies import check_study_permission
 from ...models import (
+    AudioRecording,
     Participant,
     Statement,
     Study,
     StudyRole,
 )
 from ...services.export_service import ExportService
+from ...services.storage_service import get_storage_service
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["Admin Exports"])
 
 
 @router.get("/{slug}/export/csv")
+@limiter.limit("10/minute")
 async def export_csv(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ):
@@ -32,7 +42,7 @@ async def export_csv(
     # Fetch participants with all relations needed for export
     query = (
         select(Participant)
-        .where(Participant.study_id == study.id)
+        .where(Participant.study_id == study.id, Participant.is_discarded.is_(False))
         .options(
             selectinload(Participant.qsort_entries),
             selectinload(Participant.audio_recordings),
@@ -61,7 +71,9 @@ async def export_csv(
 
 
 @router.get("/{slug}/export/pqmethod")
+@limiter.limit("10/minute")
 async def export_pqmethod(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ):
@@ -79,7 +91,7 @@ async def export_pqmethod(
 
     query = (
         select(Participant)
-        .where(Participant.study_id == study.id)
+        .where(Participant.study_id == study.id, Participant.is_discarded.is_(False))
         .options(
             selectinload(Participant.qsort_entries),
             selectinload(Participant.audio_recordings),
@@ -98,7 +110,9 @@ async def export_pqmethod(
 
 
 @router.get("/{slug}/export/r-kit")
+@limiter.limit("10/minute")
 async def export_r_kit(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ):
@@ -135,7 +149,9 @@ async def export_r_kit(
 
 
 @router.get("/{slug}/dump")
+@limiter.limit("10/minute")
 async def get_study_dump(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ):
@@ -146,7 +162,9 @@ async def get_study_dump(
 
 
 @router.get("/{slug}/participants/{participant_id}/export/csv")
+@limiter.limit("10/minute")
 async def export_participant_csv(
+    request: Request,
     participant_id: int,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
@@ -170,8 +188,6 @@ async def export_participant_csv(
     participant = participant_res.scalar_one_or_none()
 
     if not participant:
-        from fastapi import HTTPException
-
         raise HTTPException(status_code=404, detail="Participant not found")
 
     # Ensure study.statements are loaded
@@ -195,7 +211,9 @@ async def export_participant_csv(
 
 
 @router.get("/{slug}/participants/{participant_id}/export/json")
+@limiter.limit("10/minute")
 async def export_participant_json(
+    request: Request,
     participant_id: int,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
@@ -213,8 +231,6 @@ async def export_participant_json(
     )
 
     if not participant:
-        from fastapi import HTTPException
-
         raise HTTPException(status_code=404, detail="Participant not found")
 
     return {
@@ -224,8 +240,101 @@ async def export_participant_json(
     }
 
 
+@router.get("/{slug}/participants/{participant_id}/export/audio")
+@limiter.limit("10/minute")
+async def export_participant_audio(
+    request: Request,
+    participant_id: int,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Export all audio recordings for a participant as a ZIP with metadata."""
+    # Fetch participant with audio recordings
+    query = (
+        select(Participant)
+        .where(
+            Participant.id == participant_id,
+            Participant.study_id == study.id,
+        )
+        .options(selectinload(Participant.audio_recordings))
+    )
+    participant_res = await db.execute(query)
+    participant = participant_res.scalar_one_or_none()
+
+    if not participant:
+        raise HTTPException(status_code=404, detail="Participant not found")
+
+    recordings: list[AudioRecording] = list(participant.audio_recordings)
+    if not recordings:
+        raise HTTPException(
+            status_code=404, detail="No audio recordings for this participant"
+        )
+
+    storage = get_storage_service()
+
+    # Build ZIP in memory
+    zip_buffer = io.BytesIO()
+    metadata_entries = []
+
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+        for recording in recordings:
+            ext = _mime_to_extension(recording.mime_type)
+            filename = f"{recording.question_key}{ext}"
+
+            try:
+                audio_bytes = await storage.download_object(recording.s3_key)
+                zf.writestr(filename, audio_bytes)
+            except HTTPException:
+                logger.warning(
+                    "Skipping missing S3 object %s for participant %d",
+                    recording.s3_key,
+                    participant_id,
+                )
+                continue
+
+            metadata_entries.append(
+                {
+                    "question_key": recording.question_key,
+                    "filename": filename,
+                    "duration_seconds": recording.duration_seconds,
+                    "file_size_bytes": recording.file_size_bytes,
+                    "mime_type": recording.mime_type,
+                    "created_at": recording.created_at.isoformat()
+                    if recording.created_at
+                    else None,
+                }
+            )
+
+        zf.writestr("metadata.json", json.dumps(metadata_entries, indent=2))
+
+    zip_buffer.seek(0)
+    slug = study.slug
+
+    return StreamingResponse(
+        zip_buffer,
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f"attachment; filename={slug}_participant_{participant_id}_audio.zip"
+        },
+    )
+
+
+def _mime_to_extension(mime_type: str) -> str:
+    """Map MIME type to file extension."""
+    mapping = {
+        "audio/webm": ".webm",
+        "video/webm": ".webm",
+        "audio/mp4": ".m4a",
+        "audio/mpeg": ".mp3",
+        "audio/ogg": ".ogg",
+    }
+    return mapping.get(mime_type, ".webm")
+
+
 @router.get("/{slug}/export/package")
+@limiter.limit("10/minute")
 async def get_research_package(
+    request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ):

@@ -20,6 +20,6 @@ def hash_ip(ip_address: str) -> str:
             raise ValueError(
                 "IP_HASH_SALT environment variable MUST be set in production for privacy."
             )
-        salt = "default-salt-allow-override-in-prod"
+        salt = "CHANGEME-insecure-dev-only"
 
     return hashlib.sha256(f"{ip_address}{salt}".encode()).hexdigest()[:64]

@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
 from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 import logging
 
+from app.limiter import limiter
 from app.dependencies import (
     check_workspace_permission,
     get_current_active_user,
@@ -56,7 +57,9 @@ async def list_workspaces(
 
 
 @router.post("", response_model=WorkspaceRead, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute")
 async def create_workspace(
+    request: Request,
     workspace_in: WorkspaceCreate,
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
@@ -150,7 +153,9 @@ async def get_workspace(
 
 
 @router.patch("/{slug}", response_model=WorkspaceRead)
+@limiter.limit("30/minute")
 async def update_workspace(
+    request: Request,
     workspace_in: WorkspaceUpdate,
     workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
     db: AsyncSession = Depends(get_db),
@@ -224,7 +229,9 @@ async def list_workspace_members(
 
 
 @router.patch("/{slug}/members/{user_id}", response_model=WorkspaceMemberRead)
+@limiter.limit("30/minute")
 async def update_workspace_member(
+    request: Request,
     user_id: int,
     member_in: WorkspaceMemberUpdate,
     workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
@@ -264,7 +271,9 @@ async def update_workspace_member(
 
 
 @router.delete("/{slug}/members/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute")
 async def remove_workspace_member(
+    request: Request,
     user_id: int,
     workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
     current_user: User = Depends(get_current_active_user),
@@ -303,7 +312,9 @@ async def remove_workspace_member(
 
 
 @router.delete("/{slug}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("30/minute")
 async def delete_workspace(
+    request: Request,
     workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),
     db: AsyncSession = Depends(get_db),
 ):
@@ -341,7 +352,9 @@ async def delete_workspace(
 
 
 @router.post("/{slug}/invitations", response_model=InvitationLink)
+@limiter.limit("30/minute")
 async def create_invitation(
+    request: Request,
     invitation_in: WorkspaceInvitationCreate,
     background_tasks: BackgroundTasks,
     workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.owner)),

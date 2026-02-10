@@ -66,6 +66,7 @@ export function CreateStudyDialog({ open, onOpenChange, workspaceSlug }: CreateS
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
+        mode: 'onBlur',
         defaultValues: {
             title: '',
             slug: '',
@@ -181,7 +182,7 @@ export function CreateStudyDialog({ open, onOpenChange, workspaceSlug }: CreateS
                             name="title"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">
                                         {t('admin.dialogs.create_study.study_title', 'Study Title')}
                                     </FormLabel>
                                     <FormControl>
@@ -204,7 +205,7 @@ export function CreateStudyDialog({ open, onOpenChange, workspaceSlug }: CreateS
                             name="slug"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">
                                         {t('admin.dialogs.create_study.url_slug', 'URL Slug')}
                                     </FormLabel>
                                     <FormControl>
@@ -228,7 +229,7 @@ export function CreateStudyDialog({ open, onOpenChange, workspaceSlug }: CreateS
                             render={() => (
                                 <FormItem>
                                     <div className="mb-4">
-                                        <FormLabel className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        <FormLabel className="text-[10px] font-black uppercase tracking-widest text-slate-500">
                                             {t('admin.dialogs.create_study.languages', 'Languages')}
                                         </FormLabel>
                                         <p className="text-[11px] font-medium text-slate-400 mt-1">

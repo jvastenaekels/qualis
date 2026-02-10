@@ -689,7 +689,10 @@
             "logout": "Déconnexion",
             "search_label": "Chercher ou lancer des commandes",
             "to_open": "pour ouvrir",
-            "active": "Actif"
+            "active": "Actif",
+            "link_copied": "Lien de l'étude copié !",
+            "logged_out": "Déconnexion réussie",
+            "switched_workspace": "Basculé vers {{name}}"
         },
         "dashboard": {
             "title": "Tableau de bord de l'espace",
@@ -730,6 +733,9 @@
             "label": "Exporter les données",
             "success": "Export réussi",
             "error": "Échec de l'export",
+            "csv": "Exporter CSV",
+            "json": "Exporter JSON",
+            "audio": "Exporter Audio (ZIP)",
             "formats": {
                 "csv": "CSV",
                 "pqmethod": "PQMethod (ZIP)",
@@ -1410,7 +1416,6 @@
                 "abandoned_count": "{{count}} abandonné(s)",
                 "interview_interested": "Accord pour entretien",
                 "interview": "Entretiens",
-                "newsletter_interested": "Intérêt pour la newsletter",
                 "email": "Emails"
             },
             "tabs": {
@@ -1470,7 +1475,7 @@
                 "has_comments": "Contient des commentaires du participant sur les cartes",
                 "has_audio": "A des réponses audio",
                 "email_provided": "Email fourni",
-                "newsletter_consent": "Accepte la newsletter",
+                "newsletter_consent": "Souhaite recevoir les résultats",
                 "interview_consent": "Ouvert à un entretien de suivi"
             },
             "detail": {

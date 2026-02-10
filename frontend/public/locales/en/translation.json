@@ -697,7 +697,10 @@
             "logout": "Log out",
             "search_label": "Search or run commands",
             "to_open": "To open",
-            "active": "Active"
+            "active": "Active",
+            "link_copied": "Study link copied!",
+            "logged_out": "Logged out successfully",
+            "switched_workspace": "Switched to {{name}}"
         },
         "dashboard": {
             "title": "Workspace dashboard",
@@ -738,6 +741,9 @@
             "label": "Export data",
             "success": "Export successful",
             "error": "Export failed",
+            "csv": "Export CSV",
+            "json": "Export JSON",
+            "audio": "Export Audio (ZIP)",
             "formats": {
                 "csv": "CSV",
                 "pqmethod": "PQMethod (ZIP)",
@@ -1380,7 +1386,6 @@
                 "abandoned_count": "{{count}} abandoned",
                 "interview_interested": "Accepted follow-up",
                 "interview": "Interviews",
-                "newsletter_interested": "Newsletter interest",
                 "email": "Emails"
             },
             "tabs": {
@@ -1440,7 +1445,7 @@
                 "has_comments": "Contains participant comments on cards",
                 "has_audio": "Has audio responses",
                 "email_provided": "Email provided",
-                "newsletter_consent": "Newsletter opt-in",
+                "newsletter_consent": "Wants to receive results",
                 "interview_consent": "Open to follow-up interview"
             },
             "detail": {

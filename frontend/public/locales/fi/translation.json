@@ -689,7 +689,10 @@
             "logout": "Kirjaudu ulos",
             "search_label": "Hae tai suorita komentoja",
             "to_open": "avataksesi",
-            "active": "Aktiivinen"
+            "active": "Aktiivinen",
+            "link_copied": "Tutkimuksen linkki kopioitu!",
+            "logged_out": "Uloskirjautuminen onnistui",
+            "switched_workspace": "Vaihdettu tilaan {{name}}"
         },
         "dashboard": {
             "title": "Työtilan yhteenveto",
@@ -730,6 +733,9 @@
             "label": "Vie tiedot",
             "success": "Vienti onnistui",
             "error": "Vienti epäonnistui",
+            "csv": "Vie CSV",
+            "json": "Vie JSON",
+            "audio": "Vie ääni (ZIP)",
             "formats": {
                 "csv": "CSV",
                 "pqmethod": "PQMethod (ZIP)",
@@ -1372,7 +1378,6 @@
                 "abandoned_count": "{{count}} hylätty(ä)",
                 "interview_interested": "Avoin jatkohaastattelulle",
                 "interview": "Haastattelut",
-                "newsletter_interested": "Kiinnostunut uutiskirjeestä",
                 "email": "Sähköpostit"
             },
             "tabs": {
@@ -1432,7 +1437,7 @@
                 "has_comments": "Sisältää osallistujan kommentteja korteista",
                 "has_audio": "Sisältää äänivastauksia",
                 "email_provided": "Sähköposti annettu",
-                "newsletter_consent": "Uutiskirjeen tilaus",
+                "newsletter_consent": "Haluaa saada tulokset",
                 "interview_consent": "Avoin jatkohaastattelulle"
             },
             "detail": {

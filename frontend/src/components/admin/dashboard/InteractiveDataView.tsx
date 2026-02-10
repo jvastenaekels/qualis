@@ -164,6 +164,7 @@ function getDisplayStatus(p: DumpParticipant): 'completed' | 'in_progress' | 'ab
     return 'in_progress';
 }
 const PAGE_SIZE = 25;
+const columnHelper = createColumnHelper<DumpParticipant>();
 
 export default function InteractiveDataView({
     slug,
@@ -353,8 +354,6 @@ export default function InteractiveDataView({
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
     }, []);
-
-    const columnHelper = createColumnHelper<DumpParticipant>();
 
     const columns = useMemo(
         () => [
@@ -677,7 +676,7 @@ export default function InteractiveDataView({
                 },
             }),
         ],
-        [columnHelper, t, currentLocale]
+        [t, currentLocale]
     );
 
     const table = useReactTable({
@@ -947,8 +946,8 @@ export default function InteractiveDataView({
                                 </div>
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     {t(
-                                        'admin.data.stats.newsletter_interested',
-                                        'Newsletter interest'
+                                        'admin.data.badges.newsletter_consent',
+                                        'Wants to receive results'
                                     )}
                                 </span>
                             </div>
@@ -1105,6 +1104,10 @@ export default function InteractiveDataView({
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
                         <Input
                             placeholder={t(
+                                'admin.data.search.placeholder',
+                                'Search participants by ID, email...'
+                            )}
+                            aria-label={t(
                                 'admin.data.search.placeholder',
                                 'Search participants by ID, email...'
                             )}

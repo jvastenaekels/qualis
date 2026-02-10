@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pydantic import BaseModel
 
 from app.utils.security import decode_invitation_token
+from app.limiter import limiter
 from app.dependencies import get_current_user, get_db
 from app.models import User, WorkspaceMember, WorkspaceRole
 
@@ -49,7 +50,9 @@ class InvitationAccept(BaseModel):
 
 
 @router.post("/accept")
+@limiter.limit("30/minute")
 async def accept_invitation(
+    request: Request,
     data: InvitationAccept,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface Workspace {
     id: number;
@@ -44,6 +44,7 @@ export const useAuthStore = create<AuthState>()(
         {
             name: 'admin-auth-storage',
             version: 1,
+            storage: createJSONStorage(() => sessionStorage),
         }
     )
 );

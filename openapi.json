@@ -1601,6 +1601,64 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/participants/{participant_id}/export/audio": {
+      "get": {
+        "tags": [
+          "admin-exports",
+          "Admin Exports"
+        ],
+        "summary": "Export Participant Audio",
+        "description": "Export all audio recordings for a participant as a ZIP with metadata.",
+        "operationId": "export_participant_audio_api_admin_studies__slug__participants__participant_id__export_audio_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "participant_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Participant Id"
+            }
+          },
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/export/package": {
       "get": {
         "tags": [

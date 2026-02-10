@@ -149,6 +149,22 @@ export const AdminService = {
     },
 
     /**
+     * Export single participant audio recordings as ZIP
+     */
+    exportParticipantAudio: async (slug: string, participantId: number) => {
+        const response = await fetch(
+            `/api/admin/studies/${slug}/participants/${participantId}/export/audio`,
+            {
+                headers: {
+                    Authorization: `Bearer ${useAuthStore.getState().token}`,
+                },
+            }
+        );
+        if (!response.ok) throw new Error('Failed to export participant audio');
+        return response.blob();
+    },
+
+    /**
      * Export single participant results as JSON
      */
     exportParticipantJSON: async (slug: string, participantId: number) => {
