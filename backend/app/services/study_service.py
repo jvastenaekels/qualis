@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from ..models import (
+    AudioRecording,
     Participant,
     ParticipantStatus,
     QSortEntry,
@@ -995,8 +996,37 @@ class StudyService:
         return {"confirmation_code": confirmation_code, "id": participant.id}
 
     @staticmethod
+    async def delete_audio_files_for_study(
+        db: AsyncSession,
+        study_id: int,
+        *,
+        test_runs_only: bool = False,
+    ) -> None:
+        """Delete S3 audio files for participants of a study.
+
+        Must be called BEFORE deleting participants (DB cascade would
+        remove AudioRecording rows, orphaning S3 objects).
+        """
+        from ..services.storage_service import storage_service
+
+        query = (
+            select(AudioRecording.s3_key)
+            .join(Participant)
+            .where(Participant.study_id == study_id)
+        )
+        if test_runs_only:
+            query = query.where(Participant.is_test_run.is_(True))
+
+        result = await db.execute(query)
+        s3_keys = result.scalars().all()
+
+        for key in s3_keys:
+            await storage_service.delete_audio(key)
+
+    @staticmethod
     async def reset_study_participants(db: AsyncSession, study_id: int):
         """Delete all participants for a specific study."""
+        await StudyService.delete_audio_files_for_study(db, study_id)
         stmt = delete(Participant).where(Participant.study_id == study_id)
         await db.execute(stmt)
         await db.commit()

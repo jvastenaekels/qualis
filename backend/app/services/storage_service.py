@@ -89,7 +89,7 @@ class StorageService:
         s3_key = f"audio/{study_slug}/{participant_token}/{timestamp}_{question_key}{extension}"
 
         # Upload to S3 with retry for transient failures
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         max_retries = 2
         for attempt in range(max_retries + 1):
             try:
@@ -127,9 +127,8 @@ class StorageService:
                     )
                     await asyncio.sleep(delay)
                 else:
-                    raise HTTPException(
-                        status_code=500, detail=f"S3 upload failed: {str(e)}"
-                    )
+                    logger.error("S3 upload failed for key %s: %s", s3_key, e)
+                    raise HTTPException(status_code=500, detail="Audio upload failed")
 
         return {
             "s3_bucket": self.bucket_name,
@@ -160,9 +159,8 @@ class StorageService:
             )
             return url
         except ClientError as e:
-            raise HTTPException(
-                status_code=500, detail=f"URL generation failed: {str(e)}"
-            )
+            logger.error("Presigned URL generation failed for key %s: %s", s3_key, e)
+            raise HTTPException(status_code=500, detail="Failed to generate audio URL")
 
     async def delete_audio(self, s3_key: str) -> None:
         """
@@ -175,7 +173,7 @@ class StorageService:
             Logs but doesn't fail if file doesn't exist (idempotent operation)
         """
         try:
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             await loop.run_in_executor(
                 None,
                 lambda: self.s3_client.delete_object(

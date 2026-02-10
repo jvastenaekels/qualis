@@ -143,6 +143,8 @@ async def upload_audio(
 
     # Validate duration against study config
     max_allowed = audio_config.get("max_duration_seconds", 600)
+    if duration_seconds is not None and duration_seconds < 0:
+        raise HTTPException(status_code=400, detail="Invalid duration")
     if duration_seconds is not None and duration_seconds > max_allowed:
         raise HTTPException(
             status_code=400,
@@ -182,7 +184,7 @@ async def upload_audio(
         question_key=question_key,
     )
 
-    # Create database record
+    # Create database record — clean up S3 if commit fails to prevent orphans
     audio_recording = AudioRecording(
         participant_id=participant.id,
         question_key=question_key,
@@ -194,7 +196,11 @@ async def upload_audio(
     )
 
     db.add(audio_recording)
-    await db.commit()
+    try:
+        await db.commit()
+    except Exception:
+        await storage_service.delete_audio(s3_metadata["s3_key"])
+        raise
     await db.refresh(audio_recording)
 
     # Generate presigned URL for immediate playback
@@ -264,8 +270,12 @@ async def delete_audio_recording(
 
 
 @router.get("/{recording_id}/url", response_model=AudioRecordingRead)
+@limiter.limit("30/minute")
 async def get_audio_url(
-    recording_id: int, session_token: UUID, db: AsyncSession = Depends(get_db)
+    request: Request,
+    recording_id: int,
+    session_token: UUID,
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Get presigned URL for audio playback.

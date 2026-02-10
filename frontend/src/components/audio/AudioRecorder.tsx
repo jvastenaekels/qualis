@@ -100,7 +100,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     // Initialize with existing recording
     useEffect(() => {
         if (existingRecording) {
-            setAudioUrl(existingRecording.presigned_url);
+            // Revoke old blob URL before replacing with presigned URL (prevent memory leak)
+            setAudioUrl((prev) => {
+                if (prev?.startsWith('blob:')) URL.revokeObjectURL(prev);
+                return existingRecording.presigned_url;
+            });
             setDuration(Math.round(existingRecording.duration_seconds));
             setState('stopped');
 
@@ -522,13 +526,20 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         audio.onerror = async () => {
             console.error('Audio playback error - attempting URL refresh');
 
+            // Cancel animation frame on error
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+                animationFrameRef.current = null;
+            }
+
             // Try refreshing URL and retrying once (guard against infinite recursion)
             if (existingRecording && sessionToken && !playbackRetryRef.current) {
                 playbackRetryRef.current = true;
                 toast.info(t('audio.refreshing', 'Refreshing audio...'));
                 try {
                     await refreshPresignedUrl();
-                    if (!audioUrl.startsWith('blob:')) {
+                    // Don't retry blob URLs — they don't expire
+                    if (!isBlobUrl) {
                         playRecording();
                     }
                 } catch {
@@ -563,7 +574,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             setPlaybackPosition(audio.currentTime);
         };
 
-        audio.play();
+        audio.play().catch((error) => {
+            console.error('Audio play() rejected:', error);
+            setState('stopped');
+            setAudioLevels([0, 0, 0, 0, 0]);
+        });
         setState('playing');
     };
 

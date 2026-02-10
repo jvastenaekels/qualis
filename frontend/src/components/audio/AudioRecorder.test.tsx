@@ -108,7 +108,7 @@ describe('AudioRecorder', () => {
         // biome-ignore lint/complexity/useArrowFunction: must be constructable for `new Audio()`
         global.Audio = vi.fn(function () {
             return {
-                play: vi.fn(),
+                play: vi.fn().mockResolvedValue(undefined),
                 pause: vi.fn(),
                 onended: null,
                 onerror: null,

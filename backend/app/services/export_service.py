@@ -169,7 +169,7 @@ class ExportService:
                 # Generate fresh presigned URL (valid for 24 hours)
                 try:
                     presigned_url = storage_service.generate_presigned_url(
-                        audio_rec.s3_key, expiration=86400
+                        audio_rec.s3_key, expiration=3600
                     )
                     audio_map[audio_rec.question_key] = {
                         "url": presigned_url,

@@ -518,6 +518,10 @@ async def delete_study(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Study must be ARCHIVED before it can be deleted.",
         )
+    # Delete S3 audio files before DB cascade removes AudioRecording rows
+    from app.services.study_service import StudyService
+
+    await StudyService.delete_audio_files_for_study(db, study.id)
     await db.delete(study)
     await db.commit()
     return None
@@ -1098,7 +1102,9 @@ async def clear_test_runs(
     """Delete all participants flagged as is_test_run for this study."""
     from sqlalchemy import delete
     from app.models import Participant
+    from app.services.study_service import StudyService
 
+    await StudyService.delete_audio_files_for_study(db, study.id, test_runs_only=True)
     await db.execute(
         delete(Participant).where(
             Participant.study_id == study.id, Participant.is_test_run.is_(True)
@@ -1122,7 +1128,9 @@ async def clear_all_participants(
     from sqlalchemy import delete
 
     from app.models import Participant
+    from app.services.study_service import StudyService
 
+    await StudyService.delete_audio_files_for_study(db, study.id)
     await db.execute(delete(Participant).where(Participant.study_id == study.id))
     await db.commit()
     return None
