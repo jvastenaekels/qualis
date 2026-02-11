@@ -824,9 +824,9 @@ describe('AudioRecorder', () => {
     // ── KEYBOARD SHORTCUTS ──────────────────────────────────────────
 
     it('Space key starts recording in idle state', async () => {
-        render(<AudioRecorder {...defaultProps} />);
+        const { container } = render(<AudioRecorder {...defaultProps} />);
 
-        fireEvent.keyDown(document.body, { code: 'Space' });
+        fireEvent.keyDown(container.firstElementChild as HTMLElement, { code: 'Space' });
 
         await waitFor(() => {
             expect(navigator.mediaDevices.getUserMedia).toHaveBeenCalled();
@@ -834,9 +834,10 @@ describe('AudioRecorder', () => {
     });
 
     it('Space key stops recording in recording state', async () => {
-        await startRecordingFlow();
+        const { container } = await startRecordingFlow();
 
-        fireEvent.keyDown(document.body, { code: 'Space' });
+        // Fire on the container div (not a button — buttons handle Space natively)
+        fireEvent.keyDown(container.firstElementChild as HTMLElement, { code: 'Space' });
 
         await waitFor(() => {
             expect(capturedMediaRecorder?.stop).toHaveBeenCalled();

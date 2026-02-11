@@ -235,57 +235,54 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
     }, [selectedCardId]);
 
     // 7. Collision Strategy (Stable)
-    // 7. Collision Strategy (Stable)
-    const collisionStrategy: CollisionDetection = useCallback(
-        (args) => {
-            // 1. Priority: Direct hit via pointerWithin (cursor is exactly over the element)
-            const pointerCollisions = pointerWithin(args);
+    const collisionStrategy: CollisionDetection = useCallback((args) => {
+        // 1. Priority: Direct hit via pointerWithin (cursor is exactly over the element)
+        const pointerCollisions = pointerWithin(args);
 
-            if (pointerCollisions.length > 0) {
-                // Check for direct slot or deck hit
-                const targetContainer = pointerCollisions.find((c) => {
-                    const idStr = String(c.id);
-                    return idStr.startsWith('slot_') || idStr.startsWith('deck-');
-                });
+        if (pointerCollisions.length > 0) {
+            // Check for direct slot or deck hit
+            const targetContainer = pointerCollisions.find((c) => {
+                const idStr = String(c.id);
+                return idStr.startsWith('slot_') || idStr.startsWith('deck-');
+            });
 
-                if (targetContainer) return [targetContainer];
+            if (targetContainer) return [targetContainer];
 
-                // Check for card hit -> resolve to slot
-                const cardCollision = pointerCollisions.find((c) => {
-                    return typeof c.id === 'number' || !Number.isNaN(Number(c.id));
-                });
+            // Check for card hit -> resolve to slot
+            const cardCollision = pointerCollisions.find((c) => {
+                return typeof c.id === 'number' || !Number.isNaN(Number(c.id));
+            });
 
-                if (cardCollision) {
-                    const cardId = Number(cardCollision.id);
-                    const placed = qsort.find((p) => p.statementId === cardId);
-                    if (placed) {
-                        return [
-                            {
-                                id: `slot_${placed.col}_${placed.row}`,
-                                data: cardCollision.data,
-                            },
-                        ];
-                    }
+            if (cardCollision) {
+                const cardId = Number(cardCollision.id);
+                const currentQsort = useResponseStore.getState().qsort;
+                const placed = currentQsort.find((p) => p.statementId === cardId);
+                if (placed) {
+                    return [
+                        {
+                            id: `slot_${placed.col}_${placed.row}`,
+                            data: cardCollision.data,
+                        },
+                    ];
                 }
             }
+        }
 
-            // 2. Secondary: Rect Intersection (if cursor isn't over it, but visual overlap is significant)
-            // This helps when the 'center' is far but overlap is high (large targets)
-            const rectCollisions = rectIntersection(args);
-            if (rectCollisions.length > 0) {
-                // Prioritize slots
-                const targetContainer = rectCollisions.find((c) => {
-                    const idStr = String(c.id);
-                    return idStr.startsWith('slot_');
-                });
-                if (targetContainer) return [targetContainer];
-            }
+        // 2. Secondary: Rect Intersection (if cursor isn't over it, but visual overlap is significant)
+        // This helps when the 'center' is far but overlap is high (large targets)
+        const rectCollisions = rectIntersection(args);
+        if (rectCollisions.length > 0) {
+            // Prioritize slots
+            const targetContainer = rectCollisions.find((c) => {
+                const idStr = String(c.id);
+                return idStr.startsWith('slot_');
+            });
+            if (targetContainer) return [targetContainer];
+        }
 
-            // 3. Fallback to closest center (good for gaps)
-            return closestCenter(args);
-        },
-        [qsort]
-    );
+        // 3. Fallback to closest center (good for gaps)
+        return closestCenter(args);
+    }, []);
 
     // 9. Memoized render function for slot content
     const showCodes = config?.show_statement_codes ?? false;

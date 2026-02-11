@@ -20,7 +20,12 @@ export const useConfigStore = create<ConfigState>((set) => ({
     error: null,
     refetchTag: 0,
 
-    setConfig: (config) => set({ config, isLoading: false, error: null }),
+    setConfig: (config) =>
+        set({
+            config: config ? { ...config, grid_config: config.grid_config ?? [] } : config,
+            isLoading: false,
+            error: null,
+        }),
     setLoading: (isLoading) => set({ isLoading }),
     setError: (error) => set({ error, isLoading: false }),
     triggerRefetch: () => set((state) => ({ refetchTag: state.refetchTag + 1 })),

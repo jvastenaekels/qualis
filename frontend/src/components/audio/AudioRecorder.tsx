@@ -56,6 +56,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     const permissionCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
     const durationRef = useRef(0);
+    const startTimeRef = useRef<number>(0);
     const [audioLevels, setAudioLevels] = useState<number[]>([0, 0, 0, 0, 0]);
     const [urlExpiresAt, setUrlExpiresAt] = useState<number | null>(null);
     const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0);
@@ -65,6 +66,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     );
     const pendingBlobRef = useRef<Blob | null>(null);
     const playbackRetryRef = useRef(false);
+    const containerRef = useRef<HTMLDivElement>(null);
     const refreshFailCountRef = useRef(0);
 
     // Keep refs in sync so callbacks in stale closures read current values
@@ -220,11 +222,12 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
         if (disabled) return;
 
         const handleKeyDown = (event: KeyboardEvent) => {
-            // Only handle if Space is pressed and not in an input field
+            // Only handle Space when focus is within this AudioRecorder's container
             if (
                 event.code === 'Space' &&
                 event.target instanceof HTMLElement &&
-                !['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName)
+                !['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(event.target.tagName) &&
+                containerRef.current?.contains(event.target)
             ) {
                 event.preventDefault();
 
@@ -279,12 +282,17 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             audioContextRef.current = audioContext;
             analyserRef.current = analyser;
 
-            // Animate waveform
+            // Animate waveform (throttled to ~10fps to match CSS transition-duration-100)
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            let lastWaveformUpdate = 0;
             const updateWaveform = () => {
                 if (analyserRef.current) {
-                    analyserRef.current.getByteFrequencyData(dataArray);
-                    setAudioLevels(Array.from(dataArray.slice(0, 5)));
+                    const now = performance.now();
+                    if (now - lastWaveformUpdate >= 100) {
+                        lastWaveformUpdate = now;
+                        analyserRef.current.getByteFrequencyData(dataArray);
+                        setAudioLevels(Array.from(dataArray.slice(0, 5)));
+                    }
                     animationFrameRef.current = requestAnimationFrame(updateWaveform);
                 }
             };
@@ -418,18 +426,17 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 }, 2000);
             }
 
-            // Start timer
+            // Start timer — use wall-clock baseline so device sleep doesn't cause drift
+            startTimeRef.current = Date.now();
             timerRef.current = setInterval(() => {
-                setDuration((prev) => {
-                    const newDuration = prev + 1;
+                const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+                setDuration(elapsed);
+                durationRef.current = elapsed;
 
-                    // Auto-stop at max duration
-                    if (newDuration >= maxDurationSeconds) {
-                        stopRecording();
-                    }
-
-                    return newDuration;
-                });
+                // Auto-stop at max duration
+                if (elapsed >= maxDurationSeconds) {
+                    stopRecording();
+                }
             }, 1000);
         } catch (error) {
             console.error('Microphone access denied:', error);
@@ -485,6 +492,14 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             }
         }
 
+        // Clean up previous Audio element to prevent orphaned playback
+        if (audioPlayerRef.current) {
+            audioPlayerRef.current.pause();
+            audioPlayerRef.current.onended = null;
+            audioPlayerRef.current.onerror = null;
+            audioPlayerRef.current.ontimeupdate = null;
+        }
+
         // Re-read ref after potential refresh
         const urlToPlay = audioUrlRef.current || currentUrl;
         const audio = new Audio(urlToPlay);
@@ -521,10 +536,15 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             analyserRef.current = analyser;
 
             const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            let lastUpdate = 0;
             const updateWaveform = () => {
                 if (analyserRef.current && stateRef.current === 'playing') {
-                    analyserRef.current.getByteFrequencyData(dataArray);
-                    setAudioLevels(Array.from(dataArray.slice(0, 5)));
+                    const now = performance.now();
+                    if (now - lastUpdate >= 100) {
+                        lastUpdate = now;
+                        analyserRef.current.getByteFrequencyData(dataArray);
+                        setAudioLevels(Array.from(dataArray.slice(0, 5)));
+                    }
                     animationFrameRef.current = requestAnimationFrame(updateWaveform);
                 }
             };
@@ -534,15 +554,20 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             audioContextRef.current = null;
             analyserRef.current = null;
 
+            let lastSimUpdate = 0;
             const updateSimulatedWaveform = () => {
                 if (stateRef.current === 'playing') {
-                    const now = Date.now();
-                    const levels = Array.from({ length: 5 }, (_, i) => {
-                        return Math.round(
-                            80 + Math.sin(now / 200 + i * 1.5) * 60 + Math.sin(now / 350 + i) * 40
-                        );
-                    });
-                    setAudioLevels(levels);
+                    const now = performance.now();
+                    if (now - lastSimUpdate >= 100) {
+                        lastSimUpdate = now;
+                        const t = Date.now();
+                        const levels = Array.from({ length: 5 }, (_, i) => {
+                            return Math.round(
+                                80 + Math.sin(t / 200 + i * 1.5) * 60 + Math.sin(t / 350 + i) * 40
+                            );
+                        });
+                        setAudioLevels(levels);
+                    }
                     animationFrameRef.current = requestAnimationFrame(updateSimulatedWaveform);
                 }
             };
@@ -672,6 +697,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             setState('idle');
             setUploadStatus('idle');
             pendingBlobRef.current = null;
+            playbackRetryRef.current = false;
 
             toast.success(t('audio.deleted', 'Audio deleted'));
         } catch (error) {
@@ -691,7 +717,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     };
 
     return (
-        <div>
+        <div ref={containerRef}>
             {/* Idle: subtle inline link */}
             {state === 'idle' && (
                 <button
@@ -714,9 +740,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                         type="button"
                         onClick={stopRecording}
                         aria-label={t('audio.stop', 'Stop')}
-                        className="p-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors shrink-0 shadow-sm"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors shrink-0 shadow-sm text-xs font-medium"
                     >
-                        <Square className="w-3.5 h-3.5" />
+                        <Square className="w-3 h-3" fill="currentColor" strokeWidth={0} />
+                        {t('audio.stop', 'Stop')}
                     </button>
                     <span className="relative flex h-2 w-2 shrink-0">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />

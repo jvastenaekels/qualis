@@ -33,10 +33,10 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
           : 'fine.workbench.active_card';
 
     // Scroll indicator logic
-    // Scroll indicator logic
     const textRef = React.useRef<HTMLDivElement>(null);
     const [hasOverflow, setHasOverflow] = React.useState(false);
 
+    // biome-ignore lint/correctness/useExhaustiveDependencies: displayCard?.text triggers re-measurement of textRef overflow
     React.useEffect(() => {
         const checkOverflow = () => {
             if (textRef.current) {
@@ -54,7 +54,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
             window.removeEventListener('resize', checkOverflow);
             clearTimeout(timer);
         };
-    }, []); // Re-run when text or translation changes
+    }, [displayCard?.text]);
 
     const ScrollIndicator = () => (
         <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-indigo-50 via-indigo-50/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-xl z-10 transition-opacity duration-300">

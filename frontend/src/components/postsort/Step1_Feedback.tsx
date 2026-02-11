@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -71,19 +71,23 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     );
 
     // --- Data Preparation ---
-    const extremeCards = qsort
-        .filter((p) => {
-            const colDef = gridColumns[p.col];
-            if (!colDef) return false;
-            return extremeCols.includes(colDef.score);
-        })
-        .sort((a, b) => {
-            // Sort by score (asc) then row
-            const scoreA = gridColumns[a.col].score;
-            const scoreB = gridColumns[b.col].score;
-            if (scoreA !== scoreB) return scoreA - scoreB;
-            return a.row - b.row;
-        });
+    const extremeCards = useMemo(
+        () =>
+            qsort
+                .filter((p) => {
+                    const colDef = gridColumns[p.col];
+                    if (!colDef) return false;
+                    return extremeCols.includes(colDef.score);
+                })
+                .sort((a, b) => {
+                    // Sort by score (asc) then row
+                    const scoreA = gridColumns[a.col].score;
+                    const scoreB = gridColumns[b.col].score;
+                    if (scoreA !== scoreB) return scoreA - scoreB;
+                    return a.row - b.row;
+                }),
+        [qsort, gridColumns, extremeCols]
+    );
 
     // --- Helpers ---
     const getCardText = (id: number) =>
@@ -112,97 +116,106 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const isPilotMode = useSessionStore((state) => state.isPilotMode);
 
     // --- Audio Handlers ---
-    const handleAudioUpload = async (questionKey: string, blob: Blob, duration: number) => {
-        // Pilot mode: store fake metadata locally, skip backend upload
-        if (isPilotMode) {
-            // Revoke previous blob URL if replacing a recording (prevent memory leak)
-            const existing = getAudioRecording(questionKey);
-            if (existing?.presigned_url?.startsWith('blob:')) {
-                URL.revokeObjectURL(existing.presigned_url);
+    const performAudioUpload = useCallback(
+        async (questionKey: string, blob: Blob, duration: number) => {
+            setUploadingKeys((prev) => new Set(prev).add(questionKey));
+            try {
+                // Create File from Blob (orval expects File, not Blob)
+                const extension = blob.type.includes('mp4') ? 'mp4' : 'webm';
+                const file = new File([blob], `recording_${Date.now()}.${extension}`, {
+                    type: blob.type,
+                });
+
+                if (!token) {
+                    throw new Error('Session token missing');
+                }
+
+                const response = await uploadAudioApiAudioUploadPost({
+                    file,
+                    session_token: token,
+                    question_key: questionKey,
+                    duration_seconds: duration,
+                });
+
+                // Store metadata in Zustand with expiration timestamp
+                setAudioRecording(questionKey, {
+                    id: response.recording_id,
+                    question_key: questionKey,
+                    file_size_bytes: response.file_size_bytes,
+                    duration_seconds: duration,
+                    presigned_url: response.presigned_url,
+                    created_at: new Date().toISOString(),
+                    url_expires_at: new Date(Date.now() + 3600 * 1000).toISOString(), // 1 hour from now
+                });
+            } catch (error) {
+                console.error('Audio upload failed:', error);
+                throw error; // Let AudioRecorder show inline status icon
+            } finally {
+                setUploadingKeys((prev) => {
+                    const next = new Set(prev);
+                    next.delete(questionKey);
+                    return next;
+                });
             }
-            setAudioRecording(questionKey, {
-                id: -1,
-                question_key: questionKey,
-                file_size_bytes: blob.size,
-                duration_seconds: duration,
-                presigned_url: URL.createObjectURL(blob),
-                created_at: new Date().toISOString(),
-                url_expires_at: undefined,
-            });
-            return;
-        }
+        },
+        [token, setAudioRecording]
+    );
 
-        if (!token) {
-            toast.error(t('audio.error.no_token', 'Session token missing'));
-            return;
-        }
-        await performAudioUpload(questionKey, blob, duration);
-    };
-
-    const performAudioUpload = async (questionKey: string, blob: Blob, duration: number) => {
-        setUploadingKeys((prev) => new Set(prev).add(questionKey));
-        try {
-            // Create File from Blob (orval expects File, not Blob)
-            const extension = blob.type.includes('mp4') ? 'mp4' : 'webm';
-            const file = new File([blob], `recording_${Date.now()}.${extension}`, {
-                type: blob.type,
-            });
+    const handleAudioUpload = useCallback(
+        async (questionKey: string, blob: Blob, duration: number) => {
+            // Pilot mode: store fake metadata locally, skip backend upload
+            if (isPilotMode) {
+                // Revoke previous blob URL if replacing a recording (prevent memory leak)
+                const existing = getAudioRecording(questionKey);
+                if (existing?.presigned_url?.startsWith('blob:')) {
+                    URL.revokeObjectURL(existing.presigned_url);
+                }
+                setAudioRecording(questionKey, {
+                    id: -1,
+                    question_key: questionKey,
+                    file_size_bytes: blob.size,
+                    duration_seconds: duration,
+                    presigned_url: URL.createObjectURL(blob),
+                    created_at: new Date().toISOString(),
+                    url_expires_at: undefined,
+                });
+                return;
+            }
 
             if (!token) {
-                throw new Error('Session token missing');
+                toast.error(t('audio.error.no_token', 'Session token missing'));
+                return;
+            }
+            await performAudioUpload(questionKey, blob, duration);
+        },
+        [isPilotMode, getAudioRecording, setAudioRecording, token, t, performAudioUpload]
+    );
+
+    const handleAudioDelete = useCallback(
+        async (questionKey: string) => {
+            const recording = getAudioRecording(questionKey);
+            if (!recording) return;
+
+            // Pilot mode: just clear local state, no backend call
+            if (isPilotMode) {
+                deleteAudioRecording(questionKey);
+                return;
             }
 
-            const response = await uploadAudioApiAudioUploadPost({
-                file,
-                session_token: token,
-                question_key: questionKey,
-                duration_seconds: duration,
-            });
+            if (!token) return;
 
-            // Store metadata in Zustand with expiration timestamp
-            setAudioRecording(questionKey, {
-                id: response.recording_id,
-                question_key: questionKey,
-                file_size_bytes: response.file_size_bytes,
-                duration_seconds: duration,
-                presigned_url: response.presigned_url,
-                created_at: new Date().toISOString(),
-                url_expires_at: new Date(Date.now() + 3600 * 1000).toISOString(), // 1 hour from now
-            });
-        } catch (error) {
-            console.error('Audio upload failed:', error);
-            throw error; // Let AudioRecorder show inline status icon
-        } finally {
-            setUploadingKeys((prev) => {
-                const next = new Set(prev);
-                next.delete(questionKey);
-                return next;
-            });
-        }
-    };
-
-    const handleAudioDelete = async (questionKey: string) => {
-        const recording = getAudioRecording(questionKey);
-        if (!recording) return;
-
-        // Pilot mode: just clear local state, no backend call
-        if (isPilotMode) {
-            deleteAudioRecording(questionKey);
-            return;
-        }
-
-        if (!token) return;
-
-        try {
-            await deleteAudioRecordingApiAudioRecordingIdDelete(recording.id, {
-                session_token: token,
-            });
-            deleteAudioRecording(questionKey);
-        } catch (error) {
-            console.error('Audio deletion failed:', error);
-            throw error; // Let AudioRecorder handle the error display
-        }
-    };
+            try {
+                await deleteAudioRecordingApiAudioRecordingIdDelete(recording.id, {
+                    session_token: token,
+                });
+                deleteAudioRecording(questionKey);
+            } catch (error) {
+                console.error('Audio deletion failed:', error);
+                throw error; // Let AudioRecorder handle the error display
+            }
+        },
+        [getAudioRecording, isPilotMode, deleteAudioRecording, token]
+    );
 
     const handleCommentChange = (id: number, val: string) => {
         const current = { ...(postsort.card_comments || {}) };
