@@ -103,6 +103,8 @@ export default function GeneralSettingsPage() {
     const revalidator = useRevalidator();
     const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
     const [isResetLoading, setIsResetLoading] = useState(false);
+    const [quotaMb, setQuotaMb] = useState<number | null>(null);
+    const [isSavingQuota, setIsSavingQuota] = useState(false);
 
     const study = initialStudy;
     const slug = initialSlug;
@@ -226,12 +228,47 @@ export default function GeneralSettingsPage() {
         }
     };
 
+    const handleSaveQuota = async () => {
+        if (!slug || quotaMb === null) return;
+        setIsSavingQuota(true);
+        try {
+            const currentConfig = (study?.postsort_config ?? {}) as Record<string, unknown>;
+            const currentAudio = (currentConfig.audio ?? {}) as Record<string, unknown>;
+            const updatedConfig = {
+                ...currentConfig,
+                audio: { ...currentAudio, max_storage_mb: quotaMb },
+            };
+            await AdminService.updateStudy(slug, {
+                postsort_config: updatedConfig,
+            } as unknown as StudyUpdate);
+            toast.success(t('admin.settings.storage.save_success', 'Storage quota updated'));
+            await queryClient.invalidateQueries({ queryKey: ['storage-usage', slug] });
+            await queryClient.invalidateQueries({
+                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
+            });
+            revalidator.revalidate();
+        } catch (error) {
+            const message = parseApiErrorSync(
+                error,
+                t('admin.settings.storage.save_error', 'Failed to update storage quota')
+            );
+            toast.error(t('admin.settings.storage.save_error', 'Failed to update storage quota'), {
+                description: message,
+            });
+        } finally {
+            setIsSavingQuota(false);
+        }
+    };
+
     const isClosed = study.state === 'closed';
     const isArchived = study.state === 'archived';
 
     // Check if audio is enabled for this study
-    const audioConfig = (study?.postsort_config as { audio?: { enabled?: boolean } })?.audio;
+    const audioConfig = (
+        study?.postsort_config as { audio?: { enabled?: boolean; max_storage_mb?: number } }
+    )?.audio;
     const isAudioEnabled = audioConfig?.enabled ?? false;
+    const currentQuotaMb = audioConfig?.max_storage_mb ?? 100;
 
     // Fetch storage usage if audio is enabled
     const {
@@ -383,12 +420,21 @@ export default function GeneralSettingsPage() {
 
                                         <div className="flex justify-between text-xs text-slate-500">
                                             <span>
-                                                {t('admin.settings.storage.files_count', 'Files')}:{' '}
-                                                {storageUsage.file_count}
+                                                {t(
+                                                    'admin.settings.storage.files_count',
+                                                    'Files: {{count}}',
+                                                    { count: storageUsage.file_count }
+                                                )}
                                             </span>
                                             <span>
-                                                {storageUsage.usage_percent.toFixed(1)}%{' '}
-                                                {t('admin.settings.storage.used_lowercase', 'used')}
+                                                {t(
+                                                    'admin.settings.storage.percent_used',
+                                                    '{{percent}}% used',
+                                                    {
+                                                        percent:
+                                                            storageUsage.usage_percent.toFixed(1),
+                                                    }
+                                                )}
                                             </span>
                                         </div>
                                     </div>
@@ -404,9 +450,64 @@ export default function GeneralSettingsPage() {
                                             </AlertDescription>
                                         </Alert>
                                     )}
+
+                                    <div className="border-t border-slate-100 pt-4 space-y-2">
+                                        <label
+                                            htmlFor="storage-quota"
+                                            className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5"
+                                        >
+                                            <HardDrive className="w-3 h-3" />
+                                            {t(
+                                                'admin.settings.storage.quota_label',
+                                                'Storage Quota'
+                                            )}
+                                        </label>
+                                        <div className="flex items-center gap-3">
+                                            <Input
+                                                id="storage-quota"
+                                                type="number"
+                                                min={10}
+                                                max={1000}
+                                                step={10}
+                                                value={quotaMb ?? currentQuotaMb}
+                                                onChange={(e) => {
+                                                    const value = Number(e.target.value);
+                                                    if (value < 10 || value > 1000) return;
+                                                    setQuotaMb(value);
+                                                }}
+                                                disabled={isArchived}
+                                                className="w-32 h-11 rounded-xl bg-slate-50 border-slate-100 focus-visible:ring-indigo-500"
+                                            />
+                                            <span className="text-sm text-slate-600 font-medium">
+                                                MB
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-slate-500">
+                                            {t(
+                                                'admin.settings.storage.quota_help',
+                                                'Maximum total audio storage for this study (10–1000 MB).'
+                                            )}
+                                        </p>
+                                    </div>
                                 </div>
                             ) : null}
                         </CardContent>
+                        {storageUsage && quotaMb !== null && quotaMb !== currentQuotaMb && (
+                            <CardFooter className="flex justify-end border-t border-slate-50 px-6 py-4">
+                                <Button
+                                    onClick={handleSaveQuota}
+                                    disabled={isSavingQuota || isArchived}
+                                    className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
+                                >
+                                    {isSavingQuota ? (
+                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    ) : (
+                                        <Save className="w-4 h-4 mr-2" />
+                                    )}
+                                    {t('admin.settings.save_button')}
+                                </Button>
+                            </CardFooter>
+                        )}
                     </Card>
                 )}
 

@@ -1322,8 +1322,6 @@
                     "max_duration": "Durée maximale",
                     "seconds": "secondes",
                     "max_duration_help": "Durée maximale d'enregistrement par question (30–600 secondes).",
-                    "storage_quota": "Quota de stockage",
-                    "storage_quota_help": "Espace de stockage audio maximal par étude (en Mo).",
                     "participant_choice_info": "Les participants peuvent répondre par texte, par audio, ou les deux pour chaque question."
                 }
             },
@@ -1621,7 +1619,21 @@
             "delete_success": "Étude supprimée",
             "delete_success_desc": "L'étude a été définitivement supprimée.",
             "delete_error": "Erreur de suppression",
-            "delete_error_desc": "Échec de la suppression de l'étude."
+            "delete_error_desc": "Échec de la suppression de l'étude.",
+            "storage": {
+                "title": "Utilisation du stockage audio",
+                "description": "Surveillez le stockage des enregistrements audio de cette étude.",
+                "used": "Stockage utilisé",
+                "quota": "Quota",
+                "quota_label": "Quota de stockage",
+                "quota_help": "Stockage audio maximal pour cette étude (10–1000 Mo).",
+                "files_count": "Fichiers : {{count}}",
+                "percent_used": "{{percent}} % utilisé",
+                "error": "Échec du chargement de l'utilisation du stockage.",
+                "warning_high_usage": "L'utilisation du stockage est élevée. Envisagez d'augmenter le quota ou de supprimer d'anciens enregistrements.",
+                "save_success": "Quota de stockage mis à jour",
+                "save_error": "Échec de la mise à jour du quota de stockage"
+            }
         },
         "workspaces": {
             "title": "Espaces de travail",

@@ -1284,8 +1284,6 @@
                     "max_duration": "Enimmäiskesto",
                     "seconds": "sekuntia",
                     "max_duration_help": "Tallennuksen enimmäiskesto per kysymys (30–600 sekuntia).",
-                    "storage_quota": "Tallennustilakiintiö",
-                    "storage_quota_help": "Enimmäisäänisäilytystila per tutkimus (Mt).",
                     "participant_choice_info": "Osallistujat voivat vastata tekstillä, äänellä tai molemmilla kuhunkin kysymykseen."
                 }
             },
@@ -1621,7 +1619,21 @@
             "delete_success": "Tutkimus poistettu",
             "delete_success_desc": "Tutkimus on poistettu pysyvästi.",
             "delete_error": "Virhe tutkimuksen poistamisessa",
-            "delete_error_desc": "Tutkimuksen poistaminen epäonnistui."
+            "delete_error_desc": "Tutkimuksen poistaminen epäonnistui.",
+            "storage": {
+                "title": "Äänitallenteiden tallennustila",
+                "description": "Seuraa tämän tutkimuksen äänitallenteiden tallennustilan käyttöä.",
+                "used": "Käytetty tallennustila",
+                "quota": "Kiintiö",
+                "quota_label": "Tallennustilakiintiö",
+                "quota_help": "Tämän tutkimuksen äänitallenteiden enimmäistallennustila (10–1000 Mt).",
+                "files_count": "Tiedostoja: {{count}}",
+                "percent_used": "{{percent}} % käytetty",
+                "error": "Tallennustilan käytön lataaminen epäonnistui.",
+                "warning_high_usage": "Tallennustilan käyttö on korkea. Harkitse kiintiön kasvattamista tai vanhojen tallenteiden poistamista.",
+                "save_success": "Tallennustilakiintiö päivitetty",
+                "save_error": "Tallennustilakiintiön päivitys epäonnistui"
+            }
         },
         "workspaces": {
             "title": "Työtilat",

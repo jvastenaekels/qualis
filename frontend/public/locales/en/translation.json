@@ -1293,8 +1293,6 @@
                     "max_duration": "Maximum Duration",
                     "seconds": "seconds",
                     "max_duration_help": "Maximum recording time per question (30–600 seconds).",
-                    "storage_quota": "Storage Quota",
-                    "storage_quota_help": "Maximum total audio storage per study (in MB).",
                     "participant_choice_info": "Participants can respond with text, audio, or both for each question."
                 }
             },
@@ -1629,7 +1627,21 @@
             "delete_success": "Study deleted",
             "delete_success_desc": "The study has been permanently removed.",
             "delete_error": "Error deleting study",
-            "delete_error_desc": "Failed to delete study."
+            "delete_error_desc": "Failed to delete study.",
+            "storage": {
+                "title": "Audio Storage Usage",
+                "description": "Monitor audio recording storage for this study.",
+                "used": "Storage Used",
+                "quota": "Quota",
+                "quota_label": "Storage Quota",
+                "quota_help": "Maximum total audio storage for this study (10–1000 MB).",
+                "files_count": "Files: {{count}}",
+                "percent_used": "{{percent}}% used",
+                "error": "Failed to load storage usage.",
+                "warning_high_usage": "Storage usage is high. Consider increasing the quota or removing old recordings.",
+                "save_success": "Storage quota updated",
+                "save_error": "Failed to update storage quota"
+            }
         },
         "workspaces": {
             "title": "Workspaces",

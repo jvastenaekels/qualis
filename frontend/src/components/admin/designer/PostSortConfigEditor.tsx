@@ -578,47 +578,6 @@ const PostSortConfigEditor = ({
                                     </p>
                                 </div>
 
-                                {/* Storage Quota */}
-                                <div className="space-y-3">
-                                    <Label
-                                        htmlFor="audio-storage-quota"
-                                        className="text-sm font-bold text-slate-700"
-                                    >
-                                        {t('admin.design.postsort.audio.storage_quota') ||
-                                            'Storage Quota'}
-                                    </Label>
-                                    <div className="flex items-center gap-3">
-                                        <Input
-                                            id="audio-storage-quota"
-                                            type="number"
-                                            min={10}
-                                            max={1000}
-                                            step={10}
-                                            value={config?.audio?.max_storage_mb ?? 100}
-                                            onChange={(e) => {
-                                                const value = Number(e.target.value);
-                                                if (value < 10 || value > 1000) return;
-                                                updateDraft((d) => {
-                                                    if (!d.postsort_config) d.postsort_config = {};
-                                                    // biome-ignore lint/suspicious/noExplicitAny: complex config
-                                                    const ps = d.postsort_config as any;
-                                                    if (!ps.audio) ps.audio = {};
-                                                    ps.audio.max_storage_mb = value;
-                                                });
-                                            }}
-                                            disabled={readOnly}
-                                            className="w-32 rounded-xl border-slate-300"
-                                        />
-                                        <span className="text-sm text-slate-600 font-medium">
-                                            MB
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-slate-500 leading-relaxed">
-                                        {t('admin.design.postsort.audio.storage_quota_help') ||
-                                            'Maximum total audio storage for this study (10-1000 MB)'}
-                                    </p>
-                                </div>
-
                                 {/* Info Alert */}
                                 <Alert className="border-indigo-200 bg-indigo-50/50">
                                     <Info className="h-4 w-4 text-indigo-600" />
