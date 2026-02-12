@@ -674,9 +674,12 @@ export default function InteractiveDataView({
     if (isLoading && !data) {
         return (
             <div className="space-y-6">
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                        <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+                <div className="flex gap-3 overflow-x-auto pb-2 sm:pb-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible">
+                    {[1, 2, 3, 4].map((i) => (
+                        <Skeleton
+                            key={i}
+                            className="h-32 min-w-[160px] flex-1 sm:min-w-0 rounded-2xl"
+                        />
                     ))}
                 </div>
                 <div className="space-y-3">
@@ -712,7 +715,7 @@ export default function InteractiveDataView({
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Interactive Summary Grid */}
             {liveCount > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="flex gap-3 overflow-x-auto pb-2 sm:pb-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible">
                     {/* Primary Metrics: Completed & In Progress */}
 
                     {/* Completed Card */}
@@ -722,7 +725,7 @@ export default function InteractiveDataView({
                             setStatusFilter((prev) => (prev === 'completed' ? 'all' : 'completed'))
                         }
                         className={cn(
-                            'col-span-1',
+                            'min-w-[160px] flex-1 sm:min-w-0',
                             'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             statusFilter === 'completed'
                                 ? 'border-emerald-500 ring-4 ring-emerald-50/50'
@@ -775,7 +778,7 @@ export default function InteractiveDataView({
                             )
                         }
                         className={cn(
-                            'col-span-1',
+                            'min-w-[160px] flex-1 sm:min-w-0',
                             'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             statusFilter === 'in_progress'
                                 ? 'border-sky-500 ring-4 ring-sky-50/50'
@@ -850,7 +853,7 @@ export default function InteractiveDataView({
                         type="button"
                         onClick={() => toggleConsent('interview')}
                         className={cn(
-                            'col-span-1',
+                            'min-w-[160px] flex-1 sm:min-w-0',
                             'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             consentFilters.has('interview')
                                 ? 'border-amber-500 ring-4 ring-amber-50/50'
@@ -902,7 +905,7 @@ export default function InteractiveDataView({
                         type="button"
                         onClick={() => toggleConsent('newsletter')}
                         className={cn(
-                            'col-span-1',
+                            'min-w-[160px] flex-1 sm:min-w-0',
                             'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             consentFilters.has('newsletter')
                                 ? 'border-indigo-500 ring-4 ring-indigo-50/50'
