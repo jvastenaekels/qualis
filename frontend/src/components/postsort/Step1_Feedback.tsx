@@ -49,6 +49,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
     const extremeCols = config?.postsort_config?.extreme_columns || [-4, 4];
     const allowRandomComments = config?.postsort_config?.allow_random_comments ?? true;
     const allowMissingStatements = config?.postsort_config?.missing_statements_enabled ?? true;
+    const showCodes = config?.show_statement_codes ?? false;
 
     // Audio configuration
     const audioConfig = config?.postsort_config?.audio;
@@ -490,7 +491,9 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                             : text;
                                     return (
                                         <option key={s.statementId} value={s.statementId}>
-                                            {`S${s.statementId}: ${displayLabel}`}
+                                            {showCodes
+                                                ? `S${s.statementId}: ${displayLabel}`
+                                                : displayLabel}
                                         </option>
                                     );
                                 })}

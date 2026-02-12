@@ -226,8 +226,8 @@ describe('PostSortPage', () => {
         // Find the dropdown
         const select = screen.getByDisplayValue(/Select a statement/i);
 
-        // Selection by label
-        const option = screen.getByText(/S3: S3 text content/i) as HTMLOptionElement;
+        // Selection by label (show_statement_codes defaults to false, so no "S3:" prefix)
+        const option = screen.getByText(/S3 text content/i) as HTMLOptionElement;
         await user.selectOptions(select, option);
 
         // Verify it's in the store

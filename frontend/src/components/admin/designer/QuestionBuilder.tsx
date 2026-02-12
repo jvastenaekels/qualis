@@ -268,7 +268,7 @@ const QuestionItem = ({
                                     </div>
                                 </AccordionTrigger>
                                 {!readOnly && !structureLocked && (
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 shrink-0">
                                         {!readOnly && availableLanguages.length > 1 && (
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>

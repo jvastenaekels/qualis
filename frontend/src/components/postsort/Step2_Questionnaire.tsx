@@ -64,9 +64,11 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
     );
 
     // Whether to show the audio section for a given question
+    // text_audio questions always show audio (it's part of the question type)
+    // Other questions only show audio when global audio is enabled
     const showAudioSection = useCallback(
-        (questionKey: string): boolean =>
-            isAudioEffectivelyEnabled || !!getAudioRecording(questionKey),
+        (questionKey: string, isTextAudio = false): boolean =>
+            isTextAudio || isAudioEffectivelyEnabled || !!getAudioRecording(questionKey),
         [isAudioEffectivelyEnabled, getAudioRecording]
     );
 
@@ -205,7 +207,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                     : t('presort.error_required');
 
                 if (field.required) {
-                    // text_audio: text is optional (audio alone satisfies requirement)
+                    // text_audio: text is always optional (audio is intrinsic to the type)
                     // Custom validation in handleFinalSubmit checks text OR audio
                     if (field.type === 'text_audio') {
                         shape[key] = z.preprocess(
@@ -336,6 +338,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
         const emailValid = isEmailValid();
 
         // Validate required text_audio fields: need text OR audio
+        // Audio is intrinsic to text_audio questions (independent of global audio toggle)
         const newTextAudioErrors: Record<string, string> = {};
         if (questions) {
             for (const [key, field] of Object.entries(questions)) {
@@ -375,7 +378,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
             {/* Audio info banner for text_audio questions */}
-            {isAudioEffectivelyEnabled && hasTextAudioQuestions && (
+            {hasTextAudioQuestions && !audioUnsupported && (
                 <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center gap-3 text-indigo-800">
                     <Info size={20} className="shrink-0" />
                     <p className="text-sm">
@@ -422,7 +425,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                                         register={register}
                                     />
                                     {fieldConfig.type === 'text_audio' &&
-                                        showAudioSection(`question_${key}`) && (
+                                        showAudioSection(`question_${key}`, true) && (
                                             <AudioRecorder
                                                 questionKey={`question_${key}`}
                                                 maxDurationSeconds={maxDurationSeconds}
