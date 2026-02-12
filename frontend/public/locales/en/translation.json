@@ -1111,7 +1111,7 @@
                 "pre_label": "Pre-instruction content",
                 "tips": {
                     "title": "Why is this important?",
-                    "desc": "In q-methodology, the 'condition of instruction' determines the point of view from which the participant sorts the items. It should be clear, singular, and consistent across all sorting phases."
+                    "desc": "In q-methodology, the 'condition of instruction' determines the point of view from which the participant sorts the items. It should be clear and consistent across all sorting phases."
                 }
             },
             "questions": {
