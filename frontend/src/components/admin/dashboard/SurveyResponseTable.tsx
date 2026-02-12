@@ -262,6 +262,9 @@ export function SurveyResponseTable({
             }
             processedKeys.add('card_comments');
         }
+
+        // Skip audio_recordings — handled separately in the UI
+        processedKeys.add('audio_recordings');
     }
 
     // 2. Map other top-level keys

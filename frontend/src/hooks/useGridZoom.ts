@@ -175,6 +175,22 @@ export const useGridZoom = ({
         return () => resizeObserver.disconnect();
     }, [performAutoFit, wrapperRef]);
 
+    // Handle content size changes (cards rendering with calculated dimensions)
+    useEffect(() => {
+        const content = contentRef.current;
+        if (!content) return;
+        let rafId: number;
+        const observer = new ResizeObserver(() => {
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(() => performAutoFit());
+        });
+        observer.observe(content);
+        return () => {
+            observer.disconnect();
+            cancelAnimationFrame(rafId);
+        };
+    }, [performAutoFit, contentRef]);
+
     // Zonal Focus Logic (Anti-Bias: Sector Panning)
     // 2-step animation: First show entire pyramid, then zoom to zone
     useEffect(() => {

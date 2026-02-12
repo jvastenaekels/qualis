@@ -514,6 +514,81 @@ export function ParticipantDetailContent({
                                         language={language}
                                     />
                                 </div>
+
+                                {/* Audio Recordings */}
+                                {hasAudioRecordings && (
+                                    <div className="space-y-4">
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
+                                            {t(
+                                                'admin.participant.survey.audio_recordings',
+                                                'Audio Recordings'
+                                            )}
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {Object.entries(
+                                                // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
+                                                (participant as any).audio_recordings as Record<
+                                                    string,
+                                                    any
+                                                >
+                                            ).map(([key, audio]) => {
+                                                // Resolve label from question_key
+                                                let label = key;
+                                                if (key.startsWith('card_')) {
+                                                    const sId = Number(key.replace('card_', ''));
+                                                    const stmt = statementsMap.get(sId);
+                                                    if (stmt) {
+                                                        label =
+                                                            stmt.translations.find(
+                                                                (tr) => tr.lang === language
+                                                            )?.text ||
+                                                            stmt.translations[0]?.text ||
+                                                            stmt.code ||
+                                                            `Card ${sId}`;
+                                                    } else {
+                                                        label = `Card ${sId}`;
+                                                    }
+                                                } else if (key === 'missing_statement') {
+                                                    label = t(
+                                                        'post.extreme.missing_statement',
+                                                        'Missing Statement'
+                                                    );
+                                                } else if (key === 'general_comment') {
+                                                    label = t(
+                                                        'post.extreme.general_comment',
+                                                        'General Comment'
+                                                    );
+                                                }
+
+                                                return (
+                                                    <div
+                                                        key={key}
+                                                        className="border border-slate-100 bg-white rounded-2xl p-4 space-y-3"
+                                                    >
+                                                        <div className="flex items-center gap-2">
+                                                            <Mic className="w-3.5 h-3.5 text-violet-500" />
+                                                            <p className="text-sm font-bold text-slate-800">
+                                                                {label}
+                                                            </p>
+                                                        </div>
+                                                        <AudioPlayer
+                                                            url={audio.presigned_url}
+                                                            duration={audio.duration_seconds}
+                                                            fileName={`${key}.webm`}
+                                                        />
+                                                        <p className="text-xs text-slate-500">
+                                                            {(audio.file_size_bytes / 1024).toFixed(
+                                                                1
+                                                            )}{' '}
+                                                            KB
+                                                        </p>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
                             </motion.div>
                         </TabsContent>
                     </AnimatePresence>

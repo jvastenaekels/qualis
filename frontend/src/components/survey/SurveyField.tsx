@@ -52,6 +52,7 @@ export const SurveyField: React.FC<SurveyFieldProps> = ({ id, fieldConfig, regis
             );
         case 'date':
             return <input id={id} type="date" {...register(id)} className={commonClasses} />;
+        case 'text_audio':
         case 'textarea':
             return (
                 <textarea

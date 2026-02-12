@@ -132,89 +132,83 @@ const StudyOverviewPage = () => {
                         }}
                     />
 
-                    <div className="bg-gradient-to-br from-slate-50 to-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
-                        <div className="grid gap-3 md:grid-cols-3">
-                            {/* Sample Size */}
-                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden h-full">
-                                <CardContent className="p-3.5">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Users className="h-4 w-4 text-indigo-600" />
-                                        <div className="text-xs font-semibold text-slate-500">
-                                            {t(
-                                                'admin.study_overview.sample_size',
-                                                'Sample size (N)'
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="text-4xl font-bold text-slate-900">
-                                        {stats.completed_count}
-                                    </div>
-                                </CardContent>
-                            </Card>
+                    <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
+                        {/* Sample Size */}
+                        <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <Users className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
+                            </div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+                                    <Users className="w-5 h-5" />
+                                </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t('admin.study_overview.sample_size', 'Sample size (N)')}
+                                </span>
+                            </div>
+                            <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                {stats.completed_count}
+                            </div>
+                        </div>
 
-                            {/* Completion Rate */}
-                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden h-full">
-                                <CardContent className="p-3.5">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                                        <div className="text-xs font-semibold text-slate-500">
-                                            {t(
-                                                'admin.study_overview.completion_rate',
-                                                'Completion rate'
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="text-4xl font-bold text-emerald-600 mb-2">
-                                        {Math.round(
-                                            (stats.completed_count / stats.started_count) * 100
-                                        ) || 0}
-                                        %
-                                    </div>
-                                    <Progress
-                                        value={
-                                            Math.round(
-                                                (stats.completed_count / stats.started_count) * 100
-                                            ) || 0
-                                        }
-                                        className="h-1.5 bg-emerald-50"
-                                    />
-                                </CardContent>
-                            </Card>
+                        {/* Completion Rate */}
+                        <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <CheckCircle2 className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
+                            </div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+                                    <CheckCircle2 className="w-5 h-5" />
+                                </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t('admin.study_overview.completion_rate', 'Completion rate')}
+                                </span>
+                            </div>
+                            <div className="text-2xl sm:text-4xl font-black text-emerald-600 tracking-tight mb-2">
+                                {Math.round((stats.completed_count / stats.started_count) * 100) ||
+                                    0}
+                                %
+                            </div>
+                            <Progress
+                                value={
+                                    Math.round(
+                                        (stats.completed_count / stats.started_count) * 100
+                                    ) || 0
+                                }
+                                className="h-1.5 bg-emerald-50"
+                            />
+                        </div>
 
-                            {/* Median Duration */}
-                            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden h-full">
-                                <CardContent className="p-3.5">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <Clock className="h-4 w-4 text-amber-500" />
-                                        <div className="text-xs font-semibold text-slate-500">
-                                            {t(
-                                                'admin.study_overview.median_duration',
-                                                'Median duration'
-                                            )}
-                                        </div>
-                                    </div>
-                                    <div className="flex items-baseline gap-2 mb-1">
-                                        <div className="text-4xl font-bold text-slate-900">
-                                            {stats.median_duration_seconds
-                                                ? `${Math.floor(stats.median_duration_seconds / 60)}m`
-                                                : '--'}
-                                        </div>
-                                        {stats.median_duration_seconds &&
-                                            stats.median_duration_seconds < 120 && (
-                                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-[10px] font-semibold ring-1 ring-amber-200">
-                                                    <AlertTriangle size={9} />{' '}
-                                                    {t('admin.study_overview.suspect', 'Suspect')}
-                                                </span>
-                                            )}
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 font-medium">
-                                        {t(
-                                            'admin.study_overview.time_to_complete',
-                                            'Time to complete'
-                                        )}
-                                    </p>
-                                </CardContent>
-                            </Card>
+                        {/* Median Duration */}
+                        <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                                <Clock className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
+                            </div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
+                                    <Clock className="w-5 h-5" />
+                                </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t('admin.study_overview.median_duration', 'Median duration')}
+                                </span>
+                            </div>
+                            <div className="flex items-baseline gap-2 mb-1">
+                                <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                    {stats.median_duration_seconds
+                                        ? `${Math.floor(stats.median_duration_seconds / 60)}m`
+                                        : '--'}
+                                </div>
+                                {stats.median_duration_seconds &&
+                                    stats.median_duration_seconds < 120 && (
+                                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-[10px] font-semibold ring-1 ring-amber-200">
+                                            <AlertTriangle size={9} />{' '}
+                                            {t('admin.study_overview.suspect', 'Suspect')}
+                                        </span>
+                                    )}
+                            </div>
+                            <p className="text-[10px] text-slate-400 font-medium">
+                                {t('admin.study_overview.time_to_complete', 'Time to complete')}
+                            </p>
                         </div>
                     </div>
 

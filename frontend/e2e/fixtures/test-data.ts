@@ -227,7 +227,8 @@ export type PresortFieldType =
     | 'checkbox'
     | 'radio'
     | 'date'
-    | 'textarea';
+    | 'textarea'
+    | 'text_audio';
 
 export type GridDistribution = 'symmetric' | 'asymmetric' | 'minimal';
 

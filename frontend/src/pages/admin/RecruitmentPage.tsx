@@ -303,64 +303,67 @@ const RecruitmentPage = () => {
                 }
             />
 
-            <div className="grid gap-6 md:grid-cols-3">
-                <Card className="md:col-span-1 border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group">
+            <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
+                <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
                     <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Users className="h-12 w-12 text-indigo-600" />
+                        <Users className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
                     </div>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-xs font-semibold text-slate-500">
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+                            <Users className="w-5 h-5" />
+                        </div>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             {t('admin.recruitment.stats.total_links', 'Total Links')}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-black text-slate-900">
-                            {links?.length || 0}
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-1 font-medium">
-                            {t('admin.recruitment.stats.active_channels', 'Recruitment channels')}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="md:col-span-1 border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Globe className="h-12 w-12 text-amber-600" />
+                        </span>
                     </div>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-xs font-semibold text-slate-500">
+                    <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        {links?.length || 0}
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                        {t('admin.recruitment.stats.active_channels', 'Recruitment channels')}
+                    </p>
+                </div>
+
+                <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Globe className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
+                    </div>
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
+                            <Globe className="w-5 h-5" />
+                        </div>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             {t('admin.recruitment.stats.started', 'Started')}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-black text-amber-600">
-                            {/* biome-ignore lint/suspicious/noExplicitAny: API type inference issue */}
-                            {links?.reduce((acc, l: any) => acc + (l.start_count || 0), 0) || 0}
-                        </div>
-                        <p className="text-[10px] text-slate-400 mt-1 font-medium">
-                            {t('admin.recruitment.stats.engagements', 'Initial engagements')}
-                        </p>
-                    </CardContent>
-                </Card>
-
-                <Card className="md:col-span-1 border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group border-l-4 border-l-green-500">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <CheckCircle2 className="h-12 w-12 text-green-600" />
+                        </span>
                     </div>
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-xs font-semibold text-slate-500">
-                            {t('admin.recruitment.stats.submitted', 'Submitted')}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-3xl font-black text-green-600">
-                            {links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0}
+                    <div className="text-2xl sm:text-4xl font-black text-amber-600 tracking-tight">
+                        {/* biome-ignore lint/suspicious/noExplicitAny: API type inference issue */}
+                        {links?.reduce((acc, l: any) => acc + (l.start_count || 0), 0) || 0}
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                        {t('admin.recruitment.stats.engagements', 'Initial engagements')}
+                    </p>
+                </div>
+
+                <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <CheckCircle2 className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
+                    </div>
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+                            <CheckCircle2 className="w-5 h-5" />
                         </div>
-                        <p className="text-[10px] text-slate-400 mt-1 font-medium">
-                            {t('admin.recruitment.stats.completions', 'Validated responses')}
-                        </p>
-                    </CardContent>
-                </Card>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            {t('admin.recruitment.stats.submitted', 'Submitted')}
+                        </span>
+                    </div>
+                    <div className="text-2xl sm:text-4xl font-black text-emerald-600 tracking-tight">
+                        {links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0}
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1 font-medium">
+                        {t('admin.recruitment.stats.completions', 'Validated responses')}
+                    </p>
+                </div>
             </div>
 
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">

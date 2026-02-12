@@ -34,6 +34,7 @@ import {
     AlignLeft,
     Circle,
     Languages,
+    Mic,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
@@ -69,7 +70,8 @@ type QuestionType =
     | 'date'
     | 'email'
     | 'textarea'
-    | 'radio';
+    | 'radio'
+    | 'text_audio';
 
 interface QuestionConfig {
     type: QuestionType;
@@ -251,6 +253,9 @@ const QuestionItem = ({
                                             )}
                                             {question.type === 'textarea' && (
                                                 <AlignLeft className="h-4 w-4" />
+                                            )}
+                                            {question.type === 'text_audio' && (
+                                                <Mic className="h-4 w-4" />
                                             )}
                                         </div>
                                         <span className="text-sm font-bold text-slate-900 truncate tracking-tight">
@@ -889,6 +894,7 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                                         { type: 'number', icon: Hash, label: 'number' },
                                         { type: 'date', icon: Calendar, label: 'date' },
                                         { type: 'email', icon: Mail, label: 'email' },
+                                        { type: 'text_audio', icon: Mic, label: 'text_audio' },
                                     ].map((field) => (
                                         <Button
                                             key={field.type}

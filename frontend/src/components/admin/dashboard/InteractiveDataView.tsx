@@ -1375,7 +1375,14 @@ export default function InteractiveDataView({
                                 {headerGroup.headers.map((header) => (
                                     <TableHead
                                         key={header.id}
-                                        className="h-14 text-xs font-semibold text-slate-600 px-3 sm:px-6"
+                                        className={cn(
+                                            'h-14 text-xs font-semibold text-slate-600 px-3 sm:px-6',
+                                            [
+                                                'consent_indicators',
+                                                'duration_seconds',
+                                                'submitted_at',
+                                            ].includes(header.id) && 'hidden md:table-cell'
+                                        )}
                                     >
                                         {header.isPlaceholder
                                             ? null
@@ -1400,7 +1407,17 @@ export default function InteractiveDataView({
                                     onClick={() => handleViewParticipant(row.original)}
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="px-3 sm:px-6 py-5">
+                                        <TableCell
+                                            key={cell.id}
+                                            className={cn(
+                                                'px-3 sm:px-6 py-5',
+                                                [
+                                                    'consent_indicators',
+                                                    'duration_seconds',
+                                                    'submitted_at',
+                                                ].includes(cell.column.id) && 'hidden md:table-cell'
+                                            )}
+                                        >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()

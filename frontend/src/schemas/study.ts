@@ -52,7 +52,17 @@ export const VisibilityConditionSchema = z.object({
 });
 
 export const PreSortFieldSchema = z.object({
-    type: z.enum(['text', 'number', 'select', 'checkbox', 'radio', 'date', 'email', 'textarea']),
+    type: z.enum([
+        'text',
+        'number',
+        'select',
+        'checkbox',
+        'radio',
+        'date',
+        'email',
+        'textarea',
+        'text_audio',
+    ]),
     label: z.union([z.string(), z.record(z.string())]),
     required: z.boolean().optional(),
     options: z

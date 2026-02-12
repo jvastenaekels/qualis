@@ -1,17 +1,24 @@
-import React, { useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
-import { Check, Loader2, ArrowLeft } from 'lucide-react';
+import { Check, Loader2, ArrowLeft, AlertCircle, Info } from 'lucide-react';
 import { useResponseStore } from '@/store/useResponseStore';
 import { useConfigStore } from '@/store/useConfigStore';
+import { useSessionStore } from '@/store/useSessionStore';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SurveyField } from '@/components/survey/SurveyField';
+import { AudioRecorder } from '@/components/audio/AudioRecorder';
+import {
+    uploadAudioApiAudioUploadPost,
+    deleteAudioRecordingApiAudioRecordingIdDelete,
+} from '@/api/generated';
+import { toast } from 'sonner';
 
 import { evaluateVisibilityCondition } from '@/utils/visibilityEvaluator';
 import { getLocalizedText } from '@/utils/localization';
@@ -27,6 +34,15 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
     const config = useConfigStore((state) => state.config);
     const { postsort } = useResponseStore((state) => ({ postsort: state.postsort }));
     const setPostSortResponse = useResponseStore((state) => state.setPostSortResponse);
+    const setAudioRecording = useResponseStore((state) => state.setAudioRecording);
+    const deleteAudioRecordingStore = useResponseStore((state) => state.deleteAudioRecording);
+    const getAudioRecording = useResponseStore((state) => state.getAudioRecording);
+    const token = useSessionStore((state) => state.token);
+    const isPilotMode = useSessionStore((state) => state.isPilotMode);
+
+    // Track in-progress uploads to block submission
+    const [uploadingKeys, setUploadingKeys] = useState<Set<string>>(new Set());
+    const [audioUnsupported, setAudioUnsupported] = useState(false);
 
     // --- Config Logic ---
     const questions = useMemo(() => config?.postsort_config?.questions, [config]);
@@ -34,6 +50,131 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
     const emailEnabled = config?.postsort_config?.email_collection_enabled;
     const interviewConsentEnabled = config?.postsort_config?.interview_consent_enabled ?? true;
     const newsletterConsentEnabled = config?.postsort_config?.newsletter_consent_enabled ?? true;
+
+    // Audio configuration
+    const audioConfig = config?.postsort_config?.audio;
+    const isAudioEnabled = audioConfig?.enabled ?? false;
+    const maxDurationSeconds = audioConfig?.max_duration_seconds ?? 180;
+    const isAudioEffectivelyEnabled = isAudioEnabled && !audioUnsupported;
+
+    // Check if any text_audio questions exist
+    const hasTextAudioQuestions = useMemo(
+        () => questions && Object.values(questions).some((q) => q.type === 'text_audio'),
+        [questions]
+    );
+
+    // Whether to show the audio section for a given question
+    const showAudioSection = useCallback(
+        (questionKey: string): boolean =>
+            isAudioEffectivelyEnabled || !!getAudioRecording(questionKey),
+        [isAudioEffectivelyEnabled, getAudioRecording]
+    );
+
+    // --- Audio Handlers ---
+    const handleAudioError = useCallback(
+        (type: 'mic_denied' | 'mic_revoked' | 'recorder_error' | 'empty_blob' | 'unsupported') => {
+            if (type === 'unsupported') {
+                setAudioUnsupported(true);
+            }
+        },
+        []
+    );
+
+    const performAudioUpload = useCallback(
+        async (questionKey: string, blob: Blob, duration: number) => {
+            setUploadingKeys((prev) => new Set(prev).add(questionKey));
+            try {
+                const extension = blob.type.includes('mp4') ? 'mp4' : 'webm';
+                const file = new File([blob], `recording_${Date.now()}.${extension}`, {
+                    type: blob.type,
+                });
+
+                if (!token) {
+                    throw new Error('Session token missing');
+                }
+
+                const response = await uploadAudioApiAudioUploadPost({
+                    file,
+                    session_token: token,
+                    question_key: questionKey,
+                    duration_seconds: duration,
+                });
+
+                setAudioRecording(questionKey, {
+                    id: response.recording_id,
+                    question_key: questionKey,
+                    file_size_bytes: response.file_size_bytes,
+                    duration_seconds: duration,
+                    presigned_url: response.presigned_url,
+                    created_at: new Date().toISOString(),
+                    url_expires_at: new Date(Date.now() + 3600 * 1000).toISOString(),
+                });
+            } catch (error) {
+                console.error('Audio upload failed:', error);
+                throw error;
+            } finally {
+                setUploadingKeys((prev) => {
+                    const next = new Set(prev);
+                    next.delete(questionKey);
+                    return next;
+                });
+            }
+        },
+        [token, setAudioRecording]
+    );
+
+    const handleAudioUpload = useCallback(
+        async (questionKey: string, blob: Blob, duration: number) => {
+            if (isPilotMode) {
+                const existing = getAudioRecording(questionKey);
+                if (existing?.presigned_url?.startsWith('blob:')) {
+                    URL.revokeObjectURL(existing.presigned_url);
+                }
+                setAudioRecording(questionKey, {
+                    id: -1,
+                    question_key: questionKey,
+                    file_size_bytes: blob.size,
+                    duration_seconds: duration,
+                    presigned_url: URL.createObjectURL(blob),
+                    created_at: new Date().toISOString(),
+                    url_expires_at: undefined,
+                });
+                return;
+            }
+
+            if (!token) {
+                toast.error(t('audio.error.no_token', 'Session token missing'));
+                return;
+            }
+            await performAudioUpload(questionKey, blob, duration);
+        },
+        [isPilotMode, getAudioRecording, setAudioRecording, token, t, performAudioUpload]
+    );
+
+    const handleAudioDelete = useCallback(
+        async (questionKey: string) => {
+            const recording = getAudioRecording(questionKey);
+            if (!recording) return;
+
+            if (isPilotMode) {
+                deleteAudioRecordingStore(questionKey);
+                return;
+            }
+
+            if (!token) return;
+
+            try {
+                await deleteAudioRecordingApiAudioRecordingIdDelete(recording.id, {
+                    session_token: token,
+                });
+                deleteAudioRecordingStore(questionKey);
+            } catch (error) {
+                console.error('Audio deletion failed:', error);
+                throw error;
+            }
+        },
+        [getAudioRecording, isPilotMode, deleteAudioRecordingStore, token]
+    );
 
     // --- Form Logic ---
     const {
@@ -58,13 +199,20 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                     return;
                 }
 
-                const isTextual = ['text', 'textarea', 'email'].includes(field.type);
+                const isTextual = ['text', 'textarea', 'email', 'text_audio'].includes(field.type);
                 const errorMsg = isTextual
                     ? t('post.extreme.min_chars')
                     : t('presort.error_required');
 
                 if (field.required) {
-                    if (field.type === 'checkbox') {
+                    // text_audio: text is optional (audio alone satisfies requirement)
+                    // Custom validation in handleFinalSubmit checks text OR audio
+                    if (field.type === 'text_audio') {
+                        shape[key] = z.preprocess(
+                            (val) => (val === '' || val === null || val === undefined ? null : val),
+                            z.string().optional().nullable()
+                        );
+                    } else if (field.type === 'checkbox') {
                         shape[key] = z.array(z.string()).min(1, t('presort.error_required'));
                     } else if (field.type === 'number') {
                         let numSchema = z.number({
@@ -171,14 +319,52 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     };
 
+    const isUploadInProgress = uploadingKeys.size > 0;
+
+    // Track text_audio validation errors separately (not handled by Zod)
+    const [textAudioErrors, setTextAudioErrors] = useState<Record<string, string>>({});
+
     const handleFinalSubmit = async () => {
+        if (isUploadInProgress) {
+            toast.info(
+                t('audio.error.upload_in_progress', 'Please wait for audio upload to finish.')
+            );
+            return;
+        }
+
         const isFormValid = await triggerFormValidation();
         const emailValid = isEmailValid();
 
-        if (isFormValid && emailValid) {
+        // Validate required text_audio fields: need text OR audio
+        const newTextAudioErrors: Record<string, string> = {};
+        if (questions) {
+            for (const [key, field] of Object.entries(questions)) {
+                if (field.type === 'text_audio' && field.required) {
+                    const isVisible = evaluateVisibilityCondition(
+                        field.visibility_condition,
+                        currentValues,
+                        questions
+                    );
+                    if (!isVisible) continue;
+
+                    const hasText = !!(currentValues[key] && String(currentValues[key]).trim());
+                    const hasAudio = !!getAudioRecording(`question_${key}`);
+                    if (!hasText && !hasAudio) {
+                        newTextAudioErrors[key] = t(
+                            'post.text_audio_required',
+                            'Please provide either a text or audio response.'
+                        );
+                    }
+                }
+            }
+        }
+        setTextAudioErrors(newTextAudioErrors);
+
+        const textAudioValid = Object.keys(newTextAudioErrors).length === 0;
+
+        if (isFormValid && emailValid && textAudioValid) {
             onSubmit();
         } else {
-            // Scroll to error
             const el = document.getElementById('main-scroll-container');
             if (el && typeof el.scrollTo === 'function') {
                 el.scrollTo({ top: 0, behavior: 'smooth' });
@@ -188,6 +374,19 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+            {/* Audio info banner for text_audio questions */}
+            {isAudioEffectivelyEnabled && hasTextAudioQuestions && (
+                <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center gap-3 text-indigo-800">
+                    <Info size={20} className="shrink-0" />
+                    <p className="text-sm">
+                        {t(
+                            'post.text_audio_info',
+                            'For text + audio questions, you can respond with text, an audio recording, or both.'
+                        )}
+                    </p>
+                </div>
+            )}
+
             {/* 3. CUSTOM QUESTIONS */}
             {questions && Object.keys(questions).length > 0 && (
                 <div className="space-y-6">
@@ -216,16 +415,46 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                                         <span className="text-red-500 ml-1">*</span>
                                     )}
                                 </label>
-                                <SurveyField
-                                    id={key}
-                                    fieldConfig={fieldConfig}
-                                    register={register}
-                                />
+                                <div className="space-y-4">
+                                    <SurveyField
+                                        id={key}
+                                        fieldConfig={fieldConfig}
+                                        register={register}
+                                    />
+                                    {fieldConfig.type === 'text_audio' &&
+                                        showAudioSection(`question_${key}`) && (
+                                            <AudioRecorder
+                                                questionKey={`question_${key}`}
+                                                maxDurationSeconds={maxDurationSeconds}
+                                                onRecordingComplete={async (blob, duration) => {
+                                                    await handleAudioUpload(
+                                                        `question_${key}`,
+                                                        blob,
+                                                        duration
+                                                    );
+                                                }}
+                                                onRecordingDeleted={async () => {
+                                                    await handleAudioDelete(`question_${key}`);
+                                                }}
+                                                existingRecording={getAudioRecording(
+                                                    `question_${key}`
+                                                )}
+                                                sessionToken={token || undefined}
+                                                onError={handleAudioError}
+                                            />
+                                        )}
+                                </div>
                                 {formErrors[key] && (
                                     <p className="text-red-500 text-sm mt-1">
                                         {(formErrors[key]?.message as string) ||
                                             t('presort.error_required')}
                                     </p>
+                                )}
+                                {textAudioErrors[key] && (
+                                    <div className="flex items-center gap-1.5 mt-2 text-red-600 text-sm animate-in fade-in slide-in-from-top-1">
+                                        <AlertCircle size={16} />
+                                        <span>{textAudioErrors[key]}</span>
+                                    </div>
                                 )}
                             </div>
                         );
@@ -334,10 +563,15 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                     onClick={handleFinalSubmit}
                     data-testid="postsort-submit-btn"
                     className="bg-indigo-600 hover:bg-indigo-700 text-white min-w-[200px]"
-                    disabled={isLoading}
+                    disabled={isLoading || isUploadInProgress}
                 >
                     {isLoading ? (
                         <Loader2 className="w-6 h-6 animate-spin" />
+                    ) : isUploadInProgress ? (
+                        <>
+                            <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                            <span>{t('audio.uploading', 'Uploading...')}</span>
+                        </>
                     ) : (
                         <>
                             <span>{t('post.submit', 'Submit Study')}</span>
