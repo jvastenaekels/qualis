@@ -5,7 +5,7 @@
  */
 
 import { type MotionValue, motion, type PanInfo, useAnimation, useTransform } from 'framer-motion';
-import { Eye } from 'lucide-react';
+import { Eye, Frown, Smile } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -152,17 +152,19 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                     style={{ opacity: opacityAgree }}
                     className="absolute inset-0 bg-green-100/50 pointer-events-none flex items-center justify-center border-4 border-green-500 rounded-3xl"
                 >
-                    <span className="text-4xl font-bold text-green-600 tracking-wider rotate-[-12deg] border-4 border-green-600 px-4 py-2 rounded-lg opacity-80">
-                        {t('common.agree')}
-                    </span>
+                    <Smile
+                        className="w-16 h-16 text-green-600 opacity-80 rotate-[-12deg]"
+                        strokeWidth={2.5}
+                    />
                 </motion.div>
                 <motion.div
                     style={{ opacity: opacityDisagree }}
                     className="absolute inset-0 bg-red-100/50 pointer-events-none flex items-center justify-center border-4 border-red-500 rounded-3xl"
                 >
-                    <span className="text-4xl font-bold text-red-600 tracking-wider rotate-[12deg] border-4 border-red-600 px-4 py-2 rounded-lg opacity-80">
-                        {t('common.disagree')}
-                    </span>
+                    <Frown
+                        className="w-16 h-16 text-red-600 opacity-80 rotate-[12deg]"
+                        strokeWidth={2.5}
+                    />
                 </motion.div>
                 <motion.div
                     style={{ opacity: opacityNeutral }}

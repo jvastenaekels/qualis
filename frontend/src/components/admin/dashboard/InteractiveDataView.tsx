@@ -755,7 +755,7 @@ export default function InteractiveDataView({
                             </div>
 
                             <div className="flex items-baseline gap-2">
-                                <span className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {completedCount}
                                 </span>
                                 <span className="text-sm font-semibold text-slate-400">
@@ -807,7 +807,7 @@ export default function InteractiveDataView({
                             </div>
 
                             <div className="flex items-baseline gap-2">
-                                <span className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {inProgressCount}
                                 </span>
                                 <span className="text-sm font-semibold text-slate-400">
@@ -884,7 +884,7 @@ export default function InteractiveDataView({
                             </div>
 
                             <div className="flex items-baseline gap-2">
-                                <span className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {interviewCount}
                                 </span>
                                 <span className="text-sm font-semibold text-slate-400">
@@ -935,7 +935,7 @@ export default function InteractiveDataView({
                             </div>
 
                             <div className="flex items-baseline gap-2">
-                                <span className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {newsletterCount}
                                 </span>
                                 <span className="text-sm font-semibold text-slate-400">
@@ -1100,7 +1100,7 @@ export default function InteractiveDataView({
                     </div>
                 </div>
                 {/* Right Group: Filters & Actions */}
-                <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end overflow-x-auto">
+                <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
                     {/* Flagged Filter Toggle */}
                     <Button
                         variant="ghost"
@@ -1109,12 +1109,13 @@ export default function InteractiveDataView({
                             setQualityFilter((prev) => (prev === 'all' ? 'flagged' : 'all'))
                         }
                         className={cn(
-                            'h-10 sm:h-9 border border-transparent font-medium text-xs',
+                            'h-10 w-10 sm:w-auto sm:h-9 border border-transparent font-medium text-xs',
                             qualityFilter === 'flagged'
                                 ? 'bg-amber-50 text-amber-700 border-amber-200'
                                 : 'text-slate-600 hover:bg-slate-100'
                         )}
                         title={t('admin.data.filter.only_flagged')}
+                        aria-label={t('admin.data.filter.only_flagged')}
                     >
                         <AlertTriangle className="h-3.5 w-3.5 sm:mr-2" />
                         <span className="hidden sm:inline">
@@ -1129,7 +1130,7 @@ export default function InteractiveDataView({
                                 variant="ghost"
                                 size="sm"
                                 className={cn(
-                                    'h-10 sm:h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
+                                    'h-10 w-10 sm:w-auto sm:h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
                                     statusFilter !== 'all' &&
                                         'bg-indigo-50 text-indigo-700 border-indigo-100'
                                 )}
@@ -1142,7 +1143,7 @@ export default function InteractiveDataView({
                                 </span>
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuContent align="end" className="w-48" collisionPadding={8}>
                             <DropdownMenuItem onClick={() => setStatusFilter('all')}>
                                 {t('admin.data.filters.all_statuses', 'All Statuses')}
                             </DropdownMenuItem>
@@ -1177,7 +1178,7 @@ export default function InteractiveDataView({
                                 variant="ghost"
                                 size="sm"
                                 className={cn(
-                                    'h-10 sm:h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
+                                    'h-10 w-10 sm:w-auto sm:h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
                                     consentFilters.size > 0 &&
                                         'bg-indigo-50 text-indigo-700 border-indigo-100'
                                 )}
@@ -1185,7 +1186,7 @@ export default function InteractiveDataView({
                                 <Mail className="h-3.5 w-3.5" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuContent align="end" className="w-48" collisionPadding={8}>
                             <DropdownMenuItem onClick={() => setConsentFilters(new Set())}>
                                 {t('admin.data.filters.all_consents', 'All')}
                             </DropdownMenuItem>
@@ -1226,8 +1227,9 @@ export default function InteractiveDataView({
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
-                                className="h-10 sm:h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-sm gap-2 text-xs"
+                                className="h-10 w-10 sm:w-auto sm:h-9 bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-sm gap-2 text-xs"
                                 disabled={isExportLoading}
+                                aria-label={t('admin.export.label', 'Export')}
                             >
                                 {isExportLoading ? (
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -1239,7 +1241,11 @@ export default function InteractiveDataView({
                                 </span>
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56 rounded-xl">
+                        <DropdownMenuContent
+                            align="end"
+                            className="w-56 rounded-xl"
+                            collisionPadding={8}
+                        >
                             <DropdownMenuItem
                                 disabled={isExportLoading}
                                 onClick={() =>
@@ -1321,7 +1327,11 @@ export default function InteractiveDataView({
                                     <MoreVertical className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-52 rounded-xl">
+                            <DropdownMenuContent
+                                align="end"
+                                className="w-52 rounded-xl"
+                                collisionPadding={8}
+                            >
                                 <DropdownMenuItem
                                     onClick={() => setClearAllDialogOpen(true)}
                                     className="font-semibold cursor-pointer gap-2 text-rose-600 focus:text-rose-600 focus:bg-rose-50"
@@ -1373,7 +1383,7 @@ export default function InteractiveDataView({
                                 {headerGroup.headers.map((header) => (
                                     <TableHead
                                         key={header.id}
-                                        className="h-14 text-xs font-semibold text-slate-600 px-3 sm:px-6 whitespace-nowrap"
+                                        className="h-14 text-xs font-semibold text-slate-600 px-2 sm:px-6 whitespace-nowrap"
                                     >
                                         {header.isPlaceholder
                                             ? null
@@ -1400,7 +1410,7 @@ export default function InteractiveDataView({
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell
                                             key={cell.id}
-                                            className="px-3 sm:px-6 py-5 whitespace-nowrap"
+                                            className="px-2 sm:px-6 py-4 sm:py-5 whitespace-nowrap"
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,

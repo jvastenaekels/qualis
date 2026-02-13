@@ -317,12 +317,12 @@ export function ParticipantDetailContent({
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
                 <div className="flex items-center justify-between px-3 sm:px-6 border-b border-slate-50 bg-white sticky top-0 z-10">
-                    <TabsList className="h-12 sm:h-14 bg-transparent p-0 gap-1.5 sm:gap-6 overflow-x-auto">
+                    <TabsList className="h-12 sm:h-14 bg-transparent p-0 gap-1 sm:gap-4 overflow-x-auto">
                         {['session', 'presort', 'grid', 'postsort'].map((tab) => (
                             <TabsTrigger
                                 key={tab}
                                 value={tab}
-                                className="h-12 sm:h-14 rounded-none border-b-2 border-transparent px-0 text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
+                                className="h-12 sm:h-14 rounded-none border-b-2 border-transparent px-0 text-[11px] sm:text-xs font-black uppercase tracking-widest text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
                             >
                                 <div className="flex items-center gap-2">
                                     {tab === 'session' && <Fingerprint className="w-3.5 h-3.5" />}
@@ -353,8 +353,9 @@ export function ParticipantDetailContent({
                             size="sm"
                             disabled={isExporting}
                             onClick={handleExportCSV}
-                            className="h-9 w-9 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
+                            className="h-10 w-10 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
                             title={t('admin.export.csv', 'Export CSV')}
+                            aria-label={t('admin.export.csv', 'Export CSV')}
                         >
                             <FileSpreadsheet className="w-4 h-4" />
                         </Button>
@@ -363,8 +364,9 @@ export function ParticipantDetailContent({
                             size="sm"
                             disabled={isExporting}
                             onClick={handleExportJSON}
-                            className="h-9 w-9 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
+                            className="h-10 w-10 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
                             title={t('admin.export.json', 'Export JSON')}
+                            aria-label={t('admin.export.json', 'Export JSON')}
                         >
                             <FileJson className="w-4 h-4" />
                         </Button>
@@ -436,7 +438,7 @@ export function ParticipantDetailContent({
 
                         <TabsContent
                             value="grid"
-                            className="h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[800px] min-h-[350px] mt-0 outline-none"
+                            className="h-[55vh] sm:h-[60vh] md:h-[70vh] lg:h-[800px] min-h-[350px] mt-0 outline-none"
                         >
                             {/* Grid View fixed height for canvas scroll */}
                             <GridSort

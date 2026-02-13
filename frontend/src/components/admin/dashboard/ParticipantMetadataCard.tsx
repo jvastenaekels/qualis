@@ -94,7 +94,7 @@ export function ParticipantMetadataCard({
                                 onClick={() => setDiscardDialogOpen(true)}
                                 disabled={isDiscardPending}
                                 className={cn(
-                                    'h-6 px-2 text-[10px] font-bold uppercase tracking-wider',
+                                    'h-9 px-3 text-[11px] font-bold uppercase tracking-wider',
                                     isDiscarded
                                         ? 'text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50'
                                         : 'text-red-500 hover:text-red-600 hover:bg-red-50'

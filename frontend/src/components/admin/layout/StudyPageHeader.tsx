@@ -29,7 +29,7 @@ export function StudyPageHeader({
                             </div>
                         )}
                         <div className="space-y-1">
-                            <h1 className="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
+                            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
                                 {title}
                                 {statusBadge}
                             </h1>
@@ -39,7 +39,7 @@ export function StudyPageHeader({
                         </div>
                     </div>
                 </div>
-                {actions && <div className="flex items-center gap-2">{actions}</div>}
+                {actions && <div className="flex items-center gap-2 flex-wrap">{actions}</div>}
             </div>
         </header>
     );

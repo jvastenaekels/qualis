@@ -183,7 +183,7 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
     return (
         <Card className="shadow-sm border border-slate-200 bg-white">
             <CardContent className="p-1">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-1">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
                     {steps.map((step) => {
                         const isActive = currentState === step.id;
                         // Determine if this step is targetable

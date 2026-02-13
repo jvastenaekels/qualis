@@ -133,7 +133,7 @@ export default function AdminLayout() {
                     className={cn(
                         'flex flex-1 flex-col transition-all duration-300 min-w-0',
                         !location.pathname.includes('/design')
-                            ? 'gap-4 p-4 pt-0'
+                            ? 'gap-3 sm:gap-4 p-3 sm:p-4 pt-0'
                             : 'overflow-hidden max-w-full'
                     )}
                 >

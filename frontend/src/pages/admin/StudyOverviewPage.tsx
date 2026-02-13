@@ -146,7 +146,7 @@ const StudyOverviewPage = () => {
                                     {t('admin.study_overview.sample_size', 'Sample size (N)')}
                                 </span>
                             </div>
-                            <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                            <div className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                 {stats.completed_count}
                             </div>
                         </div>
@@ -164,7 +164,7 @@ const StudyOverviewPage = () => {
                                     {t('admin.study_overview.completion_rate', 'Completion rate')}
                                 </span>
                             </div>
-                            <div className="text-2xl sm:text-4xl font-black text-emerald-600 tracking-tight mb-2">
+                            <div className="text-xl sm:text-4xl font-black text-emerald-600 tracking-tight mb-2">
                                 {Math.round((stats.completed_count / stats.started_count) * 100) ||
                                     0}
                                 %
@@ -193,7 +193,7 @@ const StudyOverviewPage = () => {
                                 </span>
                             </div>
                             <div className="flex items-baseline gap-2 mb-1">
-                                <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                <div className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {stats.median_duration_seconds
                                         ? `${Math.floor(stats.median_duration_seconds / 60)}m`
                                         : '--'}
@@ -300,7 +300,7 @@ const StudyOverviewPage = () => {
                                                                         );
                                                                     })()}
                                                                     <div className="flex-1 min-w-0">
-                                                                        <div className="flex items-center gap-2">
+                                                                        <div className="flex items-center gap-2 flex-wrap">
                                                                             <span className="text-sm font-mono font-bold text-slate-800">
                                                                                 {p.session_token.substring(
                                                                                     0,
@@ -460,7 +460,7 @@ const StudyOverviewPage = () => {
                                                                         );
                                                                     })()}
                                                                     <div className="flex-1 min-w-0">
-                                                                        <div className="flex items-center gap-2">
+                                                                        <div className="flex items-center gap-2 flex-wrap">
                                                                             <span className="text-sm font-mono font-bold text-slate-800">
                                                                                 {p.session_token.substring(
                                                                                     0,
