@@ -12,7 +12,6 @@ import {
     Users,
     ArrowLeft,
     Settings2,
-    Plus,
     Wand2,
     Table,
 } from 'lucide-react';
@@ -444,19 +443,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     )}
                 </SidebarContent>
                 <SidebarFooter className="gap-2">
-                    {!isFocusMode && (
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarMenuButton
-                                    className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                                    onClick={() => navigate('/app/workspaces/new')}
-                                >
-                                    <Plus className="size-4" />
-                                    <span>{t('admin.workspace.switcher.new_workspace')}</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
-                    )}
                     <NavLanguage />
                     <NavUser user={user} />
                 </SidebarFooter>
@@ -520,19 +506,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 )}
             </SidebarContent>
             <SidebarFooter className="gap-2">
-                {!isValidStudy && (
-                    <SidebarMenu>
-                        <SidebarMenuItem>
-                            <SidebarMenuButton
-                                className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                                onClick={() => navigate('/app/workspaces/new')}
-                            >
-                                <Plus className="size-4" />
-                                <span>{t('admin.workspace.switcher.new_workspace')}</span>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    </SidebarMenu>
-                )}
                 <NavLanguage />
                 <NavUser user={user} />
             </SidebarFooter>

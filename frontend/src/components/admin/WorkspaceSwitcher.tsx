@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ChevronsUpDown, Briefcase } from 'lucide-react';
+import { ChevronsUpDown, Briefcase, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -8,6 +8,7 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuLabel,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -157,6 +158,18 @@ export function WorkspaceSwitcher() {
                                 );
                             })}
                         </div>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            onClick={() => navigate('/app/workspaces/new')}
+                            className="flex items-center gap-3 px-2 py-2 rounded-lg cursor-pointer text-muted-foreground hover:text-foreground"
+                        >
+                            <div className="flex size-7 items-center justify-center rounded-md border border-dashed border-slate-300">
+                                <Plus className="size-3.5" />
+                            </div>
+                            <span className="text-sm font-medium">
+                                {t('admin.workspace.switcher.new_workspace', 'New workspace')}
+                            </span>
+                        </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </SidebarMenuItem>
