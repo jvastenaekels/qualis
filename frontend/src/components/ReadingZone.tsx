@@ -156,7 +156,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     }
 
     return (
-        <div className="w-full bg-indigo-50/50 backdrop-blur-md border border-indigo-100 rounded-xl h-40 relative group overflow-hidden">
+        <div className="w-full bg-indigo-50/50 backdrop-blur-md border border-indigo-100 rounded-xl h-[170px] relative group overflow-hidden">
             {/* Card Content Layer */}
             <div
                 ref={textRef}
