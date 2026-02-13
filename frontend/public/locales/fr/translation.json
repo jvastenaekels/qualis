@@ -1752,6 +1752,7 @@
                 "session": "Détails de la session",
                 "duration": "Durée totale",
                 "started": "Commencé",
+                "submitted": "Soumis",
                 "id": "ID interne",
                 "ip_hash": "Hash IP",
                 "test_run": "Test",

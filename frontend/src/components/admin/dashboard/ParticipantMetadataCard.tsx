@@ -19,6 +19,7 @@ import {
     Fingerprint,
     Clock,
     Activity,
+    CheckCircle,
     Hash,
     AlertTriangle,
 } from 'lucide-react';
@@ -230,6 +231,24 @@ export function ParticipantMetadataCard({
                                 </p>
                             </div>
                         </div>
+                        {participant.submitted_at && (
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-slate-50 rounded-lg">
+                                    <CheckCircle className="h-4 w-4 text-slate-500" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-black text-slate-900 leading-none">
+                                        {formatDistanceToNow(new Date(participant.submitted_at), {
+                                            addSuffix: true,
+                                            locale: currentLocale,
+                                        })}
+                                    </p>
+                                    <p className="text-[10px] text-slate-500 uppercase font-bold mt-1">
+                                        {t('admin.participant.metadata.submitted', 'Submitted')}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-slate-50 rounded-lg">
                                 <Hash className="h-4 w-4 text-slate-500" />

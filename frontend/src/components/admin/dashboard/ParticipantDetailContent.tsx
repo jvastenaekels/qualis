@@ -530,6 +530,7 @@ export function ParticipantDetailContent({
                                                 // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
                                                 (participant as any).audio_recordings as Record<
                                                     string,
+                                                    // biome-ignore lint/suspicious/noExplicitAny: dynamic audio data
                                                     any
                                                 >
                                             ).map(([key, audio]) => {

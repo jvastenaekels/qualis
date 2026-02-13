@@ -1746,6 +1746,7 @@
                 "session": "Istunnon tiedot",
                 "duration": "Kokonaiskesto",
                 "started": "Aloitettu",
+                "submitted": "Lähetetty",
                 "id": "Sisäinen ID",
                 "ip_hash": "IP-tiiviste",
                 "test_run": "Testiajo",

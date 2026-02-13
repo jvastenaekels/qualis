@@ -1752,6 +1752,7 @@
                 "session": "Session Details",
                 "duration": "Total Duration",
                 "started": "Started",
+                "submitted": "Submitted",
                 "id": "Internal ID",
                 "ip_hash": "IP Hash",
                 "test_run": "Test Run",
