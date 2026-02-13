@@ -170,7 +170,7 @@ export default function ResearcherHub() {
                                             )}
                                         >
                                             {t(
-                                                `admin.study_states.${study.state}`,
+                                                `admin.workspace.study_states.${study.state}`,
                                                 study.state as string
                                             )}
                                         </div>

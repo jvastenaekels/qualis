@@ -266,7 +266,7 @@ export function AdminDashboard() {
                                             )}
                                         >
                                             {t(
-                                                `admin.hub.study_states.${study.state}`,
+                                                `admin.workspace.study_states.${study.state}`,
                                                 study.state ?? 'draft'
                                             )}
                                         </Badge>
