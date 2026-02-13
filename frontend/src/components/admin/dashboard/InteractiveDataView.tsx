@@ -1364,8 +1364,8 @@ export default function InteractiveDataView({
                 </AlertDialogContent>
             </AlertDialog>
 
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-x-auto ring-1 ring-slate-100">
-                <Table>
+            <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/50 overflow-x-auto ring-1 ring-slate-100 -mx-4 sm:mx-0 rounded-none sm:rounded-2xl">
+                <Table className="min-w-[800px]">
                     <TableHeader className="bg-slate-50/80">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow
@@ -1375,14 +1375,7 @@ export default function InteractiveDataView({
                                 {headerGroup.headers.map((header) => (
                                     <TableHead
                                         key={header.id}
-                                        className={cn(
-                                            'h-14 text-xs font-semibold text-slate-600 px-3 sm:px-6',
-                                            [
-                                                'consent_indicators',
-                                                'duration_seconds',
-                                                'submitted_at',
-                                            ].includes(header.id) && 'hidden md:table-cell'
-                                        )}
+                                        className="h-14 text-xs font-semibold text-slate-600 px-3 sm:px-6 whitespace-nowrap"
                                     >
                                         {header.isPlaceholder
                                             ? null
@@ -1409,14 +1402,7 @@ export default function InteractiveDataView({
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell
                                             key={cell.id}
-                                            className={cn(
-                                                'px-3 sm:px-6 py-5',
-                                                [
-                                                    'consent_indicators',
-                                                    'duration_seconds',
-                                                    'submitted_at',
-                                                ].includes(cell.column.id) && 'hidden md:table-cell'
-                                            )}
+                                            className="px-3 sm:px-6 py-5 whitespace-nowrap"
                                         >
                                             {flexRender(
                                                 cell.column.columnDef.cell,
