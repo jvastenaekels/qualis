@@ -674,12 +674,9 @@ export default function InteractiveDataView({
     if (isLoading && !data) {
         return (
             <div className="space-y-6">
-                <div className="flex gap-3 overflow-x-auto pb-2 sm:pb-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
                     {[1, 2, 3, 4].map((i) => (
-                        <Skeleton
-                            key={i}
-                            className="h-32 min-w-[160px] flex-1 sm:min-w-0 rounded-2xl"
-                        />
+                        <Skeleton key={i} className="h-24 sm:h-32 rounded-2xl" />
                     ))}
                 </div>
                 <div className="space-y-3">
@@ -715,7 +712,7 @@ export default function InteractiveDataView({
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Interactive Summary Grid */}
             {liveCount > 0 && (
-                <div className="flex gap-3 overflow-x-auto pb-2 sm:pb-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:gap-4 sm:overflow-visible">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
                     {/* Primary Metrics: Completed & In Progress */}
 
                     {/* Completed Card */}
@@ -725,14 +722,13 @@ export default function InteractiveDataView({
                             setStatusFilter((prev) => (prev === 'completed' ? 'all' : 'completed'))
                         }
                         className={cn(
-                            'min-w-[160px] flex-1 sm:min-w-0',
                             'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             statusFilter === 'completed'
                                 ? 'border-emerald-500 ring-4 ring-emerald-50/50'
                                 : 'border-slate-100 hover:border-emerald-200'
                         )}
                     >
-                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
                             <CheckCircle2 className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
                         </div>
 
@@ -763,7 +759,7 @@ export default function InteractiveDataView({
                             </div>
                         </div>
 
-                        <div className="mt-4 flex items-center text-[11px] font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
                             {t('admin.data.stats.click_to_filter', 'Filter table')}
                             <ArrowRight className="w-3 h-3" />
                         </div>
@@ -778,14 +774,13 @@ export default function InteractiveDataView({
                             )
                         }
                         className={cn(
-                            'min-w-[160px] flex-1 sm:min-w-0',
                             'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             statusFilter === 'in_progress'
                                 ? 'border-sky-500 ring-4 ring-sky-50/50'
                                 : 'border-slate-100 hover:border-sky-200'
                         )}
                     >
-                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
                             <Clock className="w-24 h-24 text-sky-500 -mr-6 -mt-6" />
                         </div>
 
@@ -816,7 +811,7 @@ export default function InteractiveDataView({
                             </div>
                         </div>
 
-                        <div className="mt-4 h-5 flex items-center">
+                        <div className="mt-2 sm:mt-4 h-5 flex items-center">
                             {abandonedCount > 0 ? (
                                 <button
                                     type="button"
@@ -840,7 +835,7 @@ export default function InteractiveDataView({
                                     </span>
                                 </button>
                             ) : (
-                                <div className="flex items-center text-[11px] font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                                <div className="hidden sm:flex items-center text-[11px] font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
                                     {t('admin.data.stats.click_to_filter', 'Filter table')}
                                     <ArrowRight className="w-3 h-3" />
                                 </div>
@@ -853,14 +848,13 @@ export default function InteractiveDataView({
                         type="button"
                         onClick={() => toggleConsent('interview')}
                         className={cn(
-                            'min-w-[160px] flex-1 sm:min-w-0',
                             'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             consentFilters.has('interview')
                                 ? 'border-amber-500 ring-4 ring-amber-50/50'
                                 : 'border-slate-100 hover:border-amber-200'
                         )}
                     >
-                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
                             <Briefcase className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
                         </div>
 
@@ -894,7 +888,7 @@ export default function InteractiveDataView({
                             </div>
                         </div>
 
-                        <div className="mt-4 flex items-center text-[11px] font-semibold text-amber-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-amber-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
                             {t('admin.data.stats.click_to_filter', 'Filter table')}
                             <ArrowRight className="w-3 h-3" />
                         </div>
@@ -905,14 +899,13 @@ export default function InteractiveDataView({
                         type="button"
                         onClick={() => toggleConsent('newsletter')}
                         className={cn(
-                            'min-w-[160px] flex-1 sm:min-w-0',
                             'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
                             consentFilters.has('newsletter')
                                 ? 'border-indigo-500 ring-4 ring-indigo-50/50'
                                 : 'border-slate-100 hover:border-indigo-200'
                         )}
                     >
-                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
                             <Bell className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
                         </div>
 
@@ -946,7 +939,7 @@ export default function InteractiveDataView({
                             </div>
                         </div>
 
-                        <div className="mt-4 flex items-center text-[11px] font-semibold text-indigo-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-indigo-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
                             {t('admin.data.stats.click_to_filter', 'Filter table')}
                             <ArrowRight className="w-3 h-3" />
                         </div>
@@ -1081,9 +1074,9 @@ export default function InteractiveDataView({
                 </div>
             )}
 
-            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 lg:gap-4 w-full bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
-                {/* Left Group: Search & Total */}
-                <div className="flex items-center gap-3 w-full lg:w-auto flex-1 lg:max-w-2xl px-1 sm:px-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3 w-full bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
+                {/* Left Group: Search */}
+                <div className="flex items-center gap-3 w-full sm:w-auto flex-1 sm:max-w-sm lg:max-w-2xl">
                     <div className="relative group w-full">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors pointer-events-none" />
                         <Input
@@ -1102,7 +1095,7 @@ export default function InteractiveDataView({
                     </div>
                 </div>
                 {/* Right Group: Filters & Actions */}
-                <div className="flex items-center gap-1.5 sm:gap-2 w-full lg:w-auto justify-end px-1 sm:px-2 overflow-x-auto">
+                <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end overflow-x-auto">
                     {/* Flagged Filter Toggle */}
                     <Button
                         variant="ghost"
