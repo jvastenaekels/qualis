@@ -8,6 +8,7 @@ import { type MotionValue, motion, type PanInfo, useAnimation, useTransform } fr
 import { Eye } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from './SafeMarkdown';
 import { useUIStore } from '../store/useUIStore';
 import { useViewport } from '@/contexts/ViewportContext';
@@ -31,6 +32,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
     ref,
 }) => {
     const { width } = useViewport();
+    const { t } = useTranslation();
     const controls = useAnimation();
     const setHoveredCard = useUIStore((state) => state.setHoveredCard);
     const [isOverflowing, setIsOverflowing] = useState(false);
@@ -151,7 +153,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                     className="absolute inset-0 bg-green-100/50 pointer-events-none flex items-center justify-center border-4 border-green-500 rounded-3xl"
                 >
                     <span className="text-4xl font-bold text-green-600 tracking-wider rotate-[-12deg] border-4 border-green-600 px-4 py-2 rounded-lg opacity-80">
-                        AGREE
+                        {t('common.agree')}
                     </span>
                 </motion.div>
                 <motion.div
@@ -159,7 +161,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                     className="absolute inset-0 bg-red-100/50 pointer-events-none flex items-center justify-center border-4 border-red-500 rounded-3xl"
                 >
                     <span className="text-4xl font-bold text-red-600 tracking-wider rotate-[12deg] border-4 border-red-600 px-4 py-2 rounded-lg opacity-80">
-                        DISAGREE
+                        {t('common.disagree')}
                     </span>
                 </motion.div>
                 <motion.div
@@ -201,7 +203,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                             });
                         }}
                         className="absolute bottom-2 right-2 p-1.5 bg-indigo-50/90 rounded-full text-indigo-600 shadow-sm lg:p-1.5 transition-colors hover:bg-indigo-100 z-20"
-                        aria-label="Read statement"
+                        aria-label={t('common.read_full', 'Read full statement')}
                     >
                         <Eye size={20} strokeWidth={3} />
                     </motion.button>

@@ -421,7 +421,7 @@ class QSortEntryInput(BaseModel):
     """Schema for individual statement placement during submission."""
 
     statement_id: int
-    grid_score: int
+    grid_score: int = Field(..., ge=-10, le=10)
     card_comment: str | None = Field(None, max_length=2000)
 
     @field_validator("card_comment")

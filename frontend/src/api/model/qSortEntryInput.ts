@@ -11,6 +11,10 @@ import type { QSortEntryInputCardComment } from './qSortEntryInputCardComment';
  */
 export interface QSortEntryInput {
     statement_id: number;
+    /**
+     * @minimum -10
+     * @maximum 10
+     */
     grid_score: number;
     card_comment?: QSortEntryInputCardComment;
 }

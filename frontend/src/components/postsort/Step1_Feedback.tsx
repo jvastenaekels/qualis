@@ -150,6 +150,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 });
             } catch (error) {
                 console.error('Audio upload failed:', error);
+                toast.error(t('audio.upload_failed', 'Upload failed. Please try again.'));
                 throw error; // Let AudioRecorder show inline status icon
             } finally {
                 setUploadingKeys((prev) => {
@@ -159,7 +160,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                 });
             }
         },
-        [token, setAudioRecording]
+        [token, setAudioRecording, t]
     );
 
     const handleAudioUpload = useCallback(

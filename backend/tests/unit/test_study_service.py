@@ -55,7 +55,7 @@ async def test_validate_distribution_invalid_score(active_study):
         QSortEntryInput(statement_id=1, grid_score=-1),
         QSortEntryInput(statement_id=2, grid_score=0),
         QSortEntryInput(statement_id=3, grid_score=0),
-        QSortEntryInput(statement_id=4, grid_score=99),  # Invalid
+        QSortEntryInput(statement_id=4, grid_score=5),  # Out of distribution range
     ]
     with pytest.raises(HTTPException) as excinfo:
         StudyService.validate_distribution(active_study, qsort)

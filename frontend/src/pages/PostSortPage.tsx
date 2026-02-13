@@ -136,7 +136,11 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
         <div className="max-w-3xl mx-auto px-4 py-8 pb-32 relative">
             {/* Loading Overlay */}
             {isLoading && (
-                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center min-h-[50vh] rounded-3xl">
+                <div
+                    role="status"
+                    aria-live="polite"
+                    className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex flex-col items-center justify-center min-h-[50vh] rounded-3xl"
+                >
                     <div className="animate-spin mb-4 text-[var(--brand-accent)]">
                         <Loader2 size={48} />
                     </div>
@@ -148,7 +152,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
 
             {/* Submission Error */}
             {submitError && !isLoading && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
+                <div
+                    role="alert"
+                    className="mb-6 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3"
+                >
                     <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
                     <div className="flex-1">
                         <p className="text-sm font-semibold text-red-800">

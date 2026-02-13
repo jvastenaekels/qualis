@@ -4012,6 +4012,8 @@
           },
           "grid_score": {
             "type": "integer",
+            "maximum": 10.0,
+            "minimum": -10.0,
             "title": "Grid Score"
           },
           "card_comment": {

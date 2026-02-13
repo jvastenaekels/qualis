@@ -107,6 +107,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                 });
             } catch (error) {
                 console.error('Audio upload failed:', error);
+                toast.error(t('audio.upload_failed', 'Upload failed. Please try again.'));
                 throw error;
             } finally {
                 setUploadingKeys((prev) => {
@@ -116,7 +117,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                 });
             }
         },
-        [token, setAudioRecording]
+        [token, setAudioRecording, t]
     );
 
     const handleAudioUpload = useCallback(
@@ -135,6 +136,14 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                     created_at: new Date().toISOString(),
                     url_expires_at: undefined,
                 });
+                // Clear text_audio validation error for this key (audio now provided)
+                const bareKey = questionKey.replace(/^question_/, '');
+                setTextAudioErrors((prev) => {
+                    if (!prev[bareKey]) return prev;
+                    const next = { ...prev };
+                    delete next[bareKey];
+                    return next;
+                });
                 return;
             }
 
@@ -143,6 +152,14 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                 return;
             }
             await performAudioUpload(questionKey, blob, duration);
+            // Clear text_audio validation error for this key (audio now provided)
+            const bareKey = questionKey.replace(/^question_/, '');
+            setTextAudioErrors((prev) => {
+                if (!prev[bareKey]) return prev;
+                const next = { ...prev };
+                delete next[bareKey];
+                return next;
+            });
         },
         [isPilotMode, getAudioRecording, setAudioRecording, token, t, performAudioUpload]
     );
@@ -166,10 +183,10 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                 deleteAudioRecordingStore(questionKey);
             } catch (error) {
                 console.error('Audio deletion failed:', error);
-                throw error;
+                toast.error(t('audio.delete_failed', 'Delete failed'));
             }
         },
-        [getAudioRecording, isPilotMode, deleteAudioRecordingStore, token]
+        [getAudioRecording, isPilotMode, deleteAudioRecordingStore, token, t]
     );
 
     // --- Form Logic ---
