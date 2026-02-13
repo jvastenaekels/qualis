@@ -10,7 +10,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import { reportBug } from '../api/client';
 import { useRecordConsentApiStudySlugConsentPost } from '../api/generated';
@@ -38,6 +38,7 @@ async function hashConsent(text: string): Promise<string> {
 const ConsentPage: React.FC = () => {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { t, i18n } = useTranslation();
 
     const config = useConfigStore((state) => state.config);
@@ -118,7 +119,7 @@ const ConsentPage: React.FC = () => {
             }
 
             setStep(nextStep);
-            navigate(`/study/${slug}/${nextPath}`);
+            navigate(`/study/${slug}/${nextPath}${location.search}`);
         }
     };
 
@@ -188,7 +189,7 @@ const ConsentPage: React.FC = () => {
                     <button
                         type="submit"
                         data-testid="consent-accept-btn"
-                        disabled={!isValid && !session.hasConsented}
+                        disabled={!isValid}
                         style={{ backgroundColor: 'var(--brand-accent)' }}
                         className="w-full sm:w-auto px-8 py-3 text-white rounded-md font-bold text-base hover:brightness-110 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     >

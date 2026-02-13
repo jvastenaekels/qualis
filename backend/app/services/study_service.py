@@ -309,8 +309,7 @@ class StudyService:
                     ip_address=hashed_ip,
                     user_agent=user_agent,
                     status=ParticipantStatus.started,
-                    is_discarded=is_test_run,
-                    discard_reason="Test Run" if is_test_run else None,
+                    is_test_run=is_test_run,
                 )
                 db.add(participant)
                 await db.flush()
@@ -332,8 +331,7 @@ class StudyService:
             participant.ip_address = hashed_ip
             participant.user_agent = user_agent
             if is_test_run:
-                participant.is_discarded = True
-                participant.discard_reason = "Test Run"
+                participant.is_test_run = True
 
         await db.commit()
         return {"status": "recorded"}

@@ -109,8 +109,8 @@ export const useSubmitStudy = () => {
             } catch (err: unknown) {
                 console.error(err);
                 setError(err instanceof Error ? err.message : 'An unexpected error occurred');
-                isSubmittingRef.current = false; // Allow retry after failure
             } finally {
+                isSubmittingRef.current = false; // Allow retry after failure or re-submission
                 if (!options?.silent) {
                     setIsLoading(false);
                 }

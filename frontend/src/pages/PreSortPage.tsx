@@ -8,7 +8,7 @@ import { ArrowRight } from 'lucide-react';
 import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import type { PreSortField } from '../schemas/study';
 import { SurveyField } from '../components/survey/SurveyField';
@@ -28,6 +28,7 @@ interface PreSortPageProps {
 const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const config = useConfigStore((state) => state.config);
     const setStep = useSessionStore((state) => state.setStep);
@@ -180,16 +181,16 @@ const PreSortPage: React.FC<PreSortPageProps> = ({ highlightKey }) => {
             'enabled' in config.presort_config &&
             !config.presort_config.enabled
         ) {
-            navigate(`/study/${slug}/rough-sort`, { replace: true });
+            navigate(`/study/${slug}/rough-sort${location.search}`, { replace: true });
         }
-    }, [config, navigate, slug]);
+    }, [config, navigate, slug, location.search]);
 
     if (!config) return null;
 
     const onSubmit = (data: Record<string, string | number | boolean>) => {
         setPresortResponse(data);
         setStep(3);
-        navigate(`/study/${slug}/rough-sort`);
+        navigate(`/study/${slug}/rough-sort${location.search}`);
     };
 
     // Helper for multilingual strings

@@ -7,7 +7,7 @@
 import { AlertTriangle, Check, Loader2 } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLayoutAction } from '../hooks/useLayout';
 import { useSubmitStudy } from '../hooks/useSubmitStudy';
 import { useConfigStore } from '../store/useConfigStore';
@@ -39,6 +39,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
     const { setHeaderAction } = useLayoutAction();
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const location = useLocation();
     const { slug } = useParams();
     const config = useConfigStore((state) => state.config);
 
@@ -73,7 +74,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
         if (session.isCompleted) return;
 
         if (config && responses.qsort.length !== config.statements.length) {
-            navigate(`/study/${slug}/fine-sort`, { replace: true });
+            navigate(`/study/${slug}/fine-sort${location.search}`, { replace: true });
         } else if (!startedSentRef.current) {
             // Send a single silent 'started' status update on first mount
             startedSentRef.current = true;
@@ -82,7 +83,15 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
             }, 1000);
             return () => clearTimeout(timer);
         }
-    }, [config, responses.qsort.length, navigate, slug, session.isCompleted, submit]);
+    }, [
+        config,
+        responses.qsort.length,
+        navigate,
+        slug,
+        session.isCompleted,
+        submit,
+        location.search,
+    ]);
 
     // --- Render ---
 

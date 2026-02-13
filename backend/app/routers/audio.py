@@ -13,7 +13,7 @@ import re
 import magic
 
 from app.database import get_db
-from app.models import Participant, AudioRecording, Study
+from app.models import Participant, AudioRecording, Study, StudyState
 from app.schemas import AudioUploadResponse, AudioRecordingRead
 from app.services.storage_service import storage_service
 from app.core.config import settings
@@ -129,6 +129,13 @@ async def upload_audio(
         raise HTTPException(status_code=404, detail="Participant not found")
 
     participant, study = row
+
+    # Check study is still active
+    if study.state != StudyState.active and not participant.is_test_run:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Study is not active (state: {study.state.value}). Audio upload not allowed.",
+        )
 
     # Check if already submitted
     if participant.submitted_at:

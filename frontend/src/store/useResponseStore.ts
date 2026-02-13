@@ -76,11 +76,16 @@ const initialResponses: Responses = {
     },
 };
 
-// Helper: Trigger Saving Indicator
+// Helper: Trigger Saving Indicator (debounced — cancels previous timeout)
+let autoSaveTimeoutId: ReturnType<typeof setTimeout> | null = null;
 const triggerAutoSave = () => {
     useSessionStore.getState().setSaving(true);
-    setTimeout(() => {
+    if (autoSaveTimeoutId !== null) {
+        clearTimeout(autoSaveTimeoutId);
+    }
+    autoSaveTimeoutId = setTimeout(() => {
         useSessionStore.getState().setSaving(false);
+        autoSaveTimeoutId = null;
     }, 800);
 };
 

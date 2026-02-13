@@ -37,7 +37,7 @@ import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';
@@ -70,6 +70,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
 
     const setStep = useSessionStore((state) => state.setStep);
     const navigate = useNavigate();
+    const location = useLocation();
     const { slug } = useParams();
     const { setHeaderAction } = useLayoutAction();
     const { t } = useTranslation();
@@ -325,13 +326,13 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                 const eventX =
                     event instanceof MouseEvent || event instanceof PointerEvent
                         ? event.clientX
-                        : event instanceof TouchEvent
+                        : event instanceof TouchEvent && event.touches.length > 0
                           ? event.touches[0].clientX
                           : 0;
                 const eventY =
                     event instanceof MouseEvent || event instanceof PointerEvent
                         ? event.clientY
-                        : event instanceof TouchEvent
+                        : event instanceof TouchEvent && event.touches.length > 0
                           ? event.touches[0].clientY
                           : 0;
                 return {
@@ -353,8 +354,8 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         if (window.confirm(t('fine.deck.confirm_reset'))) resetFineSort();
     }, [resetFineSort, t]);
     const handleValidate = useCallback(
-        () => navigate(`/study/${slug}/post-sort`),
-        [navigate, slug]
+        () => navigate(`/study/${slug}/post-sort${location.search}`),
+        [navigate, slug, location.search]
     );
 
     if (!config) return null;

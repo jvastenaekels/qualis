@@ -10,7 +10,7 @@ import { BREAKPOINTS } from '@/constants/breakpoints';
 import React, { startTransition, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import CardStack, { type CardStackHandle } from '../components/CardStack';
 import { useLayoutAction } from '../hooks/useLayout';
 import { useConfigStore } from '../store/useConfigStore';
@@ -28,6 +28,7 @@ interface RoughSortPageProps {
 const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     const { slug } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const { isDesktop } = useViewport();
 
     // Config Store
@@ -227,7 +228,11 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     <button
                         type="button"
                         data-testid="rough-sort-next-btn"
-                        onClick={() => startTransition(() => navigate(`/study/${slug}/fine-sort`))}
+                        onClick={() =>
+                            startTransition(() =>
+                                navigate(`/study/${slug}/fine-sort${location.search}`)
+                            )
+                        }
                         style={{ backgroundColor: 'var(--brand-accent)' }}
                         className="px-10 py-4 text-white rounded-full font-bold text-lg hover:brightness-110 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-3 animate-pulse hover:animate-none w-full sm:w-auto"
                     >
