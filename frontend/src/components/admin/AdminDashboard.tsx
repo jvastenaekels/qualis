@@ -1,19 +1,59 @@
 import { useState } from 'react';
-import { Plus, Layout, TrendingUp, ExternalLink, Upload } from 'lucide-react';
+import {
+    Plus,
+    Layout,
+    TrendingUp,
+    Upload,
+    ArrowRight,
+    Users,
+    Calendar,
+    FileText,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
 import { ImportStudyDialog } from '@/components/admin/ImportStudyDialog';
 import { useAdminStore } from '@/store/useAdminStore';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
+
+const STUDY_GRADIENTS = [
+    'from-indigo-500 to-purple-600',
+    'from-emerald-500 to-teal-600',
+    'from-amber-500 to-orange-600',
+    'from-rose-500 to-pink-600',
+    'from-sky-500 to-blue-600',
+    'from-violet-500 to-fuchsia-600',
+];
+
+function getStudyGradient(index: number): string {
+    return STUDY_GRADIENTS[index % STUDY_GRADIENTS.length];
+}
+
+function getStateStyles(state: string | undefined): string {
+    switch (state) {
+        case 'active':
+            return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        case 'draft':
+            return 'bg-slate-50 text-slate-600 border-slate-200';
+        case 'paused':
+            return 'bg-amber-50 text-amber-700 border-amber-200';
+        case 'closed':
+            return 'bg-red-50 text-red-700 border-red-200';
+        case 'archived':
+            return 'bg-gray-50 text-gray-500 border-gray-200';
+        default:
+            return 'bg-slate-50 text-slate-600 border-slate-200';
+    }
+}
 
 export function AdminDashboard() {
     const { user, currentWorkspace } = useAuthStore();
@@ -38,152 +78,253 @@ export function AdminDashboard() {
 
     const studies = allStudies?.filter((s) => s.workspace_id === currentWorkspace?.id);
 
-    const activeStudiesCount = studies?.filter((s) => s.state === 'active').length || 0;
-    const _totalStudies = studies?.length || 0;
+    const totalStudies = studies?.length ?? 0;
+    const activeStudiesCount = studies?.filter((s) => s.state === 'active').length ?? 0;
+    const totalParticipants = studies?.reduce((sum, s) => sum + (s.participant_count ?? 0), 0) ?? 0;
 
     const handleOpenStudy = (studySlug: string) => {
         if (currentWorkspace?.slug) {
             setActiveStudy(studySlug);
             navigate(`/app/${currentWorkspace.slug}/studies/${studySlug}`);
         } else {
-            // Fallback for legacy support if workspace context is missing
             setActiveStudy(studySlug);
             navigate(`/admin/studies/${studySlug}`);
         }
     };
 
+    const getStudyTitle = (study: NonNullable<typeof studies>[number]): string => {
+        const translation = study.translations?.find((tr) => tr.language_code === i18n.language);
+        if (translation?.title) return translation.title;
+        const fallback = study.translations?.find((tr) => tr.language_code === 'en');
+        if (fallback?.title) return fallback.title;
+        return study.slug;
+    };
+
     if (isLoading) {
         return (
-            <div className="p-8">
-                <Skeleton className="h-[400px] w-full" />
+            <div className="flex flex-1 flex-col gap-6 p-4 md:p-8 max-w-[1400px] mx-auto w-full">
+                <div className="space-y-2">
+                    <Skeleton className="h-10 w-64" />
+                    <Skeleton className="h-5 w-96" />
+                </div>
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+                    {[1, 2, 3].map((i) => (
+                        <Skeleton key={i} className="h-24 rounded-xl" />
+                    ))}
+                </div>
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <Skeleton key={i} className="h-52 rounded-xl" />
+                    ))}
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-6 md:gap-10 p-4 md:p-8 max-w-[1600px] mx-auto animate-in fade-in-50 duration-500">
+        <div className="flex flex-1 flex-col gap-6 md:gap-8 p-4 md:p-8 max-w-[1400px] mx-auto w-full animate-in fade-in-50 duration-500">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="space-y-1">
-                    <h1 className="text-3xl md:text-5xl font-black tracking-tight text-slate-900">
-                        {t('admin.dashboard.title')}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="space-y-1 min-w-0">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+                        {t('admin.dashboard.welcome', 'Welcome back,')}{' '}
+                        <span className="text-indigo-600">{user?.email.split('@')[0]}</span>
                     </h1>
-                    <p className="text-sm md:text-lg text-slate-600 font-medium">
-                        {t('admin.dashboard.welcome')}{' '}
-                        <span className="text-indigo-600 font-bold">
-                            {user?.email.split('@')[0]}
-                        </span>
-                        . {t('admin.dashboard.snapshot')}
+                    <p className="text-sm md:text-base text-muted-foreground">
+                        {t(
+                            'admin.dashboard.snapshot',
+                            "Here's a snapshot of your research activity."
+                        )}
                     </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                     <Button
                         onClick={() => setShowImportDialog(true)}
                         variant="outline"
-                        size="lg"
-                        className="w-full md:w-auto border-slate-200 hover:border-indigo-500 hover:text-indigo-600 shadow-sm font-bold h-12 px-8 rounded-xl"
+                        className="border-slate-200 hover:border-indigo-300 hover:text-indigo-600 font-medium rounded-lg"
                     >
-                        <Upload className="mr-2 h-5 w-5" />{' '}
-                        {t('admin.dashboard.import_study', 'Import Study')}
+                        <Upload className="mr-2 h-4 w-4" />
+                        {t('admin.dashboard.import_study', 'Import')}
                     </Button>
                     <Button
                         onClick={() => setShowCreateDialog(true)}
-                        size="lg"
-                        className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 shadow-sm font-bold h-12 px-8 rounded-xl"
+                        className="bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg"
                     >
-                        <Plus className="mr-2 h-5 w-5" /> {t('admin.dashboard.create_study')}
+                        <Plus className="mr-2 h-4 w-4" />
+                        {t('admin.dashboard.create_study', 'Create study')}
                     </Button>
                 </div>
             </div>
 
             {/* Stats Overview */}
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden group">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-[10px] font-black uppercase text-slate-600 tracking-widest">
-                            {t('admin.dashboard.active_data_collection')}
-                        </CardTitle>
-                        <TrendingUp className="h-4 w-4 text-indigo-500" />
-                    </CardHeader>
-                    <CardContent className="pt-4">
-                        <div className="text-3xl font-black text-indigo-600">
-                            {activeStudiesCount}
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+                <Card className="border shadow-none rounded-xl">
+                    <CardContent className="flex items-center gap-4 p-5">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                            <FileText className="h-5 w-5" />
                         </div>
-                        <p className="text-[10px] font-black text-slate-600 mt-1 uppercase tracking-widest">
-                            {t('admin.dashboard.receiving_responses')}
-                        </p>
-                    </CardContent>
-                </Card>
-                {/* Other specialized metrics could go here */}
-            </div>
-
-            {/* Recent Studies */}
-            <Card className="col-span-4 border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                <CardHeader className="border-b border-slate-50 pb-4">
-                    <CardTitle className="text-lg font-black text-slate-900">
-                        {t('admin.dashboard.recent_studies')}
-                    </CardTitle>
-                    <CardDescription className="text-sm font-medium text-slate-600">
-                        {t('admin.dashboard.recent_description')}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    {studies && studies.length > 0 ? (
-                        <div className="space-y-3">
-                            {studies.slice(0, 5).map((study) => (
-                                <button
-                                    key={study.id}
-                                    type="button"
-                                    className="flex w-full items-center justify-between p-4 rounded-xl border border-transparent hover:border-indigo-500/20 hover:bg-white/60 hover:shadow-md transition-all duration-200 cursor-pointer group text-left bg-transparent"
-                                    onClick={() => handleOpenStudy(study.slug)}
-                                >
-                                    <div className="flex items-center gap-5">
-                                        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/10 flex items-center justify-center text-indigo-600 font-black tracking-tighter text-lg shadow-inner group-hover:scale-110 transition-transform duration-300">
-                                            {study.slug.substring(0, 1).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <p className="font-black text-slate-900 group-hover:text-indigo-600 transition-colors">
-                                                {study.slug}
-                                            </p>
-                                            <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mt-0.5">
-                                                {t('admin.dashboard.created')}{' '}
-                                                {formatDistanceToNow(new Date(study.created_at), {
-                                                    addSuffix: true,
-                                                    locale: currentLocale,
-                                                })}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-6">
-                                        <div
-                                            className={cn(
-                                                'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-sm',
-                                                study.state === 'active'
-                                                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-100 ring-2 ring-emerald-500/20 animate-pulse-slow'
-                                                    : 'bg-slate-50 text-slate-600 border border-slate-100'
-                                            )}
-                                        >
-                                            {study.state}
-                                        </div>
-                                        <div className="bg-slate-50 p-2 rounded-lg group-hover:bg-indigo-50 transition-colors">
-                                            <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
-                                        </div>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="text-center py-20 bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
-                            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 mb-4">
-                                <Layout className="h-6 w-6 text-slate-400" />
-                            </div>
-                            <p className="text-sm font-semibold text-slate-600">
-                                {t('admin.dashboard.no_studies')}
+                        <div className="min-w-0">
+                            <p className="text-2xl font-bold text-foreground">{totalStudies}</p>
+                            <p className="text-xs text-muted-foreground truncate">
+                                {t('admin.dashboard.total_studies', 'Total studies')}
                             </p>
                         </div>
-                    )}
-                </CardContent>
-            </Card>
+                    </CardContent>
+                </Card>
+                <Card className="border shadow-none rounded-xl">
+                    <CardContent className="flex items-center gap-4 p-5">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+                            <TrendingUp className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-2xl font-bold text-foreground">
+                                {activeStudiesCount}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">
+                                {t(
+                                    'admin.dashboard.active_data_collection',
+                                    'Active data collection'
+                                )}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card className="border shadow-none rounded-xl">
+                    <CardContent className="flex items-center gap-4 p-5">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
+                            <Users className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-2xl font-bold text-foreground">
+                                {totalParticipants}
+                            </p>
+                            <p className="text-xs text-muted-foreground truncate">
+                                {t('admin.dashboard.total_participants', 'Total participants')}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Section header */}
+            <div>
+                <h2 className="text-lg font-semibold text-foreground">
+                    {t('admin.dashboard.all_studies', 'All studies')}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                    {t('admin.dashboard.all_studies_description', 'All studies in this workspace.')}
+                </p>
+            </div>
+
+            {/* Study Cards Grid */}
+            {studies && studies.length > 0 ? (
+                <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                    {studies.map((study, index) => {
+                        const title = getStudyTitle(study);
+                        const languageCount = study.translations?.length ?? 0;
+
+                        return (
+                            <Card
+                                key={study.id}
+                                className="group border shadow-none hover:shadow-md rounded-xl overflow-hidden transition-all duration-200 cursor-pointer hover:border-indigo-200"
+                                onClick={() => handleOpenStudy(study.slug)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleOpenStudy(study.slug);
+                                    }
+                                }}
+                                tabIndex={0}
+                                role="button"
+                            >
+                                {/* Color accent bar */}
+                                <div
+                                    className={cn(
+                                        'h-1.5 bg-gradient-to-r',
+                                        getStudyGradient(index)
+                                    )}
+                                />
+
+                                <CardContent className="p-5 flex flex-col gap-4">
+                                    {/* Title and status */}
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0 flex-1">
+                                            <h3 className="font-semibold text-foreground truncate group-hover:text-indigo-600 transition-colors">
+                                                {title}
+                                            </h3>
+                                            <p className="text-xs text-muted-foreground mt-0.5 font-mono">
+                                                {study.slug}
+                                            </p>
+                                        </div>
+                                        <Badge
+                                            variant="outline"
+                                            className={cn(
+                                                'shrink-0 text-[10px] font-semibold uppercase tracking-wide border',
+                                                getStateStyles(study.state)
+                                            )}
+                                        >
+                                            {t(
+                                                `admin.hub.study_states.${study.state}`,
+                                                study.state ?? 'draft'
+                                            )}
+                                        </Badge>
+                                    </div>
+
+                                    {/* Metadata row */}
+                                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                                        <span className="inline-flex items-center gap-1.5">
+                                            <Calendar className="h-3.5 w-3.5" />
+                                            {formatDistanceToNow(new Date(study.created_at), {
+                                                addSuffix: true,
+                                                locale: currentLocale,
+                                            })}
+                                        </span>
+                                        {languageCount > 0 && (
+                                            <span className="inline-flex items-center gap-1.5">
+                                                {t('admin.dashboard.languages_count', {
+                                                    count: languageCount,
+                                                    defaultValue: '{{count}} languages',
+                                                })}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Participants + action */}
+                                    <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                                        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                                            <Users className="h-3.5 w-3.5" />
+                                            {t('admin.dashboard.n_participants', {
+                                                count: study.participant_count ?? 0,
+                                                defaultValue: '{{count}} participants',
+                                            })}
+                                        </span>
+                                        <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className="text-center py-20 bg-muted/30 rounded-xl border border-dashed border-muted">
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-muted mb-4">
+                        <Layout className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground mb-4">
+                        {t(
+                            'admin.dashboard.no_studies',
+                            'No studies found. Create your first study to get started!'
+                        )}
+                    </p>
+                    <Button
+                        onClick={() => setShowCreateDialog(true)}
+                        className="bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg"
+                    >
+                        <Plus className="mr-2 h-4 w-4" />
+                        {t('admin.dashboard.create_study', 'Create study')}
+                    </Button>
+                </div>
+            )}
 
             <CreateStudyDialog
                 open={showCreateDialog}
