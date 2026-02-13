@@ -136,7 +136,17 @@ async def upload_audio(
 
     # Check if audio enabled for this study
     audio_config = study.postsort_config.get("audio", {})
-    if not audio_config.get("enabled", False):
+    audio_globally_enabled = audio_config.get("enabled", False)
+
+    # text_audio questions can upload audio even when global audio is disabled
+    has_text_audio_question = False
+    if question_key.startswith("question_"):
+        q_key = question_key[len("question_") :]
+        questions = study.postsort_config.get("questions", {})
+        q_cfg = questions.get(q_key, {})
+        has_text_audio_question = q_cfg.get("type") == "text_audio"
+
+    if not audio_globally_enabled and not has_text_audio_question:
         raise HTTPException(
             status_code=403, detail="Audio recording not enabled for this study"
         )
