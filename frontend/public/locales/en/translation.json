@@ -342,7 +342,7 @@
         "submit": "Share my perspective",
         "validation_error": "Please fill in all required fields.",
         "text_audio_info": "For text + audio questions, you can respond with text, an audio recording, or both.",
-        "text_audio_required": "Please provide either a text or audio response.",
+        "text_audio_required": "A few words or an audio recording will help us understand your viewpoint.",
         "success": {
             "title": "Thank you for your participation!",
             "message": "Your contribution to the study has been saved.",
@@ -370,6 +370,7 @@
         }
     },
     "audio": {
+        "record_prompt": "Record audio response if you prefer",
         "recording": "Recording...",
         "recorded": "Recorded",
         "playing": "Playing...",

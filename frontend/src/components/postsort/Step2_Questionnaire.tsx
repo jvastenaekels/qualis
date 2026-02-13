@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardTitle, CardHeader } from '@/components/ui/card';
-import { Check, Loader2, ArrowLeft, AlertCircle, Info } from 'lucide-react';
+import { Check, Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
 import { useResponseStore } from '@/store/useResponseStore';
 import { useConfigStore } from '@/store/useConfigStore';
 import { useSessionStore } from '@/store/useSessionStore';
@@ -56,12 +56,6 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
     const isAudioEnabled = audioConfig?.enabled ?? false;
     const maxDurationSeconds = audioConfig?.max_duration_seconds ?? 180;
     const isAudioEffectivelyEnabled = isAudioEnabled && !audioUnsupported;
-
-    // Check if any text_audio questions exist
-    const hasTextAudioQuestions = useMemo(
-        () => questions && Object.values(questions).some((q) => q.type === 'text_audio'),
-        [questions]
-    );
 
     // Whether to show the audio section for a given question
     // text_audio questions always show audio (it's part of the question type)
@@ -377,19 +371,6 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-            {/* Audio info banner for text_audio questions */}
-            {hasTextAudioQuestions && !audioUnsupported && (
-                <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg flex items-center gap-3 text-indigo-800">
-                    <Info size={20} className="shrink-0" />
-                    <p className="text-sm">
-                        {t(
-                            'post.text_audio_info',
-                            'For text + audio questions, you can respond with text, an audio recording, or both.'
-                        )}
-                    </p>
-                </div>
-            )}
-
             {/* 3. CUSTOM QUESTIONS */}
             {questions && Object.keys(questions).length > 0 && (
                 <div className="space-y-6">

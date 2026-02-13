@@ -342,7 +342,7 @@
         "submit": "Partager mon point de vue",
         "validation_error": "Merci d'ajouter une courte explication pour vos choix principaux ci-dessus.",
         "text_audio_info": "Pour les questions texte + audio, vous pouvez répondre par écrit, par enregistrement audio, ou les deux.",
-        "text_audio_required": "Veuillez fournir une réponse textuelle ou audio.",
+        "text_audio_required": "Quelques mots ou un enregistrement audio suffiront pour nous aider à comprendre votre point de vue.",
         "success": {
             "title": "Merci pour votre participation !",
             "message": "Votre contribution à l'étude a bien été enregistrée.",
@@ -370,6 +370,7 @@
         }
     },
     "audio": {
+        "record_prompt": "Enregistrer une réponse audio si vous préférez",
         "recording": "Enregistrement...",
         "recorded": "Enregistré",
         "playing": "Lecture...",

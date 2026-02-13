@@ -342,7 +342,7 @@
         "submit": "Lähetä vastaukset",
         "validation_error": "Täytä kaikki pakolliset kentät.",
         "text_audio_info": "Teksti + ääni -kysymyksissä voit vastata tekstillä, äänitteellä tai molemmilla.",
-        "text_audio_required": "Anna joko teksti- tai äänivastaus.",
+        "text_audio_required": "Muutama sana tai äänitallenne auttaa meitä ymmärtämään näkökulmaasi.",
         "success": {
             "title": "Kiitos osallistumisestasi!",
             "message": "Vastauksesi tutkimukseen on tallennettu.",
@@ -370,6 +370,7 @@
         }
     },
     "audio": {
+        "record_prompt": "Tallenna äänivastaus, jos haluat",
         "recording": "Tallennetaan...",
         "recorded": "Tallennettu",
         "playing": "Toistetaan...",

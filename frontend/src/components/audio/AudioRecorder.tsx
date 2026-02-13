@@ -729,7 +729,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                     <div className="p-1.5 rounded-lg bg-white border border-slate-200 group-hover:border-indigo-200 group-hover:bg-indigo-50 transition-colors shadow-sm">
                         <AudioLines className="w-4 h-4 text-slate-500 group-hover:text-indigo-500" />
                     </div>
-                    <span>{t('audio.record_prompt', 'Record audio response')}</span>
+                    <span>{t('audio.record_prompt', 'Record audio response if you prefer')}</span>
                 </button>
             )}
 

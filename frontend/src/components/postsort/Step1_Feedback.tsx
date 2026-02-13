@@ -418,10 +418,15 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                     <div className="flex items-center gap-1.5 mt-2 text-red-600 text-sm animate-in fade-in slide-in-from-top-1">
                                         <AlertCircle size={16} />
                                         <span>
-                                            {t(
-                                                'post.extreme.required',
-                                                'Please provide either a text or audio response.'
-                                            )}
+                                            {isAudioEffectivelyEnabled
+                                                ? t(
+                                                      'post.extreme.required',
+                                                      'Please provide either a text or audio response.'
+                                                  )
+                                                : t(
+                                                      'post.extreme.min_chars',
+                                                      'A few words are enough to help us understand the context.'
+                                                  )}
                                         </span>
                                     </div>
                                 )}
