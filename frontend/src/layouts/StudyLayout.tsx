@@ -354,7 +354,7 @@ const StudyLayoutContent: React.FC = () => {
                 </div>
 
                 {/* LEFT: Branding / Context */}
-                <div className="flex items-center gap-3 min-w-0 shrink-0">
+                <div className="flex items-center gap-3 min-w-0 shrink-0 z-10">
                     <div className="font-semibold text-slate-800 text-lg truncate max-w-[200px] md:max-w-[160px] lg:max-w-md">
                         {/* Use custom logo if available, or logo if on step 1, else config title */}
                         {/* Show Main Logo if available */}
@@ -476,8 +476,11 @@ const StudyLayoutContent: React.FC = () => {
                 </div>
 
                 {/* CENTER: Stepper (Desktop Only) */}
-                <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 items-center">
-                    <div data-testid="stepper-container" className="flex items-center gap-2">
+                <div className="hidden md:flex flex-1 justify-center items-center min-w-0 mx-4">
+                    <div
+                        data-testid="stepper-container"
+                        className="flex items-center gap-1 lg:gap-2 min-w-0"
+                    >
                         {visibleSteps.map((step, index) => {
                             const status =
                                 currentStep === step.id
@@ -499,11 +502,14 @@ const StudyLayoutContent: React.FC = () => {
                             }
 
                             return (
-                                <div key={step.id} className="flex items-center group relative">
+                                <div
+                                    key={step.id}
+                                    className="flex items-center group relative min-w-0"
+                                >
                                     {/* Connection Line */}
                                     {index > 0 && (
                                         <div
-                                            className="w-8 h-0.5 mx-2 transition-colors duration-300"
+                                            className="w-4 lg:w-8 h-0.5 mx-1 lg:mx-2 shrink-0 transition-colors duration-300"
                                             style={{
                                                 backgroundColor:
                                                     status === 'upcoming'
@@ -537,7 +543,7 @@ const StudyLayoutContent: React.FC = () => {
                                                     : undefined,
                                         }}
                                         className={`
-                                           w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 hover:scale-105
+                                           w-8 h-8 shrink-0 rounded-full flex items-center justify-center border-2 transition-all duration-300 hover:scale-105
                                            ${
                                                status === 'upcoming' && !isReachable
                                                    ? 'bg-slate-50 text-slate-300 cursor-not-allowed pointer-events-none'
@@ -568,13 +574,14 @@ const StudyLayoutContent: React.FC = () => {
 
                                     {/* Label (Always visible but styled) */}
                                     <span
-                                        className={`ml-3 text-sm whitespace-nowrap transition-all duration-300 ${
+                                        className={`ml-2 text-sm truncate transition-all duration-300 ${
                                             status === 'current'
-                                                ? 'font-bold text-slate-800 opacity-100 max-w-full'
+                                                ? 'font-bold text-slate-800 opacity-100 max-w-[8rem] lg:max-w-[12rem]'
                                                 : status === 'completed'
-                                                  ? 'font-medium text-slate-500 opacity-100 hidden lg:block'
-                                                  : 'font-normal text-slate-500 opacity-100 hidden xl:block'
+                                                  ? 'font-medium text-slate-500 opacity-100 hidden lg:block max-w-[8rem] xl:max-w-[12rem]'
+                                                  : 'font-normal text-slate-500 opacity-100 hidden xl:block max-w-[8rem]'
                                         }`}
+                                        title={stepLabel}
                                     >
                                         {stepLabel}
                                     </span>
@@ -585,7 +592,7 @@ const StudyLayoutContent: React.FC = () => {
                 </div>
 
                 {/* RIGHT: Actions + Language */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 shrink-0 z-10">
                     <HelpOverlay />
 
                     {/* Language Selector (Globe Icon) */}
