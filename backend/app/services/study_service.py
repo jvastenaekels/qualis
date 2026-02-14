@@ -1203,6 +1203,10 @@ class StudyService:
                     "status": p.status.value,
                     "recruitment_token": getattr(p, "recruitment_token", None),
                     "ip_address": p.ip_address,
+                    "submitted_at": p.submitted_at.isoformat()
+                    if p.submitted_at
+                    else None,
+                    "created_at": p.created_at.isoformat() if p.created_at else None,
                 }
             )
 
