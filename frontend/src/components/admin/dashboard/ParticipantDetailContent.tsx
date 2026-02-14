@@ -317,19 +317,25 @@ export function ParticipantDetailContent({
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
                 <div className="flex items-center justify-between px-3 sm:px-6 border-b border-slate-50 bg-white sticky top-0 z-10">
-                    <TabsList className="h-12 sm:h-14 bg-transparent p-0 gap-1 sm:gap-4 overflow-x-auto">
+                    <TabsList className="h-12 sm:h-14 bg-transparent p-0 gap-0 sm:gap-4 overflow-x-auto">
                         {['session', 'presort', 'grid', 'postsort'].map((tab) => (
                             <TabsTrigger
                                 key={tab}
                                 value={tab}
-                                className="h-12 sm:h-14 rounded-none border-b-2 border-transparent px-0 text-[11px] sm:text-xs font-black uppercase tracking-widest text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
+                                className="min-h-[44px] sm:h-14 min-w-[44px] rounded-none border-b-2 border-transparent px-3 sm:px-0 text-[11px] sm:text-xs font-black uppercase tracking-widest text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
                             >
                                 <div className="flex items-center gap-2">
-                                    {tab === 'session' && <Fingerprint className="w-3.5 h-3.5" />}
-                                    {tab === 'presort' && <ClipboardList className="w-3.5 h-3.5" />}
-                                    {tab === 'grid' && <LayoutGrid className="w-3.5 h-3.5" />}
+                                    {tab === 'session' && (
+                                        <Fingerprint className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+                                    )}
+                                    {tab === 'presort' && (
+                                        <ClipboardList className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+                                    )}
+                                    {tab === 'grid' && (
+                                        <LayoutGrid className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+                                    )}
                                     {tab === 'postsort' && (
-                                        <MessageSquare className="w-3.5 h-3.5" />
+                                        <MessageSquare className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
                                     )}
                                     <span className="hidden sm:inline">
                                         {t(
@@ -353,22 +359,22 @@ export function ParticipantDetailContent({
                             size="sm"
                             disabled={isExporting}
                             onClick={handleExportCSV}
-                            className="h-10 w-10 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
+                            className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
                             title={t('admin.export.csv', 'Export CSV')}
                             aria-label={t('admin.export.csv', 'Export CSV')}
                         >
-                            <FileSpreadsheet className="w-4 h-4" />
+                            <FileSpreadsheet className="w-5 h-5 sm:w-4 sm:h-4" />
                         </Button>
                         <Button
                             variant="ghost"
                             size="sm"
                             disabled={isExporting}
                             onClick={handleExportJSON}
-                            className="h-10 w-10 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
+                            className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
                             title={t('admin.export.json', 'Export JSON')}
                             aria-label={t('admin.export.json', 'Export JSON')}
                         >
-                            <FileJson className="w-4 h-4" />
+                            <FileJson className="w-5 h-5 sm:w-4 sm:h-4" />
                         </Button>
                         {hasAudioRecordings && (
                             <Button
@@ -376,10 +382,11 @@ export function ParticipantDetailContent({
                                 size="sm"
                                 disabled={isExporting}
                                 onClick={handleExportAudio}
-                                className="text-slate-400 hover:text-indigo-600"
+                                className="h-11 w-11 sm:h-auto sm:w-auto p-0 sm:p-2 text-slate-400 hover:text-indigo-600"
                                 title={t('admin.export.audio', 'Export Audio (ZIP)')}
+                                aria-label={t('admin.export.audio', 'Export Audio (ZIP)')}
                             >
-                                <FileArchive className="w-4 h-4" />
+                                <FileArchive className="w-5 h-5 sm:w-4 sm:h-4" />
                             </Button>
                         )}
                     </div>
