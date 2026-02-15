@@ -399,10 +399,6 @@ export default function InteractiveDataView({
     const inProgressCount = liveParticipants.filter(
         (p) => getDisplayStatus(p) === 'in_progress'
     ).length;
-    const abandonedCount = liveParticipants.filter(
-        (p) => getDisplayStatus(p) === 'abandoned'
-    ).length;
-
     // Map duplicate IP hashes to a group number so participants sharing the same IP can be linked visually
     const duplicateIpGroups = useMemo(() => {
         const ipCounts = new Map<string, number>();
@@ -960,9 +956,6 @@ export default function InteractiveDataView({
                                 <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {completedCount}
                                 </span>
-                                <span className="text-sm font-semibold text-slate-400">
-                                    / {liveCount}
-                                </span>
                             </div>
                         </div>
 
@@ -1012,41 +1005,12 @@ export default function InteractiveDataView({
                                 <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {inProgressCount}
                                 </span>
-                                <span className="text-sm font-semibold text-slate-400">
-                                    / {liveCount}
-                                </span>
                             </div>
                         </div>
 
-                        <div className="mt-2 sm:mt-4 h-5 flex items-center">
-                            {abandonedCount > 0 ? (
-                                <button
-                                    type="button"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setStatusFilter((prev) =>
-                                            prev === 'abandoned' ? 'all' : 'abandoned'
-                                        );
-                                    }}
-                                    className="z-10 cursor-pointer flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-rose-50 hover:bg-rose-100 border border-rose-100 transition-colors"
-                                >
-                                    <AlertTriangle className="w-3 h-3 text-rose-500" />
-                                    <span className="text-[10px] font-bold text-rose-600">
-                                        {t(
-                                            'admin.data.stats.abandoned_count',
-                                            '{{count}} abandoned',
-                                            {
-                                                count: abandonedCount,
-                                            }
-                                        )}
-                                    </span>
-                                </button>
-                            ) : (
-                                <div className="hidden sm:flex items-center text-[11px] font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                                    {t('admin.data.stats.click_to_filter', 'Filter table')}
-                                    <ArrowRight className="w-3 h-3" />
-                                </div>
-                            )}
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            <ArrowRight className="w-3 h-3" />
                         </div>
                     </button>
 
@@ -1088,9 +1052,6 @@ export default function InteractiveDataView({
                             <div className="flex items-baseline gap-2">
                                 <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {interviewCount}
-                                </span>
-                                <span className="text-sm font-semibold text-slate-400">
-                                    / {liveCount}
                                 </span>
                             </div>
                         </div>
@@ -1139,9 +1100,6 @@ export default function InteractiveDataView({
                             <div className="flex items-baseline gap-2">
                                 <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
                                     {newsletterCount}
-                                </span>
-                                <span className="text-sm font-semibold text-slate-400">
-                                    / {liveCount}
                                 </span>
                             </div>
                         </div>
