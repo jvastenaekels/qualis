@@ -95,6 +95,26 @@ export function ScreePlot({
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>
+
+            {/* Keyboard-accessible alternative for scree plot bar selection */}
+            <div
+                className="sr-only"
+                role="listbox"
+                aria-label={t('admin.analysis.select_factors', 'Select number of factors')}
+            >
+                {eigenvalues.map((ev, i) => (
+                    <button
+                        key={i}
+                        type="button"
+                        role="option"
+                        aria-selected={selectedNFactors === i + 1}
+                        onClick={() => onSelectNFactors(i + 1)}
+                    >
+                        {t('admin.analysis.factor', 'Factor')} {i + 1}: {ev.toFixed(3)}
+                    </button>
+                ))}
+            </div>
+
             <p className="text-xs text-slate-400 text-center">
                 {t(
                     'admin.analysis.kaiser_suggestion',

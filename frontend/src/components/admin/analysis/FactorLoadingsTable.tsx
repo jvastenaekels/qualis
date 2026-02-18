@@ -1,15 +1,25 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { AnalysisResult } from '@/api/model';
 
 interface FactorLoadingsTableProps {
     result: AnalysisResult;
+    flaggingMode: 'auto' | 'manual';
+    manualFlags: Record<number, number[]>;
+    onToggleFlag: (participantDbId: number, factorNumber: number) => void;
 }
 
 type SortKey = 'label' | 'flagged' | number;
 
-export function FactorLoadingsTable({ result }: FactorLoadingsTableProps) {
+export function FactorLoadingsTable({
+    result,
+    flaggingMode,
+    manualFlags,
+    onToggleFlag,
+}: FactorLoadingsTableProps) {
     const { t } = useTranslation();
     const [sortKey, setSortKey] = useState<SortKey>('label');
     const [sortAsc, setSortAsc] = useState(true);
@@ -42,6 +52,10 @@ export function FactorLoadingsTable({ result }: FactorLoadingsTableProps) {
         [result.participants, sortKey, sortAsc]
     );
 
+    const hasFlaggedParticipants = result.participants.some(
+        (p) => p.flagged_factors && p.flagged_factors.length > 0
+    );
+
     const sortProps = (key: SortKey) => ({
         role: 'columnheader' as const,
         'aria-sort': (sortKey === key ? (sortAsc ? 'ascending' : 'descending') : 'none') as
@@ -58,17 +72,54 @@ export function FactorLoadingsTable({ result }: FactorLoadingsTableProps) {
         },
     });
 
-    const arrow = (key: SortKey) => (sortKey === key ? (sortAsc ? ' ↑' : ' ↓') : '');
+    const arrow = (key: SortKey) => (sortKey === key ? (sortAsc ? ' \u2191' : ' \u2193') : '');
 
     return (
         <div className="overflow-x-auto">
-            <p className="text-xs text-slate-500 mb-2">
-                {t(
-                    'admin.analysis.significance_threshold',
-                    'Significance threshold (p<0.05): ±{{threshold}}',
-                    { threshold }
-                )}
-            </p>
+            <div className="flex items-center gap-2 mb-2">
+                <p className="text-xs text-slate-500">
+                    {t(
+                        'admin.analysis.significance_threshold',
+                        'Significance threshold (p<0.05): \u00b1{{threshold}}',
+                        { threshold }
+                    )}
+                </p>
+                <TooltipProvider delayDuration={300}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Info
+                                className="size-3.5 text-slate-400 cursor-help"
+                                aria-hidden="true"
+                            />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-xs text-xs">
+                            {t(
+                                'admin.analysis.loadings_help',
+                                'Factor loadings show how strongly each participant correlates with each factor. Highlighted cells indicate statistically significant loadings.'
+                            )}
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+            </div>
+
+            {flaggingMode === 'manual' && (
+                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1 mb-2">
+                    {t(
+                        'admin.analysis.manual_flag_hint',
+                        'Click a loading cell to flag/unflag a participant for that factor. Re-run analysis to update results.'
+                    )}
+                </p>
+            )}
+
+            {!hasFlaggedParticipants && (
+                <div className="flex items-center justify-center p-8 text-muted-foreground text-sm">
+                    {t(
+                        'admin.analysis.no_flagged_participants',
+                        'No participants flagged for any factor. Try adjusting the number of factors or flagging method.'
+                    )}
+                </div>
+            )}
+
             <table className="w-full text-sm">
                 <caption className="sr-only">
                     {t('admin.analysis.caption_loadings', 'Factor loadings per participant')}
@@ -106,7 +157,10 @@ export function FactorLoadingsTable({ result }: FactorLoadingsTableProps) {
                 </thead>
                 <tbody>
                     {sorted.map((p) => {
-                        const flaggedSet = new Set(p.flagged_factors ?? []);
+                        const flaggedSet =
+                            flaggingMode === 'manual'
+                                ? new Set(manualFlags[p.db_id] ?? [])
+                                : new Set(p.flagged_factors ?? []);
                         return (
                             <tr
                                 key={p.db_id}
@@ -114,7 +168,9 @@ export function FactorLoadingsTable({ result }: FactorLoadingsTableProps) {
                             >
                                 <td className="py-1.5 px-3 font-mono text-xs">{p.label}</td>
                                 {p.loadings.map((loading, f) => {
-                                    const isFlagged = flaggedSet.has(f + 1);
+                                    const factorNum = f + 1;
+                                    const isFlagged = flaggedSet.has(factorNum);
+                                    const isManual = flaggingMode === 'manual';
                                     return (
                                         <td
                                             key={f}
@@ -123,8 +179,32 @@ export function FactorLoadingsTable({ result }: FactorLoadingsTableProps) {
                                                 isFlagged &&
                                                     'font-bold bg-indigo-50 text-indigo-700',
                                                 !isFlagged && loading > 0 && 'text-blue-600',
-                                                !isFlagged && loading < 0 && 'text-red-500'
+                                                !isFlagged && loading < 0 && 'text-red-500',
+                                                isManual &&
+                                                    'cursor-pointer hover:bg-indigo-100/50 transition-colors'
                                             )}
+                                            onClick={
+                                                isManual
+                                                    ? () => onToggleFlag(p.db_id, factorNum)
+                                                    : undefined
+                                            }
+                                            onKeyDown={
+                                                isManual
+                                                    ? (e) => {
+                                                          if (e.key === 'Enter' || e.key === ' ') {
+                                                              e.preventDefault();
+                                                              onToggleFlag(p.db_id, factorNum);
+                                                          }
+                                                      }
+                                                    : undefined
+                                            }
+                                            tabIndex={isManual ? 0 : undefined}
+                                            role={isManual ? 'button' : undefined}
+                                            aria-label={
+                                                isManual
+                                                    ? `${isFlagged ? 'Unflag' : 'Flag'} ${p.label} for Factor ${factorNum}`
+                                                    : undefined
+                                            }
                                         >
                                             {loading.toFixed(4)}
                                         </td>
@@ -143,7 +223,7 @@ export function FactorLoadingsTable({ result }: FactorLoadingsTableProps) {
                                             ))}
                                         </span>
                                     ) : (
-                                        <span className="text-slate-300">—</span>
+                                        <span className="text-slate-300">&mdash;</span>
                                     )}
                                 </td>
                             </tr>

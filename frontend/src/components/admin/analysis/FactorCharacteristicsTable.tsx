@@ -1,4 +1,6 @@
 import { useTranslation } from 'react-i18next';
+import { Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { AnalysisResult } from '@/api/model';
 
 interface FactorCharacteristicsTableProps {
@@ -8,6 +10,14 @@ interface FactorCharacteristicsTableProps {
 export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTableProps) {
     const { t } = useTranslation();
     const chars = result.factor_characteristics;
+
+    if (chars.length === 0) {
+        return (
+            <div className="flex items-center justify-center p-8 text-muted-foreground text-sm">
+                {t('admin.analysis.no_characteristics', 'No factor characteristics available.')}
+            </div>
+        );
+    }
 
     const rows: { label: string; values: string[] }[] = [
         {
@@ -39,6 +49,27 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
     return (
         <div className="space-y-4">
             <div className="overflow-x-auto">
+                <div className="flex items-center gap-2 mb-2">
+                    <h4 className="text-sm font-medium text-slate-700">
+                        {t('admin.analysis.factor_statistics', 'Factor Statistics')}
+                    </h4>
+                    <TooltipProvider delayDuration={300}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Info
+                                    className="size-3.5 text-slate-400 cursor-help"
+                                    aria-hidden="true"
+                                />
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" className="max-w-xs text-xs">
+                                {t(
+                                    'admin.analysis.characteristics_help',
+                                    'Eigenvalues indicate factor strength. Composite reliability measures internal consistency. SE indicates precision of factor score estimates.'
+                                )}
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
                 <table className="w-full text-sm">
                     <caption className="sr-only">
                         {t(

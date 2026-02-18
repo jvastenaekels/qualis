@@ -255,7 +255,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       title: t('admin.sidebar.analysis', 'Analysis'),
                       url: `/app/${workspaceSlug}/studies/${params.studySlug}/analysis`,
                       icon: ChartColumnStacked,
-                      show: can('study:view_data'),
+                      show: can('study:edit_design'),
                   },
                   {
                       title: t('admin.sidebar.settings'),

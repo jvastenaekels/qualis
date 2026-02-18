@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
+import {
+    Tooltip as UiTooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import type { AnalysisResult } from '@/api/model';
 
 interface StatementsTableProps {
@@ -91,7 +97,7 @@ export function StatementsTable({ result }: StatementsTableProps) {
         },
     });
 
-    const arrow = (key: SortKey) => (sortKey === key ? (sortAsc ? ' ↑' : ' ↓') : '');
+    const arrow = (key: SortKey) => (sortKey === key ? (sortAsc ? ' \u2191' : ' \u2193') : '');
 
     const getTypeLabel = (stmtId: number): string => {
         const d = distinguishingMap.get(stmtId);
@@ -114,8 +120,43 @@ export function StatementsTable({ result }: StatementsTableProps) {
         return '';
     };
 
+    if (result.statement_scores.length === 0) {
+        return (
+            <div className="flex items-center justify-center p-8 text-muted-foreground text-sm">
+                {t(
+                    'admin.analysis.no_statement_scores',
+                    'No statement scores available. Ensure participants are flagged for at least one factor.'
+                )}
+            </div>
+        );
+    }
+
     return (
         <div className="overflow-x-auto">
+            <div className="flex items-center gap-2 mb-2">
+                <p className="text-xs text-slate-500">
+                    {t(
+                        'admin.analysis.z_scores_description',
+                        'Z-scores and factor array positions per statement'
+                    )}
+                </p>
+                <TooltipProvider delayDuration={300}>
+                    <UiTooltip>
+                        <TooltipTrigger asChild>
+                            <Info
+                                className="size-3.5 text-slate-400 cursor-help"
+                                aria-hidden="true"
+                            />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-xs text-xs">
+                            {t(
+                                'admin.analysis.statements_help',
+                                "Z-scores show each factor's standardized position on each statement. D = distinguishing (significantly different between factors), C = consensus (no significant differences)."
+                            )}
+                        </TooltipContent>
+                    </UiTooltip>
+                </TooltipProvider>
+            </div>
             <table className="w-full text-sm">
                 <caption className="sr-only">
                     {t(
@@ -178,11 +219,13 @@ export function StatementsTable({ result }: StatementsTableProps) {
                                 <td className="py-1.5 px-2 font-mono text-xs text-slate-500">
                                     {stmt.code}
                                 </td>
-                                <td className="py-1.5 px-2 text-xs text-slate-700 max-w-xs truncate">
+                                <td className="py-1.5 px-2 text-xs text-slate-700 max-w-xs">
                                     <TooltipProvider delayDuration={300}>
-                                        <Tooltip>
+                                        <UiTooltip>
                                             <TooltipTrigger asChild>
-                                                <span className="block truncate">{stmt.text}</span>
+                                                <span className="block truncate md:truncate">
+                                                    {stmt.text}
+                                                </span>
                                             </TooltipTrigger>
                                             <TooltipContent
                                                 side="bottom"
@@ -190,7 +233,7 @@ export function StatementsTable({ result }: StatementsTableProps) {
                                             >
                                                 {stmt.text}
                                             </TooltipContent>
-                                        </Tooltip>
+                                        </UiTooltip>
                                     </TooltipProvider>
                                 </td>
                                 {stmt.z_scores.map((z, f) => (

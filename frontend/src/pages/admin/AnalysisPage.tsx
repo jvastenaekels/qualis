@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
@@ -11,6 +11,8 @@ import {
     List,
     Info,
     AlertTriangle,
+    Download,
+    RefreshCw,
 } from 'lucide-react';
 import { ApiError } from '@/api/client';
 
@@ -26,6 +28,12 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 import {
     useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet,
@@ -39,38 +47,126 @@ import { FactorArraysView } from '@/components/admin/analysis/FactorArraysView';
 import { StatementsTable } from '@/components/admin/analysis/StatementsTable';
 import { FactorCharacteristicsTable } from '@/components/admin/analysis/FactorCharacteristicsTable';
 
+function downloadBlob(blob: Blob, filename: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
+}
+
+function generateLoadingsCsv(result: AnalysisResult): string {
+    const headers = [
+        'Participant',
+        ...Array.from({ length: result.n_factors }, (_, f) => `F${f + 1}`),
+        'Flagged',
+    ];
+    const rows = result.participants.map((p) => [
+        p.label,
+        ...p.loadings.map((l) => l.toFixed(4)),
+        (p.flagged_factors ?? []).map((f) => `F${f}`).join(';') || '',
+    ]);
+    return [headers, ...rows].map((r) => r.join(',')).join('\n');
+}
+
+function generateScoresCsv(result: AnalysisResult): string {
+    const dIds = new Set(result.distinguishing.map((d) => d.statement_id));
+    const cIds = new Set(result.consensus.map((c) => c.statement_id));
+    const headers = [
+        'Code',
+        'Statement',
+        ...Array.from({ length: result.n_factors }, (_, f) => `F${f + 1} Z-Score`),
+        ...Array.from({ length: result.n_factors }, (_, f) => `F${f + 1} Array`),
+        'Type',
+    ];
+    const rows = result.statement_scores.map((s) => [
+        s.code,
+        `"${s.text.replace(/"/g, '""')}"`,
+        ...s.z_scores.map((z) => z.toFixed(2)),
+        ...s.factor_arrays.map(String),
+        dIds.has(s.statement_id) ? 'D' : cIds.has(s.statement_id) ? 'C' : '',
+    ]);
+    return [headers, ...rows].map((r) => r.join(',')).join('\n');
+}
+
 export default function AnalysisPage() {
     const { studySlug } = useParams();
     const slug = studySlug ?? '';
     const { t } = useTranslation();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    // Analysis parameters
-    const [extraction, setExtraction] = useState('pca');
-    const [nFactors, setNFactors] = useState(3);
-    const [rotation, setRotation] = useState('varimax');
+    // Restore parameters from URL or use defaults
+    const [extraction, setExtraction] = useState(searchParams.get('extraction') || 'pca');
+    const [nFactors, setNFactors] = useState(Number(searchParams.get('nFactors')) || 3);
+    const [rotation, setRotation] = useState(searchParams.get('rotation') || 'varimax');
+    const [flagging, setFlagging] = useState<'auto' | 'manual'>(
+        (searchParams.get('flagging') as 'auto' | 'manual') || 'auto'
+    );
+    const [manualFlags, setManualFlags] = useState<Record<number, number[]>>({});
     const [activeTab, setActiveTab] = useState('loadings');
 
     // Analysis result state
     const [result, setResult] = useState<AnalysisResult | null>(null);
+
+    // Persist control state to URL params
+    const syncParams = useCallback(
+        (ext: string, nf: number, rot: string, flag: string) => {
+            setSearchParams(
+                { extraction: ext, nFactors: String(nf), rotation: rot, flagging: flag },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
 
     // Eigenvalues query (for scree plot)
     const eigenvaluesQuery = useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet(slug, {
         query: { enabled: !!slug },
     });
 
+    // Cap factor dropdown at (n_participants - 1) or 10, whichever is smaller
+    const maxFactors = useMemo(() => {
+        if (!eigenvaluesQuery.data) return 10;
+        return Math.min(Math.max(eigenvaluesQuery.data.eigenvalues.length - 1, 1), 10);
+    }, [eigenvaluesQuery.data]);
+
     // Update nFactors when eigenvalues load with suggestion
     useEffect(() => {
         if (eigenvaluesQuery.data && !result) {
-            setNFactors(eigenvaluesQuery.data.suggested_n_factors);
+            const suggested = eigenvaluesQuery.data.suggested_n_factors;
+            const capped = Math.min(suggested, maxFactors);
+            setNFactors(capped);
         }
-    }, [eigenvaluesQuery.data, result]);
+    }, [eigenvaluesQuery.data, result, maxFactors]);
+
+    // Clamp nFactors when maxFactors changes
+    useEffect(() => {
+        if (nFactors > maxFactors) {
+            setNFactors(maxFactors);
+        }
+    }, [maxFactors, nFactors]);
 
     // Analysis mutation (no retry for expensive CPU-bound request)
     const analysisMutation = useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost({
         mutation: { retry: false },
     });
 
-    const handleRunAnalysis = () => {
+    const isRunning = analysisMutation.isPending;
+
+    const handleRunAnalysis = useCallback(() => {
+        // Build manual_flags payload: { participant_db_id: factor_number }
+        const manualFlagsPayload: Record<string, number> | undefined =
+            flagging === 'manual'
+                ? Object.fromEntries(
+                      Object.entries(manualFlags).flatMap(([dbId, factors]) =>
+                          factors.map((f) => [dbId, f])
+                      )
+                  )
+                : undefined;
+
         analysisMutation.mutate(
             {
                 slug,
@@ -78,12 +174,14 @@ export default function AnalysisPage() {
                     extraction,
                     n_factors: nFactors,
                     rotation,
-                    flagging: 'auto',
+                    flagging,
+                    manual_flags: manualFlagsPayload,
                 },
             },
             {
                 onSuccess: (data) => {
                     setResult(data);
+                    syncParams(extraction, nFactors, rotation, flagging);
                     toast.success(
                         t('admin.analysis.success', 'Analysis complete — {{n}} factors extracted', {
                             n: data.n_factors,
@@ -98,7 +196,51 @@ export default function AnalysisPage() {
                 },
             }
         );
-    };
+    }, [
+        slug,
+        extraction,
+        nFactors,
+        rotation,
+        flagging,
+        manualFlags,
+        analysisMutation,
+        syncParams,
+        t,
+    ]);
+
+    const handleToggleFlag = useCallback((participantDbId: number, factorNumber: number) => {
+        setManualFlags((prev) => {
+            const current = prev[participantDbId] ?? [];
+            const has = current.includes(factorNumber);
+            // Toggle: only one factor per participant (Q-method standard)
+            const next = has ? [] : [factorNumber];
+            return { ...prev, [participantDbId]: next };
+        });
+    }, []);
+
+    // Initialize manual flags from auto-flagging result when switching to manual mode
+    useEffect(() => {
+        if (result && flagging === 'manual' && Object.keys(manualFlags).length === 0) {
+            const flags: Record<number, number[]> = {};
+            for (const p of result.participants) {
+                if (p.flagged_factors && p.flagged_factors.length > 0) {
+                    flags[p.db_id] = [...p.flagged_factors];
+                }
+            }
+            setManualFlags(flags);
+        }
+    }, [result, flagging, manualFlags]);
+
+    const handleExport = useCallback(
+        (type: 'loadings' | 'scores') => {
+            if (!result) return;
+            const csv =
+                type === 'loadings' ? generateLoadingsCsv(result) : generateScoresCsv(result);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            downloadBlob(blob, `${slug}_analysis_${type}.csv`);
+        },
+        [result, slug]
+    );
 
     const hasEigenvalues = eigenvaluesQuery.isSuccess && eigenvaluesQuery.data;
 
@@ -163,10 +305,21 @@ export default function AnalysisPage() {
                             role="alert"
                         >
                             <AlertTriangle className="size-4 flex-shrink-0" aria-hidden="true" />
-                            {t(
-                                'admin.analysis.eigenvalue_error',
-                                'Failed to load analysis data. Please try again.'
-                            )}
+                            <span className="flex-1">
+                                {t(
+                                    'admin.analysis.eigenvalue_error',
+                                    'Failed to load analysis data. Please try again.'
+                                )}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => eigenvaluesQuery.refetch()}
+                                className="gap-1.5 shrink-0"
+                            >
+                                <RefreshCw className="size-3.5" aria-hidden="true" />
+                                {t('admin.analysis.retry', 'Retry')}
+                            </Button>
                         </div>
                     )}
 
@@ -187,7 +340,11 @@ export default function AnalysisPage() {
                             <Label htmlFor="extraction-select" className="text-xs">
                                 {t('admin.analysis.extraction_method', 'Extraction')}
                             </Label>
-                            <Select value={extraction} onValueChange={setExtraction}>
+                            <Select
+                                value={extraction}
+                                onValueChange={setExtraction}
+                                disabled={isRunning}
+                            >
                                 <SelectTrigger id="extraction-select" className="w-[140px]">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -209,12 +366,13 @@ export default function AnalysisPage() {
                             <Select
                                 value={String(nFactors)}
                                 onValueChange={(v) => setNFactors(Number(v))}
+                                disabled={isRunning}
                             >
                                 <SelectTrigger id="factors-select" className="w-[80px]">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    {Array.from({ length: 10 }, (_, i) => (
+                                    {Array.from({ length: maxFactors }, (_, i) => (
                                         <SelectItem key={i + 1} value={String(i + 1)}>
                                             {i + 1}
                                         </SelectItem>
@@ -227,7 +385,11 @@ export default function AnalysisPage() {
                             <Label htmlFor="rotation-select" className="text-xs">
                                 {t('admin.analysis.rotation_method', 'Rotation')}
                             </Label>
-                            <Select value={rotation} onValueChange={setRotation}>
+                            <Select
+                                value={rotation}
+                                onValueChange={setRotation}
+                                disabled={isRunning}
+                            >
                                 <SelectTrigger id="rotation-select" className="w-[140px]">
                                     <SelectValue />
                                 </SelectTrigger>
@@ -242,20 +404,71 @@ export default function AnalysisPage() {
                             </Select>
                         </div>
 
+                        <div className="space-y-1.5">
+                            <Label htmlFor="flagging-select" className="text-xs">
+                                {t('admin.analysis.flagging_method', 'Flagging')}
+                            </Label>
+                            <Select
+                                value={flagging}
+                                onValueChange={(v) => {
+                                    setFlagging(v as 'auto' | 'manual');
+                                    if (v === 'auto') setManualFlags({});
+                                }}
+                                disabled={isRunning}
+                            >
+                                <SelectTrigger id="flagging-select" className="w-[120px]">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="auto">
+                                        {t('admin.analysis.auto', 'Auto')}
+                                    </SelectItem>
+                                    <SelectItem value="manual">
+                                        {t('admin.analysis.manual', 'Manual')}
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
                         <Button
                             onClick={handleRunAnalysis}
-                            disabled={analysisMutation.isPending || !hasEigenvalues}
+                            disabled={isRunning || !hasEigenvalues}
                             className="gap-2"
                         >
-                            {analysisMutation.isPending ? (
+                            {isRunning ? (
                                 <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                             ) : (
                                 <Play className="size-4" aria-hidden="true" />
                             )}
-                            {analysisMutation.isPending
+                            {isRunning
                                 ? t('admin.analysis.running', 'Analyzing...')
                                 : t('admin.analysis.run', 'Run Analysis')}
                         </Button>
+
+                        {result && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="gap-2">
+                                        <Download className="size-4" aria-hidden="true" />
+                                        {t('admin.analysis.export', 'Export')}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                    <DropdownMenuItem onClick={() => handleExport('loadings')}>
+                                        {t(
+                                            'admin.analysis.export_loadings',
+                                            'CSV — Factor Loadings'
+                                        )}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleExport('scores')}>
+                                        {t(
+                                            'admin.analysis.export_scores',
+                                            'CSV — Statement Scores'
+                                        )}
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
                     </div>
                 </CardContent>
             </Card>
@@ -263,7 +476,7 @@ export default function AnalysisPage() {
             {/* Results */}
             {result && (
                 <Card className="border-none shadow-sm bg-white rounded-2xl relative">
-                    {analysisMutation.isPending && (
+                    {isRunning && (
                         <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center rounded-2xl">
                             <div className="flex items-center gap-2 text-slate-500">
                                 <Loader2 className="size-5 animate-spin" aria-hidden="true" />
@@ -295,7 +508,12 @@ export default function AnalysisPage() {
                             </TabsList>
 
                             <TabsContent value="loadings">
-                                <FactorLoadingsTable result={result} />
+                                <FactorLoadingsTable
+                                    result={result}
+                                    flaggingMode={flagging}
+                                    manualFlags={manualFlags}
+                                    onToggleFlag={handleToggleFlag}
+                                />
                             </TabsContent>
 
                             <TabsContent value="arrays">
@@ -315,7 +533,7 @@ export default function AnalysisPage() {
             )}
 
             {/* Empty state */}
-            {!result && !analysisMutation.isPending && hasEigenvalues && (
+            {!result && !isRunning && hasEigenvalues && (
                 <div className="text-center py-12 text-slate-400">
                     <ChartColumnStacked className="size-12 mx-auto mb-3 opacity-30" />
                     <p className="text-sm">
