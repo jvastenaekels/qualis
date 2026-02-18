@@ -1,5 +1,6 @@
 import {
     BadgeCheck,
+    ChartColumnStacked,
     ChevronsUpDown,
     Globe,
     LayoutDashboard,
@@ -251,6 +252,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       show: can('study:view_data'),
                   },
                   {
+                      title: t('admin.sidebar.analysis', 'Analysis'),
+                      url: `/app/${workspaceSlug}/studies/${params.studySlug}/analysis`,
+                      icon: ChartColumnStacked,
+                      show: can('study:view_data'),
+                  },
+                  {
                       title: t('admin.sidebar.settings'),
                       url: `/app/${workspaceSlug}/studies/${params.studySlug}/settings`,
                       icon: Settings,
@@ -310,6 +317,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                     ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/data`
                                     : `/admin/studies/${activeStudyId}/exports`,
                           icon: Table,
+                      },
+                      {
+                          title: t('admin.sidebar.analysis', 'Analysis'),
+                          url:
+                              workspaceSlug && activeStudyId
+                                  ? `/app/${workspaceSlug}/studies/${activeStudyId}/analysis`
+                                  : activeStudy?.workspace?.slug && activeStudyId
+                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/analysis`
+                                    : `/admin/studies/${activeStudyId}/analysis`,
+                          icon: ChartColumnStacked,
                       },
                       {
                           title: t('admin.sidebar.settings', 'Settings'),

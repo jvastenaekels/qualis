@@ -22,6 +22,7 @@ from app.middleware.errors import (
 )
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import audio, auth, logs, participants, submissions
+from app.routers.admin import analysis as admin_analysis
 from app.routers.admin import exports as admin_exports
 from app.routers.admin import invitations as admin_invitations
 from app.routers.admin import recruitment as admin_recruitment
@@ -124,6 +125,9 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api", tags=["auth"])
 app.include_router(
     admin_studies.router, prefix="/api/admin/studies", tags=["admin-studies"]
+)
+app.include_router(
+    admin_analysis.router, prefix="/api/admin/studies", tags=["admin-analysis"]
 )
 app.include_router(
     admin_exports.router, prefix="/api/admin/studies", tags=["admin-exports"]

@@ -5,6 +5,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './analysisRequest';
+export * from './analysisRequestManualFlags';
+export * from './analysisRequestManualFlagsAnyOf';
+export * from './analysisResult';
 export * from './audioRecordingRead';
 export * from './audioRecordingReadDurationSeconds';
 export * from './audioRecordingReadPresignedUrl';
@@ -25,6 +29,8 @@ export * from './consentInput';
 export * from './consentInputConsentHash';
 export * from './createRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams';
 export * from './deleteAudioRecordingApiAudioRecordingIdDeleteParams';
+export * from './eigenvalueResult';
+export * from './factorCharacteristic';
 export * from './getAudioUrlApiAudioRecordingIdUrlGetParams';
 export * from './getStudyApiStudySlugGetParams';
 export * from './gridColumn';
@@ -47,6 +53,8 @@ export * from './participantDetailReadSubmittedAt';
 export * from './participantDetailReadUserAgent';
 export * from './participantDiscardUpdate';
 export * from './participantDiscardUpdateDiscardReason';
+export * from './participantLoading';
+export * from './participantLoadingFlaggedFactor';
 export * from './participantRead';
 export * from './participantReadDiscardReason';
 export * from './participantReadRecruitmentToken';
@@ -71,8 +79,11 @@ export * from './recruitmentLinkReadCapacity';
 export * from './recruitmentLinkReadExpiresAt';
 export * from './recruitmentLinkReadName';
 export * from './recruitmentLinkType';
+export * from './statementClassification';
+export * from './statementClassificationSignificance';
 export * from './statementCreate';
 export * from './statementRead';
+export * from './statementScore';
 export * from './statementTranslationCreate';
 export * from './statementTranslationRead';
 export * from './statementUpdate';

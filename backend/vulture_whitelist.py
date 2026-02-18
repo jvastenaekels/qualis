@@ -86,6 +86,10 @@ clear_test_runs
 clear_all_participants
 get_study_storage_usage
 
+# admin/analysis.py
+get_eigenvalues
+run_factor_analysis
+
 # audio.py
 upload_audio
 delete_audio_recording
@@ -167,6 +171,7 @@ SchemaValidationError
 _.start_count
 delete_link
 get_storage_service
+get_study_sort_data
 
 # --- app/utils/script_utils.py ---
 sync_study_from_file
@@ -184,3 +189,20 @@ validate_name
 pre_instruction
 statement_code
 url_expires_at
+
+# Analysis schemas (app/schemas.py)
+validate_extraction
+validate_rotation
+validate_flagging
+significance
+factor
+variance_explained
+cumulative_variance
+avg_rel_coef
+composite_reliability
+se_factor_scores
+total_variance_explained
+rotated_loadings
+factor_characteristics
+suggested_n_factors
+flagged_factors

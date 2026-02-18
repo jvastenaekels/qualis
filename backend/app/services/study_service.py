@@ -1235,3 +1235,78 @@ class StudyService:
             "participants": participant_data,
             "statement_id_to_index": statement_id_to_index,
         }
+
+    @staticmethod
+    async def get_study_sort_data(db: AsyncSession, study_id: int) -> dict[str, Any]:
+        """Lightweight version of get_study_full_dump for analysis.
+
+        Skips audio recordings, presigned URLs, presort/postsort answers,
+        and other metadata not needed for factor analysis. Only loads
+        completed, non-discarded, non-test participants with Q-sort scores.
+        """
+        # 1. Study with statements
+        stmt = (
+            select(Study)
+            .where(Study.id == study_id)
+            .options(
+                selectinload(Study.statements).selectinload(Statement.translations),
+            )
+        )
+        result = await db.execute(stmt)
+        study = result.scalar_one_or_none()
+        if not study:
+            raise HTTPException(status_code=404, detail="Study not found")
+
+        # 2. Only completed, non-discarded, non-test participants (with Q-sort entries only)
+        p_stmt = (
+            select(Participant)
+            .where(
+                Participant.study_id == study_id,
+                Participant.is_discarded.is_(False),
+                Participant.is_test_run.is_(False),
+                Participant.status == ParticipantStatus.completed,
+            )
+            .options(selectinload(Participant.qsort_entries))
+        )
+        p_result = await db.execute(p_stmt)
+        participants = p_result.scalars().all()
+
+        # 3. Build lightweight structure
+        sorted_statements = sorted(study.statements, key=lambda s: s.display_order)
+
+        participant_data = []
+        for p in participants:
+            placements = {}
+            if p.qsort_entries:
+                placements = {
+                    entry.statement_id: entry.grid_score for entry in p.qsort_entries
+                }
+            scores = [placements.get(s.id, None) for s in sorted_statements]
+
+            participant_data.append(
+                {
+                    "id": str(p.session_token)[:8].upper(),
+                    "db_id": p.id,
+                    "scores": scores,
+                    "is_discarded": False,
+                    "is_test_run": False,
+                    "status": "completed",
+                }
+            )
+
+        return {
+            "study": {
+                "statements": [
+                    {
+                        "id": s.id,
+                        "code": s.code,
+                        "translations": [
+                            {"lang": t.language_code, "text": t.text}
+                            for t in s.translations
+                        ],
+                    }
+                    for s in sorted_statements
+                ],
+            },
+            "participants": participant_data,
+        }

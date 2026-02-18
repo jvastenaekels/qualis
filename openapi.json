@@ -1289,6 +1289,118 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/analysis/eigenvalues": {
+      "get": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "Get Eigenvalues",
+        "description": "Compute eigenvalues for the scree plot (before running full analysis).",
+        "operationId": "get_eigenvalues_api_admin_studies__slug__analysis_eigenvalues_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EigenvalueResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/analysis/run": {
+      "post": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "Run Factor Analysis",
+        "description": "Run a complete Q-method factor analysis.",
+        "operationId": "run_factor_analysis_api_admin_studies__slug__analysis_run_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnalysisRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/export/csv": {
       "get": {
         "tags": [
@@ -3214,6 +3326,189 @@
   },
   "components": {
     "schemas": {
+      "AnalysisRequest": {
+        "properties": {
+          "extraction": {
+            "type": "string",
+            "title": "Extraction",
+            "description": "Factor extraction method: 'pca' or 'centroid'",
+            "default": "pca"
+          },
+          "n_factors": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "N Factors",
+            "description": "Number of factors to extract",
+            "default": 3
+          },
+          "rotation": {
+            "type": "string",
+            "title": "Rotation",
+            "description": "Rotation method: 'varimax' or 'none'",
+            "default": "varimax"
+          },
+          "flagging": {
+            "type": "string",
+            "title": "Flagging",
+            "description": "Flagging method: 'auto' or 'manual'",
+            "default": "auto"
+          },
+          "manual_flags": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manual Flags",
+            "description": "Manual participant-to-factor assignments (participant_db_id \u2192 factor_number, 1-indexed)"
+          }
+        },
+        "type": "object",
+        "title": "AnalysisRequest",
+        "description": "Schema for requesting a Q-method factor analysis."
+      },
+      "AnalysisResult": {
+        "properties": {
+          "n_participants": {
+            "type": "integer",
+            "title": "N Participants"
+          },
+          "n_statements": {
+            "type": "integer",
+            "title": "N Statements"
+          },
+          "n_factors": {
+            "type": "integer",
+            "title": "N Factors"
+          },
+          "extraction": {
+            "type": "string",
+            "title": "Extraction"
+          },
+          "rotation": {
+            "type": "string",
+            "title": "Rotation"
+          },
+          "eigenvalues": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Eigenvalues"
+          },
+          "total_variance_explained": {
+            "type": "number",
+            "title": "Total Variance Explained"
+          },
+          "loadings": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Loadings",
+            "description": "Unrotated loadings: n_participants x n_factors"
+          },
+          "rotated_loadings": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Rotated Loadings",
+            "description": "Rotated loadings: n_participants x n_factors"
+          },
+          "flags": {
+            "items": {
+              "items": {
+                "type": "boolean"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Flags",
+            "description": "Flagging matrix: n_participants x n_factors"
+          },
+          "participants": {
+            "items": {
+              "$ref": "#/components/schemas/ParticipantLoading"
+            },
+            "type": "array",
+            "title": "Participants"
+          },
+          "statement_scores": {
+            "items": {
+              "$ref": "#/components/schemas/StatementScore"
+            },
+            "type": "array",
+            "title": "Statement Scores"
+          },
+          "distinguishing": {
+            "items": {
+              "$ref": "#/components/schemas/StatementClassification"
+            },
+            "type": "array",
+            "title": "Distinguishing"
+          },
+          "consensus": {
+            "items": {
+              "$ref": "#/components/schemas/StatementClassification"
+            },
+            "type": "array",
+            "title": "Consensus"
+          },
+          "factor_characteristics": {
+            "items": {
+              "$ref": "#/components/schemas/FactorCharacteristic"
+            },
+            "type": "array",
+            "title": "Factor Characteristics"
+          },
+          "correlation_matrix": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Correlation Matrix",
+            "description": "Between-factor correlation matrix: n_factors x n_factors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "n_participants",
+          "n_statements",
+          "n_factors",
+          "extraction",
+          "rotation",
+          "eigenvalues",
+          "total_variance_explained",
+          "loadings",
+          "rotated_loadings",
+          "flags",
+          "participants",
+          "statement_scores",
+          "distinguishing",
+          "consensus",
+          "factor_characteristics",
+          "correlation_matrix"
+        ],
+        "title": "AnalysisResult",
+        "description": "Complete result of a Q-method factor analysis."
+      },
       "AudioRecordingRead": {
         "properties": {
           "question_key": {
@@ -3511,6 +3806,81 @@
         "title": "ConsentInput",
         "description": "Schema for recording participant consent."
       },
+      "EigenvalueResult": {
+        "properties": {
+          "eigenvalues": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Eigenvalues"
+          },
+          "suggested_n_factors": {
+            "type": "integer",
+            "title": "Suggested N Factors",
+            "description": "Suggested number of factors (Kaiser criterion: eigenvalue > 1)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "eigenvalues",
+          "suggested_n_factors"
+        ],
+        "title": "EigenvalueResult",
+        "description": "Eigenvalues for scree plot (pre-analysis)."
+      },
+      "FactorCharacteristic": {
+        "properties": {
+          "factor": {
+            "type": "integer",
+            "title": "Factor",
+            "description": "1-indexed factor number"
+          },
+          "eigenvalue": {
+            "type": "number",
+            "title": "Eigenvalue"
+          },
+          "variance_explained": {
+            "type": "number",
+            "title": "Variance Explained"
+          },
+          "cumulative_variance": {
+            "type": "number",
+            "title": "Cumulative Variance"
+          },
+          "n_flagged": {
+            "type": "integer",
+            "title": "N Flagged"
+          },
+          "avg_rel_coef": {
+            "type": "number",
+            "title": "Avg Rel Coef",
+            "description": "Average reliability coefficient"
+          },
+          "composite_reliability": {
+            "type": "number",
+            "title": "Composite Reliability"
+          },
+          "se_factor_scores": {
+            "type": "number",
+            "title": "Se Factor Scores",
+            "description": "Standard error of factor scores"
+          }
+        },
+        "type": "object",
+        "required": [
+          "factor",
+          "eigenvalue",
+          "variance_explained",
+          "cumulative_variance",
+          "n_flagged",
+          "avg_rel_coef",
+          "composite_reliability",
+          "se_factor_scores"
+        ],
+        "title": "FactorCharacteristic",
+        "description": "Statistical characteristics for a single factor."
+      },
       "GridColumn": {
         "properties": {
           "score": {
@@ -3796,6 +4166,41 @@
         ],
         "title": "ParticipantDiscardUpdate",
         "description": "Schema for discarding/flagging a participant."
+      },
+      "ParticipantLoading": {
+        "properties": {
+          "db_id": {
+            "type": "integer",
+            "title": "Db Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "loadings": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Loadings"
+          },
+          "flagged_factors": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Flagged Factors",
+            "description": "1-indexed factors this participant is flagged to (may be multiple or empty)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "db_id",
+          "label",
+          "loadings"
+        ],
+        "title": "ParticipantLoading",
+        "description": "Factor loading for a single participant."
       },
       "ParticipantRead": {
         "properties": {
@@ -4202,6 +4607,54 @@
         "title": "RecruitmentLinkType",
         "description": "Enum for types of recruitment links."
       },
+      "StatementClassification": {
+        "properties": {
+          "statement_id": {
+            "type": "integer",
+            "title": "Statement Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "z_scores": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Z Scores"
+          },
+          "factor_arrays": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Factor Arrays"
+          },
+          "significance": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Significance",
+            "description": "Pairwise significance levels, e.g. {'1-2': 'p<0.05', '1-3': 'p<0.01'}"
+          }
+        },
+        "type": "object",
+        "required": [
+          "statement_id",
+          "code",
+          "text",
+          "z_scores",
+          "factor_arrays"
+        ],
+        "title": "StatementClassification",
+        "description": "Classification of a statement as distinguishing or consensus."
+      },
       "StatementCreate": {
         "properties": {
           "code": {
@@ -4257,6 +4710,46 @@
         ],
         "title": "StatementRead",
         "description": "Schema for reading a statement."
+      },
+      "StatementScore": {
+        "properties": {
+          "statement_id": {
+            "type": "integer",
+            "title": "Statement Id"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "z_scores": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Z Scores"
+          },
+          "factor_arrays": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Factor Arrays"
+          }
+        },
+        "type": "object",
+        "required": [
+          "statement_id",
+          "code",
+          "text",
+          "z_scores",
+          "factor_arrays"
+        ],
+        "title": "StatementScore",
+        "description": "Z-scores and factor array values for a single statement."
       },
       "StatementTranslationCreate": {
         "properties": {

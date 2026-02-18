@@ -21,6 +21,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+    AnalysisRequest,
     BodyLoginForAccessTokenApiTokenPost,
     BodyUploadAudioApiAudioUploadPost,
     ChangeStudyStateApiAdminStudiesSlugStatePostParams,
@@ -60,8 +61,10 @@ import type { RequestHandlerOptions } from 'msw';
 
 import { ParticipantStatus, RecruitmentLinkType, StudyState, WorkspaceRole } from './model';
 import type {
+    AnalysisResult,
     AudioRecordingRead,
     AudioUploadResponse,
+    EigenvalueResult,
     InvitationLink,
     ParticipantDetailRead,
     ParticipantRead,
@@ -2845,6 +2848,257 @@ export function useGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGet<
 
     return query;
 }
+
+/**
+ * Compute eigenvalues for the scree plot (before running full analysis).
+ * @summary Get Eigenvalues
+ */
+export const getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<EigenvalueResult>({
+        url: `/api/admin/studies/${slug}/analysis/eigenvalues`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetQueryKey = (
+    slug?: string
+) => {
+    return [`/api/admin/studies/${slug}/analysis/eigenvalues`] as const;
+};
+
+export const getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>
+    > = ({ signal }) => getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>
+>;
+export type GetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetQueryError = HTTPValidationError;
+
+export function useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet<
+    TData = Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet<
+    TData = Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet<
+    TData = Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Eigenvalues
+ */
+
+export function useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet<
+    TData = Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Run a complete Q-method factor analysis.
+ * @summary Run Factor Analysis
+ */
+export const runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost = (
+    slug: string,
+    analysisRequest: AnalysisRequest,
+    signal?: AbortSignal
+) => {
+    return customInstance<AnalysisResult>({
+        url: `/api/admin/studies/${slug}/analysis/run`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: analysisRequest,
+        signal,
+    });
+};
+
+export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost>>,
+        TError,
+        { slug: string; data: AnalysisRequest },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost>>,
+    TError,
+    { slug: string; data: AnalysisRequest },
+    TContext
+> => {
+    const mutationKey = ['runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost>>,
+        { slug: string; data: AnalysisRequest }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type RunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost>>
+>;
+export type RunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMutationBody = AnalysisRequest;
+export type RunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Run Factor Analysis
+ */
+export const useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost>>,
+            TError,
+            { slug: string; data: AnalysisRequest },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof runFactorAnalysisApiAdminStudiesSlugAnalysisRunPost>>,
+    TError,
+    { slug: string; data: AnalysisRequest },
+    TContext
+> => {
+    const mutationOptions =
+        getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
 
 /**
  * Export study results as CSV.
@@ -9311,6 +9565,167 @@ export const getImportStudyConfigApiAdminStudiesImportPostResponseMock = (
     ...overrideResponse,
 });
 
+export const getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetResponseMock = (
+    overrideResponse: Partial<EigenvalueResult> = {}
+): EigenvalueResult => ({
+    eigenvalues: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })
+    ),
+    suggested_n_factors: faker.number.int({ min: undefined, max: undefined }),
+    ...overrideResponse,
+});
+
+export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostResponseMock = (
+    overrideResponse: Partial<AnalysisResult> = {}
+): AnalysisResult => ({
+    n_participants: faker.number.int({ min: undefined, max: undefined }),
+    n_statements: faker.number.int({ min: undefined, max: undefined }),
+    n_factors: faker.number.int({ min: undefined, max: undefined }),
+    extraction: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    rotation: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    eigenvalues: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })
+    ),
+    total_variance_explained: faker.number.float({
+        min: undefined,
+        max: undefined,
+        fractionDigits: 2,
+    }),
+    loadings: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () =>
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() =>
+                faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })
+            )
+    ),
+    rotated_loadings: Array.from(
+        { length: faker.number.int({ min: 1, max: 10 }) },
+        (_, i) => i + 1
+    ).map(() =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() =>
+            faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })
+        )
+    ),
+    flags: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() =>
+            faker.datatype.boolean()
+        )
+    ),
+    participants: Array.from(
+        { length: faker.number.int({ min: 1, max: 10 }) },
+        (_, i) => i + 1
+    ).map(() => ({
+        db_id: faker.number.int({ min: undefined, max: undefined }),
+        label: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        loadings: Array.from(
+            { length: faker.number.int({ min: 1, max: 10 }) },
+            (_, i) => i + 1
+        ).map(() => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })),
+        flagged_factors: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() =>
+                faker.number.int({ min: undefined, max: undefined })
+            ),
+            undefined,
+        ]),
+    })),
+    statement_scores: Array.from(
+        { length: faker.number.int({ min: 1, max: 10 }) },
+        (_, i) => i + 1
+    ).map(() => ({
+        statement_id: faker.number.int({ min: undefined, max: undefined }),
+        code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        text: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        z_scores: Array.from(
+            { length: faker.number.int({ min: 1, max: 10 }) },
+            (_, i) => i + 1
+        ).map(() => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })),
+        factor_arrays: Array.from(
+            { length: faker.number.int({ min: 1, max: 10 }) },
+            (_, i) => i + 1
+        ).map(() => faker.number.int({ min: undefined, max: undefined })),
+    })),
+    distinguishing: Array.from(
+        { length: faker.number.int({ min: 1, max: 10 }) },
+        (_, i) => i + 1
+    ).map(() => ({
+        statement_id: faker.number.int({ min: undefined, max: undefined }),
+        code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        text: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        z_scores: Array.from(
+            { length: faker.number.int({ min: 1, max: 10 }) },
+            (_, i) => i + 1
+        ).map(() => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })),
+        factor_arrays: Array.from(
+            { length: faker.number.int({ min: 1, max: 10 }) },
+            (_, i) => i + 1
+        ).map(() => faker.number.int({ min: undefined, max: undefined })),
+        significance: faker.helpers.arrayElement([
+            {
+                [faker.string.alphanumeric(5)]: faker.string.alpha({
+                    length: { min: 10, max: 20 },
+                }),
+            },
+            undefined,
+        ]),
+    })),
+    consensus: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            statement_id: faker.number.int({ min: undefined, max: undefined }),
+            code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            text: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            z_scores: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })),
+            factor_arrays: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => faker.number.int({ min: undefined, max: undefined })),
+            significance: faker.helpers.arrayElement([
+                {
+                    [faker.string.alphanumeric(5)]: faker.string.alpha({
+                        length: { min: 10, max: 20 },
+                    }),
+                },
+                undefined,
+            ]),
+        })
+    ),
+    factor_characteristics: Array.from(
+        { length: faker.number.int({ min: 1, max: 10 }) },
+        (_, i) => i + 1
+    ).map(() => ({
+        factor: faker.number.int({ min: undefined, max: undefined }),
+        eigenvalue: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+        variance_explained: faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+        }),
+        cumulative_variance: faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+        }),
+        n_flagged: faker.number.int({ min: undefined, max: undefined }),
+        avg_rel_coef: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+        composite_reliability: faker.number.float({
+            min: undefined,
+            max: undefined,
+            fractionDigits: 2,
+        }),
+        se_factor_scores: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    })),
+    correlation_matrix: Array.from(
+        { length: faker.number.int({ min: 1, max: 10 }) },
+        (_, i) => i + 1
+    ).map(() =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() =>
+            faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })
+        )
+    ),
+    ...overrideResponse,
+});
+
 export const getListUsersApiAdminUsersGetResponseMock = (): UserRead[] =>
     Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
         email: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -10231,6 +10646,58 @@ export const getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetMockHandle
     );
 };
 
+export const getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetMockHandler = (
+    overrideResponse?:
+        | EigenvalueResult
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<EigenvalueResult> | EigenvalueResult),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/analysis/eigenvalues',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMockHandler = (
+    overrideResponse?:
+        | AnalysisResult
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AnalysisResult> | AnalysisResult),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:slug/analysis/run',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -11100,6 +11567,8 @@ export const getLibreQAPIMock = () => [
     getImportStudyConfigApiAdminStudiesImportPostMockHandler(),
     getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler(),
     getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetMockHandler(),
+    getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetMockHandler(),
+    getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMockHandler(),
     getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
     getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),

@@ -22,6 +22,7 @@ dependencies = [
     "python-multipart>=0.0.22",
     "boto3>=1.36.17",
     "python-magic>=0.4.27",
+    "numpy>=2.2.0",
 ]
 
 [dependency-groups]

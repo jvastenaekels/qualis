@@ -42,6 +42,7 @@ const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
 const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
 const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage'));
 const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
+const AnalysisPage = lazy(() => import('./pages/admin/AnalysisPage'));
 
 // const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
 import DataExportsPage from './pages/admin/DataExportsPage';
@@ -170,6 +171,11 @@ const router = createBrowserRouter([
                                         path: 'data',
                                         element: <DataExportsPage />,
                                         loader: dataExportsPageLoader,
+                                        HydrateFallback: DesignerSkeleton,
+                                    },
+                                    {
+                                        path: 'analysis',
+                                        element: <AnalysisPage />,
                                         HydrateFallback: DesignerSkeleton,
                                     },
                                     {
