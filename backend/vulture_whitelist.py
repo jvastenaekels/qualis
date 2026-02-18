@@ -124,6 +124,9 @@ disable_totp
 # logs.py
 report_log
 
+# participants.py
+update_progress
+
 # submissions.py
 submit_study
 unlock_study

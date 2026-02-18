@@ -440,6 +440,13 @@ class ConsentInput(BaseModel):
     is_test_run: bool = False
 
 
+class ProgressUpdate(BaseModel):
+    """Schema for recording participant step progress."""
+
+    session_token: UUID
+    step: int = Field(..., ge=1, le=5)
+
+
 class SubmissionInput(BaseModel):
     """Schema for the full study submission/completion."""
 
@@ -524,6 +531,10 @@ class ParticipantRead(BaseModel):
     user_agent: str | None
     # We don't expose IP address directly to researchers usually, maybe masked or hash
     # For now, let's keep it private or added if requested.
+
+    # Step progress tracking
+    last_step_reached: int | None = None
+    last_step_reached_at: datetime | None = None
 
     # Computed fields
     recruitment_token: str | None = None

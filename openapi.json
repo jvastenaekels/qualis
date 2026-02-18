@@ -2922,6 +2922,59 @@
         }
       }
     },
+    "/api/study/{slug}/progress": {
+      "patch": {
+        "tags": [
+          "participants"
+        ],
+        "summary": "Update Progress",
+        "description": "Records the participant's current step (fire-and-forget from frontend).",
+        "operationId": "update_progress_api_study__slug__progress_patch",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Study Slug",
+              "description": "The distinct slug of the study"
+            },
+            "description": "The distinct slug of the study"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProgressUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/logs": {
       "post": {
         "tags": [
@@ -4084,6 +4137,29 @@
             ],
             "title": "User Agent"
           },
+          "last_step_reached": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Step Reached"
+          },
+          "last_step_reached_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Step Reached At"
+          },
           "recruitment_token": {
             "anyOf": [
               {
@@ -4271,6 +4347,29 @@
             ],
             "title": "User Agent"
           },
+          "last_step_reached": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Step Reached"
+          },
+          "last_step_reached_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Step Reached At"
+          },
           "recruitment_token": {
             "anyOf": [
               {
@@ -4408,6 +4507,28 @@
         ],
         "title": "ProcessStep",
         "description": "Schema for a dynamic study process step."
+      },
+      "ProgressUpdate": {
+        "properties": {
+          "session_token": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Token"
+          },
+          "step": {
+            "type": "integer",
+            "maximum": 5.0,
+            "minimum": 1.0,
+            "title": "Step"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_token",
+          "step"
+        ],
+        "title": "ProgressUpdate",
+        "description": "Schema for recording participant step progress."
       },
       "QSortEntryInput": {
         "properties": {

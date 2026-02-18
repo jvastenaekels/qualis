@@ -600,7 +600,26 @@
             "caption_loadings": "Factor loadings per participant",
             "caption_statements": "Statement z-scores and factor arrays per factor",
             "caption_characteristics": "Factor characteristics and reliability statistics",
-            "caption_correlations": "Factor-to-factor correlation matrix"
+            "caption_correlations": "Factor-to-factor correlation matrix",
+            "retry": "Retry",
+            "flagging_method": "Flagging",
+            "auto": "Auto",
+            "manual": "Manual",
+            "manual_flag_hint": "Click a loading cell to flag/unflag a participant for that factor. Re-run analysis to update results.",
+            "no_flagged_participants": "No participants flagged for any factor. Try adjusting the number of factors or flagging method.",
+            "no_statement_scores": "No statement scores available. Ensure participants are flagged for at least one factor.",
+            "no_characteristics": "No factor characteristics available.",
+            "export": "Export",
+            "export_loadings": "CSV — Factor Loadings",
+            "export_scores": "CSV — Statement Scores",
+            "select_factors": "Select number of factors",
+            "loadings_help": "Factor loadings show how strongly each participant correlates with each factor. Highlighted cells indicate statistically significant loadings.",
+            "factor_array_help": "Composite Q-sort showing the idealized sort pattern for this factor. Statements are placed in the distribution based on their weighted z-scores.",
+            "factor_array_label": "Factor {{n}} composite sort",
+            "statements_help": "Z-scores show each factor's standardized position on each statement. D = distinguishing (significantly different between factors), C = consensus (no significant differences).",
+            "z_scores_description": "Z-scores and factor array positions per statement",
+            "factor_statistics": "Factor Statistics",
+            "characteristics_help": "Eigenvalues indicate factor strength. Composite reliability measures internal consistency. SE indicates precision of factor score estimates."
         },
         "workspace": {
             "switcher": {
@@ -1477,6 +1496,13 @@
                 "in_progress": "In progress",
                 "abandoned": "Abandoned",
                 "discarded": "discarded"
+            },
+            "step": {
+                "consent": "Consent",
+                "presort": "Pre-sort",
+                "rough": "Rough sort",
+                "fine": "Fine sort",
+                "post": "Post-sort"
             },
             "actions": {
                 "discard": "Discard",

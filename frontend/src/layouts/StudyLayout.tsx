@@ -28,6 +28,7 @@ import {
     useLoaderData,
 } from 'react-router-dom';
 import { ApiError } from '../api/client';
+import { customInstance } from '../api/mutator';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
@@ -66,6 +67,31 @@ const StudyLayoutContent: React.FC = () => {
     const hasConsented = useSessionStore((state) => state.hasConsented);
     const sessionLanguage = useSessionStore((state) => state.language);
     const isPilotMode = useSessionStore((state) => state.isPilotMode);
+
+    // Fire-and-forget progress tracking: report step advances to backend
+    const lastReportedStepRef = useRef(0);
+    useEffect(() => {
+        const unsub = useSessionStore.subscribe((state, prevState) => {
+            const step = state.maxReachedStep;
+            if (
+                step > prevState.maxReachedStep &&
+                step > lastReportedStepRef.current &&
+                !state.isPilotMode &&
+                state.token &&
+                slug
+            ) {
+                lastReportedStepRef.current = step;
+                customInstance({
+                    url: `/api/study/${slug}/progress`,
+                    method: 'PATCH',
+                    data: { session_token: state.token, step },
+                }).catch(() => {
+                    // Silent failure — participant experience is unaffected
+                });
+            }
+        });
+        return unsub;
+    }, [slug]);
 
     const location = useLocation();
     const { headerAction } = useLayoutState();

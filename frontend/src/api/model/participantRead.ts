@@ -8,6 +8,8 @@ import type { ParticipantStatus } from './participantStatus';
 import type { ParticipantReadSubmittedAt } from './participantReadSubmittedAt';
 import type { ParticipantReadDiscardReason } from './participantReadDiscardReason';
 import type { ParticipantReadUserAgent } from './participantReadUserAgent';
+import type { ParticipantReadLastStepReached } from './participantReadLastStepReached';
+import type { ParticipantReadLastStepReachedAt } from './participantReadLastStepReachedAt';
 import type { ParticipantReadRecruitmentToken } from './participantReadRecruitmentToken';
 
 /**
@@ -25,5 +27,7 @@ export interface ParticipantRead {
     is_test_run: boolean;
     discard_reason: ParticipantReadDiscardReason;
     user_agent: ParticipantReadUserAgent;
+    last_step_reached?: ParticipantReadLastStepReached;
+    last_step_reached_at?: ParticipantReadLastStepReachedAt;
     recruitment_token?: ParticipantReadRecruitmentToken;
 }

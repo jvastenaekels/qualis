@@ -102,12 +102,22 @@ const ABANDONED_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
 
 function getDisplayStatus(p: DumpParticipant): 'completed' | 'in_progress' | 'abandoned' {
     if (p.status === 'completed') return 'completed';
-    if (p.created_at) {
-        const age = Date.now() - new Date(p.created_at).getTime();
+    // Use last_step_reached_at if available, fallback to created_at
+    const lastActive = p.last_step_reached_at || p.created_at;
+    if (lastActive) {
+        const age = Date.now() - new Date(lastActive).getTime();
         if (age > ABANDONED_THRESHOLD_MS) return 'abandoned';
     }
     return 'in_progress';
 }
+
+const STEP_LABEL_KEYS: Record<number, [string, string]> = {
+    1: ['admin.data.step.consent', 'Consent'],
+    2: ['admin.data.step.presort', 'Pre-sort'],
+    3: ['admin.data.step.rough', 'Rough sort'],
+    4: ['admin.data.step.fine', 'Fine sort'],
+    5: ['admin.data.step.post', 'Post-sort'],
+};
 const PAGE_SIZE = 25;
 const columnHelper = createColumnHelper<DumpParticipant>();
 
@@ -179,6 +189,10 @@ function ParticipantCard({
                     )}
                 >
                     {t(`admin.data.status.${displayStatus}`, displayStatus)}
+                    {displayStatus !== 'completed' &&
+                        participant.last_step_reached != null &&
+                        STEP_LABEL_KEYS[participant.last_step_reached] &&
+                        ` \u2013 ${t(...STEP_LABEL_KEYS[participant.last_step_reached])}`}
                 </Badge>
             </div>
 
@@ -604,7 +618,12 @@ export default function InteractiveDataView({
                     </Button>
                 ),
                 cell: ({ row }) => {
-                    const displayStatus = getDisplayStatus(row.original);
+                    const p = row.original;
+                    const displayStatus = getDisplayStatus(p);
+                    const stepEntry =
+                        displayStatus !== 'completed' && p.last_step_reached != null
+                            ? STEP_LABEL_KEYS[p.last_step_reached]
+                            : null;
                     return (
                         <Badge
                             variant="outline"
@@ -618,6 +637,7 @@ export default function InteractiveDataView({
                             )}
                         >
                             {t(`admin.data.status.${displayStatus}`, displayStatus)}
+                            {stepEntry && ` \u2013 ${t(...stepEntry)}`}
                         </Badge>
                     );
                 },

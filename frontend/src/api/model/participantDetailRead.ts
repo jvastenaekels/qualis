@@ -8,6 +8,8 @@ import type { ParticipantStatus } from './participantStatus';
 import type { ParticipantDetailReadSubmittedAt } from './participantDetailReadSubmittedAt';
 import type { ParticipantDetailReadDiscardReason } from './participantDetailReadDiscardReason';
 import type { ParticipantDetailReadUserAgent } from './participantDetailReadUserAgent';
+import type { ParticipantDetailReadLastStepReached } from './participantDetailReadLastStepReached';
+import type { ParticipantDetailReadLastStepReachedAt } from './participantDetailReadLastStepReachedAt';
 import type { ParticipantDetailReadRecruitmentToken } from './participantDetailReadRecruitmentToken';
 import type { ParticipantDetailReadPresortAnswers } from './participantDetailReadPresortAnswers';
 import type { ParticipantDetailReadPostsortAnswers } from './participantDetailReadPostsortAnswers';
@@ -29,6 +31,8 @@ export interface ParticipantDetailRead {
     is_test_run: boolean;
     discard_reason: ParticipantDetailReadDiscardReason;
     user_agent: ParticipantDetailReadUserAgent;
+    last_step_reached?: ParticipantDetailReadLastStepReached;
+    last_step_reached_at?: ParticipantDetailReadLastStepReachedAt;
     recruitment_token?: ParticipantDetailReadRecruitmentToken;
     presort_answers: ParticipantDetailReadPresortAnswers;
     postsort_answers: ParticipantDetailReadPostsortAnswers;

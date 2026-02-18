@@ -35,6 +35,8 @@ export interface DumpParticipant {
     user_agent?: string;
     created_at?: string;
     ip_address?: string;
+    last_step_reached?: number | null;
+    last_step_reached_at?: string | null;
 }
 
 export interface DumpResponse {

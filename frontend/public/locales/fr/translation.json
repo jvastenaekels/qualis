@@ -592,7 +592,26 @@
             "caption_loadings": "Saturations factorielles par participant",
             "caption_statements": "Scores z et tableaux factoriels par facteur",
             "caption_characteristics": "Caractéristiques factorielles et statistiques de fiabilité",
-            "caption_correlations": "Matrice de corrélation entre facteurs"
+            "caption_correlations": "Matrice de corrélation entre facteurs",
+            "retry": "Réessayer",
+            "flagging_method": "Marquage",
+            "auto": "Automatique",
+            "manual": "Manuel",
+            "manual_flag_hint": "Cliquez sur une cellule de saturation pour marquer/démarquer un participant pour ce facteur. Relancez l'analyse pour mettre à jour les résultats.",
+            "no_flagged_participants": "Aucun participant marqué pour un facteur. Essayez d'ajuster le nombre de facteurs ou la méthode de marquage.",
+            "no_statement_scores": "Aucun score d'énoncé disponible. Assurez-vous que des participants sont marqués pour au moins un facteur.",
+            "no_characteristics": "Aucune caractéristique factorielle disponible.",
+            "export": "Exporter",
+            "export_loadings": "CSV — Saturations factorielles",
+            "export_scores": "CSV — Scores des énoncés",
+            "select_factors": "Sélectionner le nombre de facteurs",
+            "loadings_help": "Les saturations factorielles montrent la corrélation de chaque participant avec chaque facteur. Les cellules surlignées indiquent des saturations statistiquement significatives.",
+            "factor_array_help": "Q-sort composite montrant le patron de tri idéalisé pour ce facteur. Les énoncés sont placés dans la distribution selon leurs scores z pondérés.",
+            "factor_array_label": "Tri composite du facteur {{n}}",
+            "statements_help": "Les scores z montrent la position standardisée de chaque facteur sur chaque énoncé. D = distinctif (différence significative entre facteurs), C = consensus (aucune différence significative).",
+            "z_scores_description": "Scores z et positions dans le tableau factoriel par énoncé",
+            "factor_statistics": "Statistiques factorielles",
+            "characteristics_help": "Les valeurs propres indiquent la force du facteur. La fiabilité composite mesure la cohérence interne. L'ET indique la précision des estimations de scores factoriels."
         },
         "workspace": {
             "roles": {
@@ -1507,6 +1526,13 @@
                 "in_progress": "En cours",
                 "abandoned": "Abandonné",
                 "discarded": "rejeté"
+            },
+            "step": {
+                "consent": "Consentement",
+                "presort": "Pré-tri",
+                "rough": "Tri initial",
+                "fine": "Tri fin",
+                "post": "Post-tri"
             },
             "actions": {
                 "discard": "Écarter",

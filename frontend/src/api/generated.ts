@@ -35,6 +35,7 @@ import type {
     LogEntry,
     ParticipantDiscardUpdate,
     PasswordChange,
+    ProgressUpdate,
     RecruitmentLinkCreate,
     StudyCreate,
     StudyImportRequest,
@@ -6806,6 +6807,90 @@ export const useRecordConsentApiStudySlugConsentPost = <
 };
 
 /**
+ * Records the participant's current step (fire-and-forget from frontend).
+ * @summary Update Progress
+ */
+export const updateProgressApiStudySlugProgressPatch = (
+    slug: string,
+    progressUpdate: ProgressUpdate
+) => {
+    return customInstance<unknown>({
+        url: `/api/study/${slug}/progress`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: progressUpdate,
+    });
+};
+
+export const getUpdateProgressApiStudySlugProgressPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateProgressApiStudySlugProgressPatch>>,
+        TError,
+        { slug: string; data: ProgressUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateProgressApiStudySlugProgressPatch>>,
+    TError,
+    { slug: string; data: ProgressUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateProgressApiStudySlugProgressPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateProgressApiStudySlugProgressPatch>>,
+        { slug: string; data: ProgressUpdate }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return updateProgressApiStudySlugProgressPatch(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateProgressApiStudySlugProgressPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateProgressApiStudySlugProgressPatch>>
+>;
+export type UpdateProgressApiStudySlugProgressPatchMutationBody = ProgressUpdate;
+export type UpdateProgressApiStudySlugProgressPatchMutationError = HTTPValidationError;
+
+/**
+ * @summary Update Progress
+ */
+export const useUpdateProgressApiStudySlugProgressPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateProgressApiStudySlugProgressPatch>>,
+            TError,
+            { slug: string; data: ProgressUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateProgressApiStudySlugProgressPatch>>,
+    TError,
+    { slug: string; data: ProgressUpdate },
+    TContext
+> => {
+    const mutationOptions = getUpdateProgressApiStudySlugProgressPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * Receives logging/error data from the frontend.
  * @summary Report Log
  */
@@ -9407,6 +9492,14 @@ export const getGetParticipantApiAdminStudiesParticipantsParticipantIdGetRespons
         faker.string.alpha({ length: { min: 10, max: 20 } }),
         null,
     ]),
+    last_step_reached: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
+        undefined,
+    ]),
+    last_step_reached_at: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
     recruitment_token: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
@@ -9485,6 +9578,17 @@ export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscar
             faker.string.alpha({ length: { min: 10, max: 20 } }),
             null,
         ]),
+        last_step_reached: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            undefined,
+        ]),
+        last_step_reached_at: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+            undefined,
+        ]),
         recruitment_token: faker.helpers.arrayElement([
             faker.helpers.arrayElement([
                 faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -9517,6 +9621,20 @@ export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseM
             user_agent: faker.helpers.arrayElement([
                 faker.string.alpha({ length: { min: 10, max: 20 } }),
                 null,
+            ]),
+            last_step_reached: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            last_step_reached_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
             ]),
             recruitment_token: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
@@ -11309,6 +11427,24 @@ export const getRecordConsentApiStudySlugConsentPostMockHandler = (
     );
 };
 
+export const getUpdateProgressApiStudySlugProgressPatchMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/study/:slug/progress',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
 export const getReportLogApiLogsPostMockHandler = (
     overrideResponse?:
         | unknown
@@ -11598,6 +11734,7 @@ export const getLibreQAPIMock = () => [
     getGetStudyApiStudySlugGetMockHandler(),
     getUnlockStudyApiStudySlugUnlockPostMockHandler(),
     getRecordConsentApiStudySlugConsentPostMockHandler(),
+    getUpdateProgressApiStudySlugProgressPatchMockHandler(),
     getReportLogApiLogsPostMockHandler(),
     getUploadAudioApiAudioUploadPostMockHandler(),
     getDeleteAudioRecordingApiAudioRecordingIdDeleteMockHandler(),

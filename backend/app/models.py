@@ -16,6 +16,7 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
+    SmallInteger,
     String,
     UniqueConstraint,
     CheckConstraint,
@@ -345,6 +346,14 @@ class Participant(Base):
         DateTime(timezone=True), nullable=True
     )
     consent_hash: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    # Step progress tracking (1=consent, 2=presort, 3=rough sort, 4=fine sort, 5=post-sort)
+    last_step_reached: Mapped[int | None] = mapped_column(
+        SmallInteger, nullable=True, default=1
+    )
+    last_step_reached_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     # Answers
     presort_answers: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)

@@ -592,7 +592,26 @@
             "caption_loadings": "Faktorikuormitukset osallistujittain",
             "caption_statements": "Väittämien z-arvot ja faktorijärjestykset faktoreittain",
             "caption_characteristics": "Faktorien ominaisuudet ja luotettavuustilastot",
-            "caption_correlations": "Faktorien välinen korrelaatiomatriisi"
+            "caption_correlations": "Faktorien välinen korrelaatiomatriisi",
+            "retry": "Yritä uudelleen",
+            "flagging_method": "Merkintä",
+            "auto": "Automaattinen",
+            "manual": "Manuaalinen",
+            "manual_flag_hint": "Napsauta kuormitussolua merkitäksesi/poistaaksesi osallistujan merkinnän kyseiselle faktorille. Suorita analyysi uudelleen päivittääksesi tulokset.",
+            "no_flagged_participants": "Yhtään osallistujaa ei ole merkitty millekään faktorille. Kokeile muuttaa faktorien lukumäärää tai merkintämenetelmää.",
+            "no_statement_scores": "Väittämäpisteitä ei saatavilla. Varmista, että osallistujia on merkitty vähintään yhdelle faktorille.",
+            "no_characteristics": "Faktorien ominaisuustietoja ei saatavilla.",
+            "export": "Vie",
+            "export_loadings": "CSV — Faktorikuormitukset",
+            "export_scores": "CSV — Väittämäpisteet",
+            "select_factors": "Valitse faktorien lukumäärä",
+            "loadings_help": "Faktorikuormitukset osoittavat, kuinka voimakkaasti kukin osallistuja korreloi kunkin faktorin kanssa. Korostetut solut osoittavat tilastollisesti merkitseviä kuormituksia.",
+            "factor_array_help": "Komposiitti-Q-lajittelu, joka näyttää tämän faktorin idealisoidun lajittelukuvion. Väittämät sijoitetaan jakaumaan painotettujen z-arvojen perusteella.",
+            "factor_array_label": "Faktorin {{n}} komposiittilajittelu",
+            "statements_help": "Z-arvot näyttävät kunkin faktorin standardoidun aseman kullakin väittämällä. D = erotteleva (merkitsevä ero faktorien välillä), C = konsensus (ei merkitseviä eroja).",
+            "z_scores_description": "Väittämien z-arvot ja faktorijärjestyksen sijoitukset",
+            "factor_statistics": "Faktoritilastot",
+            "characteristics_help": "Ominaisarvot ilmaisevat faktorin voimakkuuden. Komposiittireliabiliteetti mittaa sisäistä yhdenmukaisuutta. Keskivirhe ilmaisee faktoripiste-estimaattien tarkkuuden."
         },
         "workspace": {
             "switcher": {
@@ -1469,6 +1488,13 @@
                 "in_progress": "Kesken",
                 "abandoned": "Hylätty",
                 "discarded": "hylätty"
+            },
+            "step": {
+                "consent": "Suostumus",
+                "presort": "Esilajittelu",
+                "rough": "Karkea lajittelu",
+                "fine": "Tarkka lajittelu",
+                "post": "Jälkilajittelu"
             },
             "actions": {
                 "discard": "Hylkää",

@@ -310,6 +310,8 @@ class StudyService:
                     user_agent=user_agent,
                     status=ParticipantStatus.started,
                     is_test_run=is_test_run,
+                    last_step_reached=1,
+                    last_step_reached_at=datetime.now(timezone.utc),
                 )
                 db.add(participant)
                 await db.flush()
@@ -901,6 +903,10 @@ class StudyService:
                     submitted_at=datetime.now(timezone.utc)
                     if data.status == ParticipantStatus.completed
                     else None,
+                    last_step_reached=5
+                    if data.status == ParticipantStatus.completed
+                    else 1,
+                    last_step_reached_at=datetime.now(timezone.utc),
                     is_test_run=data.is_test_run,
                 )
                 db.add(participant)
@@ -974,6 +980,8 @@ class StudyService:
             participant.is_test_run = data.is_test_run
             if data.status == ParticipantStatus.completed:
                 participant.submitted_at = datetime.now(timezone.utc)
+                participant.last_step_reached = 5
+                participant.last_step_reached_at = participant.submitted_at
 
             await db.flush()
 
@@ -1207,6 +1215,10 @@ class StudyService:
                     if p.submitted_at
                     else None,
                     "created_at": p.created_at.isoformat() if p.created_at else None,
+                    "last_step_reached": p.last_step_reached,
+                    "last_step_reached_at": p.last_step_reached_at.isoformat()
+                    if p.last_step_reached_at
+                    else None,
                 }
             )
 
