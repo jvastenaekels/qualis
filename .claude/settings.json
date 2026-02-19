@@ -24,7 +24,8 @@
       "Bash(git remote:*)",
       "Bash(ls:*)",
       "Bash(test:*)",
-      "Bash(git -C /home/julien/open-q diff --stat)"
+      "Bash(git -C /home/julien/open-q diff --stat)",
+      "Bash(find:*)"
     ]
   }
 }
