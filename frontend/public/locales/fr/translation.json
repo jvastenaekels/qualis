@@ -1536,7 +1536,7 @@
                 "completed": "Terminé",
                 "in_progress": "En cours",
                 "abandoned_count": "{{count}} abandonné(s)",
-                "interview_interested": "Accord pour entretien",
+                "interview_interested": "Accord pour suivi",
                 "interview": "Entretiens",
                 "email": "Emails"
             },
@@ -1658,7 +1658,12 @@
                 "flagged": "Signalés uniquement",
                 "clear_all": "Effacer les filtres",
                 "all_statuses": "Tous les statuts",
-                "all_consents": "Tous"
+                "all_consents": "Tous",
+                "all_indicators": "Tous",
+                "all_steps": "Toutes les étapes",
+                "has_comments": "Avec commentaires",
+                "has_audio": "Avec audio",
+                "has_recruitment": "Avec lien de recrutement"
             },
             "search": {
                 "placeholder": "Chercher par ID ou jeton...",

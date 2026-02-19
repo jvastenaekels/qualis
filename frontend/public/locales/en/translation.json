@@ -1628,7 +1628,12 @@
                 "flagged": "Flagged only",
                 "clear_all": "Clear filters",
                 "all_statuses": "All statuses",
-                "all_consents": "All"
+                "all_consents": "All",
+                "all_indicators": "All",
+                "all_steps": "All steps",
+                "has_comments": "Has comments",
+                "has_audio": "Has audio",
+                "has_recruitment": "Has recruitment link"
             },
             "search": {
                 "placeholder": "Search by ID or recruitment token...",

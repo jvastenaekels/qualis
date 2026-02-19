@@ -47,6 +47,7 @@ import {
     FileCode,
     Sparkles,
     FilterX,
+    Filter,
     Tag,
     Briefcase,
     Loader2,
@@ -97,6 +98,8 @@ interface InteractiveDataViewProps {
 
 type ConsentType = 'email' | 'newsletter' | 'interview';
 type StatusFilter = 'all' | 'completed' | 'in_progress' | 'abandoned';
+type StepFilter = 'all' | 'completed' | 1 | 2 | 3 | 4 | 5;
+type QualityFilter = 'all' | 'flagged' | 'has_comments' | 'has_audio' | 'has_recruitment';
 
 const SUSPECT_DURATION_THRESHOLD = 120;
 const ABANDONED_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
@@ -331,9 +334,10 @@ export default function InteractiveDataView({
 
     const [sorting, setSorting] = useState<SortingState>([{ id: 'submitted_at', desc: true }]);
     const [globalFilter, setGlobalFilter] = useState('');
-    const [qualityFilter, setQualityFilter] = useState<'all' | 'flagged'>('all');
+    const [qualityFilter, setQualityFilter] = useState<QualityFilter>('all');
     const [consentFilters, setConsentFilters] = useState<Set<ConsentType>>(new Set());
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+    const [stepFilter, setStepFilter] = useState<StepFilter>('all');
     const [isExportLoading, setIsExportLoading] = useState(false);
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: PAGE_SIZE });
     const [clearAllDialogOpen, setClearAllDialogOpen] = useState(false);
@@ -351,6 +355,7 @@ export default function InteractiveDataView({
         setConsentFilters(new Set());
         setQualityFilter('all');
         setStatusFilter('all');
+        setStepFilter('all');
         setGlobalFilter('');
     }, []);
 
@@ -412,7 +417,6 @@ export default function InteractiveDataView({
     );
 
     const liveCount = liveParticipants.length;
-    const emailCount = liveParticipants.filter((p) => p.postsort.email).length;
     const newsletterCount = liveParticipants.filter((p) => p.postsort.newsletter_consent).length;
     const interviewCount = liveParticipants.filter((p) => p.postsort.interview_consent).length;
     const completedCount = liveParticipants.filter(
@@ -442,18 +446,28 @@ export default function InteractiveDataView({
 
     const hasActiveFilters =
         consentFilters.size > 0 ||
-        qualityFilter === 'flagged' ||
+        qualityFilter !== 'all' ||
         statusFilter !== 'all' ||
+        stepFilter !== 'all' ||
         globalFilter !== '';
 
     const filteredParticipants = useMemo(() => {
         return liveParticipants.filter((p) => {
-            const matchesQuality =
-                qualityFilter === 'flagged'
-                    ? (p.duration_seconds !== null &&
-                          p.duration_seconds < SUSPECT_DURATION_THRESHOLD) ||
-                      p.is_discarded
-                    : true;
+            const matchesQuality = (() => {
+                if (qualityFilter === 'all') return true;
+                if (qualityFilter === 'flagged')
+                    return (
+                        (p.duration_seconds !== null &&
+                            p.duration_seconds < SUSPECT_DURATION_THRESHOLD) ||
+                        p.is_discarded
+                    );
+                if (qualityFilter === 'has_comments')
+                    return Object.keys(p.postsort.card_comments || {}).length > 0;
+                if (qualityFilter === 'has_audio')
+                    return p.audio_recordings && Object.keys(p.audio_recordings).length > 0;
+                if (qualityFilter === 'has_recruitment') return !!p.recruitment_token;
+                return true;
+            })();
 
             const matchesConsent =
                 consentFilters.size === 0 ||
@@ -465,6 +479,12 @@ export default function InteractiveDataView({
                 });
 
             const matchesStatus = statusFilter === 'all' || getDisplayStatus(p) === statusFilter;
+
+            const matchesStep = (() => {
+                if (stepFilter === 'all') return true;
+                if (stepFilter === 'completed') return p.status === 'completed';
+                return p.last_step_reached === stepFilter && p.status !== 'completed';
+            })();
 
             const matchesSearch =
                 !globalFilter ||
@@ -480,9 +500,11 @@ export default function InteractiveDataView({
                     );
                 })();
 
-            return matchesQuality && matchesConsent && matchesStatus && matchesSearch;
+            return (
+                matchesQuality && matchesConsent && matchesStatus && matchesStep && matchesSearch
+            );
         });
-    }, [liveParticipants, qualityFilter, consentFilters, statusFilter, globalFilter]);
+    }, [liveParticipants, qualityFilter, consentFilters, statusFilter, stepFilter, globalFilter]);
 
     const handleViewParticipant = useCallback(
         (participant: DumpParticipant) => {
@@ -609,21 +631,78 @@ export default function InteractiveDataView({
                 : []),
             columnHelper.accessor('status', {
                 header: ({ column }) => (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-                        className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
-                    >
-                        <Sparkles className="w-3.5 h-3.5 text-slate-400" />
-                        {t('admin.data.table.status', 'Status')}
-                        {column.getIsSorted() === 'asc' ? (
-                            <ArrowUp className="ml-2 h-3 w-3 text-indigo-500" />
-                        ) : column.getIsSorted() === 'desc' ? (
-                            <ArrowDown className="ml-2 h-3 w-3 text-indigo-500" />
-                        ) : (
-                            <ArrowUpDown className="ml-2 h-3 w-3 text-slate-300" />
-                        )}
-                    </Button>
+                    <div className="flex items-center gap-1">
+                        <Button
+                            variant="ghost"
+                            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                            className="h-8 text-xs font-semibold p-0 hover:bg-transparent flex items-center gap-1.5"
+                        >
+                            <Sparkles className="w-3.5 h-3.5 text-slate-400" />
+                            {t('admin.data.table.status', 'Status')}
+                            {column.getIsSorted() === 'asc' ? (
+                                <ArrowUp className="ml-1 h-3 w-3 text-indigo-500" />
+                            ) : column.getIsSorted() === 'desc' ? (
+                                <ArrowDown className="ml-1 h-3 w-3 text-indigo-500" />
+                            ) : (
+                                <ArrowUpDown className="ml-1 h-3 w-3 text-slate-300" />
+                            )}
+                        </Button>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={cn(
+                                        'h-6 w-6 p-0 rounded',
+                                        statusFilter !== 'all'
+                                            ? 'text-indigo-600 bg-indigo-50'
+                                            : 'text-slate-400 hover:text-slate-600'
+                                    )}
+                                >
+                                    <Filter className="h-3 w-3" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                align="start"
+                                className="w-48"
+                                collisionPadding={8}
+                            >
+                                <DropdownMenuItem onClick={() => setStatusFilter('all')}>
+                                    {t('admin.data.filters.all_statuses', 'All statuses')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setStatusFilter('completed')}
+                                    className={cn(
+                                        'text-emerald-600',
+                                        statusFilter === 'completed' && 'bg-emerald-50'
+                                    )}
+                                >
+                                    <CheckCircle2 className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.status.completed', 'Completed')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setStatusFilter('in_progress')}
+                                    className={cn(
+                                        'text-sky-600',
+                                        statusFilter === 'in_progress' && 'bg-sky-50'
+                                    )}
+                                >
+                                    <Clock className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.status.in_progress', 'In Progress')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setStatusFilter('abandoned')}
+                                    className={cn(
+                                        'text-rose-600',
+                                        statusFilter === 'abandoned' && 'bg-rose-50'
+                                    )}
+                                >
+                                    <AlertTriangle className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.status.abandoned', 'Abandoned')}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 ),
                 cell: ({ row }) => {
                     const p = row.original;
@@ -648,9 +727,66 @@ export default function InteractiveDataView({
             columnHelper.display({
                 id: 'consent_indicators',
                 header: () => (
-                    <div className="flex items-center gap-1.5">
-                        <UserCheck className="w-3.5 h-3.5" />
-                        <span>{t('admin.data.table.consent', 'Consent')}</span>
+                    <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
+                            <UserCheck className="w-3.5 h-3.5" />
+                            <span>{t('admin.data.table.consent', 'Consent')}</span>
+                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={cn(
+                                        'h-6 w-6 p-0 rounded',
+                                        consentFilters.size > 0
+                                            ? 'text-indigo-600 bg-indigo-50'
+                                            : 'text-slate-400 hover:text-slate-600'
+                                    )}
+                                >
+                                    <Filter className="h-3 w-3" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                align="start"
+                                className="w-48"
+                                collisionPadding={8}
+                            >
+                                <DropdownMenuItem onClick={() => setConsentFilters(new Set())}>
+                                    {t('admin.data.filters.all_consents', 'All')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => toggleConsent('email')}
+                                    className={cn(
+                                        consentFilters.has('email') &&
+                                            'bg-indigo-50 text-indigo-700'
+                                    )}
+                                >
+                                    <Mail className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.filters.has_email', 'Has email')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => toggleConsent('newsletter')}
+                                    className={cn(
+                                        consentFilters.has('newsletter') &&
+                                            'bg-emerald-50 text-emerald-700'
+                                    )}
+                                >
+                                    <Bell className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.filters.newsletter', 'Newsletter')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => toggleConsent('interview')}
+                                    className={cn(
+                                        consentFilters.has('interview') &&
+                                            'bg-amber-50 text-amber-700'
+                                    )}
+                                >
+                                    <Briefcase className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.filters.interview', 'Follow-up')}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 ),
                 cell: ({ row }) => {
@@ -718,9 +854,78 @@ export default function InteractiveDataView({
             columnHelper.display({
                 id: 'quality',
                 header: () => (
-                    <div className="flex items-center gap-1.5">
-                        <AlertTriangle className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{t('admin.data.table.flags')}</span>
+                    <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
+                            <AlertTriangle className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{t('admin.data.table.flags')}</span>
+                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={cn(
+                                        'h-6 w-6 p-0 rounded',
+                                        qualityFilter !== 'all'
+                                            ? 'text-indigo-600 bg-indigo-50'
+                                            : 'text-slate-400 hover:text-slate-600'
+                                    )}
+                                >
+                                    <Filter className="h-3 w-3" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                align="start"
+                                className="w-52"
+                                collisionPadding={8}
+                            >
+                                <DropdownMenuItem onClick={() => setQualityFilter('all')}>
+                                    {t('admin.data.filters.all_indicators', 'All')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setQualityFilter('flagged')}
+                                    className={cn(
+                                        qualityFilter === 'flagged' && 'bg-amber-50 text-amber-700'
+                                    )}
+                                >
+                                    <AlertTriangle className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.filters.flagged', 'Flagged')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setQualityFilter('has_comments')}
+                                    className={cn(
+                                        qualityFilter === 'has_comments' &&
+                                            'bg-blue-50 text-blue-700'
+                                    )}
+                                >
+                                    <MessageSquare className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.filters.has_comments', 'Has comments')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setQualityFilter('has_audio')}
+                                    className={cn(
+                                        qualityFilter === 'has_audio' &&
+                                            'bg-purple-50 text-purple-700'
+                                    )}
+                                >
+                                    <Mic className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.filters.has_audio', 'Has audio')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setQualityFilter('has_recruitment')}
+                                    className={cn(
+                                        qualityFilter === 'has_recruitment' &&
+                                            'bg-slate-100 text-slate-700'
+                                    )}
+                                >
+                                    <Tag className="w-3.5 h-3.5 mr-2" />
+                                    {t(
+                                        'admin.data.filters.has_recruitment',
+                                        'Has recruitment link'
+                                    )}
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 ),
                 cell: ({ row }) => {
@@ -885,9 +1090,60 @@ export default function InteractiveDataView({
             columnHelper.display({
                 id: 'last_step',
                 header: () => (
-                    <div className="flex items-center gap-1.5">
-                        <Footprints className="w-3.5 h-3.5 text-slate-400" />
-                        <span>{t('admin.data.table.last_step', 'Last step')}</span>
+                    <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1.5">
+                            <Footprints className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{t('admin.data.table.last_step', 'Last step')}</span>
+                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className={cn(
+                                        'h-6 w-6 p-0 rounded',
+                                        stepFilter !== 'all'
+                                            ? 'text-indigo-600 bg-indigo-50'
+                                            : 'text-slate-400 hover:text-slate-600'
+                                    )}
+                                >
+                                    <Filter className="h-3 w-3" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                                align="start"
+                                className="w-48"
+                                collisionPadding={8}
+                            >
+                                <DropdownMenuItem onClick={() => setStepFilter('all')}>
+                                    {t('admin.data.filters.all_steps', 'All steps')}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setStepFilter('completed')}
+                                    className={cn(
+                                        'text-emerald-600',
+                                        stepFilter === 'completed' && 'bg-emerald-50'
+                                    )}
+                                >
+                                    <CheckCircle2 className="w-3.5 h-3.5 mr-2" />
+                                    {t('admin.data.status.completed', 'Completed')}
+                                </DropdownMenuItem>
+                                {Object.entries(STEP_LABEL_KEYS).map(([step, [key, fallback]]) => (
+                                    <DropdownMenuItem
+                                        key={step}
+                                        onClick={() =>
+                                            setStepFilter(Number(step) as 1 | 2 | 3 | 4 | 5)
+                                        }
+                                        className={cn(
+                                            stepFilter === Number(step) &&
+                                                'bg-indigo-50 text-indigo-700'
+                                        )}
+                                    >
+                                        {t(key, fallback)}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
                 ),
                 cell: ({ row }) => {
@@ -910,7 +1166,17 @@ export default function InteractiveDataView({
                 },
             }),
         ],
-        [t, currentLocale, duplicateIpGroups, showLanguageColumn]
+        [
+            t,
+            currentLocale,
+            duplicateIpGroups,
+            showLanguageColumn,
+            statusFilter,
+            consentFilters,
+            qualityFilter,
+            stepFilter,
+            toggleConsent,
+        ]
     );
 
     const table = useReactTable({
@@ -1215,17 +1481,46 @@ export default function InteractiveDataView({
                             </button>
                         </Badge>
                     )}
-                    {qualityFilter === 'flagged' && (
+                    {qualityFilter !== 'all' && (
                         <Badge
                             variant="secondary"
                             className="h-7 px-3 gap-2 bg-amber-100 text-amber-700 border-amber-200 font-semibold"
                         >
                             <AlertTriangle className="w-3 h-3" />
-                            {t('admin.data.filters.flagged', 'Flagged only')}
+                            {qualityFilter === 'flagged'
+                                ? t('admin.data.filters.flagged', 'Flagged')
+                                : qualityFilter === 'has_comments'
+                                  ? t('admin.data.filters.has_comments', 'Has comments')
+                                  : qualityFilter === 'has_audio'
+                                    ? t('admin.data.filters.has_audio', 'Has audio')
+                                    : t(
+                                          'admin.data.filters.has_recruitment',
+                                          'Has recruitment link'
+                                      )}
                             <button
                                 type="button"
                                 onClick={() => setQualityFilter('all')}
                                 className="hover:bg-amber-200 rounded-full p-0.5 transition-colors"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </Badge>
+                    )}
+                    {stepFilter !== 'all' && (
+                        <Badge
+                            variant="secondary"
+                            className="h-7 px-3 gap-2 bg-indigo-100 text-indigo-700 border-indigo-200 font-semibold"
+                        >
+                            <Footprints className="w-3 h-3" />
+                            {stepFilter === 'completed'
+                                ? t('admin.data.status.completed', 'Completed')
+                                : STEP_LABEL_KEYS[stepFilter]
+                                  ? t(...STEP_LABEL_KEYS[stepFilter])
+                                  : stepFilter}
+                            <button
+                                type="button"
+                                onClick={() => setStepFilter('all')}
+                                className="hover:bg-indigo-200 rounded-full p-0.5 transition-colors"
                             >
                                 <X className="w-3 h-3" />
                             </button>
@@ -1309,130 +1604,8 @@ export default function InteractiveDataView({
                         />
                     </div>
                 </div>
-                {/* Right Group: Filters & Actions */}
+                {/* Right Group: Actions */}
                 <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
-                    {/* Flagged Filter Toggle */}
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                            setQualityFilter((prev) => (prev === 'all' ? 'flagged' : 'all'))
-                        }
-                        className={cn(
-                            'h-10 w-10 sm:w-auto sm:h-9 border border-transparent font-medium text-xs',
-                            qualityFilter === 'flagged'
-                                ? 'bg-amber-50 text-amber-700 border-amber-200'
-                                : 'text-slate-600 hover:bg-slate-100'
-                        )}
-                        title={t('admin.data.filter.only_flagged')}
-                        aria-label={t('admin.data.filter.only_flagged')}
-                    >
-                        <AlertTriangle className="h-3.5 w-3.5 sm:mr-2" />
-                        <span className="hidden sm:inline">
-                            {t('admin.data.filters.flagged', 'Flagged')}
-                        </span>
-                    </Button>
-
-                    {/* Status Filter Dropdown */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className={cn(
-                                    'h-10 w-10 sm:w-auto sm:h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
-                                    statusFilter !== 'all' &&
-                                        'bg-indigo-50 text-indigo-700 border-indigo-100'
-                                )}
-                            >
-                                <Sparkles className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">
-                                    {statusFilter === 'all'
-                                        ? t('admin.data.table.status', 'Status')
-                                        : t(`admin.data.status.${statusFilter}`, statusFilter)}
-                                </span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48" collisionPadding={8}>
-                            <DropdownMenuItem onClick={() => setStatusFilter('all')}>
-                                {t('admin.data.filters.all_statuses', 'All Statuses')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => setStatusFilter('completed')}
-                                className="text-emerald-600"
-                            >
-                                <CheckCircle2 className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.status.completed', 'Completed')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => setStatusFilter('in_progress')}
-                                className="text-sky-600"
-                            >
-                                <Clock className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.status.in_progress', 'In Progress')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => setStatusFilter('abandoned')}
-                                className="text-rose-600"
-                            >
-                                <AlertTriangle className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.status.abandoned', 'Abandoned')}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    {/* Consent Filter Dropdown */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className={cn(
-                                    'h-10 w-10 sm:w-auto sm:h-9 border border-transparent font-medium text-xs text-slate-600 hover:bg-slate-100 gap-2',
-                                    consentFilters.size > 0 &&
-                                        'bg-indigo-50 text-indigo-700 border-indigo-100'
-                                )}
-                            >
-                                <Mail className="h-3.5 w-3.5" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-48" collisionPadding={8}>
-                            <DropdownMenuItem onClick={() => setConsentFilters(new Set())}>
-                                {t('admin.data.filters.all_consents', 'All')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => toggleConsent('email')}
-                                className={cn(
-                                    consentFilters.has('email') && 'bg-indigo-50 text-indigo-700'
-                                )}
-                            >
-                                <Mail className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.stats.email', 'Emails')} ({emailCount})
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => toggleConsent('newsletter')}
-                                className={cn(
-                                    consentFilters.has('newsletter') &&
-                                        'bg-emerald-50 text-emerald-700'
-                                )}
-                            >
-                                <Bell className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.stats.newsletter', 'Newsletter')} ({newsletterCount})
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => toggleConsent('interview')}
-                                className={cn(
-                                    consentFilters.has('interview') && 'bg-amber-50 text-amber-700'
-                                )}
-                            >
-                                <Briefcase className="w-3.5 h-3.5 mr-2" />
-                                {t('admin.data.stats.interview', 'Interviews')} ({interviewCount})
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    <div className="h-6 w-px bg-slate-200 mx-2 hidden sm:block" />
-
                     {/* Export Dropdown */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>

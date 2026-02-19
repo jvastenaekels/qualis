@@ -1620,7 +1620,12 @@
                 "flagged": "Vain merkityt",
                 "clear_all": "Tyhjennä suodattimet",
                 "all_statuses": "Kaikki tilat",
-                "all_consents": "Kaikki"
+                "all_consents": "Kaikki",
+                "all_indicators": "Kaikki",
+                "all_steps": "Kaikki vaiheet",
+                "has_comments": "Sisältää kommentteja",
+                "has_audio": "Sisältää ääntä",
+                "has_recruitment": "Rekrytointilinkki"
             },
             "search": {
                 "placeholder": "Hae ID:llä tai tunnisteella...",
