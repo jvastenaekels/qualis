@@ -274,7 +274,7 @@
             "all_placed": "All statements in this pile are sorted"
         },
         "toolbar": {
-            "preview": "Statement preview",
+            "preview": "Statement",
             "zoom_in": "Zoom in",
             "zoom_out": "Zoom out",
             "fit_screen": "Fit to screen",

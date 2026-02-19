@@ -274,7 +274,7 @@
             "all_placed": "Tous les énoncés de cette pile sont classés"
         },
         "toolbar": {
-            "preview": "Aperçu de l'énoncé",
+            "preview": "Énoncé",
             "zoom_in": "Zoom avant",
             "zoom_out": "Zoom arrière",
             "fit_screen": "Ajuster à l'écran",
