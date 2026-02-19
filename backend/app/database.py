@@ -32,10 +32,14 @@ if "sslmode=" in SQLALCHEMY_DATABASE_URL:
     q.pop("sslmode", None)
     SQLALCHEMY_DATABASE_URL = urlunparse(u._replace(query=urlencode(q, doseq=True)))
 
+# Pool sizing: production gets a larger pool; dev/test stays minimal
+# to fit within sandbox DB plans (~5-10 connection slots).
+_is_production = settings.ENVIRONMENT == "production"
+
 engine_kwargs: dict[str, Any] = {
     "echo": False,
-    "pool_size": 1,
-    "max_overflow": 1,
+    "pool_size": 3 if _is_production else 1,
+    "max_overflow": 2 if _is_production else 1,
     "pool_timeout": 30,
     "pool_recycle": 1800,
     "pool_pre_ping": True,  # Detect disconnected connections
