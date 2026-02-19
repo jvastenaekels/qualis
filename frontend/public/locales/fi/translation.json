@@ -307,6 +307,7 @@
             "place_on_grid": "Napauta ruudukkoa sijoittaaksesi",
             "drag_or_tap": "Vedä ruudukkoon tai napauta paikkaa",
             "initial_instruction": "Napauta (tai vedä) väitettä",
+            "initial_instruction_mobile": "Napauta väitettä",
             "help": "Miten tämä toimii?",
             "methodology": {
                 "extremes": "Vinkki: Aloita siitä, mikä on sinulle selkeintä (ääripäät).",
@@ -347,7 +348,16 @@
         "success": {
             "title": "Kiitos osallistumisestasi!",
             "message": "Vastauksesi tutkimukseen on tallennettu.",
-            "id_label": "Vahvistuskoodi"
+            "id_label": "Vahvistuskoodi",
+            "share": {
+                "title": "Kerro muille",
+                "copy_link": "Kopioi linkki",
+                "copy_success": "Linkki kopioitu!",
+                "message": "Osallistuin juuri tähän tutkimukseen: \"{{title}}\". Ajattelin, että se voisi kiinnostaa sinua. Pääset siihen täältä:",
+                "email": "Sähköposti",
+                "email_subject": "Osallistu tutkimukseen: {{title}}",
+                "native": "Jaa"
+            }
         },
         "submit_error": {
             "title": "Lähetys epäonnistui",

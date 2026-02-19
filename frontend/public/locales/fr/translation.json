@@ -307,6 +307,7 @@
             "place_on_grid": "Touchez un emplacement sur la grille pour placer l'énoncé",
             "drag_or_tap": "Glissez ou touchez une case",
             "initial_instruction": "Touchez (ou glissez) un énoncé",
+            "initial_instruction_mobile": "Touchez un énoncé",
             "help": "Comment faire ?",
             "methodology": {
                 "extremes": "Astuce : commencez par ce qui est le plus évident pour vous (les extrêmes).",
@@ -347,7 +348,16 @@
         "success": {
             "title": "Merci pour votre participation !",
             "message": "Votre contribution à l'étude a bien été enregistrée.",
-            "id_label": "Code de confirmation"
+            "id_label": "Code de confirmation",
+            "share": {
+                "title": "Faites passer le mot",
+                "copy_link": "Copier le lien",
+                "copy_success": "Lien copié !",
+                "message": "Je viens de participer à cette étude : « {{title}} ». Ça pourrait t'intéresser. Tu peux y accéder ici :",
+                "email": "E-mail",
+                "email_subject": "Participer à cette étude : {{title}}",
+                "native": "Partager"
+            }
         },
         "submit_error": {
             "title": "Échec de l'envoi",

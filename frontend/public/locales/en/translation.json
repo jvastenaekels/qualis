@@ -307,6 +307,7 @@
             "place_on_grid": "Tap grid to place",
             "drag_or_tap": "Drag to grid or tap slot",
             "initial_instruction": "Tap (or drag) statement",
+            "initial_instruction_mobile": "Tap statement",
             "help": "How does it work?",
             "methodology": {
                 "extremes": "Tip: start with what is most obvious to you (the extremes).",
@@ -347,7 +348,16 @@
         "success": {
             "title": "Thank you for your participation!",
             "message": "Your contribution to the study has been saved.",
-            "id_label": "Confirmation code"
+            "id_label": "Confirmation code",
+            "share": {
+                "title": "Spread the word",
+                "copy_link": "Copy link",
+                "copy_success": "Link copied!",
+                "message": "I just participated in this study: \"{{title}}\". I thought it might interest you. You can access it here:",
+                "email": "Email",
+                "email_subject": "Participate in this study: {{title}}",
+                "native": "Share"
+            }
         },
         "submit_error": {
             "title": "Submission failed",
