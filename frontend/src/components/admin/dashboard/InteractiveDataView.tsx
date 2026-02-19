@@ -29,6 +29,9 @@ import {
     ChevronLeft,
     ChevronRight,
     AlertTriangle,
+    Monitor,
+    Smartphone,
+    Tablet,
     MessageSquare,
     Search,
     Mail,
@@ -75,6 +78,19 @@ import {
 import { customInstance } from '@/api/mutator';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import { parseUA } from '@/utils/uaParser';
+import {
+    FaWindows,
+    FaApple,
+    FaLinux,
+    FaAndroid,
+    FaChrome,
+    FaFirefoxBrowser,
+    FaSafari,
+    FaEdge,
+    FaOpera,
+    FaInternetExplorer,
+} from 'react-icons/fa6';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import {
@@ -106,6 +122,23 @@ type ConsentType = 'email' | 'newsletter' | 'interview';
 type StatusFilter = 'all' | 'completed' | 'in_progress' | 'abandoned';
 type StepFilter = 'all' | 'completed' | 1 | 2 | 3 | 4 | 5;
 type QualityFilter = 'all' | 'flagged' | 'has_comments' | 'has_audio' | 'has_recruitment';
+
+const DEVICE_ICONS = { mobile: Smartphone, tablet: Tablet, desktop: Monitor } as const;
+const OS_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+    Windows: FaWindows,
+    macOS: FaApple,
+    iOS: FaApple,
+    Linux: FaLinux,
+    Android: FaAndroid,
+};
+const BROWSER_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+    Chrome: FaChrome,
+    Firefox: FaFirefoxBrowser,
+    Safari: FaSafari,
+    Edge: FaEdge,
+    Opera: FaOpera,
+    'Internet Explorer': FaInternetExplorer,
+};
 
 const SUSPECT_DURATION_THRESHOLD = 120;
 const ABANDONED_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24h
@@ -633,6 +666,10 @@ export default function InteractiveDataView({
                 ),
                 cell: (info) => {
                     const p = info.row.original;
+                    const ua = p.user_agent ? parseUA(p.user_agent) : null;
+                    const DeviceIcon = ua ? DEVICE_ICONS[ua.device] : null;
+                    const OsIcon = ua ? OS_ICONS[ua.os] : null;
+                    const BrowserIcon = ua ? BROWSER_ICONS[ua.browser] : null;
                     return (
                         <div className="flex flex-col gap-1.5">
                             <div className="flex items-center gap-2">
@@ -648,6 +685,40 @@ export default function InteractiveDataView({
                                     </Badge>
                                 )}
                             </div>
+                            {ua && DeviceIcon && (
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div className="flex items-center gap-1 flex-wrap">
+                                                <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                                                    {OsIcon ? (
+                                                        <OsIcon className="w-3 h-3" />
+                                                    ) : (
+                                                        <DeviceIcon className="w-3 h-3" />
+                                                    )}
+                                                    {ua.os !== 'Unknown' ? ua.os : ua.device}
+                                                </span>
+                                                {ua.browser !== 'Unknown' && (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
+                                                        {BrowserIcon ? (
+                                                            <BrowserIcon className="w-3 h-3" />
+                                                        ) : (
+                                                            <Globe className="w-3 h-3" />
+                                                        )}
+                                                        {ua.browser}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent
+                                            side="bottom"
+                                            className="max-w-xs break-all font-mono text-[10px]"
+                                        >
+                                            {p.user_agent}
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            )}
                             {p.ip_address && duplicateIpGroups.has(p.ip_address) && (
                                 <TooltipProvider>
                                     <Tooltip>
