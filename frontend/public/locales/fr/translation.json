@@ -1525,6 +1525,11 @@
         "data": {
             "title": "Explorateur de données",
             "description": "Suivi de la participation en temps réel, analyse de la qualité et gestion des sessions.",
+            "sections": {
+                "key_indicators": "Indicateurs clés",
+                "responses": "Réponses",
+                "key_statistics": "Statistiques clés"
+            },
             "stats": {
                 "email_collection": "Collecte d'emails",
                 "participants": "au total",

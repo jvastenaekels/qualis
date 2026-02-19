@@ -1487,6 +1487,11 @@
         "data": {
             "title": "Analytiikka & Tiedot",
             "description": "Tarkastele osallistujien suorituksia, laadullista palautetta ja vie tietoaineistoja.",
+            "sections": {
+                "key_indicators": "Avainmittarit",
+                "responses": "Vastaukset",
+                "key_statistics": "Avaintilastot"
+            },
             "stats": {
                 "email_collection": "Sähköpostien kerääminen",
                 "participants": "osallistujaa",

@@ -1495,6 +1495,11 @@
         "data": {
             "title": "Data explorer",
             "description": "Monitor real-time participation, analyze data quality, and manage research sessions.",
+            "sections": {
+                "key_indicators": "Key indicators",
+                "responses": "Responses",
+                "key_statistics": "Key statistics"
+            },
             "stats": {
                 "email_collection": "Email collection",
                 "participants": "total",
