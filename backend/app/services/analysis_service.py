@@ -610,12 +610,12 @@ def _distribution_from_grid_config(
 ) -> NDArray[np.int64]:
     """Build the forced distribution array from the study's grid_config.
 
-    Each entry in grid_config has {"value": int, "count": int}.
+    Each entry in grid_config has {"score": int, "capacity": int}.
     Returns a sorted array of all score values repeated by their count.
     """
     dist: list[int] = []
     for entry in grid_config:
-        dist.extend([int(entry["value"])] * int(entry["count"]))
+        dist.extend([int(entry["score"])] * int(entry["capacity"]))
     return np.sort(np.array(dist, dtype=np.int64))
 
 

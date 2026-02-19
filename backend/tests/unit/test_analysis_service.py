@@ -830,11 +830,11 @@ class TestGridConfigDistribution:
     def test_grid_config_used(self, dataset):
         """When grid_config is provided, it should be used for factor arrays."""
         grid_config = [
-            {"value": -2, "count": 1},
-            {"value": -1, "count": 2},
-            {"value": 0, "count": 3},
-            {"value": 1, "count": 2},
-            {"value": 2, "count": 1},
+            {"score": -2, "capacity": 1},
+            {"score": -1, "capacity": 2},
+            {"score": 0, "capacity": 3},
+            {"score": 1, "capacity": 2},
+            {"score": 2, "capacity": 1},
         ]
         result = run_analysis(
             dataset,

@@ -34,8 +34,8 @@ if "sslmode=" in SQLALCHEMY_DATABASE_URL:
 
 engine_kwargs: dict[str, Any] = {
     "echo": False,
-    "pool_size": 20,
-    "max_overflow": 40,
+    "pool_size": 3,
+    "max_overflow": 2,
     "pool_timeout": 30,
     "pool_recycle": 1800,
     "pool_pre_ping": True,  # Detect disconnected connections
