@@ -226,9 +226,13 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                 onClick={(e) => {
                     if (isDragging) return;
 
-                    // Stop propagation so parent slot click handlers don't
-                    // also fire (which would re-place the selected card).
-                    e.stopPropagation();
+                    // When deselecting (tapping the already-selected card),
+                    // stop propagation so the parent DroppableSlot doesn't
+                    // re-place the card. For other cards, let it bubble so
+                    // the slot can handle swap/placement.
+                    if (isSelected) {
+                        e.stopPropagation();
+                    }
 
                     if (hoverTimerRef.current) {
                         clearTimeout(hoverTimerRef.current);
