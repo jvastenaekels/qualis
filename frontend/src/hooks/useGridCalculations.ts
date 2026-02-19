@@ -23,8 +23,9 @@ export const useGridCalculations = ({
     selectedCardId,
     onDimensionsChange,
 }: UseGridCalculationsProps) => {
-    const { isDesktop } = useViewport(); // Centralized viewport detection
+    const { isDesktop, isLandscape } = useViewport(); // Centralized viewport detection
     const wrapperRef = useRef<HTMLDivElement>(null);
+    const prevLandscapeRef = useRef(isLandscape);
     const [cardDimensions, setCardDimensions] = useState({
         width: 160,
         height: 96,
@@ -35,8 +36,12 @@ export const useGridCalculations = ({
 
         // Grid Anchoring: Do not resize cards when in Mobile Focus Mode (Deck Collapsed)
         // This prevents "Layout Thrashing" / Chaos.
-        // Use isDesktop check from context
-        if (selectedCardId && !isDesktop) return;
+        // Exception: allow recalculation when orientation changes (e.g. portrait→landscape)
+        const orientationChanged = isLandscape !== prevLandscapeRef.current;
+        if (orientationChanged) {
+            prevLandscapeRef.current = isLandscape;
+        }
+        if (selectedCardId && !isDesktop && !orientationChanged) return;
 
         const wrapper = wrapperRef.current;
         const W = wrapper.clientWidth;
@@ -93,7 +98,7 @@ export const useGridCalculations = ({
                 return prev;
             return { width: newWidth, height: newHeight };
         });
-    }, [gridColumns, selectedCardId, isDesktop]);
+    }, [gridColumns, selectedCardId, isDesktop, isLandscape]);
 
     // Notify parent of dimension changes via Effect to avoid "setState during render" warning
     useEffect(() => {

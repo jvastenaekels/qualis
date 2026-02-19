@@ -20,7 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AdminService } from '@/api/admin';
 import { useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import GridSort from '@/components/GridSort';
 import SortableCard from '@/components/SortableCard';
 import { AudioPlayer } from '@/components/admin/AudioPlayer';
@@ -46,6 +46,10 @@ export function ParticipantDetailContent({
     const [detailStatementId, setDetailStatementId] = useState<number | null>(null);
     const [activeTab, setActiveTab] = useState('session');
     const gridUtilsRef = useRef<InteractionUtils | null>(null);
+    const handleInteractionUtils = useCallback((utils: InteractionUtils) => {
+        gridUtilsRef.current = utils;
+        setTimeout(() => utils.performAutoFit(), 200);
+    }, []);
 
     // Auto-fit grid when tab activates
     useEffect(() => {
@@ -459,11 +463,7 @@ export function ParticipantDetailContent({
                                     'Viewer Mode'
                                 )}
                                 sidebarContent={sidebarContent}
-                                onInteractionUtils={(utils) => {
-                                    gridUtilsRef.current = utils;
-                                    // Force auto-fit on mount/tab switch
-                                    setTimeout(() => utils.performAutoFit(), 200);
-                                }}
+                                onInteractionUtils={handleInteractionUtils}
                                 renderSlotContent={(colIdx, rowIdx, dims) => {
                                     const sId = cellContentMap[`${colIdx}-${rowIdx}`];
                                     if (!sId) return null;

@@ -176,3 +176,103 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         expect(minimizeBtnAgain).toBeInTheDocument();
     });
 });
+
+describe('GridSort Landscape Mobile Layout', () => {
+    const defaultProps = {
+        agreeCards: [],
+        disagreeCards: [{ id: 1, text: 'Card 1' }],
+        neutralCards: [],
+        gridColumns: [{ score: 0, capacity: 5 }],
+        renderSlotContent: () => null,
+    };
+
+    beforeEach(() => {
+        // Mock viewport for landscape mobile (e.g. iPhone SE rotated)
+        Object.defineProperty(window, 'innerWidth', {
+            writable: true,
+            configurable: true,
+            value: 667,
+        });
+        Object.defineProperty(window, 'innerHeight', {
+            writable: true,
+            configurable: true,
+            value: 375,
+        });
+        window.dispatchEvent(new Event('resize'));
+        vi.clearAllMocks();
+    });
+
+    it('uses flex-row layout in landscape mobile', () => {
+        const { container } = render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        // The main container should have flex-row (not flex-col)
+        const mainContainer = container.querySelector('[class*="flex-row"]');
+        expect(mainContainer).toBeInTheDocument();
+    });
+
+    it('renders sidebar with responsive width instead of full-width bottom panel', () => {
+        const { container } = render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        const sidebar = container.querySelector('[class*="w-[min(280px,40vw)]"]');
+        expect(sidebar).toBeInTheDocument();
+        // Should NOT have the portrait mobile bottom panel height
+        expect(sidebar?.className).not.toContain('h-[120px]');
+    });
+
+    it('does not render ReadingZone above the grid (no sticky mobile variant)', () => {
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        // The sticky mobile reading zone should not exist
+        const stickyReadingZone = document.querySelector('.sticky.top-0.h-24');
+        expect(stickyReadingZone).not.toBeInTheDocument();
+    });
+
+    it('renders ReadingZone in sidebar with landscape variant (compact h-16)', () => {
+        const { container } = render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        // Landscape ReadingZone has h-16 class (64px, compact for landscape)
+        const landscapeReadingZone = container.querySelector('[class*="h-16"]');
+        expect(landscapeReadingZone).toBeInTheDocument();
+    });
+
+    it('uses vertical scroll for deck cards (not horizontal)', () => {
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        const deckContainer = screen.getByTestId('deck-cards-container');
+        // In landscape mobile: vertical scroll
+        expect(deckContainer.className).toContain('overflow-y-auto');
+        expect(deckContainer.className).not.toContain('overflow-x-auto');
+    });
+
+    it('renders compact validation footer without fixed min-height', () => {
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        const footer = screen.getByTestId('validation-footer');
+        expect(footer).toBeInTheDocument();
+        expect(footer.className).not.toContain('min-h-[72px]');
+    });
+});

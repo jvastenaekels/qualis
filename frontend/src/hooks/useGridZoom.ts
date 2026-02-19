@@ -27,7 +27,7 @@ export const useGridZoom = ({
     onZoomChange,
     onTransformChange,
 }: UseGridZoomProps) => {
-    const { width, height, isDesktop } = useViewport();
+    const { width, height, isDesktop, isLandscape } = useViewport();
     const transformRef = useRef<ReactZoomPanPinchRef>(null);
 
     const onTransformed = useCallback(
@@ -49,23 +49,32 @@ export const useGridZoom = ({
         if (contentW === 0 || contentH === 0) return;
 
         const isMobile = !isDesktop;
+        const isLandscapeMobile = isMobile && isLandscape;
 
         let scale: number, x: number, y: number;
 
         if (isMobile) {
-            // Mobile: Fit Width primarily
             const widthScale = (wrapperW * 0.98) / contentW;
-            const heightScale = (wrapperH * 0.9) / contentH; // 90% height to ensure legend visibility
+            const heightScale = (wrapperH * (isLandscapeMobile ? 0.95 : 0.9)) / contentH;
 
-            // Allow slightly more zoom on mobile
-            scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.7));
+            if (isLandscapeMobile) {
+                // Landscape mobile: fit both dimensions, center vertically
+                scale = Math.min(widthScale, heightScale);
+            } else {
+                // Portrait mobile: fit width primarily
+                scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.7));
+            }
 
-            // Center Horizontally (Content is flex-centered, so this centers the pyramid)
+            // Center Horizontally
             x = (wrapperW - contentW * scale) / 2;
 
-            // Anchor Bottom to leave top space for numbers/text
-            // But ensure we don't push it *too* far down if it's small
-            y = wrapperH - contentH * scale - 10;
+            if (isLandscapeMobile) {
+                // Center vertically in landscape
+                y = (wrapperH - contentH * scale) / 2;
+            } else {
+                // Anchor Bottom in portrait to leave top space for numbers/text
+                y = wrapperH - contentH * scale - 10;
+            }
         } else {
             // Desktop: Fit both, with padding to encompass Spectrum Bar
             const padding = 70; // Reduced to 70px to increase default zoom for better readability
@@ -90,7 +99,7 @@ export const useGridZoom = ({
         }
 
         transformRef.current.setTransform(x, y, scale, 400, 'easeOutQuad');
-    }, [wrapperRef, contentRef, isDesktop]);
+    }, [wrapperRef, contentRef, isDesktop, isLandscape]);
 
     const zoomIn = useCallback(() => {
         if (!transformRef.current || !wrapperRef.current) return;
@@ -146,8 +155,10 @@ export const useGridZoom = ({
         const widthChange = Math.abs(width - lastSizeRef.current.width);
         const heightChange = Math.abs(height - lastSizeRef.current.height);
 
-        // Only trigger for significant changes (> 50px)
-        if (widthChange > 50 || heightChange > 50) {
+        // Only trigger for significant changes (proportional to viewport size)
+        const widthThreshold = Math.max(30, lastSizeRef.current.width * 0.08);
+        const heightThreshold = Math.max(30, lastSizeRef.current.height * 0.08);
+        if (widthChange > widthThreshold || heightChange > heightThreshold) {
             timeoutId = setTimeout(() => {
                 performAutoFit();
                 lastSizeRef.current = { width, height };
@@ -159,37 +170,32 @@ export const useGridZoom = ({
         };
     }, [performAutoFit, width, height]);
 
-    // Handle container visibility/resize (important for Tab switching)
+    // Handle container visibility/resize and content size changes
+    // Consolidated into a single observer to avoid redundant autoFit calls per frame
     useEffect(() => {
-        if (!wrapperRef.current) return;
+        const wrapper = wrapperRef.current;
+        const content = contentRef.current;
+        if (!wrapper && !content) return;
 
-        const resizeObserver = new ResizeObserver((entries) => {
+        let rafId: number;
+        const observer = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
-                    performAutoFit();
+                    cancelAnimationFrame(rafId);
+                    rafId = requestAnimationFrame(() => performAutoFit());
+                    break;
                 }
             }
         });
 
-        resizeObserver.observe(wrapperRef.current);
-        return () => resizeObserver.disconnect();
-    }, [performAutoFit, wrapperRef]);
+        if (wrapper) observer.observe(wrapper);
+        if (content) observer.observe(content);
 
-    // Handle content size changes (cards rendering with calculated dimensions)
-    useEffect(() => {
-        const content = contentRef.current;
-        if (!content) return;
-        let rafId: number;
-        const observer = new ResizeObserver(() => {
-            cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(() => performAutoFit());
-        });
-        observer.observe(content);
         return () => {
             observer.disconnect();
             cancelAnimationFrame(rafId);
         };
-    }, [performAutoFit, contentRef]);
+    }, [performAutoFit, wrapperRef, contentRef]);
 
     // Zonal Focus Logic (Anti-Bias: Sector Panning)
     // 2-step animation: First show entire pyramid, then zoom to zone
@@ -220,6 +226,7 @@ export const useGridZoom = ({
             const maxScore = Math.max(...scores);
 
             const isMobile = !isDesktop;
+            const isLandscapeMob = isMobile && isLandscape;
             let targetScore: number;
 
             if (isMobile) {
@@ -251,8 +258,8 @@ export const useGridZoom = ({
             const contentW = contentRef.current.offsetWidth;
             const contentH = contentRef.current.offsetHeight;
 
-            // Target scale: fit content nicely (1.0 for desktop, 0.66 for mobile)
-            const targetScale = isMobile ? 0.66 : 1.0;
+            // Target scale: fit content nicely (1.0 for desktop, 0.85 for landscape mobile, 0.66 for portrait mobile)
+            const targetScale = isMobile ? (isLandscapeMob ? 0.85 : 0.66) : 1.0;
 
             // Get the column's position relative to the content (not screen)
             const contentRect = contentRef.current.getBoundingClientRect();
@@ -274,8 +281,10 @@ export const useGridZoom = ({
             const minX = wrapperW - contentW * targetScale;
             const clampedX = Math.max(minX, Math.min(maxX, targetX));
 
-            // Bottom anchor for Y (spectrum bar visible)
-            const targetY = wrapperH - contentH * targetScale - 10;
+            // Y positioning: center in landscape, bottom anchor in portrait
+            const targetY = isLandscapeMob
+                ? (wrapperH - contentH * targetScale) / 2
+                : wrapperH - contentH * targetScale - 10;
 
             // Apply zoom and pan with smooth easing
             transformRef.current.setTransform(clampedX, targetY, targetScale, 800, 'easeInOutQuad');
@@ -297,6 +306,7 @@ export const useGridZoom = ({
         activePileCount,
         setHasPerformedZonalFocus,
         isDesktop,
+        isLandscape,
     ]);
 
     return {

@@ -16,6 +16,7 @@ import {
     RotateCcw,
     Smile,
     Target,
+    X,
     ZoomIn,
     ZoomOut,
 } from 'lucide-react';
@@ -30,9 +31,15 @@ import type { InteractionUtils } from '../types/grid';
 import DroppableSlot from './DroppableSlot';
 import ReadingZone from './ReadingZone';
 import SortableCard from './SortableCard';
+import type { TFunction } from 'i18next';
 import { useViewport } from '@/contexts/ViewportContext';
 
 import { cn } from '@/lib/utils';
+
+const noop = () => {};
+const markdownComponents = {
+    p: ({ children }: { children?: React.ReactNode }) => <span>{children}</span>,
+};
 
 // Sub-component: Droppable Pile
 const DroppablePile: React.FC<
@@ -134,14 +141,17 @@ const pileBadgeVariants = cva(
 const InstructionHeader: React.FC<{
     instruction: string | null;
     defaultText: string;
-}> = React.memo(({ instruction, defaultText }) => {
+    emphasizeCollapse?: boolean;
+    forceMobile?: boolean;
+}> = React.memo(({ instruction, defaultText, emphasizeCollapse, forceMobile }) => {
     const { isMobile } = useViewport();
     const { t } = useTranslation();
-    // Default to visible on first load
-    const [isMinimized, setIsMinimized] = useState(false);
+    const useMobileLayout = isMobile || forceMobile;
+    // Start minimized in landscape mobile to maximize grid space
+    const [isMinimized, setIsMinimized] = useState(!!emphasizeCollapse);
 
     // Desktop: Regular flow
-    if (!isMobile) {
+    if (!useMobileLayout) {
         return (
             <div
                 className="flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3"
@@ -154,7 +164,7 @@ const InstructionHeader: React.FC<{
                     aria-hidden="true"
                 />
                 <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900">
-                    <SafeMarkdown components={{ p: ({ children }) => <span>{children}</span> }}>
+                    <SafeMarkdown components={markdownComponents}>
                         {instruction || defaultText}
                     </SafeMarkdown>
                 </div>
@@ -174,7 +184,10 @@ const InstructionHeader: React.FC<{
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
                         onClick={() => setIsMinimized(false)}
-                        className="absolute top-[96px] inset-x-0 mx-auto w-fit z-[60] bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide"
+                        className={cn(
+                            'absolute inset-x-0 mx-auto w-fit z-[60] bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide',
+                            emphasizeCollapse ? 'top-2' : 'top-[96px]'
+                        )}
                         aria-label="Expand instructions"
                     >
                         <Target size={14} />
@@ -200,9 +213,7 @@ const InstructionHeader: React.FC<{
                                 aria-hidden="true"
                             />
                             <div className="text-sm font-medium text-slate-700 text-center leading-relaxed max-w-[90%] [&_strong]:font-bold [&_strong]:text-indigo-700">
-                                <SafeMarkdown
-                                    components={{ p: ({ children }) => <span>{children}</span> }}
-                                >
+                                <SafeMarkdown components={markdownComponents}>
                                     {instruction || defaultText}
                                 </SafeMarkdown>
                             </div>
@@ -210,10 +221,21 @@ const InstructionHeader: React.FC<{
                         <button
                             type="button"
                             onClick={() => setIsMinimized(true)}
-                            className="w-full flex items-center justify-center pt-1 pb-1 text-slate-400 hover:text-slate-600 transition-colors"
+                            className={cn(
+                                'flex items-center justify-center transition-colors gap-1.5',
+                                emphasizeCollapse
+                                    ? 'w-full text-white font-bold text-xs uppercase tracking-wide py-1.5 rounded-lg motion-safe:animate-pulse-3x'
+                                    : 'mx-auto mt-1 px-4 py-1 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 text-xs font-medium'
+                            )}
+                            style={
+                                emphasizeCollapse
+                                    ? { backgroundColor: 'var(--brand-accent)' }
+                                    : undefined
+                            }
                             aria-label="Minimize instructions"
                         >
-                            <ChevronUp size={16} />
+                            <ChevronUp size={14} />
+                            {t('fine.header.collapse', 'OK')}
                         </button>
                     </motion.div>
                 )}
@@ -290,7 +312,7 @@ const LegendLabel: React.FC<{
                 typeStyles[type],
                 fontSize,
                 highlight &&
-                    'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative rounded px-1 shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
+                    'ring-4 ring-[var(--brand-accent)] ring-offset-2 motion-safe:animate-pulse z-[100] relative rounded px-1 shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
             )}
         >
             {label}
@@ -300,8 +322,7 @@ const LegendLabel: React.FC<{
 
 const GridLegend: React.FC<{
     highlightKey?: string | null;
-    // biome-ignore lint/suspicious/noExplicitAny: translation function
-    t: any;
+    t: TFunction;
     getLegendFontSize: (maxLen: number) => string;
     uiLabels?: Record<string, string>;
 }> = React.memo(({ highlightKey, t, getLegendFontSize, uiLabels }) => {
@@ -343,7 +364,8 @@ const PileTab: React.FC<{
     label: string;
     cardsLabel: string;
     onClick: () => void;
-}> = React.memo(({ pile, isActive, count, label, cardsLabel, onClick }) => {
+    compact?: boolean;
+}> = React.memo(({ pile, isActive, count, label, cardsLabel, onClick, compact }) => {
     const Icon = {
         disagree: Frown,
         neutral: Meh,
@@ -353,10 +375,13 @@ const PileTab: React.FC<{
     return (
         <DroppablePile
             id={`deck-${pile}`}
-            className={pileTabVariants({
-                variant: isActive ? pile : 'inactive',
-                active: isActive,
-            })}
+            className={cn(
+                pileTabVariants({
+                    variant: isActive ? pile : 'inactive',
+                    active: isActive,
+                }),
+                compact && '!min-h-0 !p-1.5'
+            )}
             onClick={onClick}
             active={isActive}
             role="tab"
@@ -364,28 +389,35 @@ const PileTab: React.FC<{
             aria-label={`${label}: ${count} ${cardsLabel}`}
         >
             <Icon
-                size={isActive ? 28 : 24}
+                size={compact ? 20 : isActive ? 28 : 24}
                 strokeWidth={2.5}
                 className={cn(
-                    'mb-1 lg:mb-2 opacity-80 transition-transform',
+                    'opacity-80 transition-transform',
+                    !compact && 'mb-1 lg:mb-2',
                     pileIconVariants({ type: pile })
                 )}
             />
-            <span className="hidden lg:block text-[10px] font-bold uppercase tracking-wider mb-1 line-clamp-2 text-center px-1 leading-tight">
-                {label}
-            </span>
-            <div
-                className={cn(
-                    'hidden lg:block w-8 h-1 rounded-full mb-1 sm:opacity-40',
-                    isActive ? 'bg-current' : 'bg-slate-200'
-                )}
-            />
-            <div
-                className={cn(
-                    'hidden lg:block w-6 h-1 rounded-full sm:opacity-40',
-                    isActive ? 'bg-current' : 'bg-slate-200'
-                )}
-            />
+            {!compact && (
+                <span className="hidden sm:block text-[10px] font-bold uppercase tracking-wider mb-1 line-clamp-2 text-center px-1 leading-tight">
+                    {label}
+                </span>
+            )}
+            {!compact && (
+                <>
+                    <div
+                        className={cn(
+                            'hidden lg:block w-8 h-1 rounded-full mb-1 sm:opacity-40',
+                            isActive ? 'bg-current' : 'bg-slate-200'
+                        )}
+                    />
+                    <div
+                        className={cn(
+                            'hidden lg:block w-6 h-1 rounded-full sm:opacity-40',
+                            isActive ? 'bg-current' : 'bg-slate-200'
+                        )}
+                    />
+                </>
+            )}
             <motion.span
                 key={count}
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -402,6 +434,7 @@ const ValidationFooter: React.FC<{
     isAllPlaced: boolean;
     selectedCardId?: number | null;
     onValidate: () => void;
+    onCancelSelection?: () => void;
     labels: {
         validate: string;
         place: string;
@@ -409,58 +442,87 @@ const ValidationFooter: React.FC<{
         finish: string;
     };
     highlightKey?: string | null;
-}> = React.memo(({ isAllPlaced, selectedCardId, onValidate, labels, highlightKey }) => (
-    <div
-        data-testid="validation-footer"
-        className="w-full lg:w-[360px] p-2 lg:p-4 border-t border-indigo-100 bg-white shadow-[0_-8px_20px_rgba(0,0,0,0.1)] z-[100] min-h-[72px] lg:min-h-[100px] flex-none pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
-    >
-        {isAllPlaced ? (
-            <button
-                type="button"
-                data-testid="fine-sort-validate-btn"
-                onClick={onValidate}
-                style={{ backgroundColor: 'var(--brand-accent)' }}
-                className={cn(
-                    'w-full flex items-center justify-center gap-2 py-3 lg:py-4 text-white rounded-full font-bold text-base shadow-lg hover:brightness-110 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500',
-                    highlightKey === 'fine.actions.validate' &&
-                        'ring-4 ring-[var(--brand-accent)] ring-offset-2 animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
-                )}
-            >
-                {labels.validate} <Check size={18} strokeWidth={3} />
-            </button>
-        ) : (
-            <div className="flex items-center justify-center min-h-[44px] bg-indigo-50 border border-indigo-100 rounded-xl px-4 w-full">
-                <div className="flex items-center gap-3 text-slate-500">
-                    {selectedCardId ? (
-                        <>
-                            <span
-                                className="flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] text-white font-black"
-                                style={{ backgroundColor: 'var(--brand-accent)' }}
-                            >
-                                2
-                            </span>
-                            <span
-                                className="text-xs font-bold uppercase tracking-wide animate-pulse"
-                                style={{ color: 'var(--brand-accent)' }}
-                            >
-                                {labels.place}
-                            </span>
-                        </>
-                    ) : (
-                        <>
-                            <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500 font-black">
-                                1
-                            </span>
-                            <span className="text-xs font-bold uppercase tracking-wide">
-                                {isAllPlaced ? labels.finish : labels.initial}
-                            </span>
-                        </>
+    compact?: boolean;
+}> = React.memo(
+    ({
+        isAllPlaced,
+        selectedCardId,
+        onValidate,
+        onCancelSelection,
+        labels,
+        highlightKey,
+        compact,
+    }) => (
+        <div
+            data-testid="validation-footer"
+            className={cn(
+                'lg:p-4 border-t border-indigo-100 bg-white z-[100] flex-none pb-[calc(0.5rem+env(safe-area-inset-bottom))]',
+                compact
+                    ? 'w-full min-h-0 p-1.5'
+                    : 'w-full p-2 lg:w-[360px] min-h-[72px] lg:min-h-[100px] shadow-[0_-8px_20px_rgba(0,0,0,0.1)]'
+            )}
+        >
+            {isAllPlaced ? (
+                <button
+                    type="button"
+                    data-testid="fine-sort-validate-btn"
+                    onClick={onValidate}
+                    style={{ backgroundColor: 'var(--brand-accent)' }}
+                    className={cn(
+                        cn(
+                            'w-full flex items-center justify-center gap-2 text-white rounded-full font-bold shadow-lg hover:brightness-110 hover:shadow-xl hover:-translate-y-0.5 transition-all active:scale-95 animate-in fade-in zoom-in-95 duration-500',
+                            compact ? 'py-2 text-sm' : 'py-3 lg:py-4 text-base'
+                        ),
+                        highlightKey === 'fine.actions.validate' &&
+                            'ring-4 ring-[var(--brand-accent)] ring-offset-2 motion-safe:animate-pulse z-[100] relative shadow-[0_0_20px_color-mix(in_srgb,var(--brand-accent),transparent_50%)]'
                     )}
+                >
+                    {labels.validate} <Check size={18} strokeWidth={3} />
+                </button>
+            ) : (
+                <div className="flex items-center justify-center min-h-[44px] bg-indigo-50 border border-indigo-100 rounded-xl px-4 w-full">
+                    <div className="flex items-center gap-3 text-slate-500">
+                        {selectedCardId ? (
+                            <>
+                                <span
+                                    className="flex h-5 w-5 flex-none items-center justify-center rounded-full text-[10px] text-white font-black"
+                                    style={{ backgroundColor: 'var(--brand-accent)' }}
+                                >
+                                    2
+                                </span>
+                                <span
+                                    className="text-xs font-bold uppercase tracking-wide motion-safe:animate-pulse"
+                                    style={{ color: 'var(--brand-accent)' }}
+                                >
+                                    {labels.place}
+                                </span>
+                                {onCancelSelection && (
+                                    <button
+                                        type="button"
+                                        onClick={onCancelSelection}
+                                        className="ml-auto flex-none p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-indigo-100 text-slate-500 hover:text-slate-700 transition-colors"
+                                        aria-label="Cancel selection"
+                                    >
+                                        <X size={16} strokeWidth={2.5} aria-hidden="true" />
+                                    </button>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500 font-black">
+                                    1
+                                </span>
+                                <span className="text-xs font-bold uppercase tracking-wide">
+                                    {isAllPlaced ? labels.finish : labels.initial}
+                                </span>
+                            </>
+                        )}
+                    </div>
                 </div>
-            </div>
-        )}
-    </div>
-));
+            )}
+        </div>
+    )
+);
 
 interface GridSortProps {
     agreeCards: { id: number; text: string; code?: string }[];
@@ -535,7 +597,11 @@ const GridSort: React.FC<GridSortProps> = React.memo(
     }) => {
         const { t } = useTranslation();
 
-        const { isMobile, isDesktop } = useViewport();
+        const { isMobile, isDesktop, isLandscape, height } = useViewport();
+        // Include landscape phones >= 768px (e.g., iPhone 14 Pro at 844x390)
+        // that fall into the "tablet" zone but need the landscape-mobile layout
+        const isLandscapeMobile =
+            (isMobile && isLandscape) || (isLandscape && height < 500 && !isDesktop);
 
         // Deck Management Hook
         const {
@@ -658,22 +724,24 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             return () => clearTimeout(tFit);
         }, [performAutoFit]);
 
-        // Responsive: Disable autofit on mobile selection
+        // Responsive: Disable autofit on mobile selection, re-enable on deselection
         useEffect(() => {
             if (selectedCardId && !isDesktop) {
                 setAutoFitEnabled(false);
+            } else if (!selectedCardId) {
+                setAutoFitEnabled(true);
             }
         }, [selectedCardId, isDesktop]);
-
-        useEffect(() => {
-            setAutoFitEnabled(true);
-        }, []);
 
         useEffect(() => {
             if (!autoFitEnabled) return;
             const t = setTimeout(performAutoFit, 100);
             return () => clearTimeout(t);
         }, [autoFitEnabled, performAutoFit]);
+
+        const handleCancelSelection = useCallback(() => {
+            if (selectedCardId && onCardClick) onCardClick(selectedCardId);
+        }, [selectedCardId, onCardClick]);
 
         const inventoryLabels = useMemo(
             () => ({
@@ -706,7 +774,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
             if (activeCards.length === 0) {
                 return (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-4 lg:col-span-2 lg:h-full lg:place-self-center">
+                    <div className="w-full h-full flex flex-col items-center justify-center text-center text-slate-400 py-4 col-span-2 lg:h-full place-self-center">
                         <div className="flex flex-col items-center gap-2">
                             <div className="p-2 bg-green-50 rounded-full border border-green-100 shadow-sm animate-in zoom-in duration-300">
                                 <Check size={20} className="text-green-500" strokeWidth={2.5} />
@@ -724,9 +792,19 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                     key={card.id}
                     className={cn(
                         'flex-none lg:w-full lg:flex-none',
-                        isMobile ? 'h-[100px]' : 'h-full w-[130px] sm:w-[140px]'
+                        isLandscapeMobile
+                            ? 'w-full h-[52px]'
+                            : isMobile
+                              ? 'h-[80px]'
+                              : 'h-full w-[130px] sm:w-[140px]'
                     )}
-                    style={{ aspectRatio: isMobile ? mobileRatio : gridRatio }}
+                    style={{
+                        aspectRatio: isLandscapeMobile
+                            ? undefined
+                            : isMobile
+                              ? mobileRatio
+                              : gridRatio,
+                    }}
                 >
                     <SortableCard
                         id={card.id}
@@ -735,7 +813,9 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         variant="compact"
                         isSelected={selectedCardId === card.id}
                         onAction={onCardClick}
-                        aspectRatio={isMobile ? mobileRatio : gridRatio}
+                        aspectRatio={
+                            isLandscapeMobile ? undefined : isMobile ? mobileRatio : gridRatio
+                        }
                         disableHoverZoom={disableHoverZoom || isMobile}
                     />
                 </div>
@@ -745,6 +825,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             selectedCardId,
             onCardClick,
             isMobile,
+            isLandscapeMobile,
             disableHoverZoom,
             t,
             showCodes,
@@ -752,18 +833,25 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         ]);
 
         return (
-            <div className="flex flex-col lg:flex-row h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative">
+            <div
+                className={cn(
+                    'flex h-full bg-slate-50 w-full max-w-[1920px] mx-auto overflow-hidden relative',
+                    isLandscapeMobile ? 'flex-row' : 'flex-col lg:flex-row'
+                )}
+            >
                 {/* PANEL: THE GRID (Canvas) */}
-                <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300">
+                <div className="flex-1 min-h-0 bg-slate-50 relative flex flex-col overflow-hidden transition-all duration-300 pl-safe">
                     <InstructionHeader
                         instruction={conditionOfInstruction || null}
                         defaultText={t('fine.header.title')}
+                        emphasizeCollapse={isLandscapeMobile}
+                        forceMobile={isLandscapeMobile}
                     />
 
-                    {isMobile && <ReadingZone variant="mobile" />}
+                    {isMobile && !isLandscapeMobile && <ReadingZone variant="mobile" />}
 
                     <div
-                        className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing"
+                        className="flex-1 w-full h-full relative overflow-hidden bg-slate-100 cursor-grab active:cursor-grabbing touch-none"
                         ref={wrapperRef}
                     >
                         <GridToolbar
@@ -795,6 +883,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                         ref={pyramidRef}
                                         className="flex flex-row gap-2 items-end flex-nowrap outline-none"
                                         role="grid"
+                                        aria-label={t('fine.grid.label', 'Sorting grid')}
                                         tabIndex={-1}
                                         onKeyDown={handleGridKeyDown}
                                     >
@@ -832,6 +921,14 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                                     }}
                                                                     role="button"
                                                                     tabIndex={0}
+                                                                    aria-label={t(
+                                                                        'fine.grid.slot_label',
+                                                                        {
+                                                                            score: col.score,
+                                                                            row: rowIndex + 1,
+                                                                            defaultValue: `Score ${col.score}, row ${rowIndex + 1}`,
+                                                                        }
+                                                                    )}
                                                                     onClick={() =>
                                                                         onSlotClick?.(
                                                                             colIndex,
@@ -861,6 +958,14 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                                     key={`${colIndex}-${rowIndex}`}
                                                                     id={`slot_${colIndex}_${rowIndex}`}
                                                                     role="gridcell"
+                                                                    aria-label={t(
+                                                                        'fine.grid.slot_label',
+                                                                        {
+                                                                            score: col.score,
+                                                                            row: rowIndex + 1,
+                                                                            defaultValue: `Score ${col.score}, row ${rowIndex + 1}`,
+                                                                        }
+                                                                    )}
                                                                     onClick={() =>
                                                                         onSlotClick?.(
                                                                             colIndex,
@@ -910,8 +1015,11 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 {/* PANEL: SOURCE INVENTORY (Deck) */}
                 <div
                     className={cn(
-                        'w-full lg:w-[360px] flex-none bg-white lg:border-r border-t lg:border-t-0 border-gray-200 z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md flex flex-col lg:h-full transition-all duration-300 overflow-hidden',
-                        isMobile ? 'h-auto' : 'h-full'
+                        'flex-none bg-white border-gray-200 z-40 flex flex-col transition-all duration-300 overflow-hidden',
+                        isLandscapeMobile
+                            ? 'w-[min(280px,40vw)] h-full border-l shadow-md pr-safe'
+                            : 'w-full lg:w-[360px] lg:border-r border-t lg:border-t-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md lg:h-full',
+                        !isLandscapeMobile && (isMobile ? 'h-auto' : 'h-full')
                     )}
                 >
                     {readOnly && sidebarContent ? (
@@ -920,16 +1028,31 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         </div>
                     ) : (
                         <>
-                            {!isMobile && (
-                                <div className="flex-none p-4 pb-0">
-                                    <ReadingZone variant="desktop" />
+                            {(!isMobile || isLandscapeMobile) && (
+                                <div
+                                    className={cn(
+                                        'flex-none pb-0',
+                                        isLandscapeMobile ? 'p-2' : 'p-4'
+                                    )}
+                                >
+                                    <ReadingZone
+                                        variant={isLandscapeMobile ? 'landscape' : 'desktop'}
+                                    />
                                 </div>
                             )}
 
                             {/* Category selector (Piles) */}
-                            <div className="flex-none p-3 pb-1.5 lg:p-4 lg:pb-2">
+                            <div
+                                className={cn(
+                                    'flex-none lg:p-4 lg:pb-2',
+                                    isLandscapeMobile ? 'p-2 pb-1' : 'p-2 pb-1 sm:p-3 sm:pb-1.5'
+                                )}
+                            >
                                 <div
-                                    className="flex w-full gap-2 lg:grid lg:grid-cols-3"
+                                    className={cn(
+                                        'flex w-full lg:grid lg:grid-cols-3',
+                                        isLandscapeMobile ? 'gap-1' : 'gap-2'
+                                    )}
                                     role="tablist"
                                 >
                                     {(['disagree', 'neutral', 'agree'] as const).map((pile) => (
@@ -946,9 +1069,11 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                             }
                                             label={t(`common.${pile}`)}
                                             cardsLabel={t('common.cards')}
+                                            compact={isLandscapeMobile}
                                             onClick={() => {
                                                 setActivePile(pile);
-                                                if (isMobile) setHasPerformedZonalFocus(true);
+                                                if (isMobile || isLandscapeMobile)
+                                                    setHasPerformedZonalFocus(true);
                                             }}
                                         />
                                     ))}
@@ -959,13 +1084,20 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 id={`deck-area-${activePile}`}
                                 className={cn(
                                     'flex-col overflow-hidden relative',
-                                    isMobile ? 'h-[120px] flex-none' : 'flex-1 min-h-0 flex'
+                                    isLandscapeMobile
+                                        ? 'flex-1 min-h-0 flex'
+                                        : isMobile
+                                          ? 'h-[100px] flex-none'
+                                          : 'flex-1 min-h-0 flex'
                                 )}
                             >
                                 <div
                                     key={activePile}
                                     className={cn(
-                                        'flex-1 p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden min-h-0 items-stretch justify-start custom-scrollbar lg:grid lg:grid-cols-2 lg:gap-2 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:p-3',
+                                        'flex-1 min-h-0 custom-scrollbar',
+                                        isLandscapeMobile
+                                            ? 'grid grid-cols-2 gap-1 content-start overflow-y-auto overflow-x-hidden p-1.5'
+                                            : 'p-1 px-2 flex flex-row gap-2 overflow-x-auto overflow-y-hidden items-stretch justify-start lg:grid lg:grid-cols-2 lg:gap-2 lg:content-start lg:overflow-y-auto lg:overflow-x-hidden lg:p-3',
                                         activeCards.length === 0 &&
                                             'justify-center lg:place-content-center'
                                     )}
@@ -973,14 +1105,27 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 >
                                     {renderDeckCards()}
                                 </div>
+                                {/* Scroll hint: right-edge gradient for horizontal deck (portrait mobile only) */}
+                                {isMobile && !isLandscapeMobile && activeCards.length > 0 && (
+                                    <div
+                                        className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10"
+                                        aria-hidden="true"
+                                    />
+                                )}
                             </DroppableDeckArea>
 
                             <ValidationFooter
                                 isAllPlaced={isAllPlaced}
                                 selectedCardId={selectedCardId}
-                                onValidate={onValidate || (() => {})}
+                                onValidate={onValidate || noop}
+                                onCancelSelection={
+                                    selectedCardId && onCardClick
+                                        ? handleCancelSelection
+                                        : undefined
+                                }
                                 labels={inventoryLabels}
                                 highlightKey={highlightKey}
+                                compact={isLandscapeMobile}
                             />
                         </>
                     )}

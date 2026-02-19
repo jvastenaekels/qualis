@@ -34,7 +34,7 @@ import {
     sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -57,7 +57,7 @@ interface FineSortPageProps {
 const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
     // 1. Hooks (Store / Router) - Top Level
     const config = useConfigStore((state) => state.config);
-    const { isDesktop } = useViewport();
+    const { isDesktop, isLandscape } = useViewport();
     const rough = useResponseStore((state) => state.rough);
     const qsort = useResponseStore((state) => state.qsort);
 
@@ -234,6 +234,17 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedCardId]);
+
+    // Cancel any active drag when device orientation changes (prevents mis-drops)
+    const prevLandscapeRef = useRef(isLandscape);
+    useEffect(() => {
+        if (isLandscape !== prevLandscapeRef.current) {
+            prevLandscapeRef.current = isLandscape;
+            if (activeId !== null) {
+                handleDragCancel();
+            }
+        }
+    }, [isLandscape, activeId, handleDragCancel]);
 
     // 7. Collision Strategy (Stable)
     const collisionStrategy: CollisionDetection = useCallback((args) => {

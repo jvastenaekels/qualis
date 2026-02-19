@@ -21,6 +21,10 @@ import { useUIStore } from '../store/useUIStore';
 import { cn } from '@/lib/utils';
 import { cva } from 'class-variance-authority';
 
+const markdownComponents = {
+    p: ({ children }: { children?: React.ReactNode }) => <span>{children}</span>,
+};
+
 interface SortableCardProps {
     id: number;
     text: string;
@@ -58,7 +62,7 @@ const CARD_PULSE_ANIMATION = {
 };
 
 const cardStyles = cva(
-    'relative flex items-center justify-center p-0 cursor-grab active:cursor-grabbing dnd-prevent-pan',
+    'relative flex items-center justify-center p-0 cursor-grab active:cursor-grabbing dnd-prevent-pan focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none',
     {
         variants: {
             isDragging: {
@@ -190,6 +194,8 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                 {...listeners}
                 role="button"
                 tabIndex={0}
+                aria-label={code ? `${code}: ${text}` : text}
+                aria-pressed={isSelected}
                 style={{ ...style, ...aspectStyle }}
                 data-testid={`card-${id}`}
                 onPointerDown={(e) => {
@@ -275,9 +281,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                         <div className={textStyles({ variant, allowScroll })}>
                             {/[*_~#]/.test(text) ? (
                                 <SafeMarkdown
-                                    components={{
-                                        p: ({ children }) => <span>{children}</span>,
-                                    }}
+                                    components={markdownComponents}
                                     className="!prose-none text-inherit"
                                 >
                                     {text}

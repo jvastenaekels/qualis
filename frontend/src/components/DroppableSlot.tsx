@@ -43,6 +43,7 @@ const DroppableSlot: React.FC<DroppableSlotProps> = React.memo(
         flex items-center justify-center
         transition-colors duration-200
         cursor-pointer
+        focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:outline-none
         ${
             isOver
                 ? 'bg-indigo-50 border-indigo-300 ring-2 ring-indigo-200'

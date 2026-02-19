@@ -12,8 +12,53 @@ import { useUIStore } from '../store/useUIStore';
 import MethodologyTips from './MethodologyTips';
 import { cn } from '@/lib/utils';
 
+const ScrollIndicator: React.FC = () => (
+    <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-indigo-50 via-indigo-50/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-xl z-10 transition-opacity duration-300">
+        <div className="motion-safe:animate-bounce opacity-50">
+            <svg
+                aria-hidden="true"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-indigo-900"
+            >
+                <path d="m6 9 6 6 6-6" />
+            </svg>
+        </div>
+    </div>
+);
+
+const CardHeader: React.FC<{
+    label: string;
+    code?: string;
+    className: string;
+    iconSize: number;
+    showCodes: boolean;
+}> = ({ label, code, className, iconSize, showCodes }) => (
+    <div
+        className={cn(
+            'font-bold text-indigo-400 uppercase tracking-wider flex items-center',
+            className
+        )}
+    >
+        <Eye size={iconSize} strokeWidth={2.5} />
+        {label}
+        {showCodes && code && (
+            <>
+                <span className="text-indigo-300 mx-1">•</span>
+                {code}
+            </>
+        )}
+    </div>
+);
+
 interface ReadingZoneProps {
-    variant: 'mobile' | 'desktop';
+    variant: 'mobile' | 'desktop' | 'landscape';
 }
 const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     const { t } = useTranslation();
@@ -25,12 +70,13 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     const showCodes = config?.show_statement_codes ?? true;
 
     const rawDisplayCard = activeCard || hoveredCard || selectedCard;
-    const displayCard = React.useDeferredValue(rawDisplayCard);
-    const labelKey = activeCard
+    const rawLabelKey = activeCard
         ? 'fine.workbench.active_card'
         : hoveredCard
           ? 'fine.toolbar.preview'
           : 'fine.workbench.active_card';
+    const displayCard = React.useDeferredValue(rawDisplayCard);
+    const labelKey = React.useDeferredValue(rawLabelKey);
 
     // Scroll indicator logic
     const textRef = React.useRef<HTMLDivElement>(null);
@@ -56,55 +102,6 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
         };
     }, [displayCard?.text]);
 
-    const ScrollIndicator = () => (
-        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-indigo-50 via-indigo-50/50 to-transparent pointer-events-none flex items-end justify-center pb-0.5 rounded-b-xl z-10 transition-opacity duration-300">
-            <div className="animate-bounce opacity-50">
-                <svg
-                    aria-hidden="true"
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-indigo-900"
-                >
-                    <path d="m6 9 6 6 6-6" />
-                </svg>
-            </div>
-        </div>
-    );
-
-    const CardHeader = ({
-        label,
-        code,
-        className,
-        iconSize,
-    }: {
-        label: string;
-        code?: string;
-        className: string;
-        iconSize: number;
-    }) => (
-        <div
-            className={cn(
-                'font-bold text-indigo-400 uppercase tracking-wider flex items-center',
-                className
-            )}
-        >
-            <Eye size={iconSize} strokeWidth={2.5} />
-            {label}
-            {showCodes && code && (
-                <>
-                    <span className="text-indigo-300 mx-1">•</span>
-                    {code}
-                </>
-            )}
-        </div>
-    );
-
     if (variant === 'mobile') {
         return (
             <div className="sticky top-0 z-30 flex-none bg-indigo-50/50 backdrop-blur-md border-b border-indigo-100 shadow-sm relative overflow-hidden h-24">
@@ -126,6 +123,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                                 code={displayCard.code}
                                 className="text-[10px] mb-0.5 gap-1.5"
                                 iconSize={12}
+                                showCodes={showCodes}
                             />
                             <div className="flex flex-col gap-0.5">
                                 <p className="text-slate-800 text-sm font-medium leading-relaxed">
@@ -155,6 +153,51 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
         );
     }
 
+    if (variant === 'landscape') {
+        return (
+            <div className="w-full bg-indigo-50/50 backdrop-blur-md border border-indigo-100 rounded-xl h-16 relative overflow-hidden">
+                <div
+                    ref={textRef}
+                    className={cn(
+                        'transition-opacity duration-300 absolute inset-0 p-1.5 overflow-y-auto custom-scrollbar',
+                        displayCard
+                            ? 'opacity-100 z-10'
+                            : 'opacity-0 z-0 pointer-events-none invisible'
+                    )}
+                    aria-hidden={!displayCard}
+                >
+                    {displayCard && (
+                        <div className="animate-in fade-in duration-200">
+                            <CardHeader
+                                label={t(labelKey)}
+                                code={displayCard.code}
+                                className="text-[9px] mb-0 gap-1"
+                                iconSize={9}
+                                showCodes={showCodes}
+                            />
+                            <p className="text-slate-800 text-xs font-medium leading-snug">
+                                {displayCard.text}
+                            </p>
+                        </div>
+                    )}
+                </div>
+                <div
+                    className={cn(
+                        'transition-opacity duration-500 absolute inset-0 flex items-center justify-center',
+                        !displayCard
+                            ? 'opacity-100 z-10 delay-100'
+                            : 'opacity-0 z-0 pointer-events-none invisible'
+                    )}
+                    aria-hidden={!!displayCard}
+                    data-testid="reading-zone-tips"
+                >
+                    <MethodologyTips variant="mobile" />
+                </div>
+                {hasOverflow && displayCard && <ScrollIndicator />}
+            </div>
+        );
+    }
+
     return (
         <div className="w-full bg-indigo-50/50 backdrop-blur-md border border-indigo-100 rounded-xl h-[170px] relative group overflow-hidden">
             {/* Card Content Layer */}
@@ -173,6 +216,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                             code={displayCard.code}
                             className="text-xs mb-1.5 gap-2"
                             iconSize={14}
+                            showCodes={showCodes}
                         />
                         <p className="text-slate-800 text-base font-medium leading-relaxed">
                             {displayCard.text}
@@ -188,6 +232,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                         ? 'opacity-100 z-10 delay-100'
                         : 'opacity-0 z-0 pointer-events-none invisible'
                 )}
+                aria-hidden={!!displayCard}
                 data-testid="reading-zone-tips"
             >
                 <MethodologyTips variant="desktop" />

@@ -69,6 +69,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                     type="button"
                     onClick={prevTip}
                     className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/50 rounded-full transition-colors"
+                    aria-label={t('fine.workbench.previous_tip', 'Previous tip')}
                 >
                     <ChevronLeft size={16} />
                 </button>
@@ -98,6 +99,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                     type="button"
                     onClick={nextTip}
                     className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/50 rounded-full transition-colors"
+                    aria-label={t('fine.workbench.next_tip', 'Next tip')}
                 >
                     <ChevronRight size={16} />
                 </button>
@@ -113,7 +115,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 className="absolute left-1 top-1/2 -translate-y-1/2 p-1.5 text-indigo-300 hover:text-indigo-600 hover:bg-indigo-100/80 rounded-full transition-all opacity-0 group-hover:opacity-100"
                 aria-label="Previous tip"
             >
-                <ChevronLeft size={20} message-id="button-icon" />
+                <ChevronLeft size={20} />
             </button>
 
             <div className="flex flex-col items-center gap-3 px-8 animate-in fade-in duration-300">

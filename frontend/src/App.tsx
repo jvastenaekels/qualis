@@ -237,12 +237,15 @@ const router = createBrowserRouter([
 ]);
 
 import { ViewportProvider } from '@/contexts/ViewportContext';
+import { MotionConfig } from 'framer-motion';
 
 const App = () => {
     return (
         <ErrorBoundary>
             <ViewportProvider>
-                <RouterProvider router={router} />
+                <MotionConfig reducedMotion="user">
+                    <RouterProvider router={router} />
+                </MotionConfig>
             </ViewportProvider>
             <Toaster richColors position="top-center" closeButton />
         </ErrorBoundary>
