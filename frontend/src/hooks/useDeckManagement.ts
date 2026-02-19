@@ -21,8 +21,6 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
 }: UseDeckManagementProps<T>) => {
     const [activePile, setActivePile] = useState<PileType>('disagree');
     const [isPending, startTransition] = useTransition();
-    const [hasPerformedZonalFocus, setHasPerformedZonalFocus] = useState(false);
-
     const setActivePileTransition = (pile: PileType) => {
         startTransition(() => {
             setActivePile(pile);
@@ -59,8 +57,6 @@ export const useDeckManagement = <T extends { id: number; text: string }>({
         setActivePile: setActivePileTransition,
         activeCards,
         deckHeight,
-        hasPerformedZonalFocus,
-        setHasPerformedZonalFocus,
         isPending,
     };
 };

@@ -5,12 +5,6 @@ import { useViewport } from '@/contexts/ViewportContext';
 interface UseGridZoomProps {
     wrapperRef: React.RefObject<HTMLDivElement | null>;
     contentRef: React.RefObject<HTMLDivElement | null>;
-    pyramidRef: React.RefObject<HTMLDivElement | null>;
-    gridColumns: { score: number; capacity: number }[];
-    activePile: 'agree' | 'disagree' | 'neutral';
-    activePileCount: number;
-    hasPerformedZonalFocus: boolean;
-    setHasPerformedZonalFocus: (val: boolean) => void;
     onZoomChange?: (scale: number) => void;
     onTransformChange?: () => void;
 }
@@ -18,12 +12,6 @@ interface UseGridZoomProps {
 export const useGridZoom = ({
     wrapperRef,
     contentRef,
-    pyramidRef,
-    gridColumns,
-    activePile,
-    activePileCount,
-    hasPerformedZonalFocus,
-    setHasPerformedZonalFocus,
     onZoomChange,
     onTransformChange,
 }: UseGridZoomProps) => {
@@ -196,118 +184,6 @@ export const useGridZoom = ({
             cancelAnimationFrame(rafId);
         };
     }, [performAutoFit, wrapperRef]);
-
-    // Zonal Focus Logic (Anti-Bias: Sector Panning)
-    // 2-step animation: First show entire pyramid, then zoom to zone
-    useEffect(() => {
-        if (!hasPerformedZonalFocus || !transformRef.current) return;
-
-        // Step 1: First show the entire pyramid (autoFit)
-        performAutoFit();
-
-        // Step 2: After delay, zoom to the target zone
-        const zoomTimer = setTimeout(() => {
-            if (
-                !transformRef.current ||
-                !wrapperRef.current ||
-                !contentRef.current ||
-                !pyramidRef.current
-            )
-                return;
-
-            // Skip zonal zoom if pile is empty - just stay centered
-            if (activePileCount === 0) return;
-
-            // Calculate dynamic target column based on grid limits
-            // Desktop: -1 (Disagree), 0 (Neutral), +1 (Agree)
-            // Mobile: minScore + 2, Neutral: 0, Agree: maxScore - 2
-            const scores = gridColumns.map((c) => c.score);
-            const minScore = Math.min(...scores);
-            const maxScore = Math.max(...scores);
-
-            const isMobile = !isDesktop;
-            const isLandscapeMob = isMobile && isLandscape;
-            let targetScore: number;
-
-            if (isMobile) {
-                if (activePile === 'disagree') {
-                    targetScore = minScore + 2;
-                } else if (activePile === 'agree') {
-                    targetScore = maxScore - 2;
-                } else {
-                    targetScore = 0;
-                }
-            } else {
-                if (activePile === 'disagree') {
-                    targetScore = -1;
-                } else if (activePile === 'agree') {
-                    targetScore = 1;
-                } else {
-                    targetScore = 0;
-                }
-            }
-
-            // Format column ID
-            const targetColumnId = `column-${targetScore}`;
-            const targetColumn = document.getElementById(targetColumnId);
-            if (!targetColumn) return;
-
-            // Get wrapper and content dimensions
-            const wrapperW = wrapperRef.current.clientWidth;
-            const wrapperH = wrapperRef.current.clientHeight;
-            const contentW = contentRef.current.offsetWidth;
-            const contentH = contentRef.current.offsetHeight;
-
-            // Target scale: fit content nicely (1.0 for desktop, 0.85 for landscape mobile, 0.66 for portrait mobile)
-            const targetScale = isMobile ? (isLandscapeMob ? 0.85 : 0.66) : 1.0;
-
-            // Get the column's position relative to the content (not screen)
-            const contentRect = contentRef.current.getBoundingClientRect();
-            const columnRect = targetColumn.getBoundingClientRect();
-
-            // Column center relative to content (at current scale)
-            const currentScale = transformRef.current.instance.transformState.scale;
-            const columnCenterInContent =
-                (columnRect.left - contentRect.left + columnRect.width / 2) / currentScale;
-
-            // Where we want the column center to be (center of wrapper)
-            const targetColumnScreenX = wrapperW / 2;
-
-            // Calculate X position: targetColumnScreenX = columnCenterInContent * targetScale + targetX
-            const targetX = targetColumnScreenX - columnCenterInContent * targetScale;
-
-            // Center content horizontally, ensure it doesn't overflow too much
-            const maxX = 0;
-            const minX = wrapperW - contentW * targetScale;
-            const clampedX = Math.max(minX, Math.min(maxX, targetX));
-
-            // Y positioning: center in landscape, bottom anchor in portrait
-            const targetY = isLandscapeMob
-                ? (wrapperH - contentH * targetScale) / 2
-                : wrapperH - contentH * targetScale - 10;
-
-            // Apply zoom and pan with smooth easing
-            transformRef.current.setTransform(clampedX, targetY, targetScale, 800, 'easeInOutQuad');
-
-            // Reset focus state to prevent redundant triggers
-            setHasPerformedZonalFocus(false);
-        }, 500); // Reduced delay for smoother transition
-
-        return () => clearTimeout(zoomTimer);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [
-        activePile,
-        hasPerformedZonalFocus,
-        wrapperRef,
-        contentRef,
-        pyramidRef,
-        performAutoFit,
-        gridColumns,
-        activePileCount,
-        setHasPerformedZonalFocus,
-        isDesktop,
-        isLandscape,
-    ]);
 
     return {
         transformRef,

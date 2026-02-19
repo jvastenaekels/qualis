@@ -20,19 +20,12 @@ const mockTransformRef = {
     },
 };
 
-const mockSetHasPerformedZonalFocus = vi.fn();
 const mockOnZoomChange = vi.fn();
 const mockOnTransformChange = vi.fn();
 
 const defaultProps = {
     wrapperRef: { current: document.createElement('div') },
     contentRef: { current: document.createElement('div') },
-    pyramidRef: { current: document.createElement('div') },
-    gridColumns: [{ score: 0, capacity: 1 }],
-    activePile: 'neutral' as const,
-    activePileCount: 1,
-    hasPerformedZonalFocus: false,
-    setHasPerformedZonalFocus: mockSetHasPerformedZonalFocus,
     onZoomChange: mockOnZoomChange,
     onTransformChange: mockOnTransformChange,
 };
@@ -113,49 +106,5 @@ describe('useGridZoom', () => {
 
         // Scale is min(1.96, ...) -> around 1.96
         expect(scale).toBeGreaterThan(1.0);
-    });
-
-    it('triggers zonal focus sequence when enabled', async () => {
-        vi.useFakeTimers();
-        const props = { ...defaultProps, hasPerformedZonalFocus: true };
-
-        // Mock getElementById for target column
-        const mockColumn = document.createElement('div');
-        vi.spyOn(document, 'getElementById').mockReturnValue(mockColumn);
-        vi.spyOn(mockColumn, 'getBoundingClientRect').mockReturnValue({
-            left: 400,
-            top: 400,
-            width: 100,
-            height: 100,
-            bottom: 500,
-            right: 500,
-            x: 400,
-            y: 400,
-            toJSON: () => {},
-        } as DOMRect);
-        vi.spyOn(
-            defaultProps.contentRef.current as Element,
-            'getBoundingClientRect'
-        ).mockReturnValue({
-            left: 0,
-            top: 0,
-            width: 500,
-            height: 400,
-            bottom: 400,
-            right: 500,
-            x: 0,
-            y: 0,
-            toJSON: () => {},
-        } as DOMRect);
-
-        renderHook(() => useGridZoom(props), { wrapper: AllTheProviders });
-
-        // Advance time to trigger Step 2 (Step 1 is mount)
-        vi.advanceTimersByTime(501);
-
-        expect(mockTransformRef.setTransform).toHaveBeenCalled();
-        expect(mockSetHasPerformedZonalFocus).toHaveBeenCalledWith(false);
-
-        vi.useRealTimers();
     });
 });

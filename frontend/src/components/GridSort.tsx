@@ -604,13 +604,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             (isMobile && isLandscape) || (isLandscape && height < 500 && !isDesktop);
 
         // Deck Management Hook
-        const {
-            activePile,
-            setActivePile,
-            activeCards,
-            hasPerformedZonalFocus,
-            setHasPerformedZonalFocus,
-        } = useDeckManagement({
+        const { activePile, setActivePile, activeCards } = useDeckManagement({
             agreeCards,
             disagreeCards,
             neutralCards,
@@ -627,18 +621,11 @@ const GridSort: React.FC<GridSortProps> = React.memo(
 
         // Refs for Zoom Hook (wrapperRef is now provided by useGridCalculations)
         const contentRef = useRef<HTMLDivElement>(null);
-        const pyramidRef = useRef<HTMLDivElement>(null);
 
         // Zoom Hook
         const { zoomIn, zoomOut, performAutoFit, transformRef, onTransformed } = useGridZoom({
             wrapperRef,
             contentRef,
-            pyramidRef,
-            gridColumns,
-            activePile,
-            activePileCount: activeCards.length,
-            hasPerformedZonalFocus,
-            setHasPerformedZonalFocus,
             onZoomChange,
             onTransformChange,
         });
@@ -724,12 +711,13 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             return () => clearTimeout(tFit);
         }, [performAutoFit]);
 
-        // Responsive: Disable autofit on mobile selection, re-enable on deselection
+        // Responsive: Disable autofit on mobile selection so viewport resize
+        // doesn't fight with the user placing a card. We intentionally do NOT
+        // re-enable it on deselection — doing so triggers performAutoFit which
+        // resets the zoom level after every card placement on mobile.
         useEffect(() => {
             if (selectedCardId && !isDesktop) {
                 setAutoFitEnabled(false);
-            } else if (!selectedCardId) {
-                setAutoFitEnabled(true);
             }
         }, [selectedCardId, isDesktop]);
 
@@ -817,7 +805,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                         isSelected={selectedCardId === card.id}
                         onAction={onCardClick}
                         aspectRatio={
-                            isLandscapeMobile ? undefined : isMobile ? mobileRatio : gridRatio
+                            isLandscapeMobile ? 'auto' : isMobile ? mobileRatio : gridRatio
                         }
                         disableHoverZoom={disableHoverZoom || isMobile}
                     />
@@ -885,7 +873,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                     className="flex flex-col items-center gap-8 px-4 relative"
                                 >
                                     <div
-                                        ref={pyramidRef}
                                         className="flex flex-row gap-2 items-end flex-nowrap outline-none"
                                         role="grid"
                                         aria-label={t('fine.grid.label', 'Sorting grid')}
@@ -1070,8 +1057,6 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                             compact={isLandscapeMobile}
                                             onClick={() => {
                                                 setActivePile(pile);
-                                                if (isMobile || isLandscapeMobile)
-                                                    setHasPerformedZonalFocus(true);
                                             }}
                                         />
                                     ))}

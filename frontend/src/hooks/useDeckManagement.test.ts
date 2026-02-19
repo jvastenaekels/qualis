@@ -78,22 +78,4 @@ describe('useDeckManagement', () => {
         expect(highResult.current.deckHeight).toBe(600);
         expect(lowResult.current.deckHeight).toBe(345);
     });
-
-    it('should maintain zonal focus state', () => {
-        const { result } = renderHook(() =>
-            useDeckManagement({
-                agreeCards: [],
-                disagreeCards: [],
-                neutralCards: [],
-            })
-        );
-
-        expect(result.current.hasPerformedZonalFocus).toBe(false);
-
-        act(() => {
-            result.current.setHasPerformedZonalFocus(true);
-        });
-
-        expect(result.current.hasPerformedZonalFocus).toBe(true);
-    });
 });
