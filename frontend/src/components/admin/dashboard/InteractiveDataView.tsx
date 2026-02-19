@@ -676,6 +676,38 @@ export default function InteractiveDataView({
                                 <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
                                     {info.getValue()}
                                 </span>
+                                {ua && DeviceIcon && (
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="inline-flex items-center text-slate-400">
+                                                        {OsIcon ? (
+                                                            <OsIcon className="w-3 h-3" />
+                                                        ) : (
+                                                            <DeviceIcon className="w-3 h-3" />
+                                                        )}
+                                                    </span>
+                                                    {ua.browser !== 'Unknown' && (
+                                                        <span className="inline-flex items-center text-slate-400">
+                                                            {BrowserIcon ? (
+                                                                <BrowserIcon className="w-3 h-3" />
+                                                            ) : (
+                                                                <Globe className="w-3 h-3" />
+                                                            )}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent
+                                                side="bottom"
+                                                className="max-w-xs break-all font-mono text-[10px]"
+                                            >
+                                                {p.user_agent}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                )}
                                 {p.is_discarded && (
                                     <Badge
                                         variant="destructive"
@@ -685,40 +717,6 @@ export default function InteractiveDataView({
                                     </Badge>
                                 )}
                             </div>
-                            {ua && DeviceIcon && (
-                                <TooltipProvider>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="flex items-center gap-1 flex-wrap">
-                                                <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
-                                                    {OsIcon ? (
-                                                        <OsIcon className="w-3 h-3" />
-                                                    ) : (
-                                                        <DeviceIcon className="w-3 h-3" />
-                                                    )}
-                                                    {ua.os !== 'Unknown' ? ua.os : ua.device}
-                                                </span>
-                                                {ua.browser !== 'Unknown' && (
-                                                    <span className="inline-flex items-center gap-1 text-[10px] text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">
-                                                        {BrowserIcon ? (
-                                                            <BrowserIcon className="w-3 h-3" />
-                                                        ) : (
-                                                            <Globe className="w-3 h-3" />
-                                                        )}
-                                                        {ua.browser}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent
-                                            side="bottom"
-                                            className="max-w-xs break-all font-mono text-[10px]"
-                                        >
-                                            {p.user_agent}
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
-                            )}
                             {p.ip_address && duplicateIpGroups.has(p.ip_address) && (
                                 <TooltipProvider>
                                     <Tooltip>
