@@ -211,7 +211,7 @@ export function QuestionDistributionCharts({
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <ResponsiveContainer width="100%" height={chartHeight}>
+                            <ResponsiveContainer width="100%" height={chartHeight} minWidth={0}>
                                 <BarChart
                                     data={item.bars}
                                     layout="vertical"
