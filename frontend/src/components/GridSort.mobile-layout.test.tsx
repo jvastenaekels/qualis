@@ -239,15 +239,15 @@ describe('GridSort Landscape Mobile Layout', () => {
         expect(stickyReadingZone).not.toBeInTheDocument();
     });
 
-    it('renders ReadingZone in sidebar with landscape variant (compact h-16)', () => {
+    it('renders ReadingZone in sidebar with landscape variant (auto-collapsing)', () => {
         const { container } = render(
             <DndContext>
                 <GridSort {...defaultProps} />
             </DndContext>
         );
 
-        // Landscape ReadingZone has h-16 class (64px, compact for landscape)
-        const landscapeReadingZone = container.querySelector('[class*="h-16"]');
+        // Landscape ReadingZone starts collapsed (h-0) when no card is active/hovered
+        const landscapeReadingZone = container.querySelector('[class*="h-0"]');
         expect(landscapeReadingZone).toBeInTheDocument();
     });
 

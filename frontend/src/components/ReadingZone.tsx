@@ -154,15 +154,22 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
     }
 
     if (variant === 'landscape') {
+        // Auto-collapsing: h-0 when idle, h-16 when previewing a card.
+        // Maximizes deck space on cramped landscape phones.
         return (
-            <div className="w-full bg-indigo-50/50 backdrop-blur-md border border-indigo-100 rounded-xl h-16 relative overflow-hidden">
+            <div
+                className={cn(
+                    'w-full relative overflow-hidden transition-all duration-300 ease-in-out',
+                    displayCard
+                        ? 'h-16 bg-indigo-50/50 backdrop-blur-md border border-indigo-100 rounded-xl'
+                        : 'h-0'
+                )}
+            >
                 <div
                     ref={textRef}
                     className={cn(
-                        'transition-opacity duration-300 absolute inset-0 p-1.5 overflow-y-auto custom-scrollbar',
-                        displayCard
-                            ? 'opacity-100 z-10'
-                            : 'opacity-0 z-0 pointer-events-none invisible'
+                        'transition-opacity duration-200 absolute inset-0 p-1.5 overflow-y-auto custom-scrollbar',
+                        displayCard ? 'opacity-100' : 'opacity-0 pointer-events-none'
                     )}
                     aria-hidden={!displayCard}
                 >
@@ -180,18 +187,6 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
                             </p>
                         </div>
                     )}
-                </div>
-                <div
-                    className={cn(
-                        'transition-opacity duration-500 absolute inset-0 flex items-center justify-center',
-                        !displayCard
-                            ? 'opacity-100 z-10 delay-100'
-                            : 'opacity-0 z-0 pointer-events-none invisible'
-                    )}
-                    aria-hidden={!!displayCard}
-                    data-testid="reading-zone-tips"
-                >
-                    <MethodologyTips variant="mobile" />
                 </div>
                 {hasOverflow && displayCard && <ScrollIndicator />}
             </div>
