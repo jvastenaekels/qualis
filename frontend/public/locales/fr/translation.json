@@ -951,7 +951,7 @@
             "title": "Tableau de bord",
             "subtitle": "Analyses en temps réel et aperçu des participants pour cette étude.",
             "back_to_overview": "Retour à la vue d'ensemble",
-            "sample_size": "Taille de l'échantillon (N)",
+            "sample_size": "Nombre de participations (P-Set)",
             "valid": "validé(s)",
             "completion_rate": "Taux de complétion",
             "active": "actifs",

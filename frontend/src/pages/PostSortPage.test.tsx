@@ -240,4 +240,26 @@ describe('PostSortPage', () => {
         // Then check content
         expect(await screen.findByText(/S3 text content/i)).toBeInTheDocument();
     });
+
+    it('Shows share links on success screen', async () => {
+        const { useSubmitStudy } = await import('../hooks/useSubmitStudy');
+        vi.mocked(useSubmitStudy).mockReturnValue({
+            submit: vi.fn(),
+            isLoading: false,
+            isSuccess: true,
+            error: null,
+            confirmationCode: 'ABC12345',
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/post-sort" element={<PostSortPage />} />
+            </Routes>,
+            { initialEntries: ['/study/demo/post-sort'] }
+        );
+
+        expect(await screen.findByTestId('thank-you-message')).toBeInTheDocument();
+        expect(screen.getByText('Spread the word')).toBeInTheDocument();
+        expect(screen.getByText('Copy link')).toBeInTheDocument();
+    });
 });

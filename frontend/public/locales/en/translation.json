@@ -959,7 +959,7 @@
             "title": "Overview",
             "subtitle": "Real-time analytics and participant overview for this study.",
             "back_to_overview": "Back to overview",
-            "sample_size": "Sample size (n)",
+            "sample_size": "Number of participants (P-Set)",
             "valid": "valid",
             "completion_rate": "Completion rate",
             "active": "active",

@@ -951,7 +951,7 @@
             "title": "Hallintapaneeli",
             "subtitle": "Reaaliaikainen analytiikka ja osallistujien esikatselu.",
             "back_to_overview": "Takaisin yhteenvetoon",
-            "sample_size": "Otoskoko (N)",
+            "sample_size": "Osallistujamäärä (P-Set)",
             "valid": "kelvollinen",
             "completion_rate": "Konversioprosentti",
             "active": "aktiivinen",
