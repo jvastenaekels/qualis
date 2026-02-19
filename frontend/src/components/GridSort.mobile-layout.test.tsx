@@ -246,9 +246,9 @@ describe('GridSort Landscape Mobile Layout', () => {
             </DndContext>
         );
 
-        // Overlay ReadingZone is rendered inside the grid panel as a z-50 overlay
+        // Overlay ReadingZone is rendered inside the grid panel as an overlay
         const overlayReadingZone = container.querySelector(
-            '[class*="z-50"][class*="pointer-events-none"]'
+            '[class*="z-[70]"][class*="pointer-events-none"]'
         );
         expect(overlayReadingZone).toBeInTheDocument();
 

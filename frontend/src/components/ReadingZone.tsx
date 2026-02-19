@@ -160,7 +160,7 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
         return (
             <div
                 className={cn(
-                    'absolute top-0 left-0 right-0 z-[70] pointer-events-none transition-all duration-200 ease-in-out',
+                    'absolute top-0 left-0 right-16 z-[70] pointer-events-none transition-all duration-200 ease-in-out',
                     displayCard ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
                 )}
             >

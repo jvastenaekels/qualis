@@ -113,7 +113,7 @@ const textStyles = cva('w-full text-center font-medium text-slate-800', {
     },
     compoundVariants: [
         { variant: 'hand', allowScroll: false, className: 'line-clamp-5' },
-        { variant: 'compact', allowScroll: false, className: 'line-clamp-4' },
+        { variant: 'compact', allowScroll: false, className: 'line-clamp-3' },
         { variant: 'grid', allowScroll: false, className: 'line-clamp-4' },
     ],
     defaultVariants: {
@@ -276,7 +276,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
 
                     <div
                         ref={scrollRef}
-                        className={`w-full h-full flex items-center justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
+                        className={`w-full h-full flex ${variant === 'compact' ? 'items-start pt-0.5' : 'items-center'} justify-center ${allowScroll ? 'overflow-y-auto custom-scrollbar' : 'overflow-hidden'}`}
                     >
                         <div className={textStyles({ variant, allowScroll })}>
                             {/[*_~#]/.test(text) ? (
