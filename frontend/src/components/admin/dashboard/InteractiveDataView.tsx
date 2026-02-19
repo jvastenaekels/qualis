@@ -161,7 +161,7 @@ function CollapsibleSection({
                 </button>
             </Collapsible.Trigger>
             <Collapsible.Content className="overflow-hidden data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                {children}
+                <div className="pt-2 pb-1">{children}</div>
             </Collapsible.Content>
         </Collapsible.Root>
     );
