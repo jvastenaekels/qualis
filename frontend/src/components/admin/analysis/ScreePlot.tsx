@@ -36,7 +36,7 @@ export function ScreePlot({
             <p className="text-xs text-slate-500">
                 {t(
                     'admin.analysis.scree_hint',
-                    'Click a bar to select the number of factors. Dashed line = Kaiser criterion (eigenvalue > 1).'
+                    'Each bar shows how much variance a factor explains (its eigenvalue). Factors above the dashed Kaiser line (eigenvalue > 1) are typically meaningful. Click a bar to select the number of factors to extract.'
                 )}
             </p>
             <ResponsiveContainer width="100%" height={220}>

@@ -53,6 +53,7 @@ import {
     MoreVertical,
     Inbox,
     CheckCircle2,
+    Footprints,
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -189,10 +190,6 @@ function ParticipantCard({
                     )}
                 >
                     {t(`admin.data.status.${displayStatus}`, displayStatus)}
-                    {displayStatus !== 'completed' &&
-                        participant.last_step_reached != null &&
-                        STEP_LABEL_KEYS[participant.last_step_reached] &&
-                        ` \u2013 ${t(...STEP_LABEL_KEYS[participant.last_step_reached])}`}
                 </Badge>
             </div>
 
@@ -233,6 +230,17 @@ function ParticipantCard({
                             : '—'}
                     </span>
                 </div>
+                {displayStatus !== 'completed' && (
+                    <div className="flex items-center gap-1.5">
+                        <Footprints className="h-3 w-3 text-slate-400" />
+                        <span>
+                            {participant.last_step_reached != null &&
+                            STEP_LABEL_KEYS[participant.last_step_reached]
+                                ? t(...STEP_LABEL_KEYS[participant.last_step_reached])
+                                : '?'}
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Row 3: Consent + Quality indicators */}
@@ -620,10 +628,6 @@ export default function InteractiveDataView({
                 cell: ({ row }) => {
                     const p = row.original;
                     const displayStatus = getDisplayStatus(p);
-                    const stepEntry =
-                        displayStatus !== 'completed' && p.last_step_reached != null
-                            ? STEP_LABEL_KEYS[p.last_step_reached]
-                            : null;
                     return (
                         <Badge
                             variant="outline"
@@ -637,7 +641,6 @@ export default function InteractiveDataView({
                             )}
                         >
                             {t(`admin.data.status.${displayStatus}`, displayStatus)}
-                            {stepEntry && ` \u2013 ${t(...stepEntry)}`}
                         </Badge>
                     );
                 },
@@ -877,6 +880,33 @@ export default function InteractiveDataView({
                             </Tooltip>
                         </TooltipProvider>
                     );
+                },
+            }),
+            columnHelper.display({
+                id: 'last_step',
+                header: () => (
+                    <div className="flex items-center gap-1.5">
+                        <Footprints className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{t('admin.data.table.last_step', 'Last step')}</span>
+                    </div>
+                ),
+                cell: ({ row }) => {
+                    const p = row.original;
+                    if (p.status === 'completed') {
+                        return (
+                            <span className="text-xs text-emerald-600 font-medium">
+                                {t('admin.data.status.completed', 'Completed')}
+                            </span>
+                        );
+                    }
+                    if (p.last_step_reached != null && STEP_LABEL_KEYS[p.last_step_reached]) {
+                        return (
+                            <span className="text-xs text-slate-500 font-medium">
+                                {t(...STEP_LABEL_KEYS[p.last_step_reached])}
+                            </span>
+                        );
+                    }
+                    return <span className="text-slate-300">?</span>;
                 },
             }),
         ],

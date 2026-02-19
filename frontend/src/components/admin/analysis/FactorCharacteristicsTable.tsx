@@ -1,7 +1,41 @@
 import { useTranslation } from 'react-i18next';
-import { Info } from 'lucide-react';
+import { Info, Check, AlertTriangle } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { AnalysisResult } from '@/api/model';
+
+function BenchmarkBadge({
+    value,
+    good,
+    caution,
+    higherIsBetter = true,
+    goodLabel,
+    cautionLabel,
+}: {
+    value: number;
+    good: number;
+    caution: number;
+    higherIsBetter?: boolean;
+    goodLabel: string;
+    cautionLabel: string;
+}) {
+    const isGood = higherIsBetter ? value >= good : value <= good;
+    const isCaution = higherIsBetter ? value < caution : value > caution;
+    if (isGood)
+        return (
+            <span className="inline-flex ml-1 text-emerald-600" title={goodLabel}>
+                <Check className="size-3" aria-hidden="true" />
+                <span className="sr-only">{goodLabel}</span>
+            </span>
+        );
+    if (isCaution)
+        return (
+            <span className="inline-flex ml-1 text-amber-500" title={cautionLabel}>
+                <AlertTriangle className="size-3" aria-hidden="true" />
+                <span className="sr-only">{cautionLabel}</span>
+            </span>
+        );
+    return null;
+}
 
 interface FactorCharacteristicsTableProps {
     result: AnalysisResult;
@@ -19,10 +53,22 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
         );
     }
 
-    const rows: { label: string; values: string[] }[] = [
+    const goodLabel = t('admin.analysis.benchmark_good', 'Good');
+    const cautionLabel = t('admin.analysis.benchmark_caution', 'Caution');
+
+    const rows: {
+        label: string;
+        values: string[];
+        benchmark?: { value: number; good: number; caution: number; higherIsBetter?: boolean }[];
+    }[] = [
         {
             label: t('admin.analysis.eigenvalue', 'Eigenvalue'),
             values: chars.map((c) => c.eigenvalue.toFixed(3)),
+            benchmark: chars.map((c) => ({
+                value: c.eigenvalue,
+                good: 1.0,
+                caution: 1.0,
+            })),
         },
         {
             label: t('admin.analysis.variance_explained', 'Variance Explained (%)'),
@@ -39,10 +85,21 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
         {
             label: t('admin.analysis.composite_reliability', 'Composite Reliability'),
             values: chars.map((c) => c.composite_reliability.toFixed(3)),
+            benchmark: chars.map((c) => ({
+                value: c.composite_reliability,
+                good: 0.8,
+                caution: 0.7,
+            })),
         },
         {
             label: t('admin.analysis.se_factor_scores', 'SE of Factor Scores'),
             values: chars.map((c) => c.se_factor_scores.toFixed(3)),
+            benchmark: chars.map((c) => ({
+                value: c.se_factor_scores,
+                good: 0.3,
+                caution: 0.4,
+                higherIsBetter: false,
+            })),
         },
     ];
 
@@ -113,6 +170,18 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
                                         className="text-right py-1.5 px-3 font-mono text-xs tabular-nums text-slate-600"
                                     >
                                         {val}
+                                        {row.benchmark?.[i] && (
+                                            <BenchmarkBadge
+                                                value={row.benchmark[i].value}
+                                                good={row.benchmark[i].good}
+                                                caution={row.benchmark[i].caution}
+                                                higherIsBetter={
+                                                    row.benchmark[i].higherIsBetter ?? true
+                                                }
+                                                goodLabel={goodLabel}
+                                                cautionLabel={cautionLabel}
+                                            />
+                                        )}
                                     </td>
                                 ))}
                             </tr>
@@ -162,14 +231,24 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
                                         >
                                             F{i + 1}
                                         </th>
-                                        {row.map((val, j) => (
-                                            <td
-                                                key={j}
-                                                className="text-right py-1.5 px-3 font-mono text-xs tabular-nums text-slate-600"
-                                            >
-                                                {i === j ? '1.000' : val.toFixed(3)}
-                                            </td>
-                                        ))}
+                                        {row.map((val, j) => {
+                                            const isOffDiagonal = i !== j;
+                                            const isHigh = isOffDiagonal && Math.abs(val) > 0.5;
+                                            return (
+                                                <td
+                                                    key={j}
+                                                    className={`text-right py-1.5 px-3 font-mono text-xs tabular-nums ${isHigh ? 'text-amber-700 bg-amber-50' : 'text-slate-600'}`}
+                                                >
+                                                    {isOffDiagonal ? val.toFixed(3) : '1.000'}
+                                                    {isHigh && (
+                                                        <span className="sr-only">
+                                                            {' '}
+                                                            ({cautionLabel})
+                                                        </span>
+                                                    )}
+                                                </td>
+                                            );
+                                        })}
                                     </tr>
                                 ))}
                             </tbody>

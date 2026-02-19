@@ -37,7 +37,7 @@ import PostSortConfigEditor from '@/components/admin/designer/PostSortConfigEdit
 import BrandingEditor from '@/components/admin/designer/BrandingEditor';
 import InterfaceEditor from '@/components/admin/designer/InterfaceEditor';
 import ConditionOfInstructionEditor from '@/components/admin/designer/ConditionOfInstructionEditor';
-import { GuidanceCard } from '@/components/admin/designer/GuidanceCard';
+import { GuidanceCard } from '@/components/admin/GuidanceCard';
 import { useStudyPersistence } from '@/hooks/useStudyPersistence';
 import { ExportConfigButton } from '@/components/admin/designer/ExportConfigButton';
 import { ImportConfigButton } from '@/components/admin/designer/ImportConfigButton';

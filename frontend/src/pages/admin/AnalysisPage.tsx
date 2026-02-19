@@ -41,6 +41,7 @@ import {
 } from '@/api/generated';
 import type { AnalysisResult } from '@/api/model';
 
+import { GuidanceCard } from '@/components/admin/GuidanceCard';
 import { ScreePlot } from '@/components/admin/analysis/ScreePlot';
 import { FactorLoadingsTable } from '@/components/admin/analysis/FactorLoadingsTable';
 import { FactorArraysView } from '@/components/admin/analysis/FactorArraysView';
@@ -335,7 +336,7 @@ export default function AnalysisPage() {
                     )}
 
                     {/* Parameters row */}
-                    <div className="flex flex-wrap items-end gap-4">
+                    <div className="flex flex-wrap items-start gap-4">
                         <div className="space-y-1.5">
                             <Label htmlFor="extraction-select" className="text-xs">
                                 {t('admin.analysis.extraction_method', 'Extraction')}
@@ -357,6 +358,12 @@ export default function AnalysisPage() {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
+                            <p className="text-xs text-muted-foreground max-w-[180px]">
+                                {t(
+                                    'admin.analysis.help_extraction',
+                                    'How factors are derived. PCA is standard; Centroid is traditional in Q.'
+                                )}
+                            </p>
                         </div>
 
                         <div className="space-y-1.5">
@@ -379,6 +386,12 @@ export default function AnalysisPage() {
                                     ))}
                                 </SelectContent>
                             </Select>
+                            <p className="text-xs text-muted-foreground max-w-[140px]">
+                                {t(
+                                    'admin.analysis.help_n_factors',
+                                    'Viewpoints to extract. Use the scree plot to guide your choice.'
+                                )}
+                            </p>
                         </div>
 
                         <div className="space-y-1.5">
@@ -402,6 +415,12 @@ export default function AnalysisPage() {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
+                            <p className="text-xs text-muted-foreground max-w-[180px]">
+                                {t(
+                                    'admin.analysis.help_rotation',
+                                    'Simplifies factor structure. Varimax is recommended for most studies.'
+                                )}
+                            </p>
                         </div>
 
                         <div className="space-y-1.5">
@@ -428,6 +447,12 @@ export default function AnalysisPage() {
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
+                            <p className="text-xs text-muted-foreground max-w-[160px]">
+                                {t(
+                                    'admin.analysis.help_flagging',
+                                    'How participants are assigned to factors. Auto uses significance thresholds.'
+                                )}
+                            </p>
                         </div>
 
                         <Button
@@ -507,7 +532,42 @@ export default function AnalysisPage() {
                                 </TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="loadings">
+                            <TabsContent value="loadings" className="space-y-4">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.analysis.guide_loadings_title',
+                                        'Reading Factor Loadings'
+                                    )}
+                                    type="info"
+                                    collapsible
+                                >
+                                    <ul className="text-sm opacity-80 leading-relaxed space-y-1 list-disc list-inside">
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_loadings_1',
+                                                'Each loading is a correlation (-1 to +1) between a participant and a factor (shared viewpoint).'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_loadings_2',
+                                                'Highlighted values exceed the significance threshold shown above the table.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_loadings_3',
+                                                'A "flagged" participant defines that factor. Look for clean structure: each person on one factor.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_loadings_4',
+                                                'Participants not flagged on any factor hold a unique view not captured by the solution.'
+                                            )}
+                                        </li>
+                                    </ul>
+                                </GuidanceCard>
                                 <FactorLoadingsTable
                                     result={result}
                                     flaggingMode={flagging}
@@ -516,15 +576,120 @@ export default function AnalysisPage() {
                                 />
                             </TabsContent>
 
-                            <TabsContent value="arrays">
+                            <TabsContent value="arrays" className="space-y-4">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.analysis.guide_arrays_title',
+                                        'Interpreting Factor Arrays'
+                                    )}
+                                    type="info"
+                                    collapsible
+                                >
+                                    <ul className="text-sm opacity-80 leading-relaxed space-y-1 list-disc list-inside">
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_arrays_1',
+                                                'Each factor array is the composite Q-sort representing one shared viewpoint.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_arrays_2',
+                                                'Read left-to-right as most disagreed to most agreed. Focus on the extreme positions.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_arrays_3',
+                                                'Amber-highlighted statements are distinguishing — placed significantly differently compared to other factors.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_arrays_4',
+                                                'Compare arrays across factors to see where viewpoints diverge and converge.'
+                                            )}
+                                        </li>
+                                    </ul>
+                                </GuidanceCard>
                                 <FactorArraysView result={result} />
                             </TabsContent>
 
-                            <TabsContent value="statements">
+                            <TabsContent value="statements" className="space-y-4">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.analysis.guide_statements_title',
+                                        'Understanding Statement Scores'
+                                    )}
+                                    type="info"
+                                    collapsible
+                                >
+                                    <ul className="text-sm opacity-80 leading-relaxed space-y-1 list-disc list-inside">
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_statements_1',
+                                                'Z-scores show how strongly each factor agrees or disagrees with each statement (0 = neutral).'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_statements_2',
+                                                'D = distinguishing (placed significantly differently across factors). Stars indicate significance level.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_statements_3',
+                                                "C = consensus (all factors agree on placement). These don't help differentiate viewpoints."
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_statements_4',
+                                                'Focus on D statements for interpretation: they reveal what makes each viewpoint unique.'
+                                            )}
+                                        </li>
+                                    </ul>
+                                </GuidanceCard>
                                 <StatementsTable result={result} />
                             </TabsContent>
 
-                            <TabsContent value="summary">
+                            <TabsContent value="summary" className="space-y-4">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.analysis.guide_summary_title',
+                                        'Evaluating Your Solution'
+                                    )}
+                                    type="info"
+                                    collapsible
+                                >
+                                    <ul className="text-sm opacity-80 leading-relaxed space-y-1 list-disc list-inside">
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_summary_1',
+                                                'Eigenvalues > 1.00 (Kaiser criterion) suggest a factor explains more variance than a single variable.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_summary_2',
+                                                'Composite reliability > 0.80 indicates a dependable factor. Values below 0.70 warrant caution.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_summary_3',
+                                                'Low factor correlations (< 0.50) confirm factors represent distinct viewpoints.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_summary_4',
+                                                'Total variance > 35-40% is typical for Q studies. Higher is better but not strictly required.'
+                                            )}
+                                        </li>
+                                    </ul>
+                                </GuidanceCard>
                                 <FactorCharacteristicsTable result={result} />
                             </TabsContent>
                         </Tabs>

@@ -1,5 +1,6 @@
 import { renderWithProviders, screen } from '@/test-utils/test-utils';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { act } from 'react';
 import userEvent from '@testing-library/user-event';
 import AnalysisPage from './AnalysisPage';
 import type { AnalysisResult } from '@/api/model';
@@ -327,5 +328,54 @@ describe('AnalysisPage', () => {
             }),
             expect.any(Object)
         );
+    });
+
+    it('shows parameter help descriptions', () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+
+        renderWithProviders(<AnalysisPage />);
+
+        expect(screen.getByText(/PCA is standard/i)).toBeInTheDocument();
+        expect(screen.getByText(/scree plot to guide/i)).toBeInTheDocument();
+        expect(screen.getByText(/Varimax is recommended/i)).toBeInTheDocument();
+        expect(screen.getByText(/significance thresholds/i)).toBeInTheDocument();
+    });
+
+    it('shows interpretation guidance in results tabs', async () => {
+        const mockMutate = vi.fn();
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+
+        mockAnalysisMutationHook.mockReturnValue({
+            mutate: mockMutate,
+            isPending: false,
+        });
+
+        renderWithProviders(<AnalysisPage />);
+
+        // Trigger analysis by clicking Run then calling the onSuccess callback
+        await userEvent.click(screen.getByRole('button', { name: /Run Analysis/i }));
+
+        // Extract the onSuccess callback and call it with mock result
+        const [, callbacks] = mockMutate.mock.calls[0];
+        await act(async () => {
+            callbacks.onSuccess(_mockResult);
+        });
+
+        // The loadings tab should show its guidance card (default tab)
+        expect(screen.getByText(/Reading Factor Loadings/i)).toBeInTheDocument();
     });
 });
