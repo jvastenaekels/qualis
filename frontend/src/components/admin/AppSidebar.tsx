@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
     BadgeCheck,
     ChartColumnStacked,
@@ -46,6 +47,7 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { usePermission } from '@/hooks/usePermission';
+import { useSidebar } from '@/components/ui/sidebar';
 
 function NavLanguage() {
     const { i18n, t } = useTranslation();
@@ -180,6 +182,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const navigate = useNavigate();
     const { t } = useTranslation();
     const params = useParams<{ workspaceSlug?: string; studySlug?: string }>();
+    const { setOpenMobile } = useSidebar();
+
+    // Close mobile sidebar on route change
+    // biome-ignore lint/correctness/useExhaustiveDependencies: intentional trigger on pathname
+    useEffect(() => {
+        setOpenMobile(false);
+    }, [location.pathname]);
 
     // Detect if we're in the new Workspace-First architecture
     const isNewArchitecture = location.pathname.startsWith('/app/');

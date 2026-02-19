@@ -11,7 +11,6 @@ import {
     Cell,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { BarChart3 } from 'lucide-react';
 import { getLocalizedText } from '@/utils/localization';
 import type { DumpParticipant, DumpResponse } from '../types';
 
@@ -187,114 +186,105 @@ export function QuestionDistributionCharts({
     if (chartData.length === 0) return null;
 
     return (
-        <div className="space-y-4">
-            <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                <BarChart3 className="h-4 w-4 text-slate-400" />
-                {t('admin.data.charts.section_title', 'Response Distributions')}
-            </h3>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                {chartData.map((item) => {
-                    const chartHeight = Math.max(180, item.bars.length * 40 + 40);
-                    return (
-                        <Card key={item.questionKey}>
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-sm font-bold">
-                                    {item.questionLabel}
-                                </CardTitle>
-                                <CardDescription className="text-xs">
-                                    {item.type === 'checkbox'
-                                        ? t(
-                                              'admin.data.charts.multi_select_note',
-                                              'Multiple selections allowed'
-                                          )
-                                        : t(
-                                              'admin.data.charts.responses_count',
-                                              '{{count}} responses',
-                                              {
-                                                  count:
-                                                      item.totalParticipants - item.noAnswerCount,
-                                              }
-                                          )}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <ResponsiveContainer width="100%" height={chartHeight}>
-                                    <BarChart
-                                        data={item.bars}
-                                        layout="vertical"
-                                        margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
-                                        aria-label={t(
-                                            'admin.data.charts.distribution_label',
-                                            'Distribution for {{question}}',
-                                            { question: item.questionLabel }
-                                        )}
-                                    >
-                                        <CartesianGrid
-                                            strokeDasharray="3 3"
-                                            stroke="#e2e8f0"
-                                            horizontal={false}
-                                        />
-                                        <XAxis
-                                            type="number"
-                                            tick={{ fontSize: 12 }}
-                                            allowDecimals={false}
-                                        />
-                                        <YAxis
-                                            dataKey="option"
-                                            type="category"
-                                            tick={{ fontSize: 11 }}
-                                            width={140}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{
-                                                borderRadius: '12px',
-                                                border: 'none',
-                                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                                                fontSize: '12px',
-                                            }}
-                                            itemStyle={{ fontWeight: 600 }}
-                                            formatter={(value: number | undefined) => [
-                                                value ?? 0,
-                                                t('admin.data.charts.count', 'Count'),
-                                            ]}
-                                            labelFormatter={(label: string) => label}
-                                        />
-                                        <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-                                            {item.bars.map((bar, idx) => (
-                                                <Cell
-                                                    key={`${item.questionKey}-${idx}`}
-                                                    fill={
-                                                        bar.isNoAnswer ? NO_ANSWER_COLOR : BAR_COLOR
-                                                    }
-                                                />
-                                            ))}
-                                        </Bar>
-                                    </BarChart>
-                                </ResponsiveContainer>
-
-                                {/* Screen-reader accessible data */}
-                                <table className="sr-only">
-                                    <caption>{item.questionLabel}</caption>
-                                    <thead>
-                                        <tr>
-                                            <th>{t('admin.data.charts.option', 'Option')}</th>
-                                            <th>{t('admin.data.charts.count', 'Count')}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {item.bars.map((bar) => (
-                                            <tr key={bar.option}>
-                                                <td>{bar.option}</td>
-                                                <td>{bar.count}</td>
-                                            </tr>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {chartData.map((item) => {
+                const chartHeight = Math.max(180, item.bars.length * 40 + 40);
+                return (
+                    <Card key={item.questionKey}>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-sm font-bold">
+                                {item.questionLabel}
+                            </CardTitle>
+                            <CardDescription className="text-xs">
+                                {item.type === 'checkbox'
+                                    ? t(
+                                          'admin.data.charts.multi_select_note',
+                                          'Multiple selections allowed'
+                                      )
+                                    : t(
+                                          'admin.data.charts.responses_count',
+                                          '{{count}} responses',
+                                          {
+                                              count: item.totalParticipants - item.noAnswerCount,
+                                          }
+                                      )}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <ResponsiveContainer width="100%" height={chartHeight}>
+                                <BarChart
+                                    data={item.bars}
+                                    layout="vertical"
+                                    margin={{ top: 5, right: 30, left: 0, bottom: 5 }}
+                                    aria-label={t(
+                                        'admin.data.charts.distribution_label',
+                                        'Distribution for {{question}}',
+                                        { question: item.questionLabel }
+                                    )}
+                                >
+                                    <CartesianGrid
+                                        strokeDasharray="3 3"
+                                        stroke="#e2e8f0"
+                                        horizontal={false}
+                                    />
+                                    <XAxis
+                                        type="number"
+                                        tick={{ fontSize: 12 }}
+                                        allowDecimals={false}
+                                    />
+                                    <YAxis
+                                        dataKey="option"
+                                        type="category"
+                                        tick={{ fontSize: 11 }}
+                                        width={140}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            borderRadius: '12px',
+                                            border: 'none',
+                                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                                            fontSize: '12px',
+                                        }}
+                                        itemStyle={{ fontWeight: 600 }}
+                                        formatter={(value: number | undefined) => [
+                                            value ?? 0,
+                                            t('admin.data.charts.count', 'Count'),
+                                        ]}
+                                        labelFormatter={(label: string) => label}
+                                    />
+                                    <Bar dataKey="count" radius={[0, 4, 4, 0]}>
+                                        {item.bars.map((bar, idx) => (
+                                            <Cell
+                                                key={`${item.questionKey}-${idx}`}
+                                                fill={bar.isNoAnswer ? NO_ANSWER_COLOR : BAR_COLOR}
+                                            />
                                         ))}
-                                    </tbody>
-                                </table>
-                            </CardContent>
-                        </Card>
-                    );
-                })}
-            </div>
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+
+                            {/* Screen-reader accessible data */}
+                            <table className="sr-only">
+                                <caption>{item.questionLabel}</caption>
+                                <thead>
+                                    <tr>
+                                        <th>{t('admin.data.charts.option', 'Option')}</th>
+                                        <th>{t('admin.data.charts.count', 'Count')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {item.bars.map((bar) => (
+                                        <tr key={bar.option}>
+                                            <td>{bar.option}</td>
+                                            <td>{bar.count}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </CardContent>
+                    </Card>
+                );
+            })}
         </div>
     );
 }
