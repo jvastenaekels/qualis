@@ -326,7 +326,7 @@ const GridLegend: React.FC<{
     getLegendFontSize: (maxLen: number) => string;
     uiLabels?: Record<string, string>;
 }> = React.memo(({ highlightKey, t, getLegendFontSize, uiLabels }) => {
-    const legends = ['disagree', 'neutral', 'agree'] as const;
+    const legends = ['disagree', 'agree'] as const;
     const fs = getLegendFontSize(Math.max(...legends.map((key) => t(`fine.legend.${key}`).length)));
 
     return (
