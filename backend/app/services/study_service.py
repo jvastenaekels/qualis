@@ -1211,6 +1211,7 @@ class StudyService:
                     "status": p.status.value,
                     "recruitment_token": getattr(p, "recruitment_token", None),
                     "ip_address": p.ip_address,
+                    "user_agent": p.user_agent,
                     "submitted_at": p.submitted_at.isoformat()
                     if p.submitted_at
                     else None,
