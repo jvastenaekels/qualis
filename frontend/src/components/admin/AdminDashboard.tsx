@@ -145,14 +145,14 @@ export function AdminDashboard() {
                     <Button
                         onClick={() => setShowImportDialog(true)}
                         variant="outline"
-                        className="border-slate-200 hover:border-indigo-300 hover:text-indigo-600 font-medium rounded-lg"
+                        className="border-slate-200 hover:border-indigo-300 hover:text-indigo-600 font-bold rounded-xl"
                     >
                         <Upload className="mr-2 h-4 w-4" />
                         {t('admin.dashboard.import_study', 'Import')}
                     </Button>
                     <Button
                         onClick={() => setShowCreateDialog(true)}
-                        className="bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg"
+                        className="bg-indigo-600 hover:bg-indigo-700 font-bold rounded-xl"
                     >
                         <Plus className="mr-2 h-4 w-4" />
                         {t('admin.dashboard.create_study', 'Create study')}
@@ -161,53 +161,73 @@ export function AdminDashboard() {
             </div>
 
             {/* Stats Overview */}
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-                <Card className="border shadow-none rounded-xl">
-                    <CardContent className="flex items-center gap-4 p-5">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
-                            <FileText className="h-5 w-5" />
+            <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
+                <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <div
+                        className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+                        aria-hidden="true"
+                    >
+                        <FileText className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
+                    </div>
+                    <div className="flex items-center gap-2 mb-3">
+                        <div
+                            className="p-2 rounded-lg bg-indigo-50 text-indigo-600"
+                            aria-hidden="true"
+                        >
+                            <FileText className="w-5 h-5" />
                         </div>
-                        <div className="min-w-0">
-                            <p className="text-2xl font-bold text-foreground">{totalStudies}</p>
-                            <p className="text-xs text-muted-foreground truncate">
-                                {t('admin.dashboard.total_studies', 'Total studies')}
-                            </p>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            {t('admin.dashboard.total_studies', 'Total studies')}
+                        </span>
+                    </div>
+                    <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        {totalStudies}
+                    </div>
+                </div>
+                <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <div
+                        className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+                        aria-hidden="true"
+                    >
+                        <TrendingUp className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
+                    </div>
+                    <div className="flex items-center gap-2 mb-3">
+                        <div
+                            className="p-2 rounded-lg bg-emerald-50 text-emerald-600"
+                            aria-hidden="true"
+                        >
+                            <TrendingUp className="w-5 h-5" />
                         </div>
-                    </CardContent>
-                </Card>
-                <Card className="border shadow-none rounded-xl">
-                    <CardContent className="flex items-center gap-4 p-5">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
-                            <TrendingUp className="h-5 w-5" />
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            {t('admin.dashboard.active_data_collection', 'Active data collection')}
+                        </span>
+                    </div>
+                    <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        {activeStudiesCount}
+                    </div>
+                </div>
+                <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <div
+                        className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+                        aria-hidden="true"
+                    >
+                        <Users className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
+                    </div>
+                    <div className="flex items-center gap-2 mb-3">
+                        <div
+                            className="p-2 rounded-lg bg-amber-50 text-amber-600"
+                            aria-hidden="true"
+                        >
+                            <Users className="w-5 h-5" />
                         </div>
-                        <div className="min-w-0">
-                            <p className="text-2xl font-bold text-foreground">
-                                {activeStudiesCount}
-                            </p>
-                            <p className="text-xs text-muted-foreground truncate">
-                                {t(
-                                    'admin.dashboard.active_data_collection',
-                                    'Active data collection'
-                                )}
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
-                <Card className="border shadow-none rounded-xl">
-                    <CardContent className="flex items-center gap-4 p-5">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-50 text-purple-600">
-                            <Users className="h-5 w-5" />
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-2xl font-bold text-foreground">
-                                {totalParticipants}
-                            </p>
-                            <p className="text-xs text-muted-foreground truncate">
-                                {t('admin.dashboard.total_participants', 'Total participants')}
-                            </p>
-                        </div>
-                    </CardContent>
-                </Card>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            {t('admin.dashboard.total_participants', 'Total participants')}
+                        </span>
+                    </div>
+                    <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                        {totalParticipants}
+                    </div>
+                </div>
             </div>
 
             {/* Section header */}
@@ -228,7 +248,7 @@ export function AdminDashboard() {
                         return (
                             <Card
                                 key={study.id}
-                                className="group border shadow-none hover:shadow-md rounded-xl overflow-hidden transition-all duration-200 cursor-pointer hover:border-indigo-200"
+                                className="group border shadow-none hover:shadow-md rounded-2xl overflow-hidden transition-all duration-200 cursor-pointer hover:border-indigo-200"
                                 onClick={() => handleOpenStudy(study.slug)}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' || e.key === ' ') {
@@ -251,7 +271,7 @@ export function AdminDashboard() {
                                     {/* Title and status */}
                                     <div className="flex items-start justify-between gap-3">
                                         <div className="min-w-0 flex-1">
-                                            <h3 className="font-semibold text-foreground truncate group-hover:text-indigo-600 transition-colors">
+                                            <h3 className="font-bold text-foreground truncate group-hover:text-indigo-600 transition-colors">
                                                 {title}
                                             </h3>
                                             <p className="text-xs text-muted-foreground mt-0.5 font-mono">
@@ -317,7 +337,7 @@ export function AdminDashboard() {
                     </p>
                     <Button
                         onClick={() => setShowCreateDialog(true)}
-                        className="bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg"
+                        className="bg-indigo-600 hover:bg-indigo-700 font-bold rounded-xl"
                     >
                         <Plus className="mr-2 h-4 w-4" />
                         {t('admin.dashboard.create_study', 'Create study')}

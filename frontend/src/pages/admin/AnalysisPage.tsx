@@ -258,7 +258,7 @@ export default function AnalysisPage() {
     const isEigenvalueError = eigenvaluesQuery.isError && !isTooFewParticipants;
 
     return (
-        <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto">
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
                 title={t('admin.analysis.title', 'Analysis')}
                 description={t(
@@ -271,7 +271,7 @@ export default function AnalysisPage() {
             {/* Controls */}
             <Card className="border-none shadow-sm bg-white rounded-2xl">
                 <CardHeader className="pb-3">
-                    <CardTitle className="text-base">
+                    <CardTitle className="text-base font-bold">
                         {t('admin.analysis.configuration', 'Configuration')}
                     </CardTitle>
                     <CardDescription>

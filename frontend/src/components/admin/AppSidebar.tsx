@@ -54,9 +54,9 @@ function NavLanguage() {
     const currentLang = i18n.language;
 
     const languages = [
-        { code: 'en', label: 'EN', flag: '🇬🇧' },
-        { code: 'fr', label: 'FR', flag: '🇫🇷' },
-        { code: 'fi', label: 'FI', flag: '🇫🇮' },
+        { code: 'en', label: 'EN', flag: '🇬🇧', name: 'English' },
+        { code: 'fr', label: 'FR', flag: '🇫🇷', name: 'Français' },
+        { code: 'fi', label: 'FI', flag: '🇫🇮', name: 'Suomi' },
     ];
 
     return (
@@ -87,8 +87,11 @@ function NavLanguage() {
                                     currentLang === lang.code && 'bg-accent text-accent-foreground'
                                 )}
                             >
-                                <span className="text-sm">{lang.flag}</span>
+                                <span className="text-sm" aria-hidden="true">
+                                    {lang.flag}
+                                </span>
                                 <span className="text-sm">{lang.label}</span>
+                                <span className="sr-only">{lang.name}</span>
                             </DropdownMenuItem>
                         ))}
                     </DropdownMenuContent>

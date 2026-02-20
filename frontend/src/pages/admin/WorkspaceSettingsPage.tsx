@@ -323,18 +323,33 @@ export default function WorkspaceSettingsPage() {
                         </CardHeader>
                         <CardContent className="p-0">
                             <Table>
+                                <caption className="sr-only">
+                                    {t('admin.workspace.table_caption', 'Workspace members')}
+                                </caption>
                                 <TableHeader className="bg-slate-50/50">
                                     <TableRow className="hover:bg-transparent border-slate-100">
-                                        <TableHead className="text-[10px] font-black uppercase tracking-wider px-6 h-12">
+                                        <TableHead
+                                            scope="col"
+                                            className="text-[10px] font-black uppercase tracking-wider px-6 h-12"
+                                        >
                                             {t('admin.workspaces.settings.team.col_user')}
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-wider h-12">
+                                        <TableHead
+                                            scope="col"
+                                            className="text-[10px] font-black uppercase tracking-wider h-12"
+                                        >
                                             {t('admin.workspaces.settings.team.col_role')}
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-wider h-12">
+                                        <TableHead
+                                            scope="col"
+                                            className="text-[10px] font-black uppercase tracking-wider h-12"
+                                        >
                                             {t('admin.workspaces.settings.team.col_joined')}
                                         </TableHead>
-                                        <TableHead className="text-[10px] font-black uppercase tracking-wider text-right px-6 h-12">
+                                        <TableHead
+                                            scope="col"
+                                            className="text-[10px] font-black uppercase tracking-wider text-right px-6 h-12"
+                                        >
                                             {t('admin.workspaces.settings.team.col_actions')}
                                         </TableHead>
                                     </TableRow>
@@ -420,7 +435,7 @@ export default function WorkspaceSettingsPage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="size-9 min-h-[44px] min-w-[44px] p-0 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                                     onClick={() =>
                                                         handleRemoveMember(member.user_id)
                                                     }
@@ -428,6 +443,10 @@ export default function WorkspaceSettingsPage() {
                                                         !isAdmin ||
                                                         member.user_id === currentUser?.id
                                                     }
+                                                    aria-label={t(
+                                                        'admin.workspace.remove_member',
+                                                        'Remove member'
+                                                    )}
                                                 >
                                                     <Trash2 className="size-4" />
                                                 </Button>

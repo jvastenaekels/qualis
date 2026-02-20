@@ -658,6 +658,8 @@
             "benchmark_below": "Below threshold"
         },
         "workspace": {
+            "remove_member": "Remove member",
+            "table_caption": "Workspace members",
             "switcher": {
                 "settings": "Workspace settings",
                 "settings_desc": "Members & profiles",
@@ -719,7 +721,11 @@
             "share_desc": "Distribute your study URL to invite participants.",
             "public_url_label": "Public participation URL",
             "hide_qr": "Hide QR",
-            "show_qr": "Show QR",
+            "show_qr": "Show QR code",
+            "delete_link": "Delete link",
+            "qr_alt": "QR code for {{url}}",
+            "table_caption": "Recruitment links",
+            "progress_label": "{{count}} of {{max}} responses",
             "live_study": "Live study",
             "download_qr": "Download image",
             "qr_print_hint": "Scan or print this code for physical recruitment materials (flyers, posters).",
@@ -992,6 +998,9 @@
             "reset_description": "This action cannot be undone. This will permanently delete all participant data and Q-sort submissions for this study.",
             "reset_success": "Participants reset successfully",
             "reset_error": "Failed to reset participants"
+        },
+        "overview": {
+            "copy_id": "Copy participant ID"
         },
         "study_status": {
             "dialog": {

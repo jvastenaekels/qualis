@@ -650,6 +650,8 @@
             "benchmark_below": "En dessous du seuil"
         },
         "workspace": {
+            "remove_member": "Retirer le membre",
+            "table_caption": "Membres de l'espace de travail",
             "roles": {
                 "owner": "Propriétaire",
                 "admin": "Administrateur",
@@ -711,7 +713,11 @@
             "share_desc": "Distribuez l'URL de votre étude pour inviter des participants.",
             "public_url_label": "URL publique de participation",
             "hide_qr": "Masquer le QR",
-            "show_qr": "Afficher le QR",
+            "show_qr": "Afficher le code QR",
+            "delete_link": "Supprimer le lien",
+            "qr_alt": "Code QR pour {{url}}",
+            "table_caption": "Liens de recrutement",
+            "progress_label": "{{count}} sur {{max}} réponses",
             "live_study": "Ouvrir l'étude",
             "download_qr": "Télécharger l'image",
             "qr_print_hint": "Scannez ou imprimez ce code pour vos supports physiques (flyers, affiches).",
@@ -984,6 +990,9 @@
             "reset_description": "Cette action est irréversible. Cela supprimera définitivement toutes les données des participants et les soumissions Q-sort pour cette étude.",
             "reset_success": "Participants réinitialisés avec succès",
             "reset_error": "Échec de la réinitialisation des participants"
+        },
+        "overview": {
+            "copy_id": "Copier l'identifiant du participant"
         },
         "study_status": {
             "dialog": {

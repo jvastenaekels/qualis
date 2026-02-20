@@ -119,7 +119,7 @@ const RecruitmentPage = () => {
     };
 
     return (
-        <div className="flex flex-1 flex-col gap-6 p-6 pt-2">
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
                 title={t('admin.recruitment.title', 'Recruitment')}
                 description={t(
@@ -320,12 +320,15 @@ const RecruitmentPage = () => {
 
             <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
                 <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <div
+                        className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+                        aria-hidden="true"
+                    >
                         <Users className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
                     </div>
                     <div className="flex items-center gap-2 mb-3">
                         <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-                            <Users className="w-5 h-5" />
+                            <Users className="w-5 h-5" aria-hidden="true" />
                         </div>
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             {t('admin.recruitment.stats.total_links', 'Total Links')}
@@ -340,12 +343,15 @@ const RecruitmentPage = () => {
                 </div>
 
                 <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <div
+                        className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+                        aria-hidden="true"
+                    >
                         <Globe className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
                     </div>
                     <div className="flex items-center gap-2 mb-3">
                         <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
-                            <Globe className="w-5 h-5" />
+                            <Globe className="w-5 h-5" aria-hidden="true" />
                         </div>
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             {t('admin.recruitment.stats.started', 'Started')}
@@ -360,12 +366,15 @@ const RecruitmentPage = () => {
                 </div>
 
                 <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                    <div
+                        className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+                        aria-hidden="true"
+                    >
                         <CheckCircle2 className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
                     </div>
                     <div className="flex items-center gap-2 mb-3">
                         <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
-                            <CheckCircle2 className="w-5 h-5" />
+                            <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
                         </div>
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                             {t('admin.recruitment.stats.submitted', 'Submitted')}
@@ -394,24 +403,45 @@ const RecruitmentPage = () => {
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
+                        <caption className="sr-only">
+                            {t('admin.recruitment.table_caption', 'Recruitment links')}
+                        </caption>
                         <TableHeader>
                             <TableRow className="hover:bg-transparent border-slate-100">
-                                <TableHead className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400 pl-6">
+                                <TableHead
+                                    scope="col"
+                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400 pl-6"
+                                >
                                     {t('admin.recruitment.table.name', 'Name / Cohort')}
                                 </TableHead>
-                                <TableHead className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                <TableHead
+                                    scope="col"
+                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400"
+                                >
                                     {t('admin.recruitment.table.type', 'Type')}
                                 </TableHead>
-                                <TableHead className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                <TableHead
+                                    scope="col"
+                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400"
+                                >
                                     {t('admin.recruitment.table.token', 'Token')}
                                 </TableHead>
-                                <TableHead className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                <TableHead
+                                    scope="col"
+                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400"
+                                >
                                     {t('admin.recruitment.table.usage', 'Usage')}
                                 </TableHead>
-                                <TableHead className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                <TableHead
+                                    scope="col"
+                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400"
+                                >
                                     {t('admin.recruitment.table.status', 'Status')}
                                 </TableHead>
-                                <TableHead className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400 text-right pr-6">
+                                <TableHead
+                                    scope="col"
+                                    className="py-4 text-[10px] font-black uppercase tracking-wider text-slate-400 text-right pr-6"
+                                >
                                     {t('admin.recruitment.table.actions', 'Actions')}
                                 </TableHead>
                             </TableRow>
@@ -479,7 +509,32 @@ const RecruitmentPage = () => {
                                                         ''
                                                     )}
                                                 </span>
-                                                <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                                                <div
+                                                    className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden shadow-inner"
+                                                    role="progressbar"
+                                                    aria-valuenow={
+                                                        link.capacity
+                                                            ? Math.min(
+                                                                  Math.round(
+                                                                      (link.usage_count /
+                                                                          link.capacity) *
+                                                                          100
+                                                                  ),
+                                                                  100
+                                                              )
+                                                            : 100
+                                                    }
+                                                    aria-valuemin={0}
+                                                    aria-valuemax={100}
+                                                    aria-label={t(
+                                                        'admin.recruitment.progress_label',
+                                                        '{{count}} of {{max}} responses',
+                                                        {
+                                                            count: link.usage_count,
+                                                            max: link.capacity ?? '∞',
+                                                        }
+                                                    )}
+                                                >
                                                     <div
                                                         className={cn(
                                                             'h-full transition-all duration-500',
@@ -517,7 +572,11 @@ const RecruitmentPage = () => {
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-8 w-8 text-slate-400 hover:text-indigo-600"
+                                                            className="h-9 w-9 min-h-[44px] min-w-[44px] text-slate-400 hover:text-indigo-600"
+                                                            aria-label={t(
+                                                                'admin.recruitment.show_qr',
+                                                                'Show QR code'
+                                                            )}
                                                         >
                                                             <QrCode className="h-4 w-4" />
                                                         </Button>
@@ -544,6 +603,11 @@ const RecruitmentPage = () => {
                                                             <QRCodeSVG
                                                                 value={getFullUrl(link.token)}
                                                                 size={200}
+                                                                title={t(
+                                                                    'admin.recruitment.qr_alt',
+                                                                    'QR code for {{url}}',
+                                                                    { url: getFullUrl(link.token) }
+                                                                )}
                                                             />
                                                         </div>
                                                         <div className="flex flex-col items-center gap-2 w-full">
@@ -573,11 +637,15 @@ const RecruitmentPage = () => {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-8 w-8 text-slate-400 hover:text-red-600"
+                                                    className="h-9 w-9 min-h-[44px] min-w-[44px] text-slate-400 hover:text-red-600"
                                                     onClick={() =>
                                                         revokeMutation.mutate({ linkId: link.id })
                                                     }
                                                     disabled={revokeMutation.isPending}
+                                                    aria-label={t(
+                                                        'admin.recruitment.delete_link',
+                                                        'Delete link'
+                                                    )}
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>

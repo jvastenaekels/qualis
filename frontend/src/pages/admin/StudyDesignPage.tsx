@@ -747,7 +747,10 @@ const StudyDesignPage = () => {
                                     data-testid="tab-intro"
                                     className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-indigo-100 text-slate-500 hover:text-slate-900"
                                 >
-                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                    <span
+                                        className="opacity-80 group-data-[state=active]:opacity-100 text-lg"
+                                        aria-hidden="true"
+                                    >
                                         👋
                                     </span>{' '}
                                     {t('admin.design.tabs.welcome')}
@@ -760,7 +763,10 @@ const StudyDesignPage = () => {
                                     data-testid="tab-pre-sort"
                                     className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-amber-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-amber-100 text-slate-500 hover:text-slate-900"
                                 >
-                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                    <span
+                                        className="opacity-80 group-data-[state=active]:opacity-100 text-lg"
+                                        aria-hidden="true"
+                                    >
                                         📋
                                     </span>{' '}
                                     {t('admin.design.tabs.presort')}
@@ -770,7 +776,10 @@ const StudyDesignPage = () => {
                                     data-testid="tab-condition"
                                     className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-rose-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-rose-100 text-slate-500 hover:text-slate-900"
                                 >
-                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                    <span
+                                        className="opacity-80 group-data-[state=active]:opacity-100 text-lg"
+                                        aria-hidden="true"
+                                    >
                                         🎯
                                     </span>{' '}
                                     {t('admin.design.tabs.condition')}
@@ -783,7 +792,10 @@ const StudyDesignPage = () => {
                                     data-testid="tab-q-sort"
                                     className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-purple-100 text-slate-500 hover:text-slate-900"
                                 >
-                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                    <span
+                                        className="opacity-80 group-data-[state=active]:opacity-100 text-lg"
+                                        aria-hidden="true"
+                                    >
                                         🧩
                                     </span>{' '}
                                     {t('admin.design.tabs.qsort')}
@@ -799,7 +811,10 @@ const StudyDesignPage = () => {
                                     data-testid="tab-post-sort"
                                     className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-emerald-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-emerald-100 text-slate-500 hover:text-slate-900"
                                 >
-                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                    <span
+                                        className="opacity-80 group-data-[state=active]:opacity-100 text-lg"
+                                        aria-hidden="true"
+                                    >
                                         💬
                                     </span>{' '}
                                     {t('admin.design.tabs.postsort')}
@@ -809,7 +824,10 @@ const StudyDesignPage = () => {
                                     data-testid="tab-branding"
                                     className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-pink-600 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-pink-100 text-slate-500 hover:text-slate-900"
                                 >
-                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                    <span
+                                        className="opacity-80 group-data-[state=active]:opacity-100 text-lg"
+                                        aria-hidden="true"
+                                    >
                                         🎨
                                     </span>{' '}
                                     {t('admin.design.tabs.theme')}
@@ -819,7 +837,10 @@ const StudyDesignPage = () => {
                                     data-testid="tab-interface"
                                     className="gap-2.5 min-w-fit px-6 flex-none snap-start rounded-xl data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-md font-bold transition-all data-[state=active]:ring-1 data-[state=active]:ring-slate-100 text-slate-500 hover:text-slate-900"
                                 >
-                                    <span className="opacity-80 group-data-[state=active]:opacity-100 text-lg">
+                                    <span
+                                        className="opacity-80 group-data-[state=active]:opacity-100 text-lg"
+                                        aria-hidden="true"
+                                    >
                                         ✨
                                     </span>{' '}
                                     {t('admin.design.tabs.interface')}

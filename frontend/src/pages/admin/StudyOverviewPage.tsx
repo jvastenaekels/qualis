@@ -132,12 +132,15 @@ const StudyOverviewPage = () => {
                     <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
                         {/* Sample Size */}
                         <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
-                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <div
+                                className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+                                aria-hidden="true"
+                            >
                                 <Users className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
                             </div>
                             <div className="flex items-center gap-2 mb-3">
                                 <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-                                    <Users className="w-5 h-5" />
+                                    <Users className="w-5 h-5" aria-hidden="true" />
                                 </div>
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     {t('admin.study_overview.sample_size', 'Sample size (N)')}
@@ -150,12 +153,15 @@ const StudyOverviewPage = () => {
 
                         {/* Completion Rate */}
                         <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
-                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <div
+                                className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+                                aria-hidden="true"
+                            >
                                 <CheckCircle2 className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
                             </div>
                             <div className="flex items-center gap-2 mb-3">
                                 <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
-                                    <CheckCircle2 className="w-5 h-5" />
+                                    <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
                                 </div>
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     {t('admin.study_overview.completion_rate', 'Completion rate')}
@@ -178,12 +184,15 @@ const StudyOverviewPage = () => {
 
                         {/* Median Duration */}
                         <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
-                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                            <div
+                                className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+                                aria-hidden="true"
+                            >
                                 <Clock className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
                             </div>
                             <div className="flex items-center gap-2 mb-3">
                                 <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
-                                    <Clock className="w-5 h-5" />
+                                    <Clock className="w-5 h-5" aria-hidden="true" />
                                 </div>
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     {t('admin.study_overview.median_duration', 'Median duration')}
@@ -317,7 +326,11 @@ const StudyOverviewPage = () => {
                                                                                         )
                                                                                     );
                                                                                 }}
-                                                                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
+                                                                                className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
+                                                                                aria-label={t(
+                                                                                    'admin.overview.copy_id',
+                                                                                    'Copy participant ID'
+                                                                                )}
                                                                             >
                                                                                 <Copy className="h-3 w-3 text-slate-400" />
                                                                             </button>
@@ -477,7 +490,11 @@ const StudyOverviewPage = () => {
                                                                                         )
                                                                                     );
                                                                                 }}
-                                                                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
+                                                                                className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity p-1 hover:bg-slate-100 rounded"
+                                                                                aria-label={t(
+                                                                                    'admin.overview.copy_id',
+                                                                                    'Copy participant ID'
+                                                                                )}
                                                                             >
                                                                                 <Copy className="h-3 w-3 text-slate-400" />
                                                                             </button>

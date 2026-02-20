@@ -650,6 +650,8 @@
             "benchmark_below": "Kynnyksen alapuolella"
         },
         "workspace": {
+            "remove_member": "Poista jäsen",
+            "table_caption": "Työtilan jäsenet",
             "switcher": {
                 "settings": "Työtilan asetukset",
                 "settings_desc": "Jäsenet ja profiilit",
@@ -711,7 +713,11 @@
             "share_desc": "Levitä tutkimuslinkkiä kutsuaksesi osallistujia.",
             "public_url_label": "Julkinen osallistumislinkki",
             "hide_qr": "Piilota QR",
-            "show_qr": "Näytä QR",
+            "show_qr": "Näytä QR-koodi",
+            "delete_link": "Poista linkki",
+            "qr_alt": "QR-koodi osoitteelle {{url}}",
+            "table_caption": "Rekrytointilinkit",
+            "progress_label": "{{count}} / {{max}} vastausta",
             "live_study": "Tutkimus käynnissä",
             "download_qr": "Lataa kuva",
             "qr_print_hint": "Skannaa tai tulosta tämä koodi fyysisiä materiaaleja varten (esitteet, julisteet).",
@@ -984,6 +990,9 @@
             "reset_description": "Tätä toimintoa ei voi kumota. Tämä poistaa pysyvästi kaikki osallistujatiedot ja Q-lajitteluvastaukset tästä tutkimuksesta.",
             "reset_success": "Osallistujat nollattu onnistuneesti",
             "reset_error": "Osallistujien nollaus epäonnistui"
+        },
+        "overview": {
+            "copy_id": "Kopioi osallistujan tunniste"
         },
         "study_status": {
             "dialog": {
