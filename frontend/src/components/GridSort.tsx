@@ -9,7 +9,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { cva } from 'class-variance-authority';
 import {
     Check,
-    ChevronUp,
     Maximize2,
     Frown,
     Meh,
@@ -234,8 +233,7 @@ const InstructionHeader: React.FC<{
                             }
                             aria-label="Minimize instructions"
                         >
-                            <ChevronUp size={14} />
-                            {t('fine.header.collapse', 'OK')}
+                            <Check size={14} />
                         </button>
                     </motion.div>
                 )}
