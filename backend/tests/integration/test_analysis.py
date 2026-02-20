@@ -22,9 +22,9 @@ def _make_analysis_study():
         # Ensure study is active with a proper grid_config
         study.state = StudyState.active
         study.grid_config = [
-            {"value": -1, "count": 1},
-            {"value": 0, "count": 2},
-            {"value": 1, "count": 1},
+            {"score": -1, "capacity": 1},
+            {"score": 0, "capacity": 2},
+            {"score": 1, "capacity": 1},
         ]
         db.add(study)
         await db.flush()

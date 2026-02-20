@@ -3,6 +3,7 @@ import {
     useGetStudyApiAdminStudiesSlugGet,
     useGetParticipantApiAdminStudiesParticipantsParticipantIdGet,
     useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch,
+    useListStudyParticipantsApiAdminStudiesSlugParticipantsGet,
 } from '@/api/generated';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { ArrowLeft, User } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import type { DumpResponse, DumpParticipant } from '@/components/admin/dashboard/types';
 import { ParticipantDetailContent } from '@/components/admin/dashboard/ParticipantDetailContent';
 import { useTranslation } from 'react-i18next';
@@ -50,6 +51,31 @@ export default function ParticipantDetailsPage() {
             retry: 1,
         },
     });
+
+    // Fetch participant list for prev/next navigation
+    const { data: participantList } = useListStudyParticipantsApiAdminStudiesSlugParticipantsGet(
+        effectiveSlug,
+        {
+            query: { enabled: !!effectiveSlug },
+        }
+    );
+
+    const { currentIndex, prevId, nextId } = useMemo(() => {
+        if (!participantList || !participantId) {
+            return { currentIndex: -1, prevId: null, nextId: null };
+        }
+        const idx = participantList.findIndex((p) => p.id === Number(participantId));
+        return {
+            currentIndex: idx,
+            prevId: idx > 0 ? participantList[idx - 1].id : null,
+            nextId:
+                idx >= 0 && idx < participantList.length - 1 ? participantList[idx + 1].id : null,
+        };
+    }, [participantList, participantId]);
+
+    const baseUrl = currentWorkspace?.slug
+        ? `/app/${currentWorkspace.slug}/studies/${effectiveSlug}`
+        : `/admin/studies/${effectiveSlug}`;
 
     const discardMutation =
         useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatch();
@@ -260,13 +286,42 @@ export default function ParticipantDetailsPage() {
                     </BreadcrumbList>
                 </Breadcrumb>
 
-                <StudyPageHeader
-                    title={t('admin.data.detail.title', 'Participant Details')}
-                    description={`${t('admin.sidebar.study', 'Study')}: ${
-                        study?.translations?.[0]?.title || study?.slug
-                    }`}
-                    icon={User}
-                />
+                <div className="flex items-center justify-between gap-4">
+                    <StudyPageHeader
+                        title={t('admin.data.detail.title', 'Participant Details')}
+                        description={`${t('admin.sidebar.study', 'Study')}: ${
+                            study?.translations?.[0]?.title || study?.slug
+                        }`}
+                        icon={User}
+                    />
+
+                    {participantList && participantList.length > 1 && (
+                        <div className="flex items-center gap-2 shrink-0">
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                disabled={prevId === null}
+                                onClick={() => navigate(`${baseUrl}/participants/${prevId}`)}
+                                aria-label={t('common.previous', 'Previous')}
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </Button>
+                            <span className="text-sm text-slate-500 tabular-nums min-w-[3ch] text-center">
+                                {currentIndex >= 0 ? currentIndex + 1 : '–'} /{' '}
+                                {participantList.length}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                disabled={nextId === null}
+                                onClick={() => navigate(`${baseUrl}/participants/${nextId}`)}
+                                aria-label={t('common.next', 'Next')}
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </Button>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="flex-1 overflow-y-auto px-6 pb-6">

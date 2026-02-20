@@ -33,6 +33,11 @@ make migrate          # Run database migrations
 make migration-new    # Create a new Alembic migration
 ```
 
+## Python environment rules
+- This project uses a virtual environment strictly located in the `.venv` directory.
+- Never use the global system Python.
+- To execute code or install dependencies, always use explicit paths pointing to the virtual environment (for example: `.venv/bin/python` or `.venv/bin/pip`).
+
 ## Coding Standards
 
 ### General

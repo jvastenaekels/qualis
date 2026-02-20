@@ -1,3 +1,6 @@
+-include .env
+export
+
 .PHONY: install run-backend run-frontend lint check test ci run-ci ci-full run-ci-full
 
 install:
