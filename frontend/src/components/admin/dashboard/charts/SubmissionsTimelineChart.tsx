@@ -91,7 +91,7 @@ export const SubmissionsTimelineChart = ({
 
     return (
         <Card className={className}>
-            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-6">
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-2">
                 <div className="space-y-1">
                     <CardTitle className="text-base font-bold flex items-center gap-2">
                         {t('admin.dashboard.timeline.title', 'Submissions Timeline')}

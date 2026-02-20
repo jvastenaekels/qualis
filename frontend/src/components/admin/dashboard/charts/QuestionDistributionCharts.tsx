@@ -190,9 +190,12 @@ export function QuestionDistributionCharts({
             {chartData.map((item) => {
                 const chartHeight = Math.max(180, item.bars.length * 40 + 40);
                 return (
-                    <Card key={item.questionKey}>
+                    <Card
+                        key={item.questionKey}
+                        className="border-none shadow-sm bg-white rounded-2xl"
+                    >
                         <CardHeader className="pb-2">
-                            <CardTitle className="text-sm font-bold">
+                            <CardTitle className="text-base font-bold">
                                 {item.questionLabel}
                             </CardTitle>
                             <CardDescription className="text-xs">

@@ -2261,7 +2261,7 @@ export default function InteractiveDataView({
                 icon={<BarChart3 className="h-4 w-4 text-slate-400" />}
             >
                 {liveParticipants.length > 0 && (
-                    <div className="grid gap-6 md:grid-cols-12 mb-6">
+                    <div className="grid gap-4 md:grid-cols-12 mb-4">
                         <div className="col-span-12 md:col-span-8">
                             <SubmissionsTimelineChart
                                 participants={liveParticipants}
