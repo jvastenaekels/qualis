@@ -148,7 +148,7 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
         // We can traverse up from the button
         const container = minimizeBtn.closest('div.absolute');
         expect(container).toBeInTheDocument();
-        expect(container?.className).toContain('z-toolbar');
+        expect(container?.className).toContain('z-modal');
     });
 
     it('toggles instruction minimization on click', async () => {

@@ -184,7 +184,7 @@ const InstructionHeader: React.FC<{
                         exit={{ opacity: 0, y: -20 }}
                         onClick={() => setIsMinimized(false)}
                         className={cn(
-                            'absolute inset-x-0 mx-auto w-fit z-toolbar bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide',
+                            'absolute inset-x-0 mx-auto w-fit z-modal bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide',
                             emphasizeCollapse ? 'top-2' : 'top-[96px]'
                         )}
                         aria-label="Expand instructions"
@@ -199,7 +199,7 @@ const InstructionHeader: React.FC<{
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="absolute top-0 left-0 right-0 z-toolbar bg-white/95 backdrop-blur-md shadow-md border-b border-slate-100/50 flex flex-col items-center p-3 gap-2"
+                        className="absolute top-0 left-0 right-0 z-modal bg-white/95 backdrop-blur-md shadow-md border-b border-slate-100/50 flex flex-col items-center p-3 gap-2"
                     >
                         <div
                             className="flex items-start justify-center gap-3 w-full"
