@@ -960,7 +960,7 @@
             "suspect": "Suspect",
             "time_to_complete": "Temps de complétion",
             "recent_activity": "Activité récente",
-            "latest_submissions": "Dernières soumissions ({{count}} sur {{total}})",
+            "latest_participants": "Dernières participations ({{count}} sur {{total}})",
             "recently_completed": "Récemment complété",
             "in_progress": "En cours",
             "discarded": "Écarté",

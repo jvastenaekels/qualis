@@ -960,7 +960,7 @@
             "suspect": "Epäilyttävä",
             "time_to_complete": "Suoritusaika",
             "recent_activity": "Viimeaikainen toiminta",
-            "latest_submissions": "Viimeisimmät vastaukset ({{count}} / {{total}})",
+            "latest_participants": "Viimeisimmät osallistujat ({{count}} / {{total}})",
             "recently_completed": "Viimeksi valmistuneet",
             "in_progress": "Keskeneräiset",
             "discarded": "Hylätyt",

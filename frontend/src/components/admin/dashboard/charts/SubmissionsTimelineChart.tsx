@@ -19,12 +19,16 @@ import {
     subDays,
     endOfDay,
 } from 'date-fns';
-import type { ParticipantRead } from '@/api/model';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+interface TimelineParticipant {
+    created_at?: string;
+    submitted_at?: string;
+}
+
 interface SubmissionsTimelineChartProps {
-    participants: ParticipantRead[];
+    participants: TimelineParticipant[];
     className?: string;
 }
 

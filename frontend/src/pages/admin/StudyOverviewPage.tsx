@@ -23,9 +23,6 @@ import {
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Link } from 'react-router-dom';
 import StudyStatusControl from '@/components/admin/dashboard/StudyStatusControl';
-import { SubmissionsTimelineChart } from '@/components/admin/dashboard/charts/SubmissionsTimelineChart';
-
-import { DeviceBreakdownChart } from '@/components/admin/dashboard/charts/DeviceBreakdownChart';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, format } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
@@ -225,10 +222,10 @@ const StudyOverviewPage = () => {
                                         )}
                                     </CardTitle>
                                     <CardDescription>
-                                        {t('admin.study_overview.latest_submissions', {
+                                        {t('admin.study_overview.latest_participants', {
                                             count: recentParticipants.length,
                                             total: (participants || []).length,
-                                            defaultValue: `Latest submissions (${recentParticipants.length} of ${(participants || []).length})`,
+                                            defaultValue: `Latest participants (${recentParticipants.length} of ${(participants || []).length})`,
                                         })}
                                     </CardDescription>
                                 </div>
@@ -629,24 +626,6 @@ const StudyOverviewPage = () => {
                             <RecruitmentModule slug={slug || ''} />
                         </div>
                     </div>
-
-                    {/* Analytics Overview - Phase 1 */}
-                    {participants.length > 0 && (
-                        <div className="grid gap-6 md:grid-cols-12">
-                            <div className="col-span-12 md:col-span-8">
-                                <SubmissionsTimelineChart
-                                    participants={validParticipants}
-                                    className="border-none shadow-sm bg-white rounded-2xl h-full"
-                                />
-                            </div>
-                            <div className="col-span-12 md:col-span-4">
-                                <DeviceBreakdownChart
-                                    deviceBreakdown={stats.device_breakdown}
-                                    className="border-none shadow-sm bg-white rounded-2xl h-full"
-                                />
-                            </div>
-                        </div>
-                    )}
                 </>
             )}
         </div>

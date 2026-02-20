@@ -112,6 +112,8 @@ import * as Collapsible from '@radix-ui/react-collapsible';
 import { useIsMobile } from '@/hooks/use-mobile';
 import type { DumpParticipant, DumpResponse } from './types';
 import { QuestionDistributionCharts } from './charts/QuestionDistributionCharts';
+import { SubmissionsTimelineChart } from './charts/SubmissionsTimelineChart';
+import { DeviceBreakdownChart } from './charts/DeviceBreakdownChart';
 
 interface InteractiveDataViewProps {
     slug: string;
@@ -541,6 +543,15 @@ export default function InteractiveDataView({
             }
         }
         return groups;
+    }, [liveParticipants]);
+
+    const deviceBreakdown = useMemo(() => {
+        const counts: Record<string, number> = {};
+        for (const p of liveParticipants) {
+            const { device } = parseUA(p.user_agent);
+            counts[device] = (counts[device] || 0) + 1;
+        }
+        return counts;
     }, [liveParticipants]);
 
     const hasActiveFilters =
@@ -2249,6 +2260,22 @@ export default function InteractiveDataView({
                 title={t('admin.data.sections.key_statistics', 'Key statistics')}
                 icon={<BarChart3 className="h-4 w-4 text-slate-400" />}
             >
+                {liveParticipants.length > 0 && (
+                    <div className="grid gap-6 md:grid-cols-12 mb-6">
+                        <div className="col-span-12 md:col-span-8">
+                            <SubmissionsTimelineChart
+                                participants={liveParticipants}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
+                        </div>
+                        <div className="col-span-12 md:col-span-4">
+                            <DeviceBreakdownChart
+                                deviceBreakdown={deviceBreakdown}
+                                className="border-none shadow-sm bg-white rounded-2xl h-full"
+                            />
+                        </div>
+                    </div>
+                )}
                 <QuestionDistributionCharts
                     presortConfig={data.study.presort_config}
                     postsortConfig={data.study.postsort_config}
