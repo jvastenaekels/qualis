@@ -1,5 +1,7 @@
 # Implementation Plan: Branching (Conditional) Questions in Surveys
 
+> **Status: Implemented.** The `visibilityEvaluator.ts` and related files implement the branching logic described in this plan.
+
 This plan outlines the steps required to implement branching logic for pre-sort and post-sort survey questions. Branching allows certain questions to be shown or hidden based on the participant's answers to previous questions.
 
 ## 1. Schema Updates

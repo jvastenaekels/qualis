@@ -1,6 +1,6 @@
 # Study Configuration Format (JSON)
 
-This document describes the JSON format used for exporting and importing Open-Q study configurations.
+This document describes the JSON format used for exporting and importing Libre-Q study configurations.
 
 ## Overview
 

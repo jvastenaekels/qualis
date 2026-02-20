@@ -1,10 +1,10 @@
 # Backend Architectural Guidelines
 
-This document outlines the architectural patterns and best practices for the Open-Q backend (FastAPI), ensuring consistency, maintainability, and scalability.
+This document outlines the architectural patterns and best practices for the Libre-Q backend (FastAPI), ensuring consistency, maintainability, and scalability.
 
 ## 1. High-Level Architecture
 
-Open-Q follows a strict **Three-Tier Architecture** (also known as Controller-Service-Repository, though we treat Models as the data layer).
+Libre-Q follows a strict **Three-Tier Architecture** (also known as Controller-Service-Repository, though we treat Models as the data layer).
 
 ```mermaid
 graph TD

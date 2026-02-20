@@ -1,5 +1,7 @@
 # Implementation Plan: Friendly Optimistic Locking
 
+> **Status: Partially Implemented.** The `updated_at` / `last_updated_at` fields exist in models and schemas. Full conflict resolution UI is not yet complete.
+
 ## Objective
 
 Implement robust optimistic locking to prevent data loss during concurrent editing of Studies, while maintaining a seamless ("super-friendly") user experience by minimizing interruptions and automatically merging non-conflicting changes.

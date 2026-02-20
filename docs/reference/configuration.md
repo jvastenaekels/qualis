@@ -1,8 +1,8 @@
 # Configuration Reference
 
-Open-Q studies are highly configurable via JSON objects stored in the `studies` table. This document details the schema for these configurations.
+Libre-Q studies are highly configurable via JSON objects stored in the `studies` table. This document details the schema for these configurations.
 
-## 📐 `grid_config` (The Distribution)
+## `grid_config` (The Distribution)
 
 The grid config defines the shape of the Q-sort table. It is an array of objects representing columns.
 
@@ -28,9 +28,9 @@ The grid config defines the shape of the Q-sort table. It is an array of objects
 
 ---
 
-## 📝 `presort_config` (Demographics)
+## `presort_config` (Demographics)
 
-Defines the fields presented to participants before the sorting begins. Supports `number`, `text`, and `select` types.
+Defines the fields presented to participants before the sorting begins. Supports `text`, `textarea`, `number`, `select`, `radio`, `checkbox`, `date`, and `email` types.
 
 ```json
 {
@@ -54,7 +54,7 @@ Defines the fields presented to participants before the sorting begins. Supports
 
 ---
 
-## 🧐 `postsort_config` (Qualitative)
+## `postsort_config` (Qualitative)
 
 Controls the behavior of the final phase of the study.
 
@@ -69,10 +69,12 @@ Controls the behavior of the final phase of the study.
 - **extreme_columns**: An array of column scores for which the participant will be asked to provide comments.
 - **ask_missing**: If true, participants are nudged to fill any empty slots (though the UI usually forces this before proceeding).
 - **ask_general_comment**: If true, shows a final text area for any additional thoughts.
+- **audio**: Optional audio configuration object.
+  - `max_storage_mb`: Per-study storage quota for audio recordings (default: 100 MB). Uploads exceeding this quota return HTTP 507.
 
 ---
 
-## 🎨 Study Options
+## Study Options
 
 ### `show_statement_codes`
 
@@ -107,6 +109,31 @@ A boolean flag to control whether statements are shuffled for each participant.
 > [!NOTE]
 > Randomization is deterministic per session - if a participant refreshes the page, they will see the same order.
 
+### `symmetry_lock`
+
+A boolean flag to enforce grid symmetry in the study designer.
+
+- **true (Default)**: The designer enforces symmetrical column capacities (e.g., if -3 has capacity 2, then +3 must also have capacity 2).
+- **false**: Allows asymmetrical grid designs.
+
+### `default_language`
+
+The fallback language code (ISO 639-1) used when a participant's preferred language is not available.
+
+```json
+{
+  "slug": "my-study",
+  "default_language": "en",
+  ...
+}
+```
+
+The language resolution hierarchy is:
+
+1. Use the participant's requested language if a translation exists.
+2. Fall back to the study's `default_language`.
+3. Fall back to the first available translation.
+
 ### `access_password`
 
 A hashed password to restrict access to the study configuration.
@@ -127,11 +154,23 @@ A hashed password to restrict access to the study configuration.
 
 ---
 
-## 🌍 `StudyTranslation`
+## `StudyTranslation`
 
 Content that varies by language is stored in the `study_translations` table:
 
-- **title**: Study title.
-- **description**: Short summary.
-- **instructions**: Detailed Markdown content for the welcome page.
-- **ui_labels**: (Optional) Override default button text (e.g., `{"start_button": "Go!"}`).
+| Field                      | Type            | Description                                              |
+| :------------------------- | :-------------- | :------------------------------------------------------- |
+| `language_code`            | `string`        | ISO 639-1 code (e.g., `"en"`, `"fr"`)                   |
+| `title`                    | `string`        | Study title                                              |
+| `subtitle`                 | `string | null` | Brief tagline on welcome page                            |
+| `description`              | `string`        | Short summary                                            |
+| `objective`                | `string | null` | Research objective shown to participants                  |
+| `condition_of_instruction` | `string | null` | The core sorting prompt/frame                            |
+| `pre_instruction`          | `string | null` | Instruction for the initial rough sort phase             |
+| `instructions`             | `string | null` | Detailed Markdown content for the welcome page           |
+| `consent_title`            | `string | null` | Title for the consent step                               |
+| `consent_description`      | `string | null` | Full text of the consent form                            |
+| `ui_labels`                | `json`          | Override default button text (e.g., `{"start_button": "Go!"}`) |
+| `process_steps`            | `json`          | Custom step definitions for the progress indicator       |
+| `methodology_tips`         | `json`          | Methodology tips shown during sorting                    |
+| `step_help`                | `json`          | Per-step help content for the help overlay               |

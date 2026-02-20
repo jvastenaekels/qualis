@@ -1,6 +1,6 @@
 # API Reference
 
-Open-Q uses **FastAPI** which auto-generates interactive API documentation.
+Libre-Q uses **FastAPI** which auto-generates interactive API documentation.
 
 ---
 
@@ -89,8 +89,27 @@ Submit participant data after completing the study.
 
 ```json
 {
-  "success": true,
-  "confirmation_code": "ABC123XYZ"
+  "status": "success",
+  "confirmation_code": "ABC123XYZ",
+  "id": 42
+}
+```
+
+---
+
+### Password Unlock
+
+#### `POST /api/study/{slug}/unlock`
+
+Validate a study's access password. Returns unlock status if correct, 403 if incorrect.
+
+**Query Parameter:** `password` (required)
+
+**Response:**
+
+```json
+{
+  "status": "unlocked"
 }
 ```
 
@@ -150,7 +169,7 @@ Administrative endpoints require two layers of identification:
 
 ---
 
-## 🏗️ Administrative API
+## Administrative API
 
 The Administrative API allows researchers to manage studies, users, and data.
 
@@ -168,7 +187,8 @@ The Administrative API allows researchers to manage studies, users, and data.
 
 ### Invitations
 
-- `POST /api/admin/studies/{slug}/invite`: Send a collaborator invitation via email (or log the URL if SMTP is not configured).
+- `POST /api/admin/workspaces/{slug}/invitations`: Send a workspace invitation via email (or log the URL if SMTP is not configured).
+- `GET /api/admin/invitations/{token}`: Accept an invitation by token.
 
 ### Study Management
 
@@ -179,11 +199,15 @@ The Administrative API allows researchers to manage studies, users, and data.
 - `POST /api/admin/studies/{slug}/state`: Publish or Close a study.
 - `DELETE /api/admin/studies/{slug}`: Completely remove a study (Owner only).
 
-### Collaborator Management
+### Workspace Management
 
-- `GET /api/admin/studies/{slug}/collaborators`: List researchers on a study.
-- `POST /api/admin/studies/{slug}/collaborators`: Invite or update a collaborator's role.
-- `DELETE /api/admin/studies/{slug}/collaborators/{email}`: Remove a collaborator.
+- `GET /api/admin/workspaces/`: List workspaces accessible to the current user.
+- `POST /api/admin/workspaces/`: Create a new workspace.
+- `GET /api/admin/workspaces/{slug}`: Get workspace details.
+- `PATCH /api/admin/workspaces/{slug}`: Update workspace settings.
+- `GET /api/admin/workspaces/{slug}/members`: List workspace members.
+- `PATCH /api/admin/workspaces/{slug}/members/{user_id}`: Update a member's role.
+- `DELETE /api/admin/workspaces/{slug}/members/{user_id}`: Remove a member.
 
 ### User Management (Superuser Only)
 
@@ -209,7 +233,39 @@ Download a ZIP file containing `.dat` and `.sta` files for PQMethod.
 
 #### `GET /api/admin/studies/{slug}/export/rkit`
 
-Download a ZIP file formatted for R analysis (experimental).
+Download a ZIP file formatted for R analysis.
+
+---
+
+### Analysis
+
+#### `GET /api/admin/studies/{slug}/analysis/eigenvalues`
+
+Compute and return eigenvalues for a study's Q-sort data. Used to display the scree plot and determine the suggested number of factors.
+
+#### `POST /api/admin/studies/{slug}/analysis/run`
+
+Run a full factor analysis with the specified parameters. Request body includes extraction method (PCA or centroid), number of factors, rotation method (varimax or none), and flagging mode (auto or manual).
+
+Returns factor loadings, factor arrays, statement z-scores, distinguishing/consensus classifications, and factor characteristics.
+
+---
+
+### Audio Recordings
+
+#### `POST /api/audio/upload`
+
+Upload an audio recording for a participant. Requires S3 to be configured. Returns the recording ID and metadata.
+
+#### `GET /api/audio/{recording_id}/url`
+
+Get a presigned URL for playing back an audio recording. URLs expire after a configured duration.
+
+#### `DELETE /api/audio/{recording_id}`
+
+Delete an audio recording from S3 and remove its metadata from the database.
+
+---
 
 ## Rate Limiting
 
@@ -217,6 +273,60 @@ To ensure fair usage and system stability, the API implements rate limiting via 
 
 | Endpoint                | Limit                | Requirement |
 | ----------------------- | -------------------- | ----------- |
-| `GET /api/study/{slug}` | 60 requests / minute | Public      |
-| `POST /api/submit`      | 5 requests / minute  | Public      |
-| `/api/admin/*`          | 30 requests / minute | Authorized  |
+| `GET /api/study/{slug}`          | 120 requests / minute | Public     |
+| `POST /api/submit`               | 60 requests / minute  | Public     |
+| `POST /api/study/{slug}/unlock`  | 10 requests / minute  | Public     |
+| `/api/admin/*`                   | 30 requests / minute  | Authorized |
+
+---
+
+## Error Response Format
+
+All API errors follow a standardized JSON schema:
+
+```json
+{
+  "code": 422,
+  "message": "Validation Error",
+  "details": [
+    {
+      "loc": ["body", "qsort", 0, "grid_score"],
+      "msg": "field required",
+      "type": "value_error.missing"
+    }
+  ]
+}
+```
+
+| Field     | Type             | Description                                          |
+| :-------- | :--------------- | :--------------------------------------------------- |
+| `code`    | `integer`        | HTTP status code                                     |
+| `message` | `string`         | Human-readable error description                     |
+| `details` | `array \| null`  | Validation details (Pydantic errors) or conflict info |
+
+Common error codes:
+
+| Code | Meaning                                                    |
+| :--- | :--------------------------------------------------------- |
+| 400  | Bad request (malformed input)                              |
+| 401  | Authentication required or invalid token                   |
+| 403  | Insufficient permissions or incorrect password             |
+| 404  | Resource not found                                         |
+| 409  | Conflict (e.g., duplicate slug, concurrent edit detected)  |
+| 422  | Validation error (missing or invalid fields)               |
+| 429  | Rate limit exceeded                                        |
+| 507  | Insufficient storage (audio quota exceeded)                |
+
+---
+
+## Security Headers
+
+The API includes security headers on all responses:
+
+| Header                    | Value                                                   |
+| :------------------------ | :------------------------------------------------------ |
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains`                 |
+| `Content-Security-Policy` | Restricts sources; includes S3 endpoint for audio       |
+| `X-Frame-Options`        | `DENY`                                                   |
+| `X-Content-Type-Options`  | `nosniff`                                               |
+| `Permissions-Policy`      | Restricts camera; enables microphone (self)             |

@@ -6,7 +6,7 @@ Use these templates when interacting with the codebase via an AI Agent (Google A
 
 _Use this prompt to prime the agent when starting a new session._
 
-> "We are working on **Open-Q**, a Q-Methodology platform (FastAPI/React).
+> "We are working on **Libre-Q**, a Q-Methodology platform (FastAPI/React).
 >
 > **Core Guidelines:**
 >
@@ -39,7 +39,7 @@ _Do not ask the agent to do everything at once. Split it into two phases._
 >
 > **Constraints:**
 >
-> - Use synchronous SQLAlchemy.
+> - Use async SQLAlchemy (`AsyncSession`).
 > - Raise specific HTTP exceptions defined in the schema."
 
 ## 3. Frontend: Participant Experience (Mobile-First)

@@ -1,10 +1,10 @@
 # Testing Guide
 
-Open-Q uses a comprehensive testing strategy covering unit tests, integration tests, and end-to-end (E2E) tests. We prioritize **automation** and **reliability** to ensure the platform remains stable as it evolves.
+Libre-Q uses a comprehensive testing strategy covering unit tests, integration tests, and end-to-end (E2E) tests. We prioritize **automation** and **reliability** to ensure the platform remains stable as it evolves.
 
 ---
 
-## 🛠️ Test Stack
+## Test Stack
 
 | Layer           | Tool                     | Purpose                                    |
 | --------------- | ------------------------ | ------------------------------------------ |
@@ -16,7 +16,7 @@ Open-Q uses a comprehensive testing strategy covering unit tests, integration te
 
 ---
 
-## 🚀 Quick Start (Make Commands)
+## Quick Start (Make Commands)
 
 The easiest way to run tests is via the project's `Makefile`.
 
@@ -24,19 +24,19 @@ The easiest way to run tests is via the project's `Makefile`.
 # Run backend and frontend unit/integration tests
 make test
 
-# Run full E2E suite (requires backend running?) - No, `make e2e` spins up its own environment
+# Run full E2E suite (spins up its own environment)
 make e2e
 
-# Run Fast CI checks (Lint, Types, Unit Tests) - Recommended before push
+# Run Fast CI checks (Lint + Check + Test + Build) - Recommended before push
 make ci
 
-# Run Full CI checks (Fast CI + E2E)
+# Run Full CI checks (Fast CI + DB Reset + E2E)
 make ci-full
 ```
 
 ---
 
-## ⚛️ Frontend Tests
+## Frontend Tests
 
 ### Directory Structure
 
@@ -102,13 +102,13 @@ describe("MyComponent Integration", () => {
 
 **Best Practices:**
 
-1.  **Prefer Integration over Unit**: Test page flows and component interactions rather than implementation details.
-2.  **Mock specific slices**: Use `setupStoreMocks` to isolate the state you are testing.
-3.  **Avoid testing libraries internals**: Don't test that `zustand` works; test that your component reacts to state changes.
+1. **Prefer Integration over Unit**: Test page flows and component interactions rather than implementation details.
+2. **Mock specific slices**: Use `setupStoreMocks` to isolate the state you are testing.
+3. **Avoid testing library internals**: Do not test that `zustand` works; test that your component reacts to state changes.
 
 ---
 
-## 🎭 E2E Tests (Playwright)
+## E2E Tests (Playwright)
 
 End-to-End tests run against a **real backend** and a **real database**.
 
@@ -120,7 +120,7 @@ The robust way is via `make`:
 make e2e
 ```
 
-Or manually (crucial: set `ENVIRONMENT=test`):
+Or manually (set `ENVIRONMENT=test`):
 
 ```bash
 cd frontend
@@ -177,14 +177,14 @@ test.describe("Study Flow", () => {
 
 ---
 
-## 🐍 Backend Tests (pytest)
+## Backend Tests (pytest)
 
 ### Running Backend Tests
 
 ```bash
 make test
 # OR
-cd backend && pytest
+cd backend && uv run pytest tests/
 ```
 
 ### Structure
@@ -201,12 +201,12 @@ backend/tests/
 The `conftest.py` file handles:
 
 - **Database Isolation**: Uses a dedicated PostgreSQL test database and handles schema setup/teardown via Alembic or direct metadata calls.
-- **Async Client**: Provides an `client` fixture for making API calls.
+- **Async Client**: Provides a `client` fixture for making API calls.
 - **Factories**: Provides factories for creating workspaces, studies, and users dynamically within tests.
 
 ---
 
-## ✅ API Consistency (`check-api`)
+## API Consistency (`check-api`)
 
 We use **Orval** to generate the frontend API client from the backend OpenAPI spec. To ensure they are in sync:
 
@@ -222,7 +222,7 @@ Runs automatically during `make ci`.
 
 ---
 
-## 🔄 CI/CD Pipeline
+## CI/CD Pipeline
 
 The project uses GitHub Actions.
 
@@ -236,7 +236,5 @@ The project uses GitHub Actions.
 
 After deployment, Scalingo runs a `release` phase defined in the `Procfile` that:
 
-1.  Migrates the database (`python scripts/migrate.py` which calls `alembic upgrade head`).
-2.  Ensures basic infrastructure is initialized (`python init_db.py`).
-
----
+1. Migrates the database (`python scripts/migrate.py` which calls `alembic upgrade head`).
+2. Ensures basic infrastructure is initialized (`python init_db.py`).

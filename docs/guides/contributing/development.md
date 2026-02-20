@@ -1,21 +1,22 @@
 # Development Guide
 
-This guide covers how to set up your local environment to contribute to Open-Q.
+This guide covers how to set up your local environment to contribute to Libre-Q.
 
 ## Prerequisites
 
 - **Node.js**: v24.x (see `.nvmrc`)
 - **Python**: v3.13+ (managed by `uv`)
 - **uv**: [Installation Guide](https://docs.astral.sh/uv/) (Required for Python dependency management)
+- **PostgreSQL**: v15+
 - **Make**: (Recommended for shortcut commands)
 
-## 📥 Installation
+## Installation
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/jvastenaekels/open-q.git
-cd open-q
+git clone https://github.com/jvastenaekels/libre-q.git
+cd libre-q
 ```
 
 ### 2. Install Dependencies
@@ -36,14 +37,17 @@ This will:
 Initialize the PostgreSQL database with the schema and the default admin user.
 
 ```bash
-# Initialize DB (Creates schema via Alembic + Admin user)
+# Run Alembic migrations to create the schema
+make migrate
+
+# Or initialize with a default admin account
 cd backend && uv run python init_db.py
 ```
 
 > [!IMPORTANT]
-> Ensure your `DATABASE_URL` is set in `backend/.env` before running this. See [**Configuration options**](../../reference/configuration.md) defined in `backend/app/schemas.py`.
+> Ensure your `DATABASE_URL` is set in `backend/.env` before running this. Example: `DATABASE_URL=postgresql+asyncpg://user:pass@localhost:5432/libreq_dev`
 
-## 🚀 Running Locally
+## Running Locally
 
 You can run both services in separate terminals using `make`:
 
@@ -64,7 +68,7 @@ make run-frontend
 
 _App available at http://localhost:5173_
 
-## 🛠️ Daily Workflow Tools
+## Daily Workflow Tools
 
 We enforce high code quality standards. Please install the pre-commit hooks to catch issues early.
 
@@ -82,29 +86,29 @@ pre-commit run --all-files
 
 ### Code Quality Commands (Make)
 
-| Scope    | Command             | Description                             |
-| -------- | ------------------- | --------------------------------------- |
-| **All**  | `make install`      | Install all dependencies                |
-| **Back** | `make lint`         | Run Ruff (Back) & ESLint (Front)        |
-| **Back** | `make check`        | Run Deep static analysis (Mypy, Bandie) |
-| **Back** | `make test`         | Run Unit Tests (Front & Back)           |
-| **API**  | `make check-api`    | Verify Frontend Client matches Backend  |
-| **API**  | `make generate-api` | Regenerate Frontend Client              |
-| **E2E**  | `make e2e`          | Run Playwright E2E Tests                |
-| **CI**   | `make ci`           | Run Fast CI (Lint + Check + Test)       |
-| **CI**   | `make ci-full`      | Run Full CI (Fast CI + E2E)             |
+| Scope    | Command             | Description                              |
+| -------- | ------------------- | ---------------------------------------- |
+| **All**  | `make install`      | Install all dependencies                 |
+| **All**  | `make lint`         | Run Ruff (Python) and Biome (TypeScript) |
+| **All**  | `make check`        | Deep static analysis (Mypy, Bandit, etc.)|
+| **All**  | `make test`         | Run unit tests (Frontend and Backend)    |
+| **API**  | `make check-api`    | Verify frontend client matches backend   |
+| **API**  | `make generate-api` | Regenerate frontend API client           |
+| **E2E**  | `make e2e`          | Run Playwright E2E tests                 |
+| **CI**   | `make ci`           | Run fast CI (Lint + Check + Test + Build)|
+| **CI**   | `make ci-full`      | Run full CI (Fast CI + DB Reset + E2E)   |
 
 ### API Client Synchronization
 
 If you modify Backend Routes (e.g., `backend/app/routers/...`):
 
-1.  Run **`make generate-api`** to regenerate the frontend client.
-2.  This ensures `frontend/src/api/generated.ts` matches the backend (OpenAPI spec).
-3.  Commit the updated client files.
+1. Run **`make generate-api`** to regenerate the frontend client.
+2. This ensures `frontend/src/api/generated.ts` matches the backend (OpenAPI spec).
+3. Commit the updated client files.
 
 > **Note:** The CI pipeline runs `make check-api` and will fail if the client is out of sync.
 
-## 🏗️ Architecture Checks
+## Architecture Checks
 
 We use **Architectural Fitness Functions** to prevent spaghetti code.
 
@@ -113,11 +117,13 @@ We use **Architectural Fitness Functions** to prevent spaghetti code.
 
 These are run via `make check`.
 
-## 🗄️ Database Maintenance
+## Database Maintenance
 
-- **Sync Study Config**: `cd backend && uv run python seed.py data/example-study.json`
-  Updates/Creates a study from JSON definition. Requires backend running.
-- **Run Migrations**: `cd backend && uv run python scripts/migrate.py`
+- **Run Migrations**: `make migrate`
   Executes `alembic upgrade head` to ensure your local database is up to date.
 - **Create New Migration**: `make migration-new`
   Generates a new Alembic revision after you modify models in `backend/app/models.py`.
+- **Reset Database**: `make db-reset`
+  Drops and recreates all tables. **Warning**: destroys all local data.
+- **Sync Study Config**: `cd backend && uv run python seed.py data/example-study.json`
+  Updates/Creates a study from JSON definition. Requires backend running.

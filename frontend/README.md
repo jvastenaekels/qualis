@@ -1,4 +1,4 @@
-# Open-Q Frontend
+# Libre-Q Frontend
 
 A modern, responsive React application for conducting Q-methodology sorts.
 

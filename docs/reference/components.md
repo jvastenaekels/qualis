@@ -1,6 +1,6 @@
 # Frontend Components
 
-This guide documents the key reusable React components in Open-Q.
+This guide documents the key reusable React components in Libre-Q.
 
 ---
 
@@ -31,8 +31,7 @@ graph TD
     subgraph "Primitive Components"
         SC[SortableCard]
         DS[DroppableSlot]
-        CP[CardPile]
-        WB[WorkbenchPanel]
+        RZ[ReadingZone]
     end
 
     PDP --> PDC
@@ -45,10 +44,9 @@ graph TD
     CS --> SC
 
     FSP --> GS
-    GS --> CP
     GS --> DS
     GS --> SC
-    GS --> WB
+    GS --> RZ
 
     style CS fill:#dbeafe
     style GS fill:#dbeafe
@@ -64,19 +62,19 @@ A swipeable card deck for the Rough Sort phase. Uses Framer Motion for gestures.
 
 ### Props
 
-| Prop      | Type                                               | Description                          |
-| --------- | -------------------------------------------------- | ------------------------------------ |
-| `cards`   | `Card[]`                                           | Array of cards to display            |
-| `onSwipe` | `(direction: 'left' \| 'right' \| 'down') => void` | Callback when card is swiped         |
-| `x`       | `MotionValue<number>`                              | External motion value for X position |
-| `y`       | `MotionValue<number>`                              | External motion value for Y position |
+| Prop        | Type                                                    | Description                          |
+| ----------- | ------------------------------------------------------- | ------------------------------------ |
+| `statement` | `{ id: number; text: string; code?: string }`           | The current statement to display     |
+| `onVote`    | `(direction: 'agree' \| 'disagree' \| 'neutral') => void` | Callback when card is swiped      |
+| `x`         | `MotionValue<number>`                                   | External motion value for X position |
+| `y`         | `MotionValue<number>`                                   | External motion value for Y position |
 
 ### Usage
 
 ```tsx
 <CardStack
-  cards={unsortedCards}
-  onSwipe={handleSwipe}
+  statement={currentStatement}
+  onVote={handleVote}
   x={motionX}
   y={motionY}
 />
@@ -94,18 +92,29 @@ The main Q-grid component with zoom/pan support for Fine Sort.
 
 ### Props
 
-| Prop               | Type                                 | Description                                           |
-| :----------------- | :----------------------------------- | :---------------------------------------------------- |
-| `agreeCards`       | `Card[]`                             | List of cards for the "Agree" pile                    |
-| `disagreeCards`    | `Card[]`                             | List of cards for the "Disagree" pile                 |
-| `neutralCards`     | `Card[]`                             | List of cards for the "Neutral" pile                  |
-| `gridColumns`      | `Column[]`                           | Configuration for the pyramid layout                  |
-| `isAllPlaced`      | `boolean`                            | Whether all cards have been placed (enables validation) |
-| `disableHoverZoom` | `boolean`                            | If true, disables the heavy hover magnification (useful for mobile) |
-| `forcedTipsClosed` | `boolean`                            | Hide instructional tips                               |
-| `selectedCardId`   | `number \| null`                     | Currently selected card                               |
-| `onCardClick`      | `(id: number) => void`               | Card selection handler                                |
-| `onSlotClick`      | `(col: number, row: number) => void` | Slot click handler                                    |
+| Prop                     | Type                                                             | Description                                                     |
+| :----------------------- | :--------------------------------------------------------------- | :-------------------------------------------------------------- |
+| `agreeCards`             | `{ id: number; text: string; code?: string }[]`                  | Cards for the "Agree" pile                                      |
+| `disagreeCards`          | `{ id: number; text: string; code?: string }[]`                  | Cards for the "Disagree" pile                                   |
+| `neutralCards`           | `{ id: number; text: string; code?: string }[]`                  | Cards for the "Neutral" pile                                    |
+| `gridColumns`            | `{ score: number; capacity: number }[]`                          | Configuration for the pyramid layout                            |
+| `renderSlotContent`      | `(col, row, dimensions) => ReactNode`                            | Render callback for slot content (required)                     |
+| `isAllPlaced`            | `boolean`                                                        | Whether all cards have been placed                              |
+| `disableHoverZoom`       | `boolean`                                                        | Disables hover magnification (useful for mobile)                |
+| `selectedCardId`         | `number \| null`                                                 | Currently selected card                                         |
+| `onCardClick`            | `(id: number) => void`                                           | Card selection handler                                          |
+| `onSlotClick`            | `(col: number, row: number) => void`                             | Slot click handler                                              |
+| `onReset`                | `() => void`                                                     | Reset handler                                                   |
+| `onValidate`             | `() => void`                                                     | Validation/submit handler                                       |
+| `onDimensionsChange`     | `(d: { width: number; height: number }) => void`                 | Callback when grid dimensions change                            |
+| `onZoomChange`           | `(zoom: number) => void`                                         | Callback when zoom level changes                                |
+| `onInteractionUtils`     | `(utils: InteractionUtils) => void`                              | Exposes internal interaction utilities                           |
+| `showCodes`              | `boolean`                                                        | Show statement codes on cards                                   |
+| `highlightKey`           | `string \| null`                                                 | Highlight key for distinguishing statements                     |
+| `conditionOfInstruction` | `string \| null`                                                 | Condition of instruction text displayed above grid              |
+| `uiLabels`               | `Record<string, string>`                                         | Custom UI label overrides                                       |
+| `readOnly`               | `boolean`                                                        | Disable all interaction (used in admin view)                    |
+| `sidebarContent`         | `ReactNode`                                                      | Custom content for sidebar area                                 |
 
 ### Features
 
@@ -124,14 +133,23 @@ A draggable card component using dnd-kit.
 
 ### Props
 
-| Prop         | Type                            | Description                      |
-| ------------ | ------------------------------- | -------------------------------- |
-| `id`         | `number`                        | Unique card ID                   |
-| `text`       | `string`                        | Card content (supports Markdown) |
-| `variant`    | `'hand' \| 'grid' \| 'compact'` | Visual style                     |
-| `isSelected` | `boolean`                       | Selection state                  |
-| `onClick`    | `() => void`                    | Click handler                    |
-| `isOverlay`  | `boolean`                       | Render as drag overlay           |
+| Prop               | Type                             | Description                              |
+| ------------------ | -------------------------------- | ---------------------------------------- |
+| `id`               | `number`                         | Unique card ID                           |
+| `text`             | `string`                         | Card content (supports Markdown)         |
+| `code`             | `string`                         | Statement code (e.g., "S1")              |
+| `variant`          | `'hand' \| 'grid' \| 'compact'`  | Visual style                             |
+| `isSelected`       | `boolean`                        | Selection state                          |
+| `isOverlay`        | `boolean`                        | Render as drag overlay                   |
+| `onClick`          | `() => void`                     | Click handler                            |
+| `onAction`         | `(id: number) => void`           | Action callback (e.g., zoom)             |
+| `dimensions`       | `{ width: number; height: number }` | Explicit card dimensions             |
+| `aspectRatio`      | `number \| 'auto'`               | Card aspect ratio                        |
+| `disableHoverZoom` | `boolean`                        | Disable hover magnification              |
+| `allowScroll`      | `boolean`                        | Allow scroll on long card text           |
+| `hasComment`       | `boolean`                        | Show comment indicator icon              |
+| `hasAudio`         | `boolean`                        | Show audio indicator icon                |
+| `readOnly`         | `boolean`                        | Disable interaction (admin view)         |
 
 ### Variants
 
@@ -153,25 +171,21 @@ A drop zone for placing cards in the Q-grid.
 
 | Prop       | Type         | Description                              |
 | ---------- | ------------ | ---------------------------------------- |
-| `id`       | `string`     | Slot identifier (format: `slot_col_row`) |
+| `id`       | `string`     | Slot identifier (format: `col-row`)      |
 | `children` | `ReactNode`  | Slot contents                            |
+| `isOver`   | `boolean`    | Whether a card is being dragged over     |
+| `role`     | `string`     | ARIA role: `'button'` (default) or `'gridcell'` |
 | `onClick`  | `() => void` | Click handler for tap-to-place           |
+
+Extends `React.HTMLAttributes<HTMLDivElement>` for full customization.
 
 ---
 
-## CardPile
+## ReadingZone
 
-**Location:** `src/components/CardPile.tsx`
+**Location:** `src/components/ReadingZone.tsx`
 
-Displays a stack of cards in a pile with count badge.
-
-### Props
-
-| Prop      | Type                                 | Description               |
-| --------- | ------------------------------------ | ------------------------- |
-| `type`    | `'agree' \| 'disagree' \| 'neutral'` | Pile category             |
-| `count`   | `number`                             | Number of cards remaining |
-| `topCard` | `Card \| undefined`                  | Card to display on top    |
+Displays a zoomed/magnified view of the currently hovered or active card within the GridSort component.
 
 ---
 
@@ -194,6 +208,26 @@ A dynamic table that displays Pre-sort and Post-sort data. It handles heterogene
 **Location:** `src/components/admin/dashboard/ParticipantMetadataCard.tsx`
 
 Displays technical session details including OS, Browser (v), IP, and duration. It uses `ua-parser-js` (via backend) to provide human-readable device information.
+
+### InteractiveDataView
+
+**Location:** `src/components/admin/dashboard/InteractiveDataView.tsx`
+
+The main data visualization interface for study results. Contains a participant table, timeline chart, and device breakdown chart. Includes a `charts/` subdirectory with individual visualization components.
+
+### Analysis Components
+
+**Location:** `src/components/admin/analysis/`
+
+Components for the built-in factor analysis workflow:
+
+| Component                      | Description                                                           |
+| :----------------------------- | :-------------------------------------------------------------------- |
+| `ScreePlot.tsx`                | Displays eigenvalues with a Kaiser criterion reference line            |
+| `FactorLoadingsTable.tsx`      | Participant-by-factor loading matrix with significance highlighting   |
+| `FactorArraysView.tsx`        | Composite Q-sort visualization for each factor                       |
+| `StatementsTable.tsx`          | Z-scores, factor array positions, and distinguishing/consensus flags |
+| `FactorCharacteristicsTable.tsx` | Eigenvalues, variance explained, reliability, and correlations      |
 
 ---
 

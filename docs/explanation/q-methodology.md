@@ -1,6 +1,6 @@
 # Q-Methodology: A Researcher's Guide
 
-Q-methodology is a research approach for studying **subjectivity** — how people think about topics from their own perspective. Open-Q provides the digital infrastructure to conduct Q-studies online.
+Q-methodology is a research approach for studying **subjectivity** — how people think about topics from their own perspective. Libre-Q provides the digital infrastructure to conduct Q-studies online.
 
 ---
 
@@ -28,7 +28,7 @@ flowchart TD
         A[Define Research Question] --> B[Develop Concourse]
         B --> C[Select Q-Set<br/>30-60 statements]
         C --> D[Design Grid Layout]
-        D --> E[Configure Study in Open-Q]
+        D --> E[Configure Study in Libre-Q]
     end
 
     subgraph "Participant Sorts"
@@ -84,9 +84,9 @@ The **Q-grid** is a forced quasi-normal distribution where participants place st
 
 ---
 
-## Open-Q Study Phases
+## Libre-Q Study Phases
 
-Open-Q breaks the Q-sort into manageable phases:
+Libre-Q breaks the Q-sort into manageable phases:
 
 ### 1. Pre-Sort (Optional)
 
@@ -112,7 +112,7 @@ Participants explain why they placed their most extreme statements (e.g., +5 and
 
 ## Configuring Your Study
 
-Open-Q uses JSON configuration to define studies. See the [Configuration Reference](../reference/configuration.md) for details.
+Libre-Q uses JSON configuration to define studies. See the [Configuration Reference](../reference/configuration.md) for details.
 
 ### Example Grid Configuration
 

@@ -1,4 +1,16 @@
 # TODO
 
-- [ ] Add support for accepted consent details (timestamp, language, technical details, consent form hash, etc.) in admin UI
-- [ ] Add support for email and invitation management in admin UI
+- Transformer les "workspaces" en "projects"
+- Ajouter un concourse manager
+    - traçage
+    - collaboration
+- Un endroit où stocker les rapports d'analyse dans le projet
+- Améliorer la page de recrutement
+    - plus intuitive
+    - lien générique
+    - code d'accès
+- gestion rgpd
+- logs
+- thème foncé et contrasté pour l'admin UI
+- audio and picture statements
+- stimulus

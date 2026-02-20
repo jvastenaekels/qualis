@@ -1,28 +1,28 @@
 # Admin Dashboard Features
 
-This guide provides a comprehensive overview of all administrative features available in the Open-Q platform.
+This guide provides a comprehensive overview of all administrative features available in the Libre-Q platform.
 
 ---
 
-## 📊 Dashboard Overview
+## Dashboard Overview
 
-The Admin Dashboard is organized into dedicated pages for each study:
+The Admin Dashboard is organized into dedicated pages for each study, accessible from the left sidebar:
 
 - **Overview**: Study statistics, participation trends, and quick actions.
-- **Analytics**: Deep dive into consensus analysis, duration patterns, and data quality.
-- **Design**: Configure grid shape, statements, translations, and study behavior.
-- **Team**: Manage collaborators and invite new researchers.
+- **Design**: Configure grid shape, statements, translations, and study behavior (7 tabs: General, Presort, Instruction, Grid & Q-Set, Post-sort, Branding, Interface).
 - **Recruitment**: Create access links, track conversion funnels, and monitor success rates.
-- **Exports**: Download participant data and explore individual grid reconstructions.
+- **Data**: View participant timelines, device breakdowns, individual session detail, and manage test runs.
+- **Analysis**: Run factor analysis (PCA/Centroid), view scree plots, factor loadings, factor arrays, and distinguishing/consensus statements.
+- **Settings**: Study-level settings.
 - **Profile**: Manage your account security and enable 2FA.
 
 ---
 
-## 🎨 Study Design
+## Study Design
 
 ### Study Configuration
 
-**Location**: `/admin/studies/{slug}/design`
+**Location**: Study sidebar > Design
 
 #### Core Settings
 
@@ -33,6 +33,7 @@ The Admin Dashboard is organized into dedicated pages for each study:
   - **Active**: Public and collecting data. Structural changes (grid, statements) are locked.
   - **Paused**: Temporarily closed to new submissions. Allows text/translation fixes.
   - **Closed**: No longer accepting submissions. Exports remain available.
+  - **Archived**: Long-term storage state for completed studies.
 
 #### Grid Configuration
 
@@ -42,15 +43,14 @@ Define the forced distribution shape for the Q-sort:
 - **Capacity**: Number of statements that fit in each column.
 
 > [!IMPORTANT]
-> The sum of all column capacities **must equal** the total number of statements.
+> The sum of all column capacities **must equal** the total number of statements. The designer validates this and shows a warning banner if they do not match.
 
 #### Behavioral Options
 
 - **Show Statement Codes**: Display "S1", "S2" identifiers on cards for easier analysis.
 - **Randomize Statements**: Shuffle statement order per participant to prevent bias (Q-methodology best practice).
-- **Access Password**: Require a password before participants can view the study content.
 
-### 🔄 Import / Export Configuration
+### Import / Export Configuration
 
 Easily duplicate studies or back up your configurations:
 
@@ -60,14 +60,16 @@ Easily duplicate studies or back up your configurations:
 > [!TIP]
 > Use this feature to create "template" studies that you can clone and adapt for different contexts or languages.
 
-### Translations & Content
+### Translations and Content
 
 Manage multilingual content for your study:
 
 - **Title**: Main study name.
-- **Description**: Brief overview shown on the welcome page.
-- **Instructions**: Detailed Markdown content explaining the research context.
-- **Consent**: Customizable consent form (title, description, accept/decline text).
+- **Subtitle**: Brief tagline shown on the welcome page.
+- **Description**: Overview shown on the welcome page.
+- **Objective**: Research objective shown to participants.
+- **Instructions (Condition of Instruction)**: Markdown content explaining the sorting frame for participants.
+- **Consent**: Customizable consent form (title, description).
 
 ### Statements
 
@@ -79,45 +81,79 @@ Add, edit, or remove statements from your Q-set:
 > [!WARNING]
 > Once a study is **Active**, you cannot add or remove statements. Plan your Q-set carefully during the Draft phase.
 
-### Pre-Sort & Post-Sort
+### Pre-Sort and Post-Sort
 
 Configure demographic questions (Pre-Sort) and qualitative follow-up questions (Post-Sort):
 
-- **Pre-Sort**: Collect participant metadata (age, gender, occupation, etc.).
-- **Post-Sort**: Ask participants to comment on extreme placements or provide general feedback.
+- **Pre-Sort**: Collect participant metadata before sorting begins.
+- **Post-Sort**: Ask participants to comment on extreme placements or provide general feedback. Supports audio responses when S3 is configured.
+
+#### Question Types
+
+Both pre-sort and post-sort support the following field types:
+
+| Type          | Description                                      |
+| :------------ | :----------------------------------------------- |
+| `text`        | Single-line text input                           |
+| `textarea`    | Multi-line text area                             |
+| `number`      | Numeric input with optional min/max validation   |
+| `select`      | Dropdown with predefined options                 |
+| `radio`       | Radio button group                               |
+| `checkbox`    | Checkbox toggle                                  |
+| `date`        | Date picker                                      |
+| `email`       | Email input with format validation               |
+| `text_audio`  | Text input with optional audio recording (post-sort only, requires S3) |
+
+Each question supports:
+
+- **Localized labels and placeholders** for all configured languages.
+- **Required field validation** to enforce mandatory responses.
+- **Conditional visibility**: Show or hide a question based on another question's answer using operators (`equals`, `not_equals`, `contains`, `greater_than`, `less_than`).
+- **Drag-to-reorder** for arranging question order in the designer.
+
+#### Content Formatting
+
+Instructions, condition of instruction, and consent text fields support **Markdown** formatting (headings, bold, italic, lists, links). Content is rendered with XSS protection.
+
+#### Custom UI Labels
+
+Researchers can override default UI strings (button text, step names) per language via the `ui_labels` field in study translations. This allows full localization control without modifying the application code.
 
 ---
 
-## 👥 Team Management
+## Team Management
 
-**Location**: `/admin/studies/{slug}/team`
+**Location**: Workspace settings (sidebar > workspace menu)
+
+Team management is handled at the **workspace level**, not per-study. Workspace owners can invite collaborators and manage roles from the workspace settings page.
 
 ### Inviting Collaborators
 
-1. Enter the collaborator's email address.
-2. Select their role (**Editor** or **Viewer**).
-3. Click **Send Invitation**.
+1. Navigate to your workspace settings.
+2. Enter the collaborator's email address.
+3. Select their role (**Researcher** or **Viewer**).
+4. Click **Send Invitation**.
 
 The system generates a unique registration link. If SMTP is configured, an email is sent automatically. Otherwise, the link is displayed in the UI for manual sharing.
 
-### Roles & Permissions
+### Roles and Permissions
 
-| Feature                      | Owner | Editor | Viewer |
-| :--------------------------- | :---: | :----: | :----: |
-| View Study Configuration     |  ✅   |   ✅   |   ✅   |
-| Edit Translations/Metadata   |  ✅   |   ✅   |   ❌   |
-| Edit Grid/Statements (Draft) |  ✅   |   ✅   |   ❌   |
-| Change Study State           |  ✅   |   ✅   |   ❌   |
-| Manage Recruitment Links     |  ✅   |   ✅   |   ❌   |
-| Export Data                  |  ✅   |   ✅   |   ✅   |
-| Invite/Remove Collaborators  |  ✅   |   ❌   |   ❌   |
-| Delete Study                 |  ✅   |   ❌   |   ❌   |
+| Feature                      | Owner | Researcher | Viewer |
+| :--------------------------- | :---: | :--------: | :----: |
+| View Study Configuration     |  Yes  |    Yes     |  Yes   |
+| Edit Translations/Metadata   |  Yes  |    Yes     |  No    |
+| Edit Grid/Statements (Draft) |  Yes  |    Yes     |  No    |
+| Change Study State           |  Yes  |    Yes     |  No    |
+| Manage Recruitment Links     |  Yes  |    Yes     |  No    |
+| Export Data                  |  Yes  |    Yes     |  No    |
+| Manage Workspace Members     |  Yes  |    No      |  No    |
+| Delete Study                 |  Yes  |    No      |  No    |
 
 ---
 
-## 📡 Recruitment & Analytics
+## Recruitment
 
-**Location**: `/admin/studies/{slug}/recruitment`
+**Location**: Study sidebar > Recruitment
 
 ### Creating Access Links
 
@@ -139,109 +175,129 @@ Monitor your recruitment funnel in real-time:
 > [!TIP]
 > A low success rate often indicates usability issues. Review your instructions, grid complexity, or mobile experience.
 
-### Visual Analytics
+### QR Codes
 
-The recruitment page now includes interactive charts to help you optimize your outreach:
-
-- **Recruitment Funnel**: A visual pipeline showing the conversion from Link Visit → Study Start → Submission.
-- **Link Comparison**: Benchmarking chart comparing performance metrics across different recruitment channels.
+Each recruitment link can generate a QR code for printed materials, conference presentations, or classroom settings.
 
 ---
 
-## 📦 Data Exports
+## Data Page
 
-**Location**: `/admin/studies/{slug}/exports`
+**Location**: Study sidebar > Data
 
-### Interactive Inspection
+### Participant Table
 
-Before exporting raw data, use the **Interactive Data View** to audit your results:
+A searchable, sortable table of all participants showing:
 
-- **Participant ID**: Click any ID to view that participant's specific grid reconstruction and survey responses.
-- **Audit Tooltips**: Identify why a participant was flagged as suspect or see their qualitative comments at a glance.
+- Participant ID (anonymous)
+- Status (completed, in progress, started)
+- Submission timestamp and duration
+- Language used and device type
+- Test run flag and discard status
+
+### Timeline and Device Charts
+
+- **Submissions Timeline**: Track participation velocity with daily trends.
+- **Device Breakdown**: Distribution of desktop, mobile, and tablet participants.
+
+### Individual Participant Detail
+
+Click any participant to view their detailed session:
+
+- **Grid Reconstruction**: High-fidelity visual of the participant's exact Q-sort placement.
+- **Presort and Post-sort Responses**: All survey answers in a structured view.
+- **Audio Recordings**: Playback controls for audio responses (if S3 is configured).
+- **Metadata**: Device, browser, language, duration, timestamps.
+
+### Managing Responses
+
+- **Discard**: Flag a participant's data as discarded with a mandatory reason (e.g., "incomplete sorting", "suspected bot"). Discarded participants are excluded from exports and analysis but data is preserved for audit purposes.
+- **Test Runs**: Test submissions are automatically flagged and can be cleared from this page.
+
+### Pilot / Test Mode
+
+The study designer includes a built-in pilot mode for non-destructive testing:
+
+1. In the Design page, use the **Preview** action to launch a test session.
+2. The participant view opens with `?mode=test` in the URL, loading the current draft from local storage instead of the backend.
+3. Complete the study as a participant would — no data is persisted to the database.
+4. A local confirmation code (e.g., `PILOT-ABC123`) is generated at the end.
+
+Pilot mode supports cross-tab collaboration: multiple team members can test the same draft simultaneously via `localStorage` synchronization. Each pilot session is isolated from real participant data.
+
+> [!TIP]
+> Use pilot mode to walk through the full participant experience before activating your study. The session resets automatically on the next visit.
+
+---
+
+## Analysis
+
+**Location**: Study sidebar > Analysis
+
+### Scree Plot
+
+Displays eigenvalues to help determine the optimal number of factors. A Kaiser criterion reference line (eigenvalue > 1) is drawn automatically. Components above this line are suggested as meaningful factors.
+
+### Analysis Configuration
+
+- **Extraction Method**: PCA (Principal Component Analysis) or Centroid extraction (Brown 1980). PCA is faster; Centroid is traditional in Q-methodology.
+- **Number of Factors**: Select based on the scree plot elbow and Kaiser criterion (eigenvalue > 1.0). The system suggests a default count.
+- **Rotation**: Varimax with Kaiser normalization (standard) or None.
+- **Flagging**: Auto-flagging uses a dual threshold — significance (`1.96 / sqrt(n_statements)`) and dominance (loading must be highest on one factor). Manual flagging allows researcher override.
+
+### Results Tabs
+
+After running an analysis:
+
+- **Loadings**: Participant-by-factor loading matrix with significance highlighting and flag indicators.
+- **Factor Arrays**: Composite Q-sort for each factor showing idealized statement placements, computed from weighted z-scores of flagged participants.
+- **Statements**: Z-scores, factor array positions, and distinguishing/consensus classifications:
+  - **Distinguishing (D)**: Statements where a factor's z-score differs significantly from other factors, tested at p < 0.05, 0.01, and 0.001 using Standard Error of Differences (SED).
+  - **Consensus (C)**: Statements with no significant differences across any pair of factors.
+- **Characteristics**: Eigenvalues, variance explained, composite reliability (Spearman-Brown formula), standard error of factor scores, and factor correlation matrix.
+
+> [!NOTE]
+> Test runs and discarded participants are automatically excluded from analysis. At least 2 non-discarded participants are required to run an analysis.
+
+---
+
+## Data Exports
+
+**Location**: Study sidebar > Data (export options)
 
 ### Export Formats
 
-1. **Full JSON Dump**
-   - Complete study configuration + all participant data.
-   - Ideal for backup or custom analysis pipelines.
+1. **CSV (Wide Format)**: One row per participant, columns for metadata and statement scores. Compatible with Excel, SPSS, and other spreadsheet tools.
+2. **PQMethod ZIP**: `.dat` and `.sta` files formatted for PQMethod and Ken-Q Analysis software.
+3. **KenQ JSON**: Complete JSON structure compatible with web-based analysis tools.
+4. **R-Kit ZIP**: CSV data file with a ready-to-run R script using the `qmethod` package.
+5. **Research Package**: Comprehensive ZIP with all formats, codebook, and metadata for archiving.
 
-2. **CSV (Wide Format)**
-   - One row per participant, columns for metadata and statement scores.
-   - Compatible with Excel, SPSS, and other spreadsheet tools.
+### Individual Participant Exports
 
-3. **PQMethod ZIP**
-   - `.dat` and `.sta` files formatted for PQMethod software.
-   - Industry-standard format for Q-methodology factor analysis.
-
-4. **KenQ JSON**
-   - Optimized for the Web-KenQ analysis tool. Contains study definition and sorts.
+From a participant's detail view, export their data individually as CSV or JSON. Audio recordings can be downloaded as a ZIP.
 
 ### Data Privacy
 
-All exports are available only to users with at least **Viewer** permissions on the study. IP addresses are hashed by default to protect participant anonymity.
+All exports are available only to users with at least Researcher permissions on the study. No PII is stored unless specifically requested in the presort configuration. Researchers are encouraged to only collect necessary data.
+
+Libre-Q implements several privacy protections automatically:
+
+- **IP Address Hashing**: Participant IP addresses are hashed using SHA-256 with a configurable salt (`IP_HASH_SALT`) before storage. Raw IPs are never persisted.
+- **Consent Audit Trail**: Each participant's consent is recorded with a hash of the consent version they saw, enabling researchers to audit which consent text each participant agreed to.
+- **Language Resolution**: When exporting multilingual studies, option labels are resolved using the participant's language, falling back to the study's default language, then to the first available translation.
 
 ---
 
-## 📈 Study Analytics
+## Profile and Security
 
-**Location**: `/admin/studies/{slug}/analytics`
-
-The Analytics module provides advanced research insights beyond simple counts:
-
-### Participation Trends
-
-- **Submissions Timeline**: Track participation velocity with daily "Started vs. Completed" comparisons.
-- **Completion Rate Evolution**: Monitor how your conversion rate changes over time to identify engagement drops.
-
-### Data Quality & Distribution
-
-- **Duration Distribution**: A histogram of completion times.
-  - 🚩 **Suspect Flag**: Participants who complete the study in under 2 minutes are automatically flagged as "Suspect" (speeders).
-- **Device Breakdown**: Analysis of the hardware used by participants (Desktop vs. Mobile).
-
-### Content Analysis (Consensus & Controversy)
-
-Identify the most significant patterns in your Q-set:
-
-- **Consensus Analysis**: Statements with the lowest standard deviation (where participants agree the most).
-- **Controversy Analysis**: Statements with the highest variance (where views are most polarized).
-- **Research Strength**: Real-time confidence indicator based on your current sample size.
-
----
-
-## 🔍 Individual Participant Detail
-
-**Location**: `/admin/studies/{slug}/exports` (Click any participant ID)
-
-Inspect individual perspectives with a high-fidelity, tabbed interface:
-
-### 1. Visual Sort
-
-- **Grid Reconstruction**: See the participant's exact sorting layout in a 2D pyramid grid matching the study design.
-- **Interactive Tooltips**: Hover over statements in the grid to read their full text and see their original code.
-- **Contextual Awareness**: The grid highlights consensus and controversy items directly in the participant's layout.
-
-### 2. Survey Responses
-
-- **Demographics & Follow-up**: View all answers from the Pre-sort and Post-sort surveys in a clean, searchable table.
-- **Heterogeneous Data Support**: Gracefully handles different question types (text, choice, scale).
-
-### 3. Environment & Metadata
-
-- **Technical Footprint**: Detailed breakdown of the participant's device, OS, and browser (parsed via `ua-parser-js`).
-- **Session Info**: Total duration, completion timestamps, and hashed IP address for privacy-preserving auditing.
-
----
-
-## 🔐 Profile & Security
-
-**Location**: `/admin/profile`
+**Location**: Profile page
 
 ### Account Settings
 
-- **Email**: Your login identifier (cannot be changed directly - contact admin).
+- **Email**: Your login identifier.
 - **Full Name**: Display name shown in the UI.
-- **Password**: Change your account password anytime.
+- **Password**: Change your account password.
 
 ### Two-Factor Authentication (2FA)
 
@@ -258,26 +314,42 @@ Once enabled, login requires both your password and a valid TOTP token.
 
 ---
 
-## 🏢 Workspace Management (Superuser)
-
-**Location**: `/admin/workspaces` (Superuser only)
+## Workspace Management
 
 Workspaces provide organizational isolation for multi-tenant deployments:
 
-- **List Workspaces**: View all workspaces in the system.
-- **Create Workspace**: Set up a new isolated environment for a research team.
-- **Manage Members**: Assign workspace-level roles (Admin, Researcher, Viewer).
+- **Create Workspace**: Set up an isolated environment for a research team.
+- **Manage Members**: Assign workspace-level roles (Owner, Researcher, Viewer).
+- **Switch Workspaces**: Use the workspace switcher in the sidebar.
+- **Storage Usage**: Monitor total audio storage consumption and quota from the study settings page.
 
 ---
 
-## 👤 User Management (Superuser)
+## Collaborative Editing
 
-**Location**: `/admin/users` (Superuser only)
+When multiple team members edit a study simultaneously, Libre-Q provides safety mechanisms to prevent data loss:
+
+- **Auto-Save with Backup**: Changes are automatically backed up to local storage every second. If the browser closes unexpectedly, unsaved changes are recovered on the next visit.
+- **Navigation Guard**: Attempting to leave the Design page with unsaved changes triggers a confirmation dialog.
+- **Optimistic Locking**: If another user saves changes while you are editing, the system detects the conflict (HTTP 409) and attempts a 3-way merge. Simple changes (metadata, translations) are merged automatically. Structural conflicts (grid, statements) require manual resolution.
+- **Sync Status**: The Design page shows a real-time indicator: *Synced*, *Saving...*, *Modified*, or *Error*.
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut        | Action                                |
+| :-------------- | :------------------------------------ |
+| `Cmd+K` / `Ctrl+K` | Open the command menu for quick navigation between studies, workspaces, and actions |
+
+---
+
+## User Management (Superuser)
 
 Superusers can manage all user accounts:
 
 - **List Users**: View all registered accounts.
-- **Create User**: Manually create an account (useful for admin-managed onboarding).
+- **Create User**: Manually create an account.
 - **Delete User**: Remove an account (cannot delete yourself).
 
 > [!CAUTION]
@@ -285,23 +357,24 @@ Superusers can manage all user accounts:
 
 ---
 
-## 📈 Study Overview
+## Study Overview
 
-**Location**: `/admin/studies/{slug}`
+**Location**: Study sidebar > Overview
 
 Get a high-level view of your study's progress:
 
-- **Study State Badge**: Visual indicator of Draft/Active/Paused/Closed status.
+- **Study State Badge**: Visual indicator of Draft/Active/Paused/Closed/Archived status.
 - **Participant Count**: Total starts and submissions.
 - **Recent Activity**: Latest participant submissions.
-- **Quick Actions**: Shortcuts to Design, Recruitment, and Exports.
+- **Quick Actions**: Shortcuts to Design, Recruitment, and Data.
 
 ---
 
-## 🚀 Best Practices
+## Best Practices
 
 1. **Start in Draft**: Build and test your study configuration thoroughly before activating.
-2. **Use Recruitment Links**: Track cohorts separately for better analysis (e.g., "Twitter Campaign", "Email List Batch 1").
-3. **Enable 2FA**: Protect sensitive research data from unauthorized access.
-4. **Monitor Success Rates**: A drop below 60% often signals UX issues.
-5. **Export Regularly**: Back up your data throughout the study lifecycle.
+2. **Use Test Runs**: Walk through the participant experience before going live.
+3. **Use Recruitment Links**: Track cohorts separately for better analysis (e.g., "Twitter Campaign", "Email List Batch 1").
+4. **Enable 2FA**: Protect sensitive research data from unauthorized access.
+5. **Monitor Success Rates**: A drop below 60% often signals UX issues.
+6. **Export Regularly**: Back up your data throughout the study lifecycle.

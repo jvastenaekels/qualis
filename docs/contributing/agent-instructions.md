@@ -130,7 +130,7 @@ make e2e         # playwright (study + admin flows)
 1. **Never fetch directly** — Use generated hooks only; Orval regeneration is automatic.
 2. **No bare Any types** — Every variable must have explicit type; breaks reasoning.
 3. **Avoid __getattr__ magic** — LLMs can't trace dynamic attribute access.
-4. **Sync SQLAlchemy only** — This project uses synchronous patterns for clarity.
+4. **Async SQLAlchemy** — This project uses async SQLAlchemy (`AsyncSession`) for all database interactions.
 5. **Test first, not after** — Write failing test before implementation (Inverse TDD).
 6. **Don't skip make ci** — Local validation is required before PRs.
 7. **Mobile-first CSS** — Design for touch first, then desktop breakpoints.
@@ -140,7 +140,7 @@ make e2e         # playwright (study + admin flows)
 
 Before marking a task done:
 ```bash
-cd /home/julien/open-q
+cd /home/julien/libre-q
 make ci              # Fast verification (~2-3 min)
 # OR for full validation:
 make ci-full         # Includes E2E (~10-15 min)

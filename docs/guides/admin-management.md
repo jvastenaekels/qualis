@@ -1,15 +1,10 @@
-# Admin & Team Management
+# Admin and Team Management
 
-This guide explains how to manage accounts, research teams, and study permissions in Open-Q.
-
-⚠️ **Important Terminology Update (2026-01-15)**:
-
-- **Workspace Owner** (formerly "Admin"): Full control within a workspace
-- **Superuser**: System-level administrator with global access
+This guide explains how to manage accounts, research teams, and study permissions in Libre-Q.
 
 ---
 
-## 👤 User Management
+## User Management
 
 User accounts are managed by **Superusers**. A superuser can list all system users and create new accounts.
 
@@ -19,7 +14,7 @@ If your system is fresh, use the CLI to create your first superuser:
 
 ```bash
 cd backend
-python scripts/create_user.py
+uv run python scripts/create_user.py
 ```
 
 Follow the prompts to enter an email, password, and toggle the **Superuser** status to `y`. This user will be added as the **Owner** of the default workspace.
@@ -33,7 +28,7 @@ Once you have an account, you can manage users via the API at `GET /api/admin/us
 
 ---
 
-## 🔐 Account Security (2FA)
+## Account Security (2FA)
 
 Researchers are strongly encouraged to enable **Two-Factor Authentication (TOTP)** to protect sensitive research data.
 
@@ -53,19 +48,19 @@ Once enabled, the login flow will require your password first, followed by a val
 
 ---
 
-## 👥 Managing Study Teams
+## Managing Study Teams
 
 Study owners can invite other researchers to collaborate on their work.
 
 ### Inviting a Collaborator
 
-Invite a user by their email through the **Team** tab in the Study Dashboard.
+Invite a user by their email through the **workspace settings** page.
 
-1.  Enter the collaborator's email.
-2.  Select a role (**Editor** or **Viewer**).
-3.  Click **Send Invitation**.
+1. Enter the collaborator's email.
+2. Select a role (**Researcher** or **Viewer**).
+3. Click **Send Invitation**.
 
-Open-Q will generate a unique registration link. If SMTP is configured, the user will receive an email. If not (e.g., in development), the link is displayed in the dashboard logs.
+Libre-Q will generate a unique registration link. If SMTP is configured, the user will receive an email. If not (e.g., in development), the link is displayed in the dashboard logs.
 
 ### Invitation Process
 
@@ -74,23 +69,23 @@ Open-Q will generate a unique registration link. If SMTP is configured, the user
 
 ### Roles and Permissions
 
-Open-Q supports three roles with varying levels of access:
+Libre-Q supports three workspace-level roles with varying levels of access:
 
-| Feature                            | Owner | Editor | Viewer |
-| :--------------------------------- | :---: | :----: | :----: |
-| View Configuration                 |  ✅   |   ✅   |   ✅   |
-| Update Meta/Text (Active/Paused)   |  ✅   |   ✅   |   ❌   |
-| Update Grid/Structure (Draft Only) |  ✅   |   ✅   |   ❌   |
-| Export Study Data                  |  ✅   |   ✅   |   ✅   |
-| Change Study State                 |  ✅   |   ✅   |   ❌   |
-| Manage Collaborators               |  ✅   |   ❌   |   ❌   |
-| Delete Study                       |  ✅   |   ❌   |   ❌   |
+| Feature                            | Owner | Researcher | Viewer |
+| :--------------------------------- | :---: | :--------: | :----: |
+| View Configuration                 |  Yes  |    Yes     |  Yes   |
+| Update Meta/Text (Active/Paused)   |  Yes  |    Yes     |  No    |
+| Update Grid/Structure (Draft Only) |  Yes  |    Yes     |  No    |
+| Export Study Data                  |  Yes  |    Yes     |  No    |
+| Change Study State                 |  Yes  |    Yes     |  No    |
+| Manage Workspace Members           |  Yes  |    No      |  No    |
+| Delete Study                       |  Yes  |    No      |  No    |
 
 **Note**: Workspace Owners automatically have Owner-level access to all studies in their workspace.
 
 ---
 
-## 🔄 Study Lifecycle
+## Study Lifecycle
 
 Studies progress through several states:
 
@@ -98,6 +93,7 @@ Studies progress through several states:
 2. **Active**: The study is public. **Structural configuration is locked**. Only metadata and translations (text fixes) can be updated.
 3. **Paused**: Public access is suspended. Participants cannot submit. Use this state for temporary maintenance or fixing urgent typos.
 4. **Closed**: Public access is revoked. Exporting results is still possible.
+5. **Archived**: Long-term storage for completed studies. Data is preserved but the study is hidden from the active list.
 
 > [!TIP]
 > Use the **Paused** state if you need to fix a typo in a statement or instruction while the study is live, without deleting and recreating it.

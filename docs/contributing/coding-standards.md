@@ -26,7 +26,7 @@ We use **Python 3.13+** with strict adherence to type hinting.
 
 ### 2.2 SQLAlchemy & Database
 
-- **Synchronous Core:** We currently use synchronous SQLAlchemy patterns for stability and easier debugging by agents.
+- **Async Core:** We use async SQLAlchemy (`AsyncSession`) for all database interactions. Use `await` for all DB calls.
 - **Explicit Relationships:** Define foreign keys and relationships explicitly in models. Avoid implicit joins.
 
 ### 2.3 Style & Structure

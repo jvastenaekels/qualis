@@ -1,17 +1,17 @@
 # Researcher Handbook
 
-This guide is intended for researchers who want to use Open-Q to conduct Q-methodology studies.
+This guide is intended for researchers who want to use Libre-Q to conduct Q-methodology studies.
 
-## 📋 The Q-Methodology Workflow
+## The Q-Methodology Workflow
 
-Open-Q streamlines the traditional Q-sort process into a modern, digital experience:
+Libre-Q streamlines the traditional Q-sort process into a modern, digital experience:
 
-1.  **Preparation**: Define your set of statements (the Q-set) and the shape of your grid (the distribution).
-2.  **Onboarding**: Participants read your instructions and provide informed consent.
-3.  **Phase 1: Pre-sort (Context)**: Collect demographic or contextual data.
-4.  **Phase 2: Rough Sort**: Participants categorize statements into "Agree", "Neutral", and "Disagree" piles.
-5.  **Phase 3: Fine Sort (The Grid)**: Participants place statements into a forced distribution grid.
-6.  **Phase 4: Post-sort (Reflections)**: Participants provide qualitative feedback on their placements.
+1. **Preparation**: Define your set of statements (the Q-set) and the shape of your grid (the distribution).
+2. **Onboarding**: Participants read your instructions and provide informed consent.
+3. **Phase 1: Pre-sort (Context)**: Collect demographic or contextual data.
+4. **Phase 2: Rough Sort**: Participants categorize statements into "Agree", "Neutral", and "Disagree" piles.
+5. **Phase 3: Fine Sort (The Grid)**: Participants place statements into a forced distribution grid.
+6. **Phase 4: Post-sort (Reflections)**: Participants provide qualitative feedback on their placements.
 
 ### Recruitment Analytics
 
@@ -24,31 +24,34 @@ Track your participant conversion funnel in real-time on the **Recruitment** pag
 > [!TIP]
 > Use the **Recruitment Funnel** chart to identify exactly where participants are dropping off (e.g., after the welcome page vs. during the fine sort).
 
-### Data Analysis & Quality Control
+### Data Analysis and Quality Control
 
-Access the **Analytics** and **Exports** tabs for deeper insights:
+Access the **Data** and **Analysis** pages for deeper insights:
 
-1.  **Consensus & Controversy**: Identify which statements show high agreement vs. high polarization across your cohort.
-2.  **Duration Auditing**: Identify "suspect" participants who completed the task too quickly (speeders) to ensure your factor analysis is based on high-quality engagement.
-3.  **Visual Audit**: Reconstruct individual Q-sorts visually to look for patterns or anomalies before exporting for factor analysis.
+1. **Data page**: View participant timelines, device breakdowns, and individual session details. Flag or discard suspicious responses (e.g., participants who completed in under 2 minutes).
+2. **Analysis page**: Run built-in factor analysis (PCA or centroid extraction with varimax rotation). Examine factor loadings, factor arrays, distinguishing/consensus statements, and scree plots.
+3. **Exports**: Download data in CSV, PQMethod, R-Kit, KenQ JSON, or full research package formats.
+4. **Visual Audit**: Reconstruct individual Q-sorts visually to look for patterns or anomalies before exporting for factor analysis.
 
 ### Study Access Security
 
-You can restrict access to your study in two ways:
+You can control access to your study through recruitment links:
 
-1.  **Public Access**: Anyone with the link can participate.
-2.  **Password Protected**: Participants must enter a broad "access password" before they can view the study configuration (Consent, Statements, etc.).
+1. **Public Links**: Anyone with the link can participate (unlimited usage).
+2. **Individual Links**: Single-use tokens for controlled panel recruitment.
+3. **Limited Links**: Capped usage (e.g., 50 participants per link).
 
-> [!NOTE]
-> Passwords can be set or changed at any time in the **Design** tab of your study.
+### Test Runs
+
+Before going live, use the **Test Run** feature to walk through the participant experience yourself. Test runs are automatically flagged with `is_test_run` and excluded from exports and analysis by default. You can clear test data from the Data page.
 
 ### Tips for a Great Q-Sort
 
 - **Statement Clarity**: Keep statements concise and balanced.
-- **Instructional Design**: Use the `instructions` field in `StudyTranslation` to explain the specific context of your study. You can use **Markdown** for formatting.
-- **Grid Balance**: Ensure the number of slots in your grid matches the total number of statements in your Q-set.
+- **Instructional Design**: Use the Condition of Instruction field to explain the specific context of your study. Markdown formatting is supported.
+- **Grid Balance**: Ensure the number of slots in your grid matches the total number of statements in your Q-set. The designer validates this automatically.
 
-## 📊 Collecting Data
+## Collecting Data
 
 Once your study is "active", every completed sort by a participant is stored as a unique session.
 
