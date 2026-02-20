@@ -191,7 +191,7 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
                     </table>
                 </div>
                 <div
-                    className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none sm:hidden"
+                    className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none md:hidden"
                     aria-hidden="true"
                 />
             </div>
@@ -263,7 +263,7 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
                             </table>
                         </div>
                         <div
-                            className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none sm:hidden"
+                            className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none md:hidden"
                             aria-hidden="true"
                         />
                     </div>

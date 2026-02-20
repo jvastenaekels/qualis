@@ -342,10 +342,12 @@ describe('AnalysisPage', () => {
 
         renderWithProviders(<AnalysisPage />);
 
-        expect(screen.getByText(/PCA is standard/i)).toBeInTheDocument();
-        expect(screen.getByText(/scree plot to guide/i)).toBeInTheDocument();
-        expect(screen.getByText(/Varimax is recommended/i)).toBeInTheDocument();
-        expect(screen.getByText(/significance thresholds/i)).toBeInTheDocument();
+        expect(screen.getByText(/PCA maximizes explained variance/i)).toBeInTheDocument();
+        expect(
+            screen.getByText(/Each factor represents a distinct viewpoint/i)
+        ).toBeInTheDocument();
+        expect(screen.getByText(/Varimax maximizes the separation/i)).toBeInTheDocument();
+        expect(screen.getByText(/Auto flags participants whose loading/i)).toBeInTheDocument();
     });
 
     it('shows interpretation guidance in results tabs', async () => {

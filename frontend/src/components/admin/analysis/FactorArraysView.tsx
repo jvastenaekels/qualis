@@ -90,7 +90,7 @@ export function FactorArraysView({ result }: FactorArraysViewProps) {
                                                 <th
                                                     key={score}
                                                     scope="col"
-                                                    className="text-center text-xs font-medium text-slate-500 py-1 px-1 min-w-[70px] sm:min-w-[100px]"
+                                                    className="text-center text-xs font-medium text-slate-500 py-1 px-1 min-w-[60px] sm:min-w-[90px] lg:min-w-[110px]"
                                                 >
                                                     {score > 0 ? `+${score}` : score}
                                                 </th>
@@ -118,7 +118,7 @@ export function FactorArraysView({ result }: FactorArraysViewProps) {
                                                         <td key={score} className="p-0.5 align-top">
                                                             <div
                                                                 className={cn(
-                                                                    'px-2 py-1.5 rounded text-xs border min-w-[70px] sm:min-w-[100px]',
+                                                                    'px-2 py-1.5 rounded text-xs border min-w-[60px] sm:min-w-[90px] lg:min-w-[110px]',
                                                                     isDistinguishing
                                                                         ? 'bg-amber-50 border-amber-200'
                                                                         : 'bg-white border-slate-200'
@@ -141,7 +141,7 @@ export function FactorArraysView({ result }: FactorArraysViewProps) {
                                 </table>
                             </div>
                             <div
-                                className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent pointer-events-none sm:hidden"
+                                className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none md:hidden"
                                 aria-hidden="true"
                             />
                         </div>

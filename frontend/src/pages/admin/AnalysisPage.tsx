@@ -281,17 +281,7 @@ export default function AnalysisPage() {
                         )}
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    {/* Scree plot */}
-                    {hasEigenvalues && (
-                        <ScreePlot
-                            eigenvalues={eigenvaluesQuery.data.eigenvalues}
-                            suggestedNFactors={eigenvaluesQuery.data.suggested_n_factors}
-                            selectedNFactors={nFactors}
-                            onSelectNFactors={setNFactors}
-                        />
-                    )}
-
+                <CardContent className="space-y-5">
                     {isTooFewParticipants && (
                         <div
                             className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800"
@@ -340,126 +330,143 @@ export default function AnalysisPage() {
                         </div>
                     )}
 
-                    {/* Parameters row */}
-                    <div className="flex flex-wrap items-start gap-4">
-                        <div className="space-y-1.5">
-                            <Label htmlFor="extraction-select" className="text-xs">
-                                {t('admin.analysis.extraction_method', 'Extraction')}
-                            </Label>
-                            <Select
-                                value={extraction}
-                                onValueChange={setExtraction}
-                                disabled={isRunning}
-                            >
-                                <SelectTrigger id="extraction-select" className="w-[140px]">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="pca">
-                                        {t('admin.analysis.pca', 'PCA')}
-                                    </SelectItem>
-                                    <SelectItem value="centroid">
-                                        {t('admin.analysis.centroid', 'Centroid')}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <p className="text-xs text-muted-foreground max-w-[180px]">
-                                {t(
-                                    'admin.analysis.help_extraction',
-                                    'PCA maximizes explained variance across factors. Centroid produces less mathematically constrained factors, which some Q researchers prefer for theoretical reasons.'
-                                )}
-                            </p>
-                        </div>
+                    {/* Scree plot + parameters: side-by-side on lg+ */}
+                    <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-start">
+                        {/* Scree plot */}
+                        {hasEigenvalues && (
+                            <ScreePlot
+                                eigenvalues={eigenvaluesQuery.data.eigenvalues}
+                                suggestedNFactors={eigenvaluesQuery.data.suggested_n_factors}
+                                selectedNFactors={nFactors}
+                                onSelectNFactors={setNFactors}
+                            />
+                        )}
+                        {!hasEigenvalues && !eigenvaluesQuery.isLoading && <div />}
 
-                        <div className="space-y-1.5">
-                            <Label htmlFor="factors-select" className="text-xs">
-                                {t('admin.analysis.n_factors', 'Factors')}
-                            </Label>
-                            <Select
-                                value={String(nFactors)}
-                                onValueChange={(v) => setNFactors(Number(v))}
-                                disabled={isRunning}
-                            >
-                                <SelectTrigger id="factors-select" className="w-[80px]">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {Array.from({ length: maxFactors }, (_, i) => (
-                                        <SelectItem key={i + 1} value={String(i + 1)}>
-                                            {i + 1}
+                        {/* Parameters */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-x-4 gap-y-3 lg:w-[320px]">
+                            <div className="space-y-1.5">
+                                <Label htmlFor="extraction-select" className="text-xs">
+                                    {t('admin.analysis.extraction_method', 'Extraction')}
+                                </Label>
+                                <Select
+                                    value={extraction}
+                                    onValueChange={setExtraction}
+                                    disabled={isRunning}
+                                >
+                                    <SelectTrigger id="extraction-select">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="pca">
+                                            {t('admin.analysis.pca', 'PCA')}
                                         </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <p className="text-xs text-muted-foreground max-w-[140px]">
-                                {t(
-                                    'admin.analysis.help_n_factors',
-                                    'Each factor represents a distinct viewpoint. More factors capture more nuance but may split coherent views; fewer factors give broader groupings.'
-                                )}
-                            </p>
-                        </div>
+                                        <SelectItem value="centroid">
+                                            {t('admin.analysis.centroid', 'Centroid')}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-[11px] text-muted-foreground leading-snug">
+                                    {t(
+                                        'admin.analysis.help_extraction',
+                                        'PCA maximizes explained variance across factors. Centroid produces less mathematically constrained factors, which some Q researchers prefer for theoretical reasons.'
+                                    )}
+                                </p>
+                            </div>
 
-                        <div className="space-y-1.5">
-                            <Label htmlFor="rotation-select" className="text-xs">
-                                {t('admin.analysis.rotation_method', 'Rotation')}
-                            </Label>
-                            <Select
-                                value={rotation}
-                                onValueChange={setRotation}
-                                disabled={isRunning}
-                            >
-                                <SelectTrigger id="rotation-select" className="w-[140px]">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="varimax">
-                                        {t('admin.analysis.varimax', 'Varimax')}
-                                    </SelectItem>
-                                    <SelectItem value="none">
-                                        {t('admin.analysis.none', 'None')}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <p className="text-xs text-muted-foreground max-w-[180px]">
-                                {t(
-                                    'admin.analysis.help_rotation',
-                                    'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution.'
-                                )}
-                            </p>
-                        </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="factors-select" className="text-xs">
+                                    {t('admin.analysis.n_factors', 'Factors')}
+                                </Label>
+                                <Select
+                                    value={String(nFactors)}
+                                    onValueChange={(v) => setNFactors(Number(v))}
+                                    disabled={isRunning}
+                                >
+                                    <SelectTrigger id="factors-select">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {Array.from({ length: maxFactors }, (_, i) => (
+                                            <SelectItem key={i + 1} value={String(i + 1)}>
+                                                {i + 1}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-[11px] text-muted-foreground leading-snug">
+                                    {t(
+                                        'admin.analysis.help_n_factors',
+                                        'Each factor represents a distinct viewpoint. More factors capture more nuance but may split coherent views; fewer factors give broader groupings.'
+                                    )}
+                                </p>
+                            </div>
 
-                        <div className="space-y-1.5">
-                            <Label htmlFor="flagging-select" className="text-xs">
-                                {t('admin.analysis.flagging_method', 'Flagging')}
-                            </Label>
-                            <Select
-                                value={flagging}
-                                onValueChange={(v) => {
-                                    setFlagging(v as 'auto' | 'manual');
-                                    if (v === 'auto') setManualFlags({});
-                                }}
-                                disabled={isRunning}
-                            >
-                                <SelectTrigger id="flagging-select" className="w-[120px]">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="auto">
-                                        {t('admin.analysis.auto', 'Auto')}
-                                    </SelectItem>
-                                    <SelectItem value="manual">
-                                        {t('admin.analysis.manual', 'Manual')}
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <p className="text-xs text-muted-foreground max-w-[160px]">
-                                {t(
-                                    'admin.analysis.help_flagging',
-                                    'Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.'
-                                )}
-                            </p>
-                        </div>
+                            <div className="space-y-1.5">
+                                <Label htmlFor="rotation-select" className="text-xs">
+                                    {t('admin.analysis.rotation_method', 'Rotation')}
+                                </Label>
+                                <Select
+                                    value={rotation}
+                                    onValueChange={setRotation}
+                                    disabled={isRunning}
+                                >
+                                    <SelectTrigger id="rotation-select">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="varimax">
+                                            {t('admin.analysis.varimax', 'Varimax')}
+                                        </SelectItem>
+                                        <SelectItem value="none">
+                                            {t('admin.analysis.none', 'None')}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-[11px] text-muted-foreground leading-snug">
+                                    {t(
+                                        'admin.analysis.help_rotation',
+                                        'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution.'
+                                    )}
+                                </p>
+                            </div>
 
+                            <div className="space-y-1.5">
+                                <Label htmlFor="flagging-select" className="text-xs">
+                                    {t('admin.analysis.flagging_method', 'Flagging')}
+                                </Label>
+                                <Select
+                                    value={flagging}
+                                    onValueChange={(v) => {
+                                        setFlagging(v as 'auto' | 'manual');
+                                        if (v === 'auto') setManualFlags({});
+                                    }}
+                                    disabled={isRunning}
+                                >
+                                    <SelectTrigger id="flagging-select">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="auto">
+                                            {t('admin.analysis.auto', 'Auto')}
+                                        </SelectItem>
+                                        <SelectItem value="manual">
+                                            {t('admin.analysis.manual', 'Manual')}
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <p className="text-[11px] text-muted-foreground leading-snug">
+                                    {t(
+                                        'admin.analysis.help_flagging',
+                                        'Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.'
+                                    )}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action buttons — visually separated */}
+                    <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
                         <Button
                             onClick={handleRunAnalysis}
                             disabled={isRunning || !hasEigenvalues}
@@ -520,9 +527,9 @@ export default function AnalysisPage() {
                             </div>
                         </div>
                     )}
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-5 pb-5">
                         <Tabs value={activeTab} onValueChange={setActiveTab}>
-                            <TabsList className="mb-4">
+                            <TabsList className="mb-5 flex-wrap h-auto gap-1">
                                 <TabsTrigger value="loadings" className="gap-1.5">
                                     <BarChart3 className="size-3.5" aria-hidden="true" />
                                     {t('admin.analysis.tab_loadings', 'Loadings')}
@@ -541,7 +548,7 @@ export default function AnalysisPage() {
                                 </TabsTrigger>
                             </TabsList>
 
-                            <TabsContent value="loadings" className="space-y-4">
+                            <TabsContent value="loadings" className="space-y-3">
                                 <GuidanceCard
                                     title={t(
                                         'admin.analysis.guide_loadings_title',
@@ -549,8 +556,9 @@ export default function AnalysisPage() {
                                     )}
                                     type="info"
                                     collapsible
+                                    defaultOpen={false}
                                 >
-                                    <ul className="text-sm opacity-80 leading-relaxed space-y-1 list-disc list-inside">
+                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_loadings_1',
@@ -585,7 +593,7 @@ export default function AnalysisPage() {
                                 />
                             </TabsContent>
 
-                            <TabsContent value="arrays" className="space-y-4">
+                            <TabsContent value="arrays" className="space-y-3">
                                 <GuidanceCard
                                     title={t(
                                         'admin.analysis.guide_arrays_title',
@@ -593,8 +601,9 @@ export default function AnalysisPage() {
                                     )}
                                     type="info"
                                     collapsible
+                                    defaultOpen={false}
                                 >
-                                    <ul className="text-sm opacity-80 leading-relaxed space-y-1 list-disc list-inside">
+                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_arrays_1',
@@ -624,7 +633,7 @@ export default function AnalysisPage() {
                                 <FactorArraysView result={result} />
                             </TabsContent>
 
-                            <TabsContent value="statements" className="space-y-4">
+                            <TabsContent value="statements" className="space-y-3">
                                 <GuidanceCard
                                     title={t(
                                         'admin.analysis.guide_statements_title',
@@ -632,8 +641,9 @@ export default function AnalysisPage() {
                                     )}
                                     type="info"
                                     collapsible
+                                    defaultOpen={false}
                                 >
-                                    <ul className="text-sm opacity-80 leading-relaxed space-y-1 list-disc list-inside">
+                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_statements_1',
@@ -663,7 +673,7 @@ export default function AnalysisPage() {
                                 <StatementsTable result={result} />
                             </TabsContent>
 
-                            <TabsContent value="summary" className="space-y-4">
+                            <TabsContent value="summary" className="space-y-3">
                                 <GuidanceCard
                                     title={t(
                                         'admin.analysis.guide_summary_title',
@@ -671,8 +681,9 @@ export default function AnalysisPage() {
                                     )}
                                     type="info"
                                     collapsible
+                                    defaultOpen={false}
                                 >
-                                    <ul className="text-sm opacity-80 leading-relaxed space-y-1 list-disc list-inside">
+                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
                                         <li>
                                             {t(
                                                 'admin.analysis.guide_summary_1',
