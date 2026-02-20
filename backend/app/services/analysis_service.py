@@ -526,9 +526,7 @@ def compute_factor_characteristics(
         subset = z_scores[:, valid_cols]
         valid_rows = ~np.any(np.isnan(subset), axis=1)
         if np.sum(valid_rows) >= 2:
-            factor_cor = np.asarray(
-                np.corrcoef(subset[valid_rows], rowvar=False)
-            )
+            factor_cor = np.asarray(np.corrcoef(subset[valid_rows], rowvar=False))
             # Replace any residual NaN (e.g. zero-variance column) with 0
             factor_cor = np.nan_to_num(factor_cor, nan=0.0)
             for i, vi in enumerate(valid_cols):
@@ -652,9 +650,7 @@ def _distribution_from_grid_config(
     dist: list[int] = []
     for i, entry in enumerate(grid_config):
         if "score" not in entry or "capacity" not in entry:
-            raise ValueError(
-                f"grid_config entry {i} missing 'score' or 'capacity' key"
-            )
+            raise ValueError(f"grid_config entry {i} missing 'score' or 'capacity' key")
         dist.extend([int(entry["score"])] * int(entry["capacity"]))
     if not dist:
         raise ValueError("grid_config produced an empty distribution")

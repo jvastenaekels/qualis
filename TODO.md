@@ -14,3 +14,4 @@
 - thème foncé et contrasté pour l'admin UI
 - audio and picture statements
 - stimulus
+- collaboration simultanée sur le study designer
