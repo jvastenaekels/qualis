@@ -98,14 +98,14 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
 
     return (
         <div
-            className={`flex items-center gap-3 p-3 rounded-lg border group transition-colors ${
+            className={`flex items-center gap-2.5 p-2.5 rounded-lg border group transition-colors ${
                 isCompleted
                     ? 'border-l-emerald-400 border-l-[3px] border-emerald-100 bg-emerald-50/20 hover:bg-emerald-50/40'
                     : 'border-l-sky-400 border-l-[3px] border-slate-100 bg-white hover:bg-slate-50/50'
             }`}
         >
             <div
-                className="h-9 w-9 rounded-full border-2 flex items-center justify-center text-xs font-black shadow-sm shrink-0"
+                className="h-8 w-8 rounded-full border-2 flex items-center justify-center text-[10px] font-black shadow-sm shrink-0"
                 style={{
                     backgroundColor: colors.bg,
                     borderColor: colors.border,
@@ -117,17 +117,17 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
 
             <div className="flex-1 min-w-0 space-y-0.5">
                 {/* Line 1: token + recruitment badge */}
-                <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-mono font-bold text-slate-800">
+                <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-xs font-mono font-bold text-slate-800 shrink-0">
                         {participant.session_token.substring(0, 8)}
                     </span>
                     {participant.recruitment_token && (
                         <Badge
                             variant="outline"
-                            className="ml-1 h-5 bg-white text-slate-500 border-slate-200 gap-1 pl-1.5 pr-2"
+                            className="h-4 bg-white text-slate-500 border-slate-200 gap-0.5 pl-1 pr-1.5 truncate max-w-[100px]"
                         >
-                            <LinkIcon className="w-3 h-3" />
-                            <span className="font-mono text-[10px]">
+                            <LinkIcon className="w-2.5 h-2.5 shrink-0" />
+                            <span className="font-mono text-[9px] truncate">
                                 {participant.recruitment_token}
                             </span>
                         </Badge>
@@ -136,12 +136,12 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
 
                 {/* Line 2: status-specific info */}
                 {isCompleted ? (
-                    <div className="flex items-center gap-2">
-                        <Badge className="h-5 text-[10px] font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0">
+                    <div className="flex items-center gap-1.5">
+                        <Badge className="h-4 text-[9px] font-semibold bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-0 px-1.5">
                             {t('admin.study_overview.recently_completed', 'Completed')}
                         </Badge>
                         {durationSeconds !== null && (
-                            <span className="text-xs text-slate-500">
+                            <span className="text-[10px] text-slate-500">
                                 {durationSeconds >= 3600
                                     ? t('common.duration_long', '{{h}}h {{m}}m {{s}}s', {
                                           h: Math.floor(durationSeconds / 3600),
@@ -156,26 +156,26 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
                         )}
                     </div>
                 ) : (
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-sky-700">
+                    <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-medium text-sky-700 shrink-0">
                             {t(stepInfo.labelKey, stepInfo.labelDefault)}
                         </span>
                         <Progress
                             value={stepInfo.progress}
-                            className="h-1.5 w-16 bg-sky-100 [&>div]:bg-sky-500"
+                            className="h-1 w-12 bg-sky-100 [&>div]:bg-sky-500"
                         />
-                        <span className="text-[10px] text-slate-400 font-medium">
+                        <span className="text-[9px] text-slate-400 font-medium shrink-0">
                             {stepNum}/{TOTAL_STEPS}
                         </span>
                     </div>
                 )}
 
                 {/* Line 3: time · device · language */}
-                <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                <div className="flex items-center gap-1 text-[10px] text-slate-400 truncate">
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <span className="cursor-help">
+                                <span className="cursor-help truncate">
                                     {t(
                                         isCompleted
                                             ? 'admin.study_overview.submitted'
@@ -194,7 +194,7 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
                         </Tooltip>
                     </TooltipProvider>
                     <span aria-hidden="true">·</span>
-                    <DeviceIcon className="h-3 w-3" />
+                    <DeviceIcon className="h-2.5 w-2.5 shrink-0" />
                     {showLanguage && (
                         <>
                             <span aria-hidden="true">·</span>
@@ -206,12 +206,12 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
 
             <Button
                 variant="default"
-                size="sm"
-                className="h-8 text-xs font-bold px-4 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shrink-0"
+                size="icon"
+                className="h-7 w-7 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shrink-0 rounded-lg"
                 onClick={onView}
+                aria-label={t('admin.study_overview.view_data', 'View')}
             >
-                <Eye className="h-3.5 w-3.5 mr-1.5" />
-                {t('admin.study_overview.view_data', 'View')}
+                <Eye className="h-3.5 w-3.5" />
             </Button>
         </div>
     );
@@ -250,13 +250,13 @@ export default function RecentActivityCard({
 
     return (
         <Card className="col-span-12 md:col-span-8 border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 pb-4">
-                <div className="space-y-1">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                        <TrendingUp className="h-5 w-5 text-indigo-500" />
+            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-50 px-4 py-3">
+                <div className="space-y-0.5">
+                    <CardTitle className="text-sm font-bold flex items-center gap-2">
+                        <TrendingUp className="h-4 w-4 text-indigo-500" />
                         {t('admin.study_overview.recent_activity', 'Recent activity')}
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-xs">
                         {t('admin.study_overview.latest_participants', {
                             count: recentParticipants.length,
                             total: totalParticipantCount,
@@ -267,11 +267,11 @@ export default function RecentActivityCard({
             </CardHeader>
             <CardContent className="p-0">
                 {recentParticipants.length === 0 ? (
-                    <div className="p-8 text-center text-slate-400 text-sm">
+                    <div className="p-6 text-center text-slate-400 text-xs">
                         {t('admin.study_overview.no_participants', 'No participants yet.')}
                     </div>
                 ) : (
-                    <div className="p-3 space-y-2">
+                    <div className="p-2 space-y-1.5">
                         {recentParticipants.map((p) => (
                             <ParticipantRow
                                 key={p.id}
@@ -287,10 +287,10 @@ export default function RecentActivityCard({
                         ))}
                     </div>
                 )}
-                <div className="p-3 bg-slate-50/50 border-t border-slate-100 text-center">
+                <div className="p-2.5 bg-slate-50/50 border-t border-slate-100 text-center">
                     <Link
                         to={`/app/${workspaceSlug}/studies/${studySlug}/data`}
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
+                        className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-700 flex items-center justify-center gap-1"
                     >
                         <TableIcon className="w-3 h-3" />
                         {t(
