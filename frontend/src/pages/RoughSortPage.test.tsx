@@ -247,7 +247,6 @@ describe('RoughSortPage', () => {
 
         const overlay = screen.getByText('Zoomed Card');
         expect(overlay).toBeTruthy();
-        expect(screen.getByText(/S99/)).toBeTruthy();
 
         // Close Overlay
         const closeBtn = screen.getByText('Close');

@@ -428,10 +428,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
                         >
                             <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
-                                <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">
-                                    {t('common.statement')} {hoveredCard.id}{' '}
-                                    {hoveredCard.code && <span>• {hoveredCard.code}</span>}
-                                </h3>
                                 <div className="text-xl sm:text-2xl font-medium text-gray-800 leading-relaxed">
                                     <SafeMarkdown
                                         components={{
