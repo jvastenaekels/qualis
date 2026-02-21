@@ -184,8 +184,10 @@ const InstructionHeader: React.FC<{
                         exit={{ opacity: 0, y: -20 }}
                         onClick={() => setIsMinimized(false)}
                         className={cn(
-                            'absolute inset-x-0 mx-auto w-fit z-modal bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide',
-                            emphasizeCollapse ? 'top-2' : 'top-[96px]'
+                            'absolute inset-x-0 mx-auto w-fit bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide',
+                            emphasizeCollapse
+                                ? 'top-2 z-header'
+                                : 'top-[112px] z-modal'
                         )}
                         aria-label="Expand instructions"
                     >

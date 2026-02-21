@@ -765,29 +765,29 @@ const StudyLayoutContent: React.FC = () => {
 
                 {/* RIGHT: Actions + Language */}
                 <div className="flex items-center gap-2 sm:gap-3 shrink-0 z-10">
-                    {/* Auto-save status indicator */}
-                    {hasConsented && !isCompleted && !isPilotMode && draftSaveStatus !== 'idle' && (
+                    {/* Auto-save status indicator — always reserves space to prevent layout shift */}
+                    {hasConsented && !isCompleted && !isPilotMode && (
                         <span
-                            className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 animate-in fade-in"
+                            className={`hidden sm:flex items-center justify-center w-5 transition-opacity duration-300 ${draftSaveStatus === 'idle' ? 'opacity-0' : 'opacity-100'}`}
                             aria-live="polite"
+                            aria-label={
+                                draftSaveStatus === 'saving'
+                                    ? t('resume.saving', 'Saving...')
+                                    : draftSaveStatus === 'saved'
+                                      ? t('resume.saved', 'Saved')
+                                      : draftSaveStatus === 'error'
+                                        ? t('resume.save_failed', 'Not saved')
+                                        : undefined
+                            }
                         >
                             {draftSaveStatus === 'saving' && (
-                                <>
-                                    <span className="w-3 h-3 border-2 border-slate-300 border-t-transparent rounded-full animate-spin" />
-                                    {t('resume.saving', 'Saving...')}
-                                </>
+                                <span className="w-3 h-3 border-2 border-slate-300 border-t-transparent rounded-full animate-spin" />
                             )}
                             {draftSaveStatus === 'saved' && (
-                                <>
-                                    <Check size={12} className="text-emerald-500" />
-                                    {t('resume.saved', 'Saved')}
-                                </>
+                                <Check size={14} className="text-emerald-500" />
                             )}
                             {draftSaveStatus === 'error' && (
-                                <>
-                                    <CloudOff size={12} className="text-slate-400" />
-                                    {t('resume.save_failed', 'Not saved')}
-                                </>
+                                <CloudOff size={14} className="text-slate-400" />
                             )}
                         </span>
                     )}
