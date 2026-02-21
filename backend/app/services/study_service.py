@@ -329,7 +329,10 @@ class StudyService:
                             await db.flush()
                         break
                     except IntegrityError:
-                        pass  # savepoint rolled back; retry with new code
+                        logger.warning(
+                            "Resume code collision on attempt %d, retrying",
+                            _rc + 1,
+                        )
                 else:
                     raise HTTPException(
                         status_code=500,
@@ -367,7 +370,10 @@ class StudyService:
                             await db.flush()
                         break
                     except IntegrityError:
-                        pass  # savepoint rolled back; retry with new code
+                        logger.warning(
+                            "Resume code collision on attempt %d (existing participant), retrying",
+                            _rc + 1,
+                        )
                 else:
                     raise HTTPException(
                         status_code=500,

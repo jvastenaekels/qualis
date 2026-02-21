@@ -208,6 +208,9 @@ ConsentResponse
 # app/resume_codes.py
 generate_unique_resume_code
 
+# app/limiter.py
+_get_real_ip
+
 # Analysis schemas (app/schemas.py)
 validate_extraction
 validate_rotation

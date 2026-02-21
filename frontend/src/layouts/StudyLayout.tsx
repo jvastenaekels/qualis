@@ -303,7 +303,8 @@ const StudyLayoutContent: React.FC = () => {
         }
     }, [config?.title, t]);
 
-    // Welcome-back toast for returning same-browser users
+    // Welcome-back toast for returning same-browser users (skipped when
+    // arriving via ResumePage, which shows its own "restored" toast).
     const hasShownWelcomeBack = useRef(false);
     useEffect(() => {
         if (
@@ -314,6 +315,14 @@ const StudyLayoutContent: React.FC = () => {
             maxReachedStep > 1
         ) {
             hasShownWelcomeBack.current = true;
+            try {
+                if (sessionStorage.getItem('libre-q-resumed-via-link') === '1') {
+                    sessionStorage.removeItem('libre-q-resumed-via-link');
+                    return; // ResumePage already showed a toast
+                }
+            } catch {
+                // Ignore storage errors
+            }
             toast.success(t('resume.welcome_back', 'Welcome back! Your progress has been saved.'));
         }
     }, [hasConsented, isCompleted, isPilotMode, maxReachedStep, t]);
@@ -803,7 +812,6 @@ const StudyLayoutContent: React.FC = () => {
                             {isResumeMenuOpen && (
                                 <div
                                     role="dialog"
-                                    aria-modal="true"
                                     aria-label={t('resume.continue_later', 'Continue later')}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Escape') closeResumeMenu();
@@ -822,7 +830,7 @@ const StudyLayoutContent: React.FC = () => {
                                             'To continue on a different device, save this link:'
                                         )}
                                     </p>
-                                    <p className="text-xs text-slate-400">
+                                    <p className="text-xs text-amber-600 bg-amber-50 rounded px-2 py-1">
                                         {t(
                                             'resume.instruction_detail',
                                             'Keep this link private — it gives access to your session.'

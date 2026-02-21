@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import type { ResumeResponse } from '../api/model';
 import { customInstance } from '../api/mutator';
 import { STEP_ROUTES } from '../constants/stepRoutes';
 import { useConfigStore } from '../store/useConfigStore';
@@ -34,13 +35,9 @@ export default function ResumePage() {
 
         const restore = async () => {
             try {
-                const data = await customInstance<{
-                    session_token: string;
-                    language: string;
-                    last_step_reached: number;
-                    draft_responses: Record<string, unknown>;
-                    resume_code: string;
-                }>({
+                const data = await customInstance<
+                    ResumeResponse & { draft_responses: Record<string, unknown> }
+                >({
                     url: `/api/study/${slug}/resume/${token}`,
                     method: 'GET',
                 });
@@ -105,6 +102,13 @@ export default function ResumePage() {
                             ? (draft.postsort as typeof initialResponses.postsort)
                             : initialResponses.postsort,
                     });
+                }
+
+                // Flag so StudyLayout skips its welcome-back toast (we show our own)
+                try {
+                    sessionStorage.setItem('libre-q-resumed-via-link', '1');
+                } catch {
+                    // Ignore storage errors
                 }
 
                 // Navigate to the correct step

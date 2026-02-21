@@ -96,6 +96,13 @@ export const useSessionStore = create<SessionState>()(
             name: isPilot() ? 'libre-q-pilot-session' : 'libre-q-session',
             version: 1,
             storage: safeLocalStorage,
+            migrate: (persisted: unknown, version: number) => {
+                if (version === 0) {
+                    // v0 → v1: added resumeCode field
+                    return { ...(persisted as Record<string, unknown>), resumeCode: null };
+                }
+                return persisted as SessionState;
+            },
         }
     )
 );

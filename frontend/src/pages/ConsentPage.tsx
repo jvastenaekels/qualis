@@ -106,7 +106,9 @@ const ConsentPage: React.FC = () => {
                 } catch (err) {
                     // Non-blocking: we still allow user to proceed but log the error
                     console.error('Failed to record consent proof:', err);
-                    reportBug(err as Error, { context: 'ConsentPage' });
+                    reportBug(err instanceof Error ? err : new Error(String(err)), {
+                        context: 'ConsentPage',
+                    });
                 }
             }
 

@@ -136,11 +136,15 @@ async def resume_session(
         title="Resume Code",
         description="Memorable resume code or legacy UUID",
         max_length=60,
-        pattern=r"^[a-zA-Z0-9-]+$",
+        pattern=r"^[a-zA-Z0-9-]+$",  # allows uppercase input; normalized to lower in handler
     ),
     db: AsyncSession = Depends(get_db),
 ):
     """Returns participant session data for resuming on another device."""
+    # Normalize to lowercase (codes are always lowercase; prevents 404 from
+    # mobile keyboards that auto-capitalize the first letter).
+    code = code.lower()
+
     # Build query: try resume_code first, fall back to session_token for legacy UUIDs
     if _UUID_RE.match(code):
         result = await db.execute(
@@ -162,6 +166,8 @@ async def resume_session(
     participant, study = row.tuple()
 
     if participant.status == ParticipantStatus.completed:
+        # 410 rather than 404: UX benefit of telling users they finished
+        # outweighs the minor enumeration oracle risk (codes are rate-limited).
         raise HTTPException(status_code=410, detail="Session already completed")
 
     if study.state != StudyState.active:
