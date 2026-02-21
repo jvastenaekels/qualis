@@ -1368,8 +1368,7 @@ export default function InteractiveDataView({
                 title={t('admin.data.sections.key_indicators', 'Key indicators')}
                 icon={<BarChart3 className="h-4 w-4 text-slate-400" />}
             >
-                {liveCount > 0 && (
-                    <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
+                <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
                         {/* Primary Metrics: Completed & In Progress */}
 
                         {/* Completed Card */}
@@ -1556,8 +1555,7 @@ export default function InteractiveDataView({
                                 <Download className="w-3 h-3" />
                             </div>
                         </button>
-                    </div>
-                )}
+                </div>
             </CollapsibleSection>
 
             {/* Section 2: Responses */}
