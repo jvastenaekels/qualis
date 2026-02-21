@@ -220,17 +220,7 @@ const InstructionHeader: React.FC<{
                         <button
                             type="button"
                             onClick={() => setIsMinimized(true)}
-                            className={cn(
-                                'flex items-center justify-center transition-colors gap-1.5',
-                                emphasizeCollapse
-                                    ? 'w-full text-white font-bold text-xs uppercase tracking-wide py-1.5 rounded-lg motion-safe:animate-pulse-3x'
-                                    : 'mx-auto mt-1 px-4 py-1 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 text-xs font-medium'
-                            )}
-                            style={
-                                emphasizeCollapse
-                                    ? { backgroundColor: 'var(--brand-accent)' }
-                                    : undefined
-                            }
+                            className="flex items-center justify-center transition-colors gap-1.5 mx-auto mt-1 px-4 py-1 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 text-xs font-medium"
                             aria-label="Minimize instructions"
                         >
                             <Check size={14} />
