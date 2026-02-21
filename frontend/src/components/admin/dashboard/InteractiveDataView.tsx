@@ -1714,7 +1714,7 @@ export default function InteractiveDataView({
                 </AlertDialog>
 
                 {/* Table View */}
-                <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/50 overflow-x-auto ring-1 ring-slate-100 -mx-4 sm:mx-0 rounded-none sm:rounded-2xl">
+                <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/50 overflow-x-auto ring-1 ring-slate-100 rounded-xl sm:rounded-2xl">
                     <Table className="min-w-[800px]">
                         <TableHeader className="bg-slate-50/80">
                             {table.getHeaderGroups().map((headerGroup) => (
