@@ -25,6 +25,12 @@ export class RoughSortPage extends BasePage {
                 const btn = i === 0 ? this.disagreeBtn : this.agreeBtn;
                 await expect(btn).toBeEnabled({ timeout: 5000 });
                 await btn.click();
+                // Wait for card animation: counter advances or all cards sorted
+                if (i < totalCards - 1) {
+                    await expect(this.page.getByText(`${i + 2}/${totalCards}`)).toBeVisible({
+                        timeout: 5000,
+                    });
+                }
             }
         } else {
             // Custom distribution logic would go here if needed

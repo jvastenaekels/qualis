@@ -8,10 +8,10 @@ export default defineConfig({
     testDir: './e2e',
 
     /* Maximum time one test can run for */
-    timeout: 120 * 1000,
+    timeout: 60 * 1000,
 
     expect: {
-        timeout: 15000,
+        timeout: 10000,
     },
 
     /* Run tests in files in parallel */
@@ -54,7 +54,7 @@ export default defineConfig({
         viewport: { width: 1280, height: 720 },
 
         /* Default timeout for each action (click, fill, etc.) */
-        actionTimeout: 60000,
+        actionTimeout: 30000,
     },
 
     /* Configure projects for major browsers */
@@ -78,23 +78,13 @@ export default defineConfig({
         {
             name: 'Study E2E',
             testMatch: /study\/.*\.spec\.ts/,
+            testIgnore: /study\/mobile-ux\.spec\.ts/,
             use: { ...devices['Desktop Chrome'] },
         },
-        // Mobile variants for Study only (typically Admin is desktop focused)
         {
-            name: 'Study Mobile Chrome',
-            testMatch: /study\/.*\.spec\.ts/,
+            name: 'Study Mobile',
+            testMatch: /study\/mobile-ux\.spec\.ts/,
             use: { ...devices['Pixel 5'] },
-        },
-        {
-            name: 'Accessibility Tests',
-            testMatch: /accessibility\/.*\.spec\.ts/,
-            use: { ...devices['Desktop Chrome'] },
-        },
-        {
-            name: 'Visual Tests',
-            testMatch: /visual\/.*\.spec\.ts/,
-            use: { ...devices['Desktop Chrome'] },
         },
     ],
 

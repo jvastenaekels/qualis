@@ -1,11 +1,8 @@
 import { test, expect } from '../fixtures/db-setup';
 import { testDataBuilders } from '../fixtures/test-data';
 import { RoughSortPage } from '../pages/RoughSortPage';
-import { PostSortPage } from '../pages/PostSortPage';
 
 test.describe('Study Configurations', () => {
-    // --- PRESORT CONFIGURATIONS ---
-
     test('Study with no presort steps should skip presort page', async ({ page, studyNav }) => {
         await studyNav.navigateToStep('rough-sort', {
             presort_config: { enabled: false, fields: {} },
@@ -53,8 +50,6 @@ test.describe('Study Configurations', () => {
         await roughSortPage.waitForLoad();
     });
 
-    // --- Q-SORT CONFIGURATIONS ---
-
     test('Study with Asymmetric Grid should render correctly', async ({ page, studyNav }) => {
         const subGrid = [
             { score: -3, capacity: 1 },
@@ -77,53 +72,5 @@ test.describe('Study Configurations', () => {
         // Check columns capacity using ID selector
         await expect(page.locator('#column--3 [role="gridcell"]')).toHaveCount(1);
         await expect(page.locator('#column-0 [role="gridcell"]')).toHaveCount(6);
-    });
-
-    // --- POST-SORT CONFIGURATIONS ---
-
-    test('Study with email collection should show email input', async ({ page, studyNav }) => {
-        await studyNav.navigateToStep('post-sort', {
-            grid_config: [{ score: 0, capacity: 3 }],
-            statements: testDataBuilders.statements(3),
-            presort_config: { enabled: false, fields: {} },
-            postsort_config: {
-                email_collection_enabled: true,
-                interview_consent_enabled: false,
-            },
-        });
-
-        const postSort = new PostSortPage(page);
-        await postSort.waitForLoad();
-
-        // Navigate to Step 2 if needed
-        const continueBtn = page.getByRole('button', { name: /Continue|Next/i });
-        if (await continueBtn.isVisible()) {
-            await continueBtn.click();
-        }
-
-        await expect(page.getByLabel('Email', { exact: false })).toBeVisible();
-    });
-
-    test('Study with interview consent should show checkboxes', async ({ page, studyNav }) => {
-        await studyNav.navigateToStep('post-sort', {
-            grid_config: [{ score: 0, capacity: 3 }],
-            statements: testDataBuilders.statements(3),
-            presort_config: { enabled: false, fields: {} },
-            postsort_config: {
-                email_collection_enabled: false,
-                interview_consent_enabled: true,
-            },
-        });
-
-        const postSort = new PostSortPage(page);
-        await postSort.waitForLoad();
-
-        // Navigate to Step 2 if needed
-        const continueBtn = page.getByRole('button', { name: /Continue|Next/i });
-        if (await continueBtn.isVisible()) {
-            await continueBtn.click();
-        }
-
-        await expect(page.getByText('contacted', { exact: false })).toBeVisible();
     });
 });

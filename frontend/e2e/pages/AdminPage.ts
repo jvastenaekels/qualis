@@ -1,13 +1,9 @@
 import { type Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
-import { VisualAssertions } from '../helpers/VisualAssertions';
 
 export class AdminPage extends BasePage {
-    private visual: VisualAssertions;
-
     constructor(page: Page) {
         super(page);
-        this.visual = new VisualAssertions(page);
     }
 
     async login(email = 'admin@example.com', password = 'password123') {
@@ -191,41 +187,4 @@ export class AdminPage extends BasePage {
         await expect(this.page).toHaveURL('/login');
     }
 
-    // Visual Assertion Methods
-
-    async captureWorkspaceSwitcher(name: string = 'workspace-switcher') {
-        await this.page.getByTestId('workspace-switcher').click();
-        await this.page.waitForSelector('[role="menu"]', { state: 'visible' });
-        return await this.visual.captureElement('[role="menu"]', name);
-    }
-
-    async captureCommandMenu(name: string = 'command-menu') {
-        await this.page.keyboard.press('Control+k');
-        await this.page.waitForSelector('[role="dialog"]', { state: 'visible' });
-        return await this.visual.captureElement('[role="dialog"]', name);
-    }
-
-    async captureParticipantTable(name: string = 'participant-table') {
-        await this.page.waitForSelector('[data-testid="participants-table"]', {
-            state: 'visible',
-        });
-        return await this.visual.captureElement('[data-testid="participants-table"]', name);
-    }
-
-    async verifyResponsiveLayout(viewport: { width: number; height: number }) {
-        await this.page.setViewportSize(viewport);
-        return await this.visual.compareScreenshot(
-            `responsive-${viewport.width}x${viewport.height}`
-        );
-    }
-
-    async captureDashboard(name: string = 'dashboard-overview') {
-        return await this.visual.compareScreenshot(name);
-    }
-
-    async captureRecentActivity(name: string = 'recent-activity') {
-        const activityCard = this.page.locator('text=Recent activity').locator('..');
-        await activityCard.waitFor({ state: 'visible' });
-        return await this.visual.captureElement('text=Recent activity >> ..', name);
-    }
 }
