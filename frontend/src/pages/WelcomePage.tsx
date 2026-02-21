@@ -15,7 +15,7 @@ import { ArrowRight, Target } from 'lucide-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { Navigate, useNavigate, useParams, useLocation } from 'react-router-dom';
 import SortingAnimation from '../components/SortingAnimation';
 import { useConfigStore } from '../store/useConfigStore';
 import { useResponseStore } from '../store/useResponseStore';
@@ -23,6 +23,7 @@ import { useSessionStore } from '../store/useSessionStore';
 import { cn } from '@/lib/utils';
 import { DynamicIcon } from '../components/DynamicIcon';
 import { DEFAULT_STUDY_CONTENT } from '../constants/studyDefaults';
+import { STEP_ROUTES } from '../constants/stepRoutes';
 
 interface WelcomePageProps {
     highlightKey?: string | null;
@@ -42,9 +43,13 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     const hasConsented = useSessionStore((state) => state.hasConsented);
     const maxReachedStep = useSessionStore((state) => state.maxReachedStep);
 
+    const isReturningUser = hasConsented && maxReachedStep > 1;
+
     // Set Step 1 on mount and sync Pilot Mode
     React.useEffect(() => {
-        setStep(1);
+        if (!isReturningUser) {
+            setStep(1);
+        }
 
         // Pilot Mode Logic: "Running a test run and then a normal run should not contaminate the normal run"
         // We strictly sync the pilot state with the URL presence of 'mode=test' at the entry point (Welcome).
@@ -68,7 +73,7 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
                 sessionStorage.removeItem('libre-q-pilot-mode');
             }
         }
-    }, [setStep, setPilotMode, isPilotMode, location.search]);
+    }, [isReturningUser, setStep, setPilotMode, isPilotMode, location.search]);
 
     // Dynamic scaling logic for animation
     const containerRef = React.useRef<HTMLDivElement>(null);
@@ -96,6 +101,12 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
 
         return () => observer.disconnect();
     }, []);
+
+    // Redirect returning users to their latest step
+    if (isReturningUser) {
+        const target = STEP_ROUTES[maxReachedStep] || 'welcome';
+        return <Navigate to={`/study/${slug}/${target}${location.search}`} replace />;
+    }
 
     if (!config) return null;
 

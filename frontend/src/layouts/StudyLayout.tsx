@@ -451,7 +451,7 @@ const StudyLayoutContent: React.FC = () => {
     const isStudyBase =
         location.pathname === `/study/${slug}` || location.pathname === `/study/${slug}/`;
     if (isStudyBase) {
-        const target = STEP_ROUTES[currentStep] || 'welcome';
+        const target = STEP_ROUTES[maxReachedStep] || 'welcome';
         return <Navigate to={`/study/${slug}/${target}${location.search}`} replace />;
     }
 
