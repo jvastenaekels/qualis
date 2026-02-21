@@ -63,7 +63,7 @@ interface ResponseActions {
     resetResponses: () => void;
 }
 
-const initialResponses: Responses = {
+export const initialResponses: Responses = {
     presort: {},
     rough: { agree: [], disagree: [], neutral: [], history: [] },
     qsort: [],

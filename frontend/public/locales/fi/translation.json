@@ -1937,5 +1937,28 @@
                 "presort": "Esilajittelu"
             }
         }
+    },
+    "resume": {
+        "continue_later": "Jatka myöhemmin",
+        "copy_link": "Kopioi linkki",
+        "copy_failed": "Kopiointi ei onnistunut. Valitse linkki manuaalisesti.",
+        "link_copied": "Linkki kopioitu!",
+        "instruction": "Jatkaaksesi toisella laitteella, tallenna tämä linkki:",
+        "instruction_same_browser": "Jos palaat tällä selaimella, edistymisesi tallennetaan automaattisesti.",
+        "instruction_detail": "Pidä tämä linkki yksityisenä — se antaa pääsyn istuntoosi.",
+        "resume_url": "Jatkolinkki",
+        "saving": "Tallennetaan...",
+        "saved": "Tallennettu",
+        "save_failed": "Ei tallennettu",
+        "loading": "Palautetaan istuntoasi...",
+        "restored": "Tervetuloa takaisin! Edistymisesi on palautettu.",
+        "not_found": "Tämä linkki ei ole enää voimassa. Jos et ole vielä suorittanut tutkimusta, ota yhteyttä tutkijaan saadaksesi uuden linkin.",
+        "already_completed": "Olet jo lähettänyt vastauksesi. Kiitos osallistumisestasi!",
+        "study_closed": "Tämä tutkimus ei enää vastaanota vastauksia. Ota yhteyttä tutkijaan, jos sinulla on kysyttävää.",
+        "rate_limited": "Liian monta yritystä. Odota hetki ja yritä uudelleen.",
+        "error": "Istunnon palauttamisessa tapahtui virhe. Yritä uudelleen.",
+        "share": "Lähetä itselleni",
+        "share_title": "Tutkimusistuntoni",
+        "go_to_study": "Aloita uusi istunto"
     }
 }

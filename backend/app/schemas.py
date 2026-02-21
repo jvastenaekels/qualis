@@ -1,5 +1,6 @@
 """Pydantic schemas for data validation and serialization."""
 
+import json
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -675,6 +676,50 @@ class TOTPVerify(BaseModel):
     """Schema for TOTP verification."""
 
     token: str
+
+
+# Draft / Resume Schemas
+
+
+_DRAFT_ALLOWED_KEYS = {"presort", "rough", "qsort", "postsort"}
+
+
+class DraftSaveInput(BaseModel):
+    """Schema for saving participant draft responses."""
+
+    session_token: UUID
+    draft_responses: dict[str, Any] = Field(
+        ..., description="Full response store state snapshot"
+    )
+
+    @field_validator("draft_responses")
+    @classmethod
+    def validate_draft(cls, v: dict[str, Any]) -> dict[str, Any]:
+        if not v:
+            raise ValueError("Draft cannot be empty")
+
+        # Only allow known top-level keys
+        extra = set(v.keys()) - _DRAFT_ALLOWED_KEYS
+        if extra:
+            raise ValueError(f"Unexpected keys in draft: {extra}")
+
+        # Size limit (200KB)
+        try:
+            serialized = json.dumps(v)
+        except (RecursionError, TypeError, ValueError) as exc:
+            raise ValueError(f"Draft contains invalid data: {exc}")
+        if len(serialized) > 200_000:
+            raise ValueError("Draft too large")
+        return v
+
+
+class ResumeResponse(BaseModel):
+    """Schema for returning participant resume data."""
+
+    session_token: str
+    language: str
+    last_step_reached: int
+    draft_responses: dict[str, Any]
 
 
 # Analysis Schemas

@@ -12,7 +12,7 @@ const getBaseUrl = () => {
         return '';
     }
 };
-const BASE_URL = getBaseUrl();
+export const BASE_URL = getBaseUrl();
 
 export const customInstance = async <T>({
     url,

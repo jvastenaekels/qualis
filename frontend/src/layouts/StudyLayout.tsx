@@ -12,12 +12,22 @@
  * Manages the top navigation bar, step progress, and locale switching.
  */
 
-import { Check, ChevronDown, Globe, WifiOff } from 'lucide-react';
+import {
+    Check,
+    ChevronDown,
+    CloudOff,
+    Copy,
+    Globe,
+    PauseCircle,
+    Share2,
+    WifiOff,
+} from 'lucide-react';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import type { PartnerLogo } from '@/api/model';
 import type { StudyConfig } from '@/schemas/study';
 import type React from 'react';
-import { useEffect, useRef, useState, Suspense } from 'react';
+import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
+import { toast } from 'sonner';
 import { useTranslation } from 'react-i18next';
 import {
     Navigate,
@@ -28,7 +38,8 @@ import {
     useLoaderData,
 } from 'react-router-dom';
 import { ApiError } from '../api/client';
-import { customInstance } from '../api/mutator';
+import { BASE_URL, customInstance } from '../api/mutator';
+import { STEP_ROUTES } from '../constants/stepRoutes';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
@@ -37,6 +48,7 @@ import ErrorPage from '../pages/ErrorPage';
 import type { StudyStatusType } from '../pages/StudyStatusPage';
 import StudyStatusPage from '../pages/StudyStatusPage';
 import { useConfigStore } from '../store/useConfigStore';
+import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
@@ -93,12 +105,108 @@ const StudyLayoutContent: React.FC = () => {
         return unsub;
     }, [slug]);
 
+    // Debounced draft auto-save to backend
+    const draftSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [draftSaveStatus, setDraftSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>(
+        'idle'
+    );
+    const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    useEffect(() => {
+        const unsub = useResponseStore.subscribe(() => {
+            const session = useSessionStore.getState();
+            if (!session.token || session.isPilotMode || session.isCompleted || !slug) return;
+
+            if (draftSaveTimerRef.current) clearTimeout(draftSaveTimerRef.current);
+            draftSaveTimerRef.current = setTimeout(() => {
+                const { presort, rough, qsort, postsort } = useResponseStore.getState();
+                setDraftSaveStatus('saving');
+                customInstance({
+                    url: `/api/study/${slug}/save-draft`,
+                    method: 'PUT',
+                    data: {
+                        session_token: session.token,
+                        draft_responses: { presort, rough, qsort, postsort },
+                    },
+                })
+                    .then(() => {
+                        setDraftSaveStatus('saved');
+                        if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
+                        saveStatusTimerRef.current = setTimeout(
+                            () => setDraftSaveStatus('idle'),
+                            3000
+                        );
+                    })
+                    .catch(() => {
+                        setDraftSaveStatus('error');
+                        if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
+                        saveStatusTimerRef.current = setTimeout(
+                            () => setDraftSaveStatus('idle'),
+                            5000
+                        );
+                    });
+            }, 5000);
+        });
+
+        // Helper: build draft save payload
+        const buildDraftPayload = () => {
+            const session = useSessionStore.getState();
+            if (!session.token || session.isPilotMode || session.isCompleted || !slug) return null;
+            const { presort, rough, qsort, postsort } = useResponseStore.getState();
+            return {
+                url: `${BASE_URL}/api/study/${slug}/save-draft`,
+                body: JSON.stringify({
+                    session_token: session.token,
+                    draft_responses: { presort, rough, qsort, postsort },
+                }),
+            };
+        };
+
+        // Flush draft on page unload
+        const handleBeforeUnload = () => {
+            if (draftSaveTimerRef.current) clearTimeout(draftSaveTimerRef.current);
+            const payload = buildDraftPayload();
+            if (!payload) return;
+            fetch(payload.url, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: payload.body,
+                keepalive: true,
+            }).catch(() => {});
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            unsub();
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
+            // Flush (not discard) any pending draft save on unmount
+            if (draftSaveTimerRef.current) {
+                clearTimeout(draftSaveTimerRef.current);
+                const payload = buildDraftPayload();
+                if (payload) {
+                    customInstance({
+                        url: `/api/study/${slug}/save-draft`,
+                        method: 'PUT',
+                        data: JSON.parse(payload.body),
+                    }).catch(() => {});
+                }
+            }
+        };
+    }, [slug]);
+
     const location = useLocation();
     const { headerAction } = useLayoutState();
     const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
     const [isStepMenuOpen, setIsStepMenuOpen] = useState(false);
+    const [isResumeMenuOpen, setIsResumeMenuOpen] = useState(false);
+    const [linkCopied, setLinkCopied] = useState(false);
+    const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const langMenuRef = useRef<HTMLDivElement>(null);
     const stepMenuRef = useRef<HTMLDivElement>(null);
+    const resumeMenuRef = useRef<HTMLDivElement>(null);
+    const resumeButtonRef = useRef<HTMLButtonElement>(null);
+    const resumeInputRef = useRef<HTMLInputElement>(null);
+    const sessionToken = useSessionStore((state) => state.token);
 
     // Network Status
     const { isOnline } = useNetworkStatus();
@@ -116,15 +224,7 @@ const StudyLayoutContent: React.FC = () => {
             return;
         }
 
-        const routes: Record<number, string> = {
-            1: 'welcome',
-            2: 'presort',
-            3: 'rough-sort',
-            4: 'fine-sort',
-            5: 'post-sort',
-        };
-
-        const route = routes[stepId];
+        const route = STEP_ROUTES[stepId];
         if (route) {
             navigate(`/study/${slug}/${route}${location.search}`);
         }
@@ -142,11 +242,34 @@ const StudyLayoutContent: React.FC = () => {
             if (stepMenuRef.current && !stepMenuRef.current.contains(event.target as Node)) {
                 setIsStepMenuOpen(false);
             }
+            if (resumeMenuRef.current && !resumeMenuRef.current.contains(event.target as Node)) {
+                if (copyTimeoutRef.current) {
+                    clearTimeout(copyTimeoutRef.current);
+                    copyTimeoutRef.current = null;
+                }
+                setIsResumeMenuOpen(false);
+                setLinkCopied(false);
+                resumeButtonRef.current?.focus();
+            }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            if (copyTimeoutRef.current) {
+                clearTimeout(copyTimeoutRef.current);
+                copyTimeoutRef.current = null;
+            }
         };
+    }, []);
+
+    const closeResumeMenu = useCallback(() => {
+        setIsResumeMenuOpen(false);
+        setLinkCopied(false);
+        if (copyTimeoutRef.current) {
+            clearTimeout(copyTimeoutRef.current);
+            copyTimeoutRef.current = null;
+        }
+        resumeButtonRef.current?.focus();
     }, []);
 
     // URL Language Override (e.g. ?lang=fr)
@@ -298,14 +421,7 @@ const StudyLayoutContent: React.FC = () => {
     const isStudyBase =
         location.pathname === `/study/${slug}` || location.pathname === `/study/${slug}/`;
     if (isStudyBase) {
-        const stepRoutes: Record<number, string> = {
-            1: 'welcome',
-            2: 'presort',
-            3: 'rough-sort',
-            4: 'fine-sort',
-            5: 'post-sort',
-        };
-        const target = stepRoutes[currentStep] || 'welcome';
+        const target = STEP_ROUTES[currentStep] || 'welcome';
         return <Navigate to={`/study/${slug}/${target}${location.search}`} replace />;
     }
 
@@ -618,7 +734,169 @@ const StudyLayoutContent: React.FC = () => {
                 </div>
 
                 {/* RIGHT: Actions + Language */}
-                <div className="flex items-center gap-3 shrink-0 z-10">
+                <div className="flex items-center gap-2 sm:gap-3 shrink-0 z-10">
+                    {/* Auto-save status indicator */}
+                    {hasConsented && !isCompleted && !isPilotMode && draftSaveStatus !== 'idle' && (
+                        <span
+                            className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 animate-in fade-in"
+                            aria-live="polite"
+                        >
+                            {draftSaveStatus === 'saving' && (
+                                <>
+                                    <span className="w-3 h-3 border-2 border-slate-300 border-t-transparent rounded-full animate-spin" />
+                                    {t('resume.saving', 'Saving...')}
+                                </>
+                            )}
+                            {draftSaveStatus === 'saved' && (
+                                <>
+                                    <Check size={12} className="text-emerald-500" />
+                                    {t('resume.saved', 'Saved')}
+                                </>
+                            )}
+                            {draftSaveStatus === 'error' && (
+                                <>
+                                    <CloudOff size={12} className="text-slate-400" />
+                                    {t('resume.save_failed', 'Not saved')}
+                                </>
+                            )}
+                        </span>
+                    )}
+
+                    {/* Continue Later (Resume Link) */}
+                    {hasConsented && !isCompleted && !isPilotMode && sessionToken && (
+                        <div className="relative" ref={resumeMenuRef}>
+                            <button
+                                ref={resumeButtonRef}
+                                type="button"
+                                onClick={() => {
+                                    if (isResumeMenuOpen) {
+                                        closeResumeMenu();
+                                    } else {
+                                        setIsResumeMenuOpen(true);
+                                        setLinkCopied(false);
+                                        // Auto-focus input after popover renders
+                                        setTimeout(() => resumeInputRef.current?.focus(), 50);
+                                    }
+                                }}
+                                className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-amber-50 text-amber-600 transition-colors touch-manipulation"
+                                title={t('resume.continue_later', 'Continue later')}
+                                aria-expanded={isResumeMenuOpen}
+                                aria-haspopup="dialog"
+                            >
+                                <PauseCircle size={20} />
+                            </button>
+                            {isResumeMenuOpen && (
+                                <div
+                                    role="dialog"
+                                    aria-modal="true"
+                                    aria-label={t('resume.continue_later', 'Continue later')}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Escape') closeResumeMenu();
+                                    }}
+                                    className="absolute right-0 top-full mt-2 w-[calc(100vw-1.5rem)] sm:w-72 max-w-72 bg-white rounded-lg shadow-xl border border-slate-100 p-4 z-dropdown animate-in fade-in zoom-in-95 space-y-3"
+                                >
+                                    <p className="text-sm text-slate-600">
+                                        {t(
+                                            'resume.instruction_same_browser',
+                                            'If you return on this browser, your progress will be saved automatically.'
+                                        )}
+                                    </p>
+                                    <p className="text-sm text-slate-600">
+                                        {t(
+                                            'resume.instruction',
+                                            'To continue on a different device, save this link:'
+                                        )}
+                                    </p>
+                                    <p className="text-xs text-slate-400">
+                                        {t(
+                                            'resume.instruction_detail',
+                                            'Keep this link private — it gives access to your session.'
+                                        )}
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            ref={resumeInputRef}
+                                            type="text"
+                                            readOnly
+                                            aria-label={t('resume.resume_url', 'Resume URL')}
+                                            value={`${window.location.origin}/study/${slug}/resume/${sessionToken}`}
+                                            className="flex-1 text-xs sm:text-sm font-mono bg-slate-50 border border-slate-200 rounded px-2 py-2 text-slate-700 select-all truncate"
+                                            onFocus={(e) => e.target.select()}
+                                            onClick={(e) => (e.target as HTMLInputElement).select()}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                navigator.clipboard
+                                                    .writeText(
+                                                        `${window.location.origin}/study/${slug}/resume/${sessionToken}`
+                                                    )
+                                                    .then(() => {
+                                                        setLinkCopied(true);
+                                                        if (copyTimeoutRef.current)
+                                                            clearTimeout(copyTimeoutRef.current);
+                                                        copyTimeoutRef.current = setTimeout(
+                                                            () => setLinkCopied(false),
+                                                            3000
+                                                        );
+                                                    })
+                                                    .catch(() => {
+                                                        toast.error(
+                                                            t(
+                                                                'resume.copy_failed',
+                                                                'Unable to copy. Please select the link manually.'
+                                                            )
+                                                        );
+                                                    });
+                                            }}
+                                            className="shrink-0 flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors"
+                                            style={{
+                                                backgroundColor: linkCopied
+                                                    ? '#10b981'
+                                                    : 'var(--brand-accent)',
+                                                color: 'white',
+                                            }}
+                                        >
+                                            {linkCopied ? (
+                                                <>
+                                                    <Check size={14} />
+                                                    {t('resume.link_copied', 'Link copied!')}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Copy size={14} />
+                                                    {t('resume.copy_link', 'Copy link')}
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                    {typeof navigator.share === 'function' && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                navigator
+                                                    .share({
+                                                        title: t(
+                                                            'resume.share_title',
+                                                            'My study session'
+                                                        ),
+                                                        url: `${window.location.origin}/study/${slug}/resume/${sessionToken}`,
+                                                    })
+                                                    .catch(() => {
+                                                        /* user cancelled share sheet */
+                                                    });
+                                            }}
+                                            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md transition-colors"
+                                        >
+                                            <Share2 size={14} />
+                                            {t('resume.share', 'Send to myself')}
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <HelpOverlay />
 
                     {/* Language Selector (Globe Icon) */}

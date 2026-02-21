@@ -22,6 +22,7 @@ import LandingPage from './pages/LandingPage';
 import PostSortPage from './pages/PostSortPage';
 import PreSortPage from './pages/PreSortPage';
 import ResetPage from './pages/ResetPage';
+import ResumePage from './pages/ResumePage';
 import RoughSortPage from './pages/RoughSortPage';
 import WelcomePage from './pages/WelcomePage';
 import { Toaster } from 'sonner';
@@ -212,6 +213,11 @@ const router = createBrowserRouter([
                 ],
             },
         ],
+    },
+    // Resume route (outside StudyLayout to avoid consent guards and loader)
+    {
+        path: '/study/:slug/resume/:token',
+        element: <ResumePage />,
     },
     // Participant routes
     {

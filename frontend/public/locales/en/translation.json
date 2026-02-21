@@ -1937,5 +1937,28 @@
                 }
             }
         }
+    },
+    "resume": {
+        "continue_later": "Continue later",
+        "copy_link": "Copy link",
+        "copy_failed": "Unable to copy. Please select the link manually.",
+        "link_copied": "Link copied!",
+        "instruction": "To continue on a different device, save this link:",
+        "instruction_same_browser": "If you return on this browser, your progress will be saved automatically.",
+        "instruction_detail": "Keep this link private — it gives access to your session.",
+        "resume_url": "Resume URL",
+        "saving": "Saving...",
+        "saved": "Saved",
+        "save_failed": "Not saved",
+        "loading": "Restoring your session...",
+        "restored": "Welcome back! Your progress has been restored.",
+        "not_found": "This link is no longer valid. If you haven't completed the study, please contact the researcher for a new link.",
+        "already_completed": "You've already submitted your responses. Thank you for your participation!",
+        "study_closed": "This study is no longer accepting responses. Please contact the researcher if you have questions.",
+        "rate_limited": "Too many attempts. Please wait a moment and try again.",
+        "error": "Something went wrong while restoring your session. Please try again.",
+        "share": "Send to myself",
+        "share_title": "My study session",
+        "go_to_study": "Start a new session"
     }
 }

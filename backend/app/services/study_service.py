@@ -982,6 +982,7 @@ class StudyService:
                 participant.submitted_at = datetime.now(timezone.utc)
                 participant.last_step_reached = 5
                 participant.last_step_reached_at = participant.submitted_at
+                participant.draft_responses = None
 
             await db.flush()
 

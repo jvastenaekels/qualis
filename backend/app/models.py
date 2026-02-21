@@ -359,6 +359,9 @@ class Participant(Base):
     presort_answers: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     postsort_answers: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
 
+    # Draft state for resume functionality
+    draft_responses: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+
     study: Mapped["Study"] = relationship(back_populates="participants", lazy="raise")
     qsort_entries: Mapped[list["QSortEntry"]] = relationship(
         back_populates="participant", cascade="all, delete-orphan", lazy="raise"

@@ -44,6 +44,7 @@ accepted_at
 participant_count
 audio_recordings
 s3_bucket
+draft_responses
 
 # --- app/routers/ (FastAPI endpoints) ---
 # admin/exports.py
@@ -126,6 +127,8 @@ report_log
 
 # participants.py
 update_progress
+save_draft
+resume_session
 
 # submissions.py
 submit_study
@@ -192,6 +195,13 @@ validate_name
 pre_instruction
 statement_code
 url_expires_at
+
+# Analysis schemas (app/schemas.py)
+validate_draft
+
+# Draft/Resume schemas (app/schemas.py)
+# ResumeResponse fields
+language
 
 # Analysis schemas (app/schemas.py)
 validate_extraction

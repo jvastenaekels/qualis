@@ -2975,6 +2975,116 @@
         }
       }
     },
+    "/api/study/{slug}/save-draft": {
+      "put": {
+        "tags": [
+          "participants"
+        ],
+        "summary": "Save Draft",
+        "description": "Saves participant draft responses (fire-and-forget from frontend).",
+        "operationId": "save_draft_api_study__slug__save_draft_put",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Study Slug",
+              "description": "The distinct slug of the study"
+            },
+            "description": "The distinct slug of the study"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DraftSaveInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/study/{slug}/resume/{session_token}": {
+      "get": {
+        "tags": [
+          "participants"
+        ],
+        "summary": "Resume Session",
+        "description": "Returns participant session data for resuming on another device.",
+        "operationId": "resume_session_api_study__slug__resume__session_token__get",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Study Slug",
+              "description": "The distinct slug of the study"
+            },
+            "description": "The distinct slug of the study"
+          },
+          {
+            "name": "session_token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Session Token",
+              "description": "The participant's session token"
+            },
+            "description": "The participant's session token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResumeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/logs": {
       "post": {
         "tags": [
@@ -3859,6 +3969,28 @@
         "title": "ConsentInput",
         "description": "Schema for recording participant consent."
       },
+      "DraftSaveInput": {
+        "properties": {
+          "session_token": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Session Token"
+          },
+          "draft_responses": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Draft Responses",
+            "description": "Full response store state snapshot"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_token",
+          "draft_responses"
+        ],
+        "title": "DraftSaveInput",
+        "description": "Schema for saving participant draft responses."
+      },
       "EigenvalueResult": {
         "properties": {
           "eigenvalues": {
@@ -4727,6 +4859,36 @@
         ],
         "title": "RecruitmentLinkType",
         "description": "Enum for types of recruitment links."
+      },
+      "ResumeResponse": {
+        "properties": {
+          "session_token": {
+            "type": "string",
+            "title": "Session Token"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "last_step_reached": {
+            "type": "integer",
+            "title": "Last Step Reached"
+          },
+          "draft_responses": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Draft Responses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_token",
+          "language",
+          "last_step_reached",
+          "draft_responses"
+        ],
+        "title": "ResumeResponse",
+        "description": "Schema for returning participant resume data."
       },
       "StatementClassification": {
         "properties": {

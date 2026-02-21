@@ -28,6 +28,7 @@ import type {
     ConsentInput,
     CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
     DeleteAudioRecordingApiAudioRecordingIdDeleteParams,
+    DraftSaveInput,
     GetAudioUrlApiAudioRecordingIdUrlGetParams,
     GetStudyApiStudySlugGetParams,
     HTTPValidationError,
@@ -70,6 +71,7 @@ import type {
     ParticipantDetailRead,
     ParticipantRead,
     RecruitmentLinkRead,
+    ResumeResponse,
     StudyImportResponse,
     StudyRead,
     StudyStatsRead,
@@ -6891,6 +6893,256 @@ export const useUpdateProgressApiStudySlugProgressPatch = <
 };
 
 /**
+ * Saves participant draft responses (fire-and-forget from frontend).
+ * @summary Save Draft
+ */
+export const saveDraftApiStudySlugSaveDraftPut = (slug: string, draftSaveInput: DraftSaveInput) => {
+    return customInstance<unknown>({
+        url: `/api/study/${slug}/save-draft`,
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        data: draftSaveInput,
+    });
+};
+
+export const getSaveDraftApiStudySlugSaveDraftPutMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof saveDraftApiStudySlugSaveDraftPut>>,
+        TError,
+        { slug: string; data: DraftSaveInput },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof saveDraftApiStudySlugSaveDraftPut>>,
+    TError,
+    { slug: string; data: DraftSaveInput },
+    TContext
+> => {
+    const mutationKey = ['saveDraftApiStudySlugSaveDraftPut'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof saveDraftApiStudySlugSaveDraftPut>>,
+        { slug: string; data: DraftSaveInput }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return saveDraftApiStudySlugSaveDraftPut(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type SaveDraftApiStudySlugSaveDraftPutMutationResult = NonNullable<
+    Awaited<ReturnType<typeof saveDraftApiStudySlugSaveDraftPut>>
+>;
+export type SaveDraftApiStudySlugSaveDraftPutMutationBody = DraftSaveInput;
+export type SaveDraftApiStudySlugSaveDraftPutMutationError = HTTPValidationError;
+
+/**
+ * @summary Save Draft
+ */
+export const useSaveDraftApiStudySlugSaveDraftPut = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof saveDraftApiStudySlugSaveDraftPut>>,
+            TError,
+            { slug: string; data: DraftSaveInput },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof saveDraftApiStudySlugSaveDraftPut>>,
+    TError,
+    { slug: string; data: DraftSaveInput },
+    TContext
+> => {
+    const mutationOptions = getSaveDraftApiStudySlugSaveDraftPutMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Returns participant session data for resuming on another device.
+ * @summary Resume Session
+ */
+export const resumeSessionApiStudySlugResumeSessionTokenGet = (
+    slug: string,
+    sessionToken: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<ResumeResponse>({
+        url: `/api/study/${slug}/resume/${sessionToken}`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getResumeSessionApiStudySlugResumeSessionTokenGetQueryKey = (
+    slug?: string,
+    sessionToken?: string
+) => {
+    return [`/api/study/${slug}/resume/${sessionToken}`] as const;
+};
+
+export const getResumeSessionApiStudySlugResumeSessionTokenGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    sessionToken: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getResumeSessionApiStudySlugResumeSessionTokenGetQueryKey(slug, sessionToken);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>
+    > = ({ signal }) => resumeSessionApiStudySlugResumeSessionTokenGet(slug, sessionToken, signal);
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!(slug && sessionToken),
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ResumeSessionApiStudySlugResumeSessionTokenGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>
+>;
+export type ResumeSessionApiStudySlugResumeSessionTokenGetQueryError = HTTPValidationError;
+
+export function useResumeSessionApiStudySlugResumeSessionTokenGet<
+    TData = Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    sessionToken: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useResumeSessionApiStudySlugResumeSessionTokenGet<
+    TData = Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    sessionToken: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useResumeSessionApiStudySlugResumeSessionTokenGet<
+    TData = Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    sessionToken: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Resume Session
+ */
+
+export function useResumeSessionApiStudySlugResumeSessionTokenGet<
+    TData = Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    sessionToken: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof resumeSessionApiStudySlugResumeSessionTokenGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getResumeSessionApiStudySlugResumeSessionTokenGetQueryOptions(
+        slug,
+        sessionToken,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
  * Receives logging/error data from the frontend.
  * @summary Report Log
  */
@@ -10132,6 +10384,16 @@ export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostResponseMoc
     ...overrideResponse,
 });
 
+export const getResumeSessionApiStudySlugResumeSessionTokenGetResponseMock = (
+    overrideResponse: Partial<ResumeResponse> = {}
+): ResumeResponse => ({
+    session_token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    language: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    last_step_reached: faker.number.int({ min: undefined, max: undefined }),
+    draft_responses: {},
+    ...overrideResponse,
+});
+
 export const getUploadAudioApiAudioUploadPostResponseMock = (
     overrideResponse: Partial<AudioUploadResponse> = {}
 ): AudioUploadResponse => ({
@@ -11445,6 +11707,50 @@ export const getUpdateProgressApiStudySlugProgressPatchMockHandler = (
     );
 };
 
+export const getSaveDraftApiStudySlugSaveDraftPutMockHandler = (
+    overrideResponse?:
+        | unknown
+        | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<unknown> | unknown),
+    options?: RequestHandlerOptions
+) => {
+    return http.put(
+        '*/api/study/:slug/save-draft',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 200 });
+        },
+        options
+    );
+};
+
+export const getResumeSessionApiStudySlugResumeSessionTokenGetMockHandler = (
+    overrideResponse?:
+        | ResumeResponse
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ResumeResponse> | ResumeResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/study/:slug/resume/:sessionToken',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getResumeSessionApiStudySlugResumeSessionTokenGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getReportLogApiLogsPostMockHandler = (
     overrideResponse?:
         | unknown
@@ -11735,6 +12041,8 @@ export const getLibreQAPIMock = () => [
     getUnlockStudyApiStudySlugUnlockPostMockHandler(),
     getRecordConsentApiStudySlugConsentPostMockHandler(),
     getUpdateProgressApiStudySlugProgressPatchMockHandler(),
+    getSaveDraftApiStudySlugSaveDraftPutMockHandler(),
+    getResumeSessionApiStudySlugResumeSessionTokenGetMockHandler(),
     getReportLogApiLogsPostMockHandler(),
     getUploadAudioApiAudioUploadPostMockHandler(),
     getDeleteAudioRecordingApiAudioRecordingIdDeleteMockHandler(),
