@@ -986,12 +986,7 @@
                 "rough_sort": "Pré-tri",
                 "fine_sort": "Q-tri",
                 "final": "Étapes finales"
-            },
-            "reset_participants": "Réinitialiser les données",
-            "reset_title": "Réinitialiser toutes les participations ?",
-            "reset_description": "Cette action est irréversible. Cela supprimera définitivement toutes les données des participants et les soumissions Q-sort pour cette étude.",
-            "reset_success": "Participants réinitialisés avec succès",
-            "reset_error": "Échec de la réinitialisation des participants"
+            }
         },
         "overview": {
             "copy_id": "Copier l'identifiant du participant"

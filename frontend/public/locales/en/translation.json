@@ -994,12 +994,7 @@
                 "rough_sort": "Rough sort",
                 "fine_sort": "Q-sort",
                 "final": "Final steps"
-            },
-            "reset_participants": "Reset data",
-            "reset_title": "Reset all participations?",
-            "reset_description": "This action cannot be undone. This will permanently delete all participant data and Q-sort submissions for this study.",
-            "reset_success": "Participants reset successfully",
-            "reset_error": "Failed to reset participants"
+            }
         },
         "overview": {
             "copy_id": "Copy participant ID"

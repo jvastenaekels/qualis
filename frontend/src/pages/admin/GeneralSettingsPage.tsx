@@ -12,16 +12,6 @@ import {
     getGetStudyApiAdminStudiesSlugGetQueryKey,
 } from '@/api/generated';
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
     Card,
     CardContent,
     CardDescription,
@@ -101,8 +91,6 @@ export default function GeneralSettingsPage() {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const revalidator = useRevalidator();
-    const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
-    const [isResetLoading, setIsResetLoading] = useState(false);
     const [quotaMb, setQuotaMb] = useState<number | null>(null);
     const [isSavingQuota, setIsSavingQuota] = useState(false);
 
@@ -185,22 +173,6 @@ export default function GeneralSettingsPage() {
             });
         }
     };
-    const handleResetParticipants = async () => {
-        setIsResetLoading(true);
-        try {
-            await AdminService.resetStudyParticipants(slug);
-            toast.success(
-                t('admin.study_overview.reset_success', 'Participants reset successfully')
-            );
-            setIsResetDialogOpen(false);
-            revalidator.revalidate();
-        } catch (_error) {
-            toast.error(t('admin.study_overview.reset_error', 'Failed to reset participants'));
-        } finally {
-            setIsResetLoading(false);
-        }
-    };
-
     const handleDelete = async () => {
         if (!study || !slug) return;
         if (!confirm(t('admin.settings.danger.delete_confirm'))) return;
@@ -562,45 +534,6 @@ export default function GeneralSettingsPage() {
                     </CardFooter>
                 </Card>
 
-                {/* Reset Data Section */}
-                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-8 border-l-4 border-l-amber-500">
-                    <CardHeader className="border-b border-slate-50 pb-4">
-                        <div className="flex items-center gap-2 mb-1">
-                            <Trash2 className="h-5 w-5 text-amber-500" />
-                            <CardTitle className="text-lg font-black text-slate-900">
-                                {t('admin.study_overview.reset_participants', 'Reset Data')}
-                            </CardTitle>
-                        </div>
-                        <CardDescription className="text-sm font-medium text-slate-500">
-                            {t(
-                                'admin.study_overview.reset_description',
-                                'This will permanently delete all participant data and Q-sort submissions for this study.'
-                            )}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                        <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 text-xs font-medium text-amber-800 flex items-start gap-3">
-                            <ShieldAlert className="w-4 h-4 mt-0.5 shrink-0" />
-                            <p>
-                                {t(
-                                    'admin.study_overview.reset_description',
-                                    'This action cannot be undone.'
-                                )}
-                            </p>
-                        </div>
-                    </CardContent>
-                    <CardFooter className="px-6 pb-6 pt-0 flex flex-col items-start gap-2">
-                        <Button
-                            variant="destructive"
-                            onClick={() => setIsResetDialogOpen(true)}
-                            className="w-full sm:w-auto rounded-xl font-black shadow-lg shadow-red-100 flex items-center gap-2 px-6 bg-red-50 text-red-600 hover:bg-red-100 border-red-200 border"
-                        >
-                            <Trash2 size={16} />
-                            {t('admin.study_overview.reset_participants', 'Reset Data')}
-                        </Button>
-                    </CardFooter>
-                </Card>
-
                 {/* Danger Zone (Superuser Only) */}
                 {user?.is_superuser && (
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-8 border-l-4 border-l-red-500">
@@ -640,36 +573,6 @@ export default function GeneralSettingsPage() {
                     </Card>
                 )}
             </div>
-            <AlertDialog open={isResetDialogOpen} onOpenChange={setIsResetDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            {t('admin.study_overview.reset_title', 'Reset all participations?')}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                            {t(
-                                'admin.study_overview.reset_description',
-                                'This action cannot be undone. This will permanently delete all participant data and Q-sort submissions for this study.'
-                            )}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleResetParticipants}
-                            disabled={isResetLoading}
-                            className="bg-red-600 hover:bg-red-700 font-bold"
-                        >
-                            {isResetLoading ? (
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            ) : (
-                                <Trash2 className="w-4 h-4 mr-2" />
-                            )}
-                            {t('admin.study_overview.reset_participants', 'Reset Data')}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
         </div>
     );
 }

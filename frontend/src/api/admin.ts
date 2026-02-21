@@ -34,16 +34,6 @@ export const AdminService = {
     },
 
     /**
-     * Reset/Delete all participants for a study
-     */
-    resetStudyParticipants: async (slug: string) => {
-        await customInstance({
-            url: `/api/admin/studies/${slug}/reset`,
-            method: 'POST',
-        });
-    },
-
-    /**
      * Export study configuration as JSON
      */
     exportStudyConfig: async (slug: string, signal?: AbortSignal) => {

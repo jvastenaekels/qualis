@@ -986,12 +986,7 @@
                 "rough_sort": "Alustava lajittelu",
                 "fine_sort": "Tarkka lajittelu",
                 "final": "Viimeiset vaiheet"
-            },
-            "reset_participants": "Nollaa tiedot",
-            "reset_title": "Nollaa kaikki osallistumiset?",
-            "reset_description": "Tätä toimintoa ei voi kumota. Tämä poistaa pysyvästi kaikki osallistujatiedot ja Q-lajitteluvastaukset tästä tutkimuksesta.",
-            "reset_success": "Osallistujat nollattu onnistuneesti",
-            "reset_error": "Osallistujien nollaus epäonnistui"
+            }
         },
         "overview": {
             "copy_id": "Kopioi osallistujan tunniste"
