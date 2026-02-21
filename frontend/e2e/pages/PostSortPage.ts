@@ -36,9 +36,13 @@ export class PostSortPage extends BasePage {
     }
 
     async verifySuccess() {
-        await expect(this.page.getByText('Thank You!')).toBeVisible();
         await expect(
-            this.page.getByText('Your responses have been successfully submitted.')
+            this.page.getByText(/Thank You!|Merci !|Kiitos!/i)
+        ).toBeVisible();
+        await expect(
+            this.page.getByText(
+                /successfully submitted|soumises avec succès|lähetetty onnistuneesti/i
+            )
         ).toBeVisible();
     }
 }

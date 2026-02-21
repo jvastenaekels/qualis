@@ -14,7 +14,6 @@ export class ConsentPage extends BasePage {
     async acceptConsent() {
         await this.checkbox.waitFor({ state: 'visible', timeout: 10000 });
         await this.checkbox.check();
-        await this.page.waitForTimeout(300); // Allow checkbox state to propagate
         await expect(this.acceptButton).toBeEnabled({ timeout: 5000 });
         await this.acceptButton.click({ force: true });
 

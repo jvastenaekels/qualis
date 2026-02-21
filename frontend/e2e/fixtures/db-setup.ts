@@ -1,4 +1,23 @@
 import { test as base } from '@playwright/test';
+import { testDataBuilders, type StudyData } from './test-data';
+import { WelcomePage } from '../pages/WelcomePage';
+import { ConsentPage } from '../pages/ConsentPage';
+import { PreSortPage } from '../pages/PreSortPage';
+import { RoughSortPage } from '../pages/RoughSortPage';
+import { FineSortPage } from '../pages/FineSortPage';
+
+type StudyStep = 'welcome' | 'consent' | 'presort' | 'rough-sort' | 'fine-sort' | 'post-sort';
+
+// biome-ignore lint/suspicious/noExplicitAny: study response from API has dynamic shape
+type StudyResponse = Record<string, any>;
+
+interface StudyNavigation {
+    /** Create a study and navigate a participant to the given step */
+    navigateToStep(
+        step: StudyStep,
+        studyOverrides?: Partial<StudyData>
+    ): Promise<{ slug: string; study: StudyResponse }>;
+}
 
 /**
  * Test Database Manager
@@ -389,6 +408,7 @@ export class TestDatabase {
 export const test = base.extend<{
     testDb: TestDatabase;
     authToken: string;
+    studyNav: StudyNavigation;
 }>({
     // biome-ignore lint/correctness/noEmptyPattern: Playwright requires object destructuring for fixtures
     testDb: async ({}, use) => {
@@ -402,6 +422,88 @@ export const test = base.extend<{
         const token = await testDb.login();
         await use(token);
     },
+
+    studyNav: async ({ page, testDb, authToken }, use) => {
+        const nav: StudyNavigation = {
+            async navigateToStep(step, studyOverrides = {}) {
+                const defaults: Partial<StudyData> = {
+                    statements: testDataBuilders.statements(6),
+                    grid_config: [
+                        { score: -1, capacity: 2 },
+                        { score: 0, capacity: 2 },
+                        { score: 1, capacity: 2 },
+                    ],
+                    presort_config: testDataBuilders.presortConfig({
+                        age: testDataBuilders.presortField('number', 'Age', {
+                            required: true,
+                        }),
+                        gender: testDataBuilders.presortField('select', 'Gender', {
+                            required: true,
+                            options: ['Male', 'Female'],
+                        }),
+                        education: testDataBuilders.presortField('select', 'Education', {
+                            required: true,
+                            options: ['High School', 'Bachelor'],
+                        }),
+                    }),
+                    state: 'active',
+                };
+
+                const studyConfig = testDataBuilders.study({
+                    ...defaults,
+                    ...studyOverrides,
+                });
+
+                const study = (await testDb.createStudy(authToken, studyConfig)) as StudyResponse;
+
+                const steps: StudyStep[] = [
+                    'welcome',
+                    'consent',
+                    'presort',
+                    'rough-sort',
+                    'fine-sort',
+                    'post-sort',
+                ];
+                const targetIndex = steps.indexOf(step);
+
+                const welcomePage = new WelcomePage(page);
+                await welcomePage.visit(study.slug);
+                if (targetIndex === 0) return { slug: study.slug, study };
+
+                await welcomePage.startStudy();
+                const consentPage = new ConsentPage(page);
+                await consentPage.waitForLoad();
+                if (targetIndex === 1) return { slug: study.slug, study };
+
+                await consentPage.acceptConsent();
+
+                const hasPresort = studyConfig.presort_config?.enabled !== false;
+                if (hasPresort) {
+                    const preSortPage = new PreSortPage(page);
+                    await preSortPage.waitForLoad();
+                    if (targetIndex === 2) return { slug: study.slug, study };
+                    await preSortPage.completePreSort();
+                } else if (targetIndex === 2) {
+                    return { slug: study.slug, study };
+                }
+
+                const totalCards = studyConfig.statements?.length ?? 6;
+                const roughSortPage = new RoughSortPage(page);
+                await roughSortPage.waitForLoad();
+                if (targetIndex === 3) return { slug: study.slug, study };
+                await roughSortPage.completeRoughSort(totalCards);
+
+                const fineSortPage = new FineSortPage(page);
+                await fineSortPage.waitForLoad();
+                if (targetIndex === 4) return { slug: study.slug, study };
+
+                await fineSortPage.completeFineSort();
+                // post-sort
+                return { slug: study.slug, study };
+            },
+        };
+        await use(nav);
+    },
 });
 
 export { expect } from '@playwright/test';
@@ -410,6 +512,7 @@ export { expect } from '@playwright/test';
 interface StudyConfig {
     slug?: string;
     title?: string;
+    state?: string;
     translations?: Array<{
         language_code: string;
         title: string;
@@ -425,6 +528,8 @@ interface StudyConfig {
         code: string;
         translations: Array<{ language_code: string; text: string }>;
     }>;
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic config shape
     presort_config?: any;
+    // biome-ignore lint/suspicious/noExplicitAny: dynamic config shape
     postsort_config?: any;
 }

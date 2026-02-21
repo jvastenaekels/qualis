@@ -6,7 +6,7 @@ export class WelcomePage extends BasePage {
     readonly loadingSpinner = this.page.locator('[data-testid="loading-spinner"]');
 
     async visit(slug: string) {
-        await this.goto(`/study/${slug}/welcome`);
+        await this.page.goto(`/study/${slug}/welcome`);
         await this.waitForLoad();
     }
 

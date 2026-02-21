@@ -1,17 +1,8 @@
 import { test, expect } from '../../fixtures/db-setup';
 import { testDataBuilders, type PresortFieldType } from '../../fixtures/test-data';
+import { WelcomePage } from '../../pages/WelcomePage';
+import { ConsentPage } from '../../pages/ConsentPage';
 import type { Page } from '@playwright/test';
-
-/**
- * Systematic Configuration Testing: Presort Fields
- *
- * For each field type, we test:
- * 1. Admin UI: Can configure the field
- * 2. API: Configuration is saved correctly
- * 3. Participant UI: Field renders correctly
- * 4. Validation: Rules are enforced
- * 5. Edge Cases: Limits and interactions
- */
 
 const FIELD_TYPES: PresortFieldType[] = [
     'text',
@@ -24,13 +15,22 @@ const FIELD_TYPES: PresortFieldType[] = [
     'textarea',
 ];
 
+/** Navigate a participant through welcome + consent to reach presort */
+async function navigateToPresort(page: Page, studySlug: string) {
+    const welcomePage = new WelcomePage(page);
+    await welcomePage.visit(studySlug);
+    await welcomePage.startStudy();
+    const consentPage = new ConsentPage(page);
+    await consentPage.waitForLoad();
+    await consentPage.acceptConsent();
+}
+
 test.describe('Presort Field Configuration Testing', () => {
     for (const fieldType of FIELD_TYPES) {
         test.describe(`Field Type: ${fieldType}`, () => {
             let studySlug: string;
 
             test.beforeEach(async ({ testDb, authToken }) => {
-                // Create a study for this test
                 const study = await testDb.createStudy(
                     authToken,
                     testDataBuilders.study({
@@ -42,66 +42,38 @@ test.describe('Presort Field Configuration Testing', () => {
             });
 
             test(`Admin: Can add ${fieldType} field`, async ({ page, testDb }) => {
-                // Navigate to study designer
                 await testDb.loginToAdminUI(page);
 
-                // Navigate to presort configuration
-                await page.click(`text=${studySlug}`);
+                await page.getByText(studySlug).click();
                 await page
                     .getByRole('link', { name: /design/i })
                     .first()
                     .click();
                 await page.getByTestId('tab-pre-sort').click();
 
-                // Ensure presort is enabled
                 const toggle = page.getByTestId('presort-toggle');
                 const isChecked = (await toggle.getAttribute('aria-checked')) === 'true';
                 if (!isChecked) {
                     await toggle.click();
                 }
 
-                // Wait for toolbar to be visible
                 await expect(page.getByTestId('add-question-text')).toBeVisible({ timeout: 10000 });
+                await page.getByTestId(`add-question-${fieldType}`).click();
 
-                // Add a new field by clicking the specific type button
-                await page.click(`[data-testid="add-question-${fieldType}"]`);
-
-                // Wait for question item to appear
                 await page.locator('[data-testid="question-accordion-trigger"]').last().click();
-
-                // Update Label
                 await page.locator('input[value="New question"]').fill(`Test ${fieldType} Field`);
 
-                // Type-specific configuration
-                // Default options are "Option 1", "Option 2". We can verify them.
                 if (fieldType === 'select' || fieldType === 'radio' || fieldType === 'checkbox') {
                     await expect(page.locator('input[value="Option 1"]')).toBeVisible();
                     await expect(page.locator('input[value="Option 2"]')).toBeVisible();
                 }
 
-                if (fieldType === 'number') {
-                    // Min/Max are likely not in the basic view unless we check implementation.
-                    // Checked QuestionBuilder.tsx: min/max support exists but not exposed in the simplified UI shown in code?
-                    // Correction: The provided QuestionBuilder.tsx (lines 173+) only shows Label, Required, Options.
-                    // It does NOT show Min/Max configuration inputs in the code snippet provided!
-                    // lines 188-208 show Required switch.
-                    // Line 210 shows Options.
-                    // There are NO inputs for min/max/placeholder in the rendered TSX in QuestionBuilder!
-                    // They are in the `QuestionConfig` interface but not in the UI for editing.
-                    // So we CANNOT test configuring them in Admin UI if they aren't there.
-                    // We will skip Min/Max config in this test for now.
-                }
-
-                // Auto-saving happens. No save button.
-
-                // Verify field label is updated in the preview/header
                 await expect(
                     page.locator('span.font-bold', { hasText: `Test ${fieldType} Field` })
                 ).toBeVisible();
             });
 
             test(`API: ${fieldType} field is saved correctly`, async ({ testDb, authToken }) => {
-                // Create presort configuration via API
                 const field = testDataBuilders.presortField(fieldType, `Test ${fieldType} Field`, {
                     required: true,
                 });
@@ -114,7 +86,6 @@ test.describe('Presort Field Configuration Testing', () => {
                     presort_config: presortConfig,
                 });
 
-                // Verify it was saved
                 const study = await testDb.getStudy(authToken, studySlug);
 
                 expect(study.presort_config.enabled).toBe(true);
@@ -131,7 +102,6 @@ test.describe('Presort Field Configuration Testing', () => {
                 testDb,
                 authToken,
             }) => {
-                // Setup: Add field via API
                 const field = testDataBuilders.presortField(
                     fieldType,
                     `Participant ${fieldType} Test`
@@ -145,19 +115,10 @@ test.describe('Presort Field Configuration Testing', () => {
                     state: 'active',
                 });
 
-                // Navigate to study as participant
-                await page.goto(`/study/${studySlug}`);
+                await navigateToPresort(page, studySlug);
 
-                // Accept consent
-                // Accept consent (New Flow)
-                await page.click('[data-testid="start-btn"]');
-                await page.check('[data-testid="consent-checkbox"]');
-                await page.click('[data-testid="consent-accept-btn"]');
+                await expect(page.getByText(`Participant ${fieldType} Test`)).toBeVisible();
 
-                // Verify field renders
-                await expect(page.locator(`text=Participant ${fieldType} Test`)).toBeVisible();
-
-                // Verify field renders
                 const fieldSelector = getFieldSelector(fieldType);
                 await expect(page.locator(fieldSelector).first()).toBeVisible();
             });
@@ -167,7 +128,6 @@ test.describe('Presort Field Configuration Testing', () => {
                 testDb,
                 authToken,
             }) => {
-                // Setup: Add required field via API
                 const fieldOptions =
                     fieldType === 'select' || fieldType === 'checkbox' || fieldType === 'radio'
                         ? { required: true, options: ['Option 1', 'Option 2'] }
@@ -187,35 +147,27 @@ test.describe('Presort Field Configuration Testing', () => {
                     state: 'active',
                 });
 
-                // Navigate to study
-                await page.goto(`/study/${studySlug}`);
-                // Accept consent (New Flow)
-                await page.click('[data-testid="start-btn"]');
-                await page.check('[data-testid="consent-checkbox"]');
-                await page.click('[data-testid="consent-accept-btn"]');
+                await navigateToPresort(page, studySlug);
 
-                // Try to proceed without filling required field
-                // Verify submit is disabled (skip for number as it can be flaky with empty value)
                 if (fieldType !== 'number') {
                     await expect(page.getByTestId('presort-submit-btn')).toBeDisabled();
                 }
 
-                // Fill the field correctly
-                const validValue =
-                    fieldType === 'checkbox' || fieldType === 'radio' || fieldType === 'select'
-                        ? 'Option 1'
-                        : 'Valid input';
-
-                // For email/date/number, "Valid input" might fail validation (e.g. email format)
-                // Adjust for specific types
-                let finalValue = validValue;
-                if (fieldType === 'email') finalValue = 'test@example.com';
-                if (fieldType === 'date') finalValue = '2024-01-01';
-                if (fieldType === 'number') finalValue = '42';
+                let finalValue: string;
+                if (fieldType === 'checkbox' || fieldType === 'radio' || fieldType === 'select') {
+                    finalValue = 'Option 1';
+                } else if (fieldType === 'email') {
+                    finalValue = 'test@example.com';
+                } else if (fieldType === 'date') {
+                    finalValue = '2024-01-01';
+                } else if (fieldType === 'number') {
+                    finalValue = '42';
+                } else {
+                    finalValue = 'Valid input';
+                }
 
                 await fillField(page, fieldType, finalValue);
 
-                // Verify can proceed
                 await expect(page.getByTestId('presort-submit-btn')).toBeEnabled();
                 await page.getByTestId('presort-submit-btn').click();
                 await expect(page).toHaveURL(new RegExp(`/study/${studySlug}/rough-sort`));
@@ -226,9 +178,8 @@ test.describe('Presort Field Configuration Testing', () => {
                 testDb,
                 authToken,
             }) => {
-                // Type-specific edge case tests
-                let field: any = null;
-                let edgeCaseValue: any = null;
+                let field: ReturnType<typeof testDataBuilders.presortField>;
+                let edgeCaseValue: { valid: string; invalid: string | null };
 
                 if (fieldType === 'number') {
                     field = testDataBuilders.presortField(fieldType, 'Age', {
@@ -258,8 +209,9 @@ test.describe('Presort Field Configuration Testing', () => {
                     });
                     edgeCaseValue = { valid: '2022-01-01', invalid: null };
                 } else {
-                    // Other field types: test required constraint
-                    const fieldOptions: any = { required: true };
+                    const fieldOptions: { required: boolean; options?: string[] } = {
+                        required: true,
+                    };
                     if (
                         fieldType === 'select' ||
                         fieldType === 'checkbox' ||
@@ -285,20 +237,13 @@ test.describe('Presort Field Configuration Testing', () => {
                     state: 'active',
                 });
 
-                // Test invalid value
-                await page.goto(`/study/${studySlug}`);
-                // Accept consent (New Flow)
-                await page.click('[data-testid="start-btn"]');
-                await page.check('[data-testid="consent-checkbox"]');
-                await page.click('[data-testid="consent-accept-btn"]');
+                await navigateToPresort(page, studySlug);
 
                 if (edgeCaseValue.invalid) {
                     await fillField(page, fieldType, edgeCaseValue.invalid);
-                    // If invalid, button should be disabled
                     await expect(page.getByTestId('presort-submit-btn')).toBeDisabled();
                 }
 
-                // Test valid value
                 await fillField(page, fieldType, edgeCaseValue.valid);
                 await expect(page.getByTestId('presort-submit-btn')).toBeEnabled();
                 await page.getByTestId('presort-submit-btn').click();
@@ -308,7 +253,6 @@ test.describe('Presort Field Configuration Testing', () => {
     }
 });
 
-// Helper functions
 function getFieldSelector(fieldType: PresortFieldType): string {
     switch (fieldType) {
         case 'text':
@@ -328,19 +272,18 @@ function getFieldSelector(fieldType: PresortFieldType): string {
     }
 }
 
-async function fillField(page: Page, fieldType: PresortFieldType, value: any) {
+async function fillField(page: Page, fieldType: PresortFieldType, value: string) {
     const selector = getFieldSelector(fieldType);
 
     switch (fieldType) {
         case 'checkbox':
         case 'radio':
-            // Click the label corresponding to the value "Option 1"
-            await page.getByText(String(value), { exact: true }).click();
+            await page.getByText(value, { exact: true }).click();
             break;
         case 'select':
-            await page.selectOption(selector, String(value));
+            await page.selectOption(selector, value);
             break;
         default:
-            await page.fill(selector, String(value));
+            await page.fill(selector, value);
     }
 }

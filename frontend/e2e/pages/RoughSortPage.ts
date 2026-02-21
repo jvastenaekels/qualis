@@ -22,12 +22,9 @@ export class RoughSortPage extends BasePage {
         if (defaultMode) {
             // Distribute: First to Disagree, rest to Agree
             for (let i = 0; i < totalCards; i++) {
-                if (i === 0) {
-                    await this.disagreeBtn.click();
-                } else {
-                    await this.agreeBtn.click();
-                }
-                await this.page.waitForTimeout(500); // Animation wait
+                const btn = i === 0 ? this.disagreeBtn : this.agreeBtn;
+                await expect(btn).toBeEnabled({ timeout: 5000 });
+                await btn.click();
             }
         } else {
             // Custom distribution logic would go here if needed
