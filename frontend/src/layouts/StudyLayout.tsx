@@ -878,7 +878,12 @@ const StudyLayoutContent: React.FC = () => {
                                                         );
                                                     });
                                             }}
-                                            className="shrink-0 flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-md transition-colors"
+                                            aria-label={
+                                                linkCopied
+                                                    ? t('resume.link_copied', 'Link copied!')
+                                                    : t('resume.copy_link', 'Copy link')
+                                            }
+                                            className="shrink-0 flex items-center justify-center p-2 rounded-md transition-colors"
                                             style={{
                                                 backgroundColor: linkCopied
                                                     ? '#10b981'
@@ -887,15 +892,9 @@ const StudyLayoutContent: React.FC = () => {
                                             }}
                                         >
                                             {linkCopied ? (
-                                                <>
-                                                    <Check size={14} />
-                                                    {t('resume.link_copied', 'Link copied!')}
-                                                </>
+                                                <Check size={16} />
                                             ) : (
-                                                <>
-                                                    <Copy size={14} />
-                                                    {t('resume.copy_link', 'Copy link')}
-                                                </>
+                                                <Copy size={16} />
                                             )}
                                         </button>
                                     </div>
