@@ -305,10 +305,14 @@ const StudyLayoutContent: React.FC = () => {
 
     // Welcome-back toast for returning same-browser users (skipped when
     // arriving via ResumePage, which shows its own "restored" toast).
+    // Only fires when maxReachedStep was already > 1 at mount (persisted from
+    // a previous visit), not when the user first progresses past step 1.
+    const mountMaxStep = useRef(maxReachedStep);
     const hasShownWelcomeBack = useRef(false);
     useEffect(() => {
         if (
             !hasShownWelcomeBack.current &&
+            mountMaxStep.current > 1 &&
             hasConsented &&
             !isCompleted &&
             !isPilotMode &&
@@ -323,7 +327,9 @@ const StudyLayoutContent: React.FC = () => {
             } catch {
                 // Ignore storage errors
             }
-            toast.success(t('resume.welcome_back', 'Welcome back! Your progress has been saved.'));
+            toast.success(
+                t('resume.welcome_back', 'Welcome back! Your progress has been restored.')
+            );
         }
     }, [hasConsented, isCompleted, isPilotMode, maxReachedStep, t]);
 
@@ -982,7 +988,7 @@ const StudyLayoutContent: React.FC = () => {
             <main
                 id="main-scroll-container"
                 ref={mainRef}
-                className={`flex-1 w-full mx-auto relative flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/fine-sort'].some((path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}
+                className={`flex-1 w-full mx-auto relative isolate flex flex-col bg-slate-50 custom-scrollbar ${['/rough-sort', '/fine-sort'].some((path) => location.pathname.endsWith(path) && !location.pathname.includes('post-sort')) ? 'overflow-hidden' : 'overflow-y-auto'}`}
             >
                 {/* Transition Overlay / Dimming */}
                 <div

@@ -1952,7 +1952,7 @@
         "save_failed": "Not saved",
         "loading": "Restoring your session...",
         "restored": "Welcome back! Your progress has been restored.",
-        "welcome_back": "Welcome back! Your progress has been saved.",
+        "welcome_back": "Welcome back! Your progress has been restored.",
         "not_found": "This link is no longer valid. If you haven't completed the study, please contact the researcher for a new link.",
         "already_completed": "You've already submitted your responses. Thank you for your participation!",
         "study_closed": "This study is no longer accepting responses. Please contact the researcher if you have questions.",
