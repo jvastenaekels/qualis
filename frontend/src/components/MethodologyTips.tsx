@@ -116,10 +116,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                             {t('fine.workbench.help')}
                         </p>
                     </div>
-                    <div
-                        ref={textRef}
-                        className="overflow-y-auto custom-scrollbar flex-1 min-h-0"
-                    >
+                    <div ref={textRef} className="overflow-y-auto custom-scrollbar flex-1 min-h-0">
                         <p className="text-base font-semibold leading-relaxed italic text-indigo-600/80 [hyphens:manual]">
                             {hyphenate(tips[step])}
                         </p>

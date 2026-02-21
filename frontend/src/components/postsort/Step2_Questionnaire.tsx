@@ -391,9 +391,6 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
             {/* 3. CUSTOM QUESTIONS */}
             {questions && Object.keys(questions).length > 0 && (
                 <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-slate-800">
-                        {t('admin.design.postsort.custom.title', 'Questions')}
-                    </h2>
                     {Object.entries(questions).map(([key, fieldConfig]) => {
                         const isVisible = evaluateVisibilityCondition(
                             fieldConfig.visibility_condition,
