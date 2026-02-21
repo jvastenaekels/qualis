@@ -18,7 +18,7 @@ import {
     CloudOff,
     Copy,
     Globe,
-    PauseCircle,
+    ScreenShare,
     Share2,
     WifiOff,
 } from 'lucide-react';
@@ -778,12 +778,12 @@ const StudyLayoutContent: React.FC = () => {
                                         setTimeout(() => resumeInputRef.current?.focus(), 50);
                                     }
                                 }}
-                                className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-amber-50 text-amber-600 transition-colors touch-manipulation"
+                                className="p-3 min-w-[44px] min-h-[44px] rounded-full hover:bg-blue-50 text-blue-500 transition-colors touch-manipulation"
                                 title={t('resume.continue_later', 'Continue later')}
                                 aria-expanded={isResumeMenuOpen}
                                 aria-haspopup="dialog"
                             >
-                                <PauseCircle size={20} />
+                                <ScreenShare size={20} />
                             </button>
                             {isResumeMenuOpen && (
                                 <div
