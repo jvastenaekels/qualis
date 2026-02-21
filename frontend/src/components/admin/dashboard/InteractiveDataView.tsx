@@ -701,7 +701,7 @@ export default function InteractiveDataView({
                     const displayStatus = getDisplayStatus(p);
                     const currentStep =
                         displayStatus !== 'completed' && p.last_step_reached != null
-                            ? p.last_step_reached + 1
+                            ? p.last_step_reached
                             : null;
                     return (
                         <div className="flex items-center gap-1.5">
