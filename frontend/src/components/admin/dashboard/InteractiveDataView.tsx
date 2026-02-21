@@ -109,7 +109,6 @@ import { format } from 'date-fns';
 import { enUS, fr, fi } from 'date-fns/locale';
 
 import * as Collapsible from '@radix-ui/react-collapsible';
-import { useIsMobile } from '@/hooks/use-mobile';
 import type { DumpParticipant, DumpResponse } from './types';
 import { QuestionDistributionCharts } from './charts/QuestionDistributionCharts';
 import { SubmissionsTimelineChart } from './charts/SubmissionsTimelineChart';
@@ -202,208 +201,6 @@ function CollapsibleSection({
     );
 }
 
-function ParticipantCard({
-    participant,
-    onClick,
-    duplicateIpGroups,
-    showLanguage,
-    currentLocale,
-}: {
-    participant: DumpParticipant;
-    onClick: () => void;
-    duplicateIpGroups: Map<string, number>;
-    showLanguage: boolean;
-    // biome-ignore lint/suspicious/noExplicitAny: complex locale types
-    currentLocale: any;
-}) {
-    const { t } = useTranslation();
-    const displayStatus = getDisplayStatus(participant);
-    const isSuspect =
-        participant.duration_seconds !== null &&
-        participant.duration_seconds < SUSPECT_DURATION_THRESHOLD;
-    const hasComments = Object.keys(participant.postsort.card_comments || {}).length > 0;
-    const hasAudio =
-        participant.audio_recordings && Object.keys(participant.audio_recordings).length > 0;
-
-    return (
-        <button
-            type="button"
-            onClick={onClick}
-            className={cn(
-                'w-full text-left p-3.5 bg-white border border-slate-200 rounded-xl active:bg-indigo-50/40 transition-all',
-                participant.is_discarded && 'opacity-60 grayscale-[0.5]'
-            )}
-        >
-            {/* Row 1: ID + badges + status */}
-            <div className="flex items-start justify-between gap-2 mb-2.5">
-                <div className="flex items-center gap-2 flex-wrap min-w-0">
-                    <span className="font-mono text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-                        {participant.id}
-                    </span>
-                    {participant.is_discarded && (
-                        <Badge
-                            variant="destructive"
-                            className="h-4 text-[10px] px-1.5 font-semibold"
-                        >
-                            {t('admin.data.detail.discarded_badge')}
-                        </Badge>
-                    )}
-                    {participant.ip_address && duplicateIpGroups.has(participant.ip_address) && (
-                        <Badge
-                            variant="outline"
-                            className="h-4 text-[10px] px-1.5 font-semibold bg-amber-50 text-amber-600 border-amber-200"
-                        >
-                            {t('admin.data.table.duplicate_ip', 'Dup IP')} #
-                            {duplicateIpGroups.get(participant.ip_address)}
-                        </Badge>
-                    )}
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                    <Badge
-                        variant="outline"
-                        className={cn(
-                            'h-5 text-[10px] px-2 font-semibold border-none',
-                            displayStatus === 'completed'
-                                ? 'bg-emerald-50 text-emerald-600'
-                                : displayStatus === 'abandoned'
-                                  ? 'bg-rose-50 text-rose-500'
-                                  : 'bg-sky-50 text-sky-600'
-                        )}
-                    >
-                        {t(`admin.data.status.${displayStatus}`, displayStatus)}
-                    </Badge>
-                    {displayStatus !== 'completed' &&
-                        participant.last_step_reached != null &&
-                        STEP_LABEL_KEYS[participant.last_step_reached + 1] && (
-                            <Badge
-                                variant="outline"
-                                className="h-5 text-[10px] px-2 font-semibold border-slate-200 text-slate-500"
-                            >
-                                {t(...STEP_LABEL_KEYS[participant.last_step_reached + 1])}
-                            </Badge>
-                        )}
-                </div>
-            </div>
-
-            {/* Row 2: Metadata */}
-            <div className="flex items-center gap-4 text-xs text-slate-500 mb-2.5">
-                {showLanguage && (
-                    <div className="flex items-center gap-1.5">
-                        <Globe className="h-3 w-3 text-slate-400" />
-                        <span className="font-medium">
-                            {participant.language === 'US' ? 'EN' : participant.language}
-                        </span>
-                    </div>
-                )}
-                <div className="flex items-center gap-1.5">
-                    <Clock className="h-3 w-3 text-slate-400" />
-                    <span className="font-mono">
-                        {participant.duration_seconds !== null
-                            ? participant.duration_seconds >= 3600
-                                ? t('common.duration_long', '{{h}}h {{m}}m {{s}}s', {
-                                      h: Math.floor(participant.duration_seconds / 3600),
-                                      m: Math.floor((participant.duration_seconds % 3600) / 60),
-                                      s: Math.floor(participant.duration_seconds % 60),
-                                  })
-                                : t('common.duration_short', '{{m}}m {{s}}s', {
-                                      m: Math.floor(participant.duration_seconds / 60),
-                                      s: Math.floor(participant.duration_seconds % 60),
-                                  })
-                            : '—'}
-                    </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                    <Calendar className="h-3 w-3 text-slate-400" />
-                    <span>
-                        {participant.submitted_at
-                            ? format(new Date(participant.submitted_at), 'MMM d, HH:mm', {
-                                  locale: currentLocale,
-                              })
-                            : '—'}
-                    </span>
-                </div>
-            </div>
-
-            {/* Row 3: Consent + Quality indicators */}
-            <div className="flex items-center justify-between pt-2.5 border-t border-slate-100">
-                <div className="flex items-center gap-1.5">
-                    {participant.postsort.email && (
-                        <div
-                            role="img"
-                            aria-label={t('admin.data.tooltips.email_provided', 'Email provided')}
-                            className="p-1 bg-indigo-50 rounded text-indigo-600 border border-indigo-100"
-                        >
-                            <Mail className="h-3 w-3" />
-                        </div>
-                    )}
-                    {participant.postsort.newsletter_consent && (
-                        <div
-                            role="img"
-                            aria-label={t(
-                                'admin.data.tooltips.newsletter_consent',
-                                'Wants results'
-                            )}
-                            className="p-1 bg-emerald-50 rounded text-emerald-600 border border-emerald-100"
-                        >
-                            <Bell className="h-3 w-3" />
-                        </div>
-                    )}
-                    {participant.postsort.interview_consent && (
-                        <div
-                            role="img"
-                            aria-label={t(
-                                'admin.data.tooltips.interview_consent',
-                                'Accepts follow-up'
-                            )}
-                            className="p-1 bg-amber-50 rounded text-amber-600 border border-amber-100"
-                        >
-                            <Briefcase className="h-3 w-3" />
-                        </div>
-                    )}
-                </div>
-                <div className="flex items-center gap-1.5">
-                    {participant.recruitment_token && (
-                        <div
-                            role="img"
-                            aria-label={`${t('admin.data.tooltips.recruitment_link', 'Recruitment link')}: ${participant.recruitment_token}`}
-                            className="p-1 bg-slate-50 rounded text-slate-500 border border-slate-200"
-                        >
-                            <Tag className="h-3 w-3" />
-                        </div>
-                    )}
-                    {isSuspect && (
-                        <div
-                            role="img"
-                            aria-label={t('admin.data.tooltips.suspect')}
-                            className="p-1 bg-amber-50 rounded text-amber-500 border border-amber-100"
-                        >
-                            <AlertTriangle className="h-3 w-3" />
-                        </div>
-                    )}
-                    {hasComments && (
-                        <div
-                            role="img"
-                            aria-label={t('admin.data.tooltips.has_comments')}
-                            className="p-1 bg-blue-50 rounded text-blue-500 border border-blue-100"
-                        >
-                            <MessageSquare className="h-3 w-3" />
-                        </div>
-                    )}
-                    {hasAudio && (
-                        <div
-                            role="img"
-                            aria-label={t('admin.data.tooltips.has_audio', 'Has audio responses')}
-                            className="p-1 bg-purple-50 rounded text-purple-500 border border-purple-100"
-                        >
-                            <Mic className="h-3 w-3" />
-                        </div>
-                    )}
-                </div>
-            </div>
-        </button>
-    );
-}
-
 export default function InteractiveDataView({
     slug,
     participants: initialParticipants,
@@ -412,7 +209,6 @@ export default function InteractiveDataView({
     const navigate = useNavigate();
     const { workspaceSlug } = useParams<{ workspaceSlug: string }>();
     const queryClient = useQueryClient();
-    const isMobile = useIsMobile();
 
     // biome-ignore lint/suspicious/noExplicitAny: complex locale types
     const dateLocales: Record<string, any> = { en: enUS, fr, fi };
@@ -1369,192 +1165,187 @@ export default function InteractiveDataView({
                 icon={<BarChart3 className="h-4 w-4 text-slate-400" />}
             >
                 <div className="grid grid-cols-2 gap-2 sm:gap-4 lg:grid-cols-4">
-                        {/* Primary Metrics: Completed & In Progress */}
+                    {/* Primary Metrics: Completed & In Progress */}
 
-                        {/* Completed Card */}
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setStatusFilter((prev) =>
-                                    prev === 'completed' ? 'all' : 'completed'
-                                )
-                            }
-                            className={cn(
-                                'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
-                                statusFilter === 'completed'
-                                    ? 'border-emerald-500 ring-4 ring-emerald-50/50'
-                                    : 'border-slate-100 hover:border-emerald-200'
-                            )}
-                        >
-                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
-                                <CheckCircle2 className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
-                            </div>
+                    {/* Completed Card */}
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setStatusFilter((prev) => (prev === 'completed' ? 'all' : 'completed'))
+                        }
+                        className={cn(
+                            'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
+                            statusFilter === 'completed'
+                                ? 'border-emerald-500 ring-4 ring-emerald-50/50'
+                                : 'border-slate-100 hover:border-emerald-200'
+                        )}
+                    >
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
+                            <CheckCircle2 className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
+                        </div>
 
-                            <div>
-                                <div className="flex items-center gap-2 mb-3">
-                                    <div
-                                        className={cn(
-                                            'p-2 rounded-lg transition-colors',
-                                            statusFilter === 'completed'
-                                                ? 'bg-emerald-100 text-emerald-700'
-                                                : 'bg-emerald-50 text-emerald-600'
-                                        )}
-                                    >
-                                        <CheckCircle2 className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                        {t('admin.data.stats.completed', 'Completed')}
-                                    </span>
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div
+                                    className={cn(
+                                        'p-2 rounded-lg transition-colors',
+                                        statusFilter === 'completed'
+                                            ? 'bg-emerald-100 text-emerald-700'
+                                            : 'bg-emerald-50 text-emerald-600'
+                                    )}
+                                >
+                                    <CheckCircle2 className="w-5 h-5" />
                                 </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t('admin.data.stats.completed', 'Completed')}
+                                </span>
+                            </div>
 
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                                        {completedCount}
-                                    </span>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                    {completedCount}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            <ArrowRight className="w-3 h-3" />
+                        </div>
+                    </button>
+
+                    {/* In Progress Card */}
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setStatusFilter((prev) =>
+                                prev === 'in_progress' ? 'all' : 'in_progress'
+                            )
+                        }
+                        className={cn(
+                            'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
+                            statusFilter === 'in_progress'
+                                ? 'border-sky-500 ring-4 ring-sky-50/50'
+                                : 'border-slate-100 hover:border-sky-200'
+                        )}
+                    >
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
+                            <Clock className="w-24 h-24 text-sky-500 -mr-6 -mt-6" />
+                        </div>
+
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div
+                                    className={cn(
+                                        'p-2 rounded-lg transition-colors',
+                                        statusFilter === 'in_progress'
+                                            ? 'bg-sky-100 text-sky-700'
+                                            : 'bg-sky-50 text-sky-600'
+                                    )}
+                                >
+                                    <Clock className="w-5 h-5" />
                                 </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t('admin.data.stats.in_progress', 'In Progress')}
+                                </span>
                             </div>
 
-                            <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-emerald-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                                {t('admin.data.stats.click_to_filter', 'Filter table')}
-                                <ArrowRight className="w-3 h-3" />
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                    {inProgressCount}
+                                </span>
                             </div>
-                        </button>
+                        </div>
 
-                        {/* In Progress Card */}
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setStatusFilter((prev) =>
-                                    prev === 'in_progress' ? 'all' : 'in_progress'
-                                )
-                            }
-                            className={cn(
-                                'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
-                                statusFilter === 'in_progress'
-                                    ? 'border-sky-500 ring-4 ring-sky-50/50'
-                                    : 'border-slate-100 hover:border-sky-200'
-                            )}
-                        >
-                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
-                                <Clock className="w-24 h-24 text-sky-500 -mr-6 -mt-6" />
-                            </div>
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            <ArrowRight className="w-3 h-3" />
+                        </div>
+                    </button>
 
-                            <div>
-                                <div className="flex items-center gap-2 mb-3">
-                                    <div
-                                        className={cn(
-                                            'p-2 rounded-lg transition-colors',
-                                            statusFilter === 'in_progress'
-                                                ? 'bg-sky-100 text-sky-700'
-                                                : 'bg-sky-50 text-sky-600'
-                                        )}
-                                    >
-                                        <Clock className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                        {t('admin.data.stats.in_progress', 'In Progress')}
-                                    </span>
+                    {/* Interview Consent Card */}
+                    <button
+                        type="button"
+                        onClick={() => toggleConsent('interview')}
+                        className={cn(
+                            'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
+                            consentFilters.has('interview')
+                                ? 'border-amber-500 ring-4 ring-amber-50/50'
+                                : 'border-slate-100 hover:border-amber-200'
+                        )}
+                    >
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
+                            <Briefcase className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
+                        </div>
+
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div
+                                    className={cn(
+                                        'p-2 rounded-lg transition-colors',
+                                        consentFilters.has('interview')
+                                            ? 'bg-amber-100 text-amber-700'
+                                            : 'bg-amber-50 text-amber-600'
+                                    )}
+                                >
+                                    <Briefcase className="w-5 h-5" />
                                 </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t(
+                                        'admin.data.stats.interview_interested',
+                                        'Accepts follow-up'
+                                    )}
+                                </span>
+                            </div>
 
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                                        {inProgressCount}
-                                    </span>
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                    {interviewCount}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-amber-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                            {t('admin.data.stats.click_to_filter', 'Filter table')}
+                            <ArrowRight className="w-3 h-3" />
+                        </div>
+                    </button>
+
+                    {/* Newsletter Consent Card — exports email list */}
+                    <button
+                        type="button"
+                        onClick={exportNewsletterList}
+                        disabled={newsletterCount === 0}
+                        aria-label={t('admin.data.stats.click_to_export', 'Click to export list')}
+                        className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px] disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
+                            <Bell className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
+                        </div>
+
+                        <div>
+                            <div className="flex items-center gap-2 mb-3">
+                                <div className="p-2 rounded-lg transition-colors bg-indigo-50 text-indigo-600">
+                                    <Bell className="w-5 h-5" />
                                 </div>
+                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                    {t('admin.data.stats.newsletter', 'Wants results')}
+                                </span>
+                                <Download className="w-3.5 h-3.5 text-indigo-400 ml-auto sm:hidden" />
                             </div>
 
-                            <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-sky-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                                {t('admin.data.stats.click_to_filter', 'Filter table')}
-                                <ArrowRight className="w-3 h-3" />
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                                    {newsletterCount}
+                                </span>
                             </div>
-                        </button>
+                        </div>
 
-                        {/* Interview Consent Card */}
-                        <button
-                            type="button"
-                            onClick={() => toggleConsent('interview')}
-                            className={cn(
-                                'group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px]',
-                                consentFilters.has('interview')
-                                    ? 'border-amber-500 ring-4 ring-amber-50/50'
-                                    : 'border-slate-100 hover:border-amber-200'
-                            )}
-                        >
-                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
-                                <Briefcase className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
-                            </div>
-
-                            <div>
-                                <div className="flex items-center gap-2 mb-3">
-                                    <div
-                                        className={cn(
-                                            'p-2 rounded-lg transition-colors',
-                                            consentFilters.has('interview')
-                                                ? 'bg-amber-100 text-amber-700'
-                                                : 'bg-amber-50 text-amber-600'
-                                        )}
-                                    >
-                                        <Briefcase className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                        {t(
-                                            'admin.data.stats.interview_interested',
-                                            'Accepts follow-up'
-                                        )}
-                                    </span>
-                                </div>
-
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                                        {interviewCount}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-amber-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                                {t('admin.data.stats.click_to_filter', 'Filter table')}
-                                <ArrowRight className="w-3 h-3" />
-                            </div>
-                        </button>
-
-                        {/* Newsletter Consent Card — exports email list */}
-                        <button
-                            type="button"
-                            onClick={exportNewsletterList}
-                            disabled={newsletterCount === 0}
-                            aria-label={t(
-                                'admin.data.stats.click_to_export',
-                                'Click to export list'
-                            )}
-                            className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border-2 border-slate-100 hover:border-indigo-200 shadow-sm hover:shadow-md transition-all text-left flex flex-col justify-between min-h-[100px] sm:min-h-[140px] disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
-                                <Bell className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
-                            </div>
-
-                            <div>
-                                <div className="flex items-center gap-2 mb-3">
-                                    <div className="p-2 rounded-lg transition-colors bg-indigo-50 text-indigo-600">
-                                        <Bell className="w-5 h-5" />
-                                    </div>
-                                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-                                        {t('admin.data.stats.newsletter', 'Wants results')}
-                                    </span>
-                                    <Download className="w-3.5 h-3.5 text-indigo-400 ml-auto sm:hidden" />
-                                </div>
-
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                                        {newsletterCount}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-indigo-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
-                                {t('admin.data.stats.click_to_export', 'Click to export list')}
-                                <Download className="w-3 h-3" />
-                            </div>
-                        </button>
+                        <div className="mt-2 sm:mt-4 hidden sm:flex items-center text-[11px] font-semibold text-indigo-600 gap-1 opacity-0 group-hover:opacity-100 transition-opacity translate-y-1 group-hover:translate-y-0 duration-300">
+                            {t('admin.data.stats.click_to_export', 'Click to export list')}
+                            <Download className="w-3 h-3" />
+                        </div>
+                    </button>
                 </div>
             </CollapsibleSection>
 
@@ -1922,335 +1713,154 @@ export default function InteractiveDataView({
                     </AlertDialogContent>
                 </AlertDialog>
 
-                {/* Desktop: Table View */}
-                {!isMobile ? (
-                    <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/50 overflow-x-auto ring-1 ring-slate-100 -mx-4 sm:mx-0 rounded-none sm:rounded-2xl">
-                        <Table className="min-w-[800px]">
-                            <TableHeader className="bg-slate-50/80">
-                                {table.getHeaderGroups().map((headerGroup) => (
+                {/* Table View */}
+                <div className="bg-white border border-slate-200 shadow-xl shadow-slate-200/50 overflow-x-auto ring-1 ring-slate-100 -mx-4 sm:mx-0 rounded-none sm:rounded-2xl">
+                    <Table className="min-w-[800px]">
+                        <TableHeader className="bg-slate-50/80">
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow
+                                    key={headerGroup.id}
+                                    className="hover:bg-transparent border-slate-100"
+                                >
+                                    {headerGroup.headers.map((header) => (
+                                        <TableHead
+                                            key={header.id}
+                                            className="h-14 text-xs font-semibold text-slate-600 px-2 sm:px-6 whitespace-nowrap"
+                                        >
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef.header,
+                                                      header.getContext()
+                                                  )}
+                                        </TableHead>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows.length ? (
+                                table.getRowModel().rows.map((row) => (
                                     <TableRow
-                                        key={headerGroup.id}
-                                        className="hover:bg-transparent border-slate-100"
+                                        key={row.id}
+                                        className={cn(
+                                            'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
+                                            !!row.original.is_discarded &&
+                                                'opacity-60 grayscale-[0.5]'
+                                        )}
+                                        onClick={() => handleViewParticipant(row.original)}
                                     >
-                                        {headerGroup.headers.map((header) => (
-                                            <TableHead
-                                                key={header.id}
-                                                className="h-14 text-xs font-semibold text-slate-600 px-2 sm:px-6 whitespace-nowrap"
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell
+                                                key={cell.id}
+                                                className="px-2 sm:px-6 py-4 sm:py-5 whitespace-nowrap"
                                             >
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(
-                                                          header.column.columnDef.header,
-                                                          header.getContext()
-                                                      )}
-                                            </TableHead>
+                                                {flexRender(
+                                                    cell.column.columnDef.cell,
+                                                    cell.getContext()
+                                                )}
+                                            </TableCell>
                                         ))}
                                     </TableRow>
-                                ))}
-                            </TableHeader>
-                            <TableBody>
-                                {table.getRowModel().rows.length ? (
-                                    table.getRowModel().rows.map((row) => (
-                                        <TableRow
-                                            key={row.id}
-                                            className={cn(
-                                                'cursor-pointer hover:bg-indigo-50/40 transition-all border-slate-50 group border-b last:border-0',
-                                                !!row.original.is_discarded &&
-                                                    'opacity-60 grayscale-[0.5]'
-                                            )}
-                                            onClick={() => handleViewParticipant(row.original)}
-                                        >
-                                            {row.getVisibleCells().map((cell) => (
-                                                <TableCell
-                                                    key={cell.id}
-                                                    className="px-2 sm:px-6 py-4 sm:py-5 whitespace-nowrap"
-                                                >
-                                                    {flexRender(
-                                                        cell.column.columnDef.cell,
-                                                        cell.getContext()
-                                                    )}
-                                                </TableCell>
-                                            ))}
-                                        </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={columns.length}
-                                            className="h-64 text-center"
-                                        >
-                                            {liveCount === 0 ? (
-                                                <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
-                                                    <div className="p-4 bg-slate-50 rounded-full">
-                                                        <Inbox className="w-8 h-8 opacity-30" />
-                                                    </div>
-                                                    <div className="space-y-1">
-                                                        <p className="font-bold text-slate-600">
-                                                            {t(
-                                                                'admin.data.empty.no_participants_title',
-                                                                'No participants yet'
-                                                            )}
-                                                        </p>
-                                                        <p className="text-sm text-slate-400 max-w-xs mx-auto">
-                                                            {t(
-                                                                'admin.data.empty.no_participants_desc',
-                                                                'Share your study link to start collecting responses.'
-                                                            )}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
-                                                    <div className="p-4 bg-slate-50 rounded-full">
-                                                        <Search className="w-8 h-8 opacity-20" />
-                                                    </div>
-                                                    <p className="font-bold">
-                                                        {t('admin.data.search.no_results')}
-                                                    </p>
-                                                    {hasActiveFilters && (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={clearAllFilters}
-                                                            className="mt-2"
-                                                        >
-                                                            {t(
-                                                                'admin.data.filters.clear_all',
-                                                                'Clear filters'
-                                                            )}
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-
-                        {/* Pagination */}
-                        {table.getPageCount() > 1 && (
-                            <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100">
-                                <p className="text-xs text-slate-500 font-medium">
-                                    {t(
-                                        'admin.data.pagination.showing',
-                                        'Showing {{from}}\u2013{{to}} of {{total}}',
-                                        {
-                                            from: pagination.pageIndex * pagination.pageSize + 1,
-                                            to: Math.min(
-                                                (pagination.pageIndex + 1) * pagination.pageSize,
-                                                table.getRowCount()
-                                            ),
-                                            total: table.getRowCount(),
-                                        }
-                                    )}
-                                </p>
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => table.previousPage()}
-                                        disabled={!table.getCanPreviousPage()}
-                                        className="h-8 w-8 p-0 rounded-lg"
-                                    >
-                                        <ChevronLeft className="h-4 w-4" />
-                                    </Button>
-                                    <span className="text-xs font-bold text-slate-600 min-w-[4rem] text-center">
-                                        {pagination.pageIndex + 1} / {table.getPageCount()}
-                                    </span>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => table.nextPage()}
-                                        disabled={!table.getCanNextPage()}
-                                        className="h-8 w-8 p-0 rounded-lg"
-                                    >
-                                        <ChevronRight className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ) : (
-                    /* Mobile: Card List View */
-                    <div className="space-y-2">
-                        {/* Mobile Sort Control */}
-                        <div className="flex items-center justify-between">
-                            <p className="text-xs text-slate-500 font-medium">
-                                {t('admin.data.pagination.total', '{{count}} participants', {
-                                    count: table.getRowCount(),
-                                })}
-                            </p>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-8 text-xs font-medium text-slate-600 gap-1.5"
-                                    >
-                                        <ArrowUpDown className="h-3 w-3" />
-                                        {t('admin.data.sort.label', 'Sort')}
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    align="end"
-                                    className="w-48"
-                                    collisionPadding={8}
-                                >
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            setSorting([{ id: 'submitted_at', desc: true }])
-                                        }
-                                        className={cn(
-                                            sorting[0]?.id === 'submitted_at' &&
-                                                sorting[0]?.desc &&
-                                                'bg-indigo-50 text-indigo-700'
-                                        )}
-                                    >
-                                        <Calendar className="w-3.5 h-3.5 mr-2" />
-                                        {t('admin.data.sort.newest', 'Newest first')}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            setSorting([{ id: 'submitted_at', desc: false }])
-                                        }
-                                        className={cn(
-                                            sorting[0]?.id === 'submitted_at' &&
-                                                !sorting[0]?.desc &&
-                                                'bg-indigo-50 text-indigo-700'
-                                        )}
-                                    >
-                                        <Calendar className="w-3.5 h-3.5 mr-2" />
-                                        {t('admin.data.sort.oldest', 'Oldest first')}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            setSorting([{ id: 'duration_seconds', desc: false }])
-                                        }
-                                        className={cn(
-                                            sorting[0]?.id === 'duration_seconds' &&
-                                                !sorting[0]?.desc &&
-                                                'bg-indigo-50 text-indigo-700'
-                                        )}
-                                    >
-                                        <Clock className="w-3.5 h-3.5 mr-2" />
-                                        {t('admin.data.sort.shortest', 'Shortest first')}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() =>
-                                            setSorting([{ id: 'duration_seconds', desc: true }])
-                                        }
-                                        className={cn(
-                                            sorting[0]?.id === 'duration_seconds' &&
-                                                sorting[0]?.desc &&
-                                                'bg-indigo-50 text-indigo-700'
-                                        )}
-                                    >
-                                        <Clock className="w-3.5 h-3.5 mr-2" />
-                                        {t('admin.data.sort.longest', 'Longest first')}
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-
-                        {/* Card List */}
-                        {table.getRowModel().rows.length > 0 ? (
-                            table
-                                .getRowModel()
-                                .rows.map((row) => (
-                                    <ParticipantCard
-                                        key={row.id}
-                                        participant={row.original}
-                                        onClick={() => handleViewParticipant(row.original)}
-                                        duplicateIpGroups={duplicateIpGroups}
-                                        showLanguage={showLanguageColumn}
-                                        currentLocale={currentLocale}
-                                    />
                                 ))
-                        ) : (
-                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400 py-16">
-                                <div className="p-4 bg-slate-50 rounded-full">
-                                    {liveCount === 0 ? (
-                                        <Inbox className="w-8 h-8 opacity-30" />
-                                    ) : (
-                                        <Search className="w-8 h-8 opacity-20" />
-                                    )}
-                                </div>
-                                <div className="space-y-1 text-center">
-                                    <p className="font-bold text-slate-600">
-                                        {liveCount === 0
-                                            ? t(
-                                                  'admin.data.empty.no_participants_title',
-                                                  'No participants yet'
-                                              )
-                                            : t('admin.data.search.no_results')}
-                                    </p>
-                                    {liveCount === 0 && (
-                                        <p className="text-sm text-slate-400 max-w-xs mx-auto">
-                                            {t(
-                                                'admin.data.empty.no_participants_desc',
-                                                'Share your study link to start collecting responses.'
-                                            )}
-                                        </p>
-                                    )}
-                                </div>
-                                {hasActiveFilters && liveCount > 0 && (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={clearAllFilters}
-                                        className="mt-2"
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-64 text-center"
                                     >
-                                        {t('admin.data.filters.clear_all', 'Clear filters')}
-                                    </Button>
-                                )}
-                            </div>
-                        )}
+                                        {liveCount === 0 ? (
+                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                                                <div className="p-4 bg-slate-50 rounded-full">
+                                                    <Inbox className="w-8 h-8 opacity-30" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="font-bold text-slate-600">
+                                                        {t(
+                                                            'admin.data.empty.no_participants_title',
+                                                            'No participants yet'
+                                                        )}
+                                                    </p>
+                                                    <p className="text-sm text-slate-400 max-w-xs mx-auto">
+                                                        {t(
+                                                            'admin.data.empty.no_participants_desc',
+                                                            'Share your study link to start collecting responses.'
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center gap-4 text-slate-400">
+                                                <div className="p-4 bg-slate-50 rounded-full">
+                                                    <Search className="w-8 h-8 opacity-20" />
+                                                </div>
+                                                <p className="font-bold">
+                                                    {t('admin.data.search.no_results')}
+                                                </p>
+                                                {hasActiveFilters && (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={clearAllFilters}
+                                                        className="mt-2"
+                                                    >
+                                                        {t(
+                                                            'admin.data.filters.clear_all',
+                                                            'Clear filters'
+                                                        )}
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
 
-                        {/* Mobile Pagination */}
-                        {table.getPageCount() > 1 && (
-                            <div className="flex items-center justify-between pt-3">
-                                <p className="text-xs text-slate-500 font-medium">
-                                    {t(
-                                        'admin.data.pagination.showing',
-                                        'Showing {{from}}\u2013{{to}} of {{total}}',
-                                        {
-                                            from: pagination.pageIndex * pagination.pageSize + 1,
-                                            to: Math.min(
-                                                (pagination.pageIndex + 1) * pagination.pageSize,
-                                                table.getRowCount()
-                                            ),
-                                            total: table.getRowCount(),
-                                        }
-                                    )}
-                                </p>
-                                <div className="flex items-center gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => table.previousPage()}
-                                        disabled={!table.getCanPreviousPage()}
-                                        className="h-9 w-9 p-0 rounded-lg"
-                                    >
-                                        <ChevronLeft className="h-4 w-4" />
-                                    </Button>
-                                    <span className="text-xs font-bold text-slate-600 min-w-[4rem] text-center">
-                                        {pagination.pageIndex + 1} / {table.getPageCount()}
-                                    </span>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => table.nextPage()}
-                                        disabled={!table.getCanNextPage()}
-                                        className="h-9 w-9 p-0 rounded-lg"
-                                    >
-                                        <ChevronRight className="h-4 w-4" />
-                                    </Button>
-                                </div>
+                    {/* Pagination */}
+                    {table.getPageCount() > 1 && (
+                        <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100">
+                            <p className="text-xs text-slate-500 font-medium">
+                                {t(
+                                    'admin.data.pagination.showing',
+                                    'Showing {{from}}\u2013{{to}} of {{total}}',
+                                    {
+                                        from: pagination.pageIndex * pagination.pageSize + 1,
+                                        to: Math.min(
+                                            (pagination.pageIndex + 1) * pagination.pageSize,
+                                            table.getRowCount()
+                                        ),
+                                        total: table.getRowCount(),
+                                    }
+                                )}
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => table.previousPage()}
+                                    disabled={!table.getCanPreviousPage()}
+                                    className="h-8 w-8 p-0 rounded-lg"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <span className="text-xs font-bold text-slate-600 min-w-[4rem] text-center">
+                                    {pagination.pageIndex + 1} / {table.getPageCount()}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => table.nextPage()}
+                                    disabled={!table.getCanNextPage()}
+                                    className="h-8 w-8 p-0 rounded-lg"
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
                             </div>
-                        )}
-                    </div>
-                )}
+                        </div>
+                    )}
+                </div>
             </CollapsibleSection>
 
             {/* Section 3: Key statistics */}
