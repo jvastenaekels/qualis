@@ -222,10 +222,10 @@ const ReadingZone: React.FC<ReadingZoneProps> = ({ variant }) => {
             >
                 {displayCard && (
                     <div className="animate-in fade-in zoom-in-95 duration-200 pb-2">
-                        <p className="text-slate-800 text-lg font-medium leading-relaxed [hyphens:manual]">
+                        <p className="text-slate-800 text-base font-medium leading-relaxed [hyphens:manual]">
                             <InlineIcon
                                 code={displayCard.code}
-                                iconSize={16}
+                                iconSize={15}
                                 showCodes={showCodes}
                             />
                             {hyphenate(displayCard.text)}

@@ -106,7 +106,7 @@ const textStyles = cva('w-full text-center font-medium text-slate-800 [hyphens:m
         variant: {
             hand: 'text-sm sm:text-base leading-relaxed',
             compact: 'text-xs leading-tight text-slate-700',
-            grid: 'text-xs sm:text-sm font-medium leading-tight text-slate-800',
+            grid: 'text-xs sm:text-sm lg:text-base font-medium leading-snug text-slate-800',
         },
         allowScroll: {
             false: '',
@@ -115,7 +115,7 @@ const textStyles = cva('w-full text-center font-medium text-slate-800 [hyphens:m
     compoundVariants: [
         { variant: 'hand', allowScroll: false, className: 'line-clamp-5' },
         { variant: 'compact', allowScroll: false, className: 'line-clamp-3' },
-        { variant: 'grid', allowScroll: false, className: 'line-clamp-4' },
+        { variant: 'grid', allowScroll: false, className: 'line-clamp-5' },
     ],
     defaultVariants: {
         variant: 'grid',

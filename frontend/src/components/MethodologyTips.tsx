@@ -160,7 +160,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                     ref={textRef}
                     className="overflow-y-auto custom-scrollbar flex-1 min-h-0 w-full"
                 >
-                    <p className="text-lg font-medium leading-snug italic text-indigo-600/70 text-center [hyphens:manual]">
+                    <p className="text-base font-medium leading-snug italic text-indigo-600/70 text-center [hyphens:manual]">
                         {hyphenate(tips[step])}
                     </p>
                 </div>

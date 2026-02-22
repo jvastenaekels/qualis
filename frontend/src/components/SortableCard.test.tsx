@@ -185,7 +185,7 @@ describe('SortableCard', () => {
 
     it('applies line-clamp when allowScroll is false', () => {
         render(<SortableCard {...defaultProps} allowScroll={false} />);
-        const textContainer = screen.getByTestId('card-123').querySelector('.line-clamp-4');
+        const textContainer = screen.getByTestId('card-123').querySelector('.line-clamp-5');
         expect(textContainer).toBeTruthy();
     });
 });
