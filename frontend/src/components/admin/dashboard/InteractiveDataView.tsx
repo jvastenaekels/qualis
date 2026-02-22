@@ -52,7 +52,7 @@ import {
     FilterX,
     Filter,
     Tag,
-    Briefcase,
+    MessagesSquare,
     Loader2,
     MoreVertical,
     Inbox,
@@ -788,7 +788,7 @@ export default function InteractiveDataView({
                                             'bg-amber-50 text-amber-700'
                                     )}
                                 >
-                                    <Briefcase className="w-3.5 h-3.5 mr-2" />
+                                    <MessagesSquare className="w-3.5 h-3.5 mr-2" />
                                     {t('admin.data.filters.interview', 'Follow-up')}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -834,7 +834,7 @@ export default function InteractiveDataView({
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <div className="p-1 bg-amber-50 rounded text-amber-600 border border-amber-100">
-                                                <Briefcase className="h-3 w-3" />
+                                                <MessagesSquare className="h-3 w-3" />
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -1274,7 +1274,7 @@ export default function InteractiveDataView({
                         )}
                     >
                         <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity hidden sm:block">
-                            <Briefcase className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
+                            <MessagesSquare className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
                         </div>
 
                         <div>
@@ -1287,7 +1287,7 @@ export default function InteractiveDataView({
                                             : 'bg-amber-50 text-amber-600'
                                     )}
                                 >
-                                    <Briefcase className="w-5 h-5" />
+                                    <MessagesSquare className="w-5 h-5" />
                                 </div>
                                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                                     {t(
@@ -1403,7 +1403,7 @@ export default function InteractiveDataView({
                                 variant="secondary"
                                 className="h-7 px-3 gap-2 bg-amber-100 text-amber-700 border-amber-200 font-semibold"
                             >
-                                <Briefcase className="w-3 h-3" />
+                                <MessagesSquare className="w-3 h-3" />
                                 {t('admin.data.filters.interview', 'Accepts follow-up')}
                                 <button
                                     type="button"
