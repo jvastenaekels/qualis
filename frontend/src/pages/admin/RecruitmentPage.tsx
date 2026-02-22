@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, useLoaderData, useRevalidator } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, useLoaderData, useRevalidator, useNavigate } from 'react-router-dom';
 import {
     QrCode,
     Plus,
@@ -9,7 +9,10 @@ import {
     Users,
     Globe,
     Lock,
-    UserPlus,
+    Link2,
+    Save,
+    Loader2,
+    ExternalLink,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
@@ -43,22 +46,70 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
 import {
     useCreateRecruitmentLinksApiAdminRecruitmentSlugLinksPost,
     useRevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete,
+    getListStudiesApiAdminStudiesGetQueryKey,
+    getGetStudyApiAdminStudiesSlugGetQueryKey,
 } from '@/api/generated';
-import type { RecruitmentLinkRead, RecruitmentLinkType } from '@/api/model';
+import type { RecruitmentLinkRead, RecruitmentLinkType, StudyRead, StudyUpdate } from '@/api/model';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAdminContext } from '@/hooks/useAdminContext';
+import { AdminService } from '@/api/admin';
+import { parseApiErrorSync } from '@/lib/error-utils';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+
+const slugFormSchema = z.object({
+    slug: z
+        .string()
+        .min(3)
+        .max(100)
+        .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
+});
+
+type SlugFormValues = z.infer<typeof slugFormSchema>;
 
 const RecruitmentPage = () => {
-    const { studySlug: slug } = useParams<{ studySlug: string }>();
-    const { links: initialLinks } = useLoaderData() as {
+    const { studySlug: slug, workspaceSlug } = useParams<{
+        studySlug: string;
+        workspaceSlug: string;
+    }>();
+    const { links: initialLinks, study } = useLoaderData() as {
         links: RecruitmentLinkRead[];
+        study: StudyRead;
         slug: string;
     };
     const { t } = useTranslation();
     const revalidator = useRevalidator();
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const { workspace: currentWorkspace } = useAdminContext();
+
+    const isArchived = study.state === 'archived';
+
+    const form = useForm<SlugFormValues>({
+        resolver: zodResolver(slugFormSchema),
+        defaultValues: { slug: study?.slug || '' },
+    });
+
+    useEffect(() => {
+        if (study) {
+            form.reset({ slug: study.slug || '' });
+        }
+    }, [study, form]);
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [newLinkType, setNewLinkType] = useState<RecruitmentLinkType>('public');
@@ -118,15 +169,55 @@ const RecruitmentPage = () => {
         return `${window.location.origin}/study/${slug}?token=${token}`;
     };
 
+    const studyUrl = `${window.location.origin}/study/${slug}`;
+
+    const onSlugSubmit = async (data: SlugFormValues) => {
+        if (!slug) return;
+        try {
+            await AdminService.updateStudy(slug, {
+                slug: data.slug,
+            } as unknown as StudyUpdate);
+
+            toast.success(t('admin.settings.save_success', 'Settings updated'), {
+                description: t(
+                    'admin.settings.save_success_desc',
+                    'Study settings have been saved.'
+                ),
+            });
+
+            await queryClient.invalidateQueries({
+                queryKey: getListStudiesApiAdminStudiesGetQueryKey(),
+            });
+            await queryClient.invalidateQueries({
+                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
+            });
+
+            if (data.slug !== slug) {
+                const ws = workspaceSlug || currentWorkspace?.slug;
+                navigate(`/app/${ws}/studies/${data.slug}/recruitment`);
+            } else {
+                navigate('.', { replace: true });
+            }
+        } catch (error) {
+            const message = parseApiErrorSync(
+                error,
+                t('admin.settings.save_error', 'Error updating settings')
+            );
+            toast.error(t('admin.settings.save_error', 'Error updating settings'), {
+                description: message,
+            });
+        }
+    };
+
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={t('admin.recruitment.title', 'Recruitment')}
+                title={t('admin.recruitment.title', 'Access & Recruitment')}
                 description={t(
                     'admin.recruitment.description',
-                    'Manage participant access, recruitment channels, and track conversion rates.'
+                    'Configure the study URL, manage participant access, and track recruitment efficiency.'
                 )}
-                icon={UserPlus}
+                icon={Link2}
                 actions={
                     <Dialog
                         open={isCreateModalOpen}
@@ -318,6 +409,160 @@ const RecruitmentPage = () => {
                 }
             />
 
+            {/* Study URL Card */}
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                <CardHeader className="border-b border-slate-50 pb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                        <Link2 className="h-5 w-5 text-indigo-500" />
+                        <CardTitle className="text-lg font-black text-slate-900">
+                            {t('admin.recruitment.study_url.title', 'Study URL')}
+                        </CardTitle>
+                    </div>
+                    <CardDescription className="text-sm font-medium text-slate-500">
+                        {t(
+                            'admin.recruitment.study_url.description',
+                            'The public address where participants access your study.'
+                        )}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6 space-y-5">
+                    {/* Full URL display */}
+                    <div className="space-y-1.5">
+                        <Label className="text-2xs font-black text-slate-500">
+                            {t('admin.recruitment.study_url.full_url_label', 'Full URL')}
+                        </Label>
+                        <div className="flex items-center gap-2">
+                            <div className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 font-mono text-sm text-slate-700 truncate">
+                                {studyUrl}
+                            </div>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-10 w-10 rounded-xl shrink-0"
+                                onClick={() => copyToClipboard(studyUrl)}
+                                aria-label={t('admin.recruitment.copy_link', 'Copy secure URL')}
+                            >
+                                <Copy className="h-4 w-4" />
+                            </Button>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-10 w-10 rounded-xl shrink-0"
+                                        aria-label={t('admin.recruitment.show_qr', 'Show QR code')}
+                                    >
+                                        <QrCode className="h-4 w-4" />
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-md flex flex-col items-center">
+                                    <DialogHeader className="w-full text-center items-center">
+                                        <div className="p-3 bg-indigo-50 rounded-2xl mb-2">
+                                            <QrCode className="h-8 w-8 text-indigo-600" />
+                                        </div>
+                                        <DialogTitle className="text-xl font-black tracking-tight">
+                                            {t('admin.recruitment.qr_title', 'Share Access')}
+                                        </DialogTitle>
+                                        <DialogDescription className="max-w-[280px]">
+                                            {t(
+                                                'admin.recruitment.qr_desc',
+                                                'Participants can scan this code to access the study instantly.'
+                                            )}
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="p-6 bg-white rounded-xl shadow-inner border border-slate-100 my-4">
+                                        <QRCodeSVG
+                                            value={studyUrl}
+                                            size={200}
+                                            title={t(
+                                                'admin.recruitment.qr_alt',
+                                                'QR code for {{url}}',
+                                                {
+                                                    url: studyUrl,
+                                                }
+                                            )}
+                                        />
+                                    </div>
+                                    <p className="text-xs text-slate-400 font-mono break-all text-center px-4">
+                                        {studyUrl}
+                                    </p>
+                                </DialogContent>
+                            </Dialog>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-10 w-10 rounded-xl shrink-0"
+                                onClick={() => window.open(studyUrl, '_blank')}
+                                aria-label={t('admin.recruitment.live_study', 'Live study')}
+                            >
+                                <ExternalLink className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Editable slug field */}
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSlugSubmit)} className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="slug"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-2xs font-black text-slate-500 flex items-center gap-1.5">
+                                            <Globe className="w-3 h-3" />
+                                            {t(
+                                                'admin.recruitment.study_url.slug_label',
+                                                'URL slug'
+                                            )}
+                                        </FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-xs select-none">
+                                                    /study/
+                                                </div>
+                                                <Input
+                                                    {...field}
+                                                    disabled={isArchived}
+                                                    className="h-11 rounded-xl bg-slate-50 border-slate-100 pl-14 font-mono text-xs focus-visible:ring-indigo-500"
+                                                />
+                                            </div>
+                                        </FormControl>
+                                        <FormDescription className="text-xs">
+                                            {t(
+                                                'admin.recruitment.study_url.slug_description',
+                                                'The unique identifier used in the study URL. Lowercase letters, numbers, and hyphens only.'
+                                            )}
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <div className="flex justify-end">
+                                <Button
+                                    type="submit"
+                                    disabled={
+                                        isArchived ||
+                                        form.formState.isSubmitting ||
+                                        !form.formState.isDirty
+                                    }
+                                    className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
+                                >
+                                    {form.formState.isSubmitting ? (
+                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                    ) : (
+                                        <Save className="w-4 h-4 mr-2" />
+                                    )}
+                                    {t('admin.settings.save_button', 'Save changes')}
+                                </Button>
+                            </div>
+                        </form>
+                    </Form>
+                </CardContent>
+            </Card>
+
             <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
                 <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
                     <div
@@ -454,7 +699,7 @@ const RecruitmentPage = () => {
                                         className="text-center py-20 text-slate-400"
                                     >
                                         <div className="flex flex-col items-center gap-2">
-                                            <UserPlus className="h-10 w-10 opacity-20" />
+                                            <Link2 className="h-10 w-10 opacity-20" />
                                             <p className="font-medium">
                                                 {t(
                                                     'admin.recruitment.no_links',

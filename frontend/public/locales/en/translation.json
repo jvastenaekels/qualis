@@ -537,7 +537,7 @@
             "create_project": "CREATE NEW PROJECT",
             "dashboard": "Dashboard",
             "design": "Design",
-            "recruit": "Recruit",
+            "recruit": "Access",
             "data": "Data",
             "analysis": "Analysis",
             "team": "Team",
@@ -699,8 +699,15 @@
             }
         },
         "recruitment": {
-            "title": "Recruitment",
-            "description": "Generate secure links for your participants and monitor real-time recruitment efficiency.",
+            "title": "Access & Recruitment",
+            "description": "Configure the study URL, manage participant access, and track recruitment efficiency.",
+            "study_url": {
+                "title": "Study URL",
+                "description": "The public address where participants access your study.",
+                "full_url_label": "Full URL",
+                "slug_label": "URL slug",
+                "slug_description": "The unique identifier used in the study URL. Lowercase letters, numbers, and hyphens only."
+            },
             "new_link": "New access link",
             "create_title": "Create access links",
             "create_description": "Target specific cohorts or create general access. Each link type has different security and usage properties.",
@@ -1751,19 +1758,8 @@
             "draft": "Draft"
         },
         "settings": {
-            "title": "General settings",
-            "description": "Manage basic study configuration, URL slug, and lifecycle states.",
-            "basic": {
-                "title": "Basic information",
-                "description": "Configure the study identity and availability window.",
-                "slug_label": "URL slug",
-                "slug_description": "The unique identifier used in the URL.",
-                "start_date_label": "Start date (optional)",
-                "start_date_description": "Automatically opens the study on this date.",
-                "end_date_label": "End date (optional)",
-                "end_date_description": "Automatically closes the study on this date.",
-                "pick_date": "Pick a date"
-            },
+            "title": "Study lifecycle",
+            "description": "Storage management, archiving, and study deletion.",
             "lifecycle": {
                 "title": "Archiving",
                 "description": "Archive the study to make it read-only for everyone.",

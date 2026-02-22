@@ -74,55 +74,11 @@ describe('GeneralSettingsPage', () => {
         return renderWithProviders(<GeneralSettingsPage />);
     };
 
-    it('renders only the slug field', async () => {
+    it('does not render the slug form (moved to Access & Recruitment)', async () => {
         renderPage();
 
-        // Use name attribute to be precise and avoid label duplicate issues
-        const slugInput = document.querySelector('input[name="slug"]');
-        expect(slugInput).toBeInTheDocument();
-        expect(slugInput).toHaveValue('test-study');
-
-        // Verify title field is NOT present
-        expect(document.querySelector('input[name="title"]')).not.toBeInTheDocument();
-
-        // Verify date fields are NOT present
-        expect(document.querySelector('input[name="start_date"]')).not.toBeInTheDocument();
-        expect(document.querySelector('input[name="end_date"]')).not.toBeInTheDocument();
-    });
-
-    it('submits update with only slug', async () => {
-        const user = userEvent.setup();
-
-        vi.mocked(AdminService.updateStudy).mockResolvedValue({} as never);
-
-        renderPage();
-
-        const slugInput = document.querySelector('input[name="slug"]') as HTMLInputElement;
-        await user.clear(slugInput);
-        await user.type(slugInput, 'new-slug');
-
-        const saveButton = screen.getByRole('button', { name: /Save Changes/i });
-        await user.click(saveButton);
-
-        await waitFor(() => {
-            expect(AdminService.updateStudy).toHaveBeenCalledWith(
-                'test-study',
-                expect.objectContaining({
-                    slug: 'new-slug',
-                })
-            );
-            // Ensure no other fields were sent (dates, title) - checking the call arguments
-            const args = vi.mocked(AdminService.updateStudy).mock.calls[0][1] as Record<
-                string,
-                unknown
-            >;
-            expect(args.title).toBeUndefined();
-            expect(args.start_date).toBeUndefined();
-            expect(args.end_date).toBeUndefined();
-        });
-
-        // Should navigate to new slug
-        expect(mockNavigate).toHaveBeenCalledWith('/app/test-workspace/studies/new-slug/settings');
+        // Slug field should NOT be present on the settings page
+        expect(document.querySelector('input[name="slug"]')).not.toBeInTheDocument();
     });
 
     it('allows archiving the study', async () => {

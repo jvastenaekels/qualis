@@ -529,7 +529,7 @@
             "create_project": "LUO UUSI PROJEKTI",
             "dashboard": "Yhteenveto",
             "design": "Suunnittelu",
-            "recruit": "Rekrytointi",
+            "recruit": "Pääsy",
             "data": "Tiedot",
             "analysis": "Analyysi",
             "team": "Tiimi",
@@ -691,8 +691,15 @@
             }
         },
         "recruitment": {
-            "title": "Rekrytointi",
-            "description": "Luo turvallisia linkkejä osallistujille ja seuraa rekrytoinnin tehokkuutta reaaliajassa.",
+            "title": "Pääsy & Rekrytointi",
+            "description": "Määritä tutkimuksen URL-osoite, hallitse osallistujien pääsyä ja seuraa rekrytoinnin tehokkuutta.",
+            "study_url": {
+                "title": "Tutkimuksen URL",
+                "description": "Julkinen osoite, josta osallistujat pääsevät tutkimukseesi.",
+                "full_url_label": "Täydellinen URL",
+                "slug_label": "URL-tunniste",
+                "slug_description": "Tutkimuksen URL-osoitteessa käytettävä yksilöllinen tunniste. Vain pienet kirjaimet, numerot ja väliviivat."
+            },
             "new_link": "Uusi pääsulinkki",
             "create_title": "Luo pääsulinkejä",
             "create_description": "Kohdista linkit erityisryhmille tai yleiseen jakeluun. Jokaisella linkillä on eri tietoturva- ja käyttöominaisuudet.",
@@ -1743,19 +1750,8 @@
             "draft": "Luonnos"
         },
         "settings": {
-            "title": "Yleiset asetukset",
-            "description": "Hallitse tutkimuksen perusasetuksia, URL-tunnistetta ja elinkaaren tiloja.",
-            "basic": {
-                "title": "Perustiedot",
-                "description": "Määritä tutkimuksen tunnistetiedot ja saatavuus.",
-                "slug_label": "URL-tunniste",
-                "slug_description": "Yksilöllinen tunniste, jota käytetään URL-osoitteessa.",
-                "start_date_label": "Aloituspäivämäärä (valinnainen)",
-                "start_date_description": "Avaa tutkimuksen automaattisesti tänä päivänä.",
-                "end_date_label": "Lopetuspäivämäärä (valinnainen)",
-                "end_date_description": "Sulkee tutkimuksen automaattisesti tänä päivänä.",
-                "pick_date": "Valitse päivämäärä"
-            },
+            "title": "Tutkimuksen elinkaari",
+            "description": "Tallennustilan hallinta, arkistointi ja tutkimuksen poistaminen.",
             "lifecycle": {
                 "title": "Arkistointi",
                 "description": "Arkistoi tutkimus tehdäksesi siitä vain luku -tilaan kaikille.",

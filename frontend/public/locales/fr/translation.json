@@ -529,7 +529,7 @@
             "create_project": "CRÉER UN NOUVEAU PROJET",
             "dashboard": "Tableau de bord",
             "design": "Conception",
-            "recruit": "Recrutement",
+            "recruit": "Accès",
             "data": "Données",
             "analysis": "Analyse",
             "team": "Équipe",
@@ -691,8 +691,15 @@
             }
         },
         "recruitment": {
-            "title": "Recrutement",
-            "description": "Générez des liens sécurisés pour vos participants et surveillez l'efficacité du recrutement en temps réel.",
+            "title": "Accès & Recrutement",
+            "description": "Configurez l'URL de l'étude, gérez l'accès des participants et suivez l'efficacité du recrutement.",
+            "study_url": {
+                "title": "URL de l'étude",
+                "description": "L'adresse publique par laquelle les participants accèdent à votre étude.",
+                "full_url_label": "URL complète",
+                "slug_label": "Slug URL",
+                "slug_description": "L'identifiant unique utilisé dans l'URL de l'étude. Lettres minuscules, chiffres et tirets uniquement."
+            },
             "new_link": "Nouveau lien d'accès",
             "create_title": "Créer des liens d'accès",
             "create_description": "Ciblez des cohortes spécifiques ou créez un accès général. Chaque type de lien a des propriétés de sécurité différentes.",
@@ -1743,19 +1750,8 @@
             "draft": "Brouillon"
         },
         "settings": {
-            "title": "Paramètres généraux",
-            "description": "Gérez la configuration de base de l'étude, le slug URL et les états du cycle de vie.",
-            "basic": {
-                "title": "Informations de base",
-                "description": "Configurez l'identité de l'étude et la fenêtre de disponibilité.",
-                "slug_label": "Slug URL",
-                "slug_description": "L'identifiant unique utilisé dans l'URL.",
-                "start_date_label": "Date de début (optionnel)",
-                "start_date_description": "Ouvre automatiquement l'étude à cette date.",
-                "end_date_label": "Date de fin (optionnel)",
-                "end_date_description": "Ferme automatiquement l'étude à cette date.",
-                "pick_date": "Choisir une date"
-            },
+            "title": "Cycle de vie",
+            "description": "Gestion du stockage, archivage et suppression de l'étude.",
             "lifecycle": {
                 "title": "Archivage",
                 "description": "Archivez l'étude pour la rendre accessible en lecture seule pour tous.",

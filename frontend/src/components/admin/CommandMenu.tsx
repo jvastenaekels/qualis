@@ -237,7 +237,7 @@ export const CommandMenu = () => {
                                 <span>{t('admin.sidebar.design')}</span>
                             </Command.Item>
                             <Command.Item
-                                value="recruit recruitment"
+                                value="access recruit recruitment"
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(

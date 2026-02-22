@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
@@ -19,31 +19,17 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
 import type { StudyRead, StudyUpdate } from '@/api/model';
-import * as z from 'zod';
 import { AdminService } from '@/api/admin';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import {
     Loader2,
-    Globe,
     Archive,
     Trash2,
     Save,
-    Info,
     ShieldAlert,
     Settings,
     HardDrive,
@@ -52,18 +38,6 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet } from '@/api/generated';
 import { Progress } from '@/components/ui/progress';
-
-// Removing useAdminStudy as we use loader now
-
-const studyFormSchema = z.object({
-    slug: z
-        .string()
-        .min(3)
-        .max(100)
-        .regex(/^[a-z0-9-]+$/, 'Slug must be lowercase alphanumeric with hyphens'),
-});
-
-type StudyFormValues = z.infer<typeof studyFormSchema>;
 
 // Storage usage response type
 interface StorageUsageResponse {
@@ -96,58 +70,6 @@ export default function GeneralSettingsPage() {
 
     const study = initialStudy;
     const slug = initialSlug;
-
-    const form = useForm<StudyFormValues>({
-        resolver: zodResolver(studyFormSchema),
-        defaultValues: {
-            slug: study?.slug || '',
-        },
-    });
-
-    // Initial reset is handled by defaultValues from loader data
-    // but we keep keep it for when study updates via mutation if needed (though RR7 usually handles it)
-    useEffect(() => {
-        if (study) {
-            form.reset({
-                slug: study.slug || '',
-            });
-        }
-    }, [study, form]);
-
-    async function onSubmit(data: StudyFormValues) {
-        if (!slug) return;
-        try {
-            await AdminService.updateStudy(slug, {
-                slug: data.slug,
-            } as unknown as StudyUpdate);
-
-            toast.success(t('admin.settings.save_success'), {
-                description: t('admin.settings.save_success_desc'),
-            });
-
-            // Invalidate queries to update sidebar and local data
-            await queryClient.invalidateQueries({
-                queryKey: getListStudiesApiAdminStudiesGetQueryKey(),
-            });
-            await queryClient.invalidateQueries({
-                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
-            });
-
-            if (data.slug !== slug) {
-                const targetUrl = workspaceSlug
-                    ? `/app/${workspaceSlug}/studies/${data.slug}/settings`
-                    : `/app/${currentWorkspace?.slug}/studies/${data.slug}/settings`;
-                navigate(targetUrl);
-            } else {
-                navigate('.', { replace: true });
-            }
-        } catch (error) {
-            const message = parseApiErrorSync(error, t('admin.settings.save_error'));
-            toast.error(t('admin.settings.save_error'), {
-                description: message,
-            });
-        }
-    }
 
     const handleArchive = async () => {
         if (!study || !slug) return;
@@ -267,70 +189,6 @@ export default function GeneralSettingsPage() {
             />
 
             <div className="space-y-6 max-w-4xl">
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        {/* Basic Information Card - Only URL Slug */}
-                        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                            <CardHeader className="border-b border-slate-50 pb-4">
-                                <div className="flex items-center gap-2 mb-1">
-                                    <Info className="h-5 w-5 text-indigo-500" />
-                                    <CardTitle className="text-lg font-black text-slate-900">
-                                        {t('admin.settings.basic.title')}
-                                    </CardTitle>
-                                </div>
-                                <CardDescription className="text-sm font-medium text-slate-500">
-                                    {t('admin.settings.basic.description')}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="p-6">
-                                {/* Slug */}
-                                <FormField
-                                    control={form.control}
-                                    name="slug"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                            <FormLabel className="text-2xs font-black text-slate-500 flex items-center gap-1.5">
-                                                <Globe className="w-3 h-3" />
-                                                {t('admin.settings.basic.slug_label')}
-                                            </FormLabel>
-                                            <FormControl>
-                                                <div className="relative">
-                                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono text-xs select-none">
-                                                        /study/
-                                                    </div>
-                                                    <Input
-                                                        {...field}
-                                                        disabled={isArchived}
-                                                        className="h-11 rounded-xl bg-slate-50 border-slate-100 pl-14 font-mono text-xs focus-visible:ring-indigo-500"
-                                                    />
-                                                </div>
-                                            </FormControl>
-                                            <FormDescription className="text-xs">
-                                                {t('admin.settings.basic.slug_description')}
-                                            </FormDescription>
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-                            </CardContent>
-                            <CardFooter className="flex justify-end border-t border-slate-50 px-6 py-4">
-                                <Button
-                                    type="submit"
-                                    disabled={isArchived || form.formState.isSubmitting}
-                                    className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
-                                >
-                                    {form.formState.isSubmitting ? (
-                                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                                    ) : (
-                                        <Save className="w-4 h-4 mr-2" />
-                                    )}
-                                    {t('admin.settings.save_button')}
-                                </Button>
-                            </CardFooter>
-                        </Card>
-                    </form>
-                </Form>
-
                 {/* Storage Usage Card - Only shown if audio is enabled */}
                 {isAudioEnabled && (
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">

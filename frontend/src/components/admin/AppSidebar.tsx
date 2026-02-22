@@ -5,11 +5,11 @@ import {
     ChevronsUpDown,
     Globe,
     LayoutDashboard,
+    Link2,
     LogOut,
     PencilRuler,
     Search,
     Settings,
-    UserPlus,
     Download,
     Users,
     ArrowLeft,
@@ -254,7 +254,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   {
                       title: t('admin.sidebar.recruit'),
                       url: `/app/${workspaceSlug}/studies/${params.studySlug}/recruitment`,
-                      icon: UserPlus,
+                      icon: Link2,
                       show: can('study:launch_recruitment'),
                   },
                   {
