@@ -13,9 +13,16 @@ import {
     Save,
     Loader2,
     ExternalLink,
+    Info,
+    FileEdit,
+    Archive,
+    Shield,
+    X,
+    Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
+import { GuidanceCard } from '@/components/admin/GuidanceCard';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -39,6 +46,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
 import {
     Select,
     SelectContent,
@@ -82,6 +91,22 @@ const slugFormSchema = z.object({
 
 type SlugFormValues = z.infer<typeof slugFormSchema>;
 
+const accessRulesSchema = z.object({
+    passwordEnabled: z.boolean(),
+    accessPassword: z.string().optional().or(z.literal('')),
+    startDate: z.string().optional().or(z.literal('')),
+    endDate: z.string().optional().or(z.literal('')),
+});
+
+type AccessRulesValues = z.infer<typeof accessRulesSchema>;
+
+function toLocalDatetimeString(iso: string): string {
+    const date = new Date(iso);
+    const offset = date.getTimezoneOffset();
+    const local = new Date(date.getTime() - offset * 60000);
+    return local.toISOString().slice(0, 16);
+}
+
 const RecruitmentPage = () => {
     const { studySlug: slug, workspaceSlug } = useParams<{
         studySlug: string;
@@ -98,7 +123,7 @@ const RecruitmentPage = () => {
     const queryClient = useQueryClient();
     const { workspace: currentWorkspace } = useAdminContext();
 
-    const isArchived = study.state === 'archived';
+    const isSlugLocked = study.state !== 'draft';
 
     const form = useForm<SlugFormValues>({
         resolver: zodResolver(slugFormSchema),
@@ -110,6 +135,65 @@ const RecruitmentPage = () => {
             form.reset({ slug: study.slug || '' });
         }
     }, [study, form]);
+
+    const isArchived = study.state === 'archived';
+
+    const accessForm = useForm<AccessRulesValues>({
+        resolver: zodResolver(accessRulesSchema),
+        defaultValues: {
+            passwordEnabled: study.requires_password ?? false,
+            accessPassword: '',
+            startDate: study.start_date ? toLocalDatetimeString(study.start_date) : '',
+            endDate: study.end_date ? toLocalDatetimeString(study.end_date) : '',
+        },
+    });
+
+    useEffect(() => {
+        if (study) {
+            accessForm.reset({
+                passwordEnabled: study.requires_password ?? false,
+                accessPassword: '',
+                startDate: study.start_date ? toLocalDatetimeString(study.start_date) : '',
+                endDate: study.end_date ? toLocalDatetimeString(study.end_date) : '',
+            });
+        }
+    }, [study, accessForm]);
+
+    const passwordEnabled = accessForm.watch('passwordEnabled');
+
+    const onAccessRulesSubmit = async (data: AccessRulesValues) => {
+        if (!slug) return;
+        try {
+            const update: Record<string, unknown> = {};
+
+            if (!data.passwordEnabled) {
+                update.access_password = null;
+            } else if (data.accessPassword) {
+                update.access_password = data.accessPassword;
+            }
+
+            update.start_date = data.startDate ? new Date(data.startDate).toISOString() : null;
+            update.end_date = data.endDate ? new Date(data.endDate).toISOString() : null;
+
+            await AdminService.updateStudy(slug, update as unknown as StudyUpdate);
+
+            toast.success(t('admin.recruitment.access_rules.save_success', 'Access rules updated'));
+
+            await queryClient.invalidateQueries({
+                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
+            });
+            revalidator.revalidate();
+        } catch (error) {
+            const message = parseApiErrorSync(
+                error,
+                t('admin.recruitment.access_rules.save_error', 'Failed to update access rules')
+            );
+            toast.error(
+                t('admin.recruitment.access_rules.save_error', 'Failed to update access rules'),
+                { description: message }
+            );
+        }
+    };
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [newLinkType, setNewLinkType] = useState<RecruitmentLinkType>('public');
@@ -409,6 +493,59 @@ const RecruitmentPage = () => {
                 }
             />
 
+            {/* Guidance Card */}
+            <GuidanceCard
+                type="info"
+                collapsible
+                defaultOpen
+                title={t('admin.recruitment.guidance_title', 'How participant access works')}
+            >
+                <p className="text-sm font-medium opacity-80 leading-relaxed max-w-2xl">
+                    {t(
+                        'admin.recruitment.guidance_body',
+                        'The Study URL is the public web address for your study. Recruitment links append unique tokens to this URL to control and track who can participate. Share links directly, via email, or print QR codes for physical materials.'
+                    )}
+                </p>
+            </GuidanceCard>
+
+            {/* State-aware banner */}
+            {study.state === 'draft' && (
+                <div
+                    className="flex items-center gap-3 p-4 bg-indigo-50/60 border border-indigo-100 rounded-2xl text-sm text-indigo-800 font-medium"
+                    role="alert"
+                >
+                    <FileEdit className="size-4 shrink-0" />
+                    {t(
+                        'admin.recruitment.state_draft',
+                        'Your study is in draft mode. Configure the URL and prepare recruitment links — participants cannot access the study until it is activated.'
+                    )}
+                </div>
+            )}
+            {study.state === 'closed' && (
+                <div
+                    className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-600 font-medium"
+                    role="alert"
+                >
+                    <Lock className="size-4 shrink-0" />
+                    {t(
+                        'admin.recruitment.state_closed',
+                        'This study is closed. Existing links remain visible but new participants cannot start.'
+                    )}
+                </div>
+            )}
+            {study.state === 'archived' && (
+                <div
+                    className="flex items-center gap-3 p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-600 font-medium"
+                    role="alert"
+                >
+                    <Archive className="size-4 shrink-0" />
+                    {t(
+                        'admin.recruitment.state_archived',
+                        'This study is archived. All recruitment data is read-only.'
+                    )}
+                </div>
+            )}
+
             {/* Study URL Card */}
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader className="border-b border-slate-50 pb-4">
@@ -525,17 +662,27 @@ const RecruitmentPage = () => {
                                                 </div>
                                                 <Input
                                                     {...field}
-                                                    disabled={isArchived}
+                                                    disabled={isSlugLocked}
                                                     className="h-11 rounded-xl bg-slate-50 border-slate-100 pl-14 font-mono text-xs focus-visible:ring-indigo-500"
                                                 />
                                             </div>
                                         </FormControl>
-                                        <FormDescription className="text-xs">
-                                            {t(
-                                                'admin.recruitment.study_url.slug_description',
-                                                'The unique identifier used in the study URL. Lowercase letters, numbers, and hyphens only.'
-                                            )}
-                                        </FormDescription>
+                                        {isSlugLocked ? (
+                                            <p className="text-xs text-amber-600 flex items-center gap-1.5 mt-1.5">
+                                                <Info className="size-3 shrink-0" />
+                                                {t(
+                                                    'admin.recruitment.study_url.slug_locked',
+                                                    'The URL slug can only be changed while the study is in draft mode.'
+                                                )}
+                                            </p>
+                                        ) : (
+                                            <FormDescription className="text-xs">
+                                                {t(
+                                                    'admin.recruitment.study_url.slug_description',
+                                                    'The unique identifier used in the study URL. Lowercase letters, numbers, and hyphens only.'
+                                                )}
+                                            </FormDescription>
+                                        )}
                                         <FormMessage />
                                     </FormItem>
                                 )}
@@ -544,7 +691,7 @@ const RecruitmentPage = () => {
                                 <Button
                                     type="submit"
                                     disabled={
-                                        isArchived ||
+                                        isSlugLocked ||
                                         form.formState.isSubmitting ||
                                         !form.formState.isDirty
                                     }
@@ -563,88 +710,264 @@ const RecruitmentPage = () => {
                 </CardContent>
             </Card>
 
-            <div className="grid gap-3 sm:gap-4 md:grid-cols-3">
-                <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
-                    <div
-                        className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
-                        aria-hidden="true"
+            {/* Access Rules Card */}
+            <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                <CardHeader className="border-b border-slate-50 pb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                        <Shield className="h-5 w-5 text-indigo-500" />
+                        <CardTitle className="text-lg font-black text-slate-900">
+                            {t('admin.recruitment.access_rules.title', 'Access rules')}
+                        </CardTitle>
+                    </div>
+                    <CardDescription className="text-sm font-medium text-slate-500">
+                        {t(
+                            'admin.recruitment.access_rules.description',
+                            'Control when and how participants can access the study.'
+                        )}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="p-6">
+                    <form
+                        onSubmit={accessForm.handleSubmit(onAccessRulesSubmit)}
+                        className="space-y-6"
                     >
-                        <Users className="w-24 h-24 text-indigo-500 -mr-6 -mt-6" />
-                    </div>
-                    <div className="flex items-center gap-2 mb-3">
-                        <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-                            <Users className="w-5 h-5" aria-hidden="true" />
-                        </div>
-                        <span className="text-xs font-bold text-slate-500">
-                            {t('admin.recruitment.stats.total_links', 'Total Links')}
-                        </span>
-                    </div>
-                    <div className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                        {links?.length || 0}
-                    </div>
-                    <p className="text-2xs text-slate-400 mt-1 font-medium">
-                        {t('admin.recruitment.stats.active_channels', 'Recruitment channels')}
-                    </p>
-                </div>
+                        {/* Password Protection */}
+                        <div className="space-y-4">
+                            <Label className="text-2xs font-black text-slate-400 uppercase tracking-wider">
+                                {t(
+                                    'admin.recruitment.access_rules.password_toggle',
+                                    'Require a password'
+                                )}
+                            </Label>
+                            <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
+                                <div className="space-y-0.5">
+                                    <p className="text-sm font-bold text-slate-700">
+                                        {t(
+                                            'admin.recruitment.access_rules.password_toggle',
+                                            'Require a password'
+                                        )}
+                                    </p>
+                                    <p className="text-xs text-slate-500">
+                                        {t(
+                                            'admin.recruitment.access_rules.password_toggle_desc',
+                                            'Participants must enter a password before starting the study.'
+                                        )}
+                                    </p>
+                                </div>
+                                <Switch
+                                    checked={passwordEnabled}
+                                    onCheckedChange={(checked) => {
+                                        accessForm.setValue('passwordEnabled', checked, {
+                                            shouldDirty: true,
+                                        });
+                                        if (!checked) {
+                                            accessForm.setValue('accessPassword', '', {
+                                                shouldDirty: true,
+                                            });
+                                        }
+                                    }}
+                                    disabled={isSlugLocked}
+                                />
+                            </div>
 
-                <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
-                    <div
-                        className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
-                        aria-hidden="true"
-                    >
-                        <Globe className="w-24 h-24 text-amber-500 -mr-6 -mt-6" />
-                    </div>
-                    <div className="flex items-center gap-2 mb-3">
-                        <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
-                            <Globe className="w-5 h-5" aria-hidden="true" />
+                            {passwordEnabled && (
+                                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                    <Label
+                                        htmlFor="access-password"
+                                        className="text-2xs font-black text-slate-500"
+                                    >
+                                        {t(
+                                            'admin.recruitment.access_rules.password_label',
+                                            'Access password'
+                                        )}
+                                    </Label>
+                                    <div className="relative">
+                                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <Input
+                                            id="access-password"
+                                            type="text"
+                                            placeholder={t(
+                                                'admin.recruitment.access_rules.password_placeholder',
+                                                'Enter access password'
+                                            )}
+                                            disabled={isSlugLocked}
+                                            {...accessForm.register('accessPassword')}
+                                            className="h-11 pl-10 rounded-xl bg-slate-50 border-slate-100 font-mono text-xs focus-visible:ring-indigo-500"
+                                        />
+                                    </div>
+                                    {isSlugLocked ? (
+                                        <p className="text-xs text-amber-600 flex items-center gap-1.5">
+                                            <Info className="size-3 shrink-0" />
+                                            {t(
+                                                'admin.recruitment.access_rules.password_locked',
+                                                'Password protection can only be changed while the study is in draft mode.'
+                                            )}
+                                        </p>
+                                    ) : study.requires_password ? (
+                                        <p className="text-xs text-slate-500">
+                                            {t(
+                                                'admin.recruitment.access_rules.password_set',
+                                                'A password is currently set. Enter a new value to change it, or toggle off to remove.'
+                                            )}
+                                        </p>
+                                    ) : null}
+                                </div>
+                            )}
                         </div>
-                        <span className="text-xs font-bold text-slate-500">
-                            {t('admin.recruitment.stats.started', 'Started')}
-                        </span>
-                    </div>
-                    <div className="text-2xl sm:text-4xl font-black text-amber-600 tracking-tight">
-                        {links?.reduce((acc, l) => acc + (l.start_count || 0), 0) || 0}
-                    </div>
-                    <p className="text-2xs text-slate-400 mt-1 font-medium">
-                        {t('admin.recruitment.stats.engagements', 'Initial engagements')}
-                    </p>
-                </div>
 
-                <div className="group relative overflow-hidden bg-white p-3 sm:p-5 rounded-2xl border border-slate-100 shadow-sm">
-                    <div
-                        className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
-                        aria-hidden="true"
-                    >
-                        <CheckCircle2 className="w-24 h-24 text-emerald-500 -mr-6 -mt-6" />
-                    </div>
-                    <div className="flex items-center gap-2 mb-3">
-                        <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
-                            <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
+                        <Separator />
+
+                        {/* Collection Window */}
+                        <div className="space-y-4">
+                            <Label className="text-2xs font-black text-slate-400 uppercase tracking-wider">
+                                {t(
+                                    'admin.recruitment.access_rules.collection_window',
+                                    'Collection window'
+                                )}
+                            </Label>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="space-y-2">
+                                    <Label
+                                        htmlFor="start-date"
+                                        className="text-2xs font-black text-slate-500"
+                                    >
+                                        {t(
+                                            'admin.recruitment.access_rules.start_date_label',
+                                            'Opens at'
+                                        )}
+                                    </Label>
+                                    <div className="relative">
+                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                        <Input
+                                            id="start-date"
+                                            type="datetime-local"
+                                            disabled={isArchived}
+                                            {...accessForm.register('startDate')}
+                                            className="h-11 pl-10 pr-10 rounded-xl bg-slate-50 border-slate-100 text-xs focus-visible:ring-indigo-500"
+                                        />
+                                        {accessForm.watch('startDate') && !isArchived && (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    accessForm.setValue('startDate', '', {
+                                                        shouldDirty: true,
+                                                    })
+                                                }
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                                aria-label={t(
+                                                    'admin.recruitment.access_rules.clear_date',
+                                                    'Clear date'
+                                                )}
+                                            >
+                                                <X className="size-3.5" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label
+                                        htmlFor="end-date"
+                                        className="text-2xs font-black text-slate-500"
+                                    >
+                                        {t(
+                                            'admin.recruitment.access_rules.end_date_label',
+                                            'Closes at'
+                                        )}
+                                    </Label>
+                                    <div className="relative">
+                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                        <Input
+                                            id="end-date"
+                                            type="datetime-local"
+                                            disabled={isArchived}
+                                            {...accessForm.register('endDate')}
+                                            className="h-11 pl-10 pr-10 rounded-xl bg-slate-50 border-slate-100 text-xs focus-visible:ring-indigo-500"
+                                        />
+                                        {accessForm.watch('endDate') && !isArchived && (
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    accessForm.setValue('endDate', '', {
+                                                        shouldDirty: true,
+                                                    })
+                                                }
+                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                                aria-label={t(
+                                                    'admin.recruitment.access_rules.clear_date',
+                                                    'Clear date'
+                                                )}
+                                            >
+                                                <X className="size-3.5" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                            <p className="text-xs text-slate-400 font-medium">
+                                {t(
+                                    'admin.recruitment.access_rules.date_hint',
+                                    'Leave empty for no time restriction.'
+                                )}
+                            </p>
                         </div>
-                        <span className="text-xs font-bold text-slate-500">
-                            {t('admin.recruitment.stats.submitted', 'Submitted')}
-                        </span>
-                    </div>
-                    <div className="text-2xl sm:text-4xl font-black text-emerald-600 tracking-tight">
-                        {links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0}
-                    </div>
-                    <p className="text-2xs text-slate-400 mt-1 font-medium">
-                        {t('admin.recruitment.stats.completions', 'Validated responses')}
-                    </p>
-                </div>
-            </div>
+
+                        <div className="flex justify-end">
+                            <Button
+                                type="submit"
+                                disabled={
+                                    isArchived ||
+                                    accessForm.formState.isSubmitting ||
+                                    !accessForm.formState.isDirty
+                                }
+                                className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
+                            >
+                                {accessForm.formState.isSubmitting ? (
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                ) : (
+                                    <Save className="w-4 h-4 mr-2" />
+                                )}
+                                {t(
+                                    'admin.recruitment.access_rules.save_button',
+                                    'Save access rules'
+                                )}
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
 
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-4">
-                    <CardTitle className="text-sm font-black text-slate-500">
-                        {t('admin.recruitment.table_title', 'Participant Access Control')}
-                    </CardTitle>
-                    <CardDescription className="text-sm font-medium text-slate-500">
-                        {t(
-                            'admin.recruitment.table_description',
-                            'Generate and manage secure entry points for your study cohorts.'
-                        )}
-                    </CardDescription>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                            <CardTitle className="text-sm font-black text-slate-500">
+                                {t('admin.recruitment.table_title', 'Participant Access Control')}
+                            </CardTitle>
+                            <CardDescription className="text-sm font-medium text-slate-500">
+                                {t(
+                                    'admin.recruitment.table_description',
+                                    'Generate and manage secure entry points for your study cohorts.'
+                                )}
+                            </CardDescription>
+                        </div>
+                        <div className="flex items-center gap-4 text-xs font-bold text-slate-500">
+                            <span className="flex items-center gap-1.5">
+                                <Users className="size-3.5 text-indigo-500" />
+                                {links?.length || 0}{' '}
+                                {t('admin.recruitment.stats_summary.links', 'links')}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <Globe className="size-3.5 text-amber-500" />
+                                {links?.reduce((acc, l) => acc + (l.start_count || 0), 0) || 0}{' '}
+                                {t('admin.recruitment.stats_summary.started', 'started')}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <CheckCircle2 className="size-3.5 text-emerald-500" />
+                                {links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0}{' '}
+                                {t('admin.recruitment.stats_summary.submitted', 'submitted')}
+                            </span>
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
@@ -693,19 +1016,35 @@ const RecruitmentPage = () => {
                         </TableHeader>
                         <TableBody>
                             {links?.length === 0 ? (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={6}
-                                        className="text-center py-20 text-slate-400"
-                                    >
-                                        <div className="flex flex-col items-center gap-2">
-                                            <Link2 className="h-10 w-10 opacity-20" />
-                                            <p className="font-medium">
+                                <TableRow className="hover:bg-transparent">
+                                    <TableCell colSpan={6} className="p-6">
+                                        <div className="text-center py-12 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                                            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 mb-4">
+                                                <Link2 className="h-6 w-6 text-slate-400" />
+                                            </div>
+                                            <p className="text-sm font-bold text-slate-700 mb-1">
                                                 {t(
-                                                    'admin.recruitment.no_links',
-                                                    'No recruitment links generated yet.'
+                                                    'admin.recruitment.empty_title',
+                                                    'No recruitment links yet'
                                                 )}
                                             </p>
+                                            <p className="text-xs text-slate-400 font-medium mb-4 max-w-xs mx-auto">
+                                                {t(
+                                                    'admin.recruitment.empty_description',
+                                                    'Create your first link to start inviting participants.'
+                                                )}
+                                            </p>
+                                            <Button
+                                                size="sm"
+                                                onClick={() => setIsCreateModalOpen(true)}
+                                                className="bg-indigo-600 hover:bg-indigo-700 font-bold rounded-xl shadow-sm"
+                                            >
+                                                <Plus className="h-4 w-4 mr-1.5" />
+                                                {t(
+                                                    'admin.recruitment.empty_cta',
+                                                    'Create access link'
+                                                )}
+                                            </Button>
                                         </div>
                                     </TableCell>
                                 </TableRow>

@@ -304,6 +304,10 @@ async def update_study(
         for field, value in update_data.items():
             if field in ["translations", "statements", "grid_config"]:
                 continue
+            if field == "access_password" and value is not None:
+                from app.utils.security import get_password_hash
+
+                value = get_password_hash(value)
             setattr(study, field, value)
 
         # 2. Update grid_config (DRAFT only)
