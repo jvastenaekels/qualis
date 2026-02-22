@@ -13,7 +13,7 @@ from app.models import RecruitmentLink, RecruitmentLinkType
 
 class RecruitmentService:
     @staticmethod
-    def _generate_token(length: int = 12) -> str:
+    def _generate_token(length: int = 8) -> str:
         """Generate a random secure token."""
         alphabet = string.ascii_letters + string.digits
         return "".join(secrets.choice(alphabet) for _ in range(length))

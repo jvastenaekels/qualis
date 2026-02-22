@@ -302,195 +302,6 @@ const RecruitmentPage = () => {
                     'Configure the study URL, manage participant access, and track recruitment efficiency.'
                 )}
                 icon={Link2}
-                actions={
-                    <Dialog
-                        open={isCreateModalOpen}
-                        onOpenChange={(open) => {
-                            setIsCreateModalOpen(open);
-                            if (!open) {
-                                setNewLinkType('public');
-                                setNewLinkCount(1);
-                                setNewLinkName('');
-                            }
-                        }}
-                    >
-                        <DialogTrigger asChild>
-                            <Button className="bg-indigo-600 hover:bg-indigo-700 shadow-sm font-bold h-11 px-6 rounded-xl">
-                                <Plus className="h-4 w-4 mr-2" />
-                                {t('admin.recruitment.new_link', 'New Access Link')}
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle className="text-xl font-black tracking-tight flex items-center gap-2">
-                                    <div className="p-2 bg-indigo-50 rounded-lg">
-                                        <Plus className="h-5 w-5 text-indigo-600" />
-                                    </div>
-                                    {t('admin.recruitment.create_title', 'Create Access Links')}
-                                </DialogTitle>
-                                <DialogDescription className="pt-2">
-                                    {t(
-                                        'admin.recruitment.create_description',
-                                        'Generate links for your participants. Individual links are valid for one submission only.'
-                                    )}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-5 py-4">
-                                <div className="grid gap-2">
-                                    <Label
-                                        htmlFor="type"
-                                        className="text-2xs font-black text-slate-500"
-                                    >
-                                        {t('admin.recruitment.link_type', 'Link Type')}
-                                    </Label>
-                                    <Select
-                                        value={newLinkType}
-                                        onValueChange={(v) =>
-                                            setNewLinkType(v as RecruitmentLinkType)
-                                        }
-                                    >
-                                        <SelectTrigger id="type" className="h-11 rounded-xl">
-                                            <SelectValue
-                                                placeholder={t(
-                                                    'admin.recruitment.select_type',
-                                                    'Select type'
-                                                )}
-                                            />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="public">
-                                                <div className="flex items-center gap-2">
-                                                    <Globe className="h-4 w-4 text-blue-500" />
-                                                    <span>
-                                                        {t(
-                                                            'admin.recruitment.types.public',
-                                                            'Public (Multiple usage)'
-                                                        )}
-                                                    </span>
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="individual">
-                                                <div className="flex items-center gap-2">
-                                                    <Users className="h-4 w-4 text-indigo-500" />
-                                                    <span>
-                                                        {t(
-                                                            'admin.recruitment.types.individual',
-                                                            'Individual (Single usage)'
-                                                        )}
-                                                    </span>
-                                                </div>
-                                            </SelectItem>
-                                            <SelectItem value="limited">
-                                                <div className="flex items-center gap-2">
-                                                    <Lock className="h-4 w-4 text-orange-500" />
-                                                    <span>
-                                                        {t(
-                                                            'admin.recruitment.types.limited',
-                                                            'Limited (Set capacity)'
-                                                        )}
-                                                    </span>
-                                                </div>
-                                            </SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs text-slate-500 leading-relaxed italic">
-                                        {newLinkType === 'public' &&
-                                            t(
-                                                'admin.recruitment.guidance.public',
-                                                'Ideal for social media or generic newsletters. Anyone with this link can participate multiple times.'
-                                            )}
-                                        {newLinkType === 'individual' &&
-                                            t(
-                                                'admin.recruitment.guidance.individual',
-                                                'Each link is unique and expires after one submission. Best for controlled samples.'
-                                            )}
-                                        {newLinkType === 'limited' &&
-                                            t(
-                                                'admin.recruitment.guidance.limited',
-                                                'Set a maximum number of submissions for a single link. Good for small target groups.'
-                                            )}
-                                    </div>
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label
-                                        htmlFor="name"
-                                        className="text-2xs font-black text-slate-500"
-                                    >
-                                        {t(
-                                            'admin.recruitment.campaign_name',
-                                            'Campaign Name (Optional)'
-                                        )}
-                                    </Label>
-                                    <div className="relative">
-                                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                        <Input
-                                            id="name"
-                                            placeholder={t(
-                                                'admin.recruitment.name_placeholder',
-                                                'e.g. Social Media, Batch A'
-                                            )}
-                                            value={newLinkName}
-                                            onChange={(e) => setNewLinkName(e.target.value)}
-                                            className="h-11 pl-10 rounded-xl"
-                                        />
-                                    </div>
-                                </div>
-                                {newLinkType !== 'public' && (
-                                    <div className="grid gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <Label
-                                            htmlFor="count"
-                                            className="text-2xs font-black text-slate-500"
-                                        >
-                                            {newLinkType === 'individual'
-                                                ? t(
-                                                      'admin.recruitment.link_count',
-                                                      'Number of links to generate'
-                                                  )
-                                                : t(
-                                                      'admin.recruitment.capacity_label',
-                                                      'Participant Capacity'
-                                                  )}
-                                        </Label>
-                                        <div className="relative">
-                                            <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                            <Input
-                                                id="count"
-                                                type="number"
-                                                min="1"
-                                                max="500"
-                                                value={newLinkCount}
-                                                onChange={(e) =>
-                                                    setNewLinkCount(
-                                                        parseInt(e.target.value, 10) || 1
-                                                    )
-                                                }
-                                                className="h-11 pl-10 rounded-xl"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                            <DialogFooter className="mt-2 text-center sm:text-right">
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => setIsCreateModalOpen(false)}
-                                    className="rounded-xl"
-                                >
-                                    {t('common.cancel', 'Cancel')}
-                                </Button>
-                                <Button
-                                    onClick={handleCreate}
-                                    disabled={createMutation.isPending}
-                                    className="bg-indigo-600 hover:bg-indigo-700 font-bold px-8 rounded-xl shadow-lg shadow-indigo-200"
-                                >
-                                    {createMutation.isPending
-                                        ? t('common.generating', 'Generating...')
-                                        : t('admin.recruitment.generate_links', 'Generate Links')}
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-                }
             />
 
             {/* Guidance Card */}
@@ -950,22 +761,223 @@ const RecruitmentPage = () => {
                                 )}
                             </CardDescription>
                         </div>
-                        <div className="flex items-center gap-4 text-xs font-bold text-slate-500">
-                            <span className="flex items-center gap-1.5">
-                                <Users className="size-3.5 text-indigo-500" />
-                                {links?.length || 0}{' '}
-                                {t('admin.recruitment.stats_summary.links', 'links')}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <Globe className="size-3.5 text-amber-500" />
-                                {links?.reduce((acc, l) => acc + (l.start_count || 0), 0) || 0}{' '}
-                                {t('admin.recruitment.stats_summary.started', 'started')}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <CheckCircle2 className="size-3.5 text-emerald-500" />
-                                {links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0}{' '}
-                                {t('admin.recruitment.stats_summary.submitted', 'submitted')}
-                            </span>
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-4 text-xs font-bold text-slate-500">
+                                <span className="flex items-center gap-1.5">
+                                    <Users className="size-3.5 text-indigo-500" />
+                                    {links?.length || 0}{' '}
+                                    {t('admin.recruitment.stats_summary.links', 'links')}
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                    <Globe className="size-3.5 text-amber-500" />
+                                    {links?.reduce((acc, l) => acc + (l.start_count || 0), 0) || 0}{' '}
+                                    {t('admin.recruitment.stats_summary.started', 'started')}
+                                </span>
+                                <span className="flex items-center gap-1.5">
+                                    <CheckCircle2 className="size-3.5 text-emerald-500" />
+                                    {links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0}{' '}
+                                    {t('admin.recruitment.stats_summary.submitted', 'submitted')}
+                                </span>
+                            </div>
+                            <Dialog
+                                open={isCreateModalOpen}
+                                onOpenChange={(open) => {
+                                    setIsCreateModalOpen(open);
+                                    if (!open) {
+                                        setNewLinkType('public');
+                                        setNewLinkCount(1);
+                                        setNewLinkName('');
+                                    }
+                                }}
+                            >
+                                <DialogTrigger asChild>
+                                    <Button
+                                        size="sm"
+                                        className="bg-indigo-600 hover:bg-indigo-700 shadow-sm font-bold rounded-xl"
+                                    >
+                                        <Plus className="h-4 w-4 mr-1.5" />
+                                        {t('admin.recruitment.new_link', 'New Access Link')}
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[425px]">
+                                    <DialogHeader>
+                                        <DialogTitle className="text-xl font-black tracking-tight flex items-center gap-2">
+                                            <div className="p-2 bg-indigo-50 rounded-lg">
+                                                <Plus className="h-5 w-5 text-indigo-600" />
+                                            </div>
+                                            {t(
+                                                'admin.recruitment.create_title',
+                                                'Create Access Links'
+                                            )}
+                                        </DialogTitle>
+                                        <DialogDescription className="pt-2">
+                                            {t(
+                                                'admin.recruitment.create_description',
+                                                'Generate links for your participants. Individual links are valid for one submission only.'
+                                            )}
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-5 py-4">
+                                        <div className="grid gap-2">
+                                            <Label
+                                                htmlFor="type"
+                                                className="text-2xs font-black text-slate-500"
+                                            >
+                                                {t('admin.recruitment.link_type', 'Link Type')}
+                                            </Label>
+                                            <Select
+                                                value={newLinkType}
+                                                onValueChange={(v) =>
+                                                    setNewLinkType(v as RecruitmentLinkType)
+                                                }
+                                            >
+                                                <SelectTrigger
+                                                    id="type"
+                                                    className="h-11 rounded-xl"
+                                                >
+                                                    <SelectValue
+                                                        placeholder={t(
+                                                            'admin.recruitment.select_type',
+                                                            'Select type'
+                                                        )}
+                                                    />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="public">
+                                                        <div className="flex items-center gap-2">
+                                                            <Globe className="h-4 w-4 text-blue-500" />
+                                                            <span>
+                                                                {t(
+                                                                    'admin.recruitment.types.public',
+                                                                    'Public (Multiple usage)'
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </SelectItem>
+                                                    <SelectItem value="individual">
+                                                        <div className="flex items-center gap-2">
+                                                            <Users className="h-4 w-4 text-indigo-500" />
+                                                            <span>
+                                                                {t(
+                                                                    'admin.recruitment.types.individual',
+                                                                    'Individual (Single usage)'
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </SelectItem>
+                                                    <SelectItem value="limited">
+                                                        <div className="flex items-center gap-2">
+                                                            <Lock className="h-4 w-4 text-orange-500" />
+                                                            <span>
+                                                                {t(
+                                                                    'admin.recruitment.types.limited',
+                                                                    'Limited (Set capacity)'
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-xs text-slate-500 leading-relaxed italic">
+                                                {newLinkType === 'public' &&
+                                                    t(
+                                                        'admin.recruitment.guidance.public',
+                                                        'Ideal for social media or generic newsletters. Anyone with this link can participate multiple times.'
+                                                    )}
+                                                {newLinkType === 'individual' &&
+                                                    t(
+                                                        'admin.recruitment.guidance.individual',
+                                                        'Each link is unique and expires after one submission. Best for controlled samples.'
+                                                    )}
+                                                {newLinkType === 'limited' &&
+                                                    t(
+                                                        'admin.recruitment.guidance.limited',
+                                                        'Set a maximum number of submissions for a single link. Good for small target groups.'
+                                                    )}
+                                            </div>
+                                        </div>
+                                        <div className="grid gap-2">
+                                            <Label
+                                                htmlFor="name"
+                                                className="text-2xs font-black text-slate-500"
+                                            >
+                                                {t(
+                                                    'admin.recruitment.campaign_name',
+                                                    'Campaign Name (Optional)'
+                                                )}
+                                            </Label>
+                                            <div className="relative">
+                                                <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                                <Input
+                                                    id="name"
+                                                    placeholder={t(
+                                                        'admin.recruitment.name_placeholder',
+                                                        'e.g. Social Media, Batch A'
+                                                    )}
+                                                    value={newLinkName}
+                                                    onChange={(e) => setNewLinkName(e.target.value)}
+                                                    className="h-11 pl-10 rounded-xl"
+                                                />
+                                            </div>
+                                        </div>
+                                        {newLinkType !== 'public' && (
+                                            <div className="grid gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <Label
+                                                    htmlFor="count"
+                                                    className="text-2xs font-black text-slate-500"
+                                                >
+                                                    {newLinkType === 'individual'
+                                                        ? t(
+                                                              'admin.recruitment.link_count',
+                                                              'Number of links to generate'
+                                                          )
+                                                        : t(
+                                                              'admin.recruitment.capacity_label',
+                                                              'Participant Capacity'
+                                                          )}
+                                                </Label>
+                                                <div className="relative">
+                                                    <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                                    <Input
+                                                        id="count"
+                                                        type="number"
+                                                        min="1"
+                                                        max="500"
+                                                        value={newLinkCount}
+                                                        onChange={(e) =>
+                                                            setNewLinkCount(
+                                                                parseInt(e.target.value, 10) || 1
+                                                            )
+                                                        }
+                                                        className="h-11 pl-10 rounded-xl"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <DialogFooter className="mt-2 text-center sm:text-right">
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() => setIsCreateModalOpen(false)}
+                                            className="rounded-xl"
+                                        >
+                                            {t('common.cancel', 'Cancel')}
+                                        </Button>
+                                        <Button
+                                            onClick={handleCreate}
+                                            disabled={createMutation.isPending}
+                                            className="bg-indigo-600 hover:bg-indigo-700 font-bold px-8 rounded-xl shadow-lg shadow-indigo-200"
+                                        >
+                                            {createMutation.isPending
+                                                ? t('common.generating', 'Generating...')
+                                                : t(
+                                                      'admin.recruitment.generate_links',
+                                                      'Generate Links'
+                                                  )}
+                                        </Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
                 </CardHeader>
