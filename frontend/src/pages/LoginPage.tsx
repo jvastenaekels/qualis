@@ -181,7 +181,7 @@ const LoginPage = () => {
                     </form>
                 </Card>
 
-                <p className="text-center text-2xs text-slate-400 mt-12 font-medium uppercase tracking-widest opacity-50">
+                <p className="text-center text-2xs text-slate-400 mt-12 font-medium opacity-50">
                     Libre-Q
                 </p>
             </motion.div>

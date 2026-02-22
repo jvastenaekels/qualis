@@ -121,7 +121,7 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                 </p>
                 {finalConfirmationCode && (
                     <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 inline-block shadow-sm max-w-full">
-                        <span className="text-xs font-semibold text-slate-400 block uppercase tracking-widest mb-2">
+                        <span className="text-xs font-semibold text-slate-400 block mb-2">
                             {t('post.success.id_label')}
                         </span>
                         <span className="text-2xl font-mono font-bold text-slate-800 tracking-widest select-all break-all">

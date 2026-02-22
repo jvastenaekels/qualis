@@ -109,7 +109,7 @@ export const CommandMenu = () => {
                     {/* Workspaces */}
                     <Command.Group
                         heading={t('admin.command_menu.switch_workspace', 'Switch Workspace')}
-                        className="px-2 py-1.5 text-2xs font-bold text-muted-foreground uppercase tracking-widest"
+                        className="px-2 py-1.5 text-2xs font-bold text-muted-foreground"
                     >
                         {(Array.isArray(workspaces) ? workspaces : []).map((ws) => (
                             <div key={ws.id}>
@@ -160,7 +160,7 @@ export const CommandMenu = () => {
                     {/* Studies (Filtered) */}
                     <Command.Group
                         heading={t('admin.command_menu.switch_study', 'Switch Study')}
-                        className="px-2 py-1.5 text-2xs font-bold text-muted-foreground uppercase tracking-widest"
+                        className="px-2 py-1.5 text-2xs font-bold text-muted-foreground"
                     >
                         {filteredStudies?.map((study) => (
                             <Command.Item
@@ -202,7 +202,7 @@ export const CommandMenu = () => {
                     {isValidStudy && (
                         <Command.Group
                             heading={t('admin.command_menu.study_actions', 'Study Actions')}
-                            className="px-2 py-1.5 text-2xs font-bold text-muted-foreground uppercase tracking-widest"
+                            className="px-2 py-1.5 text-2xs font-bold text-muted-foreground"
                         >
                             <Command.Item
                                 value="overview dashboard"
@@ -316,7 +316,7 @@ export const CommandMenu = () => {
                     {/* System Actions */}
                     <Command.Group
                         heading={t('admin.command_menu.system', 'System')}
-                        className="px-2 py-1.5 text-2xs font-bold text-muted-foreground uppercase tracking-widest"
+                        className="px-2 py-1.5 text-2xs font-bold text-muted-foreground"
                     >
                         <Command.Item
                             value="logout sign out"

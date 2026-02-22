@@ -56,7 +56,7 @@ const TeamManagementPage = () => {
                             <Users className="size-5 text-indigo-500" />
                         </div>
                         <div className="space-y-1">
-                            <h3 className="text-sm font-black uppercase tracking-wider text-indigo-900">
+                            <h3 className="text-sm font-black text-indigo-900">
                                 {t('admin.team.what_changed', 'What changed?')}
                             </h3>
                             <p className="text-xs text-indigo-800/70 leading-relaxed">

@@ -177,7 +177,7 @@ const LanguageManagerModal = ({ isOpen, onClose }: LanguageManagerModalProps) =>
                                             <div className="font-bold text-slate-900">
                                                 {lang.label}
                                             </div>
-                                            <div className="text-xs text-slate-500 uppercase font-mono">
+                                            <div className="text-xs text-slate-500 font-mono">
                                                 {lang.code}
                                             </div>
                                         </div>

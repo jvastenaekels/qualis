@@ -56,7 +56,7 @@ export const StudyAccessGate: React.FC<StudyAccessGateProps> = ({
                             <Label
                                 htmlFor="password"
                                 name="password"
-                                className="text-sm font-bold text-slate-700 uppercase tracking-wider ml-1"
+                                className="text-sm font-bold text-slate-700 ml-1"
                             >
                                 {t('study.access.password_label', 'Enter Password')}
                             </Label>
@@ -104,7 +104,7 @@ export const StudyAccessGate: React.FC<StudyAccessGateProps> = ({
                 </CardContent>
             </Card>
 
-            <p className="mt-8 text-slate-400 text-xs font-medium uppercase tracking-widest flex items-center gap-2">
+            <p className="mt-8 text-slate-400 text-xs font-medium flex items-center gap-2">
                 <span className="w-8 h-px bg-slate-200" />
                 Powered by Libre-Q
                 <span className="w-8 h-px bg-slate-200" />

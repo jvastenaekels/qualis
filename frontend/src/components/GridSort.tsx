@@ -184,7 +184,7 @@ const InstructionHeader: React.FC<{
                         exit={{ opacity: 0, y: -20 }}
                         onClick={() => setIsMinimized(false)}
                         className={cn(
-                            'absolute inset-x-0 mx-auto w-fit bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wide',
+                            'absolute inset-x-0 mx-auto w-fit bg-white/90 backdrop-blur-md shadow-sm border border-slate-200/50 rounded-full px-3 py-1.5 flex items-center justify-center gap-2 text-xs font-bold text-indigo-600',
                             emphasizeCollapse ? 'top-2 z-header' : 'top-[112px] z-modal'
                         )}
                         aria-label="Expand instructions"
@@ -320,7 +320,7 @@ const GridLegend: React.FC<{
     return (
         <div className="w-full h-auto flex flex-col gap-3 pt-4 border-t border-slate-200/50">
             <div
-                className="flex justify-between items-end w-full font-bold uppercase tracking-widest opacity-60 px-2 gap-4"
+                className="flex justify-between items-end w-full font-bold opacity-60 px-2 gap-4"
                 role="group"
                 aria-label="Grid legend"
             >
@@ -386,7 +386,7 @@ const PileTab: React.FC<{
                 )}
             />
             {!compact && (
-                <span className="hidden sm:block text-2xs font-bold uppercase tracking-wider mb-1 line-clamp-2 text-center px-1 leading-tight">
+                <span className="hidden sm:block text-2xs font-bold mb-1 line-clamp-2 text-center px-1 leading-tight">
                     {label}
                 </span>
             )}
@@ -479,7 +479,7 @@ const ValidationFooter: React.FC<{
                                     2
                                 </span>
                                 <span
-                                    className="text-xs font-bold uppercase tracking-wide motion-safe:animate-pulse"
+                                    className="text-xs font-bold motion-safe:animate-pulse"
                                     style={{ color: 'var(--brand-accent)' }}
                                 >
                                     {labels.place}
@@ -500,7 +500,7 @@ const ValidationFooter: React.FC<{
                                 <span className="flex h-5 w-5 flex-none items-center justify-center rounded-full bg-slate-200 text-2xs text-slate-500 font-black">
                                     1
                                 </span>
-                                <span className="text-xs font-bold uppercase tracking-wide">
+                                <span className="text-xs font-bold">
                                     {isAllPlaced ? labels.finish : labels.initial}
                                 </span>
                             </>

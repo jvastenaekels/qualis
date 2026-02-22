@@ -325,7 +325,7 @@ export function ImportStudyDialog({ open, onOpenChange, workspaceSlug }: ImportS
                                     </h4>
                                     <dl className="grid grid-cols-2 gap-3 text-sm">
                                         <div>
-                                            <dt className="text-gray-500 text-xs uppercase tracking-wide">
+                                            <dt className="text-gray-500 text-xs">
                                                 {t('admin.import.title_field', 'Title')}
                                             </dt>
                                             <dd className="font-medium mt-1">
@@ -333,7 +333,7 @@ export function ImportStudyDialog({ open, onOpenChange, workspaceSlug }: ImportS
                                             </dd>
                                         </div>
                                         <div>
-                                            <dt className="text-gray-500 text-xs uppercase tracking-wide">
+                                            <dt className="text-gray-500 text-xs">
                                                 {t('admin.import.languages', 'Languages')}
                                             </dt>
                                             <dd className="font-medium mt-1 flex gap-1 flex-wrap">
@@ -349,7 +349,7 @@ export function ImportStudyDialog({ open, onOpenChange, workspaceSlug }: ImportS
                                             </dd>
                                         </div>
                                         <div>
-                                            <dt className="text-gray-500 text-xs uppercase tracking-wide">
+                                            <dt className="text-gray-500 text-xs">
                                                 {t('admin.import.statements', 'Statements')}
                                             </dt>
                                             <dd className="font-medium mt-1">
@@ -357,7 +357,7 @@ export function ImportStudyDialog({ open, onOpenChange, workspaceSlug }: ImportS
                                             </dd>
                                         </div>
                                         <div>
-                                            <dt className="text-gray-500 text-xs uppercase tracking-wide">
+                                            <dt className="text-gray-500 text-xs">
                                                 {t('admin.import.grid', 'Grid Range')}
                                             </dt>
                                             <dd className="font-medium mt-1">

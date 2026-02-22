@@ -289,7 +289,7 @@ export default function GeneralSettingsPage() {
                                     name="slug"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-2xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                                            <FormLabel className="text-2xs font-black text-slate-500 flex items-center gap-1.5">
                                                 <Globe className="w-3 h-3" />
                                                 {t('admin.settings.basic.slug_label')}
                                             </FormLabel>
@@ -426,7 +426,7 @@ export default function GeneralSettingsPage() {
                                     <div className="border-t border-slate-100 pt-4 space-y-2">
                                         <label
                                             htmlFor="storage-quota"
-                                            className="text-2xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5"
+                                            className="text-2xs font-black text-slate-500 flex items-center gap-1.5"
                                         >
                                             <HardDrive className="w-3 h-3" />
                                             {t(

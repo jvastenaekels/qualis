@@ -181,7 +181,7 @@ const ProfilePage = () => {
                             <div className="grid gap-2">
                                 <Label
                                     htmlFor="email"
-                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                    className="text-2xs font-black text-slate-500"
                                 >
                                     Email
                                 </Label>
@@ -201,7 +201,7 @@ const ProfilePage = () => {
                             <div className="grid gap-2">
                                 <Label
                                     htmlFor="full_name"
-                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                    className="text-2xs font-black text-slate-500"
                                 >
                                     Full Name
                                 </Label>
@@ -241,7 +241,7 @@ const ProfilePage = () => {
                                     <ShieldCheck className="size-5 text-indigo-500" />
                                     {t('admin.profile.security.title', 'Security & 2FA')}
                                     {user?.is_totp_enabled && (
-                                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 text-2xs font-black uppercase tracking-wider">
+                                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 text-2xs font-black">
                                             {t('admin.profile.security.enabled', 'Enabled')}
                                         </Badge>
                                     )}
@@ -479,7 +479,7 @@ const ProfilePage = () => {
                             <div className="grid gap-2">
                                 <Label
                                     htmlFor="current_password"
-                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                    className="text-2xs font-black text-slate-500"
                                 >
                                     Current Password
                                 </Label>
@@ -501,7 +501,7 @@ const ProfilePage = () => {
                             <div className="grid gap-2">
                                 <Label
                                     htmlFor="new_password"
-                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                    className="text-2xs font-black text-slate-500"
                                 >
                                     New Password
                                 </Label>

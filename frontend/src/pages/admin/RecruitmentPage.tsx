@@ -164,7 +164,7 @@ const RecruitmentPage = () => {
                                 <div className="grid gap-2">
                                     <Label
                                         htmlFor="type"
-                                        className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                        className="text-2xs font-black text-slate-500"
                                     >
                                         {t('admin.recruitment.link_type', 'Link Type')}
                                     </Label>
@@ -239,7 +239,7 @@ const RecruitmentPage = () => {
                                 <div className="grid gap-2">
                                     <Label
                                         htmlFor="name"
-                                        className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                        className="text-2xs font-black text-slate-500"
                                     >
                                         {t(
                                             'admin.recruitment.campaign_name',
@@ -264,7 +264,7 @@ const RecruitmentPage = () => {
                                     <div className="grid gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
                                         <Label
                                             htmlFor="count"
-                                            className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                            className="text-2xs font-black text-slate-500"
                                         >
                                             {newLinkType === 'individual'
                                                 ? t(
@@ -330,7 +330,7 @@ const RecruitmentPage = () => {
                         <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
                             <Users className="w-5 h-5" aria-hidden="true" />
                         </div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500">
                             {t('admin.recruitment.stats.total_links', 'Total Links')}
                         </span>
                     </div>
@@ -353,7 +353,7 @@ const RecruitmentPage = () => {
                         <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
                             <Globe className="w-5 h-5" aria-hidden="true" />
                         </div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500">
                             {t('admin.recruitment.stats.started', 'Started')}
                         </span>
                     </div>
@@ -376,7 +376,7 @@ const RecruitmentPage = () => {
                         <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
                             <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
                         </div>
-                        <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                        <span className="text-xs font-bold text-slate-500">
                             {t('admin.recruitment.stats.submitted', 'Submitted')}
                         </span>
                     </div>
@@ -391,7 +391,7 @@ const RecruitmentPage = () => {
 
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                 <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-4">
-                    <CardTitle className="text-sm font-black uppercase tracking-wider text-slate-500">
+                    <CardTitle className="text-sm font-black text-slate-500">
                         {t('admin.recruitment.table_title', 'Participant Access Control')}
                     </CardTitle>
                     <CardDescription className="text-sm font-medium text-slate-500">
@@ -410,37 +410,37 @@ const RecruitmentPage = () => {
                             <TableRow className="hover:bg-transparent border-slate-100">
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400 pl-6"
+                                    className="py-4 text-2xs font-black text-slate-400 pl-6"
                                 >
                                     {t('admin.recruitment.table.name', 'Name / Cohort')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400"
+                                    className="py-4 text-2xs font-black text-slate-400"
                                 >
                                     {t('admin.recruitment.table.type', 'Type')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400"
+                                    className="py-4 text-2xs font-black text-slate-400"
                                 >
                                     {t('admin.recruitment.table.token', 'Token')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400"
+                                    className="py-4 text-2xs font-black text-slate-400"
                                 >
                                     {t('admin.recruitment.table.usage', 'Usage')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400"
+                                    className="py-4 text-2xs font-black text-slate-400"
                                 >
                                     {t('admin.recruitment.table.status', 'Status')}
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black uppercase tracking-wider text-slate-400 text-right pr-6"
+                                    className="py-4 text-2xs font-black text-slate-400 text-right pr-6"
                                 >
                                     {t('admin.recruitment.table.actions', 'Actions')}
                                 </TableHead>
@@ -553,13 +553,13 @@ const RecruitmentPage = () => {
                                         </TableCell>
                                         <TableCell>
                                             {link.is_active ? (
-                                                <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-100 px-2 py-0 shadow-none text-[9px] font-black uppercase tracking-wider">
+                                                <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-100 px-2 py-0 shadow-none text-[9px] font-black">
                                                     {t('admin.status.active')}
                                                 </Badge>
                                             ) : (
                                                 <Badge
                                                     variant="secondary"
-                                                    className="bg-slate-50 text-slate-400 border-slate-200 px-2 py-0 shadow-none text-[9px] font-black uppercase tracking-wider"
+                                                    className="bg-slate-50 text-slate-400 border-slate-200 px-2 py-0 shadow-none text-[9px] font-black"
                                                 >
                                                     {t('admin.recruitment.revoked', 'Revoked')}
                                                 </Badge>

@@ -131,7 +131,7 @@ export function WorkspaceSwitcher() {
                                                 {/* Show Role Badge */}
                                                 <span
                                                     className={cn(
-                                                        'uppercase px-1 rounded-sm text-[8px]',
+                                                        'px-1 rounded-sm text-[8px]',
                                                         workspace.user_role === 'owner'
                                                             ? 'bg-amber-100 text-amber-700'
                                                             : workspace.user_role === 'admin'

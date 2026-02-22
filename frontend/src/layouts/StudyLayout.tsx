@@ -485,7 +485,7 @@ const StudyLayoutContent: React.FC = () => {
         >
             {/* Pilot Mode Banner */}
             {isPilotModePersistent && (
-                <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex items-center justify-center gap-2 text-amber-900 text-xs font-bold uppercase tracking-wider relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
+                <div className="bg-amber-100 border-b border-amber-200 px-4 py-1.5 flex items-center justify-center gap-2 text-amber-900 text-xs font-bold relative z-[60] shrink-0 shadow-sm animate-in fade-in slide-in-from-top-full duration-500">
                     <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                     {t('layout.pilot_mode')}
                 </div>
@@ -595,7 +595,7 @@ const StudyLayoutContent: React.FC = () => {
                         {/* Mobile Step Selection Menu */}
                         {isStepMenuOpen && (
                             <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-slate-200 rounded-xl shadow-xl z-[60] py-2 animate-in fade-in zoom-in-95 duration-200 origin-top-left">
-                                <div className="px-3 py-1 mb-1 text-2xs font-bold text-slate-400 uppercase tracking-wider">
+                                <div className="px-3 py-1 mb-1 text-2xs font-bold text-slate-400">
                                     {t('layout.navigation')}
                                 </div>
                                 {visibleSteps.map((step, index) => {
@@ -973,7 +973,7 @@ const StudyLayoutContent: React.FC = () => {
                                                     : 'text-slate-700'
                                             }`}
                                         >
-                                            <span className="uppercase">{lang}</span>
+                                            <span className="">{lang}</span>
                                             {i18n.language?.startsWith(lang) && (
                                                 <Check
                                                     size={14}

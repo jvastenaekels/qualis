@@ -203,7 +203,7 @@ export function ParticipantDetailContent({
     const sidebarContent = (
         <div className="flex flex-col h-full bg-white">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50">
-                <h3 className="text-xs font-black uppercase tracking-widest text-slate-400">
+                <h3 className="text-xs font-black text-slate-400">
                     {t('admin.participant.grid.detail_view', 'Card Details')}
                 </h3>
             </div>
@@ -326,7 +326,7 @@ export function ParticipantDetailContent({
                             <TabsTrigger
                                 key={tab}
                                 value={tab}
-                                className="min-h-[44px] sm:h-14 min-w-[44px] rounded-none border-b-2 border-transparent px-3 sm:px-0 text-xs sm:text-xs font-black uppercase tracking-widest text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
+                                className="min-h-[44px] sm:h-14 min-w-[44px] rounded-none border-b-2 border-transparent px-3 sm:px-0 text-xs sm:text-xs font-black text-slate-400 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-600 data-[state=active]:bg-transparent transition-all"
                             >
                                 <div className="flex items-center gap-2">
                                     {tab === 'session' && (
@@ -430,7 +430,7 @@ export function ParticipantDetailContent({
                                 className="space-y-6 max-w-7xl mx-auto"
                             >
                                 <div className="space-y-4">
-                                    <h3 className="text-2xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                    <h3 className="text-2xs font-black text-slate-400 flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                                         {t(
                                             'admin.participant.survey.presort',
@@ -509,7 +509,7 @@ export function ParticipantDetailContent({
                                 className="space-y-8 max-w-7xl mx-auto"
                             >
                                 <div className="space-y-4">
-                                    <h3 className="text-2xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                    <h3 className="text-2xs font-black text-slate-400 flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                         {t(
                                             'admin.participant.survey.postsort',
@@ -527,7 +527,7 @@ export function ParticipantDetailContent({
                                 {/* Audio Recordings */}
                                 {hasAudioRecordings && (
                                     <div className="space-y-4">
-                                        <h3 className="text-2xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                        <h3 className="text-2xs font-black text-slate-400 flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
                                             {t(
                                                 'admin.participant.survey.audio_recordings',

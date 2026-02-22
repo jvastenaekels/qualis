@@ -365,7 +365,7 @@ export default function AnalysisPage() {
                             <div className="space-y-1.5">
                                 <Label
                                     htmlFor="extraction-select"
-                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                    className="text-2xs font-black text-slate-500"
                                 >
                                     {t('admin.analysis.extraction_method', 'Extraction')}
                                 </Label>
@@ -397,7 +397,7 @@ export default function AnalysisPage() {
                             <div className="space-y-1.5">
                                 <Label
                                     htmlFor="factors-select"
-                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                    className="text-2xs font-black text-slate-500"
                                 >
                                     {t('admin.analysis.n_factors', 'Factors')}
                                 </Label>
@@ -428,7 +428,7 @@ export default function AnalysisPage() {
                             <div className="space-y-1.5">
                                 <Label
                                     htmlFor="rotation-select"
-                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                    className="text-2xs font-black text-slate-500"
                                 >
                                     {t('admin.analysis.rotation_method', 'Rotation')}
                                 </Label>
@@ -460,7 +460,7 @@ export default function AnalysisPage() {
                             <div className="space-y-1.5">
                                 <Label
                                     htmlFor="flagging-select"
-                                    className="text-2xs font-black uppercase tracking-wider text-slate-500"
+                                    className="text-2xs font-black text-slate-500"
                                 >
                                     {t('admin.analysis.flagging_method', 'Flagging')}
                                 </Label>

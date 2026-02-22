@@ -112,9 +112,7 @@ const MethodologyTips: React.FC<MethodologyTipsProps> = ({ variant }) => {
                 >
                     <div className="flex items-center gap-1.5 opacity-60 mb-0.5 flex-none">
                         <Lightbulb size={10} className="text-amber-400 fill-amber-400/20" />
-                        <p className="text-2xs font-bold uppercase tracking-widest">
-                            {t('fine.workbench.help')}
-                        </p>
+                        <p className="text-2xs font-bold">{t('fine.workbench.help')}</p>
                     </div>
                     <div ref={textRef} className="overflow-y-auto custom-scrollbar flex-1 min-h-0">
                         <p className="text-base font-semibold leading-snug italic text-indigo-600/80 [hyphens:manual]">

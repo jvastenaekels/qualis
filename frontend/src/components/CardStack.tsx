@@ -176,7 +176,7 @@ const CardStack: React.FC<CardStackProps & { ref?: React.Ref<CardStackHandle> }>
                 {/* Statement Code Watermark - Similar to SortableCard style */}
                 {statement.code && (
                     <div className="absolute top-3 left-4 z-20">
-                        <span className="text-xs font-bold text-slate-300/80 uppercase tracking-wider select-none">
+                        <span className="text-xs font-bold text-slate-300/80 select-none">
                             {statement.code}
                         </span>
                     </div>

@@ -75,7 +75,7 @@ const HelpOverlay: React.FC = () => {
                     <div className="space-y-2.5">
                         <div className="flex items-center gap-2">
                             <Info className="size-4 text-slate-500" />
-                            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            <h3 className="text-xs font-semibold text-slate-500">
                                 {t('study.help.what')}
                             </h3>
                         </div>
@@ -86,7 +86,7 @@ const HelpOverlay: React.FC = () => {
                     <div className="space-y-2.5">
                         <div className="flex items-center gap-2">
                             <Lightbulb className="size-4 text-slate-500" />
-                            <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            <h3 className="text-xs font-semibold text-slate-500">
                                 {t('study.help.why')}
                             </h3>
                         </div>

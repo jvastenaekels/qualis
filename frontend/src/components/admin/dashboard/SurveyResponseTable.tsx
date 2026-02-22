@@ -307,7 +307,7 @@ export function SurveyResponseTable({
                                 <div className="p-2 bg-slate-100 rounded-xl text-slate-500 group-data-[state=open]:bg-indigo-100 group-data-[state=open]:text-indigo-600 transition-colors">
                                     {group.icon}
                                 </div>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-500 group-data-[state=open]:text-slate-900 transition-colors">
+                                <span className="text-xs font-black text-slate-500 group-data-[state=open]:text-slate-900 transition-colors">
                                     {group.title}
                                 </span>
                                 <Badge
@@ -338,7 +338,7 @@ export function SurveyResponseTable({
                                                     />
                                                 )}
                                             </div>
-                                            <p className="text-2xs font-mono text-slate-400 mt-1 uppercase tracking-tighter opacity-70">
+                                            <p className="text-2xs font-mono text-slate-400 mt-1 tracking-tighter opacity-70">
                                                 {t('admin.participant.metadata.id', 'ID')}:{' '}
                                                 {item.id || item.key}
                                             </p>

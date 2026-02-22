@@ -347,7 +347,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center gap-2">
                                     <span
-                                        className={`px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${badgeColor}`}
+                                        className={`px-2 py-1 rounded-md text-xs font-bold ${badgeColor}`}
                                     >
                                         {label} ({scoreLabel})
                                     </span>
@@ -539,7 +539,7 @@ export const Step1_Feedback: React.FC<Step1Props> = ({ onNext }) => {
                                     </button>
 
                                     <div className="flex items-center gap-2 mb-4 pr-8">
-                                        <span className="px-2 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-700">
+                                        <span className="px-2 py-1 rounded-md text-xs font-bold bg-slate-100 text-slate-700">
                                             {t('post.score')}: {scoreLabel}
                                         </span>
                                     </div>

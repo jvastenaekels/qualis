@@ -121,7 +121,7 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
                         {label}
                     </Label>
                     {recommendedSize && (
-                        <span className="text-2xs font-semibold text-slate-400 uppercase tracking-tighter">
+                        <span className="text-2xs font-semibold text-slate-400 tracking-tighter">
                             {t('admin.design.theme.upload.recommended', 'Recommended')}:{' '}
                             {recommendedSize}
                         </span>

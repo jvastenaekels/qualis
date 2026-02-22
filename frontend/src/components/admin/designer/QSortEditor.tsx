@@ -833,7 +833,7 @@ const QSortEditor = ({
                                     )}
                                 </div>
                                 <div className="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <p className="text-xs font-black uppercase tracking-widest text-slate-400 px-1">
+                                    <p className="text-xs font-black text-slate-400 px-1">
                                         {t('admin.design.qsort.bulk.detected', {
                                             count: bulkText
                                                 .split('\n')
@@ -1295,7 +1295,7 @@ const QSortEditor = ({
                                     <Quote className="h-5 w-5 text-slate-400" />
                                 </div>
                                 <div>
-                                    <p className="text-2xs font-black text-slate-400 uppercase tracking-widest">
+                                    <p className="text-2xs font-black text-slate-400">
                                         {t('admin.design.qsort.grid.statements')}
                                     </p>
                                     <p className="text-xl font-black text-slate-900">
@@ -1311,7 +1311,7 @@ const QSortEditor = ({
                                     <Grid3X3 className="h-5 w-5 text-slate-400" />
                                 </div>
                                 <div>
-                                    <p className="text-2xs font-black text-slate-400 uppercase tracking-widest">
+                                    <p className="text-2xs font-black text-slate-400">
                                         {t('common.slots')}
                                     </p>
                                     <p className="text-xl font-black text-slate-900">

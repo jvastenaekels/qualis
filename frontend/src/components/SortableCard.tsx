@@ -277,7 +277,7 @@ const SortableCard: React.FC<SortableCardProps> = React.memo(
                     {/* Statement Code Watermark */}
                     {code && (
                         <div className="absolute top-2 left-2.5 z-10">
-                            <span className="text-2xs font-bold text-slate-300/80 uppercase tracking-wider select-none">
+                            <span className="text-2xs font-bold text-slate-300/80 select-none">
                                 {code}
                             </span>
                         </div>

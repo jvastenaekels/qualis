@@ -874,7 +874,7 @@ const StudyDesignPage = () => {
                                         <AlertTriangle className="h-6 w-6 text-rose-500" />
                                     </div>
                                     <div className="space-y-1">
-                                        <h4 className="font-black text-sm uppercase tracking-widest text-rose-500">
+                                        <h4 className="font-black text-sm text-rose-500">
                                             {t(
                                                 'admin.design.translation_needed',
                                                 'Translation Required'
@@ -1070,7 +1070,7 @@ const StudyDesignPage = () => {
                                 <div className="p-2 bg-indigo-50 rounded-xl">
                                     <CheckCircle className="h-5 w-5 text-indigo-600" />
                                 </div>
-                                <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">
+                                <h3 className="text-sm font-black text-slate-900">
                                     {t('admin.design.checklist.title', 'Checklist')}
                                 </h3>
                             </div>
@@ -1115,7 +1115,7 @@ const StudyDesignPage = () => {
                             </div>
                         </div>
                         <div className="pt-6 border-t border-slate-100">
-                            <h4 className="text-2xs font-black uppercase tracking-widest text-slate-400 mb-3">
+                            <h4 className="text-2xs font-black text-slate-400 mb-3">
                                 {t('admin.design.checklist.languages', 'Languages')}
                             </h4>
                             <div className="space-y-2">
@@ -1125,14 +1125,14 @@ const StudyDesignPage = () => {
                                         className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100"
                                     >
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs font-black uppercase text-slate-700">
+                                            <span className="text-xs font-black text-slate-700">
                                                 {lang.code}
                                             </span>
                                         </div>
                                         {lang.isReady ? (
                                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md">
                                                 <CheckCircle className="h-3 w-3" />
-                                                <span className="text-2xs font-bold uppercase tracking-wide">
+                                                <span className="text-2xs font-bold">
                                                     {t(
                                                         'admin.design.checklist.status_ready',
                                                         'Ready'
@@ -1142,7 +1142,7 @@ const StudyDesignPage = () => {
                                         ) : (
                                             <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md">
                                                 <CircleDashed className="h-3 w-3" />
-                                                <span className="text-2xs font-bold uppercase tracking-wide">
+                                                <span className="text-2xs font-bold">
                                                     {t(
                                                         'admin.design.checklist.status_pending',
                                                         'Pending'

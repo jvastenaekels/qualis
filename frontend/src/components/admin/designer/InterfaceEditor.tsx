@@ -351,7 +351,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                     <div className="space-y-6">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 border border-slate-100 rounded-xl w-fit">
-                                <span className="text-2xs font-black uppercase tracking-widest text-slate-600">
+                                <span className="text-2xs font-black text-slate-600">
                                     {t('admin.design.interface.terms.rough')}
                                 </span>
                             </div>
@@ -426,7 +426,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         <div className="space-y-6">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2 py-1.5 px-3 bg-slate-50 border border-slate-100 rounded-xl w-fit">
-                                    <span className="text-2xs font-black uppercase tracking-widest text-slate-600">
+                                    <span className="text-2xs font-black text-slate-600">
                                         {t('admin.design.interface.terms.grid')}
                                     </span>
                                 </div>
@@ -630,7 +630,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                             <div key={step.id} className="space-y-6">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 py-1.5 px-3 bg-indigo-50/50 border border-indigo-100 rounded-xl w-fit">
-                                        <span className="text-2xs font-black uppercase tracking-widest text-indigo-900">
+                                        <span className="text-2xs font-black text-indigo-900">
                                             {t('common.step', 'Step')} {index + 1}:{' '}
                                             {t(step.labelKey)}
                                         </span>

@@ -110,7 +110,7 @@ export function ParticipantMetadataCard({
                         {isDiscarded && (
                             <Badge
                                 variant="outline"
-                                className="bg-rose-50 text-rose-600 border-rose-200 font-black uppercase text-2xs"
+                                className="bg-rose-50 text-rose-600 border-rose-200 font-black text-2xs"
                             >
                                 {t('admin.data.detail.discarded_badge', 'Discarded')}
                             </Badge>
@@ -118,7 +118,7 @@ export function ParticipantMetadataCard({
                         {participant.is_test_run && (
                             <Badge
                                 variant="outline"
-                                className="bg-amber-50 text-amber-600 border-amber-100 font-black uppercase text-2xs"
+                                className="bg-amber-50 text-amber-600 border-amber-100 font-black text-2xs"
                             >
                                 {t('admin.participant.metadata.test_run', 'Test Run')}
                             </Badge>
@@ -126,7 +126,7 @@ export function ParticipantMetadataCard({
                         <Badge
                             variant="secondary"
                             className={cn(
-                                'font-black uppercase text-2xs',
+                                'font-black text-2xs',
                                 participant.status === 'completed'
                                     ? 'bg-emerald-50 text-emerald-600'
                                     : 'bg-slate-100 text-slate-500'
@@ -157,7 +157,7 @@ export function ParticipantMetadataCard({
                                         ? t('common.unknown', 'Unknown')
                                         : uaInfo.os}
                                 </p>
-                                <p className="text-2xs text-slate-500 uppercase font-bold mt-1">
+                                <p className="text-2xs text-slate-500 font-bold mt-1">
                                     {uaInfo.device === 'desktop' &&
                                         t('admin.participant.metadata.device.desktop', 'Desktop')}
                                     {uaInfo.device === 'mobile' &&
@@ -177,7 +177,7 @@ export function ParticipantMetadataCard({
                                         ? t('common.unknown', 'Unknown')
                                         : uaInfo.browser}
                                 </p>
-                                <p className="text-2xs text-slate-500 uppercase font-bold mt-1">
+                                <p className="text-2xs text-slate-500 font-bold mt-1">
                                     {t('admin.participant.metadata.browser', 'Browser')}
                                 </p>
                             </div>
@@ -212,7 +212,7 @@ export function ParticipantMetadataCard({
                                               })
                                         : '---'}
                                 </p>
-                                <p className="text-2xs text-slate-500 uppercase font-bold mt-1">
+                                <p className="text-2xs text-slate-500 font-bold mt-1">
                                     {t('admin.participant.metadata.duration', 'Total Duration')}
                                 </p>
                             </div>
@@ -228,7 +228,7 @@ export function ParticipantMetadataCard({
                                         locale: currentLocale,
                                     })}
                                 </p>
-                                <p className="text-2xs text-slate-500 uppercase font-bold mt-1">
+                                <p className="text-2xs text-slate-500 font-bold mt-1">
                                     {t('admin.participant.metadata.started', 'Started')}
                                 </p>
                             </div>
@@ -245,7 +245,7 @@ export function ParticipantMetadataCard({
                                             locale: currentLocale,
                                         })}
                                     </p>
-                                    <p className="text-2xs text-slate-500 uppercase font-bold mt-1">
+                                    <p className="text-2xs text-slate-500 font-bold mt-1">
                                         {t('admin.participant.metadata.submitted', 'Submitted')}
                                     </p>
                                 </div>
@@ -259,7 +259,7 @@ export function ParticipantMetadataCard({
                                 <p className="text-xs font-black text-slate-900 leading-none font-mono">
                                     {participant.id}
                                 </p>
-                                <p className="text-2xs text-slate-500 uppercase font-bold mt-1">
+                                <p className="text-2xs text-slate-500 font-bold mt-1">
                                     {t('admin.participant.metadata.id', 'Internal ID')}
                                 </p>
                             </div>
@@ -273,7 +273,7 @@ export function ParticipantMetadataCard({
                                     <p className="text-xs font-black text-slate-900 leading-none font-mono">
                                         {participant.recruitment_token}
                                     </p>
-                                    <p className="text-2xs text-slate-500 uppercase font-bold mt-1">
+                                    <p className="text-2xs text-slate-500 font-bold mt-1">
                                         {t(
                                             'admin.participant.metadata.recruitment_link',
                                             'Recruitment Link'
@@ -291,7 +291,7 @@ export function ParticipantMetadataCard({
                                     <p className="text-xs font-black text-slate-900 leading-none font-mono">
                                         {participant.ip_address.substring(0, 16)}...
                                     </p>
-                                    <p className="text-2xs text-slate-500 uppercase font-bold mt-1">
+                                    <p className="text-2xs text-slate-500 font-bold mt-1">
                                         {t('admin.participant.metadata.ip_hash', 'IP Hash')}
                                     </p>
                                 </div>
