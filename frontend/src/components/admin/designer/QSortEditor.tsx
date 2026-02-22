@@ -803,14 +803,14 @@ const QSortEditor = ({
                                     />
                                     {detectedFormat.type && (
                                         <div className="flex flex-wrap gap-2 px-1">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
                                                 <CheckCircle2 className="h-3 w-3" />
                                                 {t(
                                                     `admin.design.qsort.bulk.detected_format.${detectedFormat.type}`
                                                 )}
                                             </span>
                                             {detectedFormat.hasCode && (
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
                                                     <Wand2 className="h-3 w-3" />
                                                     {t(
                                                         'admin.design.qsort.bulk.detected_format.with_codes'
@@ -818,7 +818,7 @@ const QSortEditor = ({
                                                 </span>
                                             )}
                                             {detectedFormat.langs.length > 0 && (
-                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
+                                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-100 shadow-sm animate-in fade-in slide-in-from-top-1 duration-300">
                                                     {t(
                                                         'admin.design.qsort.bulk.detected_format.multi_lang',
                                                         {
@@ -1138,7 +1138,7 @@ const QSortEditor = ({
                                         isValid ? 'bg-green-500' : 'bg-amber-500 animate-pulse'
                                     )}
                                 />
-                                <span className="text-[11px] font-black uppercase tracking-wider">
+                                <span className="text-[11px] font-black">
                                     {totalStatements} {t('admin.design.qsort.grid.statements')} vs{' '}
                                     {totalSlots} {t('common.slots')}
                                 </span>
@@ -1147,7 +1147,7 @@ const QSortEditor = ({
                             {isBellShaped && (
                                 <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 shadow-sm animate-in zoom-in duration-300">
                                     <CheckCircle2 className="h-3.5 w-3.5" />
-                                    <span className="text-[11px] font-black uppercase tracking-wider">
+                                    <span className="text-[11px] font-black">
                                         {t('admin.design.qsort.grid.ideal_shape')}
                                     </span>
                                 </div>
@@ -1155,7 +1155,7 @@ const QSortEditor = ({
 
                             {isSymmetric && !isBellShaped && (
                                 <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-slate-500 shadow-sm">
-                                    <span className="text-[11px] font-black uppercase tracking-wider">
+                                    <span className="text-[11px] font-black">
                                         {t('admin.design.qsort.grid.symmetric')}
                                     </span>
                                 </div>

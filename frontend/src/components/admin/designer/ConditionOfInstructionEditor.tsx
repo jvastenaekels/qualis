@@ -58,7 +58,7 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 <div className="flex items-center gap-2">
                                     <Label
                                         htmlFor="pre_instruction"
-                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                        className="text-[10px] font-black text-slate-500"
                                     >
                                         {t(
                                             'admin.design.condition.pre_field_label',
@@ -84,7 +84,7 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                         type="button"
                                         onClick={resetPreInstruction}
                                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]
-                                                 font-black uppercase tracking-wider text-slate-500
+                                                 font-black text-slate-500
                                                  hover:bg-slate-100 hover:text-indigo-600 transition-colors
                                                  shadow-sm border bg-white"
                                     >
@@ -128,7 +128,7 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 <div className="flex items-center gap-2">
                                     <Label
                                         htmlFor="condition_of_instruction"
-                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                        className="text-[10px] font-black text-slate-500"
                                     >
                                         {t(
                                             'admin.design.condition.field_label',
@@ -155,7 +155,7 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                         type="button"
                                         onClick={resetInstruction}
                                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]
-                                                 font-black uppercase tracking-wider text-slate-500
+                                                 font-black text-slate-500
                                                  hover:bg-slate-100 hover:text-indigo-600 transition-colors
                                                  shadow-sm border bg-white"
                                     >

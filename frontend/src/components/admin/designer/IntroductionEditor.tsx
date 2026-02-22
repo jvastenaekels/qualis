@@ -61,7 +61,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardContent className="pt-6 space-y-6">
                         <div className="grid gap-2.5">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                            <Label className="text-[10px] font-black text-slate-500">
                                 {t('admin.design.intro.fields.default_lang')}
                             </Label>
                             <Select
@@ -121,7 +121,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                         <div className="grid gap-2.5">
                             <Label
                                 htmlFor="title"
-                                className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-2"
+                                className="text-[10px] font-black text-slate-500 flex items-center gap-2"
                             >
                                 {t('admin.design.intro.fields.title')}
                                 <MultiLangFieldIcon
@@ -151,7 +151,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                         <div className="grid gap-2.5">
                             <Label
                                 htmlFor="subtitle"
-                                className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-2"
+                                className="text-[10px] font-black text-slate-500 flex items-center gap-2"
                             >
                                 {t('admin.design.intro.fields.subtitle')}
                                 <MultiLangFieldIcon
@@ -180,7 +180,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                             />
                         </div>
                         <div className="flex items-center gap-2 mb-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                            <Label className="text-[10px] font-black text-slate-500">
                                 {t('admin.design.intro.fields.objective')}
                             </Label>
                             <MultiLangFieldIcon
@@ -222,7 +222,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    <Label className="text-[10px] font-black text-slate-500">
                                         {t('admin.design.intro.fields.task_overview')}
                                     </Label>
                                     <MultiLangFieldIcon
@@ -244,7 +244,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                         type="button"
                                         onClick={resetInstructions}
                                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px]
-                                                 font-black uppercase tracking-wider text-slate-500
+                                                 font-black text-slate-500
                                                  hover:bg-slate-100 hover:text-indigo-600 transition-colors
                                                  shadow-sm border bg-white"
                                     >
@@ -306,7 +306,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                         <div className="grid gap-2.5">
                             <Label
                                 htmlFor="consent-title"
-                                className="text-[10px] font-black uppercase tracking-wider text-slate-500 flex items-center gap-2"
+                                className="text-[10px] font-black text-slate-500 flex items-center gap-2"
                             >
                                 {t('admin.design.intro.fields.consent_title_label')}
                                 <MultiLangFieldIcon
@@ -334,7 +334,7 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                             />
                         </div>
                         <div className="flex items-center gap-2 mb-2">
-                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                            <Label className="text-[10px] font-black text-slate-500">
                                 {t('admin.design.intro.fields.legal_text')}
                             </Label>
                             <MultiLangFieldIcon

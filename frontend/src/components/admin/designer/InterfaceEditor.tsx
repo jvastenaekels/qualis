@@ -160,7 +160,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         <div className="space-y-2.5">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    <Label className="text-[10px] font-black text-slate-500">
                                         {t('admin.design.interface.nav.start')}
                                     </Label>
                                     <TooltipProvider>
@@ -180,7 +180,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         disabled={readOnly}
                                         onClick={() => resetLabel('welcome.start')}
                                         className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
-                                                 font-black uppercase tracking-wider text-slate-400
+                                                 font-black text-slate-400
                                                  hover:bg-slate-100 hover:text-indigo-600 transition-colors"
                                         title={t('common.reset_to_default')}
                                     >
@@ -202,7 +202,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         <div className="space-y-2.5">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    <Label className="text-[10px] font-black text-slate-500">
                                         {t('admin.design.interface.nav.next')}
                                     </Label>
                                     <TooltipProvider>
@@ -222,7 +222,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         disabled={readOnly}
                                         onClick={() => resetLabel('common.next')}
                                         className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
-                                                 font-black uppercase tracking-wider text-slate-400
+                                                 font-black text-slate-400
                                                  hover:bg-slate-100 hover:text-indigo-600 transition-colors"
                                         title={t('common.reset_to_default')}
                                     >
@@ -247,7 +247,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         <div className="space-y-2.5">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    <Label className="text-[10px] font-black text-slate-500">
                                         {t('admin.design.interface.nav.submit')}
                                     </Label>
                                     <TooltipProvider>
@@ -267,7 +267,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         disabled={readOnly}
                                         onClick={() => resetLabel('post.submit')}
                                         className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
-                                                 font-black uppercase tracking-wider text-slate-400
+                                                 font-black text-slate-400
                                                  hover:bg-slate-100 hover:text-indigo-600 transition-colors"
                                         title={t('common.reset_to_default')}
                                     >
@@ -289,7 +289,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         <div className="space-y-2.5">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    <Label className="text-[10px] font-black text-slate-500">
                                         {t('admin.design.interface.nav.confirm')}
                                     </Label>
                                     <TooltipProvider>
@@ -309,7 +309,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         disabled={readOnly}
                                         onClick={() => resetLabel('fine.actions.validate')}
                                         className="flex items-center gap-1.5 px-2 py-1 rounded-md text-[9px]
-                                                 font-black uppercase tracking-wider text-slate-400
+                                                 font-black text-slate-400
                                                  hover:bg-slate-100 hover:text-indigo-600 transition-colors"
                                         title={t('common.reset_to_default')}
                                     >
@@ -378,7 +378,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                             <div className="space-y-2.5">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                <Label className="text-[10px] font-black text-slate-400">
                                     {t('admin.design.interface.terms.agree')}
                                 </Label>
                                 <Input
@@ -392,7 +392,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 />
                             </div>
                             <div className="space-y-2.5">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                <Label className="text-[10px] font-black text-slate-400">
                                     {t('admin.design.interface.terms.neutral')}
                                 </Label>
                                 <Input
@@ -406,7 +406,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 />
                             </div>
                             <div className="space-y-2.5">
-                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                <Label className="text-[10px] font-black text-slate-400">
                                     {t('admin.design.interface.terms.disagree')}
                                 </Label>
                                 <Input
@@ -455,7 +455,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                                 <div className="space-y-2.5">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                    <Label className="text-[10px] font-black text-slate-400">
                                         {t('admin.design.interface.terms.most_agree')}
                                     </Label>
                                     <Input
@@ -471,7 +471,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                     />
                                 </div>
                                 <div className="space-y-2.5">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                    <Label className="text-[10px] font-black text-slate-400">
                                         {t('admin.design.interface.terms.neutral')}
                                     </Label>
                                     <Input
@@ -487,7 +487,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                     />
                                 </div>
                                 <div className="space-y-2.5">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                    <Label className="text-[10px] font-black text-slate-400">
                                         {t('admin.design.interface.terms.most_disagree')}
                                     </Label>
                                     <Input
@@ -650,7 +650,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pl-6 border-l-2 border-slate-100">
                                     <div className="space-y-2.5">
-                                        <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                        <Label className="text-[10px] font-black text-slate-400">
                                             {t('study.help.what')}
                                         </Label>
                                         <Input
@@ -676,7 +676,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                         />
                                     </div>
                                     <div className="space-y-2.5">
-                                        <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                        <Label className="text-[10px] font-black text-slate-400">
                                             {t('study.help.why')}
                                         </Label>
                                         <Input

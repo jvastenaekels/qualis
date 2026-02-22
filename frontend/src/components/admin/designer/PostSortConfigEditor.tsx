@@ -216,7 +216,7 @@ const PostSortConfigEditor = ({
 
                             {unselectedScores.length > 0 && !readOnly && !structureLocked && (
                                 <div className="flex items-center gap-3 pt-6 border-t border-slate-100">
-                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                    <Label className="text-[10px] font-black text-slate-500">
                                         {t('admin.design.postsort.extreme.add_label')}
                                     </Label>
                                     <Select
@@ -260,7 +260,7 @@ const PostSortConfigEditor = ({
                                     <div className="flex items-center gap-2">
                                         <Label
                                             htmlFor="extreme-prompt-positive"
-                                            className="text-[10px] font-black uppercase tracking-wider text-green-700"
+                                            className="text-[10px] font-black text-green-700"
                                         >
                                             {t('admin.design.postsort.extreme.prompt_label')} (+)
                                         </Label>
@@ -298,7 +298,7 @@ const PostSortConfigEditor = ({
                                     <div className="flex items-center gap-2">
                                         <Label
                                             htmlFor="extreme-prompt-neutral"
-                                            className="text-[10px] font-black uppercase tracking-wider text-slate-600"
+                                            className="text-[10px] font-black text-slate-600"
                                         >
                                             {t('admin.design.postsort.extreme.prompt_label')} (0)
                                         </Label>
@@ -336,7 +336,7 @@ const PostSortConfigEditor = ({
                                     <div className="flex items-center gap-2">
                                         <Label
                                             htmlFor="extreme-prompt-negative"
-                                            className="text-[10px] font-black uppercase tracking-wider text-red-700"
+                                            className="text-[10px] font-black text-red-700"
                                         >
                                             {t('admin.design.postsort.extreme.prompt_label')} (-)
                                         </Label>
@@ -400,7 +400,7 @@ const PostSortConfigEditor = ({
                                     <div className="flex items-center gap-2">
                                         <Label
                                             htmlFor="random-comments-prompt"
-                                            className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                            className="text-[10px] font-black text-slate-500"
                                         >
                                             {t('admin.design.postsort.missing.prompt_label')}
                                         </Label>
@@ -460,7 +460,7 @@ const PostSortConfigEditor = ({
                                     <div className="flex items-center gap-2">
                                         <Label
                                             htmlFor="missing-prompt"
-                                            className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                            className="text-[10px] font-black text-slate-500"
                                         >
                                             {t('admin.design.postsort.missing.prompt_label')}
                                         </Label>
@@ -620,7 +620,7 @@ const PostSortConfigEditor = ({
                                 {t('admin.design.postsort.email.title')}
                                 <Badge
                                     variant="outline"
-                                    className="text-[10px] font-black uppercase tracking-wider bg-white/80 border-indigo-200 text-indigo-600 px-2 py-0.5 rounded-lg shadow-sm"
+                                    className="text-[10px] font-black bg-white/80 border-indigo-200 text-indigo-600 px-2 py-0.5 rounded-lg shadow-sm"
                                 >
                                     {t('common.optional')}
                                 </Badge>

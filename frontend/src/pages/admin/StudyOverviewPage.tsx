@@ -94,7 +94,7 @@ const StudyOverviewPage = () => {
                                 <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
                                     <Users className="w-5 h-5" aria-hidden="true" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <span className="text-xs font-bold text-slate-500">
                                     {t('admin.study_overview.sample_size', 'Sample size (N)')}
                                 </span>
                             </div>
@@ -115,7 +115,7 @@ const StudyOverviewPage = () => {
                                 <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
                                     <CheckCircle2 className="w-5 h-5" aria-hidden="true" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <span className="text-xs font-bold text-slate-500">
                                     {t('admin.study_overview.completion_rate', 'Completion rate')}
                                 </span>
                             </div>
@@ -146,7 +146,7 @@ const StudyOverviewPage = () => {
                                 <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
                                     <Clock className="w-5 h-5" aria-hidden="true" />
                                 </div>
-                                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                                <span className="text-xs font-bold text-slate-500">
                                     {t('admin.study_overview.median_duration', 'Median duration')}
                                 </span>
                             </div>

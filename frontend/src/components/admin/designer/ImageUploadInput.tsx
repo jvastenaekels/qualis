@@ -117,10 +117,7 @@ const ImageUploadInput: React.FC<ImageUploadInputProps> = ({
         <div className="space-y-3">
             {label && (
                 <div className="flex items-center justify-between">
-                    <Label
-                        htmlFor={id}
-                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
-                    >
+                    <Label htmlFor={id} className="text-[10px] font-black text-slate-500">
                         {label}
                     </Label>
                     {recommendedSize && (

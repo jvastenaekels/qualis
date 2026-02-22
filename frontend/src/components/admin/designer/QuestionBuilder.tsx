@@ -320,7 +320,7 @@ const QuestionItem = ({
                             <AccordionContent className="pt-6 pb-2 space-y-6">
                                 <div className="grid gap-2.5">
                                     <div className="flex items-center gap-2">
-                                        <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        <Label className="text-[10px] font-black text-slate-500">
                                             {t('admin.design.questions.labels.question')}
                                         </Label>
                                         <MultiLangFieldIcon
@@ -377,7 +377,7 @@ const QuestionItem = ({
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
                                                 <GitBranch className="h-3.5 w-3.5 text-indigo-500" />
-                                                <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                                <Label className="text-[10px] font-black text-slate-500">
                                                     {t('admin.design.questions.logic.title')}
                                                 </Label>
                                             </div>
@@ -551,7 +551,7 @@ const QuestionItem = ({
                                     question.type === 'radio' ||
                                     question.type === 'checkbox') && (
                                     <div className="space-y-4 pt-4 border-t border-slate-100">
-                                        <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                        <Label className="text-[10px] font-black text-slate-500">
                                             {t('admin.design.questions.labels.options')}
                                             {question.type === 'checkbox' &&
                                                 ` (${t('admin.design.questions.labels.multiple')})`}

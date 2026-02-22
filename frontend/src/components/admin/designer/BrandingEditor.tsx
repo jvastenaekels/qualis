@@ -84,7 +84,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 <div className="flex-1 space-y-3">
                                     <Label
                                         htmlFor="accent-color"
-                                        className="text-[10px] font-black uppercase tracking-wider text-slate-500"
+                                        className="text-[10px] font-black text-slate-500"
                                     >
                                         {t('admin.design.theme.accent.pick')}
                                     </Label>
@@ -114,7 +114,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                             type="button"
                                             disabled={readOnly}
                                             onClick={() => updateBranding('accent_color', null)}
-                                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider text-slate-500 hover:bg-slate-100 transition-colors shadow-sm border bg-white"
+                                            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-black text-slate-500 hover:bg-slate-100 transition-colors shadow-sm border bg-white"
                                         >
                                             <RotateCcw className="size-3" />
                                             {t('admin.design.theme.accent.reset')}
@@ -260,7 +260,7 @@ const BrandingEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                             </div>
                                             <div className="flex-1 space-y-3">
                                                 <div className="grid gap-1.5">
-                                                    <Label className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                                    <Label className="text-[10px] font-black text-slate-400">
                                                         {t(
                                                             'admin.design.theme.partners.name_placeholder',
                                                             'Name'

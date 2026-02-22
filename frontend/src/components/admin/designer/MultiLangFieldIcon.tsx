@@ -105,7 +105,7 @@ export const MultiLangFieldIcon = ({
                     >
                         <div className="flex items-center gap-2 group">
                             <span className="text-xs">{trans.flag}</span>
-                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider group-hover:text-indigo-600 transition-colors">
+                            <span className="text-[10px] font-bold text-slate-500 group-hover:text-indigo-600 transition-colors">
                                 {trans.label}
                             </span>
                         </div>

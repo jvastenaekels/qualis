@@ -965,7 +965,7 @@
         },
         "study_overview": {
             "title": "Overview",
-            "subtitle": "Real-time analytics and participant overview for this study.",
+            "subtitle": "",
             "back_to_overview": "Back to overview",
             "sample_size": "Number of participants (P-Set)",
             "valid": "valid",

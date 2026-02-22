@@ -123,7 +123,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                 <div className="grid gap-6 sm:grid-cols-2">
                                     <div className="space-y-6">
                                         <div className="grid gap-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                            <Label className="text-[10px] font-black text-slate-500">
                                                 {t('admin.design.intro.process_steps.fields.title')}
                                             </Label>
                                             <Input
@@ -140,7 +140,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                            <Label className="text-[10px] font-black text-slate-500">
                                                 {t(
                                                     'admin.design.intro.process_steps.fields.description'
                                                 )}
@@ -164,7 +164,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
 
                                     <div className="space-y-6">
                                         <div className="grid gap-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                            <Label className="text-[10px] font-black text-slate-500">
                                                 {t('admin.design.intro.process_steps.fields.icon')}
                                             </Label>
                                             <IconPicker
@@ -175,7 +175,7 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
                                         </div>
 
                                         <div className="grid gap-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                                            <Label className="text-[10px] font-black text-slate-500">
                                                 {t(
                                                     'admin.design.intro.process_steps.fields.color',
                                                     'Color'

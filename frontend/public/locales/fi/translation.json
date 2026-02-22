@@ -957,7 +957,7 @@
         },
         "study_overview": {
             "title": "Hallintapaneeli",
-            "subtitle": "Reaaliaikainen analytiikka ja osallistujien esikatselu.",
+            "subtitle": "",
             "back_to_overview": "Takaisin yhteenvetoon",
             "sample_size": "Osallistujamäärä (P-Set)",
             "valid": "kelvollinen",
