@@ -1539,10 +1539,10 @@
             },
             "step": {
                 "consent": "Suostumus",
-                "presort": "Esilajittelu",
+                "presort": "Esikysely",
                 "rough": "Alustava lajittelu",
                 "fine": "Q-lajitteluruudukko",
-                "post": "Jälkilajittelu"
+                "post": "Jälkikysely"
             },
             "actions": {
                 "discard": "Hylkää",

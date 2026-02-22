@@ -156,10 +156,10 @@ function getDisplayStatus(p: DumpParticipant): 'completed' | 'in_progress' | 'ab
 }
 
 const STEP_LABEL_KEYS: Record<number, [string, string]> = {
-    2: ['admin.data.step.presort', 'Pre-sort'],
+    2: ['admin.data.step.presort', 'Pre-sort survey'],
     3: ['admin.data.step.rough', 'Preliminary sort'],
     4: ['admin.data.step.fine', 'Q-sort'],
-    5: ['admin.data.step.post', 'Post-sort'],
+    5: ['admin.data.step.post', 'Post-sort survey'],
 };
 const PAGE_SIZE = 25;
 const columnHelper = createColumnHelper<DumpParticipant>();

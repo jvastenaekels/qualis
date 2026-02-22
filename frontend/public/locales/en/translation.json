@@ -1547,10 +1547,10 @@
             },
             "step": {
                 "consent": "Consent",
-                "presort": "Pre-sort",
+                "presort": "Pre-sort survey",
                 "rough": "Preliminary sort",
                 "fine": "Q-sort",
-                "post": "Post-sort"
+                "post": "Post-sort survey"
             },
             "actions": {
                 "discard": "Discard",

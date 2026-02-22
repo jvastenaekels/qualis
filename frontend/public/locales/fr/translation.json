@@ -1577,10 +1577,10 @@
             },
             "step": {
                 "consent": "Consentement",
-                "presort": "Pré-tri",
+                "presort": "Questionnaire pré-tri",
                 "rough": "Tri préliminaire",
                 "fine": "Tri sur grille (Q-Sort)",
-                "post": "Post-tri"
+                "post": "Questionnaire post-tri"
             },
             "actions": {
                 "discard": "Écarter",

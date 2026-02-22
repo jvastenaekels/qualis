@@ -30,7 +30,7 @@ const dateLocales: Record<string, Locale> = {
 };
 
 const STEP_INFO: Record<number, { labelKey: string; labelDefault: string; progress: number }> = {
-    2: { labelKey: 'admin.data.step.presort', labelDefault: 'Pre-sort', progress: 25 },
+    2: { labelKey: 'admin.data.step.presort', labelDefault: 'Pre-sort survey', progress: 25 },
     3: {
         labelKey: 'admin.data.step.rough',
         labelDefault: 'Preliminary sort',
@@ -39,7 +39,7 @@ const STEP_INFO: Record<number, { labelKey: string; labelDefault: string; progre
     4: { labelKey: 'admin.data.step.fine', labelDefault: 'Q-sort', progress: 75 },
     5: {
         labelKey: 'admin.data.step.post',
-        labelDefault: 'Post-sort',
+        labelDefault: 'Post-sort survey',
         progress: 100,
     },
 };
