@@ -48,14 +48,22 @@ export function ParticipantDetailContent({
     const gridUtilsRef = useRef<InteractionUtils | null>(null);
     const handleInteractionUtils = useCallback((utils: InteractionUtils) => {
         gridUtilsRef.current = utils;
-        setTimeout(() => utils.performAutoFit(), 200);
+        // Wait for the full layout to stabilize: the sidebar panel (360px on
+        // desktop) affects the grid canvas width via CSS flex. Card dimensions
+        // from useGridCalculations must be computed and rendered before autofit
+        // can read accurate content dimensions.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                utils.performAutoFit();
+            });
+        });
     }, []);
 
-    // Auto-fit grid when tab activates
+    // Auto-fit grid when returning to the tab (GridSort remounts, so
+    // gridUtilsRef is reset by handleInteractionUtils above)
     useEffect(() => {
-        if (activeTab === 'grid' && gridUtilsRef.current) {
-            const timer = setTimeout(() => gridUtilsRef.current?.performAutoFit(), 150);
-            return () => clearTimeout(timer);
+        if (activeTab !== 'grid') {
+            gridUtilsRef.current = null;
         }
     }, [activeTab]);
 

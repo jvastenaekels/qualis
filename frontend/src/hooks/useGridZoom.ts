@@ -171,7 +171,13 @@ export const useGridZoom = ({
             for (const entry of entries) {
                 if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
                     cancelAnimationFrame(rafId);
-                    rafId = requestAnimationFrame(() => performAutoFit());
+                    // Double-rAF: useGridCalculations' ResizeObserver fires in the
+                    // same batch and updates card dimensions (React state). We need
+                    // to wait for React to commit that re-render so contentRef has
+                    // accurate dimensions before we compute the auto-fit.
+                    rafId = requestAnimationFrame(() => {
+                        rafId = requestAnimationFrame(() => performAutoFit());
+                    });
                     break;
                 }
             }
