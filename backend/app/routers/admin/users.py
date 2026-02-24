@@ -5,7 +5,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...database import get_db
-from ...dependencies import get_current_user
+from ...dependencies import PaginationParams, check_superuser
 from ...limiter import limiter
 from ...models import User
 from ...schemas import UserCreate, UserRead
@@ -15,31 +15,24 @@ from ...utils.security import get_password_hash
 router = APIRouter(tags=["Admin Users"])
 
 
-async def check_superuser(current_user: User = Depends(get_current_user)) -> User:
-    """Dependency to ensure the current user is a superuser."""
-    if not current_user.is_superuser:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Superuser privileges required",
-        )
-    return current_user
-
-
 @router.get("", response_model=PaginatedResponse[UserRead])
 async def list_users(
     db: AsyncSession = Depends(get_db),
     _admin: User = Depends(check_superuser),
-    limit: int = 50,
-    offset: int = 0,
+    pagination: PaginationParams = Depends(),
 ):
     """List all users in the system with pagination."""
     count_result = await db.execute(select(func.count(User.id)))
     total = count_result.scalar() or 0
 
-    result = await db.execute(select(User).limit(limit).offset(offset))
+    result = await db.execute(
+        select(User).limit(pagination.limit).offset(pagination.offset)
+    )
     items = list(result.scalars().all())
 
-    return PaginatedResponse(items=items, total=total, limit=limit, offset=offset)
+    return PaginatedResponse(
+        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    )
 
 
 @router.post("", response_model=UserRead, status_code=status.HTTP_201_CREATED)

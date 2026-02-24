@@ -10,10 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import User, WorkspaceRole, WorkspaceMember
 from app.utils.security import create_invitation_token
-
-# Test Data
-TEST_EMAIL = "test@example.com"
-TEST_PASSWORD = "testpassword"
+from tests.conftest import TEST_PASSWORD
 
 
 @pytest.mark.asyncio

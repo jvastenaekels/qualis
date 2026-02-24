@@ -1,15 +1,145 @@
 """Pydantic schemas for data validation and serialization.
 
-All schemas are re-exported here for backward compatibility.
+All schemas are re-exported here for convenience.
 New code should import from the specific submodule.
 """
 
-from .analysis import *  # noqa: F401, F403
-from .audio import *  # noqa: F401, F403
-from .auth import *  # noqa: F401, F403
-from .common import *  # noqa: F401, F403
-from .participants import *  # noqa: F401, F403
-from .recruitment import *  # noqa: F401, F403
-from .studies import *  # noqa: F401, F403
-from .users import *  # noqa: F401, F403
-from .workspaces import *  # noqa: F401, F403
+from .analysis import (
+    AnalysisRequest,
+    AnalysisResult,
+    EigenvalueResult,
+    FactorCharacteristic,
+    ParticipantLoading,
+    StatementClassification,
+    StatementScore,
+)
+from .audio import AudioRecordingBase, AudioRecordingRead, AudioUploadResponse
+from .auth import TOTPSetup, TOTPVerify, Token, TokenData
+from .common import PaginatedResponse
+from .participants import (
+    ConsentInput,
+    ConsentResponse,
+    DraftSaveInput,
+    ParticipantDetailRead,
+    ParticipantDiscardUpdate,
+    ParticipantRead,
+    ProgressUpdate,
+    QSortEntryInput,
+    QSortEntryRead,
+    ResumeResponse,
+    SubmissionInput,
+)
+from .recruitment import (
+    InvitationCreate,
+    InvitationLink,
+    RecruitmentLinkBase,
+    RecruitmentLinkCreate,
+    RecruitmentLinkRead,
+)
+from .studies import (
+    BrandingBase,
+    GridColumn,
+    PartnerLogo,
+    ProcessStep,
+    StatementBase,
+    StatementCreate,
+    StatementRead,
+    StatementTranslationBase,
+    StatementTranslationCreate,
+    StatementTranslationRead,
+    StatementUpdate,
+    StudyBase,
+    StudyCreate,
+    StudyRead,
+    StudyStatsRead,
+    StudyTranslationBase,
+    StudyTranslationCreate,
+    StudyTranslationRead,
+    StudyUpdate,
+)
+from .users import PasswordChange, UserBase, UserCreate, UserRead, UserUpdate
+from .workspaces import (
+    WorkspaceBrief,
+    WorkspaceCreate,
+    WorkspaceInvitationCreate,
+    WorkspaceMemberRead,
+    WorkspaceMemberUpdate,
+    WorkspaceRead,
+    WorkspaceUpdate,
+    WorkspaceWithRole,
+)
+
+__all__ = [
+    # analysis
+    "AnalysisRequest",
+    "AnalysisResult",
+    "EigenvalueResult",
+    "FactorCharacteristic",
+    "ParticipantLoading",
+    "StatementClassification",
+    "StatementScore",
+    # audio
+    "AudioRecordingBase",
+    "AudioRecordingRead",
+    "AudioUploadResponse",
+    # auth
+    "TOTPSetup",
+    "TOTPVerify",
+    "Token",
+    "TokenData",
+    # common
+    "PaginatedResponse",
+    # participants
+    "ConsentInput",
+    "ConsentResponse",
+    "DraftSaveInput",
+    "ParticipantDetailRead",
+    "ParticipantDiscardUpdate",
+    "ParticipantRead",
+    "ProgressUpdate",
+    "QSortEntryInput",
+    "QSortEntryRead",
+    "ResumeResponse",
+    "SubmissionInput",
+    # recruitment
+    "InvitationCreate",
+    "InvitationLink",
+    "RecruitmentLinkBase",
+    "RecruitmentLinkCreate",
+    "RecruitmentLinkRead",
+    # studies
+    "BrandingBase",
+    "GridColumn",
+    "PartnerLogo",
+    "ProcessStep",
+    "StatementBase",
+    "StatementCreate",
+    "StatementRead",
+    "StatementTranslationBase",
+    "StatementTranslationCreate",
+    "StatementTranslationRead",
+    "StatementUpdate",
+    "StudyBase",
+    "StudyCreate",
+    "StudyRead",
+    "StudyStatsRead",
+    "StudyTranslationBase",
+    "StudyTranslationCreate",
+    "StudyTranslationRead",
+    "StudyUpdate",
+    # users
+    "PasswordChange",
+    "UserBase",
+    "UserCreate",
+    "UserRead",
+    "UserUpdate",
+    # workspaces
+    "WorkspaceBrief",
+    "WorkspaceCreate",
+    "WorkspaceInvitationCreate",
+    "WorkspaceMemberRead",
+    "WorkspaceMemberUpdate",
+    "WorkspaceRead",
+    "WorkspaceUpdate",
+    "WorkspaceWithRole",
+]

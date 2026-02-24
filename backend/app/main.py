@@ -113,7 +113,7 @@ app.add_middleware(SlowAPIMiddleware)
 # CORS configuration
 origins_raw = os.getenv(
     "ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173,http://127.0.0.1:4173,http://0.0.0.0:5173",
+    "http://localhost:5173,http://localhost:4173,http://127.0.0.1:5173,http://127.0.0.1:4173",
 )
 origins = [o.strip() for o in origins_raw.split(",")]
 
@@ -166,83 +166,6 @@ def health_check():
 
 
 # Serve Frontend in Production
-import os  # noqa: E402
+from app.middleware.spa import mount_spa  # noqa: E402
 
-from fastapi.responses import FileResponse  # noqa: E402
-from fastapi.staticfiles import StaticFiles  # noqa: E402
-
-# Correct path relative to where uvicorn is run (backend dir)
-# We assume uvicorn is run from 'backend/' so we go up one level to 'frontend/dist'
-# OR if we use absolute paths based on __file__
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # backend/
-ROOT_DIR = os.path.dirname(BASE_DIR)  # root/
-FRONTEND_DIST = os.path.join(ROOT_DIR, "frontend", "dist")
-
-if os.path.exists(FRONTEND_DIST):
-    # Mount assets (JS/CSS) - These are immutable and can be served efficiently
-    app.mount(
-        "/assets",
-        StaticFiles(directory=os.path.join(FRONTEND_DIST, "assets")),
-        name="assets",
-    )
-
-    # Catch-all for SPA: Try static files first, then fallback to index.html
-    @app.get("/{full_path:path}")
-    async def serve_spa(full_path: str):
-        """Serve the Single Page Application (SPA) static files and handle client-side routing."""
-        # 1. API 404 Fallback: Do not serve SPA for missing API routes
-        if full_path.startswith("api"):
-            raise StarletteHTTPException(
-                status_code=404, detail="API endpoint not found"
-            )
-
-        # 2. Check if it's a specific static file (e.g. favicon.ico, manifest.json) in the root
-        file_path = os.path.join(FRONTEND_DIST, full_path)
-        if full_path and os.path.isfile(file_path):
-            # Cache assets (js, css, images) for 1 year, but not HTML
-            if full_path.endswith(
-                (
-                    ".js",
-                    ".css",
-                    ".png",
-                    ".jpg",
-                    ".jpeg",
-                    ".svg",
-                    ".ico",
-                    ".woff",
-                    ".woff2",
-                )
-            ):
-                return FileResponse(
-                    file_path,
-                    headers={"Cache-Control": "public, max-age=31536000, immutable"},
-                )
-            else:
-                return FileResponse(
-                    file_path, headers={"Cache-Control": "no-cache, must-revalidate"}
-                )
-
-        # 2b. Static 404 Fallback: Do not serve SPA for missing assets
-        if full_path.startswith("assets") or full_path.endswith(
-            (".js", ".css", ".png", ".jpg", ".jpeg", ".svg", ".ico", ".woff", ".woff2")
-        ):
-            raise StarletteHTTPException(
-                status_code=404, detail="Static file not found"
-            )
-
-        # 3. Otherwise serve index.html for CSR navigation (never cache HTML)
-        index_path = os.path.join(FRONTEND_DIST, "index.html")
-        return FileResponse(
-            index_path,
-            headers={
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache",
-                "Expires": "0",
-            },
-        )
-else:
-
-    @app.get("/")
-    def read_root():
-        """Root endpoint when frontend is not mounted."""
-        return {"Hello": "Frontend build not found. API is running."}
+mount_spa(app)

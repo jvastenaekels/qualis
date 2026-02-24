@@ -2,7 +2,7 @@
 
 import pytest
 from httpx import AsyncClient
-from sqlalchemy import select, delete
+from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import (
@@ -242,64 +242,3 @@ class TestStudyLifecycle:
         assert response.status_code == 200
         assert response.json()["state"] == "paused"
 
-    @pytest.mark.skip(
-        reason="Flaky test due to UQ constraint issues in test environment"
-    )
-    async def test_sync_study_from_file(
-        self,
-        client: AsyncClient,
-        db: AsyncSession,
-        test_user: User,
-        test_workspace: Workspace,
-    ):
-        """Test the logic of synchronizing studies from JSON (used by seed/CLI)."""
-        import json
-        import os
-        from app.utils.script_utils import sync_study_from_file
-        import app.utils.script_utils as script_utils_module
-
-        # Set env vars for seeds (matching test_user from conftest)
-        os.environ["ADMIN_EMAIL"] = test_user.email
-        os.environ["ADMIN_PASSWORD"] = "testpassword"
-
-        import uuid
-
-        unique_slug = f"seed-api-{uuid.uuid4().hex[:8]}"
-        study_data = {
-            "slug": unique_slug,
-            "default_language": "en",
-            "grid_config": [{"score": 0, "capacity": 1}],
-            "presort_config": {},
-            "postsort_config": {},
-            "translations": {
-                "en": {
-                    "title": "Seed Title",
-                    "instructions": "test",
-                    "consent_title": "consent",
-                }
-            },
-            "statements": [{"code": "S1", "translations": {"en": "Statement 1"}}],
-        }
-
-        tmp_path = "tmp_study.json"
-        with open(tmp_path, "w") as f:
-            json.dump(study_data, f)
-
-        orig_api_cls = script_utils_module.APIClient
-        script_utils_module.APIClient = lambda *args, **kwargs: orig_api_cls(  # type: ignore
-            client=client
-        )
-
-        # Inject workspace context globally for this client instance
-        client.headers["X-Workspace-ID"] = str(test_workspace.id)
-
-        try:
-            await sync_study_from_file(tmp_path)
-            result = await db.execute(select(Study).where(Study.slug == unique_slug))
-            study = result.scalars().first()
-            assert study is not None
-            assert study.workspace_id == test_workspace.id
-        finally:
-            script_utils_module.APIClient = orig_api_cls  # type: ignore
-            if os.path.exists(tmp_path):
-                os.remove(tmp_path)

@@ -7,6 +7,7 @@ import logging
 
 from app.limiter import limiter
 from app.dependencies import (
+    PaginationParams,
     check_workspace_permission,
     get_current_active_user,
     get_db,
@@ -36,37 +37,35 @@ logger = logging.getLogger(__name__)
 async def list_workspaces(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
-    limit: int = 50,
-    offset: int = 0,
+    pagination: PaginationParams = Depends(),
 ):
     """
     List all workspaces the current user is a member of, with their role.
     """
-    # Total count
     count_result = await db.execute(
         select(func.count()).where(WorkspaceMember.user_id == current_user.id)
     )
     total = count_result.scalar() or 0
 
-    # Paginated items
     query = (
         select(Workspace, WorkspaceMember.role)
         .join(WorkspaceMember, WorkspaceMember.workspace_id == Workspace.id)
         .where(WorkspaceMember.user_id == current_user.id)
         .options(selectinload(Workspace.members).selectinload(WorkspaceMember.user))
-        .limit(limit)
-        .offset(offset)
+        .limit(pagination.limit)
+        .offset(pagination.offset)
     )
     result = await db.execute(query)
     rows = result.unique().all()
 
-    # Map to schema
     items = [
         WorkspaceWithRole(**workspace.__dict__, user_role=role)
         for workspace, role in rows
     ]
 
-    return PaginatedResponse(items=items, total=total, limit=limit, offset=offset)
+    return PaginatedResponse(
+        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    )
 
 
 @router.post("", response_model=WorkspaceRead, status_code=status.HTTP_201_CREATED)
@@ -222,8 +221,7 @@ async def update_workspace(
 async def list_workspace_members(
     workspace: Workspace = Depends(check_workspace_permission(WorkspaceRole.viewer)),
     db: AsyncSession = Depends(get_db),
-    limit: int = 50,
-    offset: int = 0,
+    pagination: PaginationParams = Depends(),
 ):
     """
     List all members of a workspace with pagination.
@@ -232,16 +230,20 @@ async def list_workspace_members(
 
     base = select(WorkspaceMember).where(WorkspaceMember.workspace_id == workspace.id)
 
-    # Total count
     count_result = await db.execute(select(func.count()).select_from(base.subquery()))
     total = count_result.scalar() or 0
 
-    # Paginated items
-    query = base.options(selectinload(WorkspaceMember.user)).limit(limit).offset(offset)
+    query = (
+        base.options(selectinload(WorkspaceMember.user))
+        .limit(pagination.limit)
+        .offset(pagination.offset)
+    )
     result = await db.execute(query)
     items = list(result.scalars().all())
 
-    return PaginatedResponse(items=items, total=total, limit=limit, offset=offset)
+    return PaginatedResponse(
+        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    )
 
 
 @router.patch("/{slug}/members/{user_id}", response_model=WorkspaceMemberRead)

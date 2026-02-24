@@ -40,37 +40,13 @@ def test_study_translation_validation():
     st = StudyTranslationBase(language_code="en", title="  ")
     assert st.title == "  "
 
-    # None description (should be allowed via base validator if field allows None but schema validator logic handles it?)
-    # description is field("", max_length=2000). The default is empty string.
-    # validate_trans_strings receives str | None.
-    # If default "" is passed, validate_non_empty_string returns "".
-    # Wait, check validator logic:
-    # if not v.strip(): raise ValueError
-    # So empty string is NOT allowed for description?
-    # Description has default "".
-    # Review schema:
-    # `description: str = Field("", max_length=2000)`
-    # Validator: `validate_trans_strings` calls `validate_non_empty_string`.
-    # `validate_non_empty_string` raises if `not v.strip()`.
-    # This means default "" triggers error!
-    # I introduced a regression for optional fields that default to empty string.
+    # Description defaults to empty string and is not subject to non-empty validation
+    st = StudyTranslationBase(language_code="en", title="Title")
+    assert st.description == ""
 
-    # Correction: Description in StudyTranslation is often empty.
-    # If it is empty string, it should be allowed if it is optional?
-    # In StudyTranslationBase, `description` is NOT Optional[str], it is `str`.
-    # User might want empty description.
-    # But usually "empty or whitespace only" means we don't want "   ".
-    # If we want to allow empty string, we should handle it.
-    # BUT `validate_non_empty_string` explicitly forbids empty string.
-
-    # I need to check if description IS optional in logic.
-    # Usually descriptions can be empty.
-    # I should change description to `str | None = None` OR allow empty string if it's truly empty?
-    # No, "Sanitization" means strict.
-
-    # Let's adjust test to see behavior.
-
-    pass
+    # Optional fields default to None
+    assert st.instructions is None
+    assert st.subtitle is None
 
 
 def test_statement_base_validation():

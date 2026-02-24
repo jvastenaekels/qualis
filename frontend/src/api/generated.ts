@@ -848,6 +848,8 @@ export const useDisableTotpApiMe2faDisablePost = <TError = HTTPValidationError, 
 
 /**
  * Create a new study in the active workspace.
+
+Requires Owner or Researcher workspace role.
  * @summary Create Study
  */
 export const createStudyApiAdminStudiesPost = (studyCreate: StudyCreate, signal?: AbortSignal) => {
@@ -1220,7 +1222,7 @@ export function useGetStudyApiAdminStudiesSlugGet<
 }
 
 /**
- * Update study configuration.
+ * Update study configuration (draft only).
  * @summary Update Study
  */
 export const updateStudyApiAdminStudiesSlugPatch = (slug: string, studyUpdate: StudyUpdate) => {
@@ -8278,116 +8280,85 @@ export function useHealthCheckHealthGet<
 }
 
 /**
- * Serve the Single Page Application (SPA) static files and handle client-side routing.
- * @summary Serve Spa
+ * Root endpoint when frontend is not mounted.
+ * @summary Read Root
  */
-export const serveSpaFullPathGet = (fullPath: string, signal?: AbortSignal) => {
-    return customInstance<unknown>({ url: `/${fullPath}`, method: 'GET', signal });
+export const readRootGet = (signal?: AbortSignal) => {
+    return customInstance<unknown>({ url: `/`, method: 'GET', signal });
 };
 
-export const getServeSpaFullPathGetQueryKey = (fullPath?: string) => {
-    return [`/${fullPath}`] as const;
+export const getReadRootGetQueryKey = () => {
+    return [`/`] as const;
 };
 
-export const getServeSpaFullPathGetQueryOptions = <
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
-    fullPath: string,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        >;
-    }
-) => {
+export const getReadRootGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof readRootGet>>,
+    TError = unknown,
+>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>>;
+}) => {
     const { query: queryOptions } = options ?? {};
 
-    const queryKey = queryOptions?.queryKey ?? getServeSpaFullPathGetQueryKey(fullPath);
+    const queryKey = queryOptions?.queryKey ?? getReadRootGetQueryKey();
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof serveSpaFullPathGet>>> = ({ signal }) =>
-        serveSpaFullPathGet(fullPath, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof readRootGet>>> = ({ signal }) =>
+        readRootGet(signal);
 
-    return { queryKey, queryFn, enabled: !!fullPath, ...queryOptions } as UseQueryOptions<
-        Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof readRootGet>>,
         TError,
         TData
     > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type ServeSpaFullPathGetQueryResult = NonNullable<
-    Awaited<ReturnType<typeof serveSpaFullPathGet>>
->;
-export type ServeSpaFullPathGetQueryError = HTTPValidationError;
+export type ReadRootGetQueryResult = NonNullable<Awaited<ReturnType<typeof readRootGet>>>;
+export type ReadRootGetQueryError = unknown;
 
-export function useServeSpaFullPathGet<
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
-    fullPath: string,
+export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
     options: {
-        query: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        > &
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>> &
             Pick<
                 DefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+                    Awaited<ReturnType<typeof readRootGet>>,
                     TError,
-                    Awaited<ReturnType<typeof serveSpaFullPathGet>>
+                    Awaited<ReturnType<typeof readRootGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useServeSpaFullPathGet<
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
-    fullPath: string,
+export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
     options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        > &
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>> &
             Pick<
                 UndefinedInitialDataOptions<
-                    Awaited<ReturnType<typeof serveSpaFullPathGet>>,
+                    Awaited<ReturnType<typeof readRootGet>>,
                     TError,
-                    Awaited<ReturnType<typeof serveSpaFullPathGet>>
+                    Awaited<ReturnType<typeof readRootGet>>
                 >,
                 'initialData'
             >;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useServeSpaFullPathGet<
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
-    fullPath: string,
+export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
     options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        >;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary Serve Spa
+ * @summary Read Root
  */
 
-export function useServeSpaFullPathGet<
-    TData = Awaited<ReturnType<typeof serveSpaFullPathGet>>,
-    TError = HTTPValidationError,
->(
-    fullPath: string,
+export function useReadRootGet<TData = Awaited<ReturnType<typeof readRootGet>>, TError = unknown>(
     options?: {
-        query?: Partial<
-            UseQueryOptions<Awaited<ReturnType<typeof serveSpaFullPathGet>>, TError, TData>
-        >;
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof readRootGet>>, TError, TData>>;
     },
     queryClient?: QueryClient
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions = getServeSpaFullPathGetQueryOptions(fullPath, options);
+    const queryOptions = getReadRootGetQueryOptions(options);
 
     const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
         queryKey: DataTag<QueryKey, TData, TError>;
@@ -12108,14 +12079,14 @@ export const getHealthCheckHealthGetMockHandler = (
     );
 };
 
-export const getServeSpaFullPathGetMockHandler = (
+export const getReadRootGetMockHandler = (
     overrideResponse?:
         | unknown
         | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
-        '*/:fullPath',
+        '*/',
         async (info) => {
             if (typeof overrideResponse === 'function') {
                 await overrideResponse(info);
@@ -12197,5 +12168,5 @@ export const getLibreQAPIMock = () => [
     getCleanupAllTestDataApiTestCleanupAllPostMockHandler(),
     getTestHealthApiTestHealthGetMockHandler(),
     getHealthCheckHealthGetMockHandler(),
-    getServeSpaFullPathGetMockHandler(),
+    getReadRootGetMockHandler(),
 ];

@@ -347,7 +347,7 @@
           "admin-studies"
         ],
         "summary": "Create Study",
-        "description": "Create a new study in the active workspace.",
+        "description": "Create a new study in the active workspace.\n\nRequires Owner or Researcher workspace role.",
         "operationId": "create_study_api_admin_studies_post",
         "security": [
           {
@@ -424,6 +424,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
               "default": 50,
               "title": "Limit"
             }
@@ -434,6 +436,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 0,
               "default": 0,
               "title": "Offset"
             }
@@ -533,7 +536,7 @@
           "admin-studies"
         ],
         "summary": "Update Study",
-        "description": "Update study configuration.",
+        "description": "Update study configuration (draft only).",
         "operationId": "update_study_api_admin_studies__slug__patch",
         "security": [
           {
@@ -814,6 +817,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
               "default": 50,
               "title": "Limit"
             }
@@ -824,6 +829,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 0,
               "default": 0,
               "title": "Offset"
             }
@@ -1961,6 +1967,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
               "default": 50,
               "title": "Limit"
             }
@@ -1971,6 +1979,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 0,
               "default": 0,
               "title": "Offset"
             }
@@ -2283,6 +2292,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
               "default": 50,
               "title": "Limit"
             }
@@ -2293,6 +2304,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 0,
               "default": 0,
               "title": "Offset"
             }
@@ -2547,6 +2559,8 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
               "default": 50,
               "title": "Limit"
             }
@@ -2557,6 +2571,7 @@
             "required": false,
             "schema": {
               "type": "integer",
+              "minimum": 0,
               "default": 0,
               "title": "Offset"
             }
@@ -3555,38 +3570,17 @@
         }
       }
     },
-    "/{full_path}": {
+    "/": {
       "get": {
-        "summary": "Serve Spa",
-        "description": "Serve the Single Page Application (SPA) static files and handle client-side routing.",
-        "operationId": "serve_spa__full_path__get",
-        "parameters": [
-          {
-            "name": "full_path",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Full Path"
-            }
-          }
-        ],
+        "summary": "Read Root",
+        "description": "Root endpoint when frontend is not mounted.",
+        "operationId": "read_root__get",
         "responses": {
           "200": {
             "description": "Successful Response",
             "content": {
               "application/json": {
                 "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
               }
             }
           }

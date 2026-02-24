@@ -18,16 +18,21 @@ import logging
 from typing import Any, cast
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from ..exceptions import ConflictError, NotFoundError, ValidationError
 from ..models import (
+    Participant,
     Statement,
+    StatementTranslation,
     Study,
     StudyState,
     StudyTranslation,
 )
+from ..schemas import StudyCreate, StudyUpdate
 from .study_defaults import DEFAULT_PROCESS_STEPS, DEFAULT_TRANSLATION_CONTENT
 
 logger = logging.getLogger(__name__)
@@ -61,6 +66,250 @@ class StudyService:
         )
         result = await db.execute(stmt)
         return cast(Study | None, result.scalar_one_or_none())
+
+    # ------------------------------------------------------------------
+    # Create / Update
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    async def create_study(
+        db: AsyncSession, study_in: StudyCreate, workspace_id: int
+    ) -> Study:
+        """Create a new study with translations and statements.
+
+        Raises ConflictError if slug already exists.
+        """
+        # Check slug uniqueness
+        existing = await db.execute(select(Study).where(Study.slug == study_in.slug))
+        if existing.scalar_one_or_none():
+            raise ConflictError("Study with this slug already exists")
+
+        try:
+            db_study = Study(
+                slug=study_in.slug,
+                workspace_id=workspace_id,
+                state=StudyState.draft,
+                grid_config=[col.model_dump() for col in study_in.grid_config],
+                presort_config=study_in.presort_config,
+                postsort_config=study_in.postsort_config,
+                default_language=study_in.default_language
+                or (
+                    study_in.translations[0].language_code
+                    if study_in.translations
+                    else "en"
+                ),
+                show_statement_codes=study_in.show_statement_codes,
+                branding=study_in.branding.model_dump() if study_in.branding else None,
+                start_date=study_in.start_date,
+                end_date=study_in.end_date,
+            )
+            db.add(db_study)
+            await db.flush()
+
+            logger.debug(
+                "Creating study with %d translations", len(study_in.translations)
+            )
+            for t_in in study_in.translations:
+                t_data = t_in.model_dump()
+                lang = t_data.get("language_code", "en")
+                defaults = DEFAULT_TRANSLATION_CONTENT.get(
+                    lang, DEFAULT_TRANSLATION_CONTENT["en"]
+                )
+                if not t_data.get("process_steps"):
+                    t_data["process_steps"] = DEFAULT_PROCESS_STEPS.get(
+                        lang, DEFAULT_PROCESS_STEPS["en"]
+                    )
+                for field, value in defaults.items():
+                    if not t_data.get(field):
+                        t_data[field] = value
+                db.add(StudyTranslation(study_id=db_study.id, **t_data))
+
+            for idx, s_in in enumerate(study_in.statements):
+                stmt = Statement(
+                    study_id=db_study.id, code=s_in.code, display_order=idx
+                )
+                db.add(stmt)
+                await db.flush()
+                for st_in in s_in.translations:
+                    db.add(
+                        StatementTranslation(
+                            statement_id=stmt.id,
+                            language_code=st_in.language_code,
+                            text=st_in.text,
+                        )
+                    )
+
+            await db.commit()
+        except IntegrityError as e:
+            await db.rollback()
+            logger.error("Integrity check failed during study creation: %s", e)
+            raise ConflictError(f"Database integrity check failed: {e}")
+
+        return await StudyService._get_study_or_raise(db, db_study.slug)
+
+    @staticmethod
+    async def update_study(
+        db: AsyncSession, study: Study, study_update: StudyUpdate
+    ) -> Study:
+        """Update study configuration (draft only).
+
+        Expects ``study`` to be loaded with translations, statements
+        (including Statement.translations), and participants.
+
+        Raises ValidationError, ConflictError as appropriate.
+        """
+        # Grid config change guard
+        if study_update.grid_config is not None:
+            new_grid = [col.model_dump() for col in study_update.grid_config]
+            if new_grid != study.grid_config:
+                if await StudyService._has_real_participants(db, study.id):
+                    raise ValidationError(
+                        "Cannot modify grid configuration because participants "
+                        "have already started the study."
+                    )
+
+        # Draft-only updates
+        if study.state != StudyState.draft:
+            raise ValidationError(
+                f"Cannot update study in {study.state.value} state. "
+                "Switch it back to draft first."
+            )
+
+        # Optimistic locking
+        if study_update.last_updated_at and study.updated_at:
+            if (
+                study.updated_at > study_update.last_updated_at
+                and study.state != StudyState.draft
+            ):
+                raise ConflictError("Study has been modified by another user.")
+
+        try:
+            # Basic fields
+            update_data = study_update.model_dump(exclude_unset=True)
+            for field, value in update_data.items():
+                if field in ["translations", "statements", "grid_config"]:
+                    continue
+                if field == "access_password" and value is not None:
+                    from ..utils.security import get_password_hash
+
+                    value = get_password_hash(value)
+                setattr(study, field, value)
+
+            # Grid config
+            if study_update.grid_config is not None:
+                study.grid_config = [
+                    col.model_dump() for col in study_update.grid_config
+                ]
+
+            # Translations sync
+            if study_update.translations is not None:
+                StudyService._sync_translations(study, study_update.translations)
+
+            # Statements sync
+            if study_update.statements is not None:
+                await StudyService._sync_statements(db, study, study_update.statements)
+
+            await db.commit()
+        except IntegrityError as e:
+            await db.rollback()
+            logger.error("Integrity check failed during study update: %s", e)
+            raise ConflictError(
+                "Database integrity check failed (possibly duplicate statement codes)"
+            )
+
+        return await StudyService._get_study_or_raise(db, study.slug)
+
+    @staticmethod
+    def _sync_translations(study: Study, translations_in: list[Any]) -> None:
+        """Sync study translations: update existing, add new."""
+        current_trans = {t.language_code: t for t in study.translations}
+        new_trans_list = []
+        for t_in in translations_in:
+            if t_in.language_code in current_trans:
+                t_obj = current_trans[t_in.language_code]
+                for k, v in t_in.model_dump().items():
+                    setattr(t_obj, k, v)
+                new_trans_list.append(t_obj)
+            else:
+                new_trans_list.append(StudyTranslation(**t_in.model_dump()))
+        study.translations = new_trans_list
+
+    @staticmethod
+    async def _sync_statements(
+        db: AsyncSession, study: Study, statements_in: list[Any]
+    ) -> None:
+        """Sync study statements: add, update, remove."""
+        current_statements = {s.code: s for s in study.statements}
+        updated_codes = {s.code for s in statements_in}
+        can_sync_structure = not await StudyService._has_real_participants(db, study.id)
+
+        if not can_sync_structure:
+            current_codes = {s.code for s in study.statements}
+            if updated_codes != current_codes:
+                raise ValidationError(
+                    "Cannot modify statement structure because participants "
+                    "have already started the study."
+                )
+
+        # Remove statements not in the update
+        if can_sync_structure:
+            for code, s_obj in list(current_statements.items()):
+                if code not in updated_codes:
+                    study.statements.remove(s_obj)
+                    await db.delete(s_obj)
+                    del current_statements[code]
+
+        # Sync existing and add new
+        for idx, s_up in enumerate(statements_in):
+            if s_up.code in current_statements:
+                target_s = current_statements[s_up.code]
+                target_s.display_order = idx
+                curr_s_trans = {t.language_code: t for t in target_s.translations}
+                new_s_trans_list = []
+                for st_in in s_up.translations:
+                    if st_in.language_code in curr_s_trans:
+                        st_obj = curr_s_trans[st_in.language_code]
+                        st_obj.text = st_in.text
+                        new_s_trans_list.append(st_obj)
+                    else:
+                        new_s_trans_list.append(
+                            StatementTranslation(
+                                statement_id=target_s.id, **st_in.model_dump()
+                            )
+                        )
+                target_s.translations = new_s_trans_list
+            elif can_sync_structure:
+                new_s = Statement(study_id=study.id, code=s_up.code, display_order=idx)
+                db.add(new_s)
+                study.statements.append(new_s)
+                await db.flush()
+                for st_in in s_up.translations:
+                    db.add(
+                        StatementTranslation(
+                            statement_id=new_s.id,
+                            language_code=st_in.language_code,
+                            text=st_in.text,
+                        )
+                    )
+
+    @staticmethod
+    async def _has_real_participants(db: AsyncSession, study_id: int) -> bool:
+        """Check if a study has non-test participants."""
+        result = await db.execute(
+            select(func.count(Participant.id)).where(
+                Participant.study_id == study_id,
+                Participant.is_test_run.is_(False),
+            )
+        )
+        return (result.scalar() or 0) > 0
+
+    @staticmethod
+    async def _get_study_or_raise(db: AsyncSession, slug: str) -> Study:
+        """Fetch study with relationships or raise NotFoundError."""
+        study = await StudyService.get_study_by_slug(db, slug)
+        if study is None:
+            raise NotFoundError("Study")
+        return study
 
     # ------------------------------------------------------------------
     # Helpers

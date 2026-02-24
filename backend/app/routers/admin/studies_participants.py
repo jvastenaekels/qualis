@@ -11,7 +11,7 @@ from sqlalchemy.orm import selectinload
 from sqlalchemy import func
 
 from app.database import get_db
-from app.dependencies import check_study_permission, get_current_user
+from app.dependencies import PaginationParams, check_study_permission, get_current_user
 from app.limiter import limiter
 from app.models import (
     Participant,
@@ -33,22 +33,25 @@ logger = logging.getLogger(__name__)
 async def list_study_participants(
     study: Study = Depends(check_study_permission(StudyRole.viewer)),
     db: AsyncSession = Depends(get_db),
-    limit: int = 50,
-    offset: int = 0,
+    pagination: PaginationParams = Depends(),
 ):
     """List participants for a specific study with pagination."""
     base = select(Participant).where(Participant.study_id == study.id)
 
-    # Total count
     count_result = await db.execute(select(func.count()).select_from(base.subquery()))
     total = count_result.scalar() or 0
 
-    # Paginated items
-    stmt = base.order_by(Participant.created_at.desc()).limit(limit).offset(offset)
+    stmt = (
+        base.order_by(Participant.created_at.desc())
+        .limit(pagination.limit)
+        .offset(pagination.offset)
+    )
     result = await db.execute(stmt)
     items = list(result.scalars().all())
 
-    return PaginatedResponse(items=items, total=total, limit=limit, offset=offset)
+    return PaginatedResponse(
+        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    )
 
 
 @router.get("/participants/{participant_id}", response_model=ParticipantDetailRead)

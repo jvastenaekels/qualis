@@ -141,16 +141,3 @@ class TestSubmissionValidation:
         response = await client.post("/api/submit", json=payload)
         assert response.status_code == 400
         assert "does not belong" in response.json()["message"]
-
-
-@pytest.mark.asyncio
-class TestParticipantData:
-    """Tests for participant metadata and consent."""
-
-    async def test_consent_logging(
-        self, client: AsyncClient, db: AsyncSession, active_study: Study
-    ):
-        # We need a participant ID and session for the /consent endpoint usually,
-        # but the API allows posting consent. Actually, let's check the endpoint.
-        # Placeholder for consent flow tests.
-        pass

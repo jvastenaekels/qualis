@@ -209,7 +209,7 @@ class Study(Base):
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"
     )
     participants: Mapped[list["Participant"]] = relationship(
-        back_populates="study", cascade="all, delete-orphan", lazy="selectin"
+        back_populates="study", cascade="all, delete-orphan", lazy="raise"
     )
     recruitment_links: Mapped[list["RecruitmentLink"]] = relationship(
         back_populates="study", cascade="all, delete-orphan", lazy="selectin"

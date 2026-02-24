@@ -18,6 +18,7 @@ from app.dependencies import (
     check_study_permission,
     get_current_user,
     get_current_workspace,
+    require_workspace_role,
 )
 from app.limiter import limiter
 from app.models import (
@@ -392,7 +393,9 @@ async def import_study_config(
     request: Request,
     import_data: StudyImportRequest,
     current_user: User = Depends(get_current_user),
-    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(
+        require_workspace_role(WorkspaceRole.researcher)
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -400,13 +403,6 @@ async def import_study_config(
     Creates a new study in draft state.
     """
     workspace, member = workspace_ctx
-
-    # Check permission
-    if member.role not in [WorkspaceRole.owner, WorkspaceRole.researcher]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You need to be an Admin or Researcher in this Workspace to import a study.",
-        )
 
     config = import_data.config
     version = config.get("version")

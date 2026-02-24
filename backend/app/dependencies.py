@@ -1,12 +1,13 @@
 """Dependency injection definitions."""
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Annotated, cast
 
 import jwt
-from fastapi import Depends, HTTPException, Path, status, Header
+from fastapi import Depends, HTTPException, Path, Query, status, Header
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -134,6 +135,44 @@ WORKSPACE_ROLE_HIERARCHY = {
 }
 
 
+async def check_superuser(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Dependency to ensure the current user is a superuser."""
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Superuser privileges required",
+        )
+    return current_user
+
+
+def require_workspace_role(required_role: WorkspaceRole) -> Callable:
+    """Factory creating a dependency that validates workspace role from the X-Workspace-ID header.
+
+    Returns the (Workspace, WorkspaceMember) tuple if the user has the required role.
+    """
+
+    async def dependency(
+        workspace_ctx: tuple["Workspace", WorkspaceMember] = Depends(
+            get_current_workspace
+        ),
+    ) -> tuple["Workspace", WorkspaceMember]:
+        _, member = workspace_ctx
+        required_level = WORKSPACE_ROLE_HIERARCHY[required_role]
+        user_level = WORKSPACE_ROLE_HIERARCHY[member.role]
+
+        if user_level < required_level:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Insufficient permissions. Required: {required_role.value}",
+            )
+
+        return workspace_ctx
+
+    return dependency
+
+
 def check_workspace_permission(required_role: WorkspaceRole) -> Callable:
     """Factory creating a dependency to verify workspace access."""
 
@@ -228,3 +267,15 @@ def check_study_permission(required_role: StudyRole) -> Callable:
         return cast(Study, study)
 
     return permission_dependency
+
+
+# --- Pagination ---
+
+MAX_PAGE_SIZE = 100
+
+
+class PaginationParams(BaseModel):
+    """Validated pagination parameters with bounded limit."""
+
+    limit: Annotated[int, Query(ge=1, le=MAX_PAGE_SIZE)] = 50
+    offset: Annotated[int, Query(ge=0)] = 0

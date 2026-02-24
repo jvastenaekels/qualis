@@ -6,6 +6,13 @@
  */
 
 export type ListWorkspacesApiAdminWorkspacesGetParams = {
+    /**
+     * @minimum 1
+     * @maximum 100
+     */
     limit?: number;
+    /**
+     * @minimum 0
+     */
     offset?: number;
 };

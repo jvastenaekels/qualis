@@ -1,7 +1,7 @@
 """Tests for the resume_codes module."""
 
 import re
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 

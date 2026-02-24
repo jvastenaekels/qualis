@@ -1,4 +1,12 @@
-"""Participant, submission, and draft schemas."""
+"""Participant, submission, and draft schemas.
+
+Naming convention: participant-facing schemas use the ``*Input`` suffix
+(e.g. ``ConsentInput``, ``SubmissionInput``) to distinguish them from
+admin CRUD schemas which follow the ``*Create`` / ``*Update`` / ``*Read``
+pattern. ``*Input`` schemas represent data submitted by anonymous study
+participants, while ``*Create`` / ``*Update`` schemas represent admin
+operations on owned resources.
+"""
 
 import json
 from datetime import datetime
