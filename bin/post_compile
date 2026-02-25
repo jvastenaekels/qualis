@@ -10,3 +10,7 @@ npm run build
 cd ..
 
 echo "--> Frontend Build Complete"
+echo "--> Verifying frontend/dist exists:"
+ls -la frontend/dist/ | head -5
+echo "--> CWD: $(pwd)"
+echo "--> Absolute path: $(realpath frontend/dist)"

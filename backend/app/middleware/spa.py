@@ -35,6 +35,14 @@ def mount_spa(app: FastAPI) -> None:
     If the frontend build directory doesn't exist (e.g. in development),
     registers a simple root endpoint instead.
     """
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.info("SPA mount: FRONTEND_DIST=%s exists=%s", FRONTEND_DIST, os.path.exists(FRONTEND_DIST))
+    logger.info("SPA mount: _ROOT_DIR=%s contents=%s", _ROOT_DIR, os.listdir(_ROOT_DIR) if os.path.exists(_ROOT_DIR) else "N/A")
+    if os.path.exists(os.path.join(_ROOT_DIR, "frontend")):
+        logger.info("SPA mount: frontend/ contents=%s", os.listdir(os.path.join(_ROOT_DIR, "frontend")))
+
     if not os.path.exists(FRONTEND_DIST):
 
         @app.get("/")
