@@ -762,23 +762,6 @@ const RecruitmentPage = () => {
                             </CardDescription>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-4 text-xs font-bold text-slate-500">
-                                <span className="flex items-center gap-1.5">
-                                    <Users className="size-3.5 text-indigo-500" />
-                                    {links?.length || 0}{' '}
-                                    {t('admin.recruitment.stats_summary.links', 'links')}
-                                </span>
-                                <span className="flex items-center gap-1.5">
-                                    <Globe className="size-3.5 text-amber-500" />
-                                    {links?.reduce((acc, l) => acc + (l.start_count || 0), 0) || 0}{' '}
-                                    {t('admin.recruitment.stats_summary.started', 'started')}
-                                </span>
-                                <span className="flex items-center gap-1.5">
-                                    <CheckCircle2 className="size-3.5 text-emerald-500" />
-                                    {links?.reduce((acc, l) => acc + (l.usage_count || 0), 0) || 0}{' '}
-                                    {t('admin.recruitment.stats_summary.submitted', 'submitted')}
-                                </span>
-                            </div>
                             <Dialog
                                 open={isCreateModalOpen}
                                 onOpenChange={(open) => {
@@ -1093,59 +1076,113 @@ const RecruitmentPage = () => {
                                             </code>
                                         </TableCell>
                                         <TableCell>
-                                            <div className="flex flex-col gap-1.5">
-                                                <span className="text-2xs font-black text-slate-700">
-                                                    {link.usage_count}
-                                                    {link.capacity ? (
+                                            {link.type === 'public' && (
+                                                <div className="flex items-center gap-3 text-2xs">
+                                                    <span className="flex items-center gap-1 text-slate-500 font-medium">
+                                                        <Globe className="size-3 text-amber-500" />
+                                                        <span className="font-black text-slate-700">
+                                                            {link.start_count || 0}
+                                                        </span>{' '}
+                                                        {t(
+                                                            'admin.recruitment.usage.started',
+                                                            'started'
+                                                        )}
+                                                    </span>
+                                                    <span className="flex items-center gap-1 text-slate-500 font-medium">
+                                                        <CheckCircle2 className="size-3 text-emerald-500" />
+                                                        <span className="font-black text-slate-700">
+                                                            {link.usage_count}
+                                                        </span>{' '}
+                                                        {t(
+                                                            'admin.recruitment.usage.submitted',
+                                                            'submitted'
+                                                        )}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            {link.type === 'individual' && (
+                                                <div className="text-2xs">
+                                                    {link.usage_count > 0 ? (
+                                                        <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 px-2 py-0 shadow-none text-[9px] font-black">
+                                                            <CheckCircle2 className="size-3 mr-1" />
+                                                            {t(
+                                                                'admin.recruitment.usage.completed',
+                                                                'Completed'
+                                                            )}
+                                                        </Badge>
+                                                    ) : (link.start_count || 0) > 0 ? (
+                                                        <Badge className="bg-amber-50 text-amber-700 border-amber-100 px-2 py-0 shadow-none text-[9px] font-black">
+                                                            <Globe className="size-3 mr-1" />
+                                                            {t(
+                                                                'admin.recruitment.usage.in_progress',
+                                                                'In progress'
+                                                            )}
+                                                        </Badge>
+                                                    ) : (
+                                                        <Badge
+                                                            variant="secondary"
+                                                            className="bg-slate-50 text-slate-400 border-slate-200 px-2 py-0 shadow-none text-[9px] font-black"
+                                                        >
+                                                            {t(
+                                                                'admin.recruitment.usage.unused',
+                                                                'Unused'
+                                                            )}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {link.type === 'limited' && (
+                                                <div className="flex flex-col gap-1.5">
+                                                    <span className="text-2xs font-black text-slate-700">
+                                                        {link.usage_count}
                                                         <span className="text-slate-300 font-medium">
                                                             {' '}
                                                             / {link.capacity}
                                                         </span>
-                                                    ) : (
-                                                        ''
-                                                    )}
-                                                </span>
-                                                <div
-                                                    className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden shadow-inner"
-                                                    role="progressbar"
-                                                    aria-valuenow={
-                                                        link.capacity
-                                                            ? Math.min(
-                                                                  Math.round(
-                                                                      (link.usage_count /
-                                                                          link.capacity) *
-                                                                          100
-                                                                  ),
-                                                                  100
-                                                              )
-                                                            : 100
-                                                    }
-                                                    aria-valuemin={0}
-                                                    aria-valuemax={100}
-                                                    aria-label={t(
-                                                        'admin.recruitment.progress_label',
-                                                        '{{count}} of {{max}} responses',
-                                                        {
-                                                            count: link.usage_count,
-                                                            max: link.capacity ?? '∞',
-                                                        }
-                                                    )}
-                                                >
+                                                    </span>
                                                     <div
-                                                        className={cn(
-                                                            'h-full transition-all duration-500',
-                                                            link.capacity &&
-                                                                link.usage_count / link.capacity >=
-                                                                    1
-                                                                ? 'bg-amber-500'
-                                                                : 'bg-indigo-500'
+                                                        className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden shadow-inner"
+                                                        role="progressbar"
+                                                        aria-valuenow={
+                                                            link.capacity
+                                                                ? Math.min(
+                                                                      Math.round(
+                                                                          (link.usage_count /
+                                                                              link.capacity) *
+                                                                              100
+                                                                      ),
+                                                                      100
+                                                                  )
+                                                                : 0
+                                                        }
+                                                        aria-valuemin={0}
+                                                        aria-valuemax={100}
+                                                        aria-label={t(
+                                                            'admin.recruitment.progress_label',
+                                                            '{{count}} of {{max}} responses',
+                                                            {
+                                                                count: link.usage_count,
+                                                                max: link.capacity ?? 0,
+                                                            }
                                                         )}
-                                                        style={{
-                                                            width: `${link.capacity ? Math.min((link.usage_count / link.capacity) * 100, 100) : 100}%`,
-                                                        }}
-                                                    />
+                                                    >
+                                                        <div
+                                                            className={cn(
+                                                                'h-full transition-all duration-500',
+                                                                link.capacity &&
+                                                                    link.usage_count /
+                                                                        link.capacity >=
+                                                                        1
+                                                                    ? 'bg-amber-500'
+                                                                    : 'bg-indigo-500'
+                                                            )}
+                                                            style={{
+                                                                width: `${link.capacity ? Math.min((link.usage_count / link.capacity) * 100, 100) : 0}%`,
+                                                            }}
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             {link.is_active ? (

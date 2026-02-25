@@ -759,6 +759,13 @@
             "qr_alt": "QR-koodi osoitteelle {{url}}",
             "table_caption": "Rekrytointilinkit",
             "progress_label": "{{count}} / {{max}} vastausta",
+            "usage": {
+                "started": "aloitettu",
+                "submitted": "lähetetty",
+                "completed": "Valmis",
+                "in_progress": "Käynnissä",
+                "unused": "Käyttämätön"
+            },
             "live_study": "Tutkimus käynnissä",
             "download_qr": "Lataa kuva",
             "qr_print_hint": "Skannaa tai tulosta tämä koodi fyysisiä materiaaleja varten (esitteet, julisteet).",

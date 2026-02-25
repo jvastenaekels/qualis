@@ -759,6 +759,13 @@
             "qr_alt": "Code QR pour {{url}}",
             "table_caption": "Liens de recrutement",
             "progress_label": "{{count}} sur {{max}} réponses",
+            "usage": {
+                "started": "démarrés",
+                "submitted": "soumis",
+                "completed": "Terminé",
+                "in_progress": "En cours",
+                "unused": "Non utilisé"
+            },
             "live_study": "Ouvrir l'étude",
             "download_qr": "Télécharger l'image",
             "qr_print_hint": "Scannez ou imprimez ce code pour vos supports physiques (flyers, affiches).",

@@ -767,6 +767,13 @@
             "qr_alt": "QR code for {{url}}",
             "table_caption": "Recruitment links",
             "progress_label": "{{count}} of {{max}} responses",
+            "usage": {
+                "started": "started",
+                "submitted": "submitted",
+                "completed": "Completed",
+                "in_progress": "In progress",
+                "unused": "Unused"
+            },
             "live_study": "Live study",
             "download_qr": "Download image",
             "qr_print_hint": "Scan or print this code for physical recruitment materials (flyers, posters).",
