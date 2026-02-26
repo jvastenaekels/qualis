@@ -219,6 +219,11 @@ const router = createBrowserRouter([
         path: '/study/:slug/resume/:token',
         element: <ResumePage />,
     },
+    // Reset route (outside StudyLayout to avoid submission guard redirect)
+    {
+        path: '/study/:slug/reset',
+        element: <ResetPage />,
+    },
     // Participant routes
     {
         path: '/study/:slug',
@@ -233,7 +238,6 @@ const router = createBrowserRouter([
             { path: 'rough-sort', element: <RoughSortPage /> },
             { path: 'fine-sort', element: <FineSortPage /> },
             { path: 'post-sort', element: <PostSortPage /> },
-            { path: 'reset', element: <ResetPage /> },
             {
                 path: '*',
                 element: <ErrorPage error={new ApiError(404, 'Page not found')} />,
