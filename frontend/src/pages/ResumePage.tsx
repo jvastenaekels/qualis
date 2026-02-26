@@ -123,7 +123,7 @@ export default function ResumePage() {
                 const stepName = STEP_ROUTES[data.last_step_reached];
                 if (stepName) {
                     toast.success(
-                        t('resume.restored', 'Welcome back! Your progress has been restored.')
+                        i18n.t('resume.restored', 'Welcome back! Your progress has been restored.')
                     );
                 }
             } catch (err: unknown) {
