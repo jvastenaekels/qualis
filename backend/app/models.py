@@ -29,7 +29,7 @@ from sqlalchemy.sql import func
 from .database import Base
 
 # Sessions expire after this many days of inactivity (based on last_step_reached_at)
-SESSION_TTL_DAYS: int = 30
+SESSION_TTL_DAYS: int = 60
 
 
 # Enums
