@@ -50,6 +50,8 @@ import DataExportsPage from './pages/admin/DataExportsPage';
 const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetailsPage'));
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
 const WorkspaceSettingsPage = lazy(() => import('./pages/admin/WorkspaceSettingsPage'));
+const ConcourseListPage = lazy(() => import('./pages/admin/ConcourseListPage'));
+const ConcourseDetailPage = lazy(() => import('./pages/admin/ConcourseDetailPage'));
 const CreateWorkspacePage = lazy(() => import('./pages/admin/CreateWorkspacePage'));
 const ResearcherHub = lazy(() => import('./pages/ResearcherHub'));
 import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
@@ -136,6 +138,14 @@ const router = createBrowserRouter([
                                 element: <WorkspaceSettingsPage />,
                                 loader: workspaceSettingsPageLoader,
                                 HydrateFallback: DesignerSkeleton,
+                            },
+                            {
+                                path: 'concourses',
+                                element: <ConcourseListPage />,
+                            },
+                            {
+                                path: 'concourses/:concourseId',
+                                element: <ConcourseDetailPage />,
                             },
                             {
                                 path: 'profile',

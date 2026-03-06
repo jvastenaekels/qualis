@@ -142,6 +142,8 @@ class StatementRead(StatementBase):
     id: int
     display_order: int = 0
     translations: list[StatementTranslationRead] = []
+    source_concourse_item_id: int | None = None
+    source_imported_at: datetime | None = None
     model_config = ConfigDict(from_attributes=True)
 
 

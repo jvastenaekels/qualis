@@ -25,6 +25,14 @@ import type {
     BodyLoginForAccessTokenApiTokenPost,
     BodyUploadAudioApiAudioUploadPost,
     ChangeStudyStateApiAdminStudiesSlugStatePostParams,
+    ConcourseCreate,
+    ConcourseImportToStudy,
+    ConcourseItemBulkCreate,
+    ConcourseItemBulkImport,
+    ConcourseItemCreate,
+    ConcourseItemUpdate,
+    ConcourseTagCreate,
+    ConcourseUpdate,
     ConsentInput,
     CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
     DeleteAudioRecordingApiAudioRecordingIdDeleteParams,
@@ -33,6 +41,7 @@ import type {
     GetStudyApiStudySlugGetParams,
     HTTPValidationError,
     InvitationAccept,
+    ListConcoursesApiAdminConcoursesGetParams,
     ListStudiesApiAdminStudiesGetParams,
     ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
     ListUsersApiAdminUsersGetParams,
@@ -66,14 +75,25 @@ import { faker } from '@faker-js/faker';
 import { HttpResponse, http } from 'msw';
 import type { RequestHandlerOptions } from 'msw';
 
-import { ParticipantStatus, RecruitmentLinkType, StudyState, WorkspaceRole } from './model';
+import {
+    ConcourseItemStatus,
+    ParticipantStatus,
+    RecruitmentLinkType,
+    StudyState,
+    WorkspaceRole,
+} from './model';
 import type {
     AnalysisResult,
     AudioRecordingRead,
     AudioUploadResponse,
+    ConcourseDetailRead,
+    ConcourseItemRead,
+    ConcourseRead,
+    ConcourseTagRead,
     ConsentResponse,
     EigenvalueResult,
     InvitationLink,
+    PaginatedResponseConcourseRead,
     PaginatedResponseParticipantRead,
     PaginatedResponseStudyRead,
     PaginatedResponseUserRead,
@@ -83,6 +103,7 @@ import type {
     ParticipantRead,
     RecruitmentLinkRead,
     ResumeResponse,
+    StaleStatementRead,
     StudyImportResponse,
     StudyRead,
     StudyStatsRead,
@@ -1626,6 +1647,384 @@ export const useResetStudyParticipantsApiAdminStudiesSlugResetPost = <
 > => {
     const mutationOptions =
         getResetStudyParticipantsApiAdminStudiesSlugResetPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Import concourse items into a study as statements (copies, no reference).
+ * @summary Import From Concourse
+ */
+export const importFromConcourseApiAdminStudiesSlugImportConcoursePost = (
+    slug: string,
+    concourseImportToStudy: ConcourseImportToStudy,
+    signal?: AbortSignal
+) => {
+    return customInstance<StudyRead>({
+        url: `/api/admin/studies/${slug}/import-concourse`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: concourseImportToStudy,
+        signal,
+    });
+};
+
+export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof importFromConcourseApiAdminStudiesSlugImportConcoursePost>>,
+        TError,
+        { slug: string; data: ConcourseImportToStudy },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof importFromConcourseApiAdminStudiesSlugImportConcoursePost>>,
+    TError,
+    { slug: string; data: ConcourseImportToStudy },
+    TContext
+> => {
+    const mutationKey = ['importFromConcourseApiAdminStudiesSlugImportConcoursePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof importFromConcourseApiAdminStudiesSlugImportConcoursePost>>,
+        { slug: string; data: ConcourseImportToStudy }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return importFromConcourseApiAdminStudiesSlugImportConcoursePost(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ImportFromConcourseApiAdminStudiesSlugImportConcoursePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof importFromConcourseApiAdminStudiesSlugImportConcoursePost>>
+>;
+export type ImportFromConcourseApiAdminStudiesSlugImportConcoursePostMutationBody =
+    ConcourseImportToStudy;
+export type ImportFromConcourseApiAdminStudiesSlugImportConcoursePostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Import From Concourse
+ */
+export const useImportFromConcourseApiAdminStudiesSlugImportConcoursePost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof importFromConcourseApiAdminStudiesSlugImportConcoursePost>>,
+            TError,
+            { slug: string; data: ConcourseImportToStudy },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof importFromConcourseApiAdminStudiesSlugImportConcoursePost>>,
+    TError,
+    { slug: string; data: ConcourseImportToStudy },
+    TContext
+> => {
+    const mutationOptions =
+        getImportFromConcourseApiAdminStudiesSlugImportConcoursePostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Check which imported statements have stale concourse sources.
+ * @summary Check Stale Statements
+ */
+export const checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet = (
+    slug: string,
+    signal?: AbortSignal
+) => {
+    return customInstance<StaleStatementRead[]>({
+        url: `/api/admin/studies/${slug}/stale-statements`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetQueryKey = (
+    slug?: string
+) => {
+    return [`/api/admin/studies/${slug}/stale-statements`] as const;
+};
+
+export const getCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetQueryKey(slug);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>>
+    > = ({ signal }) => checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet(slug, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type CheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>>
+>;
+export type CheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetQueryError =
+    HTTPValidationError;
+
+export function useCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGet<
+    TData = Awaited<ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGet<
+    TData = Awaited<ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGet<
+    TData = Awaited<ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Check Stale Statements
+ */
+
+export function useCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGet<
+    TData = Awaited<ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>>,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof checkStaleStatementsApiAdminStudiesSlugStaleStatementsGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetQueryOptions(
+        slug,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Sync a single statement's text from its concourse source.
+ * @summary Sync Statement From Concourse
+ */
+export const syncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost = (
+    slug: string,
+    statementId: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<StudyRead>({
+        url: `/api/admin/studies/${slug}/sync-statement/${statementId}`,
+        method: 'POST',
+        signal,
+    });
+};
+
+export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPostMutationOptions =
+    <TError = HTTPValidationError, TContext = unknown>(options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<
+                    typeof syncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost
+                >
+            >,
+            TError,
+            { slug: string; statementId: number },
+            TContext
+        >;
+    }): UseMutationOptions<
+        Awaited<
+            ReturnType<
+                typeof syncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost
+            >
+        >,
+        TError,
+        { slug: string; statementId: number },
+        TContext
+    > => {
+        const mutationKey = [
+            'syncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost',
+        ];
+        const { mutation: mutationOptions } = options
+            ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+                ? options
+                : { ...options, mutation: { ...options.mutation, mutationKey } }
+            : { mutation: { mutationKey } };
+
+        const mutationFn: MutationFunction<
+            Awaited<
+                ReturnType<
+                    typeof syncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost
+                >
+            >,
+            { slug: string; statementId: number }
+        > = (props) => {
+            const { slug, statementId } = props ?? {};
+
+            return syncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost(
+                slug,
+                statementId
+            );
+        };
+
+        return { mutationFn, ...mutationOptions };
+    };
+
+export type SyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPostMutationResult =
+    NonNullable<
+        Awaited<
+            ReturnType<
+                typeof syncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost
+            >
+        >
+    >;
+
+export type SyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Sync Statement From Concourse
+ */
+export const useSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<
+                    typeof syncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost
+                >
+            >,
+            TError,
+            { slug: string; statementId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<
+        ReturnType<typeof syncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPost>
+    >,
+    TError,
+    { slug: string; statementId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPostMutationOptions(
+            options
+        );
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -6500,6 +6899,1287 @@ export const useCreateInvitationApiAdminWorkspacesSlugInvitationsPost = <
 };
 
 /**
+ * @summary List Tags
+ */
+export const listTagsApiAdminConcoursesTagsGet = (signal?: AbortSignal) => {
+    return customInstance<ConcourseTagRead[]>({
+        url: `/api/admin/concourses/tags`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getListTagsApiAdminConcoursesTagsGetQueryKey = () => {
+    return [`/api/admin/concourses/tags`] as const;
+};
+
+export const getListTagsApiAdminConcoursesTagsGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+    TError = HTTPValidationError,
+>(options?: {
+    query?: Partial<
+        UseQueryOptions<
+            Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+            TError,
+            TData
+        >
+    >;
+}) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey = queryOptions?.queryKey ?? getListTagsApiAdminConcoursesTagsGetQueryKey();
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>> = ({
+        signal,
+    }) => listTagsApiAdminConcoursesTagsGet(signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListTagsApiAdminConcoursesTagsGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>
+>;
+export type ListTagsApiAdminConcoursesTagsGetQueryError = HTTPValidationError;
+
+export function useListTagsApiAdminConcoursesTagsGet<
+    TData = Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+    TError = HTTPValidationError,
+>(
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListTagsApiAdminConcoursesTagsGet<
+    TData = Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+    TError = HTTPValidationError,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListTagsApiAdminConcoursesTagsGet<
+    TData = Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+    TError = HTTPValidationError,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Tags
+ */
+
+export function useListTagsApiAdminConcoursesTagsGet<
+    TData = Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+    TError = HTTPValidationError,
+>(
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listTagsApiAdminConcoursesTagsGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getListTagsApiAdminConcoursesTagsGetQueryOptions(options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary Create Tag
+ */
+export const createTagApiAdminConcoursesTagsPost = (
+    concourseTagCreate: ConcourseTagCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<ConcourseTagRead>({
+        url: `/api/admin/concourses/tags`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: concourseTagCreate,
+        signal,
+    });
+};
+
+export const getCreateTagApiAdminConcoursesTagsPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createTagApiAdminConcoursesTagsPost>>,
+        TError,
+        { data: ConcourseTagCreate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createTagApiAdminConcoursesTagsPost>>,
+    TError,
+    { data: ConcourseTagCreate },
+    TContext
+> => {
+    const mutationKey = ['createTagApiAdminConcoursesTagsPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createTagApiAdminConcoursesTagsPost>>,
+        { data: ConcourseTagCreate }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return createTagApiAdminConcoursesTagsPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateTagApiAdminConcoursesTagsPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createTagApiAdminConcoursesTagsPost>>
+>;
+export type CreateTagApiAdminConcoursesTagsPostMutationBody = ConcourseTagCreate;
+export type CreateTagApiAdminConcoursesTagsPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Create Tag
+ */
+export const useCreateTagApiAdminConcoursesTagsPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createTagApiAdminConcoursesTagsPost>>,
+            TError,
+            { data: ConcourseTagCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createTagApiAdminConcoursesTagsPost>>,
+    TError,
+    { data: ConcourseTagCreate },
+    TContext
+> => {
+    const mutationOptions = getCreateTagApiAdminConcoursesTagsPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Delete Tag
+ */
+export const deleteTagApiAdminConcoursesTagsTagIdDelete = (tagId: number) => {
+    return customInstance<void>({ url: `/api/admin/concourses/tags/${tagId}`, method: 'DELETE' });
+};
+
+export const getDeleteTagApiAdminConcoursesTagsTagIdDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof deleteTagApiAdminConcoursesTagsTagIdDelete>>,
+        TError,
+        { tagId: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof deleteTagApiAdminConcoursesTagsTagIdDelete>>,
+    TError,
+    { tagId: number },
+    TContext
+> => {
+    const mutationKey = ['deleteTagApiAdminConcoursesTagsTagIdDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof deleteTagApiAdminConcoursesTagsTagIdDelete>>,
+        { tagId: number }
+    > = (props) => {
+        const { tagId } = props ?? {};
+
+        return deleteTagApiAdminConcoursesTagsTagIdDelete(tagId);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteTagApiAdminConcoursesTagsTagIdDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteTagApiAdminConcoursesTagsTagIdDelete>>
+>;
+
+export type DeleteTagApiAdminConcoursesTagsTagIdDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Delete Tag
+ */
+export const useDeleteTagApiAdminConcoursesTagsTagIdDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof deleteTagApiAdminConcoursesTagsTagIdDelete>>,
+            TError,
+            { tagId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof deleteTagApiAdminConcoursesTagsTagIdDelete>>,
+    TError,
+    { tagId: number },
+    TContext
+> => {
+    const mutationOptions = getDeleteTagApiAdminConcoursesTagsTagIdDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Create Concourse
+ */
+export const createConcourseApiAdminConcoursesPost = (
+    concourseCreate: ConcourseCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<ConcourseRead>({
+        url: `/api/admin/concourses`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: concourseCreate,
+        signal,
+    });
+};
+
+export const getCreateConcourseApiAdminConcoursesPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createConcourseApiAdminConcoursesPost>>,
+        TError,
+        { data: ConcourseCreate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createConcourseApiAdminConcoursesPost>>,
+    TError,
+    { data: ConcourseCreate },
+    TContext
+> => {
+    const mutationKey = ['createConcourseApiAdminConcoursesPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createConcourseApiAdminConcoursesPost>>,
+        { data: ConcourseCreate }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return createConcourseApiAdminConcoursesPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateConcourseApiAdminConcoursesPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createConcourseApiAdminConcoursesPost>>
+>;
+export type CreateConcourseApiAdminConcoursesPostMutationBody = ConcourseCreate;
+export type CreateConcourseApiAdminConcoursesPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Create Concourse
+ */
+export const useCreateConcourseApiAdminConcoursesPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createConcourseApiAdminConcoursesPost>>,
+            TError,
+            { data: ConcourseCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createConcourseApiAdminConcoursesPost>>,
+    TError,
+    { data: ConcourseCreate },
+    TContext
+> => {
+    const mutationOptions = getCreateConcourseApiAdminConcoursesPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List Concourses
+ */
+export const listConcoursesApiAdminConcoursesGet = (
+    params?: ListConcoursesApiAdminConcoursesGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<PaginatedResponseConcourseRead>({
+        url: `/api/admin/concourses`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getListConcoursesApiAdminConcoursesGetQueryKey = (
+    params?: ListConcoursesApiAdminConcoursesGetParams
+) => {
+    return [`/api/admin/concourses`, ...(params ? [params] : [])] as const;
+};
+
+export const getListConcoursesApiAdminConcoursesGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+    TError = HTTPValidationError,
+>(
+    params?: ListConcoursesApiAdminConcoursesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getListConcoursesApiAdminConcoursesGetQueryKey(params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>
+    > = ({ signal }) => listConcoursesApiAdminConcoursesGet(params, signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListConcoursesApiAdminConcoursesGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>
+>;
+export type ListConcoursesApiAdminConcoursesGetQueryError = HTTPValidationError;
+
+export function useListConcoursesApiAdminConcoursesGet<
+    TData = Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+    TError = HTTPValidationError,
+>(
+    params: undefined | ListConcoursesApiAdminConcoursesGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListConcoursesApiAdminConcoursesGet<
+    TData = Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+    TError = HTTPValidationError,
+>(
+    params?: ListConcoursesApiAdminConcoursesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListConcoursesApiAdminConcoursesGet<
+    TData = Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+    TError = HTTPValidationError,
+>(
+    params?: ListConcoursesApiAdminConcoursesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Concourses
+ */
+
+export function useListConcoursesApiAdminConcoursesGet<
+    TData = Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+    TError = HTTPValidationError,
+>(
+    params?: ListConcoursesApiAdminConcoursesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof listConcoursesApiAdminConcoursesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getListConcoursesApiAdminConcoursesGetQueryOptions(params, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary Get Concourse
+ */
+export const getConcourseApiAdminConcoursesConcourseIdGet = (
+    concourseId: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<ConcourseDetailRead>({
+        url: `/api/admin/concourses/${concourseId}`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetConcourseApiAdminConcoursesConcourseIdGetQueryKey = (concourseId?: number) => {
+    return [`/api/admin/concourses/${concourseId}`] as const;
+};
+
+export const getGetConcourseApiAdminConcoursesConcourseIdGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getGetConcourseApiAdminConcoursesConcourseIdGetQueryKey(concourseId);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>
+    > = ({ signal }) => getConcourseApiAdminConcoursesConcourseIdGet(concourseId, signal);
+
+    return { queryKey, queryFn, enabled: !!concourseId, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetConcourseApiAdminConcoursesConcourseIdGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>
+>;
+export type GetConcourseApiAdminConcoursesConcourseIdGetQueryError = HTTPValidationError;
+
+export function useGetConcourseApiAdminConcoursesConcourseIdGet<
+    TData = Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetConcourseApiAdminConcoursesConcourseIdGet<
+    TData = Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetConcourseApiAdminConcoursesConcourseIdGet<
+    TData = Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Concourse
+ */
+
+export function useGetConcourseApiAdminConcoursesConcourseIdGet<
+    TData = Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseApiAdminConcoursesConcourseIdGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetConcourseApiAdminConcoursesConcourseIdGetQueryOptions(
+        concourseId,
+        options
+    );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary Update Concourse
+ */
+export const updateConcourseApiAdminConcoursesConcourseIdPatch = (
+    concourseId: number,
+    concourseUpdate: ConcourseUpdate
+) => {
+    return customInstance<ConcourseRead>({
+        url: `/api/admin/concourses/${concourseId}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: concourseUpdate,
+    });
+};
+
+export const getUpdateConcourseApiAdminConcoursesConcourseIdPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateConcourseApiAdminConcoursesConcourseIdPatch>>,
+        TError,
+        { concourseId: number; data: ConcourseUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateConcourseApiAdminConcoursesConcourseIdPatch>>,
+    TError,
+    { concourseId: number; data: ConcourseUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateConcourseApiAdminConcoursesConcourseIdPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateConcourseApiAdminConcoursesConcourseIdPatch>>,
+        { concourseId: number; data: ConcourseUpdate }
+    > = (props) => {
+        const { concourseId, data } = props ?? {};
+
+        return updateConcourseApiAdminConcoursesConcourseIdPatch(concourseId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateConcourseApiAdminConcoursesConcourseIdPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateConcourseApiAdminConcoursesConcourseIdPatch>>
+>;
+export type UpdateConcourseApiAdminConcoursesConcourseIdPatchMutationBody = ConcourseUpdate;
+export type UpdateConcourseApiAdminConcoursesConcourseIdPatchMutationError = HTTPValidationError;
+
+/**
+ * @summary Update Concourse
+ */
+export const useUpdateConcourseApiAdminConcoursesConcourseIdPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateConcourseApiAdminConcoursesConcourseIdPatch>>,
+            TError,
+            { concourseId: number; data: ConcourseUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateConcourseApiAdminConcoursesConcourseIdPatch>>,
+    TError,
+    { concourseId: number; data: ConcourseUpdate },
+    TContext
+> => {
+    const mutationOptions =
+        getUpdateConcourseApiAdminConcoursesConcourseIdPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Delete Concourse
+ */
+export const deleteConcourseApiAdminConcoursesConcourseIdDelete = (concourseId: number) => {
+    return customInstance<void>({ url: `/api/admin/concourses/${concourseId}`, method: 'DELETE' });
+};
+
+export const getDeleteConcourseApiAdminConcoursesConcourseIdDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof deleteConcourseApiAdminConcoursesConcourseIdDelete>>,
+        TError,
+        { concourseId: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof deleteConcourseApiAdminConcoursesConcourseIdDelete>>,
+    TError,
+    { concourseId: number },
+    TContext
+> => {
+    const mutationKey = ['deleteConcourseApiAdminConcoursesConcourseIdDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof deleteConcourseApiAdminConcoursesConcourseIdDelete>>,
+        { concourseId: number }
+    > = (props) => {
+        const { concourseId } = props ?? {};
+
+        return deleteConcourseApiAdminConcoursesConcourseIdDelete(concourseId);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteConcourseApiAdminConcoursesConcourseIdDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteConcourseApiAdminConcoursesConcourseIdDelete>>
+>;
+
+export type DeleteConcourseApiAdminConcoursesConcourseIdDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Delete Concourse
+ */
+export const useDeleteConcourseApiAdminConcoursesConcourseIdDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof deleteConcourseApiAdminConcoursesConcourseIdDelete>>,
+            TError,
+            { concourseId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof deleteConcourseApiAdminConcoursesConcourseIdDelete>>,
+    TError,
+    { concourseId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getDeleteConcourseApiAdminConcoursesConcourseIdDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Create Item
+ */
+export const createItemApiAdminConcoursesConcourseIdItemsPost = (
+    concourseId: number,
+    concourseItemCreate: ConcourseItemCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<ConcourseItemRead>({
+        url: `/api/admin/concourses/${concourseId}/items`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: concourseItemCreate,
+        signal,
+    });
+};
+
+export const getCreateItemApiAdminConcoursesConcourseIdItemsPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createItemApiAdminConcoursesConcourseIdItemsPost>>,
+        TError,
+        { concourseId: number; data: ConcourseItemCreate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createItemApiAdminConcoursesConcourseIdItemsPost>>,
+    TError,
+    { concourseId: number; data: ConcourseItemCreate },
+    TContext
+> => {
+    const mutationKey = ['createItemApiAdminConcoursesConcourseIdItemsPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createItemApiAdminConcoursesConcourseIdItemsPost>>,
+        { concourseId: number; data: ConcourseItemCreate }
+    > = (props) => {
+        const { concourseId, data } = props ?? {};
+
+        return createItemApiAdminConcoursesConcourseIdItemsPost(concourseId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateItemApiAdminConcoursesConcourseIdItemsPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createItemApiAdminConcoursesConcourseIdItemsPost>>
+>;
+export type CreateItemApiAdminConcoursesConcourseIdItemsPostMutationBody = ConcourseItemCreate;
+export type CreateItemApiAdminConcoursesConcourseIdItemsPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Create Item
+ */
+export const useCreateItemApiAdminConcoursesConcourseIdItemsPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createItemApiAdminConcoursesConcourseIdItemsPost>>,
+            TError,
+            { concourseId: number; data: ConcourseItemCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createItemApiAdminConcoursesConcourseIdItemsPost>>,
+    TError,
+    { concourseId: number; data: ConcourseItemCreate },
+    TContext
+> => {
+    const mutationOptions =
+        getCreateItemApiAdminConcoursesConcourseIdItemsPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Bulk Create Items
+ */
+export const bulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost = (
+    concourseId: number,
+    concourseItemBulkCreate: ConcourseItemBulkCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<ConcourseItemRead[]>({
+        url: `/api/admin/concourses/${concourseId}/items/bulk`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: concourseItemBulkCreate,
+        signal,
+    });
+};
+
+export const getBulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof bulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost>>,
+        TError,
+        { concourseId: number; data: ConcourseItemBulkCreate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof bulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost>>,
+    TError,
+    { concourseId: number; data: ConcourseItemBulkCreate },
+    TContext
+> => {
+    const mutationKey = ['bulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof bulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost>>,
+        { concourseId: number; data: ConcourseItemBulkCreate }
+    > = (props) => {
+        const { concourseId, data } = props ?? {};
+
+        return bulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost(concourseId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type BulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof bulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost>>
+>;
+export type BulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostMutationBody =
+    ConcourseItemBulkCreate;
+export type BulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Bulk Create Items
+ */
+export const useBulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof bulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost>>,
+            TError,
+            { concourseId: number; data: ConcourseItemBulkCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof bulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPost>>,
+    TError,
+    { concourseId: number; data: ConcourseItemBulkCreate },
+    TContext
+> => {
+    const mutationOptions =
+        getBulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Import Items From Text
+ */
+export const importItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost = (
+    concourseId: number,
+    concourseItemBulkImport: ConcourseItemBulkImport,
+    signal?: AbortSignal
+) => {
+    return customInstance<ConcourseItemRead[]>({
+        url: `/api/admin/concourses/${concourseId}/items/import`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: concourseItemBulkImport,
+        signal,
+    });
+};
+
+export const getImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof importItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost>>,
+        TError,
+        { concourseId: number; data: ConcourseItemBulkImport },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof importItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost>>,
+    TError,
+    { concourseId: number; data: ConcourseItemBulkImport },
+    TContext
+> => {
+    const mutationKey = ['importItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof importItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost>>,
+        { concourseId: number; data: ConcourseItemBulkImport }
+    > = (props) => {
+        const { concourseId, data } = props ?? {};
+
+        return importItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost(concourseId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostMutationResult =
+    NonNullable<
+        Awaited<ReturnType<typeof importItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost>>
+    >;
+export type ImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostMutationBody =
+    ConcourseItemBulkImport;
+export type ImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Import Items From Text
+ */
+export const useImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<typeof importItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost>
+            >,
+            TError,
+            { concourseId: number; data: ConcourseItemBulkImport },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof importItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost>>,
+    TError,
+    { concourseId: number; data: ConcourseItemBulkImport },
+    TContext
+> => {
+    const mutationOptions =
+        getImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Update Item
+ */
+export const updateItemApiAdminConcoursesConcourseIdItemsItemIdPatch = (
+    concourseId: number,
+    itemId: number,
+    concourseItemUpdate: ConcourseItemUpdate
+) => {
+    return customInstance<ConcourseItemRead>({
+        url: `/api/admin/concourses/${concourseId}/items/${itemId}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: concourseItemUpdate,
+    });
+};
+
+export const getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateItemApiAdminConcoursesConcourseIdItemsItemIdPatch>>,
+        TError,
+        { concourseId: number; itemId: number; data: ConcourseItemUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateItemApiAdminConcoursesConcourseIdItemsItemIdPatch>>,
+    TError,
+    { concourseId: number; itemId: number; data: ConcourseItemUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateItemApiAdminConcoursesConcourseIdItemsItemIdPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateItemApiAdminConcoursesConcourseIdItemsItemIdPatch>>,
+        { concourseId: number; itemId: number; data: ConcourseItemUpdate }
+    > = (props) => {
+        const { concourseId, itemId, data } = props ?? {};
+
+        return updateItemApiAdminConcoursesConcourseIdItemsItemIdPatch(concourseId, itemId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateItemApiAdminConcoursesConcourseIdItemsItemIdPatch>>
+>;
+export type UpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchMutationBody =
+    ConcourseItemUpdate;
+export type UpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Update Item
+ */
+export const useUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateItemApiAdminConcoursesConcourseIdItemsItemIdPatch>>,
+            TError,
+            { concourseId: number; itemId: number; data: ConcourseItemUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateItemApiAdminConcoursesConcourseIdItemsItemIdPatch>>,
+    TError,
+    { concourseId: number; itemId: number; data: ConcourseItemUpdate },
+    TContext
+> => {
+    const mutationOptions =
+        getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Delete Item
+ */
+export const deleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete = (
+    concourseId: number,
+    itemId: number
+) => {
+    return customInstance<void>({
+        url: `/api/admin/concourses/${concourseId}/items/${itemId}`,
+        method: 'DELETE',
+    });
+};
+
+export const getDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof deleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete>>,
+        TError,
+        { concourseId: number; itemId: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof deleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete>>,
+    TError,
+    { concourseId: number; itemId: number },
+    TContext
+> => {
+    const mutationKey = ['deleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof deleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete>>,
+        { concourseId: number; itemId: number }
+    > = (props) => {
+        const { concourseId, itemId } = props ?? {};
+
+        return deleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete(concourseId, itemId);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteItemApiAdminConcoursesConcourseIdItemsItemIdDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete>>
+>;
+
+export type DeleteItemApiAdminConcoursesConcourseIdItemsItemIdDeleteMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Delete Item
+ */
+export const useDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof deleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete>>,
+            TError,
+            { concourseId: number; itemId: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof deleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete>>,
+    TError,
+    { concourseId: number; itemId: number },
+    TContext
+> => {
+    const mutationOptions =
+        getDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * Submits or updates a study participation.
 
 Logic moved to StudyService for maintainability.
@@ -8561,6 +10241,20 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
                 ),
                 undefined,
             ]),
+            source_concourse_item_id: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            source_imported_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
         })),
         undefined,
     ]),
@@ -8840,6 +10534,20 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
                             })),
                             undefined,
                         ]),
+                        source_concourse_item_id: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.number.int({ min: undefined, max: undefined }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        source_imported_at: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                `${faker.date.past().toISOString().split('.')[0]}Z`,
+                                null,
+                            ]),
+                            undefined,
+                        ]),
                     })
                 ),
                 undefined,
@@ -9109,6 +10817,20 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
                 ),
                 undefined,
             ]),
+            source_concourse_item_id: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            source_imported_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
         })),
         undefined,
     ]),
@@ -9365,6 +11087,20 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
                         statement_id: faker.number.int({ min: undefined, max: undefined }),
                     })
                 ),
+                undefined,
+            ]),
+            source_concourse_item_id: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            source_imported_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
                 undefined,
             ]),
         })),
@@ -9628,6 +11364,20 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
                 ),
                 undefined,
             ]),
+            source_concourse_item_id: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            source_imported_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
         })),
         undefined,
     ]),
@@ -9675,6 +11425,585 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
     ]),
     ...overrideResponse,
 });
+
+export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostResponseMock = (
+    overrideResponse: Partial<StudyRead> = {}
+): StudyRead => ({
+    slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+    state: faker.helpers.arrayElement([
+        faker.helpers.arrayElement(Object.values(StudyState)),
+        undefined,
+    ]),
+    grid_config: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            score: faker.number.int({ min: undefined, max: undefined }),
+            capacity: faker.number.int({ min: undefined, max: undefined }),
+        })
+    ),
+    presort_config: {},
+    postsort_config: {},
+    branding: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                logo_url: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                accent_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                primary_color: faker.helpers.arrayElement([
+                    faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 50 } }),
+                        null,
+                    ]),
+                    undefined,
+                ]),
+                partners: faker.helpers.arrayElement([
+                    Array.from(
+                        { length: faker.number.int({ min: 1, max: 10 }) },
+                        (_, i) => i + 1
+                    ).map(() => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        url: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })),
+                    undefined,
+                ]),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    default_language: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 5 } }), null]),
+        undefined,
+    ]),
+    show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    start_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    end_date: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    workspace: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                id: faker.number.int({ min: undefined, max: undefined }),
+                title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            },
+            null,
+        ]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    translations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+            title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+            description: faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                undefined,
+            ]),
+            instructions: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            subtitle: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            objective: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            condition_of_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            pre_instruction: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_title: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            consent_description: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            ui_labels: faker.helpers.arrayElement([{}, undefined]),
+            process_steps: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                        description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                        icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                        color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                    })
+                ),
+                undefined,
+            ]),
+            methodology_tips: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => faker.string.alpha({ length: { min: 10, max: 20 } })
+                ),
+                undefined,
+            ]),
+            step_help: faker.helpers.arrayElement([
+                {
+                    [faker.string.alphanumeric(5)]: {
+                        [faker.string.alphanumeric(5)]: faker.string.alpha({
+                            length: { min: 10, max: 20 },
+                        }),
+                    },
+                },
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    statements: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            code: faker.string.alpha({ length: { min: 10, max: 50 } }),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            display_order: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        statement_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+            source_concourse_item_id: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            source_imported_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+        })),
+        undefined,
+    ]),
+    recruitment_links: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 100 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            type: faker.helpers.arrayElement([
+                faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                undefined,
+            ]),
+            capacity: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            study_id: faker.number.int({ min: undefined, max: undefined }),
+            token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            usage_count: faker.number.int({ min: undefined, max: undefined }),
+            start_count: faker.number.int({ min: undefined, max: undefined }),
+            expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })),
+        undefined,
+    ]),
+    requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    participant_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetResponseMock =
+    (): StaleStatementRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            statement_id: faker.number.int({ min: undefined, max: undefined }),
+            statement_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            source_concourse_item_id: faker.number.int({ min: undefined, max: undefined }),
+            source_deleted: faker.datatype.boolean(),
+            current_translations: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => ({
+                language_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                text: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            })),
+            concourse_translations: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => ({
+                language_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                text: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            })),
+        }));
+
+export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPostResponseMock =
+    (overrideResponse: Partial<StudyRead> = {}): StudyRead => ({
+        slug: faker.helpers.fromRegExp('^[a-z0-9-]+$'),
+        state: faker.helpers.arrayElement([
+            faker.helpers.arrayElement(Object.values(StudyState)),
+            undefined,
+        ]),
+        grid_config: Array.from(
+            { length: faker.number.int({ min: 1, max: 10 }) },
+            (_, i) => i + 1
+        ).map(() => ({
+            score: faker.number.int({ min: undefined, max: undefined }),
+            capacity: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        presort_config: {},
+        postsort_config: {},
+        branding: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                {
+                    logo_url: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 500 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    accent_color: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 50 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    primary_color: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 50 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    partners: faker.helpers.arrayElement([
+                        Array.from(
+                            { length: faker.number.int({ min: 1, max: 10 }) },
+                            (_, i) => i + 1
+                        ).map(() => ({
+                            id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            name: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            logo_url: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            url: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                    null,
+                                ]),
+                                undefined,
+                            ]),
+                        })),
+                        undefined,
+                    ]),
+                },
+                null,
+            ]),
+            undefined,
+        ]),
+        default_language: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 5 } }), null]),
+            undefined,
+        ]),
+        show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        randomize_statement_order: faker.helpers.arrayElement([
+            faker.datatype.boolean(),
+            undefined,
+        ]),
+        symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        start_date: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+            undefined,
+        ]),
+        end_date: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+            undefined,
+        ]),
+        id: faker.number.int({ min: undefined, max: undefined }),
+        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+        workspace: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                {
+                    id: faker.number.int({ min: undefined, max: undefined }),
+                    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                },
+                null,
+            ]),
+            undefined,
+        ]),
+        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        translations: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                () => ({
+                    language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                    title: faker.string.alpha({ length: { min: 10, max: 200 } }),
+                    description: faker.helpers.arrayElement([
+                        faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                        undefined,
+                    ]),
+                    instructions: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    subtitle: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 200 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    objective: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    condition_of_instruction: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    pre_instruction: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    consent_title: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 200 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    consent_description: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 5000 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    ui_labels: faker.helpers.arrayElement([{}, undefined]),
+                    process_steps: faker.helpers.arrayElement([
+                        Array.from(
+                            { length: faker.number.int({ min: 1, max: 10 }) },
+                            (_, i) => i + 1
+                        ).map(() => ({
+                            id: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            title: faker.string.alpha({ length: { min: 10, max: 100 } }),
+                            description: faker.string.alpha({ length: { min: 10, max: 500 } }),
+                            icon: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                            color: faker.helpers.arrayElement([
+                                faker.helpers.arrayElement([
+                                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                                    null,
+                                ]),
+                                undefined,
+                            ]),
+                        })),
+                        undefined,
+                    ]),
+                    methodology_tips: faker.helpers.arrayElement([
+                        Array.from(
+                            { length: faker.number.int({ min: 1, max: 10 }) },
+                            (_, i) => i + 1
+                        ).map(() => faker.string.alpha({ length: { min: 10, max: 20 } })),
+                        undefined,
+                    ]),
+                    step_help: faker.helpers.arrayElement([
+                        {
+                            [faker.string.alphanumeric(5)]: {
+                                [faker.string.alphanumeric(5)]: faker.string.alpha({
+                                    length: { min: 10, max: 20 },
+                                }),
+                            },
+                        },
+                        undefined,
+                    ]),
+                    id: faker.number.int({ min: undefined, max: undefined }),
+                    study_id: faker.number.int({ min: undefined, max: undefined }),
+                })
+            ),
+            undefined,
+        ]),
+        statements: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                () => ({
+                    code: faker.string.alpha({ length: { min: 10, max: 50 } }),
+                    id: faker.number.int({ min: undefined, max: undefined }),
+                    display_order: faker.helpers.arrayElement([
+                        faker.number.int({ min: undefined, max: undefined }),
+                        undefined,
+                    ]),
+                    translations: faker.helpers.arrayElement([
+                        Array.from(
+                            { length: faker.number.int({ min: 1, max: 10 }) },
+                            (_, i) => i + 1
+                        ).map(() => ({
+                            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                            text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                            id: faker.number.int({ min: undefined, max: undefined }),
+                            statement_id: faker.number.int({ min: undefined, max: undefined }),
+                        })),
+                        undefined,
+                    ]),
+                    source_concourse_item_id: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.number.int({ min: undefined, max: undefined }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    source_imported_at: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            `${faker.date.past().toISOString().split('.')[0]}Z`,
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                })
+            ),
+            undefined,
+        ]),
+        recruitment_links: faker.helpers.arrayElement([
+            Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                () => ({
+                    name: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.string.alpha({ length: { min: 10, max: 100 } }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    type: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement(Object.values(RecruitmentLinkType)),
+                        undefined,
+                    ]),
+                    capacity: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            faker.number.int({ min: undefined, max: undefined }),
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    id: faker.number.int({ min: undefined, max: undefined }),
+                    study_id: faker.number.int({ min: undefined, max: undefined }),
+                    token: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    usage_count: faker.number.int({ min: undefined, max: undefined }),
+                    start_count: faker.number.int({ min: undefined, max: undefined }),
+                    expires_at: faker.helpers.arrayElement([
+                        faker.helpers.arrayElement([
+                            `${faker.date.past().toISOString().split('.')[0]}Z`,
+                            null,
+                        ]),
+                        undefined,
+                    ]),
+                    is_active: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+                    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                })
+            ),
+            undefined,
+        ]),
+        requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        participant_count: faker.helpers.arrayElement([
+            faker.number.int({ min: undefined, max: undefined }),
+            undefined,
+        ]),
+        ...overrideResponse,
+    });
 
 export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetResponseMock = (
     overrideResponse: Partial<PaginatedResponseParticipantRead> = {}
@@ -10389,6 +12718,381 @@ export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostResponseMoc
     ...overrideResponse,
 });
 
+export const getListTagsApiAdminConcoursesTagsGetResponseMock = (): ConcourseTagRead[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        name: faker.string.alpha({ length: { min: 1, max: 100 } }),
+        color: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([faker.helpers.fromRegExp('^#[0-9a-fA-F]{6}$'), null]),
+            undefined,
+        ]),
+        id: faker.number.int({ min: undefined, max: undefined }),
+        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    }));
+
+export const getCreateTagApiAdminConcoursesTagsPostResponseMock = (
+    overrideResponse: Partial<ConcourseTagRead> = {}
+): ConcourseTagRead => ({
+    name: faker.string.alpha({ length: { min: 1, max: 100 } }),
+    color: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.helpers.fromRegExp('^#[0-9a-fA-F]{6}$'), null]),
+        undefined,
+    ]),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    ...overrideResponse,
+});
+
+export const getCreateConcourseApiAdminConcoursesPostResponseMock = (
+    overrideResponse: Partial<ConcourseRead> = {}
+): ConcourseRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    description: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    item_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
+    created_by: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ...overrideResponse,
+});
+
+export const getListConcoursesApiAdminConcoursesGetResponseMock = (
+    overrideResponse: Partial<PaginatedResponseConcourseRead> = {}
+): PaginatedResponseConcourseRead => ({
+    items: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            workspace_id: faker.number.int({ min: undefined, max: undefined }),
+            title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            description: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            item_count: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
+            created_by: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })
+    ),
+    total: faker.number.int({ min: undefined, max: undefined }),
+    limit: faker.number.int({ min: undefined, max: undefined }),
+    offset: faker.number.int({ min: undefined, max: undefined }),
+    ...overrideResponse,
+});
+
+export const getGetConcourseApiAdminConcoursesConcourseIdGetResponseMock = (
+    overrideResponse: Partial<ConcourseDetailRead> = {}
+): ConcourseDetailRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    description: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    item_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
+    created_by: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    items: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            status: faker.helpers.arrayElement(Object.values(ConcourseItemStatus)),
+            source: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            version: faker.number.int({ min: undefined, max: undefined }),
+            display_order: faker.number.int({ min: undefined, max: undefined }),
+            created_by: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        item_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+            tags: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        name: faker.string.alpha({ length: { min: 1, max: 100 } }),
+                        color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.helpers.fromRegExp('^#[0-9a-fA-F]{6}$'),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+        })),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getUpdateConcourseApiAdminConcoursesConcourseIdPatchResponseMock = (
+    overrideResponse: Partial<ConcourseRead> = {}
+): ConcourseRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    workspace_id: faker.number.int({ min: undefined, max: undefined }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    description: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    item_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
+    created_by: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ...overrideResponse,
+});
+
+export const getCreateItemApiAdminConcoursesConcourseIdItemsPostResponseMock = (
+    overrideResponse: Partial<ConcourseItemRead> = {}
+): ConcourseItemRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    status: faker.helpers.arrayElement(Object.values(ConcourseItemStatus)),
+    source: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    version: faker.number.int({ min: undefined, max: undefined }),
+    display_order: faker.number.int({ min: undefined, max: undefined }),
+    created_by: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    translations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+            text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            item_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    tags: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.string.alpha({ length: { min: 1, max: 100 } }),
+            color: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([faker.helpers.fromRegExp('^#[0-9a-fA-F]{6}$'), null]),
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            workspace_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getBulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostResponseMock =
+    (): ConcourseItemRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            status: faker.helpers.arrayElement(Object.values(ConcourseItemStatus)),
+            source: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            version: faker.number.int({ min: undefined, max: undefined }),
+            display_order: faker.number.int({ min: undefined, max: undefined }),
+            created_by: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        item_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+            tags: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        name: faker.string.alpha({ length: { min: 1, max: 100 } }),
+                        color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.helpers.fromRegExp('^#[0-9a-fA-F]{6}$'),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+        }));
+
+export const getImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostResponseMock =
+    (): ConcourseItemRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            status: faker.helpers.arrayElement(Object.values(ConcourseItemStatus)),
+            source: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            version: faker.number.int({ min: undefined, max: undefined }),
+            display_order: faker.number.int({ min: undefined, max: undefined }),
+            created_by: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            translations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+                        text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        item_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+            tags: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        name: faker.string.alpha({ length: { min: 1, max: 100 } }),
+                        color: faker.helpers.arrayElement([
+                            faker.helpers.arrayElement([
+                                faker.helpers.fromRegExp('^#[0-9a-fA-F]{6}$'),
+                                null,
+                            ]),
+                            undefined,
+                        ]),
+                        id: faker.number.int({ min: undefined, max: undefined }),
+                        workspace_id: faker.number.int({ min: undefined, max: undefined }),
+                    })
+                ),
+                undefined,
+            ]),
+        }));
+
+export const getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchResponseMock = (
+    overrideResponse: Partial<ConcourseItemRead> = {}
+): ConcourseItemRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    status: faker.helpers.arrayElement(Object.values(ConcourseItemStatus)),
+    source: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    version: faker.number.int({ min: undefined, max: undefined }),
+    display_order: faker.number.int({ min: undefined, max: undefined }),
+    created_by: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
+        undefined,
+    ]),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    translations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            language_code: faker.helpers.fromRegExp('^[a-z]{2}(-[A-Z]{2})?$'),
+            text: faker.string.alpha({ length: { min: 10, max: 1000 } }),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            item_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    tags: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            name: faker.string.alpha({ length: { min: 1, max: 100 } }),
+            color: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([faker.helpers.fromRegExp('^#[0-9a-fA-F]{6}$'), null]),
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            workspace_id: faker.number.int({ min: undefined, max: undefined }),
+        })),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
 export const getRecordConsentApiStudySlugConsentPostResponseMock = (
     overrideResponse: Partial<ConsentResponse> = {}
 ): ConsentResponse => ({
@@ -10810,6 +13514,85 @@ export const getResetStudyParticipantsApiAdminStudiesSlugResetPostMockHandler = 
         options
     );
 };
+
+export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostMockHandler = (
+    overrideResponse?:
+        | StudyRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<StudyRead> | StudyRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:slug/import-concourse',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getImportFromConcourseApiAdminStudiesSlugImportConcoursePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetMockHandler = (
+    overrideResponse?:
+        | StaleStatementRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<StaleStatementRead[]> | StaleStatementRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/stale-statements',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPostMockHandler =
+    (
+        overrideResponse?:
+            | StudyRead
+            | ((
+                  info: Parameters<Parameters<typeof http.post>[1]>[0]
+              ) => Promise<StudyRead> | StudyRead),
+        options?: RequestHandlerOptions
+    ) => {
+        return http.post(
+            '*/api/admin/studies/:slug/sync-statement/:statementId',
+            async (info) => {
+                return new HttpResponse(
+                    JSON.stringify(
+                        overrideResponse !== undefined
+                            ? typeof overrideResponse === 'function'
+                                ? await overrideResponse(info)
+                                : overrideResponse
+                            : getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPostResponseMock()
+                    ),
+                    { status: 200, headers: { 'Content-Type': 'application/json' } }
+                );
+            },
+            options
+        );
+    };
 
 export const getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler = (
     overrideResponse?:
@@ -11633,6 +14416,320 @@ export const getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMockHandler
     );
 };
 
+export const getListTagsApiAdminConcoursesTagsGetMockHandler = (
+    overrideResponse?:
+        | ConcourseTagRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ConcourseTagRead[]> | ConcourseTagRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/concourses/tags',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListTagsApiAdminConcoursesTagsGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getCreateTagApiAdminConcoursesTagsPostMockHandler = (
+    overrideResponse?:
+        | ConcourseTagRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<ConcourseTagRead> | ConcourseTagRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/concourses/tags',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateTagApiAdminConcoursesTagsPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteTagApiAdminConcoursesTagsTagIdDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/concourses/tags/:tagId',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getCreateConcourseApiAdminConcoursesPostMockHandler = (
+    overrideResponse?:
+        | ConcourseRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<ConcourseRead> | ConcourseRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/concourses',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateConcourseApiAdminConcoursesPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getListConcoursesApiAdminConcoursesGetMockHandler = (
+    overrideResponse?:
+        | PaginatedResponseConcourseRead
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<PaginatedResponseConcourseRead> | PaginatedResponseConcourseRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/concourses',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListConcoursesApiAdminConcoursesGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getGetConcourseApiAdminConcoursesConcourseIdGetMockHandler = (
+    overrideResponse?:
+        | ConcourseDetailRead
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ConcourseDetailRead> | ConcourseDetailRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/concourses/:concourseId',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetConcourseApiAdminConcoursesConcourseIdGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUpdateConcourseApiAdminConcoursesConcourseIdPatchMockHandler = (
+    overrideResponse?:
+        | ConcourseRead
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<ConcourseRead> | ConcourseRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/admin/concourses/:concourseId',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateConcourseApiAdminConcoursesConcourseIdPatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteConcourseApiAdminConcoursesConcourseIdDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/concourses/:concourseId',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getCreateItemApiAdminConcoursesConcourseIdItemsPostMockHandler = (
+    overrideResponse?:
+        | ConcourseItemRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<ConcourseItemRead> | ConcourseItemRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/concourses/:concourseId/items',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateItemApiAdminConcoursesConcourseIdItemsPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getBulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostMockHandler = (
+    overrideResponse?:
+        | ConcourseItemRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<ConcourseItemRead[]> | ConcourseItemRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/concourses/:concourseId/items/bulk',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getBulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostMockHandler = (
+    overrideResponse?:
+        | ConcourseItemRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<ConcourseItemRead[]> | ConcourseItemRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/concourses/:concourseId/items/import',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchMockHandler = (
+    overrideResponse?:
+        | ConcourseItemRead
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<ConcourseItemRead> | ConcourseItemRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/admin/concourses/:concourseId/items/:itemId',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/concourses/:concourseId/items/:itemId',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
 export const getSubmitStudyApiSubmitPostMockHandler = (
     overrideResponse?:
         | unknown
@@ -12005,6 +15102,9 @@ export const getLibreQAPIMock = () => [
     getValidateStudyApiAdminStudiesSlugValidatePostMockHandler(),
     getChangeStudyStateApiAdminStudiesSlugStatePostMockHandler(),
     getResetStudyParticipantsApiAdminStudiesSlugResetPostMockHandler(),
+    getImportFromConcourseApiAdminStudiesSlugImportConcoursePostMockHandler(),
+    getCheckStaleStatementsApiAdminStudiesSlugStaleStatementsGetMockHandler(),
+    getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatementIdPostMockHandler(),
     getListStudyParticipantsApiAdminStudiesSlugParticipantsGetMockHandler(),
     getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMockHandler(),
     getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),
@@ -12042,6 +15142,19 @@ export const getLibreQAPIMock = () => [
     getUpdateWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdPatchMockHandler(),
     getRemoveWorkspaceMemberApiAdminWorkspacesSlugMembersUserIdDeleteMockHandler(),
     getCreateInvitationApiAdminWorkspacesSlugInvitationsPostMockHandler(),
+    getListTagsApiAdminConcoursesTagsGetMockHandler(),
+    getCreateTagApiAdminConcoursesTagsPostMockHandler(),
+    getDeleteTagApiAdminConcoursesTagsTagIdDeleteMockHandler(),
+    getCreateConcourseApiAdminConcoursesPostMockHandler(),
+    getListConcoursesApiAdminConcoursesGetMockHandler(),
+    getGetConcourseApiAdminConcoursesConcourseIdGetMockHandler(),
+    getUpdateConcourseApiAdminConcoursesConcourseIdPatchMockHandler(),
+    getDeleteConcourseApiAdminConcoursesConcourseIdDeleteMockHandler(),
+    getCreateItemApiAdminConcoursesConcourseIdItemsPostMockHandler(),
+    getBulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostMockHandler(),
+    getImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostMockHandler(),
+    getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchMockHandler(),
+    getDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDeleteMockHandler(),
     getSubmitStudyApiSubmitPostMockHandler(),
     getGetStudyApiStudySlugGetMockHandler(),
     getUnlockStudyApiStudySlugUnlockPostMockHandler(),

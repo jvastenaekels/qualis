@@ -5,6 +5,8 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { StatementTranslationRead } from './statementTranslationRead';
+import type { StatementReadSourceConcourseItemId } from './statementReadSourceConcourseItemId';
+import type { StatementReadSourceImportedAt } from './statementReadSourceImportedAt';
 
 /**
  * Schema for reading a statement.
@@ -15,4 +17,6 @@ export interface StatementRead {
     id: number;
     display_order?: number;
     translations?: StatementTranslationRead[];
+    source_concourse_item_id?: StatementReadSourceConcourseItemId;
+    source_imported_at?: StatementReadSourceImportedAt;
 }

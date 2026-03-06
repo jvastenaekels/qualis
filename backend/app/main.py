@@ -24,6 +24,7 @@ from app.middleware.errors import (
 )
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import audio, auth, logs, participants, submissions
+from app.routers.admin import concourses as admin_concourses
 from app.routers.admin import analysis as admin_analysis
 from app.routers.admin import exports as admin_exports
 from app.routers.admin import invitations as admin_invitations
@@ -146,6 +147,11 @@ app.include_router(
 )
 app.include_router(
     admin_workspaces.router, prefix="/api/admin/workspaces", tags=["admin-workspaces"]
+)
+app.include_router(
+    admin_concourses.router,
+    prefix="/api/admin/concourses",
+    tags=["admin-concourses"],
 )
 app.include_router(submissions.router, prefix="/api", tags=["submissions"])
 app.include_router(

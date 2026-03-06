@@ -43,6 +43,14 @@ class StudyState(str, Enum):
     archived = "archived"
 
 
+class ConcourseItemStatus(str, Enum):
+    """Enum for concourse item curation status."""
+
+    proposed = "proposed"
+    accepted = "accepted"
+    rejected = "rejected"
+
+
 class ParticipantStatus(str, Enum):
     """Enum for participant progress status."""
 
@@ -93,6 +101,12 @@ class Workspace(Base):
         back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
     )
     members: Mapped[list["WorkspaceMember"]] = relationship(
+        back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
+    )
+    concourses: Mapped[list["Concourse"]] = relationship(
+        back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
+    )
+    concourse_tags: Mapped[list["ConcourseTag"]] = relationship(
         back_populates="workspace", cascade="all, delete-orphan", lazy="raise"
     )
 
@@ -273,9 +287,23 @@ class Statement(Base):
     code: Mapped[str] = mapped_column(String)  # "S1", "S2"...
     display_order: Mapped[int] = mapped_column(default=0)
 
+    # Concourse traceability — nullable, set when imported from a concourse
+    source_concourse_item_id: Mapped[int | None] = mapped_column(
+        ForeignKey("concourse_items.id", ondelete="SET NULL"),
+        nullable=True,
+        default=None,
+        index=True,
+    )
+    source_imported_at: Mapped[datetime | None] = mapped_column(
+        nullable=True, default=None
+    )
+
     study: Mapped["Study"] = relationship(back_populates="statements", lazy="raise")
     translations: Mapped[list["StatementTranslation"]] = relationship(
         back_populates="statement", cascade="all, delete-orphan", lazy="selectin"
+    )
+    source_concourse_item: Mapped["ConcourseItem | None"] = relationship(
+        lazy="noload", foreign_keys=[source_concourse_item_id]
     )
 
     __table_args__ = (UniqueConstraint("study_id", "code", name="uq_statement_code"),)
@@ -523,6 +551,137 @@ class Invitation(Base):
     )
 
     workspace: Mapped["Workspace"] = relationship(lazy="raise")
+
+
+# Concourse Models
+
+
+class Concourse(Base):
+    """Workspace-level collection of candidate Q-methodology statements."""
+
+    __tablename__ = "concourses"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
+    title: Mapped[str] = mapped_column(String)
+    description: Mapped[str | None] = mapped_column(String, nullable=True)
+    created_by: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    workspace: Mapped["Workspace"] = relationship(
+        back_populates="concourses", lazy="raise"
+    )
+    items: Mapped[list["ConcourseItem"]] = relationship(
+        back_populates="concourse", cascade="all, delete-orphan", lazy="raise"
+    )
+    creator: Mapped["User | None"] = relationship(lazy="raise")
+
+
+class ConcourseItem(Base):
+    """Individual candidate statement within a concourse."""
+
+    __tablename__ = "concourse_items"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    concourse_id: Mapped[int] = mapped_column(
+        ForeignKey("concourses.id", ondelete="CASCADE"), index=True
+    )
+    code: Mapped[str] = mapped_column(String(50))
+    status: Mapped[ConcourseItemStatus] = mapped_column(
+        SAEnum(ConcourseItemStatus), default=ConcourseItemStatus.proposed
+    )
+    source: Mapped[str | None] = mapped_column(String, nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    display_order: Mapped[int] = mapped_column(Integer, default=0)
+    created_by: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+    concourse: Mapped["Concourse"] = relationship(back_populates="items", lazy="raise")
+    translations: Mapped[list["ConcourseItemTranslation"]] = relationship(
+        back_populates="item", cascade="all, delete-orphan", lazy="selectin"
+    )
+    tags: Mapped[list["ConcourseTag"]] = relationship(
+        secondary="concourse_item_tags", back_populates="items", lazy="selectin"
+    )
+    creator: Mapped["User | None"] = relationship(lazy="raise")
+
+    __table_args__ = (
+        UniqueConstraint("concourse_id", "code", name="uq_concourse_item_code"),
+    )
+
+
+class ConcourseItemTranslation(Base):
+    """Multilingual text for a concourse item."""
+
+    __tablename__ = "concourse_item_translations"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    item_id: Mapped[int] = mapped_column(
+        ForeignKey("concourse_items.id", ondelete="CASCADE"), index=True
+    )
+    language_code: Mapped[str] = mapped_column(String(5))
+    text: Mapped[str] = mapped_column(String)
+
+    item: Mapped["ConcourseItem"] = relationship(
+        back_populates="translations", lazy="raise"
+    )
+
+    __table_args__ = (
+        UniqueConstraint("item_id", "language_code", name="uq_concourse_item_lang"),
+    )
+
+
+class ConcourseTag(Base):
+    """Workspace-scoped tag for categorizing concourse items."""
+
+    __tablename__ = "concourse_tags"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    workspace_id: Mapped[int] = mapped_column(
+        ForeignKey("workspaces.id", ondelete="CASCADE"), index=True
+    )
+    name: Mapped[str] = mapped_column(String(100))
+    color: Mapped[str | None] = mapped_column(String(7), nullable=True)
+
+    workspace: Mapped["Workspace"] = relationship(
+        back_populates="concourse_tags", lazy="raise"
+    )
+    items: Mapped[list["ConcourseItem"]] = relationship(
+        secondary="concourse_item_tags", back_populates="tags", lazy="raise"
+    )
+
+    __table_args__ = (
+        UniqueConstraint("workspace_id", "name", name="uq_workspace_tag_name"),
+    )
+
+
+class ConcourseItemTag(Base):
+    """Many-to-many association between concourse items and tags."""
+
+    __tablename__ = "concourse_item_tags"
+
+    item_id: Mapped[int] = mapped_column(
+        ForeignKey("concourse_items.id", ondelete="CASCADE"), primary_key=True
+    )
+    tag_id: Mapped[int] = mapped_column(
+        ForeignKey("concourse_tags.id", ondelete="CASCADE"), primary_key=True
+    )
 
 
 # Computed column properties (defined after all models to avoid circular references)

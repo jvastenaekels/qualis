@@ -45,6 +45,11 @@ participant_count
 audio_recordings
 s3_bucket
 draft_responses
+concourse_tags
+source_concourse_item
+accepted
+rejected
+creator
 
 # --- app/routers/ (FastAPI endpoints) ---
 # admin/exports.py
@@ -86,6 +91,10 @@ import_study_config
 clear_test_runs
 clear_all_participants
 get_study_storage_usage
+import_from_concourse
+check_stale_statements
+sync_statement_from_concourse
+import_items_from_text
 
 # admin/analysis.py
 get_eigenvalues
@@ -189,6 +198,7 @@ validate_strings
 validate_trans_strings
 validate_text
 validate_code
+validate_not_blank
 validate_comment
 validate_reason
 validate_name
@@ -198,6 +208,9 @@ url_expires_at
 
 # Analysis schemas (app/schemas.py)
 validate_draft
+source_deleted
+current_translations
+concourse_translations
 
 # Draft/Resume schemas (app/schemas.py)
 # ResumeResponse / ConsentResponse fields

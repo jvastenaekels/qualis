@@ -5,6 +5,7 @@ import {
     ChevronsUpDown,
     Globe,
     LayoutDashboard,
+    Library,
     Link2,
     LogOut,
     PencilRuler,
@@ -219,6 +220,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   title: t('admin.sidebar.dashboard', 'Dashboard'),
                   url: `/app/${workspaceSlug}/dashboard`,
                   icon: LayoutDashboard,
+                  show: true,
+              },
+              {
+                  title: t('admin.sidebar.concourses', 'Concourses'),
+                  url: `/app/${workspaceSlug}/concourses`,
+                  icon: Library,
                   show: true,
               },
               {

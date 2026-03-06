@@ -31,6 +31,7 @@ from app.models import (
     WorkspaceRole,
 )
 from app.schemas import StudyCreate, StudyRead, StudyUpdate
+from app.schemas.concourses import ConcourseImportToStudy, StaleStatementRead
 from app.schemas.common import PaginatedResponse
 from app.services.study_service import StudyService
 
@@ -236,6 +237,61 @@ async def delete_study(
     await db.delete(study)
     await db.commit()
     return None
+
+
+@router.post("/{slug}/import-concourse", response_model=StudyRead)
+@limiter.limit("10/minute")
+async def import_from_concourse(
+    request: Request,
+    slug: str,
+    data: ConcourseImportToStudy,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+) -> Study:
+    """Import concourse items into a study as statements (copies, no reference)."""
+    from app.services.concourse_service import ConcourseService
+
+    return await ConcourseService.import_to_study(db, study, data)
+
+
+@router.get("/{slug}/stale-statements", response_model=list[StaleStatementRead])
+async def check_stale_statements(
+    slug: str,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+):
+    """Check which imported statements have stale concourse sources."""
+    from app.services.concourse_service import ConcourseService
+
+    return await ConcourseService.check_stale_statements(db, study)
+
+
+@router.post("/{slug}/sync-statement/{statement_id}", response_model=StudyRead)
+@limiter.limit("30/minute")
+async def sync_statement_from_concourse(
+    request: Request,
+    slug: str,
+    statement_id: int,
+    study: Study = Depends(check_study_permission(StudyRole.editor)),
+    db: AsyncSession = Depends(get_db),
+) -> Study:
+    """Sync a single statement's text from its concourse source."""
+    from app.services.concourse_service import ConcourseService
+
+    await ConcourseService.sync_statement_from_concourse(db, study, statement_id)
+
+    # Return refreshed study
+    stmt = (
+        select(Study)
+        .where(Study.id == study.id)
+        .options(
+            selectinload(Study.translations),
+            selectinload(Study.statements).selectinload(Statement.translations),
+            selectinload(Study.participants),
+        )
+    )
+    res = await db.execute(stmt)
+    return res.scalar_one()
 
 
 # ------------------------------------------------------------------
