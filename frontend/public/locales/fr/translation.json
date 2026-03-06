@@ -603,7 +603,18 @@
                 "proposed": "Proposé",
                 "accepted": "Accepté",
                 "rejected": "Rejeté"
-            }
+            },
+            "change_note_placeholder": "Note de modification (optionnel)",
+            "history": "Historique",
+            "comments": "Commentaires",
+            "no_history": "Aucun historique de modifications.",
+            "no_comments": "Aucun commentaire.",
+            "add_comment": "Écrire un commentaire...",
+            "send_comment": "Envoyer",
+            "comment_added": "Commentaire ajouté",
+            "comment_error": "Échec de l'ajout du commentaire",
+            "version_label": "v{{n}}",
+            "item_detail_desc": "Historique et commentaires de cet élément"
         },
         "concourse_import": {
             "title": "Importer depuis un concours",

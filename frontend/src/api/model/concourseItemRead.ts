@@ -25,4 +25,5 @@ export interface ConcourseItemRead {
     updated_at: string;
     translations?: ConcourseItemTranslationRead[];
     tags?: ConcourseTagRead[];
+    comment_count?: number;
 }

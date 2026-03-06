@@ -20,9 +20,12 @@ from app.schemas.concourses import (
     ConcourseDetailRead,
     ConcourseItemBulkCreate,
     ConcourseItemBulkImport,
+    ConcourseItemCommentCreate,
+    ConcourseItemCommentRead,
     ConcourseItemCreate,
     ConcourseItemRead,
     ConcourseItemUpdate,
+    ConcourseItemVersionRead,
     ConcourseRead,
     ConcourseTagCreate,
     ConcourseTagRead,
@@ -154,6 +157,12 @@ async def get_concourse(
         from fastapi import HTTPException
 
         raise HTTPException(status_code=404, detail="Concourse not found")
+    # Attach comment counts
+    if concourse.items:
+        item_ids = [item.id for item in concourse.items]
+        counts = await ConcourseService.get_comment_counts(db, item_ids)
+        for item in concourse.items:
+            item.comment_count = counts.get(item.id, 0)  # type: ignore[attr-defined]
     return concourse
 
 
@@ -277,11 +286,14 @@ async def update_item(
     workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(
         require_workspace_role(WorkspaceRole.researcher)
     ),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     workspace, _ = workspace_ctx
     await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
-    return await ConcourseService.update_item(db, concourse_id, item_id, data)
+    return await ConcourseService.update_item(
+        db, concourse_id, item_id, data, user_id=current_user.id
+    )
 
 
 @router.delete(
@@ -302,3 +314,71 @@ async def delete_item(
     await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
     await ConcourseService.delete_item(db, concourse_id, item_id)
     return None
+
+
+# ------------------------------------------------------------------
+# Item Versions & Comments
+# ------------------------------------------------------------------
+
+
+@router.get(
+    "/{concourse_id}/items/{item_id}/versions",
+    response_model=list[ConcourseItemVersionRead],
+)
+async def list_item_versions(
+    concourse_id: int,
+    item_id: int,
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    pagination: PaginationParams = Depends(),
+):
+    workspace, _ = workspace_ctx
+    await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
+    await ConcourseService._verify_item_ownership(db, item_id, concourse_id)
+    return await ConcourseService.list_item_versions(
+        db, item_id, pagination.limit, pagination.offset
+    )
+
+
+@router.get(
+    "/{concourse_id}/items/{item_id}/comments",
+    response_model=list[ConcourseItemCommentRead],
+)
+async def list_item_comments(
+    concourse_id: int,
+    item_id: int,
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(get_current_workspace),
+    db: AsyncSession = Depends(get_db),
+    pagination: PaginationParams = Depends(),
+):
+    workspace, _ = workspace_ctx
+    await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
+    await ConcourseService._verify_item_ownership(db, item_id, concourse_id)
+    return await ConcourseService.list_item_comments(
+        db, item_id, pagination.limit, pagination.offset
+    )
+
+
+@router.post(
+    "/{concourse_id}/items/{item_id}/comments",
+    response_model=ConcourseItemCommentRead,
+    status_code=status.HTTP_201_CREATED,
+)
+@limiter.limit("30/minute")
+async def create_item_comment(
+    request: Request,
+    concourse_id: int,
+    item_id: int,
+    data: ConcourseItemCommentCreate,
+    workspace_ctx: tuple[Workspace, WorkspaceMember] = Depends(
+        require_workspace_role(WorkspaceRole.researcher)
+    ),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    workspace, _ = workspace_ctx
+    await ConcourseService._verify_concourse_ownership(db, concourse_id, workspace.id)
+    await ConcourseService._verify_item_ownership(db, item_id, concourse_id)
+    return await ConcourseService.create_item_comment(
+        db, item_id, current_user.id, data.body
+    )

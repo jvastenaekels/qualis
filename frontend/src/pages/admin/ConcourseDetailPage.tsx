@@ -12,6 +12,8 @@ import {
     X,
     Tag,
     Pencil,
+    Clock,
+    MessageSquare,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -54,6 +56,7 @@ import type { ConcourseItemRead, ConcourseItemStatus } from '@/api/model';
 import { useQueryClient } from '@tanstack/react-query';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { cn } from '@/lib/utils';
+import { ItemDetailSheet } from '@/components/admin/concourse/ItemDetailSheet';
 
 const STATUS_COLORS: Record<string, string> = {
     proposed: 'bg-amber-100 text-amber-800 border-amber-200',
@@ -89,6 +92,10 @@ export default function ConcourseDetailPage() {
     const [editCode, setEditCode] = useState('');
     const [editText, setEditText] = useState('');
     const [editSource, setEditSource] = useState('');
+    const [editChangeNote, setEditChangeNote] = useState('');
+    const [sheetItemId, setSheetItemId] = useState<number | null>(null);
+    const [sheetItemCode, setSheetItemCode] = useState('');
+    const [sheetTab, setSheetTab] = useState<'history' | 'comments'>('history');
 
     // Mutations
     const createItemMutation = useCreateItemApiAdminConcoursesConcourseIdItemsPost();
@@ -168,6 +175,7 @@ export default function ConcourseDetailPage() {
                 ''
         );
         setEditSource(item.source ?? '');
+        setEditChangeNote('');
     };
 
     const saveEdit = async (item: ConcourseItemRead) => {
@@ -180,10 +188,12 @@ export default function ConcourseDetailPage() {
                     code: editCode.trim() || undefined,
                     source: editSource.trim() || undefined,
                     translations: [{ language_code: activeLocale, text: editText.trim() }],
+                    change_comment: editChangeNote.trim() || undefined,
                 },
             });
             await invalidate();
             setEditingItem(null);
+            setEditChangeNote('');
             toast.success(t('admin.concourse.item_updated', 'Item updated'));
         } catch (err) {
             toast.error(
@@ -568,6 +578,43 @@ export default function ConcourseDetailPage() {
                                                                 variant="ghost"
                                                                 size="sm"
                                                                 aria-label={t(
+                                                                    'admin.concourse.history',
+                                                                    'History'
+                                                                )}
+                                                                className="size-8 p-0 text-slate-400 hover:text-slate-700"
+                                                                onClick={() => {
+                                                                    setSheetItemId(item.id);
+                                                                    setSheetItemCode(item.code);
+                                                                    setSheetTab('history');
+                                                                }}
+                                                            >
+                                                                <Clock className="size-3.5" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                aria-label={t(
+                                                                    'admin.concourse.comments',
+                                                                    'Comments'
+                                                                )}
+                                                                className="relative size-8 p-0 text-slate-400 hover:text-slate-700"
+                                                                onClick={() => {
+                                                                    setSheetItemId(item.id);
+                                                                    setSheetItemCode(item.code);
+                                                                    setSheetTab('comments');
+                                                                }}
+                                                            >
+                                                                <MessageSquare className="size-3.5" />
+                                                                {(item.comment_count ?? 0) > 0 && (
+                                                                    <span className="absolute -top-1 -right-1 flex items-center justify-center size-4 rounded-full bg-indigo-600 text-white text-[9px] font-bold">
+                                                                        {item.comment_count}
+                                                                    </span>
+                                                                )}
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                aria-label={t(
                                                                     'common.edit',
                                                                     'Edit'
                                                                 )}
@@ -617,6 +664,18 @@ export default function ConcourseDetailPage() {
                                                             'Source (optional)'
                                                         )}
                                                         className="h-8 text-xs rounded-lg"
+                                                    />
+                                                    <Input
+                                                        value={editChangeNote}
+                                                        onChange={(e) =>
+                                                            setEditChangeNote(e.target.value)
+                                                        }
+                                                        placeholder={t(
+                                                            'admin.concourse.change_note_placeholder',
+                                                            'Change note (optional)'
+                                                        )}
+                                                        className="h-8 text-xs rounded-lg"
+                                                        maxLength={500}
                                                     />
                                                 </div>
                                             ) : (
@@ -743,6 +802,43 @@ export default function ConcourseDetailPage() {
                                                     </>
                                                 ) : (
                                                     <>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            aria-label={t(
+                                                                'admin.concourse.history',
+                                                                'History'
+                                                            )}
+                                                            className="size-8 p-0 text-slate-400 hover:text-slate-700 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            onClick={() => {
+                                                                setSheetItemId(item.id);
+                                                                setSheetItemCode(item.code);
+                                                                setSheetTab('history');
+                                                            }}
+                                                        >
+                                                            <Clock className="size-3.5" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            aria-label={t(
+                                                                'admin.concourse.comments',
+                                                                'Comments'
+                                                            )}
+                                                            className="relative size-8 p-0 text-slate-400 hover:text-slate-700 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity"
+                                                            onClick={() => {
+                                                                setSheetItemId(item.id);
+                                                                setSheetItemCode(item.code);
+                                                                setSheetTab('comments');
+                                                            }}
+                                                        >
+                                                            <MessageSquare className="size-3.5" />
+                                                            {(item.comment_count ?? 0) > 0 && (
+                                                                <span className="absolute -top-1 -right-1 flex items-center justify-center size-4 rounded-full bg-indigo-600 text-white text-[9px] font-bold">
+                                                                    {item.comment_count}
+                                                                </span>
+                                                            )}
+                                                        </Button>
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
@@ -1033,6 +1129,18 @@ export default function ConcourseDetailPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Item Detail Sheet (History & Comments) */}
+            <ItemDetailSheet
+                open={sheetItemId !== null}
+                onOpenChange={(open) => {
+                    if (!open) setSheetItemId(null);
+                }}
+                concourseId={id}
+                itemId={sheetItemId}
+                itemCode={sheetItemCode}
+                defaultTab={sheetTab}
+            />
         </div>
     );
 }

@@ -11,9 +11,11 @@ from ..exceptions import ConflictError, NotFoundError, ValidationError
 from ..models import (
     Concourse,
     ConcourseItem,
+    ConcourseItemComment,
     ConcourseItemStatus,
     ConcourseItemTag,
     ConcourseItemTranslation,
+    ConcourseItemVersion,
     ConcourseTag,
     Statement,
     StatementTranslation,
@@ -316,11 +318,33 @@ class ConcourseService:
 
     @staticmethod
     async def update_item(
-        db: AsyncSession, concourse_id: int, item_id: int, data: ConcourseItemUpdate
+        db: AsyncSession,
+        concourse_id: int,
+        item_id: int,
+        data: ConcourseItemUpdate,
+        user_id: int | None = None,
     ) -> ConcourseItem:
-        """Update an item with optimistic locking."""
+        """Update an item with optimistic locking and version history."""
         # Verify item belongs to the concourse
         await ConcourseService._verify_item_ownership(db, item_id, concourse_id)
+
+        # Load current state before updating (for version snapshot)
+        current = await ConcourseService._load_item(db, item_id)
+        version_record = ConcourseItemVersion(
+            item_id=item_id,
+            version_number=current.version,
+            code=current.code,
+            status=current.status,
+            source=current.source,
+            translations_snapshot=[
+                {"language_code": t.language_code, "text": t.text}
+                for t in current.translations
+            ],
+            tag_ids_snapshot=[tag.id for tag in current.tags],
+            change_comment=data.change_comment,
+            changed_by=user_id,
+        )
+        db.add(version_record)
 
         update_values: dict = {}
         if data.code is not None:
@@ -389,6 +413,80 @@ class ConcourseService:
         if item is None:
             raise NotFoundError("ConcourseItem")
         return item
+
+    # ------------------------------------------------------------------
+    # Versions & Comments
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    async def list_item_versions(
+        db: AsyncSession,
+        item_id: int,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[ConcourseItemVersion]:
+        stmt = (
+            select(ConcourseItemVersion)
+            .where(ConcourseItemVersion.item_id == item_id)
+            .order_by(ConcourseItemVersion.version_number.desc())
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await db.execute(stmt)
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def list_item_comments(
+        db: AsyncSession,
+        item_id: int,
+        limit: int = 50,
+        offset: int = 0,
+    ) -> list[ConcourseItemComment]:
+        stmt = (
+            select(ConcourseItemComment)
+            .where(ConcourseItemComment.item_id == item_id)
+            .order_by(ConcourseItemComment.created_at.asc())
+            .limit(limit)
+            .offset(offset)
+        )
+        result = await db.execute(stmt)
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def create_item_comment(
+        db: AsyncSession,
+        item_id: int,
+        user_id: int,
+        body: str,
+    ) -> ConcourseItemComment:
+        comment = ConcourseItemComment(
+            item_id=item_id,
+            user_id=user_id,
+            body=body,
+        )
+        db.add(comment)
+        await db.commit()
+        await db.refresh(comment)
+        return comment
+
+    @staticmethod
+    async def get_comment_counts(
+        db: AsyncSession,
+        item_ids: list[int],
+    ) -> dict[int, int]:
+        """Return {item_id: comment_count} for given item IDs."""
+        if not item_ids:
+            return {}
+        stmt = (
+            select(
+                ConcourseItemComment.item_id,
+                func.count(ConcourseItemComment.id),
+            )
+            .where(ConcourseItemComment.item_id.in_(item_ids))
+            .group_by(ConcourseItemComment.item_id)
+        )
+        result = await db.execute(stmt)
+        return dict(result.all())  # type: ignore[arg-type]
 
     # ------------------------------------------------------------------
     # Tags

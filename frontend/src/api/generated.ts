@@ -29,6 +29,7 @@ import type {
     ConcourseImportToStudy,
     ConcourseItemBulkCreate,
     ConcourseItemBulkImport,
+    ConcourseItemCommentCreate,
     ConcourseItemCreate,
     ConcourseItemUpdate,
     ConcourseTagCreate,
@@ -42,6 +43,8 @@ import type {
     HTTPValidationError,
     InvitationAccept,
     ListConcoursesApiAdminConcoursesGetParams,
+    ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams,
+    ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams,
     ListStudiesApiAdminStudiesGetParams,
     ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
     ListUsersApiAdminUsersGetParams,
@@ -87,7 +90,9 @@ import type {
     AudioRecordingRead,
     AudioUploadResponse,
     ConcourseDetailRead,
+    ConcourseItemCommentRead,
     ConcourseItemRead,
+    ConcourseItemVersionRead,
     ConcourseRead,
     ConcourseTagRead,
     ConsentResponse,
@@ -8265,6 +8270,610 @@ export const useDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete = <
 };
 
 /**
+ * @summary List Item Versions
+ */
+export const listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet = (
+    concourseId: number,
+    itemId: number,
+    params?: ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<ConcourseItemVersionRead[]>({
+        url: `/api/admin/concourses/${concourseId}/items/${itemId}/versions`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetQueryKey = (
+    concourseId?: number,
+    itemId?: number,
+    params?: ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams
+) => {
+    return [
+        `/api/admin/concourses/${concourseId}/items/${itemId}/versions`,
+        ...(params ? [params] : []),
+    ] as const;
+};
+
+export const getListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetQueryOptions = <
+    TData = Awaited<
+        ReturnType<typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params?: ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetQueryKey(
+            concourseId,
+            itemId,
+            params
+        );
+
+    const queryFn: QueryFunction<
+        Awaited<
+            ReturnType<typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet>
+        >
+    > = ({ signal }) =>
+        listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet(
+            concourseId,
+            itemId,
+            params,
+            signal
+        );
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!(concourseId && itemId),
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<
+            ReturnType<typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet>
+        >,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetQueryResult =
+    NonNullable<
+        Awaited<
+            ReturnType<typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet>
+        >
+    >;
+export type ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetQueryError =
+    HTTPValidationError;
+
+export function useListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet<
+    TData = Awaited<
+        ReturnType<typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params: undefined | ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet<
+    TData = Awaited<
+        ReturnType<typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params?: ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet<
+    TData = Awaited<
+        ReturnType<typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params?: ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Item Versions
+ */
+
+export function useListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet<
+    TData = Awaited<
+        ReturnType<typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params?: ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions =
+        getListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetQueryOptions(
+            concourseId,
+            itemId,
+            params,
+            options
+        );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary List Item Comments
+ */
+export const listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet = (
+    concourseId: number,
+    itemId: number,
+    params?: ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<ConcourseItemCommentRead[]>({
+        url: `/api/admin/concourses/${concourseId}/items/${itemId}/comments`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetQueryKey = (
+    concourseId?: number,
+    itemId?: number,
+    params?: ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams
+) => {
+    return [
+        `/api/admin/concourses/${concourseId}/items/${itemId}/comments`,
+        ...(params ? [params] : []),
+    ] as const;
+};
+
+export const getListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetQueryOptions = <
+    TData = Awaited<
+        ReturnType<typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params?: ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetQueryKey(
+            concourseId,
+            itemId,
+            params
+        );
+
+    const queryFn: QueryFunction<
+        Awaited<
+            ReturnType<typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet>
+        >
+    > = ({ signal }) =>
+        listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet(
+            concourseId,
+            itemId,
+            params,
+            signal
+        );
+
+    return {
+        queryKey,
+        queryFn,
+        enabled: !!(concourseId && itemId),
+        ...queryOptions,
+    } as UseQueryOptions<
+        Awaited<
+            ReturnType<typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet>
+        >,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetQueryResult =
+    NonNullable<
+        Awaited<
+            ReturnType<typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet>
+        >
+    >;
+export type ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetQueryError =
+    HTTPValidationError;
+
+export function useListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet<
+    TData = Awaited<
+        ReturnType<typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params: undefined | ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet<
+    TData = Awaited<
+        ReturnType<typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params?: ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet<
+    TData = Awaited<
+        ReturnType<typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params?: ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Item Comments
+ */
+
+export function useListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet<
+    TData = Awaited<
+        ReturnType<typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    concourseId: number,
+    itemId: number,
+    params?: ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions =
+        getListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetQueryOptions(
+            concourseId,
+            itemId,
+            params,
+            options
+        );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary Create Item Comment
+ */
+export const createItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost = (
+    concourseId: number,
+    itemId: number,
+    concourseItemCommentCreate: ConcourseItemCommentCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<ConcourseItemCommentRead>({
+        url: `/api/admin/concourses/${concourseId}/items/${itemId}/comments`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: concourseItemCommentCreate,
+        signal,
+    });
+};
+
+export const getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMutationOptions =
+    <TError = HTTPValidationError, TContext = unknown>(options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<
+                    typeof createItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost
+                >
+            >,
+            TError,
+            { concourseId: number; itemId: number; data: ConcourseItemCommentCreate },
+            TContext
+        >;
+    }): UseMutationOptions<
+        Awaited<
+            ReturnType<typeof createItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost>
+        >,
+        TError,
+        { concourseId: number; itemId: number; data: ConcourseItemCommentCreate },
+        TContext
+    > => {
+        const mutationKey = [
+            'createItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost',
+        ];
+        const { mutation: mutationOptions } = options
+            ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+                ? options
+                : { ...options, mutation: { ...options.mutation, mutationKey } }
+            : { mutation: { mutationKey } };
+
+        const mutationFn: MutationFunction<
+            Awaited<
+                ReturnType<
+                    typeof createItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost
+                >
+            >,
+            { concourseId: number; itemId: number; data: ConcourseItemCommentCreate }
+        > = (props) => {
+            const { concourseId, itemId, data } = props ?? {};
+
+            return createItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost(
+                concourseId,
+                itemId,
+                data
+            );
+        };
+
+        return { mutationFn, ...mutationOptions };
+    };
+
+export type CreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMutationResult =
+    NonNullable<
+        Awaited<
+            ReturnType<typeof createItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost>
+        >
+    >;
+export type CreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMutationBody =
+    ConcourseItemCommentCreate;
+export type CreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Create Item Comment
+ */
+export const useCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<
+                ReturnType<
+                    typeof createItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost
+                >
+            >,
+            TError,
+            { concourseId: number; itemId: number; data: ConcourseItemCommentCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<
+        ReturnType<typeof createItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPost>
+    >,
+    TError,
+    { concourseId: number; itemId: number; data: ConcourseItemCommentCreate },
+    TContext
+> => {
+    const mutationOptions =
+        getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMutationOptions(
+            options
+        );
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * Submits or updates a study participation.
 
 Logic moved to StudyService for maintainability.
@@ -13229,6 +13838,10 @@ export const getGetConcourseApiAdminConcoursesConcourseIdGetResponseMock = (
                 ),
                 undefined,
             ]),
+            comment_count: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
         })),
         undefined,
     ]),
@@ -13297,6 +13910,10 @@ export const getCreateItemApiAdminConcoursesConcourseIdItemsPostResponseMock = (
         })),
         undefined,
     ]),
+    comment_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
     ...overrideResponse,
 });
 
@@ -13350,6 +13967,10 @@ export const getBulkCreateItemsApiAdminConcoursesConcourseIdItemsBulkPostRespons
                         workspace_id: faker.number.int({ min: undefined, max: undefined }),
                     })
                 ),
+                undefined,
+            ]),
+            comment_count: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
                 undefined,
             ]),
         }));
@@ -13406,6 +14027,10 @@ export const getImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostR
                 ),
                 undefined,
             ]),
+            comment_count: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                undefined,
+            ]),
         }));
 
 export const getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchResponseMock = (
@@ -13447,8 +14072,94 @@ export const getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchResponseM
         })),
         undefined,
     ]),
+    comment_count: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        undefined,
+    ]),
     ...overrideResponse,
 });
+
+export const getListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetResponseMock =
+    (): ConcourseItemVersionRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            item_id: faker.number.int({ min: undefined, max: undefined }),
+            version_number: faker.number.int({ min: undefined, max: undefined }),
+            code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            status: faker.helpers.arrayElement(Object.values(ConcourseItemStatus)),
+            source: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            translations_snapshot: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        [faker.string.alphanumeric(5)]: faker.string.alpha({
+                            length: { min: 10, max: 20 },
+                        }),
+                    })
+                ),
+                undefined,
+            ]),
+            tag_ids_snapshot: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => faker.number.int({ min: undefined, max: undefined })
+                ),
+                undefined,
+            ]),
+            change_comment: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            changed_by: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            changed_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        }));
+
+export const getListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetResponseMock =
+    (): ConcourseItemCommentRead[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            item_id: faker.number.int({ min: undefined, max: undefined }),
+            user_id: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        }));
+
+export const getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostResponseMock =
+    (overrideResponse: Partial<ConcourseItemCommentRead> = {}): ConcourseItemCommentRead => ({
+        id: faker.number.int({ min: undefined, max: undefined }),
+        item_id: faker.number.int({ min: undefined, max: undefined }),
+        user_id: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            undefined,
+        ]),
+        body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        ...overrideResponse,
+    });
 
 export const getRecordConsentApiStudySlugConsentPostResponseMock = (
     overrideResponse: Partial<ConsentResponse> = {}
@@ -15113,6 +15824,84 @@ export const getDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDeleteMockHand
     );
 };
 
+export const getListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetMockHandler = (
+    overrideResponse?:
+        | ConcourseItemVersionRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ConcourseItemVersionRead[]> | ConcourseItemVersionRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/concourses/:concourseId/items/:itemId/versions',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetMockHandler = (
+    overrideResponse?:
+        | ConcourseItemCommentRead[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ConcourseItemCommentRead[]> | ConcourseItemCommentRead[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/concourses/:concourseId/items/:itemId/comments',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMockHandler = (
+    overrideResponse?:
+        | ConcourseItemCommentRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<ConcourseItemCommentRead> | ConcourseItemCommentRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/concourses/:concourseId/items/:itemId/comments',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getSubmitStudyApiSubmitPostMockHandler = (
     overrideResponse?:
         | unknown
@@ -15539,6 +16328,9 @@ export const getLibreQAPIMock = () => [
     getImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPostMockHandler(),
     getUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatchMockHandler(),
     getDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDeleteMockHandler(),
+    getListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetMockHandler(),
+    getListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetMockHandler(),
+    getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMockHandler(),
     getSubmitStudyApiSubmitPostMockHandler(),
     getGetStudyApiStudySlugGetMockHandler(),
     getUnlockStudyApiStudySlugUnlockPostMockHandler(),

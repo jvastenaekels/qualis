@@ -74,6 +74,7 @@ class ConcourseItemRead(BaseModel):
     updated_at: datetime
     translations: list[ConcourseItemTranslationRead] = []
     tags: list[ConcourseTagRead] = []
+    comment_count: int = 0
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -86,6 +87,7 @@ class ConcourseItemUpdate(BaseModel):
     status: ConcourseItemStatus | None = None
     translations: list[ConcourseItemTranslationCreate] | None = None
     tag_ids: list[int] | None = None
+    change_comment: str | None = Field(None, max_length=500)
 
 
 class ConcourseItemBulkCreate(BaseModel):
@@ -172,3 +174,41 @@ class StaleStatementRead(BaseModel):
     source_deleted: bool
     current_translations: list[StaleTranslation]
     concourse_translations: list[StaleTranslation]
+
+
+# Version & Comment Schemas
+
+
+class ConcourseItemVersionRead(BaseModel):
+    """Schema for reading a concourse item version snapshot."""
+
+    id: int
+    item_id: int
+    version_number: int
+    code: str
+    status: ConcourseItemStatus
+    source: str | None = None
+    translations_snapshot: list[dict[str, str]] = []
+    tag_ids_snapshot: list[int] = []
+    change_comment: str | None = None
+    changed_by: int | None = None
+    changed_at: datetime
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ConcourseItemCommentCreate(BaseModel):
+    """Schema for creating a comment on a concourse item."""
+
+    body: str = Field(..., min_length=1, max_length=2000)
+
+
+class ConcourseItemCommentRead(BaseModel):
+    """Schema for reading a comment on a concourse item."""
+
+    id: int
+    item_id: int
+    user_id: int | None = None
+    body: str
+    created_at: datetime
+    updated_at: datetime
+    model_config = ConfigDict(from_attributes=True)

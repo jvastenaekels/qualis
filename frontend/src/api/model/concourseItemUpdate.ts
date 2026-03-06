@@ -9,6 +9,7 @@ import type { ConcourseItemUpdateSource } from './concourseItemUpdateSource';
 import type { ConcourseItemUpdateStatus } from './concourseItemUpdateStatus';
 import type { ConcourseItemUpdateTranslations } from './concourseItemUpdateTranslations';
 import type { ConcourseItemUpdateTagIds } from './concourseItemUpdateTagIds';
+import type { ConcourseItemUpdateChangeComment } from './concourseItemUpdateChangeComment';
 
 /**
  * Schema for updating a concourse item. Version is required for optimistic locking.
@@ -21,4 +22,5 @@ export interface ConcourseItemUpdate {
     status?: ConcourseItemUpdateStatus;
     translations?: ConcourseItemUpdateTranslations;
     tag_ids?: ConcourseItemUpdateTagIds;
+    change_comment?: ConcourseItemUpdateChangeComment;
 }

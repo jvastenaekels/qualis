@@ -611,7 +611,18 @@
                 "proposed": "Proposed",
                 "accepted": "Accepted",
                 "rejected": "Rejected"
-            }
+            },
+            "change_note_placeholder": "Change note (optional)",
+            "history": "History",
+            "comments": "Comments",
+            "no_history": "No edit history yet.",
+            "no_comments": "No comments yet.",
+            "add_comment": "Write a comment...",
+            "send_comment": "Send",
+            "comment_added": "Comment added",
+            "comment_error": "Failed to add comment",
+            "version_label": "v{{n}}",
+            "item_detail_desc": "History and comments for this item"
         },
         "concourse_import": {
             "title": "Import from Concourse",

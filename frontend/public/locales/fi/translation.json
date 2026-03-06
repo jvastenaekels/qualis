@@ -603,7 +603,18 @@
                 "proposed": "Ehdotettu",
                 "accepted": "Hyväksytty",
                 "rejected": "Hylätty"
-            }
+            },
+            "change_note_placeholder": "Muutoshuomautus (valinnainen)",
+            "history": "Historia",
+            "comments": "Kommentit",
+            "no_history": "Ei muokkaushistoriaa.",
+            "no_comments": "Ei kommentteja.",
+            "add_comment": "Kirjoita kommentti...",
+            "send_comment": "Lähetä",
+            "comment_added": "Kommentti lisätty",
+            "comment_error": "Kommentin lisääminen epäonnistui",
+            "version_label": "v{{n}}",
+            "item_detail_desc": "Kohteen historia ja kommentit"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",

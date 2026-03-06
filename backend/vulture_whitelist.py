@@ -49,6 +49,13 @@ concourse_tags
 accepted
 rejected
 creator
+versions
+comments
+translations_snapshot
+tag_ids_snapshot
+changed_by
+changed_at
+comment_count
 
 # --- app/routers/ (FastAPI endpoints) ---
 # admin/exports.py
@@ -95,6 +102,9 @@ check_stale_statements
 sync_statement_from_concourse
 sync_all_stale_statements
 import_items_from_text
+list_item_versions
+list_item_comments
+create_item_comment
 
 # admin/analysis.py
 get_eigenvalues
