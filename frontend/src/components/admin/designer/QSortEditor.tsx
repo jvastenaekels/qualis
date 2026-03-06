@@ -121,7 +121,7 @@ function SortableStatementItem({
             ref={setNodeRef}
             style={style}
             className={cn(
-                'flex items-center gap-3 p-3 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100',
+                'flex flex-wrap sm:flex-nowrap items-center gap-3 p-3 bg-white border-none shadow-sm rounded-2xl text-sm group transition-all hover:shadow-md hover:ring-1 hover:ring-indigo-100',
                 isDragging && 'opacity-50 z-50 shadow-xl ring-2 ring-indigo-500/20'
             )}
         >
@@ -173,7 +173,7 @@ function SortableStatementItem({
                             variant="ghost"
                             size="icon"
                             onClick={handleSaveStatement}
-                            className="h-8 w-8 text-green-600 hover:bg-green-50 rounded-lg"
+                            className="h-9 w-9 text-green-600 hover:bg-green-50 rounded-xl"
                         >
                             <CheckCircle2 className="h-4 w-4" />
                         </Button>
@@ -181,7 +181,7 @@ function SortableStatementItem({
                             variant="ghost"
                             size="icon"
                             onClick={() => setEditingIndex(null)}
-                            className="h-8 w-8 text-slate-400 hover:bg-slate-50 rounded-lg"
+                            className="h-9 w-9 text-slate-400 hover:bg-slate-50 rounded-xl"
                         >
                             <AlertCircle className="h-4 w-4" />
                         </Button>
@@ -280,7 +280,8 @@ function SortableStatementItem({
                                     }
                                 });
                             }}
-                            className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 transition-all"
+                            aria-label={t('common.delete', 'Delete')}
+                            className="h-9 w-9 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-all"
                         >
                             <Trash2 className="h-4 w-4" />
                         </Button>
@@ -1110,7 +1111,7 @@ const QSortEditor = ({
                             <div
                                 role="status"
                                 aria-live="polite"
-                                className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-2xl text-sm"
+                                className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-2xl text-sm animate-in fade-in slide-in-from-top-1 duration-300"
                             >
                                 <RefreshCw
                                     className="h-4 w-4 text-amber-600 flex-shrink-0"

@@ -166,7 +166,7 @@ export function ImportFromConcourseDialog({
 
                 <div className="space-y-4 py-2 flex-1 overflow-hidden flex flex-col">
                     {/* Concourse selector */}
-                    <div className="flex items-end gap-3">
+                    <div className="flex flex-col sm:flex-row sm:items-end gap-3">
                         <div className="flex-1 space-y-1">
                             <Label className="text-2xs font-black text-slate-500">
                                 {t('admin.concourse_import.select_concourse', 'Concourse')}
@@ -207,7 +207,7 @@ export function ImportFromConcourseDialog({
                                     'admin.concourse_import.code_prefix_placeholder',
                                     'e.g. S'
                                 )}
-                                className="h-10 rounded-xl w-24"
+                                className="h-10 rounded-xl w-full sm:w-24"
                             />
                         </div>
                     </div>
@@ -280,7 +280,7 @@ export function ImportFromConcourseDialog({
                                             }
                                         }}
                                         className={cn(
-                                            'flex items-start gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50/50 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
+                                            'flex items-start gap-3 px-4 py-2.5 cursor-pointer hover:bg-slate-50/50 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-inset',
                                             selectedItemIds.has(item.id) && 'bg-indigo-50/30'
                                         )}
                                     >
@@ -344,7 +344,7 @@ export function ImportFromConcourseDialog({
 
                 <DialogFooter className="border-t pt-4">
                     {replaceExisting && (
-                        <p className="text-xs text-amber-600 font-medium mr-auto">
+                        <p className="text-sm text-amber-700 font-semibold mr-auto border-l-2 border-amber-400 pl-2">
                             {t(
                                 'admin.concourse_import.replace_warning',
                                 'This will delete all existing statements in the study.'

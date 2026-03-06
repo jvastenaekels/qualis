@@ -642,7 +642,7 @@ export default function ConcourseDetailPage() {
 
             {/* Danger Zone */}
             {can('workspace:delete') && (
-                <Card className="border-red-100 bg-red-50/30 rounded-2xl">
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden border-l-4 border-l-red-500">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-sm font-black text-red-700">
                             {t('admin.concourse.danger_zone', 'Danger Zone')}
