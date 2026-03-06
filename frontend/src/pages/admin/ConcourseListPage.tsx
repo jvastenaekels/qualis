@@ -87,7 +87,7 @@ export default function ConcourseListPage() {
                                     {t('admin.concourse.create', 'New Concourse')}
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-md">
+                            <DialogContent className="border-slate-200 bg-white shadow-lg max-w-md">
                                 <DialogHeader>
                                     <DialogTitle className="text-xl font-black text-slate-900">
                                         {t(

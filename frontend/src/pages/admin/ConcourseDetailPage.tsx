@@ -328,8 +328,8 @@ export default function ConcourseDetailPage() {
                             className="rounded-xl"
                             onClick={() => navigate(`/app/${workspace?.slug}/concourses`)}
                         >
-                            <ArrowLeft className="size-4 mr-1" />
-                            {t('common.back', 'Back')}
+                            <ArrowLeft className="size-4 sm:mr-1" />
+                            <span className="hidden sm:inline">{t('common.back', 'Back')}</span>
                         </Button>
                         {canEdit && (
                             <>
@@ -339,16 +339,20 @@ export default function ConcourseDetailPage() {
                                     className="rounded-xl"
                                     onClick={() => setImportOpen(true)}
                                 >
-                                    <Upload className="size-4 mr-1" />
-                                    {t('admin.concourse.bulk_import', 'Bulk Import')}
+                                    <Upload className="size-4 sm:mr-1" />
+                                    <span className="hidden sm:inline">
+                                        {t('admin.concourse.bulk_import', 'Bulk Import')}
+                                    </span>
                                 </Button>
                                 <Button
                                     size="sm"
                                     className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
                                     onClick={() => setAddItemOpen(true)}
                                 >
-                                    <Plus className="size-4 mr-1" />
-                                    {t('admin.concourse.add_item', 'Add Item')}
+                                    <Plus className="size-4 sm:mr-1" />
+                                    <span className="hidden sm:inline">
+                                        {t('admin.concourse.add_item', 'Add Item')}
+                                    </span>
                                 </Button>
                             </>
                         )}
@@ -443,23 +447,152 @@ export default function ConcourseDetailPage() {
                                 return (
                                     <div
                                         key={item.id}
-                                        className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50/50 transition-colors group"
+                                        className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 px-4 py-3 hover:bg-slate-50/50 transition-colors group"
                                     >
-                                        {/* Code badge */}
-                                        <div className="flex-shrink-0 pt-0.5">
-                                            {isEditing ? (
-                                                <Input
-                                                    value={editCode}
-                                                    onChange={(e) => setEditCode(e.target.value)}
-                                                    className="h-7 w-16 text-xs font-mono rounded-lg"
-                                                />
-                                            ) : (
-                                                <Badge
-                                                    variant="outline"
-                                                    className="font-mono text-2xs bg-slate-50"
-                                                >
-                                                    {item.code}
-                                                </Badge>
+                                        {/* Code + Status (mobile: same row) */}
+                                        <div className="flex items-center gap-2 sm:contents">
+                                            {/* Code badge */}
+                                            <div className="flex-shrink-0 sm:pt-0.5">
+                                                {isEditing ? (
+                                                    <Input
+                                                        value={editCode}
+                                                        onChange={(e) =>
+                                                            setEditCode(e.target.value)
+                                                        }
+                                                        className="h-7 w-16 text-xs font-mono rounded-lg"
+                                                    />
+                                                ) : (
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="font-mono text-2xs bg-slate-50"
+                                                    >
+                                                        {item.code}
+                                                    </Badge>
+                                                )}
+                                            </div>
+
+                                            {/* Status (mobile: next to code) */}
+                                            <div className="sm:hidden">
+                                                {canEdit && !isEditing ? (
+                                                    <Select
+                                                        value={item.status}
+                                                        onValueChange={(val) =>
+                                                            changeStatus(
+                                                                item,
+                                                                val as ConcourseItemStatus
+                                                            )
+                                                        }
+                                                    >
+                                                        <SelectTrigger
+                                                            className={cn(
+                                                                'h-7 w-[100px] rounded-lg text-2xs font-bold border',
+                                                                STATUS_COLORS[item.status] ?? ''
+                                                            )}
+                                                        >
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent className="rounded-xl">
+                                                            <SelectItem value="proposed">
+                                                                {t(
+                                                                    'admin.concourse.status.proposed',
+                                                                    'Proposed'
+                                                                )}
+                                                            </SelectItem>
+                                                            <SelectItem value="accepted">
+                                                                {t(
+                                                                    'admin.concourse.status.accepted',
+                                                                    'Accepted'
+                                                                )}
+                                                            </SelectItem>
+                                                            <SelectItem value="rejected">
+                                                                {t(
+                                                                    'admin.concourse.status.rejected',
+                                                                    'Rejected'
+                                                                )}
+                                                            </SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                ) : !isEditing ? (
+                                                    <Badge
+                                                        variant="outline"
+                                                        className={cn(
+                                                            'text-2xs font-bold',
+                                                            STATUS_COLORS[item.status] ?? ''
+                                                        )}
+                                                    >
+                                                        {item.status}
+                                                    </Badge>
+                                                ) : null}
+                                            </div>
+
+                                            {/* Actions (mobile: next to code+status) */}
+                                            {canEdit && (
+                                                <div className="flex items-center gap-1 flex-shrink-0 sm:hidden ml-auto">
+                                                    {isEditing ? (
+                                                        <>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                aria-label={t(
+                                                                    'common.save',
+                                                                    'Save'
+                                                                )}
+                                                                className="size-8 p-0 text-emerald-600 hover:bg-emerald-50"
+                                                                onClick={() => saveEdit(item)}
+                                                                disabled={
+                                                                    updateItemMutation.isPending
+                                                                }
+                                                            >
+                                                                {updateItemMutation.isPending ? (
+                                                                    <Loader2 className="size-3.5 animate-spin" />
+                                                                ) : (
+                                                                    <Check className="size-3.5" />
+                                                                )}
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                aria-label={t(
+                                                                    'common.cancel',
+                                                                    'Cancel'
+                                                                )}
+                                                                className="size-8 p-0 text-slate-400 hover:bg-slate-100"
+                                                                onClick={() => setEditingItem(null)}
+                                                            >
+                                                                <X className="size-3.5" />
+                                                            </Button>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                aria-label={t(
+                                                                    'common.edit',
+                                                                    'Edit'
+                                                                )}
+                                                                className="size-8 p-0 text-slate-400 hover:text-slate-700"
+                                                                onClick={() => startEdit(item)}
+                                                            >
+                                                                <Pencil className="size-3.5" />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                aria-label={t(
+                                                                    'common.delete',
+                                                                    'Delete'
+                                                                )}
+                                                                className="size-8 p-0 text-slate-400 hover:text-red-500 hover:bg-red-50"
+                                                                onClick={() =>
+                                                                    setDeleteConfirmId(item.id)
+                                                                }
+                                                            >
+                                                                <Trash2 className="size-3.5" />
+                                                            </Button>
+                                                        </>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
 
@@ -522,58 +655,63 @@ export default function ConcourseDetailPage() {
                                             )}
                                         </div>
 
-                                        {/* Status */}
-                                        {canEdit && !isEditing ? (
-                                            <Select
-                                                value={item.status}
-                                                onValueChange={(val) =>
-                                                    changeStatus(item, val as ConcourseItemStatus)
-                                                }
-                                            >
-                                                <SelectTrigger
+                                        {/* Status (desktop only — mobile shown in top row) */}
+                                        <div className="hidden sm:block">
+                                            {canEdit && !isEditing ? (
+                                                <Select
+                                                    value={item.status}
+                                                    onValueChange={(val) =>
+                                                        changeStatus(
+                                                            item,
+                                                            val as ConcourseItemStatus
+                                                        )
+                                                    }
+                                                >
+                                                    <SelectTrigger
+                                                        className={cn(
+                                                            'h-7 w-[100px] rounded-lg text-2xs font-bold border',
+                                                            STATUS_COLORS[item.status] ?? ''
+                                                        )}
+                                                    >
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent className="rounded-xl">
+                                                        <SelectItem value="proposed">
+                                                            {t(
+                                                                'admin.concourse.status.proposed',
+                                                                'Proposed'
+                                                            )}
+                                                        </SelectItem>
+                                                        <SelectItem value="accepted">
+                                                            {t(
+                                                                'admin.concourse.status.accepted',
+                                                                'Accepted'
+                                                            )}
+                                                        </SelectItem>
+                                                        <SelectItem value="rejected">
+                                                            {t(
+                                                                'admin.concourse.status.rejected',
+                                                                'Rejected'
+                                                            )}
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            ) : !isEditing ? (
+                                                <Badge
+                                                    variant="outline"
                                                     className={cn(
-                                                        'h-7 w-[100px] rounded-lg text-2xs font-bold border',
+                                                        'text-2xs font-bold',
                                                         STATUS_COLORS[item.status] ?? ''
                                                     )}
                                                 >
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent className="rounded-xl">
-                                                    <SelectItem value="proposed">
-                                                        {t(
-                                                            'admin.concourse.status.proposed',
-                                                            'Proposed'
-                                                        )}
-                                                    </SelectItem>
-                                                    <SelectItem value="accepted">
-                                                        {t(
-                                                            'admin.concourse.status.accepted',
-                                                            'Accepted'
-                                                        )}
-                                                    </SelectItem>
-                                                    <SelectItem value="rejected">
-                                                        {t(
-                                                            'admin.concourse.status.rejected',
-                                                            'Rejected'
-                                                        )}
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        ) : !isEditing ? (
-                                            <Badge
-                                                variant="outline"
-                                                className={cn(
-                                                    'text-2xs font-bold',
-                                                    STATUS_COLORS[item.status] ?? ''
-                                                )}
-                                            >
-                                                {item.status}
-                                            </Badge>
-                                        ) : null}
+                                                    {item.status}
+                                                </Badge>
+                                            ) : null}
+                                        </div>
 
-                                        {/* Actions */}
+                                        {/* Actions (desktop only — mobile shown in top row) */}
                                         {canEdit && (
-                                            <div className="flex items-center gap-1 flex-shrink-0">
+                                            <div className="hidden sm:flex items-center gap-1 flex-shrink-0">
                                                 {isEditing ? (
                                                     <>
                                                         <Button
@@ -664,7 +802,7 @@ export default function ConcourseDetailPage() {
 
             {/* Add Item Dialog */}
             <Dialog open={addItemOpen} onOpenChange={setAddItemOpen}>
-                <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-md">
+                <DialogContent className="border-slate-200 bg-white shadow-lg max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-black text-slate-900">
                             {t('admin.concourse.add_item', 'Add Item')}
@@ -748,7 +886,7 @@ export default function ConcourseDetailPage() {
                     if (!open) setDeleteConfirmId(null);
                 }}
             >
-                <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-sm">
+                <DialogContent className="border-slate-200 bg-white shadow-lg max-w-sm">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-black text-slate-900">
                             {t('admin.concourse.delete_item_title', 'Delete Item')}
@@ -792,7 +930,7 @@ export default function ConcourseDetailPage() {
 
             {/* Delete Concourse Confirmation Dialog */}
             <Dialog open={deleteConcourseOpen} onOpenChange={setDeleteConcourseOpen}>
-                <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-sm">
+                <DialogContent className="border-slate-200 bg-white shadow-lg max-w-sm">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-black text-slate-900">
                             {t('admin.concourse.delete', 'Delete Concourse')}
@@ -834,7 +972,7 @@ export default function ConcourseDetailPage() {
 
             {/* Bulk Import Dialog */}
             <Dialog open={importOpen} onOpenChange={setImportOpen}>
-                <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-lg">
+                <DialogContent className="border-slate-200 bg-white shadow-lg max-w-lg">
                     <DialogHeader>
                         <DialogTitle className="text-lg font-black text-slate-900">
                             {t('admin.concourse.bulk_import', 'Bulk Import')}
