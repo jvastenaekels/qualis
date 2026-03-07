@@ -211,7 +211,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     // For legacy routes
     const isValidStudy =
         activeStudyId &&
-        studies?.some((s) => s.slug === activeStudyId && s.workspace_id === activeProjectId);
+        studies?.some((s) => s.slug === activeStudyId && s.project_id === activeProjectId);
 
     // Project-level navigation (always visible in new architecture)
     const projectNav = projectSlug
@@ -287,7 +287,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             : [];
 
     const activeStudy = studies?.find(
-        (s) => s.slug === activeStudyId && s.workspace_id === activeProjectId
+        (s) => s.slug === activeStudyId && s.project_id === activeProjectId
     );
 
     // Legacy navigation for backward compatibility
@@ -303,8 +303,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           url:
                               projectSlug && activeStudyId
                                   ? `/app/${projectSlug}/studies/${activeStudyId}`
-                                  : activeStudy?.workspace?.slug && activeStudyId
-                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}`
+                                  : activeStudy?.project?.slug && activeStudyId
+                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}`
                                     : `/admin/studies/${activeStudyId}`,
                           icon: LayoutDashboard,
                       },
@@ -313,8 +313,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           url:
                               projectSlug && activeStudyId
                                   ? `/app/${projectSlug}/studies/${activeStudyId}/design`
-                                  : activeStudy?.workspace?.slug && activeStudyId
-                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/design`
+                                  : activeStudy?.project?.slug && activeStudyId
+                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/design`
                                     : `/admin/studies/${activeStudyId}/design`,
                           icon: Wand2,
                       },
@@ -323,8 +323,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           url:
                               projectSlug && activeStudyId
                                   ? `/app/${projectSlug}/studies/${activeStudyId}/recruitment`
-                                  : activeStudy?.workspace?.slug && activeStudyId
-                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/recruitment`
+                                  : activeStudy?.project?.slug && activeStudyId
+                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/recruitment`
                                     : `/admin/studies/${activeStudyId}/recruitment`,
                           icon: Users,
                       },
@@ -333,8 +333,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           url:
                               projectSlug && activeStudyId
                                   ? `/app/${projectSlug}/studies/${activeStudyId}/data`
-                                  : activeStudy?.workspace?.slug && activeStudyId
-                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/data`
+                                  : activeStudy?.project?.slug && activeStudyId
+                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/data`
                                     : `/admin/studies/${activeStudyId}/exports`,
                           icon: Table,
                       },
@@ -343,8 +343,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           url:
                               projectSlug && activeStudyId
                                   ? `/app/${projectSlug}/studies/${activeStudyId}/analysis`
-                                  : activeStudy?.workspace?.slug && activeStudyId
-                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/analysis`
+                                  : activeStudy?.project?.slug && activeStudyId
+                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/analysis`
                                     : `/admin/studies/${activeStudyId}/analysis`,
                           icon: ChartColumnStacked,
                       },
@@ -353,8 +353,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                           url:
                               projectSlug && activeStudyId
                                   ? `/app/${projectSlug}/studies/${activeStudyId}/settings`
-                                  : activeStudy?.workspace?.slug && activeStudyId
-                                    ? `/app/${activeStudy.workspace.slug}/studies/${activeStudyId}/settings`
+                                  : activeStudy?.project?.slug && activeStudyId
+                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/settings`
                                     : `/admin/studies/${activeStudyId}/settings`,
                           icon: Settings,
                       },

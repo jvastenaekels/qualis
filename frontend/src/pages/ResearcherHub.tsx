@@ -111,9 +111,8 @@ export default function ResearcherHub() {
                                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                         <TrendingUp className="h-4 w-4" />
                                         <span>
-                                            {allStudies?.filter(
-                                                (s) => s.workspace_id === project.id
-                                            ).length || 0}{' '}
+                                            {allStudies?.filter((s) => s.project_id === project.id)
+                                                .length || 0}{' '}
                                             {t('admin.hub.studies_count', 'studies')}
                                         </span>
                                     </div>
@@ -131,7 +130,7 @@ export default function ResearcherHub() {
                         </h2>
                         <div className="bg-white rounded-lg shadow">
                             {recentStudies.map((study, index) => {
-                                const project = projects?.find((w) => w.id === study.workspace_id);
+                                const project = projects?.find((w) => w.id === study.project_id);
                                 return (
                                     <div
                                         key={study.id}

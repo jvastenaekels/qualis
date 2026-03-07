@@ -77,7 +77,7 @@ export function AdminDashboard() {
     };
     const currentLocale = dateLocales[i18n.language] || enUS;
 
-    const studies = allStudies?.filter((s) => s.workspace_id === currentProject?.id);
+    const studies = allStudies?.filter((s) => s.project_id === currentProject?.id);
 
     const totalStudies = studies?.length ?? 0;
     const activeStudiesCount = studies?.filter((s) => s.state === 'active').length ?? 0;

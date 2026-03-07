@@ -36,7 +36,7 @@ export function StudySwitcher() {
     const studies = studiesData?.items;
     const [showCreateDialog, setShowCreateDialog] = React.useState(false);
 
-    const filteredStudies = studies?.filter((s) => s.workspace_id === activeProjectId);
+    const filteredStudies = studies?.filter((s) => s.project_id === activeProjectId);
     const activeStudy = filteredStudies?.find((s) => s.slug === activeStudyId);
 
     const handleStudySelect = (studySlug: string) => {

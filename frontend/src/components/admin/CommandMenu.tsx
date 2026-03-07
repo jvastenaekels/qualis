@@ -40,7 +40,7 @@ export const CommandMenu = () => {
     const projects = workspacesData?.items;
     const { t } = useTranslation();
 
-    const filteredStudies = studies?.filter((s) => s.workspace_id === activeProjectId);
+    const filteredStudies = studies?.filter((s) => s.project_id === activeProjectId);
     const isValidStudy = activeStudyId && filteredStudies?.some((s) => s.slug === activeStudyId);
 
     // Toggle on Cmd+K or Ctrl+K
@@ -168,9 +168,7 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() => {
                                         setActiveStudy(study.slug);
-                                        const ws = projects?.find(
-                                            (w) => w.id === study.workspace_id
-                                        );
+                                        const ws = projects?.find((w) => w.id === study.project_id);
                                         if (ws) {
                                             navigate(`/app/${ws.slug}/studies/${study.slug}`);
                                         }

@@ -62,7 +62,7 @@ export default function StudyFocusLayout() {
     }
 
     // Validate that the study belongs to the current project
-    if (project && study.workspace_id !== project.id) {
+    if (project && study.project_id !== project.id) {
         return <Navigate to={`/app/${project.slug}/dashboard`} replace />;
     }
 

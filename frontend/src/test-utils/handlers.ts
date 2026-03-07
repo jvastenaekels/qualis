@@ -11,7 +11,7 @@ const demoStudy: StudyRead = {
     state: 'draft',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-    workspace_id: 1,
+    project_id: 1,
     default_language: 'en',
     translations: [
         {

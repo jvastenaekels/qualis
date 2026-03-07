@@ -41,7 +41,7 @@ export const useAdminStore = create<AdminState>()(
                         delete state.activeWorkspaceId;
                     }
                 }
-                return state as AdminState;
+                return state as unknown as AdminState;
             },
             partialize: (state) => ({
                 activeProjectId: state.activeProjectId,

@@ -59,7 +59,7 @@ export const useAuthStore = create<AuthState>()(
                         delete state.currentWorkspace;
                     }
                 }
-                return state as AuthState;
+                return state as unknown as AuthState;
             },
         }
     )

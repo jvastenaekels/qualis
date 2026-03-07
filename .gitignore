@@ -47,3 +47,7 @@ test_out*.txt
 pre_commit_output*.txt
 *_VERIFICATION*.md
 *_SUMMARY.md
+
+# Research articles
+article/
+reference-articles/
