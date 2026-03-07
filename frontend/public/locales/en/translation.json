@@ -648,7 +648,11 @@
             "bulk_set_status": "Set status:",
             "bulk_clear": "Clear",
             "bulk_status_success": "{{count}} items updated",
-            "bulk_status_error": "Failed to update some items"
+            "bulk_status_error": "Failed to update some items",
+            "qset_title": "Q-set",
+            "qset_pending": "{{count}} items still to review",
+            "qset_complete": "All items reviewed",
+            "show_pending": "To review"
         },
         "concourse_import": {
             "title": "Import from Concourse",

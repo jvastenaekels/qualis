@@ -15,6 +15,8 @@ import {
     Clock,
     MessageSquare,
     Settings2,
+    CheckSquare,
+    Filter,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
@@ -564,49 +566,138 @@ export default function ConcourseDetailPage() {
                 </span>
             </div>
 
-            {/* Statistics Summary */}
-            {concourse.items && concourse.items.length > 0 && (
-                <div className="flex flex-wrap gap-3">
-                    {(['proposed', 'accepted', 'rejected'] as const).map((status) => {
+            {/* Q-set Progress */}
+            {concourse.items &&
+                concourse.items.length > 0 &&
+                (() => {
+                    const totalCount = concourse.items.length;
+                    const acceptedCt = concourse.items.filter(
+                        (i) => i.status === 'accepted'
+                    ).length;
+                    const proposedCt = concourse.items.filter(
+                        (i) => i.status === 'proposed'
+                    ).length;
+                    const rejectedCt = concourse.items.filter(
+                        (i) => i.status === 'rejected'
+                    ).length;
+                    const progress =
+                        totalCount > 0 ? ((acceptedCt + rejectedCt) / totalCount) * 100 : 0;
+
+                    return (
+                        <div className="rounded-xl border border-emerald-200 bg-emerald-50/50 px-4 py-3">
+                            <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex items-center gap-3">
+                                    <CheckSquare className="size-4 text-emerald-600 shrink-0" />
+                                    <div>
+                                        <p className="text-sm font-bold text-emerald-900">
+                                            {t('admin.concourse.qset_title', 'Q-set')}
+                                            <span className="ml-2 text-lg font-black">
+                                                {acceptedCt}
+                                            </span>
+                                            <span className="text-emerald-600 font-normal text-xs ml-1">
+                                                / {totalCount}{' '}
+                                                {t('admin.concourse.items_label', 'items')}
+                                            </span>
+                                        </p>
+                                        <p className="text-xs text-emerald-700 mt-0.5">
+                                            {proposedCt > 0
+                                                ? t(
+                                                      'admin.concourse.qset_pending',
+                                                      '{{count}} items still to review',
+                                                      { count: proposedCt }
+                                                  )
+                                                : t(
+                                                      'admin.concourse.qset_complete',
+                                                      'All items reviewed'
+                                                  )}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="flex items-center gap-2 text-xs">
+                                        <span
+                                            className={cn(
+                                                'rounded-lg border px-2 py-0.5 font-bold',
+                                                STATUS_COLORS.accepted
+                                            )}
+                                        >
+                                            {acceptedCt}
+                                        </span>
+                                        <span
+                                            className={cn(
+                                                'rounded-lg border px-2 py-0.5 font-bold',
+                                                STATUS_COLORS.proposed
+                                            )}
+                                        >
+                                            {proposedCt}
+                                        </span>
+                                        <span
+                                            className={cn(
+                                                'rounded-lg border px-2 py-0.5 font-bold',
+                                                STATUS_COLORS.rejected
+                                            )}
+                                        >
+                                            {rejectedCt}
+                                        </span>
+                                    </div>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className={cn(
+                                            'h-7 rounded-lg text-2xs font-bold',
+                                            filterStatus === 'accepted'
+                                                ? 'bg-emerald-100 border-emerald-300 text-emerald-800'
+                                                : filterStatus === 'proposed'
+                                                  ? 'bg-amber-100 border-amber-300 text-amber-800'
+                                                  : ''
+                                        )}
+                                        onClick={() => {
+                                            if (filterStatus === 'proposed') {
+                                                setFilterStatus('all');
+                                            } else {
+                                                setFilterStatus('proposed');
+                                            }
+                                        }}
+                                    >
+                                        <Filter className="size-3 mr-1" />
+                                        {filterStatus === 'proposed'
+                                            ? t('common.all', 'All')
+                                            : t('admin.concourse.show_pending', 'To review')}
+                                    </Button>
+                                </div>
+                            </div>
+                            {/* Progress bar */}
+                            <div className="mt-2.5 h-1.5 rounded-full bg-emerald-100 overflow-hidden">
+                                <div
+                                    className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                                    style={{ width: `${progress}%` }}
+                                />
+                            </div>
+                        </div>
+                    );
+                })()}
+
+            {/* Tag breakdown */}
+            {tags && tags.length > 0 && concourse.items && concourse.items.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                    {tags.map((tag) => {
                         const count =
-                            concourse.items?.filter((i) => i.status === status).length ?? 0;
+                            concourse.items?.filter((i) => i.tags?.some((t) => t.id === tag.id))
+                                .length ?? 0;
                         return (
                             <div
-                                key={status}
-                                className={cn(
-                                    'flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold',
-                                    STATUS_COLORS[status]
-                                )}
+                                key={tag.id}
+                                className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs"
                             >
-                                <span>{t(`admin.concourse.status.${status}`, status)}</span>
-                                <span className="font-black">{count}</span>
+                                <div
+                                    className="size-2.5 rounded-full"
+                                    style={{ backgroundColor: tag.color ?? '#94a3b8' }}
+                                />
+                                <span className="text-slate-600">{tag.name}</span>
+                                <span className="font-bold text-slate-800">{count}</span>
                             </div>
                         );
                     })}
-                    {tags && tags.length > 0 && (
-                        <>
-                            <div className="w-px bg-slate-200 self-stretch" />
-                            {tags.map((tag) => {
-                                const count =
-                                    concourse.items?.filter((i) =>
-                                        i.tags?.some((t) => t.id === tag.id)
-                                    ).length ?? 0;
-                                return (
-                                    <div
-                                        key={tag.id}
-                                        className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs"
-                                    >
-                                        <div
-                                            className="size-2.5 rounded-full"
-                                            style={{ backgroundColor: tag.color ?? '#94a3b8' }}
-                                        />
-                                        <span className="text-slate-600">{tag.name}</span>
-                                        <span className="font-bold text-slate-800">{count}</span>
-                                    </div>
-                                );
-                            })}
-                        </>
-                    )}
                 </div>
             )}
 

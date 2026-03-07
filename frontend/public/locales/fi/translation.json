@@ -633,7 +633,11 @@
             "bulk_set_status": "Aseta tila:",
             "bulk_clear": "Tyhjennä",
             "bulk_status_success": "{{count}} kohdetta päivitetty",
-            "bulk_status_error": "Joidenkin kohteiden päivitys epäonnistui"
+            "bulk_status_error": "Joidenkin kohteiden päivitys epäonnistui",
+            "qset_title": "Q-set",
+            "qset_pending": "{{count}} kohdetta vielä tarkistettavana",
+            "qset_complete": "Kaikki kohteet tarkistettu",
+            "show_pending": "Tarkistettavat"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",
