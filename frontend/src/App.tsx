@@ -41,7 +41,6 @@ import ProjectLayout from './layouts/ProjectLayout';
 import StudyFocusLayout from './layouts/StudyFocusLayout';
 const StudyOverviewPage = lazy(() => import('./pages/admin/StudyOverviewPage'));
 const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
-const TeamManagementPage = lazy(() => import('./pages/admin/TeamManagementPage'));
 const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
 const AnalysisPage = lazy(() => import('./pages/admin/AnalysisPage'));
 
@@ -58,7 +57,6 @@ import { recruitmentPageLoader } from './pages/admin/RecruitmentPage.loader';
 
 import { studyLayoutLoader } from './layouts/StudyLayout.loader';
 import { studyOverviewPageLoader } from './pages/admin/StudyOverviewPage.loader';
-import { teamManagementPageLoader } from './pages/admin/TeamManagementPage.loader';
 import { dataExportsPageLoader } from './pages/admin/DataExportsPage.loader';
 import { generalSettingsPageLoader } from './pages/admin/GeneralSettingsPage.loader';
 import { projectSettingsPageLoader } from './pages/admin/ProjectSettingsPage.loader';
@@ -126,12 +124,6 @@ const router = createBrowserRouter([
                             {
                                 path: 'dashboard',
                                 element: <AdminDashboard />,
-                            },
-                            {
-                                path: 'team',
-                                element: <TeamManagementPage />,
-                                loader: teamManagementPageLoader,
-                                HydrateFallback: DesignerSkeleton,
                             },
                             {
                                 path: 'settings',

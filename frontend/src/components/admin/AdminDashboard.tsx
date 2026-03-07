@@ -35,6 +35,8 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useTranslation } from 'react-i18next';
 import { usePermission } from '@/hooks/usePermission';
 import type { StudyRead } from '@/api/model/studyRead';
+import type { ProjectMemberRead } from '@/api/model/projectMemberRead';
+import type { ConcourseTagRead } from '@/api/model/concourseTagRead';
 
 type TranslateFn = ReturnType<typeof useTranslation>['t'];
 
@@ -199,9 +201,33 @@ export function AdminDashboard() {
 
     const hasStudies = studies && studies.length > 0;
     const hasConcourseItems = totalItems > 0;
+    const hasActiveStudy = activeStudies.length > 0;
+    const hasLaunchedStudy =
+        hasActiveStudy ||
+        (studies?.some((s) => s.state === 'closed' || s.state === 'paused') ?? false);
+    const hasParticipants = totalParticipants > 0;
 
-    // Empty state: guided onboarding
-    if (!hasStudies && !hasConcourseItems) {
+    // Onboarding progress
+    const onboardingDone = {
+        project: true,
+        concourse: hasConcourseItems,
+        study: !!hasStudies,
+        import: hasLaunchedStudy || hasParticipants,
+        launch: hasActiveStudy || hasParticipants,
+    };
+    const allStepsDone = Object.values(onboardingDone).every(Boolean);
+
+    // Show onboarding when not all steps are complete
+    if (!allStepsDone) {
+        // Find next action step
+        const nextStep = !onboardingDone.concourse
+            ? 'concourse'
+            : !onboardingDone.study
+              ? 'study'
+              : !onboardingDone.import
+                ? 'import'
+                : 'launch';
+
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 md:p-8 max-w-[1100px] mx-auto w-full animate-in fade-in-50 duration-500">
                 <div>
@@ -219,7 +245,7 @@ export function AdminDashboard() {
                         <ol className="space-y-4">
                             <OnboardingStep
                                 step={1}
-                                done
+                                done={onboardingDone.project}
                                 title={t(
                                     'admin.dashboard.step_create_project',
                                     'Create your project'
@@ -231,29 +257,37 @@ export function AdminDashboard() {
                             />
                             <OnboardingStep
                                 step={2}
-                                done={false}
+                                done={onboardingDone.concourse}
                                 title={t('admin.dashboard.step_concourse', 'Build your concourse')}
                                 description={t(
                                     'admin.dashboard.step_concourse_desc',
                                     'Add the candidate statements that participants will sort.'
                                 )}
-                                action={() => navigate(`/app/${projectSlug}/concourses`)}
+                                action={
+                                    nextStep === 'concourse'
+                                        ? () => navigate(`/app/${projectSlug}/concourses`)
+                                        : undefined
+                                }
                                 actionLabel={t('admin.dashboard.go_to_concourse', 'Open concourse')}
                             />
                             <OnboardingStep
                                 step={3}
-                                done={false}
+                                done={onboardingDone.study}
                                 title={t('admin.dashboard.step_study', 'Create a study')}
                                 description={t(
                                     'admin.dashboard.step_study_desc',
                                     'Configure the sorting grid, instructions, and participant flow.'
                                 )}
-                                action={() => setShowCreateDialog(true)}
+                                action={
+                                    nextStep === 'study'
+                                        ? () => setShowCreateDialog(true)
+                                        : undefined
+                                }
                                 actionLabel={t('admin.dashboard.create_study', 'Create study')}
                             />
                             <OnboardingStep
                                 step={4}
-                                done={false}
+                                done={onboardingDone.import}
                                 title={t(
                                     'admin.dashboard.step_import',
                                     'Import accepted items into your study'
@@ -262,19 +296,75 @@ export function AdminDashboard() {
                                     'admin.dashboard.step_import_desc',
                                     'Select which concourse items become study statements.'
                                 )}
+                                action={
+                                    nextStep === 'import' && hasStudies
+                                        ? () => handleOpenStudy(studies[0].slug)
+                                        : undefined
+                                }
+                                actionLabel={t('admin.dashboard.open_study', 'Open study')}
                             />
                             <OnboardingStep
                                 step={5}
-                                done={false}
+                                done={onboardingDone.launch}
                                 title={t('admin.dashboard.step_launch', 'Launch recruitment')}
                                 description={t(
                                     'admin.dashboard.step_launch_desc',
                                     'Generate participation links and share them.'
                                 )}
+                                action={
+                                    nextStep === 'launch' && hasStudies
+                                        ? () => handleOpenStudy(studies[0].slug)
+                                        : undefined
+                                }
+                                actionLabel={t('admin.dashboard.open_study', 'Open study')}
                             />
                         </ol>
                     </CardContent>
                 </Card>
+
+                {/* Still show studies/concourse below onboarding if they exist */}
+                {(hasStudies || hasConcourseItems) && (
+                    <>
+                        {/* Concourse + Team row */}
+                        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+                            <ConcourseCard
+                                totalItems={totalItems}
+                                acceptedCount={acceptedCount}
+                                proposedCount={proposedCount}
+                                rejectedCount={rejectedCount}
+                                tags={tags}
+                                onNavigate={() => navigate(`/app/${projectSlug}/concourses`)}
+                                t={t}
+                            />
+                            <TeamCard
+                                members={members}
+                                canManage={can('project:settings')}
+                                onNavigate={() => navigate(`/app/${projectSlug}/settings`)}
+                                t={t}
+                            />
+                        </div>
+
+                        {hasStudies && (
+                            <>
+                                <div className="space-y-1">
+                                    <h2 className="text-lg font-semibold">
+                                        {t('admin.dashboard.studies', 'Studies')}
+                                    </h2>
+                                </div>
+                                <StudyGroups
+                                    activeStudies={activeStudies}
+                                    pausedStudies={pausedStudies}
+                                    draftStudies={draftStudies}
+                                    closedStudies={closedStudies}
+                                    getTitle={getStudyTitle}
+                                    onOpen={handleOpenStudy}
+                                    locale={currentLocale}
+                                    t={t}
+                                />
+                            </>
+                        )}
+                    </>
+                )}
 
                 <CreateStudyDialog
                     open={showCreateDialog}
@@ -362,167 +452,21 @@ export function AdminDashboard() {
 
             {/* Concourse + Team row */}
             <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-                {/* Concourse summary */}
-                <Card
-                    className="md:col-span-2 cursor-pointer hover:border-foreground/20 transition-colors"
-                    onClick={() => navigate(`/app/${projectSlug}/concourses`)}
-                >
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Library className="h-4 w-4 text-muted-foreground" />
-                                <CardTitle className="text-sm font-semibold">
-                                    {t('admin.dashboard.concourse', 'Concourse')}
-                                </CardTitle>
-                            </div>
-                            <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        {totalItems > 0 ? (
-                            <>
-                                <div className="flex items-baseline gap-2">
-                                    <span className="text-2xl font-bold">{totalItems}</span>
-                                    <span className="text-sm text-muted-foreground">
-                                        {t('admin.concourse.items_label', 'items')}
-                                    </span>
-                                </div>
-                                {/* Progress bar */}
-                                <div className="flex h-2.5 rounded-full overflow-hidden bg-slate-100">
-                                    {acceptedCount > 0 && (
-                                        <div
-                                            className="bg-emerald-500 transition-all"
-                                            style={{
-                                                width: `${(acceptedCount / totalItems) * 100}%`,
-                                            }}
-                                        />
-                                    )}
-                                    {proposedCount > 0 && (
-                                        <div
-                                            className="bg-amber-400 transition-all"
-                                            style={{
-                                                width: `${(proposedCount / totalItems) * 100}%`,
-                                            }}
-                                        />
-                                    )}
-                                    {rejectedCount > 0 && (
-                                        <div
-                                            className="bg-red-300 transition-all"
-                                            style={{
-                                                width: `${(rejectedCount / totalItems) * 100}%`,
-                                            }}
-                                        />
-                                    )}
-                                </div>
-                                <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                                    <span className="flex items-center gap-1.5">
-                                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                                        {acceptedCount}{' '}
-                                        {t('admin.concourse.status.accepted', 'Accepted')}
-                                    </span>
-                                    <span className="flex items-center gap-1.5">
-                                        <span className="h-2 w-2 rounded-full bg-amber-400" />
-                                        {proposedCount}{' '}
-                                        {t('admin.concourse.status.proposed', 'Proposed')}
-                                    </span>
-                                    {rejectedCount > 0 && (
-                                        <span className="flex items-center gap-1.5">
-                                            <span className="h-2 w-2 rounded-full bg-red-300" />
-                                            {rejectedCount}{' '}
-                                            {t('admin.concourse.status.rejected', 'Rejected')}
-                                        </span>
-                                    )}
-                                </div>
-                                {/* Tags */}
-                                {tags && tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-1.5 pt-1">
-                                        {tags.map((tag) => (
-                                            <Badge
-                                                key={tag.id}
-                                                variant="outline"
-                                                className="text-2xs font-normal"
-                                            >
-                                                {tag.color && (
-                                                    <span
-                                                        className="h-2 w-2 rounded-full mr-1.5 shrink-0"
-                                                        style={{
-                                                            backgroundColor: tag.color as string,
-                                                        }}
-                                                    />
-                                                )}
-                                                {tag.name}
-                                            </Badge>
-                                        ))}
-                                    </div>
-                                )}
-                            </>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">
-                                {t(
-                                    'admin.dashboard.concourse_empty',
-                                    'No items yet. Start building your statement collection.'
-                                )}
-                            </p>
-                        )}
-                    </CardContent>
-                </Card>
-
-                {/* Team summary */}
-                <Card
-                    className={cn(
-                        'transition-colors',
-                        can('project:settings') && 'cursor-pointer hover:border-foreground/20'
-                    )}
-                    onClick={() =>
-                        can('project:settings') && navigate(`/app/${projectSlug}/settings`)
-                    }
-                >
-                    <CardHeader className="pb-3">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <Users className="h-4 w-4 text-muted-foreground" />
-                                <CardTitle className="text-sm font-semibold">
-                                    {t('admin.dashboard.team', 'Team')}
-                                </CardTitle>
-                            </div>
-                            {can('project:settings') && (
-                                <Settings2 className="h-4 w-4 text-muted-foreground" />
-                            )}
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        {members && members.length > 0 ? (
-                            <div className="space-y-2.5">
-                                {members.map((member) => (
-                                    <div key={member.user_id} className="flex items-center gap-2.5">
-                                        <div className="flex items-center justify-center h-7 w-7 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold shrink-0">
-                                            {member.user?.full_name
-                                                ? member.user.full_name
-                                                      .substring(0, 2)
-                                                      .toUpperCase()
-                                                : member.user?.email?.substring(0, 2).toUpperCase()}
-                                        </div>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="text-sm font-medium truncate">
-                                                {member.user?.full_name || member.user?.email}
-                                            </p>
-                                        </div>
-                                        <Badge variant="outline" className="text-2xs shrink-0">
-                                            {t(
-                                                `admin.project.roles.${member.role}`,
-                                                member.role as string
-                                            )}
-                                        </Badge>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-sm text-muted-foreground">
-                                {t('admin.dashboard.team_loading', 'Loading...')}
-                            </p>
-                        )}
-                    </CardContent>
-                </Card>
+                <ConcourseCard
+                    totalItems={totalItems}
+                    acceptedCount={acceptedCount}
+                    proposedCount={proposedCount}
+                    rejectedCount={rejectedCount}
+                    tags={tags}
+                    onNavigate={() => navigate(`/app/${projectSlug}/concourses`)}
+                    t={t}
+                />
+                <TeamCard
+                    members={members}
+                    canManage={can('project:settings')}
+                    onNavigate={() => navigate(`/app/${projectSlug}/settings`)}
+                    t={t}
+                />
             </div>
 
             {/* Studies */}
@@ -530,54 +474,16 @@ export function AdminDashboard() {
                 <h2 className="text-lg font-semibold">{t('admin.dashboard.studies', 'Studies')}</h2>
             </div>
 
-            {/* Active studies */}
-            {activeStudies.length > 0 && (
-                <StudyGroup
-                    label={t('admin.dashboard.active_studies', 'Active')}
-                    studies={activeStudies}
-                    getTitle={getStudyTitle}
-                    onOpen={handleOpenStudy}
-                    locale={currentLocale}
-                    t={t}
-                />
-            )}
-
-            {/* Paused studies */}
-            {pausedStudies.length > 0 && (
-                <StudyGroup
-                    label={t('admin.dashboard.paused_studies', 'Paused')}
-                    studies={pausedStudies}
-                    getTitle={getStudyTitle}
-                    onOpen={handleOpenStudy}
-                    locale={currentLocale}
-                    t={t}
-                />
-            )}
-
-            {/* Draft studies */}
-            {draftStudies.length > 0 && (
-                <StudyGroup
-                    label={t('admin.dashboard.draft_studies', 'Drafts')}
-                    studies={draftStudies}
-                    getTitle={getStudyTitle}
-                    onOpen={handleOpenStudy}
-                    locale={currentLocale}
-                    t={t}
-                />
-            )}
-
-            {/* Closed / Archived studies */}
-            {closedStudies.length > 0 && (
-                <StudyGroup
-                    label={t('admin.dashboard.closed_studies', 'Completed')}
-                    studies={closedStudies}
-                    getTitle={getStudyTitle}
-                    onOpen={handleOpenStudy}
-                    locale={currentLocale}
-                    t={t}
-                    collapsed
-                />
-            )}
+            <StudyGroups
+                activeStudies={activeStudies}
+                pausedStudies={pausedStudies}
+                draftStudies={draftStudies}
+                closedStudies={closedStudies}
+                getTitle={getStudyTitle}
+                onOpen={handleOpenStudy}
+                locale={currentLocale}
+                t={t}
+            />
 
             <CreateStudyDialog
                 open={showCreateDialog}
@@ -642,6 +548,246 @@ function OnboardingStep({
                 )}
             </div>
         </li>
+    );
+}
+
+function ConcourseCard({
+    totalItems,
+    acceptedCount,
+    proposedCount,
+    rejectedCount,
+    tags,
+    onNavigate,
+    t,
+}: {
+    totalItems: number;
+    acceptedCount: number;
+    proposedCount: number;
+    rejectedCount: number;
+    tags?: ConcourseTagRead[];
+    onNavigate: () => void;
+    t: TranslateFn;
+}) {
+    return (
+        <Card
+            className="md:col-span-2 cursor-pointer hover:border-foreground/20 transition-colors"
+            onClick={onNavigate}
+        >
+            <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Library className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-semibold">
+                            {t('admin.dashboard.concourse', 'Concourse')}
+                        </CardTitle>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+                {totalItems > 0 ? (
+                    <>
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-bold">{totalItems}</span>
+                            <span className="text-sm text-muted-foreground">
+                                {t('admin.concourse.items_label', 'items')}
+                            </span>
+                        </div>
+                        <div className="flex h-2.5 rounded-full overflow-hidden bg-slate-100">
+                            {acceptedCount > 0 && (
+                                <div
+                                    className="bg-emerald-500 transition-all"
+                                    style={{ width: `${(acceptedCount / totalItems) * 100}%` }}
+                                />
+                            )}
+                            {proposedCount > 0 && (
+                                <div
+                                    className="bg-amber-400 transition-all"
+                                    style={{ width: `${(proposedCount / totalItems) * 100}%` }}
+                                />
+                            )}
+                            {rejectedCount > 0 && (
+                                <div
+                                    className="bg-red-300 transition-all"
+                                    style={{ width: `${(rejectedCount / totalItems) * 100}%` }}
+                                />
+                            )}
+                        </div>
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                                {acceptedCount} {t('admin.concourse.status.accepted', 'Accepted')}
+                            </span>
+                            <span className="flex items-center gap-1.5">
+                                <span className="h-2 w-2 rounded-full bg-amber-400" />
+                                {proposedCount} {t('admin.concourse.status.proposed', 'Proposed')}
+                            </span>
+                            {rejectedCount > 0 && (
+                                <span className="flex items-center gap-1.5">
+                                    <span className="h-2 w-2 rounded-full bg-red-300" />
+                                    {rejectedCount}{' '}
+                                    {t('admin.concourse.status.rejected', 'Rejected')}
+                                </span>
+                            )}
+                        </div>
+                        {tags && tags.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                                {tags.map((tag) => (
+                                    <Badge
+                                        key={tag.id}
+                                        variant="outline"
+                                        className="text-2xs font-normal"
+                                    >
+                                        {tag.color ? (
+                                            <span
+                                                className="h-2 w-2 rounded-full mr-1.5 shrink-0"
+                                                style={{ backgroundColor: tag.color }}
+                                            />
+                                        ) : null}
+                                        {tag.name}
+                                    </Badge>
+                                ))}
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <p className="text-sm text-muted-foreground">
+                        {t(
+                            'admin.dashboard.concourse_empty',
+                            'No items yet. Start building your statement collection.'
+                        )}
+                    </p>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
+function TeamCard({
+    members,
+    canManage,
+    onNavigate,
+    t,
+}: {
+    members?: ProjectMemberRead[];
+    canManage: boolean;
+    onNavigate: () => void;
+    t: TranslateFn;
+}) {
+    return (
+        <Card
+            className={cn(
+                'transition-colors',
+                canManage && 'cursor-pointer hover:border-foreground/20'
+            )}
+            onClick={() => canManage && onNavigate()}
+        >
+            <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <CardTitle className="text-sm font-semibold">
+                            {t('admin.dashboard.team', 'Team')}
+                        </CardTitle>
+                    </div>
+                    {canManage && <Settings2 className="h-4 w-4 text-muted-foreground" />}
+                </div>
+            </CardHeader>
+            <CardContent>
+                {members && members.length > 0 ? (
+                    <div className="space-y-2.5">
+                        {members.map((member) => (
+                            <div key={member.user_id} className="flex items-center gap-2.5">
+                                <div className="flex items-center justify-center h-7 w-7 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold shrink-0">
+                                    {member.user?.full_name
+                                        ? member.user.full_name.substring(0, 2).toUpperCase()
+                                        : member.user?.email?.substring(0, 2).toUpperCase()}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p className="text-sm font-medium truncate">
+                                        {member.user?.full_name || member.user?.email}
+                                    </p>
+                                </div>
+                                <Badge variant="outline" className="text-2xs shrink-0">
+                                    {t(`admin.project.roles.${member.role}`, member.role as string)}
+                                </Badge>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-sm text-muted-foreground">
+                        {t('admin.dashboard.team_loading', 'Loading...')}
+                    </p>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
+function StudyGroups({
+    activeStudies,
+    pausedStudies,
+    draftStudies,
+    closedStudies,
+    getTitle,
+    onOpen,
+    locale,
+    t,
+}: {
+    activeStudies: StudyRead[];
+    pausedStudies: StudyRead[];
+    draftStudies: StudyRead[];
+    closedStudies: StudyRead[];
+    getTitle: (s: StudyRead) => string;
+    onOpen: (slug: string) => void;
+    // biome-ignore lint/suspicious/noExplicitAny: date-fns locale type
+    locale: any;
+    t: TranslateFn;
+}) {
+    return (
+        <>
+            {activeStudies.length > 0 && (
+                <StudyGroup
+                    label={t('admin.dashboard.active_studies', 'Active')}
+                    studies={activeStudies}
+                    getTitle={getTitle}
+                    onOpen={onOpen}
+                    locale={locale}
+                    t={t}
+                />
+            )}
+            {pausedStudies.length > 0 && (
+                <StudyGroup
+                    label={t('admin.dashboard.paused_studies', 'Paused')}
+                    studies={pausedStudies}
+                    getTitle={getTitle}
+                    onOpen={onOpen}
+                    locale={locale}
+                    t={t}
+                />
+            )}
+            {draftStudies.length > 0 && (
+                <StudyGroup
+                    label={t('admin.dashboard.draft_studies', 'Drafts')}
+                    studies={draftStudies}
+                    getTitle={getTitle}
+                    onOpen={onOpen}
+                    locale={locale}
+                    t={t}
+                />
+            )}
+            {closedStudies.length > 0 && (
+                <StudyGroup
+                    label={t('admin.dashboard.closed_studies', 'Completed')}
+                    studies={closedStudies}
+                    getTitle={getTitle}
+                    onOpen={onOpen}
+                    locale={locale}
+                    t={t}
+                    collapsed
+                />
+            )}
+        </>
     );
 }
 

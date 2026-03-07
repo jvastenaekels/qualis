@@ -229,12 +229,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   show: true,
               },
               {
-                  title: t('admin.sidebar.team', 'Team'),
-                  url: `/app/${projectSlug}/team`,
-                  icon: Users,
-                  show: can('project:manage_team'),
-              },
-              {
                   title: t('admin.sidebar.project_settings', 'Settings'),
                   url: `/app/${projectSlug}/settings`,
                   icon: Settings2,

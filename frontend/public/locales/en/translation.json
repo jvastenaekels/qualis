@@ -1052,6 +1052,7 @@
             "attention": "Needs attention",
             "alert_deadline": "{{study}}: closing in {{days}} days with {{count}} participants",
             "view": "View",
+            "open_study": "Open study",
             "closes": "Closes",
             "timeline": {
                 "title": "Submissions timeline",
