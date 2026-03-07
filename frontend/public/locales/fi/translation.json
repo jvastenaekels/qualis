@@ -982,7 +982,8 @@
             "exports": "Tiedot",
             "data": "Tiedot",
             "analysis": "Analyysi",
-            "settings": "Asetukset"
+            "settings": "Asetukset",
+            "concourse": "Concourse"
         },
         "command_menu": {
             "title": "Globaali komentovalikko",

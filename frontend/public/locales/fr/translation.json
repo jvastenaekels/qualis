@@ -982,7 +982,8 @@
             "exports": "Données",
             "data": "Données",
             "analysis": "Analyse",
-            "settings": "Réglages"
+            "settings": "Réglages",
+            "concourse": "Concourse"
         },
         "command_menu": {
             "title": "Menu de commandes global",

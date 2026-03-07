@@ -58,12 +58,19 @@ export default function AdminLayout() {
             exports: t('admin.breadcrumbs.exports'),
             settings: t('admin.breadcrumbs.settings'),
             participants: t('admin.breadcrumbs.participants'),
+            concourses: t('admin.breadcrumbs.concourse', 'Concourse'),
         };
 
         // Special cases
         if (last === 'admin') return t('admin.breadcrumbs.dashboard');
         if (last === activeStudyId) return t('admin.breadcrumbs.study_dashboard');
         if (last === 'new') return t('admin.project.create.title');
+
+        // Concourse detail page: /concourses/:id → show "Concourse"
+        const prev = segments[segments.length - 2];
+        if (prev === 'concourses' && /^\d+$/.test(last)) {
+            return t('admin.breadcrumbs.concourse', 'Concourse');
+        }
 
         return mapping[last] || last.charAt(0).toUpperCase() + last.slice(1);
     };

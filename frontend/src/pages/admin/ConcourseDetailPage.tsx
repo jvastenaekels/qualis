@@ -287,10 +287,10 @@ export default function ConcourseDetailPage() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${concourse.title.replace(/[^a-zA-Z0-9-_ ]/g, '').trim()}_concourse.csv`;
+        a.download = `${project?.title?.replace(/[^a-zA-Z0-9-_ ]/g, '').trim() ?? 'project'}_concourse.csv`;
         a.click();
         URL.revokeObjectURL(url);
-    }, [concourse, filteredItems, statusLabel]);
+    }, [concourse, filteredItems, statusLabel, project?.title]);
 
     // Add item
     const [newCode, setNewCode] = useState('');
@@ -480,8 +480,7 @@ export default function ConcourseDetailPage() {
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             {/* Header */}
             <StudyPageHeader
-                title={concourse.title}
-                description={concourse.description ?? undefined}
+                title={t('admin.concourse.title', 'Concourse')}
                 icon={Library}
                 actions={
                     <div className="flex items-center gap-2">

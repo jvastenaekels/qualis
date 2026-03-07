@@ -997,7 +997,8 @@
             "exports": "Data",
             "data": "Data",
             "analysis": "Analysis",
-            "settings": "Settings"
+            "settings": "Settings",
+            "concourse": "Concourse"
         },
         "command_menu": {
             "title": "Global command menu",
