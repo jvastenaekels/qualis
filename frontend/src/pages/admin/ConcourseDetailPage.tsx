@@ -44,6 +44,7 @@ import {
 } from '@/components/ui/dialog';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { usePermission } from '@/hooks/usePermission';
+import { useAdminContext } from '@/hooks/useAdminContext';
 import {
     useGetConcourseApiAdminConcoursesConcourseIdGet,
     useCreateItemApiAdminConcoursesConcourseIdItemsPost,
@@ -81,6 +82,14 @@ export default function ConcourseDetailPage() {
         [t]
     );
     const { can } = usePermission();
+    const { project } = useAdminContext();
+    const memberNames = useMemo(() => {
+        const map: Record<number, string> = {};
+        for (const m of project?.members ?? []) {
+            map[m.user_id] = m.user.full_name ?? m.user.email;
+        }
+        return map;
+    }, [project?.members]);
     const { concourseId } = useParams<{ concourseId: string }>();
     const queryClient = useQueryClient();
     const id = Number(concourseId);
@@ -1703,6 +1712,7 @@ export default function ConcourseDetailPage() {
                 itemId={sheetItemId}
                 itemCode={sheetItemCode}
                 defaultTab={sheetTab}
+                memberNames={memberNames}
             />
         </div>
     );

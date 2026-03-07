@@ -30,6 +30,7 @@ interface ItemDetailSheetProps {
     itemId: number | null;
     itemCode: string;
     defaultTab?: 'history' | 'comments';
+    memberNames?: Record<number, string>;
 }
 
 export function ItemDetailSheet({
@@ -39,6 +40,7 @@ export function ItemDetailSheet({
     itemId,
     itemCode,
     defaultTab = 'history',
+    memberNames = {},
 }: ItemDetailSheetProps) {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
@@ -139,6 +141,7 @@ export function ItemDetailSheet({
                             versions={versions ?? []}
                             isLoading={versionsLoading}
                             formatDate={formatDate}
+                            memberNames={memberNames}
                         />
                     </TabsContent>
 
@@ -147,6 +150,7 @@ export function ItemDetailSheet({
                             comments={comments ?? []}
                             isLoading={commentsLoading}
                             formatDate={formatDate}
+                            memberNames={memberNames}
                         />
                         <div className="mt-4 space-y-2">
                             <Textarea
@@ -180,10 +184,12 @@ function VersionList({
     versions,
     isLoading,
     formatDate,
+    memberNames,
 }: {
     versions: ConcourseItemVersionRead[];
     isLoading: boolean;
     formatDate: (d: string) => string;
+    memberNames: Record<number, string>;
 }) {
     const { t } = useTranslation();
 
@@ -211,17 +217,37 @@ function VersionList({
                     className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 space-y-1.5"
                 >
                     <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="text-2xs font-mono">
-                            {t('admin.concourse.version_label', 'v{{n}}', {
-                                n: v.version_number,
-                            })}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="text-2xs font-mono">
+                                {t('admin.concourse.version_label', 'v{{n}}', {
+                                    n: v.version_number,
+                                })}
+                            </Badge>
+                            {v.changed_by != null && (
+                                <span className="text-2xs font-medium text-slate-500">
+                                    {memberNames[v.changed_by] ?? `#${v.changed_by}`}
+                                </span>
+                            )}
+                        </div>
                         <span className="text-2xs text-slate-400">{formatDate(v.changed_at)}</span>
                     </div>
-                    <p className="text-sm text-slate-700">
+                    <div className="text-sm text-slate-700">
                         <span className="font-mono text-xs text-slate-500 mr-1.5">{v.code}</span>
-                        {v.translations_snapshot?.[0]?.text ?? ''}
-                    </p>
+                        {v.translations_snapshot && v.translations_snapshot.length > 1 ? (
+                            <div className="mt-1 space-y-0.5">
+                                {v.translations_snapshot.map((tr) => (
+                                    <p key={tr.language_code} className="text-sm text-slate-700">
+                                        <span className="text-2xs font-bold text-slate-400 mr-1.5">
+                                            {tr.language_code?.toUpperCase()}
+                                        </span>
+                                        {tr.text}
+                                    </p>
+                                ))}
+                            </div>
+                        ) : (
+                            (v.translations_snapshot?.[0]?.text ?? '')
+                        )}
+                    </div>
                     {v.change_comment && (
                         <p className="text-xs text-slate-500 italic border-l-2 border-slate-200 pl-2">
                             {v.change_comment}
@@ -237,10 +263,12 @@ function CommentList({
     comments,
     isLoading,
     formatDate,
+    memberNames,
 }: {
     comments: ConcourseItemCommentRead[];
     isLoading: boolean;
     formatDate: (d: string) => string;
+    memberNames: Record<number, string>;
 }) {
     const { t } = useTranslation();
 
@@ -269,7 +297,9 @@ function CommentList({
                 >
                     <div className="flex items-center justify-between">
                         <span className="text-2xs font-bold text-slate-500">
-                            {c.user_id ? `#${c.user_id}` : t('common.unknown', 'Unknown')}
+                            {c.user_id
+                                ? (memberNames[c.user_id] ?? `#${c.user_id}`)
+                                : t('common.unknown', 'Unknown')}
                         </span>
                         <span className="text-2xs text-slate-400">{formatDate(c.created_at)}</span>
                     </div>
