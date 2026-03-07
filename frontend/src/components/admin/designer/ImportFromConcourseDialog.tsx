@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Library, Loader2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
@@ -16,13 +16,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import {
     useListConcoursesApiAdminConcoursesGet,
     useGetConcourseApiAdminConcoursesConcourseIdGet,
@@ -55,18 +48,17 @@ export function ImportFromConcourseDialog({
 }: ImportFromConcourseDialogProps) {
     const { t } = useTranslation();
 
-    const [selectedConcourseId, setSelectedConcourseId] = useState<string>('');
     const [selectedItemIds, setSelectedItemIds] = useState<Set<number>>(new Set());
     const [codePrefix, setCodePrefix] = useState('');
     const [replaceExisting, setReplaceExisting] = useState(false);
     const [showOnlyAccepted, setShowOnlyAccepted] = useState(true);
 
+    // Auto-select the single project concourse
     const { data: concoursesData } = useListConcoursesApiAdminConcoursesGet(undefined, {
         query: { enabled: open },
     });
-    const concourses = concoursesData?.items ?? [];
+    const concourseId = concoursesData?.items?.[0]?.id;
 
-    const concourseId = selectedConcourseId ? Number(selectedConcourseId) : undefined;
     const { data: concourse, isLoading: isLoadingConcourse } =
         useGetConcourseApiAdminConcoursesConcourseIdGet(concourseId as number, {
             query: { enabled: !!concourseId },
@@ -78,6 +70,11 @@ export function ImportFromConcourseDialog({
         if (!concourse?.items) return [];
         return concourse.items.filter((item) => !showOnlyAccepted || item.status === 'accepted');
     }, [concourse?.items, showOnlyAccepted]);
+
+    // Reset selection when filter changes
+    useEffect(() => {
+        setSelectedItemIds(new Set());
+    }, [showOnlyAccepted]);
 
     const toggleItem = (id: number) => {
         setSelectedItemIds((prev) => {
@@ -125,7 +122,6 @@ export function ImportFromConcourseDialog({
     };
 
     const resetState = () => {
-        setSelectedConcourseId('');
         setSelectedItemIds(new Set());
         setCodePrefix('');
         setReplaceExisting(false);
@@ -165,37 +161,8 @@ export function ImportFromConcourseDialog({
                 </DialogHeader>
 
                 <div className="space-y-4 py-2 flex-1 overflow-hidden flex flex-col">
-                    {/* Concourse selector */}
+                    {/* Options */}
                     <div className="flex flex-col sm:flex-row sm:items-end gap-3">
-                        <div className="flex-1 space-y-1">
-                            <Label className="text-2xs font-black text-slate-500">
-                                {t('admin.concourse_import.select_concourse', 'Concourse')}
-                            </Label>
-                            <Select
-                                value={selectedConcourseId}
-                                onValueChange={(v) => {
-                                    setSelectedConcourseId(v);
-                                    setSelectedItemIds(new Set());
-                                }}
-                            >
-                                <SelectTrigger className="h-10 rounded-xl bg-white">
-                                    <SelectValue
-                                        placeholder={t(
-                                            'admin.concourse_import.select_placeholder',
-                                            'Choose a concourse...'
-                                        )}
-                                    />
-                                </SelectTrigger>
-                                <SelectContent className="rounded-xl">
-                                    {concourses.map((c) => (
-                                        <SelectItem key={c.id} value={String(c.id)}>
-                                            {c.title} ({c.item_count}{' '}
-                                            {t('admin.concourse.items_label', 'items')})
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </div>
                         <div className="space-y-1">
                             <Label className="text-2xs font-black text-slate-500">
                                 {t('admin.concourse_import.code_prefix', 'Code prefix')}
@@ -210,40 +177,35 @@ export function ImportFromConcourseDialog({
                                 className="h-10 rounded-xl w-full sm:w-24"
                             />
                         </div>
-                    </div>
-
-                    {/* Options */}
-                    <div className="flex items-center gap-4">
-                        <Label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer font-normal">
-                            <Switch
-                                checked={showOnlyAccepted}
-                                onCheckedChange={(v) => {
-                                    setShowOnlyAccepted(v);
-                                    setSelectedItemIds(new Set());
-                                }}
-                            />
-                            {t('admin.concourse_import.only_accepted', 'Only accepted')}
-                        </Label>
-                        <Label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer font-normal">
-                            <Switch
-                                checked={replaceExisting}
-                                onCheckedChange={setReplaceExisting}
-                            />
-                            {t(
-                                'admin.concourse_import.replace_existing',
-                                'Replace existing statements'
-                            )}
-                        </Label>
+                        <div className="flex items-center gap-4">
+                            <Label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer font-normal">
+                                <Switch
+                                    checked={showOnlyAccepted}
+                                    onCheckedChange={setShowOnlyAccepted}
+                                />
+                                {t('admin.concourse_import.only_accepted', 'Only accepted')}
+                            </Label>
+                            <Label className="flex items-center gap-2 text-xs text-slate-600 cursor-pointer font-normal">
+                                <Switch
+                                    checked={replaceExisting}
+                                    onCheckedChange={setReplaceExisting}
+                                />
+                                {t(
+                                    'admin.concourse_import.replace_existing',
+                                    'Replace existing statements'
+                                )}
+                            </Label>
+                        </div>
                     </div>
 
                     {/* Item list */}
-                    {concourseId && isLoadingConcourse && (
+                    {isLoadingConcourse && (
                         <div className="py-8 flex justify-center">
                             <Loader2 className="size-5 animate-spin text-slate-400" />
                         </div>
                     )}
 
-                    {concourseId && !isLoadingConcourse && filteredItems.length > 0 && (
+                    {!isLoadingConcourse && filteredItems.length > 0 && (
                         <div className="flex-1 overflow-auto border rounded-xl">
                             {/* Select all header */}
                             <div className="flex items-center gap-3 px-4 py-2 bg-slate-50 border-b sticky top-0">
@@ -322,7 +284,7 @@ export function ImportFromConcourseDialog({
                         </div>
                     )}
 
-                    {concourseId && !isLoadingConcourse && filteredItems.length === 0 && (
+                    {!isLoadingConcourse && filteredItems.length === 0 && concourseId && (
                         <div className="py-8 text-center text-slate-400 text-sm">
                             {showOnlyAccepted
                                 ? t(
@@ -336,7 +298,7 @@ export function ImportFromConcourseDialog({
                         </div>
                     )}
 
-                    {!concourseId && concourses.length === 0 && (
+                    {!concourseId && !isLoadingConcourse && (
                         <div className="py-8 text-center text-slate-400 text-sm">
                             {t(
                                 'admin.concourse_import.no_concourses',

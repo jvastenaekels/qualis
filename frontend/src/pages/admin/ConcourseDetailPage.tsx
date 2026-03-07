@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     Library,
@@ -8,7 +8,6 @@ import {
     Download,
     Trash2,
     Loader2,
-    ArrowLeft,
     Check,
     X,
     Tag,
@@ -18,7 +17,7 @@ import {
     Settings2,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,7 +40,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
-import { useAdminContext } from '@/hooks/useAdminContext';
 import { usePermission } from '@/hooks/usePermission';
 import {
     useGetConcourseApiAdminConcoursesConcourseIdGet,
@@ -52,9 +50,7 @@ import {
     useListTagsApiAdminConcoursesTagsGet,
     useCreateTagApiAdminConcoursesTagsPost,
     useDeleteTagApiAdminConcoursesTagsTagIdDelete,
-    useDeleteConcourseApiAdminConcoursesConcourseIdDelete,
     getGetConcourseApiAdminConcoursesConcourseIdGetQueryKey,
-    getListConcoursesApiAdminConcoursesGetQueryKey,
     getListTagsApiAdminConcoursesTagsGetQueryKey,
 } from '@/api/generated';
 import type { ConcourseItemRead, ConcourseItemStatus, ConcourseTagRead } from '@/api/model';
@@ -72,8 +68,6 @@ const STATUS_COLORS: Record<string, string> = {
 
 export default function ConcourseDetailPage() {
     const { t } = useTranslation();
-    const navigate = useNavigate();
-    const { project: workspace } = useAdminContext();
     const { can } = usePermission();
     const { concourseId } = useParams<{ concourseId: string }>();
     const queryClient = useQueryClient();
@@ -114,7 +108,6 @@ export default function ConcourseDetailPage() {
     const updateItemMutation = useUpdateItemApiAdminConcoursesConcourseIdItemsItemIdPatch();
     const deleteItemMutation = useDeleteItemApiAdminConcoursesConcourseIdItemsItemIdDelete();
     const importMutation = useImportItemsFromTextApiAdminConcoursesConcourseIdItemsImportPost();
-    const deleteConcourseMutation = useDeleteConcourseApiAdminConcoursesConcourseIdDelete();
     const createTagMutation = useCreateTagApiAdminConcoursesTagsPost();
     const deleteTagMutation = useDeleteTagApiAdminConcoursesTagsTagIdDelete();
 
@@ -413,26 +406,6 @@ export default function ConcourseDetailPage() {
         }
     };
 
-    // Delete concourse
-    const [deleteConcourseOpen, setDeleteConcourseOpen] = useState(false);
-    const handleDeleteConcourse = async () => {
-        try {
-            await deleteConcourseMutation.mutateAsync({ concourseId: id });
-            await queryClient.invalidateQueries({
-                queryKey: getListConcoursesApiAdminConcoursesGetQueryKey(),
-            });
-            toast.success(t('admin.concourse.deleted', 'Concourse deleted'));
-            navigate(`/app/${workspace?.slug}/concourses`);
-        } catch (err) {
-            toast.error(
-                parseApiErrorSync(
-                    err,
-                    t('admin.concourse.delete_error', 'Failed to delete concourse')
-                )
-            );
-        }
-    };
-
     const languages = useMemo(
         () => [
             ...new Set(
@@ -478,15 +451,6 @@ export default function ConcourseDetailPage() {
                 icon={Library}
                 actions={
                     <div className="flex items-center gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="rounded-xl"
-                            onClick={() => navigate(`/app/${workspace?.slug}/concourses`)}
-                        >
-                            <ArrowLeft className="size-4 sm:mr-1" />
-                            <span className="hidden sm:inline">{t('common.back', 'Back')}</span>
-                        </Button>
                         <Button
                             variant="outline"
                             size="sm"
@@ -1226,28 +1190,6 @@ export default function ConcourseDetailPage() {
                 </CardContent>
             </Card>
 
-            {/* Danger Zone */}
-            {can('project:delete') && (
-                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden border-l-4 border-l-red-500">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-black text-red-700">
-                            {t('admin.concourse.danger_zone', 'Danger Zone')}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="border-red-200 text-red-600 hover:bg-red-50 rounded-xl"
-                            onClick={() => setDeleteConcourseOpen(true)}
-                        >
-                            <Trash2 className="size-4 mr-1" />
-                            {t('admin.concourse.delete', 'Delete Concourse')}
-                        </Button>
-                    </CardContent>
-                </Card>
-            )}
-
             {/* Add Item Dialog */}
             <Dialog open={addItemOpen} onOpenChange={setAddItemOpen}>
                 <DialogContent className="border-slate-200 bg-white shadow-lg max-w-md">
@@ -1379,48 +1321,6 @@ export default function ConcourseDetailPage() {
                                 <Trash2 className="size-4 mr-2" />
                             )}
                             {t('common.delete', 'Delete')}
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            {/* Delete Concourse Confirmation Dialog */}
-            <Dialog open={deleteConcourseOpen} onOpenChange={setDeleteConcourseOpen}>
-                <DialogContent className="border-slate-200 bg-white shadow-lg max-w-sm">
-                    <DialogHeader>
-                        <DialogTitle className="text-lg font-black text-slate-900">
-                            {t('admin.concourse.delete', 'Delete Concourse')}
-                        </DialogTitle>
-                        <DialogDescription className="text-sm text-slate-500">
-                            {t(
-                                'admin.concourse.delete_confirm',
-                                'Are you sure you want to delete this concourse and all its items?'
-                            )}
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter className="gap-2">
-                        <Button
-                            variant="outline"
-                            className="rounded-xl"
-                            onClick={() => setDeleteConcourseOpen(false)}
-                        >
-                            {t('common.cancel', 'Cancel')}
-                        </Button>
-                        <Button
-                            variant="destructive"
-                            className="rounded-xl"
-                            disabled={deleteConcourseMutation.isPending}
-                            onClick={async () => {
-                                await handleDeleteConcourse();
-                                setDeleteConcourseOpen(false);
-                            }}
-                        >
-                            {deleteConcourseMutation.isPending ? (
-                                <Loader2 className="size-4 animate-spin mr-2" />
-                            ) : (
-                                <Trash2 className="size-4 mr-2" />
-                            )}
-                            {t('admin.concourse.delete', 'Delete Concourse')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

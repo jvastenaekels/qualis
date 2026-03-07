@@ -548,11 +548,13 @@
             "select_project": "Choisir un projet",
             "project_settings": "Réglages du projet",
             "study_tools": "Outils d'étude",
-            "concourses": "Concours"
+            "concourses": "Concours",
+            "concourse": "Concours"
         },
         "concourse": {
             "title": "Concours",
-            "description": "Gérer les collections d'énoncés candidats pour vos études Q-méthodologie",
+            "description": "Gérer les énoncés candidats pour votre étude Q-méthodologie",
+            "default_title": "Concours",
             "create": "Nouveau concours",
             "create_success": "Concours créé",
             "create_error": "Échec de la création du concours",

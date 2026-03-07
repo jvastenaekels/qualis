@@ -548,11 +548,13 @@
             "select_project": "Valitse projekti",
             "project_settings": "Projektin asetukset",
             "study_tools": "Tutkimustyökalut",
-            "concourses": "Lausekokoelmat"
+            "concourses": "Lausekokoelmat",
+            "concourse": "Lausekokoelma"
         },
         "concourse": {
-            "title": "Lausekokoelmat",
-            "description": "Hallitse ehdokaslausekokoelmia Q-metodologiatutkimuksiasi varten",
+            "title": "Lausekokoelma",
+            "description": "Hallitse ehdokaslauseita Q-metodologiatutkimustasi varten",
+            "default_title": "Lausekokoelma",
             "create": "Uusi lausekokoelma",
             "create_success": "Lausekokoelma luotu",
             "create_error": "Lausekokoelman luonti epäonnistui",

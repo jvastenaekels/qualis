@@ -223,7 +223,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   show: true,
               },
               {
-                  title: t('admin.sidebar.concourses', 'Concourses'),
+                  title: t('admin.sidebar.concourse', 'Concourse'),
                   url: `/app/${projectSlug}/concourses`,
                   icon: Library,
                   show: true,

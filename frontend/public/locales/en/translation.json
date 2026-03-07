@@ -556,11 +556,13 @@
             "view_all_studies": "All studies",
             "study": "Study",
             "select_project": "Select project",
-            "concourses": "Concourses"
+            "concourses": "Concourses",
+            "concourse": "Concourse"
         },
         "concourse": {
-            "title": "Concourses",
-            "description": "Manage collections of candidate statements for your Q-methodology studies",
+            "title": "Concourse",
+            "description": "Manage candidate statements for your Q-methodology study",
+            "default_title": "Concourse",
             "create": "New Concourse",
             "create_success": "Concourse created",
             "create_error": "Failed to create concourse",
