@@ -67,7 +67,6 @@ const ConsentPage: React.FC = () => {
 
     const onSubmit = async (data: ConsentForm) => {
         if (data.consent) {
-            setConsent(true);
             const sessionToken = token || crypto.randomUUID();
             if (!token) {
                 // New session — clear any stale response data (e.g. audio recordings from a prior session)
@@ -99,19 +98,22 @@ const ConsentPage: React.FC = () => {
                         useSessionStore.getState().setResumeCode(result.resume_code);
                     }
                 } catch (err) {
-                    // Non-blocking: we still allow user to proceed but log the error
                     console.error('Failed to record consent proof:', err);
                     reportBug(err instanceof Error ? err : new Error(String(err)), {
                         context: 'ConsentPage',
                     });
-                    toast.warning(
+                    toast.error(
                         t(
                             'consent.record_error',
-                            'Could not save consent record. You may continue.'
+                            'Could not save consent record. Please try again.'
                         )
                     );
+                    return; // Block navigation — consent must be recorded
                 }
             }
+
+            // Consent recorded successfully — persist local state
+            setConsent(true);
 
             // Determine next step
             let nextStep = 2; // Default to Pre-Sort

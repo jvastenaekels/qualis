@@ -166,9 +166,10 @@ const PostSortPage: React.FC<PostSortPageProps> = ({ highlightKey: _highlightKey
                         <p className="text-sm font-semibold text-red-800">
                             {t('post.submit_error.title', 'Submission failed')}
                         </p>
-                        <p className="text-sm text-red-600 mt-1">
+                        <p className="text-sm text-red-600 mt-1">{submitError}</p>
+                        <p className="text-xs text-red-500 mt-1">
                             {t(
-                                'post.submit_error.message',
+                                'post.submit_error.hint',
                                 'Please check your connection and try again.'
                             )}
                         </p>

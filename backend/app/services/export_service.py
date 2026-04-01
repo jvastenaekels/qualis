@@ -492,7 +492,14 @@ class ExportService:
             # or sometimes even more compressed.
             scores_str = ""
             for s in sorted_statements:
-                score = scores_map.get(s.id, 0)
+                score = scores_map.get(s.id)
+                if score is None:
+                    logger.warning(
+                        "Participant %s missing score for statement %s — defaulting to 0",
+                        p.id,
+                        s.id,
+                    )
+                    score = 0
                 # We use 2 chars per score
                 # If score is positive, add a space. If negative, it has the minus.
                 if score >= 0:

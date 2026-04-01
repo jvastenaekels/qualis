@@ -156,7 +156,24 @@ export const useSubmitStudy = () => {
                 }
             } catch (err: unknown) {
                 console.error(err);
-                setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+                // Extract the most useful error message
+                let message = 'An unexpected error occurred';
+                if (err instanceof Error) {
+                    message = err.message;
+                }
+                // Axios-style error with response.data.detail
+                if (
+                    typeof err === 'object' &&
+                    err !== null &&
+                    'response' in err &&
+                    typeof (err as Record<string, unknown>).response === 'object'
+                ) {
+                    const resp = (err as { response: { data?: { detail?: string } } }).response;
+                    if (typeof resp.data?.detail === 'string') {
+                        message = resp.data.detail;
+                    }
+                }
+                setError(message);
             } finally {
                 isSubmittingRef.current = false; // Allow retry after failure or re-submission
                 setSubmitting(false);

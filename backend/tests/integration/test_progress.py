@@ -116,6 +116,19 @@ class TestProgressEndpoint:
         """Completing a submission sets last_step_reached to 5."""
         statements = active_study.statements
         token = str(uuid.uuid4())
+
+        # Record consent first
+        consent_resp = await client.post(
+            f"/api/study/{active_study.slug}/consent",
+            json={
+                "session_token": token,
+                "study_slug": active_study.slug,
+                "language_code": "en",
+                "consent_hash": "test-hash",
+            },
+        )
+        assert consent_resp.status_code == 200
+
         qsort = [
             {"statement_id": statements[0].id, "grid_score": -1},
             {"statement_id": statements[1].id, "grid_score": 0},

@@ -365,6 +365,17 @@ class SubmissionService:
                     f"Database error while creating participant: {str(e)}"
                 )
 
+        # 6. Validation: Consent must be recorded for completed non-test submissions
+        if (
+            data.status == ParticipantStatus.completed
+            and not data.is_test_run
+            and participant
+            and not participant.consented_at
+        ):
+            raise ValidationError(
+                "Cannot complete submission: consent has not been recorded."
+            )
+
         # If we fell through (either from 'else' or after catching exception), participant exists.
         # Ensure we don't treat a newly created participant as an existing one we need to skip/update.
         if participant and participant not in db.new and not is_newly_created:

@@ -17,6 +17,7 @@ from ...dependencies import check_study_permission
 from ...models import (
     AudioRecording,
     Participant,
+    ParticipantStatus,
     Statement,
     Study,
     StudyRole,
@@ -91,7 +92,11 @@ async def export_pqmethod(
 
     query = (
         select(Participant)
-        .where(Participant.study_id == study.id, Participant.is_discarded.is_(False))
+        .where(
+            Participant.study_id == study.id,
+            Participant.is_discarded.is_(False),
+            Participant.status == ParticipantStatus.completed,
+        )
         .options(
             selectinload(Participant.qsort_entries),
             selectinload(Participant.audio_recordings),
@@ -130,7 +135,11 @@ async def export_r_kit(
 
     query = (
         select(Participant)
-        .where(Participant.study_id == study.id, Participant.is_discarded.is_(False))
+        .where(
+            Participant.study_id == study.id,
+            Participant.is_discarded.is_(False),
+            Participant.status == ParticipantStatus.completed,
+        )
         .options(
             selectinload(Participant.qsort_entries),
             selectinload(Participant.audio_recordings),

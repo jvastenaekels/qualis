@@ -3,26 +3,12 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { AdminDashboard } from './AdminDashboard';
 
 // Hoisted mocks for generated API hooks
-const {
-    mockStudiesHook,
-    mockConcoursesHook,
-    mockConcourseDetailHook,
-    mockTagsHook,
-    mockMembersHook,
-} = vi.hoisted(() => ({
+const { mockStudiesHook } = vi.hoisted(() => ({
     mockStudiesHook: vi.fn(),
-    mockConcoursesHook: vi.fn(),
-    mockConcourseDetailHook: vi.fn(),
-    mockTagsHook: vi.fn(),
-    mockMembersHook: vi.fn(),
 }));
 
 vi.mock('@/api/generated', () => ({
     useListStudiesApiAdminStudiesGet: mockStudiesHook,
-    useListConcoursesApiAdminConcoursesGet: mockConcoursesHook,
-    useGetConcourseApiAdminConcoursesConcourseIdGet: mockConcourseDetailHook,
-    useListTagsApiAdminConcoursesTagsGet: mockTagsHook,
-    useListProjectMembersApiAdminProjectsSlugMembersGet: mockMembersHook,
 }));
 
 // Mock stores
@@ -40,11 +26,6 @@ vi.mock('@/store/useAuthStore', () => ({
 const mockSetActiveStudy = vi.fn();
 vi.mock('@/store/useAdminStore', () => ({
     useAdminStore: () => ({ setActiveStudy: mockSetActiveStudy }),
-}));
-
-// Mock usePermission
-vi.mock('@/hooks/usePermission', () => ({
-    usePermission: () => ({ can: () => true }),
 }));
 
 // Mock child dialogs to avoid rendering complexity
@@ -73,41 +54,12 @@ function makeStudy(overrides: Record<string, unknown> = {}) {
     };
 }
 
-function setupDefaultHooks(
-    overrides: {
-        studies?: unknown[];
-        studiesLoading?: boolean;
-        concoursesLoading?: boolean;
-        concourseItems?: unknown[];
-        members?: unknown[];
-        tags?: unknown[];
-    } = {}
-) {
-    const {
-        studies = [],
-        studiesLoading = false,
-        concoursesLoading = false,
-        concourseItems = [],
-        members = [],
-        tags = [],
-    } = overrides;
+function setupDefaultHooks(overrides: { studies?: unknown[]; studiesLoading?: boolean } = {}) {
+    const { studies = [], studiesLoading = false } = overrides;
 
     mockStudiesHook.mockReturnValue({
         data: { items: studies },
         isLoading: studiesLoading,
-    });
-    mockConcoursesHook.mockReturnValue({
-        data: { items: [{ id: 10, project_id: PROJECT_ID }] },
-        isLoading: concoursesLoading,
-    });
-    mockConcourseDetailHook.mockReturnValue({
-        data: { id: 10, items: concourseItems },
-    });
-    mockTagsHook.mockReturnValue({
-        data: tags,
-    });
-    mockMembersHook.mockReturnValue({
-        data: { items: members },
     });
 }
 
@@ -132,8 +84,8 @@ describe('AdminDashboard', () => {
         }
     });
 
-    it('shows onboarding when project is empty (no studies, no items)', () => {
-        setupDefaultHooks({ studies: [], concourseItems: [] });
+    it('shows onboarding when project has no studies', () => {
+        setupDefaultHooks({ studies: [] });
 
         renderWithProviders(<AdminDashboard />);
 
@@ -142,65 +94,20 @@ describe('AdminDashboard', () => {
         expect(screen.getByText('Collect statements in the concourse')).toBeInTheDocument();
     });
 
-    it('marks concourse step as done when items exist', () => {
-        setupDefaultHooks({
-            studies: [],
-            concourseItems: [{ id: 1, text: 'Item 1', status: 'proposed' }],
-        });
-
-        renderWithProviders(<AdminDashboard />);
-
-        // Onboarding is shown (not all steps done)
-        expect(screen.getByText('First steps')).toBeInTheDocument();
-        // Step 2 (concourse) text should have line-through style when done
-        const concourseStepText = screen.getByText('Collect statements in the concourse');
-        expect(concourseStepText.className).toContain('line-through');
-    });
-
-    it('marks Q-set step as done when accepted items exist', () => {
-        setupDefaultHooks({
-            studies: [],
-            concourseItems: [
-                { id: 1, text: 'Accepted item', status: 'accepted' },
-                { id: 2, text: 'Proposed item', status: 'proposed' },
-            ],
-        });
-
-        renderWithProviders(<AdminDashboard />);
-
-        expect(screen.getByText('First steps')).toBeInTheDocument();
-        const qsetStepText = screen.getByText('Select the Q-set');
-        expect(qsetStepText.className).toContain('line-through');
-    });
-
-    it('shows full dashboard when all onboarding steps are complete', () => {
+    it('shows full dashboard with studies section when studies exist', () => {
         const study = makeStudy({
             state: 'active',
             participant_count: 5,
             end_date: '2027-06-01T00:00:00Z',
         });
 
-        setupDefaultHooks({
-            studies: [study],
-            concourseItems: [{ id: 1, text: 'Item', status: 'accepted' }],
-            members: [
-                {
-                    user_id: 1,
-                    role: 'owner',
-                    user: { full_name: 'Alice', email: 'alice@example.com' },
-                },
-            ],
-        });
+        setupDefaultHooks({ studies: [study] });
 
         renderWithProviders(<AdminDashboard />);
 
         // Full dashboard shows project title and stats, not onboarding
         expect(screen.queryByText('First steps')).not.toBeInTheDocument();
         expect(screen.getByText('Test Project')).toBeInTheDocument();
-        // Concourse card present
-        expect(screen.getByText('Concourse')).toBeInTheDocument();
-        // Team card present
-        expect(screen.getByText('Team')).toBeInTheDocument();
     });
 
     it('shows SingleStudyCard layout when exactly 1 study exists', () => {
@@ -210,10 +117,7 @@ describe('AdminDashboard', () => {
             end_date: '2027-06-01T00:00:00Z',
         });
 
-        setupDefaultHooks({
-            studies: [study],
-            concourseItems: [{ id: 1, text: 'Item', status: 'accepted' }],
-        });
+        setupDefaultHooks({ studies: [study] });
 
         renderWithProviders(<AdminDashboard />);
 
@@ -239,14 +143,11 @@ describe('AdminDashboard', () => {
             translations: [{ language_code: 'en', title: 'Second Study', pre_instruction: 'Hi' }],
         });
 
-        setupDefaultHooks({
-            studies: [study1, study2],
-            concourseItems: [{ id: 1, text: 'Item', status: 'accepted' }],
-        });
+        setupDefaultHooks({ studies: [study1, study2] });
 
         renderWithProviders(<AdminDashboard />);
 
-        // StudyGroups renders a "Studies" heading (not SingleStudyCard's "Add study" button context)
+        // StudyGroups renders a "Studies" heading
         expect(screen.getByText('Studies')).toBeInTheDocument();
         expect(screen.getByText('My Study')).toBeInTheDocument();
         expect(screen.getByText('Second Study')).toBeInTheDocument();
@@ -262,70 +163,12 @@ describe('AdminDashboard', () => {
             end_date: threeDaysFromNow.toISOString(),
         });
 
-        setupDefaultHooks({
-            studies: [study],
-            concourseItems: [{ id: 1, text: 'Item', status: 'accepted' }],
-        });
+        setupDefaultHooks({ studies: [study] });
 
         renderWithProviders(<AdminDashboard />);
 
         expect(screen.getByText('Needs attention')).toBeInTheDocument();
         // Alert message includes study name and days
         expect(screen.getByText(/My Study.*closing in 3 days/)).toBeInTheDocument();
-    });
-
-    it('shows concourse item counts in the concourse card', () => {
-        const study = makeStudy({
-            state: 'active',
-            participant_count: 5,
-            end_date: '2027-06-01T00:00:00Z',
-        });
-
-        setupDefaultHooks({
-            studies: [study],
-            concourseItems: [
-                { id: 1, text: 'A', status: 'accepted' },
-                { id: 2, text: 'B', status: 'accepted' },
-                { id: 3, text: 'C', status: 'proposed' },
-            ],
-        });
-
-        renderWithProviders(<AdminDashboard />);
-
-        // Total items count
-        expect(screen.getByText('3')).toBeInTheDocument();
-        // Status breakdown
-        expect(screen.getByText(/2.*Accepted/)).toBeInTheDocument();
-        expect(screen.getByText(/1.*Proposed/)).toBeInTheDocument();
-    });
-
-    it('shows team members in the team card', () => {
-        const study = makeStudy({
-            state: 'active',
-            participant_count: 5,
-            end_date: '2027-06-01T00:00:00Z',
-        });
-
-        setupDefaultHooks({
-            studies: [study],
-            concourseItems: [{ id: 1, text: 'Item', status: 'accepted' }],
-            members: [
-                {
-                    user_id: 1,
-                    role: 'owner',
-                    user: { full_name: 'Alice Smith', email: 'alice@example.com' },
-                },
-                {
-                    user_id: 2,
-                    role: 'editor',
-                    user: { full_name: 'Bob Jones', email: 'bob@example.com' },
-                },
-            ],
-        });
-
-        renderWithProviders(<AdminDashboard />);
-
-        expect(screen.getByText('Alice Smith')).toBeInTheDocument();
-        expect(screen.getByText('Bob Jones')).toBeInTheDocument();
     });
 });

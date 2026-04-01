@@ -14,6 +14,20 @@ class TestParticipantFlow:
 
     async def test_full_submission_flow(self, client: AsyncClient, active_study: Study):
         """Test a complete valid submission from start to finish."""
+        session_token = str(uuid.uuid4())
+
+        # Record consent first
+        consent_resp = await client.post(
+            f"/api/study/{active_study.slug}/consent",
+            json={
+                "session_token": session_token,
+                "study_slug": active_study.slug,
+                "language_code": "en",
+                "consent_hash": "test-hash",
+            },
+        )
+        assert consent_resp.status_code == 200
+
         statements = active_study.statements
         qsort = [
             {"statement_id": statements[0].id, "grid_score": -1, "col": 0, "row": 0},
@@ -23,7 +37,7 @@ class TestParticipantFlow:
         ]
 
         payload = {
-            "session_token": str(uuid.uuid4()),
+            "session_token": session_token,
             "study_slug": active_study.slug,
             "language_used": "en",
             "status": "completed",
