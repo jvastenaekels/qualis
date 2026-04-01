@@ -954,7 +954,7 @@ const StudyDesignPage = () => {
                                         </div>
                                         <div className="flex-1 space-y-1">
                                             <h4 className="text-base font-black tracking-tight">
-                                                {t('admin.design.qsort.grid.mismatch_title')}
+                                                {t('admin.design.qsort.grid.mismatch_title', 'Grid capacity mismatch')}
                                             </h4>
                                             <p className="text-sm font-medium opacity-70 leading-relaxed">
                                                 {t('admin.design.qsort.grid.mismatch_desc', {

@@ -5,16 +5,16 @@ import {
     ArrowRight,
     Users,
     Calendar,
-    Library,
     AlertTriangle,
     CheckCircle2,
     Circle,
     Clock,
-    Settings2,
     PencilRuler,
     Link2,
     Download,
     ChartColumnStacked,
+    Briefcase,
+    FlaskConical,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, format } from 'date-fns';
@@ -26,21 +26,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/store/useAuthStore';
-import {
-    useListStudiesApiAdminStudiesGet,
-    useListConcoursesApiAdminConcoursesGet,
-    useGetConcourseApiAdminConcoursesConcourseIdGet,
-    useListTagsApiAdminConcoursesTagsGet,
-    useListProjectMembersApiAdminProjectsSlugMembersGet,
-} from '@/api/generated';
+import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
 import { ImportStudyDialog } from '@/components/admin/ImportStudyDialog';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useTranslation } from 'react-i18next';
-import { usePermission } from '@/hooks/usePermission';
 import type { StudyRead } from '@/api/model/studyRead';
-import type { ProjectMemberRead } from '@/api/model/projectMemberRead';
-import type { ConcourseTagRead } from '@/api/model/concourseTagRead';
 
 type TranslateFn = ReturnType<typeof useTranslation>['t'];
 
@@ -100,30 +91,8 @@ export function AdminDashboard() {
         undefined,
         { query: { enabled: !!currentProject?.id } }
     );
-    const { data: concoursesData, isLoading: concoursesLoading } =
-        useListConcoursesApiAdminConcoursesGet(undefined, {
-            query: { enabled: !!currentProject?.id },
-        });
-    const { data: tagsData } = useListTagsApiAdminConcoursesTagsGet({
-        query: { enabled: !!currentProject?.id },
-    });
-    const { data: membersData } = useListProjectMembersApiAdminProjectsSlugMembersGet(
-        projectSlug,
-        undefined,
-        { query: { enabled: !!projectSlug } }
-    );
-
-    const concourses = concoursesData?.items?.filter((c) => c.project_id === currentProject?.id);
-    const concourseId = concourses?.[0]?.id;
-
-    const { data: concourseDetail } = useGetConcourseApiAdminConcoursesConcourseIdGet(
-        concourseId as number,
-        { query: { enabled: !!concourseId } }
-    );
 
     const studies = allStudiesData?.items?.filter((s) => s.project_id === currentProject?.id);
-    const tags = tagsData?.filter((tag) => tag.project_id === currentProject?.id);
-    const members = membersData?.items;
 
     // Derived data
     const activeStudies = studies?.filter((s) => s.state === 'active') ?? [];
@@ -132,13 +101,6 @@ export function AdminDashboard() {
     const closedStudies =
         studies?.filter((s) => s.state === 'closed' || s.state === 'archived') ?? [];
     const totalParticipants = studies?.reduce((sum, s) => sum + (s.participant_count ?? 0), 0) ?? 0;
-
-    // Concourse stats
-    const items = concourseDetail?.items ?? [];
-    const acceptedCount = items.filter((i) => i.status === 'accepted').length;
-    const proposedCount = items.filter((i) => i.status === 'proposed').length;
-    const rejectedCount = items.filter((i) => i.status === 'rejected').length;
-    const totalItems = items.length;
 
     // Alerts
     const alerts: Array<{
@@ -172,7 +134,7 @@ export function AdminDashboard() {
         }
     }
 
-    const isLoading = studiesLoading || concoursesLoading;
+    const isLoading = studiesLoading;
 
     function getStudyTitle(study: NonNullable<typeof studies>[number]): string {
         const translation = study.translations?.find((tr) => tr.language_code === i18n.language);
@@ -204,29 +166,18 @@ export function AdminDashboard() {
     }
 
     const hasStudies = studies && studies.length > 0;
-    const hasConcourseItems = totalItems > 0;
-    const hasAcceptedItems = acceptedCount > 0;
-    const hasActiveStudy = activeStudies.length > 0;
-    // Onboarding progress — shown until first study is created
-    const onboardingDone = {
-        project: true,
-        concourse: hasConcourseItems,
-        qset: hasAcceptedItems,
-        study: !!hasStudies,
-    };
 
     // Show onboarding only until a study is created
     if (!hasStudies) {
-        const nextStep = !onboardingDone.concourse
-            ? 'concourse'
-            : !onboardingDone.qset
-              ? 'qset'
-              : 'study';
-
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 md:p-8 max-w-[1100px] mx-auto w-full animate-in fade-in-50 duration-500">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">{currentProject?.title}</h1>
+                    <div className="flex items-center gap-2.5">
+                        <Briefcase className="h-6 w-6 text-indigo-500" />
+                        <h1 className="text-2xl font-bold tracking-tight">
+                            {currentProject?.title}
+                        </h1>
+                    </div>
                     <p className="text-sm text-muted-foreground mt-1">
                         {t('admin.dashboard.get_started', 'Get started with your research project')}
                     </p>
@@ -240,7 +191,7 @@ export function AdminDashboard() {
                         <ol className="space-y-4">
                             <OnboardingStep
                                 step={1}
-                                done={onboardingDone.project}
+                                done
                                 title={t(
                                     'admin.dashboard.step_create_project',
                                     'Create your project'
@@ -252,7 +203,7 @@ export function AdminDashboard() {
                             />
                             <OnboardingStep
                                 step={2}
-                                done={onboardingDone.concourse}
+                                done={false}
                                 title={t(
                                     'admin.dashboard.step_concourse',
                                     'Collect statements in the concourse'
@@ -261,67 +212,32 @@ export function AdminDashboard() {
                                     'admin.dashboard.step_concourse_desc',
                                     'Add the candidate statements from your literature review.'
                                 )}
-                                action={
-                                    nextStep === 'concourse'
-                                        ? () => navigate(`/app/${projectSlug}/concourses`)
-                                        : undefined
-                                }
+                                action={() => navigate(`/app/${projectSlug}/concourses`)}
                                 actionLabel={t('admin.dashboard.go_to_concourse', 'Open concourse')}
                             />
                             <OnboardingStep
                                 step={3}
-                                done={onboardingDone.qset}
+                                done={false}
                                 title={t('admin.dashboard.step_qset', 'Select the Q-set')}
                                 description={t(
                                     'admin.dashboard.step_qset_desc',
                                     'Review and accept the items that will form your Q-set.'
                                 )}
-                                action={
-                                    nextStep === 'qset'
-                                        ? () => navigate(`/app/${projectSlug}/concourses`)
-                                        : undefined
-                                }
-                                actionLabel={t('admin.dashboard.go_to_concourse', 'Open concourse')}
                             />
                             <OnboardingStep
                                 step={4}
-                                done={onboardingDone.study}
+                                done={false}
                                 title={t('admin.dashboard.step_study', 'Create a study')}
                                 description={t(
                                     'admin.dashboard.step_study_desc',
                                     'Define the sorting grid for your Q-sort.'
                                 )}
-                                action={
-                                    nextStep === 'study'
-                                        ? () => setShowCreateDialog(true)
-                                        : undefined
-                                }
+                                action={() => setShowCreateDialog(true)}
                                 actionLabel={t('admin.dashboard.create_study', 'Create study')}
                             />
                         </ol>
                     </CardContent>
                 </Card>
-
-                {/* Concourse + Team row */}
-                {hasConcourseItems && (
-                    <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-                        <ConcourseCard
-                            totalItems={totalItems}
-                            acceptedCount={acceptedCount}
-                            proposedCount={proposedCount}
-                            rejectedCount={rejectedCount}
-                            tags={tags}
-                            onNavigate={() => navigate(`/app/${projectSlug}/concourses`)}
-                            t={t}
-                        />
-                        <TeamCard
-                            members={members}
-                            canManage={can('project:settings')}
-                            onNavigate={() => navigate(`/app/${projectSlug}/settings`)}
-                            t={t}
-                        />
-                    </div>
-                )}
 
                 <CreateStudyDialog
                     open={showCreateDialog}
@@ -337,7 +253,12 @@ export function AdminDashboard() {
             {/* Header */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight">{currentProject?.title}</h1>
+                    <div className="flex items-center gap-2.5">
+                        <Briefcase className="h-6 w-6 text-indigo-500" />
+                        <h1 className="text-2xl font-bold tracking-tight">
+                            {currentProject?.title}
+                        </h1>
+                    </div>
                     <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
                         <span>
                             {t('admin.dashboard.n_studies', {
@@ -407,26 +328,7 @@ export function AdminDashboard() {
                 </Card>
             )}
 
-            {/* Concourse + Team row */}
-            <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-                <ConcourseCard
-                    totalItems={totalItems}
-                    acceptedCount={acceptedCount}
-                    proposedCount={proposedCount}
-                    rejectedCount={rejectedCount}
-                    tags={tags}
-                    onNavigate={() => navigate(`/app/${projectSlug}/concourses`)}
-                    t={t}
-                />
-                <TeamCard
-                    members={members}
-                    canManage={can('project:settings')}
-                    onNavigate={() => navigate(`/app/${projectSlug}/settings`)}
-                    t={t}
-                />
-            </div>
-
-            {/* Studies — single study gets prominent treatment */}
+            {/* Studies */}
             {studies && studies.length === 1 ? (
                 <SingleStudyCard
                     study={studies[0]}
@@ -438,7 +340,8 @@ export function AdminDashboard() {
                 />
             ) : (
                 <>
-                    <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                        <FlaskConical className="h-5 w-5 text-indigo-500" />
                         <h2 className="text-lg font-semibold">
                             {t('admin.dashboard.studies', 'Studies')}
                         </h2>
@@ -522,178 +425,6 @@ function OnboardingStep({
     );
 }
 
-function ConcourseCard({
-    totalItems,
-    acceptedCount,
-    proposedCount,
-    rejectedCount,
-    tags,
-    onNavigate,
-    t,
-}: {
-    totalItems: number;
-    acceptedCount: number;
-    proposedCount: number;
-    rejectedCount: number;
-    tags?: ConcourseTagRead[];
-    onNavigate: () => void;
-    t: TranslateFn;
-}) {
-    return (
-        <Card
-            className="md:col-span-2 cursor-pointer hover:border-foreground/20 transition-colors"
-            onClick={onNavigate}
-        >
-            <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Library className="h-4 w-4 text-muted-foreground" />
-                        <CardTitle className="text-sm font-semibold">
-                            {t('admin.dashboard.concourse', 'Concourse')}
-                        </CardTitle>
-                    </div>
-                    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                </div>
-            </CardHeader>
-            <CardContent className="space-y-3">
-                {totalItems > 0 ? (
-                    <>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-bold">{totalItems}</span>
-                            <span className="text-sm text-muted-foreground">
-                                {t('admin.concourse.items_label', 'items')}
-                            </span>
-                        </div>
-                        <div className="flex h-2.5 rounded-full overflow-hidden bg-slate-100">
-                            {acceptedCount > 0 && (
-                                <div
-                                    className="bg-emerald-500 transition-all"
-                                    style={{ width: `${(acceptedCount / totalItems) * 100}%` }}
-                                />
-                            )}
-                            {proposedCount > 0 && (
-                                <div
-                                    className="bg-amber-400 transition-all"
-                                    style={{ width: `${(proposedCount / totalItems) * 100}%` }}
-                                />
-                            )}
-                            {rejectedCount > 0 && (
-                                <div
-                                    className="bg-red-300 transition-all"
-                                    style={{ width: `${(rejectedCount / totalItems) * 100}%` }}
-                                />
-                            )}
-                        </div>
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1.5">
-                                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                                {acceptedCount} {t('admin.concourse.status.accepted', 'Accepted')}
-                            </span>
-                            <span className="flex items-center gap-1.5">
-                                <span className="h-2 w-2 rounded-full bg-amber-400" />
-                                {proposedCount} {t('admin.concourse.status.proposed', 'Proposed')}
-                            </span>
-                            {rejectedCount > 0 && (
-                                <span className="flex items-center gap-1.5">
-                                    <span className="h-2 w-2 rounded-full bg-red-300" />
-                                    {rejectedCount}{' '}
-                                    {t('admin.concourse.status.rejected', 'Rejected')}
-                                </span>
-                            )}
-                        </div>
-                        {tags && tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 pt-1">
-                                {tags.map((tag) => (
-                                    <Badge
-                                        key={tag.id}
-                                        variant="outline"
-                                        className="text-2xs font-normal"
-                                    >
-                                        {tag.color ? (
-                                            <span
-                                                className="h-2 w-2 rounded-full mr-1.5 shrink-0"
-                                                style={{ backgroundColor: tag.color }}
-                                            />
-                                        ) : null}
-                                        {tag.name}
-                                    </Badge>
-                                ))}
-                            </div>
-                        )}
-                    </>
-                ) : (
-                    <p className="text-sm text-muted-foreground">
-                        {t(
-                            'admin.dashboard.concourse_empty',
-                            'No items yet. Start building your statement collection.'
-                        )}
-                    </p>
-                )}
-            </CardContent>
-        </Card>
-    );
-}
-
-function TeamCard({
-    members,
-    canManage,
-    onNavigate,
-    t,
-}: {
-    members?: ProjectMemberRead[];
-    canManage: boolean;
-    onNavigate: () => void;
-    t: TranslateFn;
-}) {
-    return (
-        <Card
-            className={cn(
-                'transition-colors',
-                canManage && 'cursor-pointer hover:border-foreground/20'
-            )}
-            onClick={() => canManage && onNavigate()}
-        >
-            <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        <CardTitle className="text-sm font-semibold">
-                            {t('admin.dashboard.team', 'Team')}
-                        </CardTitle>
-                    </div>
-                    {canManage && <Settings2 className="h-4 w-4 text-muted-foreground" />}
-                </div>
-            </CardHeader>
-            <CardContent>
-                {members && members.length > 0 ? (
-                    <div className="space-y-2.5">
-                        {members.map((member) => (
-                            <div key={member.user_id} className="flex items-center gap-2.5">
-                                <div className="flex items-center justify-center h-7 w-7 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold shrink-0">
-                                    {member.user?.full_name
-                                        ? member.user.full_name.substring(0, 2).toUpperCase()
-                                        : member.user?.email?.substring(0, 2).toUpperCase()}
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-sm font-medium truncate">
-                                        {member.user?.full_name || member.user?.email}
-                                    </p>
-                                </div>
-                                <Badge variant="outline" className="text-2xs shrink-0">
-                                    {t(`admin.project.roles.${member.role}`, member.role as string)}
-                                </Badge>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <p className="text-sm text-muted-foreground">
-                        {t('admin.dashboard.team_loading', 'Loading...')}
-                    </p>
-                )}
-            </CardContent>
-        </Card>
-    );
-}
 
 function SingleStudyCard({
     study,
@@ -747,7 +478,12 @@ function SingleStudyCard({
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">{t('admin.dashboard.studies', 'Studies')}</h2>
+                <div className="flex items-center gap-2">
+                    <FlaskConical className="h-5 w-5 text-indigo-500" />
+                    <h2 className="text-lg font-semibold">
+                        {t('admin.dashboard.studies', 'Studies')}
+                    </h2>
+                </div>
                 <Button
                     variant="ghost"
                     size="sm"

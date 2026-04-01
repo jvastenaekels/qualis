@@ -1608,6 +1608,7 @@
                     "locked_paused_desc": "The study is currently paused. Design remains locked to protect existing data.",
                     "locked_closed": "Study is closed",
                     "locked_closed_desc": "This study is completed. The design is archived and cannot be changed.",
+                    "mismatch_title": "Grid capacity mismatch",
                     "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match.",
                     "unlock_hint": "Go to data explorer to purge sessions and unlock structure"
                 }

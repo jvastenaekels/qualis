@@ -133,7 +133,7 @@ export default function ProjectSettingsPage() {
                     slug: data.slug,
                 },
             });
-            toast.success(t('admin.workspaces.settings.general.save_success'));
+            toast.success(t('admin.projects.settings.general.save_success'));
 
             // Invalidate React Query list to ensure Sidebar/Switcher are updated
             await queryClient.invalidateQueries({
@@ -144,7 +144,7 @@ export default function ProjectSettingsPage() {
                 navigate(`/app/${data.slug}/settings`);
             }
         } catch (err) {
-            toast.error(parseApiErrorSync(err, t('admin.workspaces.settings.general.save_error')));
+            toast.error(parseApiErrorSync(err, t('admin.projects.settings.general.save_error')));
         }
     }
 
@@ -155,11 +155,11 @@ export default function ProjectSettingsPage() {
                 userId,
                 data: { role },
             });
-            toast.success(t('admin.workspaces.settings.team.role_update_success'));
+            toast.success(t('admin.projects.settings.team.role_update_success'));
             refetchMembers();
         } catch (err) {
             toast.error(
-                parseApiErrorSync(err, t('admin.workspaces.settings.team.role_update_error'))
+                parseApiErrorSync(err, t('admin.projects.settings.team.role_update_error'))
             );
         }
     };
@@ -171,13 +171,13 @@ export default function ProjectSettingsPage() {
             );
             return;
         }
-        if (!confirm(t('admin.workspaces.settings.team.remove_confirm'))) return;
+        if (!confirm(t('admin.projects.settings.team.remove_confirm'))) return;
         try {
             await removeMemberMutation.mutateAsync({ slug, userId });
-            toast.success(t('admin.workspaces.settings.team.remove_success'));
+            toast.success(t('admin.projects.settings.team.remove_success'));
             refetchMembers();
         } catch (err) {
-            toast.error(parseApiErrorSync(err, t('admin.workspaces.settings.team.remove_error')));
+            toast.error(parseApiErrorSync(err, t('admin.projects.settings.team.remove_error')));
         }
     };
 
@@ -201,7 +201,7 @@ export default function ProjectSettingsPage() {
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
                 title={project.title}
-                description={t('admin.workspaces.settings.identity_desc')}
+                description={t('admin.projects.settings.identity_desc')}
                 icon={Briefcase}
             />
 
@@ -212,10 +212,10 @@ export default function ProjectSettingsPage() {
                         <CardHeader className="border-b border-slate-50 pb-4">
                             <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                                 <Settings className="size-5 text-indigo-500" />
-                                {t('admin.workspaces.settings.general.title')}
+                                {t('admin.projects.settings.general.title')}
                             </CardTitle>
                             <CardDescription className="text-sm font-medium text-slate-500">
-                                {t('admin.workspaces.settings.general.desc')}
+                                {t('admin.projects.settings.general.desc')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="pt-6">
@@ -231,14 +231,14 @@ export default function ProjectSettingsPage() {
                                             <FormItem>
                                                 <FormLabel className="text-2xs font-black text-slate-500">
                                                     {t(
-                                                        'admin.workspaces.settings.general.label_title'
+                                                        'admin.projects.settings.general.label_title'
                                                     )}
                                                 </FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         {...field}
                                                         placeholder={t(
-                                                            'admin.workspaces.settings.general.placeholder_title'
+                                                            'admin.projects.settings.general.placeholder_title'
                                                         )}
                                                         className="h-11 rounded-xl bg-white/50"
                                                         disabled={!isAdmin}
@@ -255,7 +255,7 @@ export default function ProjectSettingsPage() {
                                             <FormItem>
                                                 <FormLabel className="text-2xs font-black text-slate-500">
                                                     {t(
-                                                        'admin.workspaces.settings.general.label_slug'
+                                                        'admin.projects.settings.general.label_slug'
                                                     )}
                                                 </FormLabel>
                                                 <FormControl>
@@ -263,7 +263,7 @@ export default function ProjectSettingsPage() {
                                                         <Input
                                                             {...field}
                                                             placeholder={t(
-                                                                'admin.workspaces.settings.general.placeholder_slug'
+                                                                'admin.projects.settings.general.placeholder_slug'
                                                             )}
                                                             className="h-11 rounded-xl pl-32 bg-white/50"
                                                             disabled={!isAdmin}
@@ -275,7 +275,7 @@ export default function ProjectSettingsPage() {
                                                 </FormControl>
                                                 <FormDescription className="text-2xs italic">
                                                     {t(
-                                                        'admin.workspaces.settings.general.slug_hint'
+                                                        'admin.projects.settings.general.slug_hint'
                                                     )}
                                                 </FormDescription>
                                                 <FormMessage />
@@ -298,7 +298,7 @@ export default function ProjectSettingsPage() {
                                                     <>
                                                         <Save className="size-4 mr-2" />
                                                         {t(
-                                                            'admin.workspaces.settings.general.save'
+                                                            'admin.projects.settings.general.save'
                                                         )}
                                                     </>
                                                 )}
@@ -315,10 +315,10 @@ export default function ProjectSettingsPage() {
                         <CardHeader className="border-b border-slate-50 pb-4">
                             <CardTitle className="text-lg font-black text-slate-900 flex items-center gap-2">
                                 <Users className="size-5 text-indigo-500" />
-                                {t('admin.workspaces.settings.team.title')}
+                                {t('admin.projects.settings.team.title')}
                             </CardTitle>
                             <CardDescription className="text-sm font-medium text-slate-500">
-                                {t('admin.workspaces.settings.team.desc')}
+                                {t('admin.projects.settings.team.desc')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="p-0">
@@ -332,19 +332,19 @@ export default function ProjectSettingsPage() {
                                             scope="col"
                                             className="text-2xs font-black px-6 h-12"
                                         >
-                                            {t('admin.workspaces.settings.team.col_user')}
+                                            {t('admin.projects.settings.team.col_user')}
                                         </TableHead>
                                         <TableHead scope="col" className="text-2xs font-black h-12">
-                                            {t('admin.workspaces.settings.team.col_role')}
+                                            {t('admin.projects.settings.team.col_role')}
                                         </TableHead>
                                         <TableHead scope="col" className="text-2xs font-black h-12">
-                                            {t('admin.workspaces.settings.team.col_joined')}
+                                            {t('admin.projects.settings.team.col_joined')}
                                         </TableHead>
                                         <TableHead
                                             scope="col"
                                             className="text-2xs font-black text-right px-6 h-12"
                                         >
-                                            {t('admin.workspaces.settings.team.col_actions')}
+                                            {t('admin.projects.settings.team.col_actions')}
                                         </TableHead>
                                     </TableRow>
                                 </TableHeader>
@@ -467,12 +467,12 @@ export default function ProjectSettingsPage() {
                         <CardHeader>
                             <CardTitle className="text-sm font-black text-indigo-700 flex items-center gap-2">
                                 <UserPlus className="size-4" />
-                                {t('admin.workspaces.settings.team_growth_title')}
+                                {t('admin.projects.settings.team_growth_title')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <p className="text-xs font-medium text-indigo-900/70 leading-relaxed">
-                                {t('admin.workspaces.settings.team.growth_desc')}
+                                {t('admin.projects.settings.team.growth_desc')}
                             </p>
                             <InviteMemberModal slug={slug} isAdmin={isAdmin} />
                         </CardContent>
@@ -482,7 +482,7 @@ export default function ProjectSettingsPage() {
                         <CardHeader className="pb-2">
                             <CardTitle className="text-sm font-black text-slate-900 flex items-center gap-2">
                                 <Shield className="size-4 text-slate-400" />
-                                {t('admin.workspaces.settings.team.permissions_matrix.title')}
+                                {t('admin.projects.settings.team.permissions_matrix.title')}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4 pt-2">
@@ -491,7 +491,7 @@ export default function ProjectSettingsPage() {
                                     <div className="flex items-center justify-between">
                                         <span className="text-2xs font-black text-slate-900">
                                             {t(
-                                                'admin.workspaces.settings.team.permissions_matrix.researcher.label'
+                                                'admin.projects.settings.team.permissions_matrix.researcher.label'
                                             )}
                                         </span>
                                         <Badge
@@ -499,13 +499,13 @@ export default function ProjectSettingsPage() {
                                             className="text-[8px] h-4 bg-emerald-50 border-emerald-100 text-emerald-700"
                                         >
                                             {t(
-                                                'admin.workspaces.settings.team.permissions_matrix.researcher.badge'
+                                                'admin.projects.settings.team.permissions_matrix.researcher.badge'
                                             )}
                                         </Badge>
                                     </div>
                                     <p className="text-2xs text-slate-500 leading-tight">
                                         {t(
-                                            'admin.workspaces.settings.team.permissions_matrix.researcher.desc'
+                                            'admin.projects.settings.team.permissions_matrix.researcher.desc'
                                         )}
                                     </p>
                                 </div>
@@ -513,7 +513,7 @@ export default function ProjectSettingsPage() {
                                     <div className="flex items-center justify-between">
                                         <span className="text-2xs font-black text-slate-900">
                                             {t(
-                                                'admin.workspaces.settings.team.permissions_matrix.viewer.label'
+                                                'admin.projects.settings.team.permissions_matrix.viewer.label'
                                             )}
                                         </span>
                                         <Badge
@@ -521,13 +521,13 @@ export default function ProjectSettingsPage() {
                                             className="text-[8px] h-4 bg-slate-50 border-slate-100 text-slate-500"
                                         >
                                             {t(
-                                                'admin.workspaces.settings.team.permissions_matrix.viewer.badge'
+                                                'admin.projects.settings.team.permissions_matrix.viewer.badge'
                                             )}
                                         </Badge>
                                     </div>
                                     <p className="text-2xs text-slate-500 leading-tight">
                                         {t(
-                                            'admin.workspaces.settings.team.permissions_matrix.viewer.desc'
+                                            'admin.projects.settings.team.permissions_matrix.viewer.desc'
                                         )}
                                     </p>
                                 </div>
@@ -558,10 +558,10 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                 data: { email, role },
             });
             setInviteUrl(result.invite_url || null);
-            toast.success(t('admin.workspaces.settings.team.invite_modal.success'));
+            toast.success(t('admin.projects.settings.team.invite_modal.success'));
         } catch (err) {
             toast.error(
-                parseApiErrorSync(err, t('admin.workspaces.settings.team.invite_modal.error'))
+                parseApiErrorSync(err, t('admin.projects.settings.team.invite_modal.error'))
             );
         }
     };
@@ -571,7 +571,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
             navigator.clipboard.writeText(inviteUrl);
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
-            toast.success(t('admin.workspaces.settings.team.invite_modal.copy_success'));
+            toast.success(t('admin.projects.settings.team.invite_modal.copy_success'));
         }
     };
 
@@ -583,17 +583,17 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                     disabled={!isAdmin}
                 >
                     <UserPlus className="size-4 mr-2" />
-                    {t('admin.workspaces.settings.team.invite_button')}
+                    {t('admin.projects.settings.team.invite_button')}
                 </Button>
             </DialogTrigger>
             <DialogContent className="border-slate-200 bg-white shadow-2xl max-w-sm p-0 overflow-hidden">
                 <div className="p-6">
                     <DialogHeader className="mb-4">
                         <DialogTitle className="text-xl font-black text-slate-900 leading-tight">
-                            {t('admin.workspaces.settings.team.invite_modal.title')}
+                            {t('admin.projects.settings.team.invite_modal.title')}
                         </DialogTitle>
                         <DialogDescription className="text-sm font-medium text-slate-500 mt-2">
-                            {t('admin.workspaces.settings.team.invite_modal.desc')}
+                            {t('admin.projects.settings.team.invite_modal.desc')}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -601,7 +601,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                         <form onSubmit={handleInvite} className="space-y-4 pt-4">
                             <div className="space-y-2">
                                 <Label className="text-2xs font-black text-slate-700">
-                                    {t('admin.workspaces.settings.team.invite_modal.email_label')}
+                                    {t('admin.projects.settings.team.invite_modal.email_label')}
                                 </Label>
                                 <Input
                                     type="email"
@@ -614,7 +614,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                             </div>
                             <div className="space-y-2">
                                 <Label className="text-2xs font-black text-slate-700">
-                                    {t('admin.workspaces.settings.team.invite_modal.role_label')}
+                                    {t('admin.projects.settings.team.invite_modal.role_label')}
                                 </Label>
                                 <Select
                                     value={role}
@@ -656,7 +656,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                                     ) : (
                                         <Mail className="size-4 mr-2" />
                                     )}
-                                    {t('admin.workspaces.settings.team.invite_modal.send')}
+                                    {t('admin.projects.settings.team.invite_modal.send')}
                                 </Button>
                             </DialogFooter>
                         </form>
@@ -665,7 +665,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                             <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 space-y-3">
                                 <div className="flex items-center gap-2 text-emerald-700 font-bold text-sm">
                                     <Check className="size-4" />
-                                    {t('admin.workspaces.settings.team.invite_modal.success')}
+                                    {t('admin.projects.settings.team.invite_modal.success')}
                                 </div>
                                 <div className="relative group">
                                     <Input
@@ -687,7 +687,7 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                                     </Button>
                                 </div>
                                 <p className="text-2xs text-emerald-600/70 italic">
-                                    {t('admin.workspaces.settings.team.invite_modal.copy_hint')}
+                                    {t('admin.projects.settings.team.invite_modal.copy_hint')}
                                 </p>
                             </div>
                             <Button

@@ -1592,6 +1592,7 @@
                     "locked_paused_desc": "Tutkimus on tällä hetkellä keskeytetty. Suunnittelu pysyy lukittuna olemassa olevien tietojen suojaamiseksi.",
                     "locked_closed": "Tutkimus on suljettu",
                     "locked_closed_desc": "Tämä tutkimus on valmis. Suunnittelu on arkistoitu eikä sitä voi muuttaa.",
+                    "mismatch_title": "Ruudukon kapasiteetti ei täsmää",
                     "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
                     "unlock_hint": "Siirry Data-selaimeen tyhjentääksesi vastaukset ja avataksesi rakenteen muokkauksen"
                 }

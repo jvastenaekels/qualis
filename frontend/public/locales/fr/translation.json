@@ -1630,6 +1630,7 @@
                     "locked_paused_desc": "L'étude est actuellement en pause. La conception reste verrouillée pour protéger les données existantes.",
                     "locked_closed": "L'étude est clôturée",
                     "locked_closed_desc": "Cette étude est terminée. La conception est archivée et ne peut plus être modifiée.",
+                    "mismatch_title": "Capacité de grille incorrecte",
                     "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous.",
                     "unlock_hint": "Aller dans l'explorateur de données pour purger les sessions et débloquer la structure"
                 }
