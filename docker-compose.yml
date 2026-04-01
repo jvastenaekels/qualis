@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: libre_q
+      POSTGRES_USER: libre_q
+      POSTGRES_PASSWORD: libre_q
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U libre_q"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://libre_q:libre_q@db:5432/libre_q
+      SECRET_KEY: docker-dev-secret-change-in-production
+      IP_HASH_SALT: docker-dev-salt-change-in-production
+      FRONTEND_URL: http://localhost:3000
+      ENVIRONMENT: development
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: admin123
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
