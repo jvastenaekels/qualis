@@ -24,6 +24,12 @@
         "includes": ["**", "!src/api/generated.ts", "!src/api/model/**"],
         "rules": {
             "recommended": true,
+            "complexity": {
+                "noExcessiveCognitiveComplexity": {
+                    "level": "warn",
+                    "options": { "maxAllowedComplexity": 15 }
+                }
+            },
             "correctness": {
                 "noUnusedVariables": "error",
                 "useExhaustiveDependencies": "warn",
