@@ -35,6 +35,16 @@ vi.mock('@/api/generated', () => ({
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey: vi.fn(() => [
         '/api/admin/studies/test-study/analysis/runs',
     ]),
+    // FactorVoicesPanel renders inside the results tab and calls this hook
+    // — return an idle/empty query so the panel renders the empty state
+    // without a real network call.
+    useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet: () => ({
+        data: [],
+        isLoading: false,
+        isSuccess: true,
+        isError: false,
+        error: null,
+    }),
 }));
 
 // Mock react-router-dom

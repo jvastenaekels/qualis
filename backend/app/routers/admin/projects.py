@@ -287,11 +287,12 @@ async def update_project_member(
             detail="An unexpected error occurred while updating member role",
         )
     await db.refresh(member, attribute_names=["role"])
+    # ProjectMember has a composite PK (project_id, user_id), no surrogate id.
     log_admin_action(
         actor_user_id=current_user.id,
         action="role_change",
         resource="project_member",
-        resource_id=member.id,
+        resource_id=f"{project.id}:{user_id}",
         project_slug=project.slug,
         target_user_id=user_id,
         previous_role=previous_role.value,
@@ -345,7 +346,7 @@ async def remove_project_member(
         actor_user_id=current_user.id,
         action="remove_member",
         resource="project_member",
-        resource_id=member.id,
+        resource_id=f"{project.id}:{user_id}",
         project_slug=project.slug,
         target_user_id=user_id,
         previous_role=removed_role.value,

@@ -107,29 +107,33 @@ async def get_data_inventory(
     # Participant counts split by status / discarded / test-run / anonymised
     counts_q = select(
         func.count(Participant.id).label("total"),
-        func.count(Participant.id).filter(
-            Participant.status == ParticipantStatus.started
-        ).label("started"),
-        func.count(Participant.id).filter(
-            Participant.status == ParticipantStatus.completed
-        ).label("completed"),
-        func.count(Participant.id).filter(
-            Participant.is_discarded.is_(True)
-        ).label("discarded"),
-        func.count(Participant.id).filter(
-            Participant.is_test_run.is_(True)
-        ).label("test_runs"),
-        func.count(Participant.id).filter(
-            Participant.anonymised_at.isnot(None)
-        ).label("anonymised"),
+        func.count(Participant.id)
+        .filter(Participant.status == ParticipantStatus.started)
+        .label("started"),
+        func.count(Participant.id)
+        .filter(Participant.status == ParticipantStatus.completed)
+        .label("completed"),
+        func.count(Participant.id)
+        .filter(Participant.is_discarded.is_(True))
+        .label("discarded"),
+        func.count(Participant.id)
+        .filter(Participant.is_test_run.is_(True))
+        .label("test_runs"),
+        func.count(Participant.id)
+        .filter(Participant.anonymised_at.isnot(None))
+        .label("anonymised"),
     ).where(Participant.study_id == study.id)
     counts_row = (await db.execute(counts_q)).one()
 
     # Audio inventory
-    audio_q = select(
-        func.count(AudioRecording.id),
-        func.coalesce(func.sum(AudioRecording.file_size_bytes), 0),
-    ).join(Participant).where(Participant.study_id == study.id)
+    audio_q = (
+        select(
+            func.count(AudioRecording.id),
+            func.coalesce(func.sum(AudioRecording.file_size_bytes), 0),
+        )
+        .join(Participant)
+        .where(Participant.study_id == study.id)
+    )
     audio_count, audio_bytes = (await db.execute(audio_q)).one()
 
     # Timeline aggregates
@@ -145,16 +149,20 @@ async def get_data_inventory(
     cutoff_2y = now.replace(year=now.year - 2)
 
     older_q = select(
-        func.count(Participant.id).filter(
+        func.count(Participant.id)
+        .filter(
             Participant.status == ParticipantStatus.completed,
             Participant.submitted_at < cutoff_1y,
             Participant.anonymised_at.is_(None),
-        ).label("older_1y"),
-        func.count(Participant.id).filter(
+        )
+        .label("older_1y"),
+        func.count(Participant.id)
+        .filter(
             Participant.status == ParticipantStatus.completed,
             Participant.submitted_at < cutoff_2y,
             Participant.anonymised_at.is_(None),
-        ).label("older_2y"),
+        )
+        .label("older_2y"),
     ).where(Participant.study_id == study.id)
     older_row = (await db.execute(older_q)).one()
 

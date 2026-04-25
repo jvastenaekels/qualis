@@ -141,12 +141,12 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=[
-        "Authorization",       # JWT bearer
-        "Content-Type",        # JSON / multipart bodies
-        "Accept",              # content negotiation
-        "Accept-Language",     # i18n preference
-        "X-Project-ID",        # current project context for admin requests
-        "X-Requested-With",    # XHR sentinel some clients still send
+        "Authorization",  # JWT bearer
+        "Content-Type",  # JSON / multipart bodies
+        "Accept",  # content negotiation
+        "Accept-Language",  # i18n preference
+        "X-Project-ID",  # current project context for admin requests
+        "X-Requested-With",  # XHR sentinel some clients still send
     ],
 )
 

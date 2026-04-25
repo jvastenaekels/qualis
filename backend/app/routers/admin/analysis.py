@@ -303,9 +303,7 @@ async def run_factor_analysis(
 # ---- AnalysisRun history endpoints (audit trail) ----
 
 
-async def _load_run(
-    db: AsyncSession, study_id: int, run_id: int
-) -> AnalysisRun:
+async def _load_run(db: AsyncSession, study_id: int, run_id: int) -> AnalysisRun:
     """Load a run scoped to the study, with `ran_by` user joined for email."""
     stmt = (
         select(AnalysisRun)

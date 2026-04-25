@@ -250,3 +250,26 @@ rotated_loadings
 factor_characteristics
 suggested_n_factors
 flagged_factors
+
+# AnalysisRun + audit-trail endpoints (app/routers/admin/analysis.py)
+list_analysis_runs
+get_analysis_run
+update_analysis_run
+delete_analysis_run
+list_audios_for_participants
+ran_by_email
+
+# Data-lifecycle endpoints + Pydantic field hooks (app/routers/admin/lifecycle.py)
+get_data_inventory
+bulk_anonymise_old_participants
+total_mb
+completed_older_than_1y
+completed_older_than_2y
+generated_at
+timeline
+locales
+skipped_already_anonymous
+
+# RGPD erasure endpoints
+admin_erase_participant_personal_data
+participant_self_erase_personal_data

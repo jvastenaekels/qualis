@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     # Error reporting (optional). Leave SENTRY_DSN empty to disable.
     # When set, errors are reported to Sentry tagged with ENVIRONMENT.
     SENTRY_DSN: str | None = None
+    # 0 = no perf traces; raise to ~0.1 in prod once Sentry is wired.
     SENTRY_TRACES_SAMPLE_RATE: float = 0.0
 
     # Rate-limiter trust model for X-Forwarded-For (audit F-01-004).
@@ -39,7 +40,7 @@ class Settings(BaseSettings):
 
     @property
     def trusted_proxies_list(self) -> list[str]:
-        return [p.strip() for p in self.TRUSTED_PROXIES.split(",") if p.strip()]  # 0 = no perf traces; raise to ~0.1 in prod
+        return [p.strip() for p in self.TRUSTED_PROXIES.split(",") if p.strip()]
 
     # CORS — comma-separated origin list. Defaults cover local dev (Vite + preview).
     # In production set explicit origins via env, e.g.

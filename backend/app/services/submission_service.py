@@ -114,9 +114,7 @@ class SubmissionService:
                     break
 
                 if not resume_code_set:
-                    raise ConcurrencyError(
-                        "Could not generate a unique resume code."
-                    )
+                    raise ConcurrencyError("Could not generate a unique resume code.")
             except IntegrityError:
                 # Race condition: Participant created concurrently
                 await db.rollback()
