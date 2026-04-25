@@ -276,6 +276,9 @@ module = [
     #   typing.Any is structurally required: get_study_full_dump is an untyped proxy
     #   over StudyDataService.get_study_full_dump (returns open-ended StudyDump).
     "app.routers.admin.exports",
+    # admin/projects: 5 return types (PaginatedResponse[ProjectWithRole|ProjectMemberRead]
+    #   via cast, None x2 for delete endpoints, InvitationLink for invite creation).
+    "app.routers.admin.projects",
 ]
 disallow_untyped_defs = true
 warn_return_any = true

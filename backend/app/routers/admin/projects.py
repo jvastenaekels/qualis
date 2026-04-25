@@ -1,3 +1,5 @@
+from typing import cast
+
 from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
 from sqlalchemy import select, func
 from sqlalchemy.exc import IntegrityError
@@ -39,7 +41,7 @@ async def list_projects(
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
-):
+) -> PaginatedResponse[ProjectWithRole]:
     """
     List all projects the current user is a member of, with their role.
     """
@@ -63,8 +65,11 @@ async def list_projects(
         ProjectWithRole(**project.__dict__, user_role=role) for project, role in rows
     ]
 
-    return PaginatedResponse(
-        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    return cast(
+        PaginatedResponse[ProjectWithRole],
+        PaginatedResponse(
+            items=items, total=total, limit=pagination.limit, offset=pagination.offset
+        ),
     )
 
 
@@ -222,7 +227,7 @@ async def list_project_members(
     project: Project = Depends(check_project_permission(ProjectRole.viewer)),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
-):
+) -> PaginatedResponse[ProjectMemberRead]:
     """
     List all members of a project with pagination.
     """
@@ -241,8 +246,12 @@ async def list_project_members(
     result = await db.execute(query)
     items = list(result.scalars().all())
 
-    return PaginatedResponse(
-        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    # FastAPI serialises ProjectMember → ProjectMemberRead via response_model.
+    return cast(
+        PaginatedResponse[ProjectMemberRead],
+        PaginatedResponse(
+            items=items, total=total, limit=pagination.limit, offset=pagination.offset
+        ),
     )
 
 
@@ -309,7 +318,7 @@ async def remove_project_member(
     project: Project = Depends(check_project_permission(ProjectRole.owner)),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     """
     Remove a member from the project.
     """
@@ -360,7 +369,7 @@ async def delete_project(
     project: Project = Depends(check_project_permission(ProjectRole.owner)),
     current_user: User = Depends(get_current_active_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     """
     Delete a project (Owner only).
     """
@@ -410,7 +419,7 @@ async def create_invitation(
     invitation_in: ProjectInvitationCreate,
     background_tasks: BackgroundTasks,
     project: Project = Depends(check_project_permission(ProjectRole.owner)),
-):
+) -> InvitationLink:
     """
     Invite a user to the project.
     """
