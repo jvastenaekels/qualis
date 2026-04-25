@@ -2,6 +2,7 @@
 
 import logging
 from datetime import datetime, timezone
+from typing import TypedDict
 
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,6 +35,24 @@ from ..schemas.concourses import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+class TranslationEntry(TypedDict):
+    """A language_code / text pair used in stale statement diffs."""
+
+    language_code: str
+    text: str
+
+
+class StaleStatementEntry(TypedDict):
+    """Entry returned by check_stale_statements — StaleStatementRead-compatible."""
+
+    statement_id: int
+    statement_code: str
+    source_concourse_item_id: int
+    source_deleted: bool
+    current_translations: list[TranslationEntry]
+    concourse_translations: list[TranslationEntry]
 
 
 class ConcourseService:
@@ -346,7 +365,7 @@ class ConcourseService:
         )
         db.add(version_record)
 
-        update_values: dict = {}
+        update_values: dict[str, object] = {}
         if data.code is not None:
             update_values["code"] = data.code
         if data.source is not None:
@@ -652,7 +671,7 @@ class ConcourseService:
     async def check_stale_statements(
         db: AsyncSession,
         study: Study,
-    ) -> list[dict]:  # Returns StaleStatementRead-compatible dicts
+    ) -> list[StaleStatementEntry]:
         """Return statements whose concourse source has been updated since import.
 
         Each entry contains the statement id, the concourse item id,
@@ -683,7 +702,7 @@ class ConcourseService:
         item_result = await db.execute(item_stmt)
         items_by_id = {item.id: item for item in item_result.scalars().all()}
 
-        stale = []
+        stale: list[StaleStatementEntry] = []
         for s in linked_statements:
             source_id = s.source_concourse_item_id
             assert source_id is not None  # guaranteed by query filter

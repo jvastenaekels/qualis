@@ -132,6 +132,31 @@ warn_return_any = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
+# Phase 3 wave 2 — Batch 2 services (full strict)
+# storage_service: boto3 was previously untyped (type: ignore on imports);
+# stubs now ship so the ignores were unused. 2 casts for boto3 return Any
+# (generate_presigned_url → str, StreamingBody.read() → bytes).
+module = [
+    "app.services.storage_service",
+]
+disallow_untyped_defs = true
+disallow_any_explicit = true
+warn_return_any = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+# Phase 3 wave 2 — Batch 2 services (relaxed tier)
+# concourse_service: SQLAlchemy ORM-heavy; Mapped[dict] in models.py propagates
+# type-arg error. 2 bare dict annotations tightened (dict → dict[str, object]).
+# disallow_any_explicit omitted due to ORM stub propagation.
+module = [
+    "app.services.concourse_service",
+]
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
 # Phase 3 wave 2 — Batch 1 services (relaxed tier)
 # analysis_service: pure Python + NumPy; 3 casts added for numpy 2.x stub
 # gaps (arithmetic/bitwise ops return Any). Uses dict[str, Any] for JSON wire

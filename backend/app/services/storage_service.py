@@ -8,16 +8,25 @@ import asyncio
 import logging
 import re
 from datetime import UTC, datetime
-from typing import Any
+from typing import TypedDict, cast
 from uuid import UUID
 
-import boto3  # type: ignore
-from botocore.config import Config as BotoConfig  # type: ignore
-from botocore.exceptions import ClientError  # type: ignore
+import boto3
+from botocore.config import Config as BotoConfig
+from botocore.exceptions import ClientError
 from app.core.config import settings
 from app.exceptions import NotFoundError, ServiceError
 
 logger = logging.getLogger(__name__)
+
+
+class AudioUploadMetadata(TypedDict):
+    """Metadata returned by upload_audio (keys consumed by the audio router)."""
+
+    s3_bucket: str
+    s3_key: str
+    file_size_bytes: int
+    mime_type: str
 
 # question_key is participant-supplied (form field, audio recording context).
 # We constrain it to a strict charset to prevent path-traversal and key-injection
@@ -74,7 +83,10 @@ class StorageService:
                 response_checksum_validation="when_required",
             ),
         )
-        self.bucket_name = settings.S3_BUCKET_NAME
+        # settings.S3_BUCKET_NAME is str | None; the all() guard above guarantees
+        # it is non-None at this point (raises ValueError otherwise).
+        assert settings.S3_BUCKET_NAME is not None
+        self.bucket_name: str = settings.S3_BUCKET_NAME
 
     async def upload_audio(
         self,
@@ -83,7 +95,7 @@ class StorageService:
         study_slug: str,
         participant_token: UUID,
         question_key: str,
-    ) -> dict[str, Any]:
+    ) -> AudioUploadMetadata:
         """
         Upload audio file to S3 and return metadata.
 
@@ -95,7 +107,7 @@ class StorageService:
             question_key: Question identifier (e.g., "card_123", "missing_statement")
 
         Returns:
-            Dictionary with s3_bucket, s3_key, file_size_bytes, mime_type
+            AudioUploadMetadata with s3_bucket, s3_key, file_size_bytes, mime_type
 
         Raises:
             HTTPException: If upload fails
@@ -179,7 +191,7 @@ class StorageService:
                 Params={"Bucket": self.bucket_name, "Key": s3_key},
                 ExpiresIn=expiration,
             )
-            return url
+            return str(url)  # boto3 stubs type generate_presigned_url as Any
         except ClientError as e:
             logger.error("Presigned URL generation failed for key %s: %s", s3_key, e)
             raise ServiceError("Failed to generate audio URL")
@@ -204,7 +216,7 @@ class StorageService:
                 None,
                 lambda: self.s3_client.get_object(Bucket=self.bucket_name, Key=s3_key),
             )
-            return response["Body"].read()
+            return cast(bytes, response["Body"].read())  # boto3 stubs: StreamingBody.read() is Any
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "")
             if error_code == "NoSuchKey":
