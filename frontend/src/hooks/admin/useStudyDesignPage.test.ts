@@ -16,11 +16,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { AllTheProviders } from '@/test-utils/test-utils';
-import {
-    applyTranslationDefaults,
-    DESIGN_STEPS,
-    useStudyDesignPage,
-} from './useStudyDesignPage';
+import { applyTranslationDefaults, DESIGN_STEPS, useStudyDesignPage } from './useStudyDesignPage';
 import type { StudyRead } from '@/api/model';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 

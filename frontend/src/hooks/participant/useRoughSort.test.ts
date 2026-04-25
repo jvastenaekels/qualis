@@ -92,7 +92,9 @@ describe('useRoughSort', () => {
     function renderRoughSort() {
         return renderHook(
             () => {
-                const cardStackRef = useRef<{ swipe: (dir: 'agree' | 'disagree' | 'neutral') => Promise<void> } | null>(null);
+                const cardStackRef = useRef<{
+                    swipe: (dir: 'agree' | 'disagree' | 'neutral') => Promise<void>;
+                } | null>(null);
                 return useRoughSort(showTip, setShowTip, x, y, cardStackRef);
             },
             { wrapper: AllTheProviders }
@@ -171,7 +173,9 @@ describe('useRoughSort', () => {
         // onVoteComplete is what the keyboard handler ultimately calls (via cardStackRef.swipe → CardStack → onVote prop)
         const { result } = renderHook(
             () => {
-                const cardStackRef = useRef<{ swipe: (dir: 'agree' | 'disagree' | 'neutral') => Promise<void> } | null>(null);
+                const cardStackRef = useRef<{
+                    swipe: (dir: 'agree' | 'disagree' | 'neutral') => Promise<void>;
+                } | null>(null);
                 return useRoughSort(showTip, setShowTip, x, y, cardStackRef);
             },
             { wrapper: AllTheProviders }
@@ -207,7 +211,9 @@ describe('useRoughSort', () => {
     it('auto-dismisses tip after 5 sorted cards', () => {
         renderHook(
             () => {
-                const cardStackRef = useRef<{ swipe: (dir: 'agree' | 'disagree' | 'neutral') => Promise<void> } | null>(null);
+                const cardStackRef = useRef<{
+                    swipe: (dir: 'agree' | 'disagree' | 'neutral') => Promise<void>;
+                } | null>(null);
                 return useRoughSort(true, setShowTip, x, y, cardStackRef);
             },
             { wrapper: AllTheProviders }

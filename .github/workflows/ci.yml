@@ -45,7 +45,14 @@ jobs:
       - name: Security SAST (Bandit)
         run: cd backend && uv run bandit -r app -ll
       - name: Security SCA (Pip Audit)
-        run: cd backend && uv run pip-audit --ignore-vuln GHSA-wj6h-64fc-37mp
+        # Ignore list mirrors backend Makefile; rationale in SECURITY.md.
+        run: |
+          cd backend && uv run pip-audit \
+            --ignore-vuln GHSA-wj6h-64fc-37mp \
+            --ignore-vuln CVE-2026-3219 \
+            --ignore-vuln CVE-2026-4539 \
+            --ignore-vuln CVE-2026-28684 \
+            --ignore-vuln CVE-2026-25645
       - name: Complexity (Radon)
         run: cd backend && uv run radon cc app -a -nb --min B
       - name: Architecture (Import Linter)

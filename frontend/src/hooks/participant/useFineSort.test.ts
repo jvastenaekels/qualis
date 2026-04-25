@@ -139,7 +139,7 @@ describe('useFineSort', () => {
         useResponseStore.getState().categorizeCard(2, 'disagree');
         // Card 3 is not categorised — reconciliation should add it to neutral
 
-        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
 
         // After mount the reconciliation effect fires
         await act(async () => {});
