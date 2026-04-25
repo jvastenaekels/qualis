@@ -55,5 +55,6 @@ reference-articles/
 # Papis library (q-methodology)
 library/
 
-# Audit raw tool outputs (gitignored, only the index README is committed)
-docs/audits/*/.raw/
+# Audit raw tool outputs (gitignored, except the index README which is committed)
+docs/audits/*/.raw/*
+!docs/audits/*/.raw/README.md
