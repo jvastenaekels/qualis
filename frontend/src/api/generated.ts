@@ -17331,7 +17331,7 @@ export const getHealthCheckHealthGetMockHandler = (
         options
     );
 };
-export const getLibreQAPIMock = () => [
+export const getQualisAPIMock = () => [
     getReadUsersMeApiMeGetMockHandler(),
     getUpdateUserMeApiMePatchMockHandler(),
     getLoginForAccessTokenApiTokenPostMockHandler(),
