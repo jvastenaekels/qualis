@@ -26,7 +26,6 @@ import ResumePage from './pages/ResumePage';
 import RoughSortPage from './pages/RoughSortPage';
 import WelcomePage from './pages/WelcomePage';
 import { Toaster } from 'sonner';
-import GeneralSettingsPage from '@/pages/admin/GeneralSettingsPage'; // Added import
 import RouteErrorBoundary from './components/RouteErrorBoundary';
 
 // Lazy load heavy interactive components
@@ -44,8 +43,8 @@ const StudyDesignPage = lazy(() => import('./pages/admin/StudyDesignPage'));
 const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
 const AnalysisPage = lazy(() => import('./pages/admin/AnalysisPage'));
 
-// const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
-import DataExportsPage from './pages/admin/DataExportsPage';
+const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
+const GeneralSettingsPage = lazy(() => import('./pages/admin/GeneralSettingsPage'));
 const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetailsPage'));
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
 const ProjectSettingsPage = lazy(() => import('./pages/admin/ProjectSettingsPage'));

@@ -59,7 +59,17 @@ make migration-new    # Create a new Alembic migration
 - Generate: `make migration-new` (auto-generates from model changes)
 - **Always review generated migrations** — auto-generation against a blank or out-of-sync DB will include unrelated tables. The migration must only contain the intended schema change.
 - Migrations run automatically on deploy via `Procfile` release phase (`python scripts/migrate.py`)
-- Migration chain: `initial_schema` → `rename_randomize...` → `remove_consent_buttons` → `add_pre_instruction` → `add_is_test_run` → `add_audio_recordings_table`
+- Migration chain (15 migrations as of 2026-04-25, head `c94f0b41532e`):
+  `initial_schema` → `rename_randomize_statements_to_randomize_statement_order`
+  → `remove_consent_buttons` → `add_pre_instruction`
+  → `add_is_test_run_to_participants` → `add_audio_recordings_table`
+  → `add_display_order_to_statements`
+  → `add_last_step_reached_to_participants` → `fix_last_step_reached_backfill`
+  → `add_draft_responses_to_participants` → `add_resume_code_to_participants`
+  → `add_concourse_tables` → `add_concourse_traceability_columns`
+  → `add_item_versions_and_comments` → `rename_workspace_to_project`
+  → `add_analysis_runs_table`
+- Run `alembic history` (in `backend/`) for the canonical chain — this list will drift if not updated when new migrations are added.
 - PostgreSQL DDL is transactional: a failed migration rolls back entirely, leaving `alembic_version` unchanged
 
 ### API Changes
