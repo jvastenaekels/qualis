@@ -28,6 +28,7 @@ class AudioUploadMetadata(TypedDict):
     file_size_bytes: int
     mime_type: str
 
+
 # question_key is participant-supplied (form field, audio recording context).
 # We constrain it to a strict charset to prevent path-traversal and key-injection
 # in S3 (e.g. "../etc/passwd", keys with "/" that break the audio/{slug}/{token}/
@@ -216,7 +217,9 @@ class StorageService:
                 None,
                 lambda: self.s3_client.get_object(Bucket=self.bucket_name, Key=s3_key),
             )
-            return cast(bytes, response["Body"].read())  # boto3 stubs: StreamingBody.read() is Any
+            return cast(
+                bytes, response["Body"].read()
+            )  # boto3 stubs: StreamingBody.read() is Any
         except ClientError as e:
             error_code = e.response.get("Error", {}).get("Code", "")
             if error_code == "NoSuchKey":

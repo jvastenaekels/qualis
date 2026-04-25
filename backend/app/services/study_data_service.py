@@ -53,7 +53,7 @@ class StudyDataService:
             await storage_service.delete_audio(key)
 
     @staticmethod
-    async def reset_study_participants(db: AsyncSession, study_id: int):
+    async def reset_study_participants(db: AsyncSession, study_id: int) -> None:
         """Delete all participants for a specific study."""
         await StudyDataService.delete_audio_files_for_study(db, study_id)
         stmt = delete(Participant).where(Participant.study_id == study_id)

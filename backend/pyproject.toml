@@ -176,6 +176,26 @@ disallow_untyped_defs = true
 warn_return_any = true
 strict_equality = true
 
+[[tool.mypy.overrides]]
+# Phase 3 wave 3a — deferred light services (relaxed tier)
+# study_data_service: returns dict[str, Any] for JSON wire data (full dump,
+# stats, sort-data). Bare Mapped[dict] in models.py propagates type-arg via
+# ORM stub gap — disallow_any_generics cannot be enabled until models wave.
+# One no-untyped-def fixed: reset_study_participants -> None.
+# export_service: config blobs (presort_config, postsort_config) are truly
+# dict[str, Any] at the JSON boundary; two bare `dict` params in nested
+# helpers tightened to dict[str, Any]. Same ORM stub constraint as above.
+# disallow_any_explicit omitted for both: Any is load-bearing at JSON/ORM
+# boundary; disallow_any_generics omitted: models.py:264 bare Mapped[dict]
+# propagates type-arg until the models mini-wave.
+module = [
+    "app.services.study_data_service",
+    "app.services.export_service",
+]
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
 DEP003 = ["botocore"]  # Transitive dependency of boto3

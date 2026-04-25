@@ -26,7 +26,7 @@ class ExportService:
         header_lang = study.default_language or "en"
 
         # Helper to get human label for a question ID or option value from config
-        def get_label(config_dict: dict, q_id: str, lang: str = "en") -> str:
+        def get_label(config_dict: dict[str, Any], q_id: str, lang: str = "en") -> str:
             q_config = config_dict.get(q_id, {})
             label_obj = q_config.get("label", q_id)
             if isinstance(label_obj, dict):
@@ -38,7 +38,7 @@ class ExportService:
             return str(label_obj)
 
         def get_value_label(
-            config_dict: dict, q_id: str, value: Any, lang: str = "en"
+            config_dict: dict[str, Any], q_id: str, value: Any, lang: str = "en"
         ) -> str:
             """Resolves internal value (like 'm') to its label (like 'Male')."""
             if value is None or value == "":
