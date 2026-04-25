@@ -7,46 +7,24 @@
 /**
  * Fine Sort Page (Step 4)
  *
- * The core Q-Sort interface where participants drag cards into a forced distribution grid.
- * Handles complex drag-and-drop logic (dnd-kit), slot collisions, and validations.
+ * Declarative shell — all durable logic lives in useFineSort().
+ *
+ * Visual/layout state that stays in the component (cannot cleanly move to hook):
+ *   - cardDimensions, zoomLevel  — used only by DragOverlay sizing
+ *   - interactionUtils           — a callback bag returned by GridSort for mobile pan/zoom,
+ *                                  passed back into useFineSort as a param
  */
 
-import {
-    type CollisionDetection,
-    closestCenter,
-    DndContext,
-    DragOverlay,
-    KeyboardSensor,
-    MeasuringStrategy,
-    type Modifier,
-    MouseSensor,
-    pointerWithin,
-    rectIntersection,
-    TouchSensor,
-    useSensor,
-    useSensors,
-} from '@dnd-kit/core';
+import { DndContext, DragOverlay, MeasuringStrategy } from '@dnd-kit/core';
+import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { useViewport } from '@/contexts/ViewportContext';
-import {
-    rectSortingStrategy,
-    SortableContext,
-    sortableKeyboardCoordinates,
-} from '@dnd-kit/sortable';
 import type React from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import GridSort from '../components/GridSort';
 import SortableCard from '../components/SortableCard';
-import { useFineSortDrag } from '../hooks/useFineSortDrag';
-import { useGridSanity } from '../hooks/useGridSanity';
-import { useLayoutAction } from '../hooks/useLayout';
-import { useConfigStore } from '../store/useConfigStore';
-import { useResponseStore } from '../store/useResponseStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useUIStore } from '../store/useUIStore';
+import { useFineSort } from '../hooks/participant/useFineSort';
 import type { InteractionUtils } from '../types/grid';
 
 interface FineSortPageProps {
@@ -54,256 +32,44 @@ interface FineSortPageProps {
 }
 
 const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
-    // 1. Hooks (Store / Router) - Top Level
-    const config = useConfigStore((state) => state.config);
-    const { isDesktop, isLandscape } = useViewport();
-    const rough = useResponseStore((state) => state.rough);
-    const qsort = useResponseStore((state) => state.qsort);
-
-    const placeCardInGrid = useResponseStore((state) => state.placeCardInGrid);
-    const moveCardInGrid = useResponseStore((state) => state.moveCardInGrid);
-    const swapCardsInGrid = useResponseStore((state) => state.swapCardsInGrid);
-    const unplaceCard = useResponseStore((state) => state.unplaceCard);
-    const resetFineSort = useResponseStore((state) => state.resetFineSort);
-    const categorizeCard = useResponseStore((state) => state.categorizeCard);
-
-    const setStep = useSessionStore((state) => state.setStep);
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { slug } = useParams();
-    const { setHeaderAction } = useLayoutAction();
-    const { t } = useTranslation();
-
-    // 2. State & Hooks - Continuous
-    const [selectedCardId, setSelectedCardId] = useState<number | null>(null);
-    const [cardDimensions, setCardDimensions] = useState<{
-        width: number;
-        height: number;
-    } | null>(null);
+    // JSX-local visual state (cannot live in the hook — no JSX in hooks)
+    const [cardDimensions, setCardDimensions] = useState<{ width: number; height: number } | null>(
+        null
+    );
     const [zoomLevel, setZoomLevel] = useState(1);
     const [interactionUtils, setInteractionUtils] = useState<InteractionUtils | null>(null);
 
-    const setSelectedCard = useUIStore((state) => state.setSelectedCard);
+    const { isDesktop } = useViewport();
 
-    useEffect(() => {
-        if (!config) {
-            setSelectedCard(null);
-            return;
-        }
-        const selectedCard =
-            selectedCardId !== null
-                ? (config.statements.find((s) => s.id === selectedCardId) ?? null)
-                : null;
-        setSelectedCard(selectedCard);
-    }, [selectedCardId, config, setSelectedCard]);
+    // All durable logic delegated to the hook
+    const sort = useFineSort(interactionUtils);
 
-    // 3. Sensors (Always stable)
-    const sensors = useSensors(
-        useSensor(MouseSensor, { activationConstraint: { distance: 3 } }),
-        useSensor(TouchSensor, {
-            activationConstraint: { delay: 150, tolerance: 5 },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    );
-
-    const isCompleted = useSessionStore((state) => state.isCompleted);
-
-    // 4. Effects
-    useEffect(() => {
-        setStep(4);
-    }, [setStep]);
-
-    // Deep-link guard: redirect to rough-sort if no rough sort data
-    useEffect(() => {
-        if (isCompleted) return;
-        const totalRough = rough.agree.length + rough.disagree.length + rough.neutral.length;
-        if (config && totalRough === 0) {
-            navigate(`/study/${slug}/rough-sort${location.search}`, { replace: true });
-        }
-    }, [config, rough, navigate, slug, isCompleted, location.search]);
-
-    // 5. Memoized derived data
-    const gridColumns = useMemo(
-        () =>
-            config?.grid_config || [
-                { score: -4, capacity: 2 },
-                { score: -3, capacity: 3 },
-                { score: -2, capacity: 4 },
-                { score: -1, capacity: 6 },
-                { score: 0, capacity: 10 },
-                { score: 1, capacity: 6 },
-                { score: 2, capacity: 4 },
-                { score: 3, capacity: 3 },
-                { score: 4, capacity: 2 },
-            ],
-        [config?.grid_config]
-    );
-
-    const { unplacedAgree, unplacedDisagree, unplacedNeutral, isAllPlaced } = useMemo(() => {
-        const placedIds = new Set(qsort.map((c) => c.statementId));
-        const statements = config?.statements || [];
-
-        const unplacedAgree = rough.agree
-            .filter((id) => !placedIds.has(id))
-            .map((id) => statements.find((s) => s.id === id))
-            .filter((s): s is NonNullable<typeof s> => !!s);
-
-        const unplacedDisagree = rough.disagree
-            .filter((id) => !placedIds.has(id))
-            .map((id) => statements.find((s) => s.id === id))
-            .filter((s): s is NonNullable<typeof s> => !!s);
-
-        const unplacedNeutral = rough.neutral
-            .filter((id) => !placedIds.has(id))
-            .map((id) => statements.find((s) => s.id === id))
-            .filter((s): s is NonNullable<typeof s> => !!s);
-
-        const isAllPlaced =
-            unplacedAgree.length === 0 &&
-            unplacedDisagree.length === 0 &&
-            unplacedNeutral.length === 0;
-
-        return { unplacedAgree, unplacedDisagree, unplacedNeutral, isAllPlaced };
-    }, [qsort, rough, config?.statements]);
-
-    useEffect(() => {
-        setHeaderAction(null);
-        return () => setHeaderAction(null);
-    }, [setHeaderAction]);
-
-    // 6. Memoized callbacks for performance
-    const actions = useMemo(
-        () => ({
-            placeCardInGrid,
-            moveCardInGrid,
-            swapCardsInGrid,
-            unplaceCard,
-            categorizeCard,
-        }),
-        [placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard, categorizeCard]
-    );
-
-    // DnD Hooks
     const {
+        config,
+        gridColumns,
+        qsort,
+        unplacedAgree,
+        unplacedDisagree,
+        unplacedNeutral,
+        isAllPlaced,
+        showCodes,
+        selectedCardId,
+        sensors,
         activeId,
+        collisionStrategy,
+        snapCenterToCursor,
         handleDragStart,
         handleDragMove,
         handleDragEnd,
         handleDragCancel,
         handleCardClick,
         handleSlotClick,
-    } = useFineSortDrag({
-        responses: { qsort },
-        gridColumns,
-        onSelectionChange: setSelectedCardId,
-        selectedId: selectedCardId,
-        interactionUtils,
-        statements: config?.statements || [],
-        actions,
-    });
+        handleReset,
+        handleValidate,
+    } = sort;
 
-    // handleDragCancel is now provided by useFineSortDrag
-
-    // RECONCILIATION: Recover missing cards into Neutral deck
-    useEffect(() => {
-        if (!config || !qsort || !rough) return;
-        const placedIds = new Set(qsort.map((p) => p.statementId));
-        const roughIds = new Set([...rough.agree, ...rough.neutral, ...rough.disagree]);
-        const missingIds = config.statements
-            .map((s) => s.id)
-            .filter((id) => !placedIds.has(id) && !roughIds.has(id));
-        if (missingIds.length > 0) {
-            console.warn('Reconciling missing cards:', missingIds);
-            for (const id of missingIds) {
-                actions.categorizeCard(id, 'neutral');
-            }
-        }
-    }, [config, qsort, rough, actions]);
-
-    // SANITY CHECK: Ensure no overlapping cards or out-of-bounds cards
-    useGridSanity({
-        qsort,
-        gridColumns,
-        unplaceCard: actions.unplaceCard,
-        categorizeCard: actions.categorizeCard,
-    });
-
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape' && selectedCardId !== null) {
-                setSelectedCardId(null);
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedCardId]);
-
-    // Cancel any active drag when device orientation changes (prevents mis-drops)
-    const prevLandscapeRef = useRef(isLandscape);
-    useEffect(() => {
-        if (isLandscape !== prevLandscapeRef.current) {
-            prevLandscapeRef.current = isLandscape;
-            if (activeId !== null) {
-                handleDragCancel();
-            }
-        }
-    }, [isLandscape, activeId, handleDragCancel]);
-
-    // 7. Collision Strategy (Stable)
-    const collisionStrategy: CollisionDetection = useCallback((args) => {
-        // 1. Priority: Direct hit via pointerWithin (cursor is exactly over the element)
-        const pointerCollisions = pointerWithin(args);
-
-        if (pointerCollisions.length > 0) {
-            // Check for direct slot or deck hit
-            const targetContainer = pointerCollisions.find((c) => {
-                const idStr = String(c.id);
-                return idStr.startsWith('slot_') || idStr.startsWith('deck-');
-            });
-
-            if (targetContainer) return [targetContainer];
-
-            // Check for card hit -> resolve to slot
-            const cardCollision = pointerCollisions.find((c) => {
-                return typeof c.id === 'number' || !Number.isNaN(Number(c.id));
-            });
-
-            if (cardCollision) {
-                const cardId = Number(cardCollision.id);
-                const currentQsort = useResponseStore.getState().qsort;
-                const placed = currentQsort.find((p) => p.statementId === cardId);
-                if (placed) {
-                    return [
-                        {
-                            id: `slot_${placed.col}_${placed.row}`,
-                            data: cardCollision.data,
-                        },
-                    ];
-                }
-            }
-        }
-
-        // 2. Secondary: Rect Intersection (if cursor isn't over it, but visual overlap is significant)
-        // This helps when the 'center' is far but overlap is high (large targets)
-        const rectCollisions = rectIntersection(args);
-        if (rectCollisions.length > 0) {
-            // Prioritize slots
-            const targetContainer = rectCollisions.find((c) => {
-                const idStr = String(c.id);
-                return idStr.startsWith('slot_');
-            });
-            if (targetContainer) return [targetContainer];
-        }
-
-        // 3. Fallback to closest center (good for gaps)
-        return closestCenter(args);
-    }, []);
-
-    // 9. Memoized render function for slot content
-    const showCodes = config?.show_statement_codes ?? false;
-
+    // renderSlotContent stays here because it references JSX (SortableCard) and
+    // JSX-local state (selectedCardId, activeId, isDesktop, cardDimensions).
     const renderSlotContent = useCallback(
         (col: number, row: number, dimensions: { width: number; height: number }) => {
             if (!config) return null;
@@ -329,52 +95,10 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         [config, qsort, selectedCardId, handleCardClick, activeId, showCodes, isDesktop]
     );
 
-    // 10. Condition Check (After all hooks)
-    const snapCenterToCursor: Modifier = useCallback(
-        ({ activatorEvent, draggingNodeRect, transform }) => {
-            if (draggingNodeRect && activatorEvent) {
-                const activatorCenter = {
-                    x: draggingNodeRect.left + draggingNodeRect.width / 2,
-                    y: draggingNodeRect.top + draggingNodeRect.height / 2,
-                };
-                const event =
-                    'nativeEvent' in activatorEvent ? activatorEvent.nativeEvent : activatorEvent;
-                const eventX =
-                    event instanceof MouseEvent || event instanceof PointerEvent
-                        ? event.clientX
-                        : event instanceof TouchEvent && event.touches.length > 0
-                          ? event.touches[0].clientX
-                          : 0;
-                const eventY =
-                    event instanceof MouseEvent || event instanceof PointerEvent
-                        ? event.clientY
-                        : event instanceof TouchEvent && event.touches.length > 0
-                          ? event.touches[0].clientY
-                          : 0;
-                return {
-                    ...transform,
-                    x: transform.x + (eventX - activatorCenter.x),
-                    y: transform.y + (eventY - activatorCenter.y),
-                };
-            }
-            return transform;
-        },
-        []
-    );
-
-    const handleReset = useCallback(() => {
-        if (window.confirm(t('fine.deck.confirm_reset'))) resetFineSort();
-    }, [resetFineSort, t]);
-    const handleValidate = useCallback(
-        () => navigate(`/study/${slug}/post-sort${location.search}`),
-        [navigate, slug, location.search]
-    );
-
     if (!config) return null;
 
-    // 11. Memoized card data - these need to be after config null check
     const activeCardData =
-        activeId !== null ? config?.statements.find((s) => s.id === activeId) : undefined;
+        activeId !== null ? config.statements.find((s) => s.id === activeId) : undefined;
 
     return (
         <DndContext
