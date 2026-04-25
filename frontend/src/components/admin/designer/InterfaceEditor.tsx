@@ -40,25 +40,18 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
     useEffect(() => {
         if (!draft?.translations) return;
 
-        const maxTips = Math.max(
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
-            ...draft.translations.map((t) => (t as any).methodology_tips?.length || 0)
-        );
+        const maxTips = Math.max(...draft.translations.map((t) => t.methodology_tips?.length ?? 0));
 
         const someMismatch = draft.translations.some(
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
-            (t) => ((t as any).methodology_tips?.length || 0) !== maxTips
+            (t) => (t.methodology_tips?.length ?? 0) !== maxTips
         );
 
         if (someMismatch && maxTips > 0) {
             updateDraft((d) => {
                 for (const t of d.translations || []) {
-                    // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
-                    if (!(t as any).methodology_tips) (t as any).methodology_tips = [];
-                    // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
-                    while ((t as any).methodology_tips.length < maxTips) {
-                        // biome-ignore lint/suspicious/noExplicitAny: dynamic checking
-                        (t as any).methodology_tips.push('');
+                    if (!t.methodology_tips) t.methodology_tips = [];
+                    while (t.methodology_tips.length < maxTips) {
+                        t.methodology_tips.push('');
                     }
                 }
             });
@@ -85,35 +78,29 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
     ];
 
     const updateLabel = (key: string, value: string) => {
-        updateTranslation(
-            activeLocale,
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic labels
-            (t: any) => {
-                if (!t.ui_labels) t.ui_labels = {};
-                if (!value) {
-                    delete t.ui_labels[key];
-                } else {
-                    t.ui_labels[key] = value;
-                }
+        updateTranslation(activeLocale, (t) => {
+            if (!t.ui_labels) t.ui_labels = {};
+            if (!value) {
+                delete (t.ui_labels as Record<string, unknown>)[key];
+            } else {
+                (t.ui_labels as Record<string, unknown>)[key] = value;
             }
-        );
+        });
     };
 
     const getLabel = (key: string) => (uiLabels[key] || tStudy(key)) as string;
 
     const resetLabel = (key: string) => {
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic property deletion requires any
-        updateTranslation(activeLocale, (t_trans: any) => {
+        updateTranslation(activeLocale, (t_trans) => {
             if (t_trans.ui_labels) {
-                delete t_trans.ui_labels[key];
+                delete (t_trans.ui_labels as Record<string, unknown>)[key];
             }
         });
         toast.success(t('common.reset_to_default_success'));
     };
 
     const resetStepHelp = (stepId: string) => {
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic property deletion requires any
-        updateTranslation(activeLocale, (t_trans: any) => {
+        updateTranslation(activeLocale, (t_trans) => {
             if (t_trans.step_help?.[stepId]) {
                 delete t_trans.step_help[stepId];
             }
@@ -122,11 +109,10 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
     };
 
     const resetTerminologyGroup = (keys: string[]) => {
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic property deletion requires any
-        updateTranslation(activeLocale, (t_trans: any) => {
+        updateTranslation(activeLocale, (t_trans) => {
             if (t_trans.ui_labels) {
                 for (const key of keys) {
-                    delete t_trans.ui_labels[key];
+                    delete (t_trans.ui_labels as Record<string, unknown>)[key];
                 }
             }
         });
@@ -523,51 +509,40 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                 </CardHeader>
                 <CardContent className="space-y-6">
                     <div className="space-y-4">
-                        {/* biome-ignore lint/suspicious/noExplicitAny: dynamic access */}
-                        {(translation as any)?.methodology_tips?.map(
-                            (tip: string, index: number) => (
-                                <div key={index} className="flex gap-4 items-center group">
-                                    <div className="size-2 rounded-full bg-amber-400 shrink-0 shadow-sm shadow-amber-200" />
-                                    <div className="flex-1">
-                                        <Input
-                                            value={tip}
-                                            onChange={(e) => {
-                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic access
-                                                updateTranslation(activeLocale, (t: any) => {
-                                                    if (!t.methodology_tips)
-                                                        t.methodology_tips = [];
-                                                    t.methodology_tips[index] = e.target.value;
-                                                });
-                                            }}
-                                            placeholder={t(
-                                                'admin.design.interface.hints.placeholder'
-                                            )}
-                                            disabled={readOnly}
-                                            className="font-medium text-sm rounded-xl h-10 bg-slate-50/30"
-                                        />
-                                    </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        disabled={readOnly}
-                                        onClick={() => {
-                                            updateDraft((d) => {
-                                                for (const t of d.translations || []) {
-                                                    // biome-ignore lint/suspicious/noExplicitAny: dynamic access
-                                                    const tips = (t as any).methodology_tips;
-                                                    if (Array.isArray(tips)) {
-                                                        tips.splice(index, 1);
-                                                    }
-                                                }
+                        {translation?.methodology_tips?.map((tip: string, index: number) => (
+                            <div key={index} className="flex gap-4 items-center group">
+                                <div className="size-2 rounded-full bg-amber-400 shrink-0 shadow-sm shadow-amber-200" />
+                                <div className="flex-1">
+                                    <Input
+                                        value={tip}
+                                        onChange={(e) => {
+                                            updateTranslation(activeLocale, (t) => {
+                                                if (!t.methodology_tips) t.methodology_tips = [];
+                                                t.methodology_tips[index] = e.target.value;
                                             });
                                         }}
-                                        className="text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl h-10 w-10 transition-all border border-transparent hover:border-red-100 shadow-none hover:shadow-sm"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                        placeholder={t('admin.design.interface.hints.placeholder')}
+                                        disabled={readOnly}
+                                        className="font-medium text-sm rounded-xl h-10 bg-slate-50/30"
+                                    />
                                 </div>
-                            )
-                        )}
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    disabled={readOnly}
+                                    onClick={() => {
+                                        updateDraft((d) => {
+                                            for (const t of d.translations || []) {
+                                                t.methodology_tips?.splice(index, 1);
+                                            }
+                                        });
+                                    }}
+                                    className="text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl h-10 w-10 transition-all border border-transparent hover:border-red-100 shadow-none hover:shadow-sm"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
 
                         <div className="flex gap-4 pt-4">
                             <Button
@@ -576,12 +551,8 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                 onClick={() => {
                                     updateDraft((d) => {
                                         for (const t of d.translations || []) {
-                                            // biome-ignore lint/suspicious/noExplicitAny: dynamic access
-                                            if (!(t as any).methodology_tips)
-                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic access
-                                                (t as any).methodology_tips = [];
-                                            // biome-ignore lint/suspicious/noExplicitAny: dynamic access
-                                            (t as any).methodology_tips.push('');
+                                            if (!t.methodology_tips) t.methodology_tips = [];
+                                            t.methodology_tips.push('');
                                         }
                                     });
                                 }}
@@ -622,9 +593,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                 </CardHeader>
                 <CardContent className="space-y-10">
                     {visibleSteps.map((step, index) => {
-                        const stepHelp =
-                            // biome-ignore lint/suspicious/noExplicitAny: dynamic optional property
-                            (translation as any)?.step_help?.[step.id.toString()] || {};
+                        const stepHelp = translation?.step_help?.[step.id.toString()] ?? {};
 
                         return (
                             <div key={step.id} className="space-y-6">
@@ -659,8 +628,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 tStudy(`study.help.step_${step.id}.what`)
                                             }
                                             onChange={(e) => {
-                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic access
-                                                updateTranslation(activeLocale, (t: any) => {
+                                                updateTranslation(activeLocale, (t) => {
                                                     if (!t.step_help) t.step_help = {};
                                                     if (!t.step_help[step.id.toString()])
                                                         t.step_help[step.id.toString()] = {};
@@ -685,8 +653,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 tStudy(`study.help.step_${step.id}.why`)
                                             }
                                             onChange={(e) => {
-                                                // biome-ignore lint/suspicious/noExplicitAny: dynamic access
-                                                updateTranslation(activeLocale, (t: any) => {
+                                                updateTranslation(activeLocale, (t) => {
                                                     if (!t.step_help) t.step_help = {};
                                                     if (!t.step_help[step.id.toString()])
                                                         t.step_help[step.id.toString()] = {};

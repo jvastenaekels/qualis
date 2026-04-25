@@ -23,10 +23,11 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const translation = draft.translations?.find((t) => t.language_code === activeLocale);
 
     const handleChange = (field: keyof StudyTranslation, value: string | null) => {
-        // biome-ignore lint/suspicious/noExplicitAny: dynamic field update on translation object
-        updateTranslation(activeLocale, (t_trans: any) => {
-            // biome-ignore lint/suspicious/noExplicitAny: dynamic field access
-            (t_trans as any)[field] = value;
+        updateTranslation(activeLocale, (t_trans) => {
+            // keyof StudyTranslationRead ⊇ keyof DraftTranslation for all editable fields;
+            // the double cast through unknown is needed because TS cannot prove the index
+            // signature aligns, even though all editable field names are shared.
+            (t_trans as unknown as Record<string, unknown>)[field as string] = value;
         });
     };
 

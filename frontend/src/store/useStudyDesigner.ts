@@ -1,6 +1,21 @@
 import { create } from 'zustand';
-import type { StudyRead, StudyUpdate, StudyTranslationRead } from '@/api/model';
+import type {
+    StudyRead,
+    StudyUpdate,
+    StudyTranslationRead,
+    StudyTranslationCreate,
+} from '@/api/model';
 import { produce } from 'immer';
+
+/**
+ * Draft-augmented translation type used inside the Zustand store.
+ * Extends the API create schema with `_is_copy`, a transient flag set by
+ * the language-copy action and cleared on the first edit. Using a typed
+ * intersection here (rather than a discriminated union) is the right call
+ * because every call site mutates the same flat record — there is no
+ * branching on payload kind.
+ */
+export type DraftTranslation = StudyTranslationCreate & { _is_copy?: boolean };
 
 export interface StudyDesignerState {
     draft: StudyUpdate | null;
@@ -21,8 +36,7 @@ export interface StudyDesignerState {
     // Actions
     setStudy: (study: StudyRead) => void;
     updateDraft: (fn: (draft: StudyUpdate) => void) => void;
-    // biome-ignore lint/suspicious/noExplicitAny: complex translation type
-    updateTranslation: (lang: string, fn: (t: any) => void) => void;
+    updateTranslation: (lang: string, fn: (t: DraftTranslation) => void) => void;
     setActiveStep: (
         step: 'intro' | 'pre-sort' | 'condition' | 'q-sort' | 'post-sort' | 'interface' | 'branding'
     ) => void;
@@ -67,10 +81,8 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
             condition_of_instruction: t.condition_of_instruction,
             pre_instruction: t.pre_instruction,
 
-            // biome-ignore lint/suspicious/noExplicitAny: methodology tips missing in generated type
-            methodology_tips: (t as any).methodology_tips || [],
-            // biome-ignore lint/suspicious/noExplicitAny: step help missing in generated type
-            step_help: (t as any).step_help || {},
+            methodology_tips: t.methodology_tips ?? [],
+            step_help: t.step_help ?? {},
         })),
         statements: (study.statements || []).map((s) => ({
             code: s.code,
@@ -293,28 +305,25 @@ export const useStudyDesigner = create<StudyDesignerState>((set) => ({
             return { draft: newDraft };
         }),
 
-    // biome-ignore lint/suspicious/noExplicitAny: complex translation type
-    updateTranslation: (lang: string, fn: (t: any) => void) =>
+    updateTranslation: (lang: string, fn: (t: DraftTranslation) => void) =>
         set((state: StudyDesignerState) => {
             if (!state.draft) return state;
             return {
                 draft: produce(state.draft, (draft: StudyUpdate) => {
-                    let translation = draft.translations?.find((t) => t.language_code === lang);
+                    let translation = draft.translations?.find((t) => t.language_code === lang) as
+                        | DraftTranslation
+                        | undefined;
                     if (!translation) {
-                        translation = {
+                        const newTranslation: DraftTranslation = {
                             language_code: lang,
                             title: '',
-                            subtitle: '',
-                            description: '',
-                            instructions: '',
-                            condition_of_instruction: '',
-                        } as StudyTranslationRead;
-                        draft.translations?.push(translation);
+                        };
+                        draft.translations?.push(newTranslation as StudyTranslationRead);
+                        translation = newTranslation;
                     }
                     fn(translation);
                     // Clear copy flag on any edit
-                    // biome-ignore lint/suspicious/noExplicitAny: custom property
-                    (translation as any)._is_copy = false;
+                    translation._is_copy = false;
                 }),
             };
         }),
