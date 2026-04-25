@@ -47,21 +47,6 @@ export function StudySwitcher() {
         }
     };
 
-    const _getStatusColor = (state: string) => {
-        switch (state) {
-            case 'active':
-                return 'bg-emerald-500';
-            case 'draft':
-                return 'bg-slate-400';
-            case 'closed':
-                return 'bg-red-500';
-            case 'paused':
-                return 'bg-amber-500';
-            default:
-                return 'bg-slate-300';
-        }
-    };
-
     const getAvatarColor = (slug: string) => {
         const colors = [
             'from-indigo-500 to-purple-500',
