@@ -34,3 +34,12 @@ class AudioUploadResponse(BaseModel):
     file_size_bytes: int
     presigned_url: str
     message: str = "Audio uploaded successfully"
+
+
+class ParticipantAudioRecording(AudioRecordingRead):
+    """Audio recording with the owning participant's id, used in admin
+    multi-participant fetches (e.g., the per-factor voice panel in the
+    analysis page).
+    """
+
+    participant_db_id: int

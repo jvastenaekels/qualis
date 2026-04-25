@@ -16,7 +16,12 @@ from .analysis import (
     StatementClassification,
     StatementScore,
 )
-from .audio import AudioRecordingBase, AudioRecordingRead, AudioUploadResponse
+from .audio import (
+    AudioRecordingBase,
+    AudioRecordingRead,
+    AudioUploadResponse,
+    ParticipantAudioRecording,
+)
 from .auth import TOTPSetup, TOTPVerify, Token, TokenData
 from .common import PaginatedResponse
 from .participants import (
@@ -114,6 +119,7 @@ __all__ = [
     "AudioRecordingBase",
     "AudioRecordingRead",
     "AudioUploadResponse",
+    "ParticipantAudioRecording",
     # auth
     "TOTPSetup",
     "TOTPVerify",

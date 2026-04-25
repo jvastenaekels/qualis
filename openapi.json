@@ -1896,6 +1896,70 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/analysis/audios": {
+      "get": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "List Audios For Participants",
+        "description": "Fetch audio recordings (with presigned URLs) for a set of participants.\n\nUsed by the analysis UI to show post-sort audio responses linked to\nfactor membership: the frontend looks up which participants are\nflagged on a factor (from the analysis result), then calls this\nendpoint with their participant_db_ids to render a \"voices on this\nfactor\" panel. This supports the critical Q-methodology practice of\ngrounding factor interpretation in the words of the people who\ndefine each factor (Sneegas 2020; Robbins & Krueger 2000).\n\nAlways returns the *current* state of audio recordings (not a\nsnapshot). If the user reloads a historical analysis run, the\naudios shown are still the up-to-date ones \u2014 researchers see the\nvoices, not a frozen view.\n\nQuery params:\n    participant_ids: comma-separated participant database ids\n        (e.g., \"12,17,22\"). Empty string returns []. Up to 200 ids\n        accepted (a single factor rarely flags more than ~20).",
+        "operationId": "list_audios_for_participants_api_admin_studies__slug__analysis_audios_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "participant_ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Participant Ids"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ParticipantAudioRecording"
+                  },
+                  "title": "Response List Audios For Participants Api Admin Studies  Slug  Analysis Audios Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/export/csv": {
       "get": {
         "tags": [
@@ -6901,6 +6965,85 @@
           "offset"
         ],
         "title": "PaginatedResponse[UserRead]"
+      },
+      "ParticipantAudioRecording": {
+        "properties": {
+          "question_key": {
+            "type": "string",
+            "title": "Question Key"
+          },
+          "mime_type": {
+            "type": "string",
+            "title": "Mime Type"
+          },
+          "file_size_bytes": {
+            "type": "integer",
+            "title": "File Size Bytes"
+          },
+          "duration_seconds": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Seconds"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "presigned_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Presigned Url"
+          },
+          "url_expires_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url Expires At"
+          },
+          "participant_db_id": {
+            "type": "integer",
+            "title": "Participant Db Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "question_key",
+          "mime_type",
+          "file_size_bytes",
+          "id",
+          "s3_key",
+          "created_at",
+          "participant_db_id"
+        ],
+        "title": "ParticipantAudioRecording",
+        "description": "Audio recording with the owning participant's id, used in admin\nmulti-participant fetches (e.g., the per-factor voice panel in the\nanalysis page)."
       },
       "ParticipantDetailRead": {
         "properties": {

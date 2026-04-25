@@ -434,6 +434,85 @@ class TestAnalysisRunHistory:
         assert list_response.status_code == 200
         assert list_response.json() == []
 
+    async def test_audios_for_participants_returns_only_study_scoped(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """The audios endpoint must be scoped to the study, even if the
+        caller passes participant ids that belong to another study."""
+        from app.models import AudioRecording as AR
+
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        # Get the participants that exist in this study
+        from sqlalchemy import select as sel
+
+        ps_result = await db.execute(
+            sel(Participant.id).where(Participant.study_id == study.id)
+        )
+        study_participant_ids = [row[0] for row in ps_result.all()]
+        assert len(study_participant_ids) > 0
+
+        # Add an audio recording to the first study participant
+        rec = AR(
+            participant_id=study_participant_ids[0],
+            question_key="post_sort_overall",
+            s3_bucket="test-bucket",
+            s3_key=f"audio/{study.slug}/p{study_participant_ids[0]}.webm",
+            file_size_bytes=12345,
+            duration_seconds=42.0,
+            mime_type="audio/webm",
+        )
+        db.add(rec)
+        await db.commit()
+
+        # Call with an out-of-study id stuffed in — must be silently dropped
+        ids_param = ",".join(str(i) for i in study_participant_ids) + ",999999"
+        response = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/audios"
+            f"?participant_ids={ids_param}",
+            headers=headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        # Exactly the one recording we added; the 999999 id contributes nothing
+        assert len(data) == 1
+        assert data[0]["participant_db_id"] == study_participant_ids[0]
+        assert data[0]["question_key"] == "post_sort_overall"
+
+    async def test_audios_endpoint_validates_input(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        # Empty -> []
+        empty = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/audios?participant_ids=",
+            headers=headers,
+        )
+        assert empty.status_code == 200
+        assert empty.json() == []
+
+        # Non-integer -> 400
+        bad = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/audios?participant_ids=abc",
+            headers=headers,
+        )
+        assert bad.status_code == 400
+
     async def test_get_run_404_for_other_study(
         self,
         client: AsyncClient,

@@ -10,10 +10,12 @@ from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from datetime import UTC, datetime, timedelta
+
 from ...database import get_db
 from ...dependencies import check_study_permission, get_current_user
 from ...limiter import limiter
-from ...models import AnalysisRun, Study, StudyRole, User
+from ...models import AnalysisRun, AudioRecording, Participant, Study, StudyRole, User
 from ...schemas import (
     AnalysisRequest,
     AnalysisResult,
@@ -22,6 +24,7 @@ from ...schemas import (
     AnalysisRunSummary,
     EigenvalueResult,
     FactorCharacteristic,
+    ParticipantAudioRecording,
     ParticipantLoading,
     StatementClassification,
     StatementScore,
@@ -33,6 +36,7 @@ from ...services.analysis_service import (
     correlation_matrix,
     run_analysis,
 )
+from ...services.storage_service import storage_service
 
 logger = logging.getLogger(__name__)
 
@@ -411,3 +415,94 @@ async def delete_analysis_run(
         study.slug,
         run_id,
     )
+
+
+# ---- Audio recordings linked to factor membership ----
+
+
+@router.get("/{slug}/analysis/audios")
+async def list_audios_for_participants(
+    participant_ids: str,
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+) -> list[ParticipantAudioRecording]:
+    """Fetch audio recordings (with presigned URLs) for a set of participants.
+
+    Used by the analysis UI to show post-sort audio responses linked to
+    factor membership: the frontend looks up which participants are
+    flagged on a factor (from the analysis result), then calls this
+    endpoint with their participant_db_ids to render a "voices on this
+    factor" panel. This supports the critical Q-methodology practice of
+    grounding factor interpretation in the words of the people who
+    define each factor (Sneegas 2020; Robbins & Krueger 2000).
+
+    Always returns the *current* state of audio recordings (not a
+    snapshot). If the user reloads a historical analysis run, the
+    audios shown are still the up-to-date ones — researchers see the
+    voices, not a frozen view.
+
+    Query params:
+        participant_ids: comma-separated participant database ids
+            (e.g., "12,17,22"). Empty string returns []. Up to 200 ids
+            accepted (a single factor rarely flags more than ~20).
+    """
+    # Parse the comma-separated id list defensively.
+    if not participant_ids.strip():
+        return []
+    try:
+        ids = [int(x) for x in participant_ids.split(",") if x.strip()]
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="participant_ids must be comma-separated integers",
+        )
+    if len(ids) > 200:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At most 200 participant ids per request",
+        )
+    if not ids:
+        return []
+
+    # Scope: only participants belonging to THIS study, regardless of what
+    # the caller passed in. This prevents id-stuffing attacks across studies.
+    stmt = (
+        select(AudioRecording, Participant.id.label("participant_db_id"))
+        .join(Participant, AudioRecording.participant_id == Participant.id)
+        .where(
+            Participant.study_id == study.id,
+            Participant.id.in_(ids),
+        )
+        .order_by(AudioRecording.participant_id, AudioRecording.created_at)
+    )
+    result = await db.execute(stmt)
+
+    out: list[ParticipantAudioRecording] = []
+    expires_at = datetime.now(UTC) + timedelta(hours=1)
+    for recording, participant_db_id in result.all():
+        try:
+            url = storage_service.generate_presigned_url(
+                recording.s3_key, expiration=3600
+            )
+        except Exception as exc:
+            logger.warning(
+                "Failed to generate presigned URL for recording %s: %s",
+                recording.id,
+                exc,
+            )
+            url = None
+        out.append(
+            ParticipantAudioRecording(
+                id=recording.id,
+                participant_db_id=participant_db_id,
+                question_key=recording.question_key,
+                mime_type=recording.mime_type,
+                file_size_bytes=recording.file_size_bytes,
+                duration_seconds=recording.duration_seconds,
+                s3_key=recording.s3_key,
+                created_at=recording.created_at,
+                presigned_url=url,
+                url_expires_at=expires_at if url else None,
+            )
+        )
+    return out

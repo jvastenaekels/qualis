@@ -43,6 +43,7 @@ import type {
     GetStudyApiStudySlugGetParams,
     HTTPValidationError,
     InvitationAccept,
+    ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetParams,
     ListConcoursesApiAdminConcoursesGetParams,
     ListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetParams,
     ListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetParams,
@@ -106,6 +107,7 @@ import type {
     PaginatedResponseProjectWithRole,
     PaginatedResponseStudyRead,
     PaginatedResponseUserRead,
+    ParticipantAudioRecording,
     ParticipantDetailRead,
     ParticipantRead,
     ProjectMemberRead,
@@ -4147,6 +4149,228 @@ export const useDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDelete = <
 
     return useMutation(mutationOptions, queryClient);
 };
+
+/**
+ * Fetch audio recordings (with presigned URLs) for a set of participants.
+
+Used by the analysis UI to show post-sort audio responses linked to
+factor membership: the frontend looks up which participants are
+flagged on a factor (from the analysis result), then calls this
+endpoint with their participant_db_ids to render a "voices on this
+factor" panel. This supports the critical Q-methodology practice of
+grounding factor interpretation in the words of the people who
+define each factor (Sneegas 2020; Robbins & Krueger 2000).
+
+Always returns the *current* state of audio recordings (not a
+snapshot). If the user reloads a historical analysis run, the
+audios shown are still the up-to-date ones — researchers see the
+voices, not a frozen view.
+
+Query params:
+    participant_ids: comma-separated participant database ids
+        (e.g., "12,17,22"). Empty string returns []. Up to 200 ids
+        accepted (a single factor rarely flags more than ~20).
+ * @summary List Audios For Participants
+ */
+export const listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet = (
+    slug: string,
+    params: ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<ParticipantAudioRecording[]>({
+        url: `/api/admin/studies/${slug}/analysis/audios`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetQueryKey = (
+    slug?: string,
+    params?: ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetParams
+) => {
+    return [`/api/admin/studies/${slug}/analysis/audios`, ...(params ? [params] : [])] as const;
+};
+
+export const getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetQueryOptions = <
+    TData = Awaited<
+        ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetQueryKey(slug, params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>>
+    > = ({ signal }) =>
+        listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet(slug, params, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>>
+>;
+export type ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetQueryError =
+    HTTPValidationError;
+
+export function useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet<
+    TData = Awaited<
+        ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet<
+    TData = Awaited<
+        ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet<
+    TData = Awaited<
+        ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Audios For Participants
+ */
+
+export function useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet<
+    TData = Awaited<
+        ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<typeof listAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet>
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions =
+        getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetQueryOptions(
+            slug,
+            params,
+            options
+        );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
 
 /**
  * Export study results as CSV.
@@ -13454,6 +13678,39 @@ export const getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchRespon
     ...overrideResponse,
 });
 
+export const getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetResponseMock =
+    (): ParticipantAudioRecording[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            question_key: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            mime_type: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            file_size_bytes: faker.number.int({ min: undefined, max: undefined }),
+            duration_seconds: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            id: faker.number.int({ min: undefined, max: undefined }),
+            s3_key: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            presigned_url: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
+                    null,
+                ]),
+                undefined,
+            ]),
+            url_expires_at: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            participant_db_id: faker.number.int({ min: undefined, max: undefined }),
+        }));
+
 export const getListUsersApiAdminUsersGetResponseMock = (
     overrideResponse: Partial<PaginatedResponseUserRead> = {}
 ): PaginatedResponseUserRead => ({
@@ -15149,6 +15406,32 @@ export const getDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMockH
     );
 };
 
+export const getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetMockHandler = (
+    overrideResponse?:
+        | ParticipantAudioRecording[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ParticipantAudioRecording[]> | ParticipantAudioRecording[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/analysis/audios',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler = (
     overrideResponse?:
         | unknown
@@ -16364,6 +16647,7 @@ export const getLibreQAPIMock = () => [
     getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetMockHandler(),
     getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMockHandler(),
     getDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMockHandler(),
+    getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetMockHandler(),
     getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
     getExportPqmethodApiAdminStudiesSlugExportPqmethodGetMockHandler(),
     getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler(),
