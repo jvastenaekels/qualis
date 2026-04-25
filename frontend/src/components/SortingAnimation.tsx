@@ -102,8 +102,9 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
         const effectiveStep = phase === 'ROUGH' ? Math.max(0, step) : ROUGH_TARGETS.length;
 
         for (let i = 0; i < effectiveStep; i++) {
-            if (i < ROUGH_TARGETS.length) {
-                const pid = ROUGH_TARGETS[i].pileId as keyof typeof counts;
+            const target = ROUGH_TARGETS[i];
+            if (target) {
+                const pid = target.pileId as keyof typeof counts;
                 counts[pid]++;
             }
         }
@@ -112,15 +113,17 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
 
     // FINE COUNTS
     const fineSourceCounts = useMemo(() => {
-        const totals = [0, 0, 0];
+        const totals: [number, number, number] = [0, 0, 0];
         // Calculate initial source pile sizes based on what will be used in FINE steps
         for (const s of FINE_STEPS) {
-            totals[s.source]++;
+            const idx = s.source as 0 | 1 | 2;
+            totals[idx]++;
         }
 
         const effectiveStep = phase === 'FINE' ? Math.max(0, step) : 0;
         for (let i = 0; i < effectiveStep; i++) {
-            if (i < FINE_STEPS.length) totals[FINE_STEPS[i].source]--;
+            const fs = FINE_STEPS[i];
+            if (fs) totals[fs.source as 0 | 1 | 2]--;
         }
         return totals;
     }, [step, phase]);
@@ -128,7 +131,10 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
     const fineFilledIds = useMemo(() => {
         const filled = new Set<string>();
         if (phase === 'FINE') {
-            for (let i = 0; i < Math.max(0, step); i++) filled.add(FINE_STEPS[i].id);
+            for (let i = 0; i < Math.max(0, step); i++) {
+                const fs = FINE_STEPS[i];
+                if (fs) filled.add(fs.id);
+            }
         }
         return filled;
     }, [phase, step]);
@@ -346,19 +352,19 @@ const SortingAnimation: React.FC<SortingAnimationProps> = ({ scale }) => {
                     {phase === 'FINE' && (
                         <>
                             <DynamicStack
-                                count={fineSourceCounts[0]}
+                                count={fineSourceCounts[0] ?? 0}
                                 icon={Frown}
                                 type="source"
                                 layoutId="pile-disagree"
                             />
                             <DynamicStack
-                                count={fineSourceCounts[1]}
+                                count={fineSourceCounts[1] ?? 0}
                                 icon={Meh}
                                 type="source"
                                 layoutId="pile-neutral"
                             />
                             <DynamicStack
-                                count={fineSourceCounts[2]}
+                                count={fineSourceCounts[2] ?? 0}
                                 icon={Smile}
                                 type="source"
                                 layoutId="pile-agree"

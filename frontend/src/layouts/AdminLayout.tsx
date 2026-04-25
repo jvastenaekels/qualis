@@ -34,9 +34,10 @@ export default function AdminLayout() {
 
     useEffect(() => {
         const match = location.pathname.match(/\/app\/[^/]+\/studies\/([^/]+)/);
-        if (match) {
-            if (match[1] !== activeStudyId) {
-                setActiveStudy(match[1]);
+        const matchedSlug = match?.[1] ?? null;
+        if (matchedSlug !== null) {
+            if (matchedSlug !== activeStudyId) {
+                setActiveStudy(matchedSlug);
             }
         } else if (activeStudyId && !location.pathname.includes('/studies/')) {
             setActiveStudy(null);
@@ -47,6 +48,7 @@ export default function AdminLayout() {
     const getCurrentPageName = () => {
         const segments = location.pathname.split('/').filter(Boolean);
         const last = segments[segments.length - 1];
+        if (!last) return t('admin.breadcrumbs.dashboard');
 
         // Map common segments to i18n keys
         const mapping: Record<string, string> = {
