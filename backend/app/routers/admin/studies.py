@@ -5,6 +5,7 @@ that are included into this router at the bottom of the file.
 """
 
 import logging
+from typing import cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import func, select
@@ -33,6 +34,7 @@ from app.models import (
 from app.schemas import StudyCreate, StudyRead, StudyUpdate
 from app.schemas.concourses import ConcourseImportToStudy, StaleStatementRead
 from app.schemas.common import PaginatedResponse
+from app.services.concourse_service import StaleStatementEntry
 from app.services.study_service import StudyService
 from app.utils.audit import log_admin_action
 
@@ -64,7 +66,7 @@ async def list_studies(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
     pagination: PaginationParams = Depends(),
-):
+) -> PaginatedResponse[StudyRead]:
     """List studies in the active project with pagination."""
     project, _ = project_ctx
 
@@ -82,8 +84,12 @@ async def list_studies(
     result = await db.execute(query)
     items = list(result.scalars().all())
 
-    return PaginatedResponse(
-        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    # FastAPI serialises Study → StudyRead via response_model; cast aligns mypy.
+    return cast(
+        PaginatedResponse[StudyRead],
+        PaginatedResponse(
+            items=items, total=total, limit=pagination.limit, offset=pagination.offset
+        ),
     )
 
 
@@ -215,7 +221,7 @@ async def reset_study_participants(
     study: Study = Depends(check_study_permission(StudyRole.owner)),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     """Delete all participants for the study (Owner only)."""
     from app.services.study_data_service import StudyDataService
 
@@ -237,7 +243,7 @@ async def delete_study(
     study: Study = Depends(check_study_permission(StudyRole.owner)),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     """Delete a study (Superuser only, and must be Archived)."""
     if not current_user.is_superuser:
         raise HTTPException(
@@ -288,7 +294,7 @@ async def check_stale_statements(
     slug: str,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> list[StaleStatementEntry]:
     """Check which imported statements have stale concourse sources."""
     from app.services.concourse_service import ConcourseService
 

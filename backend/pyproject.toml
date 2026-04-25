@@ -263,6 +263,10 @@ module = [
     # auth: 8 return types (User x3 via response_model, Token, TOTPSetup, dict[str,str] x3).
     #   No casts needed — all calls into utils/security and utils/audit are already strict-typed.
     "app.routers.auth",
+    # admin/studies: 4 return types (PaginatedResponse[StudyRead] via cast, None x2, list[StaleStatementEntry]).
+    #   StaleStatementEntry TypedDict imported from concourse_service (Phase 3 wave 3b strict);
+    #   FastAPI serialises to StaleStatementRead via response_model.
+    "app.routers.admin.studies",
 ]
 disallow_untyped_defs = true
 warn_return_any = true
