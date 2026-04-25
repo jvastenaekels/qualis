@@ -95,6 +95,15 @@ Safe pre-submission. All four items are pure additions, no impact on existing co
 
 ## Phase 2 — TypeScript `any` cascade, ~6h
 
+> **Update 2026-04-25 (after execution):** the audit's "cascade" framing was
+> over-optimistic. Of the 219 actual `noExplicitAny` suppressions, only 27
+> were rooted in `updateTranslation`; the other 192 are diffuse (JSON opaque
+> configs, polymorphic survey fields, flexible test helpers) — each a small
+> typing decision in its own right, not one untie-the-knot fix. Phase 2
+> shipped the 27 fix (commit 637a658) and stopped honestly. Phase 3 below
+> is also probably more `O(modules)` than `O(modules ÷ key-insights)` — adjust
+> expectations accordingly.
+
 Single item, but it's the unblocker for Phase 3. Audit F-02-002.
 
 ### Item B — Type the `updateTranslation` callback root cause
