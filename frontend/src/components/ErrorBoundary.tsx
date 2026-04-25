@@ -21,7 +21,7 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-    public state: State = {
+    public override state: State = {
         hasError: false,
         error: null,
     };
@@ -30,7 +30,7 @@ class ErrorBoundary extends Component<Props, State> {
         return { hasError: true, error };
     }
 
-    public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    public override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
         console.error('Uncaught error:', error, errorInfo);
 
         // Forward to Sentry when a DSN is configured (no-op otherwise).
@@ -64,7 +64,7 @@ class ErrorBoundary extends Component<Props, State> {
         }
     }
 
-    public render() {
+    public override render() {
         if (this.state.hasError) {
             if (this.props.fallback) {
                 if (typeof this.props.fallback === 'function') {

@@ -23,6 +23,12 @@
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true,
+        "noImplicitOverride": true,
+        // TODO(quality-roadmap Phase 1.I-extended): enable noUncheckedIndexedAccess.
+        // Surfaced 71 errors when tested 2026-04-25 — needs a dedicated
+        // session to triage trivial guards vs non-trivial typing fixes.
+        // Tracked separately because it dwarfs the original Phase 1 budget.
+        // "noUncheckedIndexedAccess": true,
         "baseUrl": ".",
         "paths": {
             "@/*": ["./src/*"]
