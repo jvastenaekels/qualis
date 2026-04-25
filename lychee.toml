@@ -20,4 +20,4 @@ retry_wait_time = 2
 
 # Treat these HTTP statuses as success (transient gateway errors that resolve on retry but
 # occasionally exhaust the retry budget on busy github.com endpoints).
-accept = [200, 429, 502, 503]
+accept = ["200", "429", "502", "503"]
