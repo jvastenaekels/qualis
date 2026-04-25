@@ -29,8 +29,9 @@ describe('ResetPage', () => {
             { initialEntries: ['/study/test-study/reset'] }
         );
 
-        // Expect loading spinner
-        expect(screen.getByText('Resetting study session...')).toBeInTheDocument();
+        // Expect loading spinner — i18n key is `landing.resetting_session`,
+        // its English fallback uses an ellipsis character.
+        expect(screen.getByText(/Resetting study session/i)).toBeInTheDocument();
 
         // Verify resetAllStores called immediately
         expect(mockResetAllStores).toHaveBeenCalled();

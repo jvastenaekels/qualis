@@ -7,10 +7,12 @@
 import { RefreshCw } from 'lucide-react';
 import type React from 'react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { resetAllStores } from '../utils/sessionReset';
 
 const ResetPage: React.FC = () => {
+    const { t } = useTranslation();
     const { slug } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
@@ -32,7 +34,9 @@ const ResetPage: React.FC = () => {
             <div className="animate-spin text-blue-600">
                 <RefreshCw size={48} />
             </div>
-            <p className="text-slate-500 font-medium">Resetting study session...</p>
+            <p className="text-slate-500 font-medium">
+                {t('landing.resetting_session', 'Resetting study session…')}
+            </p>
         </div>
     );
 };

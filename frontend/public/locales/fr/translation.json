@@ -268,7 +268,8 @@
     },
     "instructions": {
       "desktop_tip": "Glissez, appuyez ou utilisez le clavier ( ← ↓ → ) pour trier"
-    }
+    },
+    "progress_label": "Progression du tri rapide : {{percent}}% terminé"
   },
   "fine": {
     "deck": {
@@ -2219,5 +2220,12 @@
     "share": "M'envoyer le lien",
     "share_title": "Ma session d'étude",
     "go_to_study": "Commencer une nouvelle session"
+  },
+  "landing": {
+    "instruction": "Entrez le code de votre étude pour commencer.",
+    "study_code_label": "Code de l'étude",
+    "study_code_placeholder": "ex. mon-etude",
+    "go_to_study": "Accéder à l'étude",
+    "resetting_session": "Réinitialisation de la session…"
   }
 }

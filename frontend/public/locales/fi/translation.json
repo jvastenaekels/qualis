@@ -268,7 +268,8 @@
     },
     "instructions": {
       "desktop_tip": "Vedä, paina tai käytä näppäimistöä ( ← ↓ → ) lajitellaksesi"
-    }
+    },
+    "progress_label": "Karkean lajittelun edistyminen: {{percent}}% valmis"
   },
   "fine": {
     "deck": {
@@ -2219,5 +2220,12 @@
     "share": "Lähetä itselleni",
     "share_title": "Tutkimusistuntoni",
     "go_to_study": "Aloita uusi istunto"
+  },
+  "landing": {
+    "instruction": "Enter your study code to begin.",
+    "study_code_label": "Study Code",
+    "study_code_placeholder": "e.g. my-study",
+    "go_to_study": "Go to Study",
+    "resetting_session": "Resetting study session…"
   }
 }

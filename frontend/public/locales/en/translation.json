@@ -268,7 +268,8 @@
     },
     "instructions": {
       "desktop_tip": "Drag, press, or use keyboard ( ← ↓ → ) to sort"
-    }
+    },
+    "progress_label": "Rough sort progress: {{percent}}% complete"
   },
   "fine": {
     "deck": {
@@ -2219,5 +2220,12 @@
     "share": "Send to myself",
     "share_title": "My study session",
     "go_to_study": "Start a new session"
+  },
+  "landing": {
+    "instruction": "Enter your study code to begin.",
+    "study_code_label": "Study Code",
+    "study_code_placeholder": "e.g. my-study",
+    "go_to_study": "Go to Study",
+    "resetting_session": "Resetting study session…"
   }
 }

@@ -24,6 +24,7 @@ import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { useUIStore } from '../store/useUIStore';
 import { useViewport } from '@/contexts/ViewportContext';
+import { Progress } from '@/components/ui/progress';
 
 import { cn } from '@/lib/utils';
 
@@ -267,16 +268,20 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     return (
         <div className="w-full px-2 sm:px-4 md:px-6 lg:max-w-7xl lg:mx-auto flex flex-col h-full overflow-hidden relative select-none">
-            {/* 1. Slim Progress Bar (Top) */}
-            <div className="w-full h-1 bg-gray-100 flex-none z-30">
-                <div
-                    className="h-full transition-all duration-300 ease-out"
-                    style={{
-                        width: `${progress}%`,
-                        backgroundColor: 'var(--brand-accent)',
-                    }}
-                />
-            </div>
+            {/* 1. Slim Progress Bar (Top) — Radix Progress provides ARIA semantics
+                (role="progressbar", aria-valuenow, aria-valuemin/max). The slim
+                visual treatment is preserved via class overrides. */}
+            <Progress
+                value={progress}
+                aria-label={t(
+                    'rough.progress_label',
+                    'Rough sort progress: {{percent}}% complete',
+                    { percent: Math.round(progress) }
+                )}
+                className="h-1 w-full rounded-none bg-gray-100 flex-none z-30"
+                indicatorClassName="bg-transparent transition-all duration-300 ease-out"
+                indicatorStyle={{ backgroundColor: 'var(--brand-accent)' }}
+            />
 
             {/* 2. Instruction Bar (Visual Synchronization with GridSort) */}
             <div className="relative flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
