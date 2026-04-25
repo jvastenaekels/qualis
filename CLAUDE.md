@@ -13,6 +13,9 @@ Open-source platform for conducting Q-methodology research. Monorepo with a Fast
 ```
 backend/        # FastAPI app
   app/          # Application code (models, schemas, services, routers)
+    models/     # Per-subdomain package (Phase 5D): base.py, user.py, project.py,
+                #   study.py, participant.py, recruitment.py, concourse.py, analysis.py
+                #   __init__.py re-exports all names for back-compat
   tests/        # Unit + integration tests (pytest)
 frontend/       # React SPA
   src/           # Components, pages, hooks, store, api
@@ -74,7 +77,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.middleware.security`, `app.middleware.errors`, `app.middleware.spa`
 - `app.database`, `app.schema_validation`
 - All `app.schemas.*` modules (10 modules) — Pydantic v2 BaseModel stubs
-- `app.models` — remaining dict[str, Any] columns are load-bearing JSON blobs (presort_config, presort_answers, analysis result) at the ORM/JSON boundary
+- `app.models` (package) — remaining dict[str, Any] columns are load-bearing JSON blobs (presort_config, presort_answers, analysis result) at the ORM/JSON boundary; the override covers all sub-modules (user, project, study, participant, recruitment, concourse, analysis)
 - `app.dependencies` — wave 4: Callable[…, Coroutine[Any,Any,T]] factory deps; Coroutine yield/send are always Any
 - `app.routers.logs` — wave 4 batch 1: LogEntry.context is dict[str, Any] (open-ended frontend error data)
 - `app.routers.admin.lifecycle` — wave 4 batch 1: Pydantic BaseModel classes in router (DataInventory etc.)
