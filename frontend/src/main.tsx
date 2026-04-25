@@ -4,11 +4,33 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+import * as Sentry from '@sentry/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './i18n';
 import './index.css';
+
+// ---------------------------------------------------------------------------
+// Sentry — initialised here (before React render) so the SDK captures errors
+// from the very first render cycle. No-op when VITE_SENTRY_DSN is not set,
+// so the dev experience (and the bundle for users without a DSN) is unchanged.
+// sendDefaultPii is false: GDPR — participant IPs / emails are never forwarded.
+// ---------------------------------------------------------------------------
+const _sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+if (_sentryDsn) {
+    Sentry.init({
+        dsn: _sentryDsn,
+        environment: import.meta.env.VITE_ENVIRONMENT ?? import.meta.env.MODE,
+        // Zero performance overhead by default; operators can opt in via Sentry project settings.
+        tracesSampleRate: 0,
+        // GDPR: do not forward participant emails / IPs to Sentry.
+        sendDefaultPii: false,
+    });
+    console.info(
+        `[Sentry] Initialised (env=${import.meta.env.VITE_ENVIRONMENT ?? import.meta.env.MODE})`
+    );
+}
 
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/queryClient';
