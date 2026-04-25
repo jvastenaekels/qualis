@@ -288,6 +288,12 @@ module = [
     #   process_submission. dict[str, Any] kept for the submission/consent payloads
     #   (open-ended response shapes consumed at JSON boundary).
     "app.services.submission_service",
+    # study_service: 2 inner helpers (add_error, check_questions) typed; 8 backward-compat
+    #   proxy methods typed as *args/**kwargs: Any -> Any. The proxies dispatch to the
+    #   already-strict SubmissionService / StudyDataService — narrowing their signatures
+    #   would require duplicating each proxy with the underlying method's signature
+    #   (out of scope; the proxies exist for backward compat with old call sites).
+    "app.services.study_service",
 ]
 disallow_untyped_defs = true
 warn_return_any = true

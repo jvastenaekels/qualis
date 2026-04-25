@@ -540,7 +540,7 @@ class StudyService:
         """
         errors = []
 
-        def add_error(key: str, **kwargs):
+        def add_error(key: str, **kwargs: Any) -> None:
             errors.append(
                 json.dumps({"key": f"admin.design.validation.errors.{key}", **kwargs})
             )
@@ -605,7 +605,7 @@ class StudyService:
                         )
 
         # 4. Questions (Pre/Post) have labels for all study languages
-        def check_questions(config: dict, section: str):
+        def check_questions(config: dict[str, Any], section: str) -> None:
             fields = {}
             if section == "presort":
                 if "fields" in config:
@@ -695,49 +695,49 @@ class StudyService:
     # continue to work without changes.
 
     @staticmethod
-    async def record_consent(*args, **kwargs):
+    async def record_consent(*args: Any, **kwargs: Any) -> Any:
         from .submission_service import SubmissionService
 
         return await SubmissionService.record_consent(*args, **kwargs)
 
     @staticmethod
-    def validate_distribution(*args, **kwargs):
+    def validate_distribution(*args: Any, **kwargs: Any) -> Any:
         from .submission_service import SubmissionService
 
         return SubmissionService.validate_distribution(*args, **kwargs)
 
     @staticmethod
-    async def process_submission(*args, **kwargs):
+    async def process_submission(*args: Any, **kwargs: Any) -> Any:
         from .submission_service import SubmissionService
 
         return await SubmissionService.process_submission(*args, **kwargs)
 
     @staticmethod
-    async def delete_audio_files_for_study(*args, **kwargs):
+    async def delete_audio_files_for_study(*args: Any, **kwargs: Any) -> Any:
         from .study_data_service import StudyDataService
 
         return await StudyDataService.delete_audio_files_for_study(*args, **kwargs)
 
     @staticmethod
-    async def reset_study_participants(*args, **kwargs):
+    async def reset_study_participants(*args: Any, **kwargs: Any) -> Any:
         from .study_data_service import StudyDataService
 
         return await StudyDataService.reset_study_participants(*args, **kwargs)
 
     @staticmethod
-    async def get_study_stats(*args, **kwargs):
+    async def get_study_stats(*args: Any, **kwargs: Any) -> Any:
         from .study_data_service import StudyDataService
 
         return await StudyDataService.get_study_stats(*args, **kwargs)
 
     @staticmethod
-    async def get_study_full_dump(*args, **kwargs):
+    async def get_study_full_dump(*args: Any, **kwargs: Any) -> Any:
         from .study_data_service import StudyDataService
 
         return await StudyDataService.get_study_full_dump(*args, **kwargs)
 
     @staticmethod
-    async def get_study_sort_data(*args, **kwargs):
+    async def get_study_sort_data(*args: Any, **kwargs: Any) -> Any:
         from .study_data_service import StudyDataService
 
         return await StudyDataService.get_study_sort_data(*args, **kwargs)
