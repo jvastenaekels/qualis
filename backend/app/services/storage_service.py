@@ -6,6 +6,7 @@
 
 import asyncio
 import logging
+import re
 from datetime import datetime
 from typing import Any
 from uuid import UUID
@@ -17,6 +18,25 @@ from app.core.config import settings
 from app.exceptions import NotFoundError, ServiceError
 
 logger = logging.getLogger(__name__)
+
+# question_key is participant-supplied (form field, audio recording context).
+# We constrain it to a strict charset to prevent path-traversal and key-injection
+# in S3 (e.g. "../etc/passwd", keys with "/" that break the audio/{slug}/{token}/
+# scoping prefix). Allow alphanumerics, dash, underscore, dot only — anything
+# else is collapsed to underscore.
+_QUESTION_KEY_SANITISER = re.compile(r"[^A-Za-z0-9._-]+")
+_MAX_QUESTION_KEY_LEN = 80
+
+
+def _sanitise_question_key(value: str) -> str:
+    """Return a path-traversal-safe rendition of a participant-supplied
+    question_key, suitable for inclusion in an S3 object key."""
+    if not value:
+        return "unknown"
+    cleaned = _QUESTION_KEY_SANITISER.sub("_", value).strip("._-")
+    if not cleaned:
+        return "unknown"
+    return cleaned[:_MAX_QUESTION_KEY_LEN]
 
 
 class StorageService:
@@ -82,10 +102,13 @@ class StorageService:
         """
         file_size = len(content)
 
-        # Generate S3 key with timestamp for uniqueness
+        # Generate S3 key with timestamp for uniqueness.
+        # question_key is sanitised before being concatenated into the path
+        # — see _sanitise_question_key for the threat model.
         timestamp = int(datetime.utcnow().timestamp())
         extension = self._get_extension(content_type)
-        s3_key = f"audio/{study_slug}/{participant_token}/{timestamp}_{question_key}{extension}"
+        safe_question_key = _sanitise_question_key(question_key)
+        s3_key = f"audio/{study_slug}/{participant_token}/{timestamp}_{safe_question_key}{extension}"
 
         # Upload to S3 with retry for transient failures
         loop = asyncio.get_running_loop()

@@ -85,24 +85,38 @@ class SubmissionService:
                 await db.flush()
 
                 # Generate memorable resume code (savepoint protects
-                # against the extremely rare concurrent collision)
+                # against the extremely rare concurrent collision).
+                # Explicit savepoint begin/commit/rollback (rather than
+                # `async with begin_nested()`) so the outer transaction
+                # state stays clean across retries — the context-manager
+                # form left the session in DEACTIVE after the first
+                # IntegrityError, which broke the second begin_nested()
+                # call with PendingRollbackError.
                 from ..resume_codes import generate_unique_resume_code
 
+                resume_code_set = False
                 for _rc in range(3):
                     participant.resume_code = await generate_unique_resume_code(
                         db, language_code
                     )
+                    savepoint = await db.begin_nested()
                     try:
-                        async with db.begin_nested():
-                            await db.flush()
-                        break
+                        await db.flush()
                     except IntegrityError:
+                        await savepoint.rollback()
                         logger.warning(
                             "Resume code collision on attempt %d, retrying",
                             _rc + 1,
                         )
-                else:
-                    raise ConcurrencyError("Could not generate a unique resume code.")
+                        continue
+                    await savepoint.commit()
+                    resume_code_set = True
+                    break
+
+                if not resume_code_set:
+                    raise ConcurrencyError(
+                        "Could not generate a unique resume code."
+                    )
             except IntegrityError:
                 # Race condition: Participant created concurrently
                 await db.rollback()

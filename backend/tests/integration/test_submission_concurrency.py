@@ -370,27 +370,51 @@ async def test_record_consent_resume_code_generated(
 async def test_record_consent_cuncurrency_error_raised_when_resume_code_exhausted(
     db: AsyncSession, active_study: Study, monkeypatch
 ):
-    """ConcurrencyError branch: if generate_unique_resume_code always collides,
-    after 3 attempts ConcurrencyError must be raised.
+    """ConcurrencyError branch: if generate_unique_resume_code always returns
+    the same colliding code, after 3 attempts ConcurrencyError must be raised.
 
-    FIXME: The service's retry loop (submission_service.py lines 91-105) calls
-    `db.begin_nested()` without resetting the session's transaction state after
-    a savepoint rollback.  After the first IntegrityError the session enters
-    SessionTransactionState.DEACTIVE, and the second `begin_nested()` call
-    raises PendingRollbackError instead of allowing the retry.
+    Forces the path by monkeypatching `generate_unique_resume_code` to
+    return a fixed code, then pre-inserting a participant carrying that
+    code so every attempt by the service hits the unique constraint.
 
-    In production this code path is extremely rare (3 consecutive resume-code
-    collisions), but the bug means the ConcurrencyError is never actually raised
-    cleanly — a PendingRollbackError propagates instead.
-
-    Skipping until the service is fixed to call `await db.rollback()` inside the
-    retry loop before attempting the next savepoint.
+    Regression check for the savepoint-retry bug: the original
+    `async with begin_nested()` pattern left the session DEACTIVE after
+    the first IntegrityError, raising PendingRollbackError instead of
+    allowing the retry.  Service now uses explicit savepoint
+    begin/commit/rollback (submission_service.py:91-105) so the outer
+    transaction stays alive across all 3 attempts.
     """
-    pytest.skip(
-        "FIXME: submission_service.py resume-code retry loop does not reset "
-        "session state between savepoint attempts.  After the first IntegrityError "
-        "the outer session transaction goes DEACTIVE, and subsequent begin_nested() "
-        "calls raise PendingRollbackError rather than allowing the retry.  "
-        "Fix: add `await db.rollback()` (or recover the outer savepoint) between "
-        "retry iterations in submission_service.py lines 91-105."
+    # Pre-insert a participant with the colliding resume code so the
+    # unique constraint fires.
+    colliding_code = "FIXED-COLLIDE-001"
+    db.add(
+        Participant(
+            study_id=active_study.id,
+            session_token=uuid.uuid4(),
+            language_used="en",
+            resume_code=colliding_code,
+        )
     )
+    await db.commit()
+
+    # Force the generator to always return the same code so all 3 retries
+    # hit the unique constraint.
+    async def _always_collide(_db, _lang):
+        return colliding_code
+
+    # The service imports `generate_unique_resume_code` lazily inside the
+    # function from `app.resume_codes`, so we patch the source module.
+    monkeypatch.setattr(
+        "app.resume_codes.generate_unique_resume_code",
+        _always_collide,
+    )
+
+    with pytest.raises(ConcurrencyError):
+        await SubmissionService.record_consent(
+            db=db,
+            study_slug=active_study.slug,
+            session_token=uuid.uuid4(),
+            language_code="en",
+            consent_hash="hash",
+            ip_address="127.0.0.1",
+        )

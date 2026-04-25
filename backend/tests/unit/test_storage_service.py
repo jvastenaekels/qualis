@@ -290,15 +290,13 @@ async def test_download_object_other_client_error_raises_service_error():
 
 @pytest.mark.asyncio
 async def test_upload_audio_key_does_not_allow_path_traversal():
-    """The generated S3 key must be constructed from service-controlled components
-    only (study_slug, participant_token, timestamp, question_key).  The key must
-    not start with '/' or contain '..' sequences, regardless of the question_key
-    value passed in.
+    """The generated S3 key must be constructed from service-controlled
+    components plus a sanitised question_key. Even malicious participant
+    input cannot escape the audio/{slug}/{token}/ prefix.
 
-    NOTE: The current implementation does NOT sanitise question_key — a caller
-    could supply a malicious value.  This test documents the current behaviour
-    and will fail if path-traversal protection is later added (remove the xfail
-    marker at that point).
+    Regression check: path-traversal sanitisation was added to
+    storage_service.py (`_sanitise_question_key`) after this test
+    surfaced the gap in audit F-04-003.
     """
     svc, mock_client = _make_service()
 
@@ -313,16 +311,10 @@ async def test_upload_audio_key_does_not_allow_path_traversal():
 
     key = result["s3_key"]
 
-    # The key ALWAYS starts with "audio/" (service-controlled prefix)
-    assert key.startswith("audio/"), f"Key should start with 'audio/': {key}"
-
-    # FIXME: The service does not sanitise question_key, so '..' can appear in
-    # the key.  A future fix should reject or normalise malicious inputs.
-    # For now we document the gap with this assertion (inverted expectation):
-    if ".." in malicious_question_key:
-        # Document the current unsafe behaviour without failing the suite
-        pytest.skip(
-            "FIXME: StorageService does not sanitise question_key — "
-            "path-traversal characters propagate into the S3 key. "
-            "Fix storage_service.py to sanitise inputs before enabling this assertion."
-        )
+    # Service-controlled prefix is preserved
+    assert key.startswith("audio/study/"), f"Key should start with 'audio/study/': {key}"
+    # No traversal characters survived sanitisation
+    assert ".." not in key
+    # The slashes from the malicious input are gone (only the 3 service-
+    # controlled separators remain: audio/<slug>/<token>/)
+    assert key.count("/") == 3, f"Unexpected slash count in key: {key}"
