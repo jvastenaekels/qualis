@@ -71,13 +71,91 @@ For each axis: **(a) automated tooling**, **(b) targeted manual review**,
 | 03 | Architecture | `pydeps`, `madge`, coupling metrics | Routers/services/models boundaries, where business logic lives, Zustand store vs hooks vs API, schema coherence (Pydantic↔ORM↔TS) | Hex/Clean architecture refs, FastAPI best practices |
 | 04 | Tests | `pytest --cov`, `vitest --coverage`, `mutmut` (sample on `factor_analysis_service.py`) | Read critical tests: factor analysis, Q-sort submission, auth, exports. Detect abusive mocks, no-op assertions, fragile fixtures | — |
 | 05 | Data & migrations | Diff `models.py` ↔ DB ↔ Alembic, `check_relationships.py` | Migration chain idempotency, potential data loss, missing unique constraints | PostgreSQL best practices |
-| 06 | Critical Q-methodology validity | Re-run on known seed dataset, compare with PQMethod/Ken-Q on same input | Read factor analysis code (PCA, varimax, flagging, sign polarity, communalities); assess critical Q compatibility (manual rotation, transparency, voice) | papis library `q-methodology` (Sneegas 2020, Stainton Rogers 1997, Stenner 2011, Robbins & Krueger 2000, Watts & Stenner 2012) |
+| 06 | Critical Q-methodology validity | See §3a below — multi-dataset comparison + intermediates + interpretive stability | Read factor analysis code (PCA, varimax, flagging, sign polarity, communalities); assess critical Q compatibility (manual rotation, transparency, voice) | papis library `q-methodology` (Sneegas 2020, Stainton Rogers 1997, Stenner 2011, Robbins & Krueger 2000, Watts & Stenner 2012) |
 | 07 | Frontend / UX | `axe-core` automated scan, Lighthouse, extended `i18n-check` | Playwright manual journeys: admin onboarding, participant Q-sort mobile, recruitment | WCAG 2.1 AA |
 | 08 | Performance | Query profiling (SQLAlchemy echo + EXPLAIN ANALYZE sample), `rollup-plugin-visualizer`, Lighthouse perf | N+1 detection in services, true async (no blocking calls), code splitting, React re-renders | — |
 | 09 | Reproducibility | Build Docker from scratch, `uv lock --check`, `npm ci`, `make ci-full`, run seed, e2e Playwright | Env vars documented, secrets separated, `init_db --reset` clean, seed data coherent | SoftwareX repro requirements |
 | 10 | Documentation | `interrogate` (docstring coverage), `lychee` (broken links), OpenAPI ↔ code conformance | README, CONTRIBUTING, tutorials, CITATION.cff, LICENSE headers, CLAUDE.md | SoftwareX manuscript template, JOSS criteria |
 | 11 | Observability | grep `print(`, `console.log`, `logger.exception`, structured logs presence | Log coverage on critical paths, audit trail (who edited what), error reporting | 12-factor logs |
-| 12 | SoftwareX compliance | Mechanical checklist: LICENSE, CITATION, README sections, public repo, Zenodo archive, version tagged | Read SoftwareX Guide for Authors, compare with recently published articles | SoftwareX Software Quality Indicators |
+| 12 | Submission package + SoftwareX compliance | See §3b below — full submission-readiness checklist | Read SoftwareX Guide for Authors, compare with recently published articles, inspect repo as a reviewer would | SoftwareX Software Quality Indicators, JOSS review criteria |
+
+### §3a — Axis 06 detailed methodology (Q-methodology validity)
+
+Re-running on a single dataset is not enough. In Q, rotation and flagging can
+change the narrative, not just decimals. The validation must cover three layers:
+
+**Layer 1 — Multi-dataset coverage (canonical edge cases).**
+Run Libre-Q's analysis on at least 4 datasets covering:
+- Standard balanced case (forced distribution, ~30 statements, ~20 participants)
+- Bipolar factor case (clear opposing perspectives → tests sign polarity)
+- Confounded / non-significant Q-sorts (tests flagging robustness)
+- Forced vs. unforced distribution variant of the same data (tests distribution
+  handling)
+- Varimax vs. judgmental rotation (if Libre-Q exposes manual rotation; otherwise
+  document the limitation)
+- Centroid vs. PCA extraction (if both supported)
+
+Use `qmethod` (R) and PQMethod as reference implementations. Datasets sourced
+from Zabala 2014 (R package examples), known published Q-studies with
+reproducible data, and the Libre-Q seed.
+
+**Layer 2 — Compare intermediates, not only final outputs.**
+For each dataset, compare:
+- Correlation matrix between Q-sorts
+- Factor loadings (per participant, per factor)
+- Flagging decisions (which Q-sorts load on which factor, at which threshold)
+- Z-scores per statement per factor
+- Factor scores (idealized Q-sorts per factor)
+- Distinguishing statements per factor
+- Consensus statements
+
+A divergence at any intermediate stage is a finding, even if final factor
+arrays look similar.
+
+**Layer 3 — Interpretive stability test.**
+For one dataset, vary one analytical choice at a time (rotation method,
+flagging threshold, number of extracted factors) and assess whether the
+resulting **interpretation** changes meaningfully. If yes, document this as a
+limitation Libre-Q must surface to users (transparency requirement of critical
+Q-methodology).
+
+**Out of scope for axis 06:** re-implementing PQMethod from scratch, validating
+factor analysis math itself (the underlying NumPy/SciPy primitives are
+trusted), evaluating Q-methodology as a method (we audit the implementation,
+not the method).
+
+### §3b — Axis 12 detailed methodology (Submission package)
+
+The audit treats SoftwareX submission as having two distinct concerns:
+**compliance** (mechanical checklist) and **package readiness** (what an editor
+sees when they open the repo).
+
+**Compliance checklist (mechanical):**
+- LICENSE file present, OSI-approved, headers in source files
+- CITATION.cff valid (validate via `cffconvert`)
+- README contains all SoftwareX-required sections (statement of need,
+  installation, usage example, contribution, citation)
+- Public GitHub repo, default branch protected
+- Version tagged (e.g., `v0.1.0`) matching the manuscript
+- Zenodo archive linked, DOI obtained
+- OpenAPI / API docs published or linked
+
+**Package readiness (reviewer-perspective):**
+- Inspect the repo as a fresh reviewer: is the entry point obvious?
+- Install from zero on a clean VM/container: does it actually work?
+- Statement of need: clear, distinguishes Libre-Q from PQMethod, KADE, Ken-Q,
+  qmethod-R (this is where critical Q orientation must be visible)
+- Comparison to alternatives: explicit table or paragraph in README and
+  manuscript
+- Submitted version is **frozen** (tag, archive) — reviewer can pin the exact
+  state they reviewed
+- Reproducibility of any figure/result claimed in the manuscript: scripts +
+  data accessible
+- Test suite runs on the tagged version (CI green)
+
+A red flag in package readiness is more dangerous than a red flag in compliance
+— compliance can often be fixed in a day; package readiness reveals deeper
+issues that the audit must surface early.
 
 ### New tools to install (Wave 1)
 
@@ -115,17 +193,41 @@ Tasks that run without human intervention. Output: raw data ready to analyze.
 Manual reading + raw data analysis + finding write-up, axis by axis. Each axis
 can be dispatched as a parallel sub-agent when independent.
 
-**Priority order if scope must be cut:**
+**Realism note.** 12 axes × ~2 days = mechanical risk of superficiality. To
+avoid producing a thin pass on everything, axes are pre-classified into
+**deep-pass** and **light-pass** by default:
+
+- **Deep-pass (full automated + manual + external):** axes 01 (security), 04
+  (tests), 06 (Q-methodology validity), 09 (reproducibility), 12 (submission
+  package).
+- **Light-pass (automated + minimal manual, ≤45min manual each):** axes 02
+  (code quality manual), 08 (perf manual), 11 (observability).
+- **Standard-pass (automated + targeted manual):** axes 03, 05, 07, 10.
+
+Light-pass axes still produce their `0X-*.md` file with findings, but the
+manual review is time-boxed and only flags structural issues, not nuanced
+cases. This is a deliberate trade-off, not a regression — surfaced explicitly
+in `00-executive-summary.md` so the user can decide if a deeper pass is
+warranted.
+
+**Priority order if further scope must be cut:**
 
 1. Security + RGPD (axis 01) — blocking for prod AND SoftwareX
 2. Critical Q-methodology validity (axis 06) — Libre-Q's scientific differentiator
 3. Tests (axis 04) — directly scrutinized by SoftwareX reviewers
 4. Reproducibility (axis 09) — explicit SoftwareX criterion
-5. Documentation + SoftwareX compliance (axes 10 + 12) — desk-reject risk
-6. Architecture, code quality, data, perf, frontend/UX, observability (8 last,
-   flexible order)
+5. Submission package + documentation (axes 12 + 10) — desk-reject risk
+6. Architecture, data, frontend/UX (3 standard-pass axes)
+7. Code quality manual, perf manual, observability (3 light-pass axes — first
+   to drop entirely if needed)
 
 Each axis produces its full `01-*.md` to `12-*.md` file.
+
+**Overrun probability acknowledged:** ~60-70% chance Wave 2 exceeds 8h given
+the codebase size. Mitigation already baked in: light-pass classification (no
+axis is silently downgraded mid-work) and the cuts list below. If overrun
+happens despite this, drop light-pass axes entirely rather than degrade
+deep-pass axes.
 
 ### Wave 3 — Synthesis, exec summary, backlog (day 4, ~2-3h)
 
@@ -133,7 +235,8 @@ Each axis produces its full `01-*.md` to `12-*.md` file.
 - Write `00-executive-summary.md`: verdict per audience (3 paragraphs), top 5
   findings per severity, cumulative effort vs. severity table
 - Write `99-action-backlog.md`: findings reordered by severity, sequenced into
-  W2 (blockers + priority majors), W3 (remaining majors), pre-submission week,
+  remediation week 1 (blockers + priority majors), remediation week 2
+  (remaining majors), pre-submission week (2026-05-10 → 2026-05-14),
   post-submission (minors + observations). Format pre-formatted for Todoist
   paste
 - Final commit of `docs/audits/2026-04-25-deep-audit/`
@@ -199,12 +302,19 @@ To avoid producing 200 noisy findings.
 - Cargo-cult standards ("Hexagonal architecture demands…" without concrete
   cost demonstration)
 - Findings without actionable recommendation
-- Unrationalized cross-axis duplicates: one parent finding + references in the
-  other axes
+- **Causal double-counting** — same root cause counted in multiple axes
+  inflates the report and dilutes priorities. Rule: one root cause = one
+  parent finding (in its primary axis) + cross-references (`see F-XX-NNN`) in
+  the other axes. Cross-references do not count as new findings.
 - Recommendations that expand scope (rewriting 3 modules → look for a minimal
   variant or flag as "major structural to defer")
 - AI-vibes suggestions without grounding in actual code (cite file:line or no
   finding)
+- **Methodological-difference-as-defect** — classifying a defensible-but-
+  different methodological choice as a "major" finding. If a Libre-Q
+  algorithmic choice diverges from PQMethod/Ken-Q but is defensible in the
+  critical Q literature, the finding belongs in `observation` (with
+  literature citation), not `major`.
 
 ## 6. Verdict and audit closure
 
