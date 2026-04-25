@@ -2,6 +2,7 @@
 
 import re
 from datetime import datetime, timezone
+from typing import cast
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Request, status
@@ -36,19 +37,25 @@ async def record_consent(
         ..., title="Study Slug", description="The distinct slug of the study"
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> ConsentResponse:
     """Records participant consent with timestamp and version."""
     client_ip = request.client.host if request.client else "unknown"
     user_agent = request.headers.get("user-agent")
-    return await StudyService.record_consent(
-        db,
-        study_slug=data.study_slug,
-        session_token=data.session_token,
-        language_code=data.language_code,
-        consent_hash=data.consent_hash,
-        ip_address=client_ip,
-        user_agent=user_agent,
-        is_test_run=data.is_test_run,
+    # StudyService.record_consent is a *args/**kwargs proxy to
+    # SubmissionService.record_consent; cast aligns mypy with the actual
+    # ConsentResponse it returns until the proxy is typed (Phase 3 services wave).
+    return cast(
+        ConsentResponse,
+        await StudyService.record_consent(
+            db,
+            study_slug=data.study_slug,
+            session_token=data.session_token,
+            language_code=data.language_code,
+            consent_hash=data.consent_hash,
+            ip_address=client_ip,
+            user_agent=user_agent,
+            is_test_run=data.is_test_run,
+        ),
     )
 
 
@@ -61,7 +68,7 @@ async def update_progress(
         ..., title="Study Slug", description="The distinct slug of the study"
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, str]:
     """Records the participant's current step (fire-and-forget from frontend)."""
     result = await db.execute(
         select(Participant)
@@ -95,7 +102,7 @@ async def save_draft(
         ..., title="Study Slug", description="The distinct slug of the study"
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, str]:
     """Saves participant draft responses (fire-and-forget from frontend)."""
     result = await db.execute(
         select(Participant, Study)
@@ -139,7 +146,7 @@ async def resume_session(
         pattern=r"^[a-zA-Z0-9-]+$",  # allows uppercase input; normalized to lower in handler
     ),
     db: AsyncSession = Depends(get_db),
-):
+) -> ResumeResponse:
     """Returns participant session data for resuming on another device."""
     # Normalize to lowercase (codes are always lowercase; prevents 404 from
     # mobile keyboards that auto-capitalize the first letter).
@@ -195,7 +202,7 @@ async def participant_self_erase_personal_data(
     session_token: UUID,
     slug: str = Path(..., description="The slug of the study"),
     db: AsyncSession = Depends(get_db),
-):
+) -> None:
     """Participant-initiated GDPR Art. 17 erasure of their own personal data.
 
     Authentication: the session_token query parameter is the bearer of

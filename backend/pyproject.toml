@@ -252,6 +252,10 @@ module = [
     # studies_participants: 6 missing return types added; cast(PaginatedResponse[ParticipantRead], ...)
     #   pattern from admin/users.py wave 4 batch 1.
     "app.routers.admin.studies_participants",
+    # participants: 5 return types added (ConsentResponse, ResumeResponse, dict[str,str] x2, None).
+    #   Calls into untyped StudyService.record_consent proxy stay clean under the relaxed tier
+    #   (disallow_untyped_calls is not enabled here).
+    "app.routers.participants",
 ]
 disallow_untyped_defs = true
 warn_return_any = true
