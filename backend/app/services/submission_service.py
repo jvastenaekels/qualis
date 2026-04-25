@@ -42,7 +42,7 @@ class SubmissionService:
         ip_address: str | None = None,
         user_agent: str | None = None,
         is_test_run: bool = False,
-    ):
+    ) -> dict[str, Any]:
         """Records the exact time and version (hash) of consent."""
         # 1. Get Study
         study = await StudyService.get_study_by_slug(db, study_slug)
@@ -156,7 +156,7 @@ class SubmissionService:
         return {"status": "recorded", "resume_code": participant.resume_code}
 
     @staticmethod
-    def validate_distribution(study: Study, qsort: list[Any]):
+    def validate_distribution(study: Study, qsort: list[Any]) -> None:
         """Validates the Q-sort distribution against the study's grid configuration."""
         # Edge case: Ensure study has statements
         if not study.statements:
@@ -229,7 +229,7 @@ class SubmissionService:
         data: SubmissionInput,
         client_ip: str,
         user_agent: str | None = None,
-    ):
+    ) -> dict[str, Any]:
         """Process and save a participant's submission."""
         # 1. IP Hashing
         hashed_ip = hash_ip(client_ip)

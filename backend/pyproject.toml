@@ -284,6 +284,10 @@ module = [
     #   ValidationResult / StudyImportResponse for the validation + import endpoints.
     #   inner add_error/add_warning use **kwargs: Any (mixed wire types).
     "app.routers.admin.studies_import_export",
+    # submission_service: 3 return types added to record_consent / validate_distribution /
+    #   process_submission. dict[str, Any] kept for the submission/consent payloads
+    #   (open-ended response shapes consumed at JSON boundary).
+    "app.services.submission_service",
 ]
 disallow_untyped_defs = true
 warn_return_any = true
