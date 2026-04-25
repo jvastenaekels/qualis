@@ -54,7 +54,7 @@ export const useGridPlacement = ({ responses, gridColumns, actions }: UseGridPla
                 return distA - distB;
             });
 
-            return emptyRows[0];
+            return emptyRows[0] ?? null;
         },
         [gridColumns, responses.qsort]
     );

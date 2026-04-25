@@ -454,8 +454,9 @@ export function useConcourseDetailPage(): ConcourseDetailPageApi {
 
     // ── Effect: pick first locale once languages arrive ────────
     useEffect(() => {
-        if (languages.length > 0 && !languages.includes(activeLocale)) {
-            setActiveLocale(languages[0]);
+        const firstLang = languages[0];
+        if (firstLang && !languages.includes(activeLocale)) {
+            setActiveLocale(firstLang);
         }
     }, [languages, activeLocale]);
 

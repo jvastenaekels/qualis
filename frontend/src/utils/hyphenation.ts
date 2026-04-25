@@ -18,7 +18,7 @@ const cache = new Map<string, string>();
 export function hyphenate(text: string, lang: string): string {
     if (!text) return text;
 
-    const normalizedLang = lang.split('-')[0].toLowerCase();
+    const normalizedLang = (lang.split('-')[0] ?? lang).toLowerCase();
     const hyphenator = hyphenators[normalizedLang];
     if (!hyphenator) return text;
 

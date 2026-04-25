@@ -319,7 +319,7 @@ export default function ConcourseDetailPage() {
                         </div>
                     ) : (
                         <>
-                            {languages.length === 1 && (
+                            {languages.length === 1 && languages[0] && (
                                 <span className="text-xs text-slate-400 flex items-center gap-1">
                                     <Globe className="size-3" />
                                     {langDisplayName(languages[0])}

@@ -439,10 +439,12 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 onChange={(e) => {
                                                     updateTranslation(activeLocale, (t) => {
                                                         if (!t.step_help) t.step_help = {};
-                                                        if (!t.step_help[step.id.toString()])
-                                                            t.step_help[step.id.toString()] = {};
-                                                        t.step_help[step.id.toString()][field] =
-                                                            e.target.value;
+                                                        const stepKey = step.id.toString();
+                                                        if (!t.step_help[stepKey]) {
+                                                            t.step_help[stepKey] = {};
+                                                        }
+                                                        const entry = t.step_help[stepKey];
+                                                        entry[field] = e.target.value;
                                                     });
                                                 }}
                                                 placeholder={tPlaceHolder(

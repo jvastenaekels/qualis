@@ -83,7 +83,11 @@ const LoginPage = () => {
                             ? projects.find((p) => p.id === lastProjectId)
                             : null;
                         const target = lastProject ?? projects[0];
-                        navigate(`/app/${target.slug}/dashboard`);
+                        if (target) {
+                            navigate(`/app/${target.slug}/dashboard`);
+                        } else {
+                            navigate('/hub');
+                        }
                     } else {
                         navigate('/hub');
                     }

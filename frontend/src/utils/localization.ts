@@ -32,8 +32,8 @@ export const getLocalizedText = (
     if (text.en) return text.en;
 
     // 3. First available
-    const availableLangs = Object.keys(text);
-    if (availableLangs.length > 0) return text[availableLangs[0]];
+    const firstLang = Object.keys(text)[0];
+    if (firstLang !== undefined) return text[firstLang] ?? fallback;
 
     return fallback;
 };

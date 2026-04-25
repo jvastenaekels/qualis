@@ -55,8 +55,9 @@ export default function ConcourseListPage() {
     useEffect(() => {
         if (isLoading || !workspace?.slug) return;
 
-        if (concourses.length > 0) {
-            navigate(`/app/${workspace.slug}/concourses/${concourses[0].id}`, { replace: true });
+        const first = concourses[0];
+        if (first) {
+            navigate(`/app/${workspace.slug}/concourses/${first.id}`, { replace: true });
             return;
         }
 

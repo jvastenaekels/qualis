@@ -484,7 +484,9 @@ export function ParticipantDetailContent({
                                             text={
                                                 statement.translations.find(
                                                     (tr) => tr.lang === language
-                                                )?.text || statement.translations[0]?.text
+                                                )?.text ||
+                                                statement.translations[0]?.text ||
+                                                ''
                                             }
                                             code={statement.code}
                                             readOnly={true}
