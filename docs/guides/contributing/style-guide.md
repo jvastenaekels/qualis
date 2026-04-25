@@ -1,6 +1,6 @@
 # Documentation Style Guide
 
-To maintain consistency and professionalism across Libre-Q documentation, please follow these guidelines.
+To maintain consistency and professionalism across Qualis documentation, please follow these guidelines.
 
 ## Markdown Conventions
 
@@ -34,5 +34,5 @@ We use **Mermaid** for technical diagrams.
 
 ## Naming
 
-- Always use **Libre-Q** (not "Open-Q") when referring to the project.
+- Always use **Qualis** (not "Open-Q") when referring to the project.
 - Use consistent terminology: "participants" (not "respondents" or "subjects"), "statements" (not "items" or "cards"), "project" (not "organization" or "team").

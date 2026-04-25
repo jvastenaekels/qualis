@@ -1,4 +1,4 @@
-# Libre-Q quality roadmap (v0.2 post-submission)
+# Qualis quality roadmap (v0.2 post-submission)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development to implement this plan phase-by-phase. Each phase is independent — pick one, dispatch sub-agents per item.
 

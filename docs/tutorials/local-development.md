@@ -1,6 +1,6 @@
 # Local Development Setup
 
-In this tutorial, you will set up a local development environment for Libre-Q, run both the backend and frontend, and make a small code change to verify everything works.
+In this tutorial, you will set up a local development environment for Qualis, run both the backend and frontend, and make a small code change to verify everything works.
 
 **What you will learn:**
 
@@ -19,8 +19,8 @@ In this tutorial, you will set up a local development environment for Libre-Q, r
 ## Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/jvastenaekels/libre-q.git
-cd libre-q
+git clone https://github.com/jvastenaekels/qualis.git
+cd qualis
 ```
 
 The repository is a monorepo:
@@ -37,7 +37,7 @@ libre-q/
 
 ## Step 2: Install Dependencies
 
-Libre-Q uses `uv` for Python and `npm` for Node.js. A single Make command installs everything:
+Qualis uses `uv` for Python and `npm` for Node.js. A single Make command installs everything:
 
 ```bash
 make install

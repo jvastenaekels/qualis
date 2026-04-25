@@ -1,4 +1,4 @@
-# Libre-Q Documentation
+# Qualis Documentation
 
 Documentation is organized using the [Diataxis framework](https://diataxis.fr/) into four quadrants.
 
@@ -6,7 +6,7 @@ Documentation is organized using the [Diataxis framework](https://diataxis.fr/) 
 
 ## Tutorials (Learning-oriented)
 
-Step-by-step lessons that guide you through using Libre-Q for the first time.
+Step-by-step lessons that guide you through using Qualis for the first time.
 
 | Tutorial | Description |
 |----------|-------------|

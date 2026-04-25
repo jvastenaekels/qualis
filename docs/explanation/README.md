@@ -1,6 +1,6 @@
 # Explanation
 
-Understanding-oriented background knowledge and architectural context for Libre-Q.
+Understanding-oriented background knowledge and architectural context for Qualis.
 
 | Document | Description |
 |----------|-------------|

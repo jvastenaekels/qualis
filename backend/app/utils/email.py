@@ -26,12 +26,12 @@ def send_invitation_email(
     <html>
         <body>
             <h2>Hello!</h2>
-            <p>You have been invited to collaborate on the {context_type} <strong>{context_name}</strong> on Libre-Q.</p>
+            <p>You have been invited to collaborate on the {context_type} <strong>{context_name}</strong> on Qualis.</p>
             <p>To accept the invitation and register your account, please click the link below:</p>
             <p><a href="{invite_url}">{invite_url}</a></p>
             <p>If you already have an account, the link will associate your account with this {context_type}.</p>
             <br>
-            <p>L'équipe Libre-Q</p>
+            <p>L'équipe Qualis</p>
         </body>
     </html>
     """

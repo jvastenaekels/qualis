@@ -92,7 +92,7 @@ def generate_totp_secret() -> str:
 
 def get_totp_uri(email: str, secret: str) -> str:
     """Generate a TOTP provisioning URI for QR codes."""
-    return pyotp.totp.TOTP(secret).provisioning_uri(name=email, issuer_name="Libre-Q")
+    return pyotp.totp.TOTP(secret).provisioning_uri(name=email, issuer_name="Qualis")
 
 
 def verify_totp_token(secret: str, token: str) -> bool:

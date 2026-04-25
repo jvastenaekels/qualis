@@ -17,7 +17,7 @@ from app.utils.script_utils import APIClient  # noqa: E402
 
 async def create_user_cli():
     """Interactive CLI to create a user via Admin API."""
-    print("--- Libre-Q User Creation (API Mode) ---")
+    print("--- Qualis User Creation (API Mode) ---")
 
     api = APIClient()
     try:

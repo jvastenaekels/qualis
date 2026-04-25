@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Execute a 12-axis deep audit of Libre-Q producing 14 markdown deliverables in `docs/audits/2026-04-25-deep-audit/`, ready to drive remediation work before the SoftwareX submission deadline (2026-05-14).
+**Goal:** Execute a 12-axis deep audit of Qualis producing 14 markdown deliverables in `docs/audits/2026-04-25-deep-audit/`, ready to drive remediation work before the SoftwareX submission deadline (2026-05-14).
 
 **Architecture:** Three-wave execution: (1) automated tool runs (parallel where possible) producing raw outputs in `.raw/`, (2) per-axis qualitative analysis (12 sub-agents in parallel where independent), (3) cross-axis synthesis producing executive summary + sequenced backlog. Each axis classified deep/standard/light-pass per the spec.
 
@@ -41,7 +41,7 @@ For Wave 2, each axis can be dispatched to a sub-agent (`general-purpose`)
 running independently. The prompt template:
 
 ```
-You are auditing axis NN ({axis name}) of the Libre-Q codebase as part of a
+You are auditing axis NN ({axis name}) of the Qualis codebase as part of a
 deep code audit. Your output is the file
 `docs/audits/2026-04-25-deep-audit/0N-{axis-slug}.md`.
 
@@ -353,10 +353,10 @@ performance/a11y/best-practices scores per page.
 **Sub-agent F — Q-methodology Layer 1 reference run:**
 
 ```
-This is the first part of axis 06's deep validation. Identify Libre-Q's
+This is the first part of axis 06's deep validation. Identify Qualis's
 factor analysis entry point in
 `backend/app/services/analysis_service.py`. Locate the seed dataset(s) under
-`backend/seed*` or `data/`. For each available dataset, run Libre-Q's analysis
+`backend/seed*` or `data/`. For each available dataset, run Qualis's analysis
 and capture full intermediate state (correlation matrix, loadings, flagging,
 z-scores, factor scores, distinguishing/consensus statements) to JSON in
 `.raw/qmethod-libre-q-{dataset}.json`.
@@ -364,7 +364,7 @@ z-scores, factor scores, distinguishing/consensus statements) to JSON in
 If R + qmethod package is available locally, run Zabala's qmethod on the same
 dataset and capture intermediates to `.raw/qmethod-zabala-{dataset}.json`. If
 not, document the gap in `.raw/qmethod-comparison-NOTE.txt` and stop after
-the Libre-Q run. Do not attempt to install R if not present.
+the Qualis run. Do not attempt to install R if not present.
 
 Report: which datasets were available, which intermediates were captured,
 whether qmethod-R was available for comparison.
@@ -779,7 +779,7 @@ If the seed lacks bipolar / confounded / forced-vs-unforced variants,
 construct minimal synthetic ones (8-15 statements, 6-10 participants) and
 save to `.raw/synthetic-datasets/{case}.csv`. Document the construction.
 
-- [ ] **Step 3: Run Libre-Q analysis on each synthetic dataset, capture intermediates**
+- [ ] **Step 3: Run Qualis analysis on each synthetic dataset, capture intermediates**
 
 ```bash
 cd /home/julien/libre-q/backend && \
@@ -809,7 +809,7 @@ budget = 120 minutes.
 CONTEXT: Read spec §3a in
 docs/superpowers/specs/2026-04-25-deep-code-audit-design.md before starting.
 This axis uses three layers: (1) multi-dataset coverage, (2) intermediates
-comparison, (3) interpretive stability test. Libre-Q's positioning is
+comparison, (3) interpretive stability test. Qualis's positioning is
 critical Q-methodology, not classical Q — see
 ~/.claude/projects/-home-julien-libre-q/memory/project_critical_q_orientation.md.
 
@@ -838,17 +838,17 @@ MANUAL REVIEW:
      rotation)
    - Computed intermediates exposed to caller / DB / API
 2. For each layer:
-   - Layer 1: For each dataset, does Libre-Q produce a coherent result?
+   - Layer 1: For each dataset, does Qualis produce a coherent result?
      Run completes, intermediates make sense (correlations bounded
      [-1, 1], loadings, z-scores normalized)?
-   - Layer 2: Compare Libre-Q intermediates to qmethod-R per dataset.
+   - Layer 2: Compare Qualis intermediates to qmethod-R per dataset.
      Tolerances: correlations ±0.001, loadings ±0.01 after sign
      alignment, z-scores ±0.01, flagging decisions ≥95% agreement.
      ANY divergence → finding (severity depends on magnitude and
      downstream impact).
    - Layer 3: For one dataset, vary flagging threshold (0.30 / 0.40 / 0.50)
      and re-run. Do distinguishing statements change? If yes → not a bug
-     but a transparency requirement: Libre-Q must surface this to user.
+     but a transparency requirement: Qualis must surface this to user.
 3. Critical Q compatibility check:
    - Is manual rotation supported? If only varimax, this is a major
      finding for critical Q practice.
@@ -872,7 +872,7 @@ Severity:
 - minor: cosmetic differences in output, non-critical option missing
 - observation: critical Q literature suggests evolution path
 
-Anti-pattern reminder: do not classify "Libre-Q does X differently from
+Anti-pattern reminder: do not classify "Qualis does X differently from
 PQMethod" as major if the difference is defensible in critical Q
 literature. Cite the literature.
 ```
@@ -1393,7 +1393,7 @@ MANUAL REVIEW (compliance track):
 MANUAL REVIEW (package readiness — reviewer perspective):
 - Open the GitHub repo with fresh eyes: is the entry point obvious in
   the first 10 seconds?
-- Statement of need: is Libre-Q's contribution clear? Is the critical Q
+- Statement of need: is Qualis's contribution clear? Is the critical Q
   positioning explicit?
 - Comparison to alternatives: explicit table comparing PQMethod, KADE,
   Ken-Q, qmethod-R, htmlQ. Does it exist? Is it accurate?
@@ -1514,7 +1514,7 @@ From `.raw/all-findings.csv`, compute:
 Create `00-executive-summary.md` with these sections (all required, no TBD):
 
 ```markdown
-# Libre-Q Deep Code Audit — Executive Summary
+# Qualis Deep Code Audit — Executive Summary
 
 **Date:** 2026-04-25
 **Auditor:** Claude Opus 4.7 + Codex review + sub-agents per axis
@@ -1635,7 +1635,7 @@ git -C /home/julien/libre-q commit -m "audit(summary): executive verdict for 3 a
 Build the backlog using this template:
 
 ```markdown
-# Libre-Q Audit — Action Backlog
+# Qualis Audit — Action Backlog
 
 **Sprint context:** SoftwareX submission target 2026-05-14. Today
 2026-04-25.

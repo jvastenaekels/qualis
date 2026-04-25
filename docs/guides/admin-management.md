@@ -1,6 +1,6 @@
 # Admin and Team Management
 
-This guide explains how to manage accounts, research teams, and study permissions in Libre-Q.
+This guide explains how to manage accounts, research teams, and study permissions in Qualis.
 
 ---
 
@@ -60,7 +60,7 @@ Invite a user by their email through the **project settings** page.
 2. Select a role (**Researcher** or **Viewer**).
 3. Click **Send Invitation**.
 
-Libre-Q will generate a unique registration link. If SMTP is configured, the user will receive an email. If not (e.g., in development), the link is displayed in the dashboard logs.
+Qualis will generate a unique registration link. If SMTP is configured, the user will receive an email. If not (e.g., in development), the link is displayed in the dashboard logs.
 
 ### Invitation Process
 
@@ -69,7 +69,7 @@ Libre-Q will generate a unique registration link. If SMTP is configured, the use
 
 ### Roles and Permissions
 
-Libre-Q supports three project-level roles with varying levels of access:
+Qualis supports three project-level roles with varying levels of access:
 
 | Feature                            | Owner | Researcher | Viewer |
 | :--------------------------------- | :---: | :--------: | :----: |

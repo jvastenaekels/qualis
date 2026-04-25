@@ -1,5 +1,5 @@
 {
-  "name": "Libre-Q",
+  "name": "Qualis",
   "env": {
     "ENVIRONMENT": {
       "description": "Application environment. Must be 'production' for any deployment with real users; 'development' enables test/seed routes used by E2E tests only.",

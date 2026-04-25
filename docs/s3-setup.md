@@ -1,4 +1,4 @@
-# Configuration S3/Cellar pour Libre-Q Audio
+# Configuration S3/Cellar pour Qualis Audio
 
 ## Prérequis
 
@@ -183,7 +183,7 @@ async def test_s3_connection():
         storage.s3_client.put_object(
             Bucket=settings.S3_BUCKET_NAME,
             Key=test_key,
-            Body=b"Test connexion Libre-Q",
+            Body=b"Test connexion Qualis",
             ContentType="text/plain"
         )
         print(f"✅ Upload de test réussi: {test_key}")

@@ -1,6 +1,6 @@
 # Tutorials
 
-Welcome to the Libre-Q tutorials. These step-by-step lessons will walk you through the platform from start to finish, whether you are a researcher designing your first Q-methodology study or a developer contributing to the codebase.
+Welcome to the Qualis tutorials. These step-by-step lessons will walk you through the platform from start to finish, whether you are a researcher designing your first Q-methodology study or a developer contributing to the codebase.
 
 Each tutorial is hands-on: you will follow along and build something real as you learn.
 
@@ -25,7 +25,7 @@ Each tutorial is hands-on: you will follow along and build something real as you
 
 ## How to Use These Tutorials
 
-1. Start with **Your First Study** if you are new to Libre-Q.
+1. Start with **Your First Study** if you are new to Qualis.
 2. Work through each tutorial in order -- each one builds on concepts from the previous.
 3. Follow the steps exactly as written. The tutorials use a realistic example study about "Attitudes Toward Remote Work" so you can see how a real research project comes together.
 4. If you get stuck, check the [Guides](../guides/) section for task-specific how-to instructions, or the [Reference](../reference/) section for detailed configuration options.

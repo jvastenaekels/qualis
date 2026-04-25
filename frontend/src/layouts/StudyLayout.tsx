@@ -1,5 +1,5 @@
 /*
- * Libre-Q - Open-source platform for conducting Q-methodology research
+ * Qualis - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
@@ -321,9 +321,9 @@ const StudyLayoutContent: React.FC = () => {
     // Browser Tab Title Management
     useEffect(() => {
         if (config?.title) {
-            document.title = `${config.title} | ${t('layout.title', 'Libre-Q')}`;
+            document.title = `${config.title} | ${t('layout.title', 'Qualis')}`;
         } else {
-            document.title = t('layout.title', 'Libre-Q');
+            document.title = t('layout.title', 'Qualis');
         }
     }, [config?.title, t]);
 

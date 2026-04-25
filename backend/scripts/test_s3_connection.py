@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script pour tester la connexion S3/Cellar pour Libre-Q Audio.
+Script pour tester la connexion S3/Cellar pour Qualis Audio.
 Usage: python scripts/test_s3_connection.py
 """
 
@@ -22,7 +22,7 @@ async def test_s3_connection():
     """Test complet de la connexion et des opérations S3."""
 
     print("=" * 70)
-    print("🔍 Test de connexion S3/Cellar pour Libre-Q")
+    print("🔍 Test de connexion S3/Cellar pour Qualis")
     print("=" * 70)
     print()
 
@@ -108,7 +108,7 @@ async def test_s3_connection():
     print()
     print("Test 4: Upload d'un fichier de test...")
     test_key = f"test/connection_test_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-    test_content = f"Test de connexion Libre-Q - {datetime.now().isoformat()}"
+    test_content = f"Test de connexion Qualis - {datetime.now().isoformat()}"
 
     try:
         storage.s3_client.put_object(

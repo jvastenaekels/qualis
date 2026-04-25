@@ -1,8 +1,8 @@
-# Libre-Q AI-First Development Guidelines
+# Qualis AI-First Development Guidelines
 
 ## 1. Philosophy: The Agent-First Paradigm
 
-**Libre-Q is an "Agent-First" project.** This means the codebase is optimized for generation, reading, and refactoring by Large Language Models (LLMs) under human supervision.
+**Qualis is an "Agent-First" project.** This means the codebase is optimized for generation, reading, and refactoring by Large Language Models (LLMs) under human supervision.
 
 Unlike traditional development where code is optimized for human brevity, here **we prioritize explicitness, strict typing, and deductive logic.** We avoid "magic" behavior, implicit state, or dynamic metaprogramming that creates hallucinations in AI reasoning.
 
@@ -79,7 +79,7 @@ When contributing a new feature, follow this sequence to minimize hallucination:
 ## 5. Domain Knowledge: Q-Methodology
 
 _Context for the Agent:_
-Libre-Q implements **Q-Methodology**, a research method used in psychology and social sciences to study human subjectivity. Unlike standard surveys (R-methodology) that treat people as variables, Q-methodology treats _items_ as variables and people as the correlation matrix (Inverted Factor Analysis).
+Qualis implements **Q-Methodology**, a research method used in psychology and social sciences to study human subjectivity. Unlike standard surveys (R-methodology) that treat people as variables, Q-methodology treats _items_ as variables and people as the correlation matrix (Inverted Factor Analysis).
 
 ### 5.1 The Core Mechanism: Forced Distribution
 

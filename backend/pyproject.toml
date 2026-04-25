@@ -1,7 +1,7 @@
 [project]
 name = "libre-q-backend"
 version = "0.1.0"
-description = "Backend for Libre-Q"
+description = "Backend for Qualis"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

@@ -1,6 +1,6 @@
 # Reference
 
-Information-oriented technical reference for the Libre-Q platform.
+Information-oriented technical reference for the Qualis platform.
 
 | Reference | Description |
 |-----------|-------------|

@@ -1,4 +1,4 @@
-# Libre-Q
+# Qualis
 
 Open-source platform for conducting Q-methodology research. Monorepo with a FastAPI backend and React frontend.
 

@@ -85,7 +85,7 @@ const StudyStatusPage: React.FC<StudyStatusPageProps> = ({ type = 'not_found', o
                 )}
             </div>
 
-            <p className="mt-8 text-sm text-slate-400">Libre-Q Platform</p>
+            <p className="mt-8 text-sm text-slate-400">Qualis Platform</p>
         </div>
     );
 };

@@ -1,6 +1,6 @@
 # Admin Dashboard Features
 
-This guide provides a comprehensive overview of all administrative features available in the Libre-Q platform.
+This guide provides a comprehensive overview of all administrative features available in the Qualis platform.
 
 ---
 
@@ -281,7 +281,7 @@ From a participant's detail view, export their data individually as CSV or JSON.
 
 All exports are available only to users with at least Researcher permissions on the study. No PII is stored unless specifically requested in the presort configuration. Researchers are encouraged to only collect necessary data.
 
-Libre-Q implements several privacy protections automatically:
+Qualis implements several privacy protections automatically:
 
 - **IP Address Hashing**: Participant IP addresses are hashed using SHA-256 with a configurable salt (`IP_HASH_SALT`) before storage. Raw IPs are never persisted.
 - **Consent Audit Trail**: Each participant's consent is recorded with a hash of the consent version they saw, enabling researchers to audit which consent text each participant agreed to.
@@ -327,7 +327,7 @@ Projects provide organizational isolation for multi-tenant deployments:
 
 ## Collaborative Editing
 
-When multiple team members edit a study simultaneously, Libre-Q provides safety mechanisms to prevent data loss:
+When multiple team members edit a study simultaneously, Qualis provides safety mechanisms to prevent data loss:
 
 - **Auto-Save with Backup**: Changes are automatically backed up to local storage every second. If the browser closes unexpectedly, unsaved changes are recovered on the next visit.
 - **Navigation Guard**: Attempting to leave the Design page with unsaved changes triggers a confirmation dialog.

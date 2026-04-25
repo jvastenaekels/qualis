@@ -1,10 +1,10 @@
 # Researcher Handbook
 
-This guide is intended for researchers who want to use Libre-Q to conduct Q-methodology studies.
+This guide is intended for researchers who want to use Qualis to conduct Q-methodology studies.
 
 ## The Q-Methodology Workflow
 
-Libre-Q streamlines the traditional Q-sort process into a modern, digital experience:
+Qualis streamlines the traditional Q-sort process into a modern, digital experience:
 
 1. **Preparation**: Define your set of statements (the Q-set) and the shape of your grid (the distribution).
 2. **Onboarding**: Participants read your instructions and provide informed consent.

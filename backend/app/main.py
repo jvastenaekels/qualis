@@ -103,7 +103,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Libre-Q API", lifespan=lifespan)
+app = FastAPI(title="Qualis API", lifespan=lifespan)
 
 # Rate Limiter
 app.state.limiter = limiter

@@ -1,6 +1,6 @@
 # Frontend Components
 
-This guide documents the key reusable React components in Libre-Q.
+This guide documents the key reusable React components in Qualis.
 
 ---
 

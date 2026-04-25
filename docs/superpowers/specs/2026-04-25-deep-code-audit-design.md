@@ -9,7 +9,7 @@
 
 ## 1. Purpose
 
-Conduct a deep, multi-axis audit of the Libre-Q codebase covering three angles
+Conduct a deep, multi-axis audit of the Qualis codebase covering three angles
 simultaneously:
 
 1. **SoftwareX submission readiness** — pass reviewers and avoid desk reject
@@ -85,19 +85,19 @@ Re-running on a single dataset is not enough. In Q, rotation and flagging can
 change the narrative, not just decimals. The validation must cover three layers:
 
 **Layer 1 — Multi-dataset coverage (canonical edge cases).**
-Run Libre-Q's analysis on at least 4 datasets covering:
+Run Qualis's analysis on at least 4 datasets covering:
 - Standard balanced case (forced distribution, ~30 statements, ~20 participants)
 - Bipolar factor case (clear opposing perspectives → tests sign polarity)
 - Confounded / non-significant Q-sorts (tests flagging robustness)
 - Forced vs. unforced distribution variant of the same data (tests distribution
   handling)
-- Varimax vs. judgmental rotation (if Libre-Q exposes manual rotation; otherwise
+- Varimax vs. judgmental rotation (if Qualis exposes manual rotation; otherwise
   document the limitation)
 - Centroid vs. PCA extraction (if both supported)
 
 Use `qmethod` (R) and PQMethod as reference implementations. Datasets sourced
 from Zabala 2014 (R package examples), known published Q-studies with
-reproducible data, and the Libre-Q seed.
+reproducible data, and the Qualis seed.
 
 **Layer 2 — Compare intermediates, not only final outputs.**
 For each dataset, compare:
@@ -116,7 +116,7 @@ arrays look similar.
 For one dataset, vary one analytical choice at a time (rotation method,
 flagging threshold, number of extracted factors) and assess whether the
 resulting **interpretation** changes meaningfully. If yes, document this as a
-limitation Libre-Q must surface to users (transparency requirement of critical
+limitation Qualis must surface to users (transparency requirement of critical
 Q-methodology).
 
 **Out of scope for axis 06:** re-implementing PQMethod from scratch, validating
@@ -143,7 +143,7 @@ sees when they open the repo).
 **Package readiness (reviewer-perspective):**
 - Inspect the repo as a fresh reviewer: is the entry point obvious?
 - Install from zero on a clean VM/container: does it actually work?
-- Statement of need: clear, distinguishes Libre-Q from PQMethod, KADE, Ken-Q,
+- Statement of need: clear, distinguishes Qualis from PQMethod, KADE, Ken-Q,
   qmethod-R (this is where critical Q orientation must be visible)
 - Comparison to alternatives: explicit table or paragraph in README and
   manuscript
@@ -213,7 +213,7 @@ warranted.
 **Priority order if further scope must be cut:**
 
 1. Security + RGPD (axis 01) — blocking for prod AND SoftwareX
-2. Critical Q-methodology validity (axis 06) — Libre-Q's scientific differentiator
+2. Critical Q-methodology validity (axis 06) — Qualis's scientific differentiator
 3. Tests (axis 04) — directly scrutinized by SoftwareX reviewers
 4. Reproducibility (axis 09) — explicit SoftwareX criterion
 5. Submission package + documentation (axes 12 + 10) — desk-reject risk
@@ -284,7 +284,7 @@ To avoid producing 200 noisy findings.
 - Missing comments (well-named code needs no comments)
 - Coverage % as a goal in itself (90% with hollow mocks is worse than 70% with
   serious tests)
-- Compliance with generic "best practices" not justified by concrete Libre-Q
+- Compliance with generic "best practices" not justified by concrete Qualis
   risk
 
 ### Severity calibration
@@ -311,7 +311,7 @@ To avoid producing 200 noisy findings.
 - AI-vibes suggestions without grounding in actual code (cite file:line or no
   finding)
 - **Methodological-difference-as-defect** — classifying a defensible-but-
-  different methodological choice as a "major" finding. If a Libre-Q
+  different methodological choice as a "major" finding. If a Qualis
   algorithmic choice diverges from PQMethod/Ken-Q but is defensible in the
   critical Q literature, the finding belongs in `observation` (with
   literature citation), not `major`.

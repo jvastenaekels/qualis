@@ -58,3 +58,6 @@ library/
 # Audit raw tool outputs (gitignored, except the index README which is committed)
 docs/audits/*/.raw/*
 !docs/audits/*/.raw/README.md
+
+# Claude Code scheduler state
+.claude/

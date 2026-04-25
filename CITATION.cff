@@ -1,9 +1,9 @@
 cff-version: 1.2.0
-message: "If you use Libre-Q in your research, please cite both the software (this entry) and the SoftwareX paper (preferred-citation below)."
+message: "If you use Qualis in your research, please cite both the software (this entry) and the SoftwareX paper (preferred-citation below)."
 type: software
-title: "Libre-Q: An open-source platform for Q-methodology research"
+title: "Qualis: An open-source platform for Q-methodology research"
 abstract: >-
-  Libre-Q is a self-hosted, open-source web application that integrates
+  Qualis is a self-hosted, open-source web application that integrates
   the complete Q-methodology workflow — study design, recruitment,
   online data collection, factor analysis, and export — into a single
   platform. It supports any device, multilingual studies, and exports
@@ -12,8 +12,8 @@ abstract: >-
   analytical choices and integration of post-sort participant voice.
 version: "0.1.0"
 date-released: "2026-04-25"
-url: "https://github.com/jvastenaekels/libre-q"
-repository-code: "https://github.com/jvastenaekels/libre-q"
+url: "https://github.com/jvastenaekels/qualis"
+repository-code: "https://github.com/jvastenaekels/qualis"
 license: "AGPL-3.0-or-later"
 # After tagging v0.1.0-softwarex and the Zenodo webhook archives the release,
 # replace the placeholder below with the assigned DOI.
@@ -46,7 +46,7 @@ keywords:
   - "research software"
 preferred-citation:
   type: article
-  title: "Libre-Q: An open-source platform for Q-methodology research"
+  title: "Qualis: An open-source platform for Q-methodology research"
   authors:
     - family-names: "Vastenaekels"
       given-names: "Julien"

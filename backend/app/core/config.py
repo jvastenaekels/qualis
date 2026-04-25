@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     """Application configuration."""
 
     API_V1_STR: str = "/api"
-    PROJECT_NAME: str = "Libre-Q API"
+    PROJECT_NAME: str = "Qualis API"
     ENVIRONMENT: str = "production"
 
     # Security

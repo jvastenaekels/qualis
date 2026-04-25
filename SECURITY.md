@@ -10,17 +10,17 @@ We patch the latest tagged release. Older releases are best-effort.
 
 ## Known dependency-level findings (deliberate acceptance)
 
-Dependencies surface CVEs that we have evaluated and chose not to fix because the affected code paths are not reachable in Libre-Q's usage.
+Dependencies surface CVEs that we have evaluated and chose not to fix because the affected code paths are not reachable in Qualis's usage.
 
 ### `xlsx` (SheetJS Community Edition)
 
-[GHSA-4r6h-8v6p-xvw6](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6) (prototype pollution) and [GHSA-5pgg-2g8v-p4x9](https://github.com/advisories/GHSA-5pgg-2g8v-p4x9) (ReDoS) require **attacker-controlled XLSX inputs to be parsed**. Libre-Q only **writes** XLSX files for export (`frontend/src/utils/analysisXlsxExport.ts`); it never parses untrusted XLSX. The test suite parses XLSX but only data it just wrote.
+[GHSA-4r6h-8v6p-xvw6](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6) (prototype pollution) and [GHSA-5pgg-2g8v-p4x9](https://github.com/advisories/GHSA-5pgg-2g8v-p4x9) (ReDoS) require **attacker-controlled XLSX inputs to be parsed**. Qualis only **writes** XLSX files for export (`frontend/src/utils/analysisXlsxExport.ts`); it never parses untrusted XLSX. The test suite parses XLSX but only data it just wrote.
 
 Mitigation if reachability changes (e.g. import-from-XLSX is added): switch to ExcelJS or vendor SheetJS Pro from the official CDN.
 
 Last reviewed: 2026-04-25.
 
-## Security-relevant practices in Libre-Q
+## Security-relevant practices in Qualis
 
 These are not a guarantee of security but document the design choices reviewers commonly verify:
 

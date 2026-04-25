@@ -12,7 +12,7 @@ _JsonDict = dict[str, Any]  # type: ignore[explicit-any]  # unstructured JSON wi
 
 
 class APIClient:
-    """Helper to interact with the Libre-Q Admin API."""
+    """Helper to interact with the Qualis Admin API."""
 
     def __init__(
         self, base_url: str | None = None, client: httpx.AsyncClient | None = None

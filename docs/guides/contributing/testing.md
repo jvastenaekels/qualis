@@ -1,6 +1,6 @@
 # Testing Guide
 
-Libre-Q uses a comprehensive testing strategy covering unit tests, integration tests, and end-to-end (E2E) tests. We prioritize **automation** and **reliability** to ensure the platform remains stable as it evolves.
+Qualis uses a comprehensive testing strategy covering unit tests, integration tests, and end-to-end (E2E) tests. We prioritize **automation** and **reliability** to ensure the platform remains stable as it evolves.
 
 ---
 

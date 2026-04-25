@@ -1,6 +1,6 @@
 # How-to Guides
 
-Task-oriented guides for accomplishing specific goals with Libre-Q.
+Task-oriented guides for accomplishing specific goals with Qualis.
 
 ## For Researchers
 

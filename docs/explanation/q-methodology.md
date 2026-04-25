@@ -1,8 +1,8 @@
 # Q-methodology: a researcher's guide
 
-Q-methodology is a research approach for studying **subjectivity**: how people think about topics from their own perspective. Libre-Q provides the digital infrastructure to conduct Q-studies online, with design choices oriented toward **critical Q-methodology** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
+Q-methodology is a research approach for studying **subjectivity**: how people think about topics from their own perspective. Qualis provides the digital infrastructure to conduct Q-studies online, with design choices oriented toward **critical Q-methodology** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
 
-If you're new to Q-methodology, the rest of this document is an introduction. If you already practice it, the most useful section is probably ["Critical Q-methodology in Libre-Q"](#critical-q-methodology-in-libre-q) below, which states what Libre-Q implements, what it defers, and why.
+If you're new to Q-methodology, the rest of this document is an introduction. If you already practice it, the most useful section is probably ["Critical Q-methodology in Qualis"](#critical-q-methodology-in-libre-q) below, which states what Qualis implements, what it defers, and why.
 
 ---
 
@@ -35,7 +35,7 @@ flowchart TD
         A[Define Research Question] --> B[Develop Concourse]
         B --> C[Select Q-Set<br/>30-60 statements]
         C --> D[Design Grid Layout]
-        D --> E[Configure Study in Libre-Q]
+        D --> E[Configure Study in Qualis]
     end
 
     subgraph "Participant Sorts"
@@ -91,9 +91,9 @@ The **Q-grid** is a forced quasi-normal distribution where participants place st
 
 ---
 
-## Libre-Q study phases
+## Qualis study phases
 
-Libre-Q breaks the Q-sort into manageable phases:
+Qualis breaks the Q-sort into manageable phases:
 
 ### 1. Pre-sort (optional)
 
@@ -119,7 +119,7 @@ Participants explain why they placed their most extreme statements (e.g., +5 and
 
 ## Configuring your study
 
-Libre-Q uses JSON configuration to define studies. See the [Configuration Reference](../reference/configuration.md) for details.
+Qualis uses JSON configuration to define studies. See the [Configuration Reference](../reference/configuration.md) for details.
 
 ### Example grid configuration
 
@@ -139,22 +139,22 @@ Libre-Q uses JSON configuration to define studies. See the [Configuration Refere
 
 ---
 
-## Critical Q-methodology in Libre-Q
+## Critical Q-methodology in Qualis
 
 Q-methodology has historically split into two strands. **Classical Q** (Stephenson, Brown 1980, 1993) treats the method as a quantitative, hypothesis-testing tool. **Critical Q** (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020) reframes it as an interpretive practice: the method's value comes from making subjectivities legible, not from extracting "the truth" about opinions, and the researcher's analytical choices (rotation, flagging thresholds, factor naming) are themselves moves to be examined and disclosed.
 
-Libre-Q is designed for the critical strand. The platform supports classical workflows too (the underlying factor analysis is the same), but its **design choices privilege transparency, researcher control, and integration of participant voice** in ways that classical Q tools (PQMethod, qmethod-R, Ken-Q) do not directly target.
+Qualis is designed for the critical strand. The platform supports classical workflows too (the underlying factor analysis is the same), but its **design choices privilege transparency, researcher control, and integration of participant voice** in ways that classical Q tools (PQMethod, qmethod-R, Ken-Q) do not directly target.
 
 ### What this means in practice
 
-| Critical Q principle | How Libre-Q supports it |
+| Critical Q principle | How Qualis supports it |
 |----------------------|--------------------------|
 | Transparency of analytical choices | Every analysis run is persisted with its parameters (extraction method, rotation, flagging threshold, `av_rel_coef`). Researchers can audit what was changed when, and explain those changes in their methods section. (See [Implemented and planned features](#implemented-and-planned-features) below for current state.) |
 | Researcher control over flagging | Auto-flagging is a starting point. Flagging is exposed and editable per study, and researcher decisions are part of the audit trail. |
 | Integration of participant voice | Post-sort recordings (audio + free-text) are stored alongside the Q-sort and are linkable to factor membership in the analysis interface. This supports the critical Q practice of grounding factor interpretation in the words of the people who define each factor (Sneegas 2020; Robbins & Krueger 2000). |
 | Reflexivity about the P-set | The recruitment funnel records who was invited, who started, who completed, and from which channel. The constructed nature of the P-set is visible rather than implicit. |
 | Multilingual studies | Statements, instructions, consent text, and the participant UI can be translated. Critical Q research often crosses language and cultural boundaries; this should not require reverse-engineering the platform. |
-| Self-hosted data residency | Libre-Q runs on the researcher's infrastructure; participant data does not transit through a third-party SaaS. Important for GDPR compliance, ethics committees, and the trust relationship with participants. |
+| Self-hosted data residency | Qualis runs on the researcher's infrastructure; participant data does not transit through a third-party SaaS. Important for GDPR compliance, ethics committees, and the trust relationship with participants. |
 
 ### Implemented and planned features (v0.1)
 

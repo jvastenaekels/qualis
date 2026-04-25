@@ -1,5 +1,5 @@
 /*
- * Libre-Q - Open-source platform for conducting Q-methodology research
+ * Qualis - Open-source platform for conducting Q-methodology research
  * Copyright (C) 2025 Julien Vastenekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
@@ -29,7 +29,7 @@ const LandingPage: React.FC = () => {
                     <div className="flex justify-center mb-6">
                         <img
                             src="/libre-q-logo.svg"
-                            alt="Libre-Q"
+                            alt="Qualis"
                             className="h-20 w-auto object-contain"
                         />
                     </div>

@@ -33,7 +33,7 @@ def run_task(script_path, description, args=None):
 
 def main():
     """Execute the post-deployment sequence."""
-    print("--- Libre-Q Post-Deployment Sequence ---")
+    print("--- Qualis Post-Deployment Sequence ---")
 
     # Determine base directory (backend/) relative to this script
     script_dir = os.path.dirname(os.path.abspath(__file__))  # .../backend/scripts
@@ -52,7 +52,7 @@ def main():
         print(
             "[PostDeploy] CRITICAL: DATABASE_URL is missing or does not use PostgreSQL."
         )
-        print("[PostDeploy] Libre-Q now strictly requires a PostgreSQL database.")
+        print("[PostDeploy] Qualis now strictly requires a PostgreSQL database.")
         sys.exit(1)
 
     # 1. Run Migrations (Safe to run first now)

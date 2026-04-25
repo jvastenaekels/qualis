@@ -1,12 +1,12 @@
-# Libre-Q Architecture
+# Qualis Architecture
 
-This document describes the technical architecture, design choices, and data flow of the Libre-Q platform.
+This document describes the technical architecture, design choices, and data flow of the Qualis platform.
 
 ---
 
 ## System Architecture
 
-Libre-Q follows a decoupled **Client-Server** architecture with clear separation of concerns.
+Qualis follows a decoupled **Client-Server** architecture with clear separation of concerns.
 
 ```mermaid
 graph LR
@@ -37,7 +37,7 @@ graph LR
 
 ### Project-First Flow
 
-Libre-Q 2.0 introduces a **Project-First** architecture.
+Qualis 2.0 introduces a **Project-First** architecture.
 
 - Most API requests are scoped by a mandatory `X-Project-ID` header.
 - The `useAdminStore` maintains the global selection context (Active Project + Study) across all admin pages.
@@ -148,7 +148,7 @@ Beyond Zustand stores, the application uses React contexts for cross-cutting con
 
 ## Responsiveness and Theming
 
-Libre-Q implements a robust, multi-layer responsiveness strategy to support devices ranging from mobile phones to high-resolution desktops.
+Qualis implements a robust, multi-layer responsiveness strategy to support devices ranging from mobile phones to high-resolution desktops.
 
 ### 1. Centralized Viewport Detection
 
@@ -352,7 +352,7 @@ Study states: `draft`, `active`, `paused`, `closed`, `archived`.
 
 ## Permission Model (RBAC)
 
-Libre-Q uses a two-tier RBAC system to balance global maintenance and fine-grained study collaboration.
+Qualis uses a two-tier RBAC system to balance global maintenance and fine-grained study collaboration.
 
 ### 1. Global Hierarchy
 

@@ -1,11 +1,11 @@
-# Libre-Q
+# Qualis
 
 **Open-source platform for Q-methodology research.**
 
 Design studies, collect Q-sorts, and run factor analysis from the browser. Supports any device, requires no software installation, and keeps data on your own server.
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![CI](https://github.com/jvastenaekels/libre-q/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/libre-q/actions/workflows/ci.yml)
+[![CI](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml/badge.svg)](https://github.com/jvastenaekels/qualis/actions/workflows/ci.yml)
 
 <!-- TODO: Add hero screenshot of the Q-sort grid interface, e.g. docs/assets/hero-qsort.png -->
 <!-- Suggested capture: a participant's mid-sort view on a tablet, statements visible, grid partially populated, language switcher visible. -->
@@ -18,15 +18,15 @@ Q-methodology, Stephenson's (1953) approach to studying subjectivity through ran
 
 Q-methodology tools typically separate data collection from analysis, and rarely cover multi-language studies, audio post-sort responses linked to the analysis, or programmatic access to the analytical pipeline. The capability table below breaks this down feature by feature.
 
-Libre-Q covers the full workflow in a single self-hosted browser application: study design, mobile-first recruitment and data collection, factor analysis, and export to PQMethod, R, and Ken-Q formats. The analytical choices stay visible and editable by the researcher. The platform is targeted at groups practising critical Q-methodology and is also usable for classical workflows.
+Qualis covers the full workflow in a single self-hosted browser application: study design, mobile-first recruitment and data collection, factor analysis, and export to PQMethod, R, and Ken-Q formats. The analytical choices stay visible and editable by the researcher. The platform is targeted at groups practising critical Q-methodology and is also usable for classical workflows.
 
-Self-hosting is intentional. Data ownership stays with the researcher, and Libre-Q can run on institutional infrastructure to meet the GDPR data-residency expectations common in European Q research.
+Self-hosting is intentional. Data ownership stays with the researcher, and Qualis can run on institutional infrastructure to meet the GDPR data-residency expectations common in European Q research.
 
 ---
 
 ## Comparison with existing tools
 
-| Capability | FlashQ / HTMLQ | PQMethod | Ken-Q (online) | KADE (Banasick 2019) | qmethod (R, Zabala 2014) | Libre-Q |
+| Capability | FlashQ / HTMLQ | PQMethod | Ken-Q (online) | KADE (Banasick 2019) | qmethod (R, Zabala 2014) | Qualis |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | Browser-based data collection | Yes | No | Yes | No | No | **Yes** |
 | Documented mobile & tablet support | — | No | — | No | N/A | **Yes** |
@@ -118,8 +118,8 @@ Self-hosting is intentional. Data ownership stays with the researcher, and Libre
 
 ```bash
 # 1. Clone and enter
-git clone https://github.com/jvastenaekels/libre-q.git
-cd libre-q
+git clone https://github.com/jvastenaekels/qualis.git
+cd qualis
 
 # 2. Configure environment
 cp .env.example .env
@@ -166,7 +166,7 @@ A `docker-compose.yml` is provided for a self-contained Postgres + app stack. Se
 
 ### Deploy
 
-Libre-Q deploys as a single application (FastAPI serves the built React frontend). See the [Deployment Guide](docs/guides/deployment.md) for Scalingo, Render, Heroku, and Docker instructions.
+Qualis deploys as a single application (FastAPI serves the built React frontend). See the [Deployment Guide](docs/guides/deployment.md) for Scalingo, Render, Heroku, and Docker instructions.
 
 ---
 
@@ -208,17 +208,17 @@ Contributions are welcome. Please read the guidelines before submitting a PR:
 
 ## Citation
 
-If you use Libre-Q in your research, please cite both the software and the accompanying paper. Machine-readable metadata is in [`CITATION.cff`](CITATION.cff) at the repository root (GitHub displays a "Cite this repository" button in the sidebar).
+If you use Qualis in your research, please cite both the software and the accompanying paper. Machine-readable metadata is in [`CITATION.cff`](CITATION.cff) at the repository root (GitHub displays a "Cite this repository" button in the sidebar).
 
 **Software (Zenodo archive):**
 
-> Vastenaekels, J., & Dedinger, C. (2026). *Libre-Q: An open-source platform for Q-methodology research* (Version 0.1.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
+> Vastenaekels, J., & Dedinger, C. (2026). *Qualis: An open-source platform for Q-methodology research* (Version 0.1.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
 
 (DOI assigned automatically by Zenodo at the first tagged release; will be filled in here once available.)
 
 **Paper (SoftwareX):**
 
-> Vastenaekels, J., & Dedinger, C. (2026). Libre-Q: An open-source platform for Q-methodology research. *SoftwareX*. https://doi.org/10.1016/j.softx.2026.XXXXXX
+> Vastenaekels, J., & Dedinger, C. (2026). Qualis: An open-source platform for Q-methodology research. *SoftwareX*. https://doi.org/10.1016/j.softx.2026.XXXXXX
 
 (DOI assigned by Elsevier on acceptance.)
 
@@ -231,15 +231,15 @@ If you use Libre-Q in your research, please cite both the software and the accom
 - **Julien Vastenaekels:** software architecture, implementation, documentation, maintenance, paper co-author.
 - **Clémence Dedinger** (Université de Reims Champagne-Ardenne): methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology, paper co-author. No direct code contribution.
 
-**Methodological grounding:** Libre-Q's design draws on the critical Q-methodology literature, in particular Stainton Rogers (1997), Stenner (2011), Watts & Stenner (2012), and Sneegas (2020).
+**Methodological grounding:** Qualis's design draws on the critical Q-methodology literature, in particular Stainton Rogers (1997), Stenner (2011), Watts & Stenner (2012), and Sneegas (2020).
 
-**Open-source dependencies:** Libre-Q builds on FastAPI, React, SQLAlchemy, Pydantic, dnd-kit, react-i18next, Vite, Biome, Ruff, Playwright, and many other libraries. See `backend/pyproject.toml` and `frontend/package.json` for the full list.
+**Open-source dependencies:** Qualis builds on FastAPI, React, SQLAlchemy, Pydantic, dnd-kit, react-i18next, Vite, Biome, Ruff, Playwright, and many other libraries. See `backend/pyproject.toml` and `frontend/package.json` for the full list.
 
 ---
 
 ## AI usage disclosure
 
-Following [Elsevier's policy on AI tool use in scientific software](https://www.elsevier.com/about/policies/publishing-ethics) and the [JOSS reviewer guidelines](https://joss.readthedocs.io/en/latest/review_criteria.html), the following disclosure applies to Libre-Q's development:
+Following [Elsevier's policy on AI tool use in scientific software](https://www.elsevier.com/about/policies/publishing-ethics) and the [JOSS reviewer guidelines](https://joss.readthedocs.io/en/latest/review_criteria.html), the following disclosure applies to Qualis's development:
 
 Generative AI assistants (primarily Anthropic Claude, with occasional cross-checks via OpenAI Codex) were used during development and documentation:
 

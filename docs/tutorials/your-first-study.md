@@ -1,6 +1,6 @@
 # Your First Study
 
-In this tutorial, you will create a complete Q-methodology study from scratch using Libre-Q. By the end, you will have a fully configured study ready for participants to complete -- including a welcome page, consent form, presort questionnaire, forced-distribution grid, statements, and post-sort questions.
+In this tutorial, you will create a complete Q-methodology study from scratch using Qualis. By the end, you will have a fully configured study ready for participants to complete -- including a welcome page, consent form, presort questionnaire, forced-distribution grid, statements, and post-sort questions.
 
 We will build a study called **"Attitudes Toward Remote Work"** with 12 example statements. This is a small study designed for learning; a real Q study typically has 30-60 statements.
 
@@ -15,15 +15,15 @@ We will build a study called **"Attitudes Toward Remote Work"** with 12 example 
 
 **Time required:** ~30 minutes
 
-**Prerequisites:** A Libre-Q account with researcher-level access. If you are running Libre-Q locally, see the [Local Development Setup](local-development.md) tutorial first.
+**Prerequisites:** A Qualis account with researcher-level access. If you are running Qualis locally, see the [Local Development Setup](local-development.md) tutorial first.
 
 ---
 
 ## Step 1: Create a Project
 
-Projects in Libre-Q organize your studies and team members. Think of a project as a research lab or project group.
+Projects in Qualis organize your studies and team members. Think of a project as a research lab or project group.
 
-1. Log in to Libre-Q. You will land on the admin dashboard.
+1. Log in to Qualis. You will land on the admin dashboard.
 2. In the left sidebar, look for the **Project Switcher** at the top. Click on it and select **Create Project**.
 3. Fill in the form:
    - **Name:** `Remote Work Research Lab`
@@ -43,7 +43,7 @@ You are now inside your new project. The sidebar shows project-level navigation.
    - **Languages:** Check **English**. You can add French or Finnish later if you want a multilingual study.
 3. Click **Create**.
 
-Libre-Q creates the study in **Draft** state and takes you to the **Study Designer** page. The designer has seven tabs:
+Qualis creates the study in **Draft** state and takes you to the **Study Designer** page. The designer has seven tabs:
 
 - **General** -- Title, description, consent form
 - **Presort** -- Pre-sorting questionnaire
@@ -200,7 +200,7 @@ Upload a **logo**, set an **accent color**, and add **partner logos** that appea
 
 1. Return to the Study Designer.
 2. Click the **Activate Study** button.
-3. Libre-Q runs server-side validation. If there are issues, a dialog will list them.
+3. Qualis runs server-side validation. If there are issues, a dialog will list them.
 4. Once validated, the study state changes from **Draft** to **Active**.
 
 Your study is now live. The designer becomes read-only while the study is active.

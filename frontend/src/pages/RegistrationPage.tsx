@@ -294,9 +294,7 @@ const RegistrationPage = () => {
                     </form>
                 </Card>
 
-                <p className="text-center text-2xs text-slate-400 font-medium opacity-50">
-                    Libre-Q
-                </p>
+                <p className="text-center text-2xs text-slate-400 font-medium opacity-50">Qualis</p>
             </div>
         </div>
     );

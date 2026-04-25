@@ -1,6 +1,6 @@
 {
-  "title": "Libre-Q: An open-source platform for Q-methodology research",
-  "description": "Libre-Q is a self-hosted, open-source web application that integrates the complete Q-methodology workflow — study design, recruitment, online data collection, factor analysis, and export — into a single platform. It supports any device, multilingual studies, and exports to PQMethod, Ken-Q Analysis, and the R qmethod package. Designed for critical Q-methodology practice.",
+  "title": "Qualis: An open-source platform for Q-methodology research",
+  "description": "Qualis is a self-hosted, open-source web application that integrates the complete Q-methodology workflow — study design, recruitment, online data collection, factor analysis, and export — into a single platform. It supports any device, multilingual studies, and exports to PQMethod, Ken-Q Analysis, and the R qmethod package. Designed for critical Q-methodology practice.",
   "creators": [
     {
       "name": "Vastenaekels, Julien",

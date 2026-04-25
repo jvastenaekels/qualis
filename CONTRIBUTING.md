@@ -1,6 +1,6 @@
-# Contributing to Libre-Q
+# Contributing to Qualis
 
-Thanks for your interest in contributing! Libre-Q is an open-source platform for Q-methodology research and welcomes contributions of all sizes — bug reports, documentation fixes, feature pull requests, and methodological feedback.
+Thanks for your interest in contributing! Qualis is an open-source platform for Q-methodology research and welcomes contributions of all sizes — bug reports, documentation fixes, feature pull requests, and methodological feedback.
 
 This file is a quick orientation. The full contributor documentation lives under [`docs/contributing/`](docs/contributing/) and [`docs/guides/`](docs/guides/).
 
@@ -67,7 +67,7 @@ For security issues: please email the maintainer (see `CITATION.cff`) rather tha
 
 ## License and contributor agreement
 
-By contributing to Libre-Q you agree that your contribution will be released under the [GNU Affero General Public License v3.0](LICENSE), the same license as the rest of the project.
+By contributing to Qualis you agree that your contribution will be released under the [GNU Affero General Public License v3.0](LICENSE), the same license as the rest of the project.
 
 There is no separate CLA. Your `git commit --author` line is the record of your contribution.
 

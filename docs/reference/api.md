@@ -1,6 +1,6 @@
 # API Reference
 
-Libre-Q uses **FastAPI** which auto-generates interactive API documentation.
+Qualis uses **FastAPI** which auto-generates interactive API documentation.
 
 ---
 

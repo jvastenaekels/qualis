@@ -2,7 +2,7 @@
 
 > **Status: Partially Implemented.** Timeline and device charts have been built and moved to the Data page. Some visualization enhancements may still be pending.
 
-**Project:** Libre-Q Admin UI Enhancement
+**Project:** Qualis Admin UI Enhancement
 **Date:** 2026-01-15
 **Branch:** `claude/improve-study-visualization-y9qUF`
 
@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-This plan outlines a comprehensive overhaul of study data visualization in the Libre-Q admin UI. Currently, the admin interface relies primarily on tables, basic metric cards, and progress bars. While functional, it lacks advanced visual analytics that would help researchers quickly identify patterns, trends, and insights in their study data.
+This plan outlines a comprehensive overhaul of study data visualization in the Qualis admin UI. Currently, the admin interface relies primarily on tables, basic metric cards, and progress bars. While functional, it lacks advanced visual analytics that would help researchers quickly identify patterns, trends, and insights in their study data.
 
 **Key Goals:**
 
@@ -5117,7 +5117,7 @@ const trackChartInteraction = (chartType: string, action: string) => {
 
 ## Conclusion
 
-This overhaul plan transforms the Libre-Q admin UI from a data-management interface into a comprehensive analytics platform. By leveraging the already-installed `recharts` library and implementing a phased approach, we can deliver significant value to researchers while maintaining code quality and performance.
+This overhaul plan transforms the Qualis admin UI from a data-management interface into a comprehensive analytics platform. By leveraging the already-installed `recharts` library and implementing a phased approach, we can deliver significant value to researchers while maintaining code quality and performance.
 
 ### Key Benefits:
 

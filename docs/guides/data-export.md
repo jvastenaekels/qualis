@@ -1,6 +1,6 @@
 # Data Export Guide
 
-This guide explains how Libre-Q stores participant data and how researchers can export and interpret it for analysis.
+This guide explains how Qualis stores participant data and how researchers can export and interpret it for analysis.
 
 ---
 
@@ -118,13 +118,13 @@ WHERE p.status = 'completed'
 
 ## Built-in Analysis
 
-Libre-Q includes a built-in factor analysis engine accessible from the **Analysis** page. This allows you to run PCA or centroid extraction with varimax rotation directly in the browser without exporting data first. See the [Analysis section of the Admin Features guide](admin-features.md#analysis) for details.
+Qualis includes a built-in factor analysis engine accessible from the **Analysis** page. This allows you to run PCA or centroid extraction with varimax rotation directly in the browser without exporting data first. See the [Analysis section of the Admin Features guide](admin-features.md#analysis) for details.
 
 ---
 
 ## Interactive Data Inspection
 
-Before performing full factor analysis, researchers can audit individual results directly in the Libre-Q dashboard.
+Before performing full factor analysis, researchers can audit individual results directly in the Qualis dashboard.
 
 1. **Grid Reconstruction**: Clicking on any participant in the Data page opens a high-fidelity visual of their final Q-sort grid.
 2. **Quality Audit**: The dashboard shows completion duration and flags test runs. You can manually discard suspicious responses.
@@ -134,4 +134,4 @@ Before performing full factor analysis, researchers can audit individual results
 
 ## Data Privacy
 
-Libre-Q is designed with privacy in mind. No PII (Personally Identifiable Information) is stored unless specifically requested in the `presort_config`. IP addresses are hashed by default. Researchers are encouraged to only collect necessary data.
+Qualis is designed with privacy in mind. No PII (Personally Identifiable Information) is stored unless specifically requested in the `presort_config`. IP addresses are hashed by default. Researchers are encouraged to only collect necessary data.

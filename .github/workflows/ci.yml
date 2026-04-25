@@ -1,4 +1,4 @@
-name: Libre-Q CI
+name: Qualis CI
 
 on:
   workflow_dispatch:
@@ -124,7 +124,7 @@ jobs:
       - name: Dead Code (Knip)
         run: npm run lint:deadcode
       - name: Security SCA (NPM Audit)
-        # xlsx CVEs are accepted: SheetJS Community has no fix and Libre-Q only
+        # xlsx CVEs are accepted: SheetJS Community has no fix and Qualis only
         # WRITES XLSX (analysisXlsxExport.ts), never parses untrusted input.
         # See SECURITY.md ("xlsx (SheetJS Community Edition)") for full rationale.
         # Fail only on high+ advisories outside the allowlist.

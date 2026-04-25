@@ -1,6 +1,6 @@
 # Frontend Best Practices
 
-This document outlines the coding standards and best practices for the Libre-Q frontend, optimized for **React v19** and **Tailwind CSS**.
+This document outlines the coding standards and best practices for the Qualis frontend, optimized for **React v19** and **Tailwind CSS**.
 
 ## 1. React v19 Integration
 
@@ -53,7 +53,7 @@ Always use the `cn()` utility (based on `clsx` and `tailwind-merge`) for conditi
 
 ### Responsive Design
 
-Libre-Q is mobile-first. Ensure all complex interactions are optimized for touch.
+Qualis is mobile-first. Ensure all complex interactions are optimized for touch.
 
 - Use `touch-manipulation` on buttons to remove click delays.
 - Use responsive prefixes: `sm:` (tablet), `lg:` (desktop).

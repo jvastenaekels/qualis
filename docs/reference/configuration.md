@@ -1,6 +1,6 @@
 # Configuration Reference
 
-Libre-Q studies are highly configurable via JSON objects stored in the `studies` table. This document details the schema for these configurations.
+Qualis studies are highly configurable via JSON objects stored in the `studies` table. This document details the schema for these configurations.
 
 ## `grid_config` (The Distribution)
 

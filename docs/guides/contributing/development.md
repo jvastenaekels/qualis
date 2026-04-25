@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide covers how to set up your local environment to contribute to Libre-Q.
+This guide covers how to set up your local environment to contribute to Qualis.
 
 ## Prerequisites
 
@@ -15,8 +15,8 @@ This guide covers how to set up your local environment to contribute to Libre-Q.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/jvastenaekels/libre-q.git
-cd libre-q
+git clone https://github.com/jvastenaekels/qualis.git
+cd qualis
 ```
 
 ### 2. Install Dependencies

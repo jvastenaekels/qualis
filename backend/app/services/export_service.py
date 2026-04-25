@@ -536,7 +536,7 @@ class ExportService:
         n_meta = n_fixed_meta + n_presort
         n_items = len(study.statements)
 
-        return f"""# Libre-Q Automatic Analysis Script
+        return f"""# Qualis Automatic Analysis Script
 # Required: install.packages("qmethod")
 
 library(qmethod)

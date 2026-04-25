@@ -1,6 +1,6 @@
-# Libre-Q Backend
+# Qualis Backend
 
-The Libre-Q backend is a robust ASGI application built with **FastAPI**, **SQLAlchemy (Async)**, and **Pydantic**. It uses **bcrypt** for password hashing and **PyJWT** for secure token handling.
+The Qualis backend is a robust ASGI application built with **FastAPI**, **SQLAlchemy (Async)**, and **Pydantic**. It uses **bcrypt** for password hashing and **PyJWT** for secure token handling.
 
 ## 📁 Directory Structure
 

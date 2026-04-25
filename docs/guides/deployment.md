@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide covers deploying Libre-Q to production environments.
+This guide covers deploying Qualis to production environments.
 
 ---
 
@@ -17,12 +17,12 @@ This guide covers deploying Libre-Q to production environments.
 
 ## Scalingo Deployment (Unified)
 
-Libre-Q is deployed as a single application where the FastAPI backend serves the pre-built React frontend.
+Qualis is deployed as a single application where the FastAPI backend serves the pre-built React frontend.
 
 ```mermaid
 graph LR
     subgraph Scalingo
-        App[Libre-Q App]
+        App[Qualis App]
         DB[(PostgreSQL)]
     end
 
@@ -65,7 +65,7 @@ graph LR
 
 ### Post-Deployment Automation
 
-Libre-Q uses the `postdeploy` phase in `Procfile` to automate critical tasks after every successful build:
+Qualis uses the `postdeploy` phase in `Procfile` to automate critical tasks after every successful build:
 
 - **Schema Migration**: Executes `alembic upgrade head` to ensure all database tables are up to date.
 - **Admin Setup**: Creates the initial admin account if the database is empty.
@@ -167,7 +167,7 @@ Scalingo provides automatic SSL certificates for all applications. No manual con
 
 ## Rate Limiting
 
-Libre-Q uses SlowAPI for request rate limiting with three operational modes:
+Qualis uses SlowAPI for request rate limiting with three operational modes:
 
 | Mode         | When Active              | Storage                    |
 | :----------- | :----------------------- | :------------------------- |

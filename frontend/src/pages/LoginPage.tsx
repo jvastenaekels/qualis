@@ -192,7 +192,7 @@ const LoginPage = () => {
                 </Card>
 
                 <p className="text-center text-2xs text-slate-400 mt-12 font-medium opacity-50">
-                    Libre-Q
+                    Qualis
                 </p>
             </motion.div>
         </div>

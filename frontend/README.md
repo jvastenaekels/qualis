@@ -1,4 +1,4 @@
-# Libre-Q Frontend
+# Qualis Frontend
 
 A modern, responsive React application for conducting Q-methodology sorts.
 

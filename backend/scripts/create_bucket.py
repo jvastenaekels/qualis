@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script pour créer le bucket S3/Cellar pour Libre-Q Audio.
+Script pour créer le bucket S3/Cellar pour Qualis Audio.
 Usage: python scripts/create_bucket.py
 """
 

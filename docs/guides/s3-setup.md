@@ -1,12 +1,12 @@
 # S3 Setup for Audio Recordings
 
-This guide explains how to configure S3-compatible object storage for Libre-Q's audio recording feature. Audio recordings allow participants to provide spoken responses during the post-sort phase.
+This guide explains how to configure S3-compatible object storage for Qualis's audio recording feature. Audio recordings allow participants to provide spoken responses during the post-sort phase.
 
 ---
 
 ## Overview
 
-When S3 is configured, Libre-Q enables audio response fields in post-sort questionnaires. Participants can record voice responses directly in their browser, and the audio files are uploaded to S3. Only metadata (bucket, key, duration, MIME type) is stored in the database.
+When S3 is configured, Qualis enables audio response fields in post-sort questionnaires. Participants can record voice responses directly in their browser, and the audio files are uploaded to S3. Only metadata (bucket, key, duration, MIME type) is stored in the database.
 
 If S3 is not configured, audio recording features are disabled and text-only responses are used.
 
@@ -105,7 +105,7 @@ After setting the environment variables and restarting the application:
 
 ## S3-Compatible Providers
 
-Libre-Q uses the standard AWS S3 SDK (boto3). Any S3-compatible provider should work:
+Qualis uses the standard AWS S3 SDK (boto3). Any S3-compatible provider should work:
 
 | Provider | Notes |
 |----------|-------|

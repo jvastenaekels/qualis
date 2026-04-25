@@ -14,7 +14,7 @@ This tutorial continues from [Your First Study](your-first-study.md).
 
 **Time required:** ~15 minutes
 
-**Prerequisites:** An active Libre-Q study (completed the [Your First Study](your-first-study.md) tutorial).
+**Prerequisites:** An active Qualis study (completed the [Your First Study](your-first-study.md) tutorial).
 
 ---
 

@@ -54,7 +54,7 @@ check:
 	# CVE-2026-3219 (pip): tooling, no fix released
 	# CVE-2026-4539 (pygments): transitive via rich, no direct pin; ReDoS in archetype lexer not used
 	# CVE-2026-28684 (python-dotenv): transitive via pydantic-settings, symlink attack requires write access to .env
-	# CVE-2026-25645 (requests): transitive via boto3, extract_zipped_paths() not called by Libre-Q
+	# CVE-2026-25645 (requests): transitive via boto3, extract_zipped_paths() not called by Qualis
 	# See SECURITY.md for the deliberate-acceptance evaluation.
 	cd backend && uv run python -m app.schema_validation
 	python3 backend/scripts/check_relationships.py

@@ -1,6 +1,6 @@
-# Libre-Q AI Agent Instructions
+# Qualis AI Agent Instructions
 
-**Libre-Q** is an open-source Q-Methodology platform built with **Agent-First** principles. This project prioritizes strict typing, explicit contracts, and type-driven development to maximize AI productivity.
+**Qualis** is an open-source Q-Methodology platform built with **Agent-First** principles. This project prioritizes strict typing, explicit contracts, and type-driven development to maximize AI productivity.
 
 ## Core Philosophy: Agent-First Development
 

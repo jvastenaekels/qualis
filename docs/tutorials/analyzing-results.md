@@ -1,6 +1,6 @@
 # Analyzing Results
 
-In this tutorial, you will learn how to use Libre-Q's built-in factor analysis tools to extract viewpoints from your Q-sort data, interpret the results, and export data for further analysis in PQMethod, R, or KADE.
+In this tutorial, you will learn how to use Qualis's built-in factor analysis tools to extract viewpoints from your Q-sort data, interpret the results, and export data for further analysis in PQMethod, R, or KADE.
 
 This tutorial continues from [Collecting Responses](collecting-responses.md).
 
@@ -14,7 +14,7 @@ This tutorial continues from [Collecting Responses](collecting-responses.md).
 
 **Time required:** ~20 minutes
 
-**Prerequisites:** A Libre-Q study with at least 2 completed participant responses.
+**Prerequisites:** A Qualis study with at least 2 completed participant responses.
 
 ---
 
@@ -22,7 +22,7 @@ This tutorial continues from [Collecting Responses](collecting-responses.md).
 
 1. In the admin sidebar, click **Analysis**.
 
-The Analysis page shows a **Configuration** card at the top. If you have enough completed participants, Libre-Q computes eigenvalues and displays a scree plot.
+The Analysis page shows a **Configuration** card at the top. If you have enough completed participants, Qualis computes eigenvalues and displays a scree plot.
 
 ---
 
@@ -31,7 +31,7 @@ The Analysis page shows a **Configuration** card at the top. If you have enough 
 The scree plot shows eigenvalues for each potential factor in descending order.
 
 Key things to look for:
-- **Kaiser criterion (eigenvalue > 1)**: Factors above this line explain more variance than a single variable. Libre-Q draws this reference line automatically.
+- **Kaiser criterion (eigenvalue > 1)**: Factors above this line explain more variance than a single variable. Qualis draws this reference line automatically.
 - **The "elbow"**: The point where the curve flattens out. Factors before the elbow are generally worth retaining.
 
 ---
@@ -52,7 +52,7 @@ Select how many factors to extract. Each factor represents a distinct shared vie
 - **None**: Preserves the original mathematical solution.
 
 ### Flagging
-- **Auto**: Libre-Q flags participants whose loading exceeds the significance threshold (`1.96 / sqrt(n_statements)`) on exactly one factor.
+- **Auto**: Qualis flags participants whose loading exceeds the significance threshold (`1.96 / sqrt(n_statements)`) on exactly one factor.
 - **Manual**: You manually select which participants define each factor.
 
 ---
