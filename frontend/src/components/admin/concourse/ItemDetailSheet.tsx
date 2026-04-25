@@ -215,6 +215,7 @@ function VersionList({
     const getChanges = (v: ConcourseItemVersionRead, idx: number) => {
         if (idx === 0) return null;
         const prev = sorted[idx - 1];
+        if (!prev) return null;
         const changes: string[] = [];
         if (prev.code !== v.code) changes.push(t('admin.concourse.diff_code', 'code'));
         if (prev.status !== v.status) changes.push(t('admin.concourse.diff_status', 'status'));

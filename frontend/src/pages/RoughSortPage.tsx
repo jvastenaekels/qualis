@@ -75,14 +75,14 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
     const scaleNeutral = useTransform(y, [50, 150], [1, 1.1]);
 
     const opacityDisagree = useTransform([x, y], ([latestX, latestY]: number[]): number => {
-        if (latestX > 50) return 0.5;
-        if (latestY > 50) return 0.5;
+        if ((latestX ?? 0) > 50) return 0.5;
+        if ((latestY ?? 0) > 50) return 0.5;
         return 1;
     });
 
     const opacityAgree = useTransform([x, y], ([latestX, latestY]: number[]): number => {
-        if (latestX < -50) return 0.5;
-        if (latestY > 50) return 0.5;
+        if ((latestX ?? 0) < -50) return 0.5;
+        if ((latestY ?? 0) > 50) return 0.5;
         return 1;
     });
 

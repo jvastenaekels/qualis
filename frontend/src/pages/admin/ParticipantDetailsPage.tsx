@@ -66,9 +66,11 @@ export default function ParticipantDetailsPage() {
         const idx = participantList.findIndex((p) => p.id === Number(participantId));
         return {
             currentIndex: idx,
-            prevId: idx > 0 ? participantList[idx - 1].id : null,
+            prevId: idx > 0 ? (participantList[idx - 1]?.id ?? null) : null,
             nextId:
-                idx >= 0 && idx < participantList.length - 1 ? participantList[idx + 1].id : null,
+                idx >= 0 && idx < participantList.length - 1
+                    ? (participantList[idx + 1]?.id ?? null)
+                    : null,
         };
     }, [participantList, participantId]);
 
@@ -134,9 +136,7 @@ export default function ParticipantDetailsPage() {
             }
         });
 
-        const scores: (number | null)[] = sortedStatements.map((s) => {
-            return placements[s.id] !== undefined ? placements[s.id] : null;
-        });
+        const scores: (number | null)[] = sortedStatements.map((s) => placements[s.id] ?? null);
 
         // Build audio recordings map by question_key
         // biome-ignore lint/suspicious/noExplicitAny: audio recordings dynamic structure
