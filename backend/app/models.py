@@ -747,6 +747,56 @@ class ConcourseItemComment(Base):
     user: Mapped["User | None"] = relationship(lazy="raise")
 
 
+class AnalysisRun(Base):
+    """Persisted record of a Q-method factor analysis execution.
+
+    Captures both the analytical choices the researcher made (extraction,
+    rotation, n_factors, flagging mode/threshold) and the full result, so
+    that analytical decisions are auditable across sessions and visible to
+    co-authors and reviewers. This supports the critical Q-methodology
+    requirement that analytical choices be transparent (Stainton Rogers
+    1997; Watts & Stenner 2012; Sneegas 2020).
+
+    Every successful call to the analysis endpoint creates one row. The
+    researcher can annotate runs with a `notes` field (e.g., "final
+    analysis used in submission") and delete experimental runs they no
+    longer need.
+    """
+
+    __tablename__ = "analysis_runs"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    study_id: Mapped[int] = mapped_column(
+        ForeignKey("studies.id", ondelete="CASCADE"), index=True
+    )
+    # Nullable so that deleting a user does not blow away the audit trail —
+    # the analytical choices remain visible even if the researcher account
+    # is removed.
+    ran_by_user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    ran_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), index=True
+    )
+
+    # Analytical choices — the audit trail
+    extraction_method: Mapped[str] = mapped_column(String(20))  # "pca" | "centroid"
+    n_factors: Mapped[int] = mapped_column(SmallInteger)
+    rotation_method: Mapped[str] = mapped_column(String(20))  # "varimax" | "none"
+    flagging_mode: Mapped[str] = mapped_column(String(20))  # "auto" | "manual"
+
+    # Researcher annotation (free text, e.g. "submission v2", "exploratory")
+    notes: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    # Full result payload (the AnalysisResult Pydantic model serialized).
+    # JSON (not JSONB) to stay consistent with other persisted configs.
+    result: Mapped[dict[str, Any]] = mapped_column(JSON)
+
+    # Relationships
+    study: Mapped["Study"] = relationship(lazy="raise")
+    ran_by: Mapped["User | None"] = relationship(lazy="raise")
+
+
 # Computed column properties (defined after all models to avoid circular references)
 Study.participant_count = column_property(
     select(func.count(Participant.id))
