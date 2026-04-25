@@ -84,6 +84,17 @@ warn_return_any = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
+# Phase 3 wave 3b — models keystone (relaxed tier)
+# step_help bare Mapped[dict] tightened to Mapped[dict[str, dict[str, str]]].
+# disallow_any_explicit omitted: remaining dict[str, Any] columns are load-bearing
+# JSON blobs (presort_config, postsort_config, presort_answers, postsort_answers,
+# draft_responses, analysis result) — the JSON/ORM boundary is genuinely untyped.
+module = ["app.models"]
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
 # pydantic-settings stubs expose Any in BaseSettings.__init__ signature;
 # disallow_any_explicit would flag every Settings subclass. All other
 # strict checks apply.
@@ -145,50 +156,31 @@ warn_return_any = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-# Phase 3 wave 2 — Batch 2 services (relaxed tier)
-# concourse_service: SQLAlchemy ORM-heavy; Mapped[dict] in models.py propagates
-# type-arg error. 2 bare dict annotations tightened (dict → dict[str, object]).
-# disallow_any_explicit omitted due to ORM stub propagation.
+# Phase 3 wave 3b — cascade promotion (full strict)
+# concourse_service: ORM-heavy; ORM stub propagation resolved by models.py fix.
+# recruitment_service: ORM stub propagation resolved by models.py fix.
+# Both are now clean under disallow_any_explicit.
 module = [
     "app.services.concourse_service",
-]
-disallow_untyped_defs = true
-warn_return_any = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
-# Phase 3 wave 2 — Batch 1 services (relaxed tier)
-# analysis_service: pure Python + NumPy; 3 casts added for numpy 2.x stub
-# gaps (arithmetic/bitwise ops return Any). Uses dict[str, Any] for JSON wire
-# data (study dump, grid_config, participant records) — structurally required.
-# study_defaults: pure i18n constants; uses dict[str, Any] for translation
-# content blobs (step_help nested structure) — structurally required.
-# recruitment_service: touches SQLAlchemy models; Mapped[dict] in models.py
-# lacks type params. One no-untyped-def fixed (record_start -> None).
-# disallow_any_explicit is omitted for all three: Any is load-bearing at the
-# JSON/ORM boundary.
-module = [
-    "app.services.analysis_service",
-    "app.services.study_defaults",
     "app.services.recruitment_service",
 ]
 disallow_untyped_defs = true
+disallow_any_explicit = true
 warn_return_any = true
 strict_equality = true
 
 [[tool.mypy.overrides]]
-# Phase 3 wave 3a — deferred light services (relaxed tier)
-# study_data_service: returns dict[str, Any] for JSON wire data (full dump,
-# stats, sort-data). Bare Mapped[dict] in models.py propagates type-arg via
-# ORM stub gap — disallow_any_generics cannot be enabled until models wave.
-# One no-untyped-def fixed: reset_study_participants -> None.
-# export_service: config blobs (presort_config, postsort_config) are truly
-# dict[str, Any] at the JSON boundary; two bare `dict` params in nested
-# helpers tightened to dict[str, Any]. Same ORM stub constraint as above.
-# disallow_any_explicit omitted for both: Any is load-bearing at JSON/ORM
-# boundary; disallow_any_generics omitted: models.py:264 bare Mapped[dict]
-# propagates type-arg until the models mini-wave.
+# Phase 3 wave 2 — Batch 1 + wave 3a (relaxed tier, retained)
+# analysis_service: dict[str, Any] for JSON wire data (study dump, participant
+# records, grid_config entries) — genuinely heterogeneous, structurally required.
+# study_defaults: DEFAULT_TRANSLATION_CONTENT outer value is dict[str, Any]
+# (mixed methodology_tips list, step_help dict, string fields) — cannot collapse.
+# study_data_service: returns dict[str, Any] for full JSON dump, stats, sort-data.
+# export_service: presort/postsort config blobs and helper params are dict[str, Any].
+# disallow_any_explicit omitted: Any is load-bearing at JSON wire boundary.
 module = [
+    "app.services.analysis_service",
+    "app.services.study_defaults",
     "app.services.study_data_service",
     "app.services.export_service",
 ]

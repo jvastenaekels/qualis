@@ -261,7 +261,7 @@ class StudyTranslation(Base):
     consent_description: Mapped[str | None] = mapped_column(String, nullable=True)
     process_steps: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
     methodology_tips: Mapped[list[str]] = mapped_column(JSON, default=list)
-    step_help: Mapped[dict] = mapped_column(JSON, default=dict)
+    step_help: Mapped[dict[str, dict[str, str]]] = mapped_column(JSON, default=dict)
 
     study: Mapped["Study"] = relationship(back_populates="translations", lazy="raise")
 
