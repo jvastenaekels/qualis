@@ -4,6 +4,16 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+/**
+ * Rough Sort Page (Step 3)
+ *
+ * Declarative shell — all durable logic lives in useRoughSort().
+ *
+ * Framer-motion MotionValues and derived transforms stay here because they must
+ * be passed to both <CardStack> (x/y) and <motion.button> elements (scale/opacity).
+ * The hook subscribes to x/y for the tip auto-dismiss side-effect.
+ */
+
 import {
     AnimatePresence,
     type MotionValue,
@@ -13,136 +23,57 @@ import {
 } from 'framer-motion';
 import { ArrowRight, Check, Frown, Keyboard, Meh, RotateCcw, Smile, Target, X } from 'lucide-react';
 import { BREAKPOINTS } from '@/constants/breakpoints';
-import React, { startTransition, useCallback, useEffect, useRef, useState } from 'react';
+import React, { startTransition, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SafeMarkdown } from '../components/SafeMarkdown';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import CardStack, { type CardStackHandle } from '../components/CardStack';
-import { useLayoutAction } from '../hooks/useLayout';
-import { useConfigStore } from '../store/useConfigStore';
-import { useResponseStore } from '../store/useResponseStore';
-import { useSessionStore } from '../store/useSessionStore';
-import { useUIStore } from '../store/useUIStore';
 import { useViewport } from '@/contexts/ViewportContext';
 import { Progress } from '@/components/ui/progress';
-
 import { cn } from '@/lib/utils';
+import { useRoughSort } from '../hooks/participant/useRoughSort';
 
 interface RoughSortPageProps {
     highlightKey?: string | null;
 }
 
 const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
-    const { slug } = useParams();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { isDesktop } = useViewport();
-
-    // Config Store
-    const config = useConfigStore((state) => state.config);
-    const showCodes = config?.show_statement_codes ?? false;
-
-    // --- Selectors (Stable) ---
-    const roughHistory = useResponseStore((state) => state.rough?.history ?? []);
-    const agreeCount = useResponseStore((state) => state.rough?.agree?.length ?? 0);
-    const disagreeCount = useResponseStore((state) => state.rough?.disagree?.length ?? 0);
-    const neutralCount = useResponseStore((state) => state.rough?.neutral?.length ?? 0);
-    const undoRoughSort = useResponseStore((state) => state.undoRoughSort);
-    const categorizeCard = useResponseStore((state) => state.categorizeCard);
-
-    // Other Stores
-    const setStep = useSessionStore((state) => state.setStep);
-    const hasConsented = useSessionStore((state) => state.hasConsented);
-    const hoveredCard = useUIStore((state) => state.hoveredCard);
-    const setHoveredCard = useUIStore((state) => state.setHoveredCard);
-    const { setHeaderAction } = useLayoutAction();
-    const { t } = useTranslation();
-
-    const cardStackRef = useRef<CardStackHandle>(null);
-
-    // 2. State & Hooks - Continuous
-    const [showTip, setShowTip] = useState(true);
-
-    // Motion Values lifted from CardStack
+    // JSX-local motion state (MotionValues — cannot move to hook, they're framer primitives)
     const x = useMotionValue(0);
     const y = useMotionValue(0);
+    const cardStackRef = useRef<CardStackHandle>(null);
+    const [showTip, setShowTip] = useState(true);
 
-    // --- Handlers ---
-    const handleUndo = useCallback(
-        (e?: React.MouseEvent) => {
-            e?.stopPropagation();
-            if (roughHistory.length > 0) {
-                undoRoughSort();
-            }
-        },
-        [undoRoughSort, roughHistory.length]
-    );
+    // All durable logic delegated to the hook
+    const rough = useRoughSort(showTip, setShowTip, x, y, cardStackRef);
 
-    // Set Step 3 on mount
-    useEffect(() => {
-        setStep(3);
-    }, [setStep]);
+    const {
+        config,
+        showCodes,
+        unsortedCards,
+        currentCard,
+        progress,
+        agreeCount,
+        disagreeCount,
+        neutralCount,
+        hoveredCard,
+        setHoveredCard,
+        roughHistory,
+        sharedFontSize,
+        handleUndo,
+        handleVote,
+        onVoteComplete,
+        slug,
+        location,
+        navigate,
+    } = rough;
 
-    // Deep-link guard: redirect to welcome if consent not given
-    useEffect(() => {
-        if (!hasConsented) {
-            navigate(`/study/${slug}/welcome${location.search}`, { replace: true });
-        }
-    }, [hasConsented, navigate, slug, location.search]);
+    const { t } = useTranslation();
 
-    // Auto-dismiss tip on first interaction (mobile only)
-    useEffect(() => {
-        if (!showTip || isDesktop) return;
-
-        const unsubscribeX = x.on('change', (latest) => {
-            if (Math.abs(latest) > 5) {
-                setShowTip(false);
-            }
-        });
-
-        const unsubscribeY = y.on('change', (latest) => {
-            if (Math.abs(latest) > 5) {
-                setShowTip(false);
-            }
-        });
-
-        return () => {
-            unsubscribeX();
-            unsubscribeY();
-        };
-    }, [showTip, x, y, isDesktop]);
-
-    useEffect(() => {
-        // Cleanup function to clear the header action when component unmounts
-        return () => setHeaderAction(null);
-    }, [setHeaderAction]);
-
-    useEffect(() => {
-        if (showTip && roughHistory.length >= 5) {
-            setShowTip(false);
-        }
-    }, [roughHistory.length, showTip]);
-
-    // Memoize sorted cards set to avoid re-calculating on every render
-    const sortedIds = React.useMemo(() => new Set(roughHistory), [roughHistory]);
-    const unsortedCards = React.useMemo(
-        () => (config?.statements ? config.statements.filter((s) => !sortedIds.has(s.id)) : []),
-        [config, sortedIds]
-    );
-
-    const currentCard = unsortedCards[0];
-    const progress = config?.statements?.length
-        ? ((config.statements.length - unsortedCards.length) / config.statements.length) * 100
-        : 0;
-
-    // --- Micro-interactions ---
-
-    // Scaling (Active State)
+    // Micro-interaction transforms — depend on x/y MotionValues, must stay in component
     const scaleAgree = useTransform(x, [50, 150], [1, 1.15]);
     const scaleDisagree = useTransform(x, [-50, -150], [1, 1.15]);
-    const scaleNeutral = useTransform(y, [50, 150], [1, 1.1]); // Slightly less scale for the wide dock
+    const scaleNeutral = useTransform(y, [50, 150], [1, 1.1]);
 
-    // Opacity (Dimming Inactive)
     const opacityDisagree = useTransform([x, y], ([latestX, latestY]: number[]): number => {
         if (latestX > 50) return 0.5;
         if (latestY > 50) return 0.5;
@@ -159,71 +90,6 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
         if (Math.abs(latestX) > 50) return 0.5;
         return 1;
     });
-
-    const handleVote = (direction: 'agree' | 'disagree' | 'neutral') => {
-        // Auto-dismiss tip on button click (mobile only)
-        if (showTip && !isDesktop) {
-            setShowTip(false);
-        }
-        // We now delegate to the card stack to animate first
-        if (cardStackRef.current) {
-            cardStackRef.current.swipe(direction);
-        }
-    };
-
-    // Called after animation finishes by CardStack
-    const onVoteComplete = (direction: 'agree' | 'disagree' | 'neutral') => {
-        if (currentCard) {
-            // React 19: Use startTransition for state updates that trigger layout shifts
-            startTransition(() => {
-                categorizeCard(currentCard.id, direction);
-            });
-            x.set(0);
-            y.set(0);
-        }
-    };
-
-    // Keyboard Support
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (!currentCard || !cardStackRef.current) return;
-            switch (e.key) {
-                case 'ArrowLeft':
-                    cardStackRef.current.swipe('disagree');
-                    break;
-                case 'ArrowRight':
-                    cardStackRef.current.swipe('agree');
-                    break;
-                case 'ArrowDown':
-                    cardStackRef.current.swipe('neutral');
-                    break;
-                case 'z':
-                    if (roughHistory.length > 0) {
-                        handleUndo();
-                    }
-                    break;
-                case 'Escape':
-                    setShowTip(false);
-                    setHoveredCard(null);
-                    break;
-            }
-        };
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentCard, roughHistory.length, handleUndo, setHoveredCard]);
-
-    // Memoized font scale advisor
-    const sharedFontSize = React.useMemo(() => {
-        if (isDesktop) return 'text-sm';
-
-        const labels = [t('common.disagree'), t('common.agree'), t('common.neutral')];
-        const words = labels.flatMap((l) => l.split(/[\s/]+/));
-        const maxWordLength = Math.max(...words.map((w) => w.length));
-
-        if (maxWordLength > 10) return 'text-2xs';
-        if (maxWordLength > 8) return 'text-xs';
-        return 'text-sm';
-    }, [t, isDesktop]);
 
     if (!config) return null;
 
@@ -268,9 +134,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
 
     return (
         <div className="w-full px-2 sm:px-4 md:px-6 lg:max-w-7xl lg:mx-auto flex flex-col h-full overflow-hidden relative select-none">
-            {/* 1. Slim Progress Bar (Top) — Radix Progress provides ARIA semantics
-                (role="progressbar", aria-valuenow, aria-valuemin/max). The slim
-                visual treatment is preserved via class overrides. */}
+            {/* 1. Slim Progress Bar */}
             <Progress
                 value={progress}
                 aria-label={t(
@@ -283,7 +147,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                 indicatorStyle={{ backgroundColor: 'var(--brand-accent)' }}
             />
 
-            {/* 2. Instruction Bar (Visual Synchronization with GridSort) */}
+            {/* 2. Instruction Bar */}
             <div className="relative flex-none bg-white/60 backdrop-blur-sm border-b border-slate-100 flex items-center justify-center py-2 px-4 z-20 gap-3">
                 <Target size={14} className="text-indigo-400 opacity-60 flex-none" />
                 <div className="text-sm sm:text-base font-semibold text-slate-700 text-center leading-relaxed max-w-2xl px-2 [&_strong]:font-bold [&_strong]:text-slate-900 flex items-center gap-2">
@@ -300,7 +164,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                     </span>
                 </div>
 
-                {/* INLINE TIP (Absolute position to avoid layout shift) */}
+                {/* INLINE TIP */}
                 <AnimatePresence>
                     {showTip && (
                         <motion.div
@@ -335,7 +199,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                 </AnimatePresence>
             </div>
 
-            {/* 3. The Control Cluster (Centered Stage) */}
+            {/* 3. The Control Cluster */}
             <div className="flex-1 min-h-0 flex flex-col items-center justify-center w-full px-0 sm:px-2 pt-12 pb-4 relative gap-2 sm:gap-8 md:gap-12">
                 {/* Row A: Horizon (Disagree - Card - Agree) */}
                 <div className="flex flex-row items-center justify-center gap-2 sm:gap-8 md:gap-12 w-full">
@@ -435,7 +299,7 @@ const RoughSortPage: React.FC<RoughSortPageProps> = ({ highlightKey }) => {
                             initial={{ scale: 0.9, opacity: 0, y: 20 }}
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            onClick={(e) => e.stopPropagation()} // Prevent closing on content click
+                            onClick={(e) => e.stopPropagation()}
                             className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
                         >
                             <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar">
@@ -491,6 +355,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
     highlightKey,
     sharedFontSize,
     uiLabels,
+    // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: DeckButton visual complexity is inherent (3 types × animation states); TODO(quality-roadmap): split into per-type sub-components
 }) => {
     const { t } = useTranslation();
     const { width } = useViewport();
@@ -568,10 +433,7 @@ const DeckButton: React.FC<DeckButtonProps> = ({
     const offset2 = isMobile ? 4 : 6;
 
     return (
-        <div
-            // FIXED: Mobile = Portrait (w-24 h-32), Desktop = Landscape (w-48 h-36)
-            className="relative group flex-none w-24 h-32 sm:w-48 sm:h-36 z-20"
-        >
+        <div className="relative group flex-none w-24 h-32 sm:w-48 sm:h-36 z-20">
             {/* Visual Stack Effect (Background Cards) */}
             <AnimatePresence>
                 {count > 0 && (
@@ -612,7 +474,6 @@ const DeckButton: React.FC<DeckButtonProps> = ({
                 style={{ scale, opacity }}
                 onClick={onClick}
                 data-testid={styleConfig.testid}
-                // FIXED: Enforce absolute inset-0 to match background cards perfectly and be full-sized
                 className={cn(
                     styleConfig.className,
                     'absolute inset-0 z-10',
