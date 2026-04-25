@@ -14,13 +14,13 @@ Design studies, collect Q-sorts, and run factor analysis from the browser. Suppo
 
 ## Statement of need
 
-Q-methodology — Stephenson's (1953) approach to studying subjectivity by having participants rank-order a set of statements — is widely used in environmental governance, health, education, and political ecology. Its uptake in the past decade has expanded into critical research traditions that emphasise reflexivity, transparency of analytical choices, situatedness of subjectivities, and integration of participant voice (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
+Q-methodology, Stephenson's (1953) approach to studying subjectivity through rank-ordering of statements, is used in environmental governance, health, education, and political ecology. Its uptake over the past decade has expanded into critical research traditions that emphasise reflexivity, transparency of analytical choices, situatedness of subjectivities, and integration of participant voice (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
 
-The current Q-methodology tooling landscape typically separates data-collection tools from analysis tools, and rarely includes multi-language studies, audio post-sort responses tied to the analysis, or programmatic access to the analytical pipeline (see the capability table below for a feature-level breakdown).
+Q-methodology tools typically separate data collection from analysis, and rarely cover multi-language studies, audio post-sort responses linked to the analysis, or programmatic access to the analytical pipeline. The capability table below breaks this down feature by feature.
 
-**Libre-Q is a single-platform, browser-based, multilingual, self-hosted, open-source tool that integrates the full Q-methodology workflow** — study design, mobile-first participant recruitment and data collection, factor analysis, and export to the major analytical formats — while keeping the methodological choices visible and editable by the researcher. It is targeted at research groups practising critical Q-methodology, but it is usable for classical Q-methodology workflows as well.
+Libre-Q covers the full workflow in a single self-hosted browser application: study design, mobile-first recruitment and data collection, factor analysis, and export to PQMethod, R, and Ken-Q formats. The analytical choices stay visible and editable by the researcher. The platform is targeted at groups practising critical Q-methodology and is also usable for classical workflows.
 
-The platform is intentionally self-hosted: data ownership remains with the researcher, and Libre-Q can be run on institutional infrastructure to satisfy GDPR data-residency requirements common in European Q research.
+Self-hosting is intentional. Data ownership stays with the researcher, and Libre-Q can run on institutional infrastructure to meet the GDPR data-residency expectations common in European Q research.
 
 ---
 
@@ -44,17 +44,17 @@ The platform is intentionally self-hosted: data ownership remains with the resea
 
 ---
 
-## Key Features
+## Key features
 
-### Participant Experience
+### Participant experience
 
-- **Clean, readable layout.** Simple interface that lets participants focus on the sorting task without unnecessary distractions.
-- **Works on any device.** Smartphone, tablet, or desktop — participants open a link and start sorting. No apps or plugins required.
-- **Mobile-first drag-and-drop.** Touch-optimized sorting with auto-pan, dwell-zoom, and edge scrolling, so participants without desktop access are not excluded.
+- **Clean, readable layout.** A simple interface that lets participants focus on the sorting task.
+- **Works on any device.** Smartphone, tablet, or desktop. Participants open a link and start sorting. No apps or plugins required.
+- **Mobile-first drag-and-drop.** Touch-optimised sorting with auto-pan, dwell-zoom, and edge scrolling, so participants without desktop access are not excluded.
 - **Multi-language support.** Translate statements, instructions, consent forms, and UI labels. Participants see the study in their preferred language.
 
 
-### Study Design
+### Study design
 
 - **Visual grid designer** with symmetry lock, capacity validation, and configurable score ranges.
 - **Survey builder** with 9 question types (text, number, select, radio, checkbox, date, email, textarea, audio), conditional visibility, reordering, and per-question validation.
@@ -64,22 +64,22 @@ The platform is intentionally self-hosted: data ownership remains with the resea
 
 ### Analysis
 
-- **Built-in factor analysis** — run initial exploration without exporting to external software.
+- **Built-in factor analysis** for initial exploration without exporting to external software.
 - **PCA or Centroid extraction** (Brown 1980) with Varimax rotation and Kaiser normalization.
 - **Scree plot** with Kaiser criterion reference line for factor selection.
 - **Auto-flagging** using significance and dominance thresholds, or manual flagging for full researcher control.
-- **Distinguishing & consensus statements** classified via Standard Error of Differences at multiple significance levels (p < 0.05, 0.01, 0.001).
+- **Distinguishing and consensus statements** classified via Standard Error of Differences at multiple significance levels (p < 0.05, 0.01, 0.001).
 - **Factor arrays, z-scores, composite reliability** (Spearman-Brown), and factor correlation matrix.
 
-### Data Collection & Monitoring
+### Data collection and monitoring
 
-- **Recruitment links** — public, single-use, or capacity-limited — with QR code generation and funnel tracking (started vs. completed).
+- **Recruitment links** (public, single-use, or capacity-limited) with QR code generation and funnel tracking (started vs. completed).
 - **Monitoring dashboard** with submission timelines, device breakdowns, and completion rates.
 - **Session review** with grid reconstruction, survey responses, and audio playback.
 - **Test run management** to separate pilot data from real submissions.
 - **Discard with reason** to flag problematic responses while preserving the audit trail.
 
-### Export & Interoperability
+### Export and interoperability
 
 | Format | Description |
 | :----- | :---------- |
@@ -89,10 +89,10 @@ The platform is intentionally self-hosted: data ownership remains with the resea
 | **R-Kit** | CSV + auto-generated R script using the `qmethod` package. |
 | **Research Package** | ZIP with all formats, codebook, and metadata for archiving. |
 
-### Privacy & Security
+### Privacy and security
 
 - **Self-hosted.** Data stays on your server with no third-party analytics or tracking.
-- **IP address hashing.** Participant IPs are SHA-256 hashed with a configurable salt before storage — never stored in plaintext.
+- **IP address hashing.** Participant IPs are SHA-256 hashed with a configurable salt before storage. Plaintext IPs are never persisted.
 - **Consent audit trail.** Each participant's consent is recorded with a hash of the consent version they agreed to.
 - **Security headers** (HSTS, CSP, X-Frame-Options) and bcrypt password hashing.
 - **Two-factor authentication** (TOTP) for researcher accounts.
@@ -100,13 +100,13 @@ The platform is intentionally self-hosted: data ownership remains with the resea
 
 ### Collaboration
 
-- **Projects** to isolate research groups — each with its own members and studies.
+- **Projects** to isolate research groups, each with its own members and studies.
 - **Concurrent editing** with auto-save, optimistic locking, and conflict resolution.
 - **Invitation system** via email, or shareable link when SMTP is not configured.
 
 ---
 
-## Quick Start
+## Quick start
 
 ### Prerequisites
 
@@ -142,8 +142,8 @@ cd backend && uv run python init_db.py && cd ..
 cd backend && uv run python seed.py data/example-study.json && cd ..
 
 # 7. Run the app (two terminals)
-make run-backend     # Terminal 1 — FastAPI on :8000
-make run-frontend    # Terminal 2 — Vite dev server on :5173
+make run-backend     # Terminal 1: FastAPI on :8000
+make run-frontend    # Terminal 2: Vite dev server on :5173
 ```
 
 Visit [http://localhost:5173](http://localhost:5173). Log in with the `ADMIN_EMAIL` / `ADMIN_PASSWORD` you set in `.env`.
@@ -183,7 +183,7 @@ Organized using the [Diataxis framework](https://diataxis.fr/). See the [full in
 
 ---
 
-## Tech Stack
+## Tech stack
 
 | Layer | Technologies |
 | :---- | :----------- |
@@ -228,18 +228,18 @@ If you use Libre-Q in your research, please cite both the software and the accom
 
 **Author contributions:**
 
-- **Julien Vastenaekels** — software architecture, implementation, documentation, maintenance, paper co-author.
-- **Clémence Dedinger** (Université de Reims Champagne-Ardenne) — methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology, paper co-author. No direct code contribution.
+- **Julien Vastenaekels:** software architecture, implementation, documentation, maintenance, paper co-author.
+- **Clémence Dedinger** (Université de Reims Champagne-Ardenne): methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology, paper co-author. No direct code contribution.
 
 **Methodological grounding:** Libre-Q's design draws on the critical Q-methodology literature, in particular Stainton Rogers (1997), Stenner (2011), Watts & Stenner (2012), and Sneegas (2020).
 
-**Tools and dependencies:** Libre-Q would not exist without the open-source ecosystem it builds on — FastAPI, React, SQLAlchemy, Pydantic, dnd-kit, react-i18next, Vite, Biome, Ruff, Playwright, and many others. See `backend/pyproject.toml` and `frontend/package.json` for the full list.
+**Open-source dependencies:** Libre-Q builds on FastAPI, React, SQLAlchemy, Pydantic, dnd-kit, react-i18next, Vite, Biome, Ruff, Playwright, and many other libraries. See `backend/pyproject.toml` and `frontend/package.json` for the full list.
 
 ---
 
 ## AI usage disclosure
 
-In the spirit of [Elsevier's policy on AI tool use in scientific software](https://www.elsevier.com/about/policies/publishing-ethics) and the [JOSS reviewer guidelines](https://joss.readthedocs.io/en/latest/review_criteria.html), the following disclosure applies to Libre-Q's development:
+Following [Elsevier's policy on AI tool use in scientific software](https://www.elsevier.com/about/policies/publishing-ethics) and the [JOSS reviewer guidelines](https://joss.readthedocs.io/en/latest/review_criteria.html), the following disclosure applies to Libre-Q's development:
 
 Generative AI assistants (primarily Anthropic Claude, with occasional cross-checks via OpenAI Codex) were used during development and documentation:
 
@@ -255,6 +255,4 @@ Generative AI assistants (primarily Anthropic Claude, with occasional cross-chec
 
 ## License
 
-This project is licensed under the **GNU Affero General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
-
-Libre-Q is developed in the spirit of Open Science — providing a transparent, reproducible, and accessible tool for subjectivity research where data ownership remains with the researcher.
+GNU Affero General Public License v3.0. See the [LICENSE](LICENSE) file for details.
