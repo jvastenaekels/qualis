@@ -57,22 +57,24 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.utils.security`, `app.utils.audit`, `app.resume_codes`
 - `app.exceptions`, `app.limiter`, `app.utils.crypto`, `app.utils.email`, `app.utils.script_utils`
 - `app.services.storage_service` — boto3 stubs now ship; AudioUploadMetadata TypedDict eliminates Any
+- `app.services.concourse_service` — ORM stub propagation resolved by models.py fix (wave 3b)
+- `app.services.recruitment_service` — ORM stub propagation resolved by models.py fix (wave 3b)
 
 **Strict without disallow_any_explicit** (Pydantic/SQLAlchemy stubs or load-bearing Any at JSON boundaries):
 - `app.core.config` — pydantic-settings BaseSettings stubs
 - `app.middleware.security`, `app.middleware.errors`, `app.middleware.spa`
 - `app.database`, `app.schema_validation`
 - All `app.schemas.*` modules (10 modules) — Pydantic v2 BaseModel stubs
+- `app.models` — remaining dict[str, Any] columns are load-bearing JSON blobs (presort_config, presort_answers, analysis result) at the ORM/JSON boundary
 - `app.services.analysis_service` — dict[str, Any] is load-bearing JSON wire data (study dump, grid_config)
-- `app.services.study_defaults` — dict[str, Any] for nested i18n content blobs
-- `app.services.recruitment_service` — SQLAlchemy ORM; Mapped[dict] stub propagation from models.py
-- `app.services.concourse_service` — SQLAlchemy ORM-heavy; StaleStatementEntry TypedDict added
-- `app.services.study_data_service` — dict[str, Any] load-bearing JSON wire data; Mapped[dict] ORM stub gap from models.py
-- `app.services.export_service` — dict[str, Any] config blobs (presort/postsort JSON); same ORM stub constraint
+- `app.services.study_defaults` — dict[str, Any] for nested i18n content blobs (heterogeneous value types)
+- `app.services.study_data_service` — dict[str, Any] load-bearing JSON wire data (full dump, stats, sort-data)
+- `app.services.export_service` — dict[str, Any] config blobs (presort/postsort JSON); helper params
 
-Total: 32 modules under strict overrides (Phase 3 wave 3a complete).
-Routers wave 3b: study_service (29 errors), submission_service (29 errors) — defer to dedicated wave.
-Models mini-wave: models.py bare Mapped[dict] at line 264 blocks disallow_any_generics for all service tier modules.
+Total: 34 modules under strict overrides (Phase 3 wave 3b complete).
+Wave 3b keystone: models.py bare Mapped[dict] tightened to Mapped[dict[str, dict[str, str]]] → 2 cascade promotions.
+Remaining relaxed-tier services: analysis_service, study_defaults, study_data_service, export_service — all use dict[str, Any] for genuinely heterogeneous JSON wire data. Cannot promote without major refactor (TypedDict per JSON shape).
+Next wave: heavy services (study_service, submission_service) and routers.
 
 Inside a strict module: every function declares its return type, no implicit `Any` propagation, no untyped variables. Use `# type: ignore[explicit-any]` with a one-line rationale when `Any` is genuinely required (e.g. JWT wire payloads, httpx.Response.json() wire data).
 
