@@ -10,7 +10,7 @@ class Settings(BaseSettings):
 
     API_V1_STR: str = "/api"
     PROJECT_NAME: str = "Libre-Q API"
-    ENVIRONMENT: str = "development"
+    ENVIRONMENT: str = "production"
 
     # Security
     SECRET_KEY: str = "CHANGEME-insecure-dev-only"
