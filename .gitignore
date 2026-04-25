@@ -51,3 +51,6 @@ pre_commit_output*.txt
 # Research articles
 article/
 reference-articles/
+
+# Papis library (q-methodology)
+library/
