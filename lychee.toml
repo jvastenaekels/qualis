@@ -13,3 +13,11 @@ exclude = [
 
 # Skip localhost URLs in tutorial code blocks
 exclude_path = []
+
+# Retry transient failures (GitHub frequently returns 502 on automated badge URL fetches).
+max_retries = 3
+retry_wait_time = 2
+
+# Treat these HTTP statuses as success (transient gateway errors that resolve on retry but
+# occasionally exhaust the retry budget on busy github.com endpoints).
+accept = [200, 429, 502, 503]
