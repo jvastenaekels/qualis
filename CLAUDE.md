@@ -83,11 +83,22 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.routers.admin.lifecycle` — wave 4 batch 1: Pydantic BaseModel classes in router (DataInventory etc.)
 - `app.routers.admin.invitations` — wave 4 batch 1: InvitationAccept Pydantic model; get_db import corrected
 - `app.routers.test` — wave 4 batch 1: 4 Pydantic model classes; 6 return types added
+- `app.routers.admin.studies_participants` — wave 4 batch 3: cast(PaginatedResponse[ParticipantRead]) + None x3
+- `app.routers.participants` — wave 4 batch 3: cast(ConsentResponse, …) for the StudyService.record_consent proxy result
+- `app.routers.submissions` — wave 4 batch 3: dict[str, Any] x2 for service-derived submission/study payloads
+- `app.routers.auth` — wave 4 batch 3: 8 return types; no casts needed (utils/security is fully strict)
+- `app.routers.admin.studies` — wave 4 batch 3: list[StaleStatementEntry] from concourse_service TypedDict
+- `app.routers.admin.concourses` — wave 4 batch 3: 15 return types (ORM models serialised via response_model)
+- `app.routers.admin.exports` — wave 4 batch 3: StreamingResponse x6 + dict[str, Any] x2 for dump endpoints
+- `app.routers.admin.projects` — wave 4 batch 3: PaginatedResponse[ProjectWithRole|ProjectMemberRead] casts
+- `app.routers.admin.studies_import_export` — wave 4 batch 3: ValidationResult/StudyImportResponse + JSONResponse for export
+- `app.services.submission_service` — services round batch 1: 3 dict[str, Any] payloads at JSON boundary
+- `app.services.study_service` — services round batch 2: 8 backward-compat *args/**kwargs proxy methods kept as Any → Any (deliberate; narrowing requires duplicating each proxy with the underlying signature)
 
-Total: 49 modules under strict overrides (Phase 3 wave 4 batches 1-2 complete).
-Previous: 40 modules. Added 9: dependencies + 7 routers + analysis_service update.
-Wave 4 highlights: build_sort_matrix cleanup eliminates last dict[str,Any] in analysis pipeline; security.py cast()s removed (bcrypt/jwt stubs now fully typed); analysis router promoted to full strict (had 31 errors — all annotation gaps).
-Next wave: remaining routers (studies, projects, studies_import_export, auth, participants, submissions, concourses, exports, studies_participants); then heavy services (study_service, submission_service).
+Total: 59 modules under strict overrides (Phase 3 wave 4 + services round complete).
+Previous milestone: 49 (after wave 4 batches 1-2). Added 10 across wave 4 batch 3 (9 routers) + services round (submission_service, study_service).
+Wave 4 highlights (cumulative): every router under strict; build_sort_matrix cleanup eliminates last dict[str,Any] in analysis pipeline; security.py cast()s removed (bcrypt/jwt stubs now fully typed); analysis router promoted to full strict.
+Next bar (out of scope for v0.2): graduate the relaxed-tier StudyService proxies to typed pass-throughs (would require duplicating SubmissionService / StudyDataService signatures); promote remaining schemas/models to full strict by introducing TypedDict wire shapes for the open-ended JSON columns.
 
 Inside a strict module: every function declares its return type, no implicit `Any` propagation, no untyped variables. Use `# type: ignore[explicit-any]` with a one-line rationale when `Any` is genuinely required (e.g. JWT wire payloads, httpx.Response.json() wire data).
 
@@ -138,19 +149,24 @@ independently from JSX; the component file stays small and declarative.
   derived transforms (they must be passed to JSX elements), visual-only state
   (`cardDimensions`, `zoomLevel`, animation callbacks).
 
-**Examples already following this pattern:**
-- `useFineSort` ← `FineSortPage` (hooks/participant/useFineSort.ts)
-- `useRoughSort` ← `RoughSortPage` (hooks/participant/useRoughSort.ts)
+**All six target pages converted (Phase 5 item G complete):**
+- `useFineSort` ← `FineSortPage` (hooks/participant/useFineSort.ts) — wave 1
+- `useRoughSort` ← `RoughSortPage` (hooks/participant/useRoughSort.ts) — wave 1
+- `useAnalysisPage` ← `AnalysisPage` (hooks/admin/useAnalysisPage.ts) — wave 2, 12 hook tests
+- `useStudyDesignPage` ← `StudyDesignPage` (hooks/admin/useStudyDesignPage.ts) — wave 3, 13 hook tests, 42-field API
+- `useRecruitmentPage` ← `RecruitmentPage` (hooks/admin/useRecruitmentPage.ts) — wave 4, 18 hook tests
+- `useConcourseDetailPage` ← `ConcourseDetailPage` (hooks/admin/useConcourseDetailPage.ts) — wave 5, 20 hook tests, 94-field API
 
-**Test convention:** add `hooks/participant/use<Name>.test.ts` covering ≥5 pure logic
+**Test convention:** add `hooks/<area>/use<Name>.test.ts` covering ≥5 pure logic
 paths without rendering. The existing page test files remain in place as integration
 tests covering hook+JSX glue.
 
 **When you author a new page or refactor an existing one:** if the component body grows
 beyond ~100 LOC of non-JSX logic, extract a `use<Name>` hook before adding more logic.
 
-**Deferred pages** (future sessions, in estimated difficulty order):
-1. `AnalysisPage.tsx` (857 LOC) — ~2h; admin-only, no touch/DnD
-2. `StudyDesignPage.tsx` (1199 LOC) — ~3h; complex form state, Zustand designer store
-3. `RecruitmentPage.tsx` (1298 LOC) — ~3h; table + modal interactions
-4. `ConcourseDetailPage.tsx` (1994 LOC) — ~4h; most complex, tabbed UI + item management
+**JSX shell complexity:** when the page is mostly large declarative JSX (multiple
+GuidanceCard panels, tabbed UI, modals), the noExcessiveCognitiveComplexity rule
+fires on the JSX shell itself. Adding a `// biome-ignore lint/complexity/noExcessiveCognitiveComplexity`
+on the page component is the documented exception (precedent: AnalysisPage,
+StudyDesignPage, RecruitmentPage, ConcourseDetailPage). Only suppress on the
+shell, never inside the hook.

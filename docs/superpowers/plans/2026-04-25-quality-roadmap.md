@@ -43,20 +43,20 @@ Safe pre-submission. All four items are pure additions, no impact on existing co
 - [ ] Verify total wall clock <90s on a clean checkout.
 - [ ] Commit: `chore(ci): add make ci-fast for tight feedback loop`.
 
-### Item I — Stricter `tsconfig.json` flags (~2h)
+### Item I — Stricter `tsconfig.json` flags (~2h) — DONE
 
 **Files:**
 - Modify: `frontend/tsconfig.json` (or `tsconfig.app.json` if split)
 - Possibly modify: a handful of `*.ts` / `*.tsx` files that the new flags surface
 
 **Steps:**
-- [ ] Add to `compilerOptions`: `"noFallthroughCasesInSwitch": true`, `"noUncheckedIndexedAccess": true`, `"noImplicitOverride": true`.
-- [ ] Run `npm run type-check` — count errors. Triage: trivial (add `?` or guard) vs needs investigation.
-- [ ] Fix trivial errors inline.
-- [ ] For non-trivial errors, add `// TODO(quality-roadmap): tighten` markers and commit them as known issues — do NOT roll back the tsconfig change.
-- [ ] Commit: `chore(ts): enable noUncheckedIndexedAccess + noFallthroughCasesInSwitch + noImplicitOverride`.
+- [x] Add to `compilerOptions`: `"noFallthroughCasesInSwitch": true`, `"noUncheckedIndexedAccess": true`, `"noImplicitOverride": true`.
+- [x] Run `npm run type-check` — count errors. Triage: trivial (add `?` or guard) vs needs investigation.
+- [x] Fix trivial errors inline (69 errors → 0 across 5 batches over 2026-04-25).
+- [x] noUncheckedIndexedAccess enabled in commit `0dbb8fa`.
+- [x] Commit: `feat(ts): enable noUncheckedIndexedAccess (was 69 errors, now 0)`.
 
-**Acceptance:** `npm run type-check` clean OR all remaining errors are TODO-tagged with rationale.
+**Acceptance:** `npm run type-check` clean — DONE.
 
 ### Item H — Per-module mypy strict overrides (~2h)
 
