@@ -818,6 +818,16 @@
         "delete_error": "Impossible de supprimer l'analyse.",
         "viewing_banner": "Consultation de l'analyse du {{date}} — {{extraction}} · {{n}}F · {{rotation}}",
         "back_to_current": "Retour à l'actuelle"
+      },
+      "factor_voices": {
+        "title": "Voix sur le facteur {{n}}",
+        "no_audio": "Aucun enregistrement audio post-tri de la part des participants définissant ce facteur.",
+        "loading": "Chargement des enregistrements…",
+        "error": "Impossible de charger les enregistrements audio. Veuillez réessayer.",
+        "context": "En méthodologie Q critique (Sneegas 2020), ancrer l'interprétation des facteurs dans les mots des personnes qui les définissent fait partie de la pratique analytique.",
+        "context_aria": "À propos de ce panneau",
+        "audio_label": "Enregistrement : {{key}} par {{participant}}",
+        "url_unavailable": "URL audio non disponible."
       }
     },
     "project": {

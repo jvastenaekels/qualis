@@ -52,6 +52,7 @@ import { FactorArraysView } from '@/components/admin/analysis/FactorArraysView';
 import { StatementsTable } from '@/components/admin/analysis/StatementsTable';
 import { FactorCharacteristicsTable } from '@/components/admin/analysis/FactorCharacteristicsTable';
 import { AnalysisHistoryPanel } from '@/components/admin/analysis/AnalysisHistoryPanel';
+import { FactorVoicesPanel } from '@/components/admin/analysis/FactorVoicesPanel';
 
 function downloadBlob(blob: Blob, filename: string) {
     const url = window.URL.createObjectURL(blob);
@@ -823,6 +824,18 @@ export default function AnalysisPage() {
                                 <FactorCharacteristicsTable result={result} />
                             </TabsContent>
                         </Tabs>
+
+                        {/* Per-factor voices panels — always rendered below all tabs */}
+                        <div className="mt-4 space-y-2">
+                            {Array.from({ length: result.n_factors }, (_, f) => (
+                                <FactorVoicesPanel
+                                    key={f}
+                                    slug={slug}
+                                    factorIndex={f}
+                                    participants={result.participants}
+                                />
+                            ))}
+                        </div>
                     </CardContent>
                 </Card>
             )}

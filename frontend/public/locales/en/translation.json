@@ -833,6 +833,16 @@
         "delete_error": "Failed to delete the run.",
         "viewing_banner": "Viewing run from {{date}} — {{extraction}} · {{n}}F · {{rotation}}",
         "back_to_current": "Back to current"
+      },
+      "factor_voices": {
+        "title": "Voices on Factor {{n}}",
+        "no_audio": "No post-sort audio recordings from participants flagged on this factor.",
+        "loading": "Loading recordings…",
+        "error": "Could not load audio recordings. Please try again.",
+        "context": "In critical Q-methodology (Sneegas 2020), grounding factor interpretation in the words of the people who define each factor is part of the analytical practice.",
+        "context_aria": "About this panel",
+        "audio_label": "Recording: {{key}} by {{participant}}",
+        "url_unavailable": "Audio URL not available."
       }
     },
     "project": {
