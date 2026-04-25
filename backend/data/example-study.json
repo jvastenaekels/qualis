@@ -1,0 +1,81 @@
+{
+  "slug": "remote-work-perspectives",
+  "translations": {
+    "en": {
+      "title": "Perspectives on remote work",
+      "description": "A short example Q-study on attitudes towards remote work, intended as a working seed for new Libre-Q installations. 12 statements, forced distribution from -2 to +2.",
+      "instruction": "Sort each statement according to how strongly it represents your own view, from 'least like my view' on the left to 'most like my view' on the right.",
+      "consent_text": "This is a demo study used to illustrate the Libre-Q workflow. By participating you agree that your responses may be displayed in tutorial materials. No personal information beyond your responses is recorded.",
+      "thank_you_text": "Thank you for completing the example sort. This is a demonstration study; no real research conclusions are drawn from your responses."
+    },
+    "fr": {
+      "title": "Perspectives sur le télétravail",
+      "description": "Une courte étude Q d'exemple sur les attitudes face au télétravail, fournie comme jeu de données initial pour les nouvelles installations Libre-Q. 12 énoncés, distribution forcée de -2 à +2.",
+      "instruction": "Classez chaque énoncé selon le degré auquel il représente votre propre point de vue, de « le moins comme mon point de vue » à gauche à « le plus comme mon point de vue » à droite.",
+      "consent_text": "Ceci est une étude de démonstration illustrant le workflow Libre-Q. En participant, vous acceptez que vos réponses soient affichées dans les supports de formation. Aucune information personnelle au-delà de vos réponses n'est enregistrée.",
+      "thank_you_text": "Merci d'avoir complété ce tri d'exemple. Il s'agit d'une étude de démonstration ; aucune conclusion de recherche réelle n'est tirée de vos réponses."
+    }
+  },
+  "default_language_code": "en",
+  "grid_config": [
+    {"score": -2, "capacity": 2},
+    {"score": -1, "capacity": 3},
+    {"score": 0, "capacity": 2},
+    {"score": 1, "capacity": 3},
+    {"score": 2, "capacity": 2}
+  ],
+  "statements": [
+    {"code": "S01", "translations": {
+      "en": "Working from home makes me more productive than working in an office.",
+      "fr": "Travailler depuis chez soi me rend plus productif·ve qu'au bureau."
+    }},
+    {"code": "S02", "translations": {
+      "en": "I miss the spontaneous social interactions of an office.",
+      "fr": "Les interactions sociales spontanées du bureau me manquent."
+    }},
+    {"code": "S03", "translations": {
+      "en": "Remote work blurs the line between my professional and personal life.",
+      "fr": "Le télétravail brouille la frontière entre ma vie professionnelle et personnelle."
+    }},
+    {"code": "S04", "translations": {
+      "en": "Video calls are an adequate substitute for in-person meetings.",
+      "fr": "Les visioconférences remplacent adéquatement les réunions en présentiel."
+    }},
+    {"code": "S05", "translations": {
+      "en": "I would accept a lower salary to keep working remotely.",
+      "fr": "J'accepterais un salaire plus bas pour continuer à télétravailler."
+    }},
+    {"code": "S06", "translations": {
+      "en": "Remote work disadvantages employees who are early in their careers.",
+      "fr": "Le télétravail désavantage les employé·es en début de carrière."
+    }},
+    {"code": "S07", "translations": {
+      "en": "Saving commute time is the single biggest benefit of remote work for me.",
+      "fr": "Économiser du temps de transport est le plus grand avantage du télétravail pour moi."
+    }},
+    {"code": "S08", "translations": {
+      "en": "My employer trusts me less when they cannot see me working.",
+      "fr": "Mon employeur me fait moins confiance quand il ne peut pas me voir travailler."
+    }},
+    {"code": "S09", "translations": {
+      "en": "Remote work is environmentally responsible because it reduces commuting.",
+      "fr": "Le télétravail est écologiquement responsable car il réduit les déplacements."
+    }},
+    {"code": "S10", "translations": {
+      "en": "Hybrid arrangements are better than fully remote or fully in-office.",
+      "fr": "Les formules hybrides sont meilleures que le tout-télétravail ou le tout-présentiel."
+    }},
+    {"code": "S11", "translations": {
+      "en": "Working remotely makes me feel isolated from my team.",
+      "fr": "Le télétravail me fait me sentir isolé·e de mon équipe."
+    }},
+    {"code": "S12", "translations": {
+      "en": "The right to remote work should be guaranteed by labour law.",
+      "fr": "Le droit au télétravail devrait être garanti par le droit du travail."
+    }}
+  ],
+  "presort_config": {},
+  "postsort_config": {
+    "fields": []
+  }
+}
