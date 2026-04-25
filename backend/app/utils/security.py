@@ -1,7 +1,7 @@
 """Security utilities."""
 
 from datetime import datetime, timedelta, timezone
-from typing import Any, cast
+from typing import Any
 
 import bcrypt
 import jwt
@@ -13,11 +13,8 @@ from app.core.config import settings
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a plain password against a hashed password."""
     try:
-        return cast(
-            bool,
-            bcrypt.checkpw(
-                plain_password.encode("utf-8"), hashed_password.encode("utf-8")
-            ),
+        return bcrypt.checkpw(
+            plain_password.encode("utf-8"), hashed_password.encode("utf-8")
         )
     except ValueError:
         return False
@@ -25,10 +22,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_password_hash(password: str) -> str:
     """Hash a password using bcrypt."""
-    return cast(
-        str,
-        bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8"),
-    )
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def create_access_token(
@@ -46,7 +40,7 @@ def create_access_token(
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
-    return cast(str, encoded_jwt)
+    return encoded_jwt
 
 
 def create_invitation_token(
@@ -75,7 +69,7 @@ def create_invitation_token(
     encoded_jwt = jwt.encode(
         to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
     )
-    return cast(str, encoded_jwt)
+    return encoded_jwt
 
 
 def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[explicit-any]
@@ -88,7 +82,7 @@ def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[expli
     payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     if payload.get("type") != "invitation":
         raise jwt.InvalidTokenError("Not an invitation token")
-    return cast(dict[str, Any], payload)  # type: ignore[explicit-any]
+    return payload
 
 
 def generate_totp_secret() -> str:

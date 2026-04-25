@@ -1,5 +1,7 @@
 """API router for administrative user management."""
 
+from typing import cast
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,7 +23,7 @@ async def list_users(
     db: AsyncSession = Depends(get_db),
     _admin: User = Depends(check_superuser),
     pagination: PaginationParams = Depends(),
-):
+) -> PaginatedResponse[UserRead]:
     """List all users in the system with pagination."""
     count_result = await db.execute(select(func.count(User.id)))
     total = count_result.scalar() or 0
@@ -31,8 +33,12 @@ async def list_users(
     )
     items = list(result.scalars().all())
 
-    return PaginatedResponse(
-        items=items, total=total, limit=pagination.limit, offset=pagination.offset
+    # FastAPI serialises User → UserRead via response_model; cast aligns mypy.
+    return cast(
+        PaginatedResponse[UserRead],
+        PaginatedResponse(
+            items=items, total=total, limit=pagination.limit, offset=pagination.offset
+        ),
     )
 
 
@@ -43,7 +49,7 @@ async def create_user(
     user_in: UserCreate,
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(check_superuser),
-):
+) -> User:
     """Create a new user."""
     # Check if user already exists
     existing_check = await db.execute(select(User).where(User.email == user_in.email))
@@ -80,7 +86,7 @@ async def delete_user(
     user_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(check_superuser),
-):
+) -> None:
     """Delete a user. Cannot delete self."""
     if user_id == current_user.id:
         raise HTTPException(

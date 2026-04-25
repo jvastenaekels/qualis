@@ -1,7 +1,5 @@
 """API router for managing study recruitment."""
 
-from typing import List
-
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -14,23 +12,23 @@ from app.dependencies import (
     STUDY_ROLE_HIERARCHY,
 )
 from app.models import Study, StudyRole, RecruitmentLink, ProjectMember, User
-from app.schemas import RecruitmentLinkCreate, RecruitmentLinkRead
+from app.schemas import RecruitmentLinkCreate, RecruitmentLinkRead  # noqa: F401 (used in response_model)
 from app.services.recruitment_service import RecruitmentService
 from sqlalchemy import select
 
 router = APIRouter(tags=["Admin Recruitment"])
 
 
-@router.get("/{slug}/links", response_model=List[RecruitmentLinkRead])
+@router.get("/{slug}/links", response_model=list[RecruitmentLinkRead])
 async def list_study_links(
     study: Study = Depends(check_study_permission(StudyRole.viewer)),
     db: AsyncSession = Depends(get_db),
-):
+) -> list[RecruitmentLink]:
     """List all recruitment links for a specific study."""
     return await RecruitmentService.get_study_links(db, study.id)
 
 
-@router.post("/{slug}/links", response_model=List[RecruitmentLinkRead])
+@router.post("/{slug}/links", response_model=list[RecruitmentLinkRead])
 @limiter.limit("30/minute")
 async def create_recruitment_links(
     request: Request,
@@ -38,7 +36,7 @@ async def create_recruitment_links(
     count: int = 1,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
-):
+) -> list[RecruitmentLink]:
     """Create one or more recruitment links."""
     if count > 100:
         raise HTTPException(
@@ -64,7 +62,7 @@ async def revoke_recruitment_link(
     link_id: int,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-):
+) -> dict[str, str]:
     """Revoke a recruitment link."""
     # 1. Fetch Link + Permissions
     # We require Editor permission on the study

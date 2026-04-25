@@ -28,7 +28,7 @@ class LogEntry(BaseModel):
 
 
 @router.post("/logs")
-async def report_log(entry: LogEntry, request: Request):
+async def report_log(entry: LogEntry, request: Request) -> dict[str, str]:
     """Receives logging/error data from the frontend."""
     # Enrich with IP if needed (caution with proxies)
     client_ip = request.client.host if request.client else "unknown"

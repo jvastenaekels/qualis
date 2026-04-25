@@ -1,7 +1,7 @@
 """Dependency injection definitions."""
 
-from collections.abc import Callable
-from typing import TYPE_CHECKING, Annotated, cast
+from collections.abc import Callable, Coroutine
+from typing import TYPE_CHECKING, Annotated, Any, cast
 
 import jwt
 from fastapi import Depends, HTTPException, Path, Query, status, Header
@@ -52,7 +52,7 @@ async def get_current_user(
 
     query = select(User).where(User.email == token_data.email)
     result = await db.execute(query)
-    user = cast(User | None, result.scalar_one_or_none())
+    user = result.scalar_one_or_none()
 
     if user is None:
         raise credentials_exception
@@ -147,7 +147,9 @@ async def check_superuser(
     return current_user
 
 
-def require_project_role(required_role: ProjectRole) -> Callable:
+def require_project_role(
+    required_role: ProjectRole,
+) -> Callable[..., Coroutine[Any, Any, tuple["Project", ProjectMember]]]:
     """Factory creating a dependency that validates project role from the X-Project-ID header.
 
     Returns the (Project, ProjectMember) tuple if the user has the required role.
@@ -171,7 +173,9 @@ def require_project_role(required_role: ProjectRole) -> Callable:
     return dependency
 
 
-def check_project_permission(required_role: ProjectRole) -> Callable:
+def check_project_permission(
+    required_role: ProjectRole,
+) -> Callable[..., Coroutine[Any, Any, "Project"]]:
     """Factory creating a dependency to verify project access."""
 
     async def permission_dependency(
@@ -215,7 +219,9 @@ def check_project_permission(required_role: ProjectRole) -> Callable:
     return permission_dependency
 
 
-def check_study_permission(required_role: StudyRole) -> Callable:
+def check_study_permission(
+    required_role: StudyRole,
+) -> Callable[..., Coroutine[Any, Any, Study]]:
     """Factory creating a dependency to verify study access."""
 
     async def permission_dependency(

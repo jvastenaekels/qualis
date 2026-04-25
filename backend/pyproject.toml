@@ -198,6 +198,44 @@ disallow_any_explicit = true
 warn_return_any = true
 strict_equality = true
 
+[[tool.mypy.overrides]]
+# Phase 3 wave 4 — batch 1 routers (full strict)
+# audio: 3 missing return types added (AudioUploadResponse, dict[str, str], AudioRecordingRead).
+# recruitment: List[T] → list[T], 3 return types added; ORM → schema cast via response_model.
+# admin/users: cast(PaginatedResponse[UserRead], ...) aligns mypy with FastAPI serialisation.
+# shared fix: security.py redundant cast()s removed (bcrypt/jwt stubs now typed);
+#             dependencies.py Callable → Callable[..., Coroutine[Any, Any, T]], redundant cast removed.
+module = [
+    "app.routers.audio",
+    "app.routers.admin.recruitment",
+    "app.routers.admin.users",
+]
+disallow_untyped_defs = true
+disallow_any_explicit = true
+warn_return_any = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+# Phase 3 wave 4 — batch 1 routers (relaxed tier) + dependencies
+# disallow_any_explicit omitted: Pydantic v2 BaseModel stubs expose Any in __init_subclass__;
+# routers with inline BaseModel definitions (logs, lifecycle, invitations, test) all trigger this.
+# dependencies.py: Coroutine[Any, Any, T] is the canonical type for async factory deps —
+#   the first two Any args (yield / send types) are always Any for standard coroutines.
+# logs.py: LogEntry.context is dict[str, Any] — frontend error payloads are genuinely open-ended.
+# lifecycle.py: 6 Pydantic model classes (DataInventory etc.); no router-level Any.
+# invitations.py: InvitationAccept Pydantic model; get_db import corrected (app.database).
+# test.py: 4 Pydantic model classes (TestSeedData etc.); router return types added.
+module = [
+    "app.dependencies",
+    "app.routers.logs",
+    "app.routers.admin.lifecycle",
+    "app.routers.admin.invitations",
+    "app.routers.test",
+]
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
 DEP003 = ["botocore"]  # Transitive dependency of boto3

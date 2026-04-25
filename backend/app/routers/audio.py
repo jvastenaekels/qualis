@@ -95,7 +95,7 @@ async def upload_audio(
     question_key: str = Form(...),
     duration_seconds: float | None = Form(None),
     db: AsyncSession = Depends(get_db),
-):
+) -> AudioUploadResponse:
     """
     Upload audio recording for a participant response.
 
@@ -238,7 +238,7 @@ async def delete_audio_recording(
     recording_id: int,
     session_token: UUID,
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, str]:
     """
     Delete an audio recording (before submission only).
 
@@ -293,7 +293,7 @@ async def get_audio_url(
     recording_id: int,
     session_token: UUID,
     db: AsyncSession = Depends(get_db),
-):
+) -> AudioRecordingRead:
     """
     Get presigned URL for audio playback.
 

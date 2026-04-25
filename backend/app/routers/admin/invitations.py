@@ -5,7 +5,8 @@ from pydantic import BaseModel
 
 from app.utils.security import decode_invitation_token
 from app.limiter import limiter
-from app.dependencies import get_current_user, get_db
+from app.database import get_db
+from app.dependencies import get_current_user
 from app.models import User, ProjectMember, ProjectRole
 
 router = APIRouter(tags=["Admin Invitations"])
@@ -15,7 +16,9 @@ router = APIRouter(tags=["Admin Invitations"])
 
 
 @router.get("/verify")
-async def verify_invitation(token: str, db: AsyncSession = Depends(get_db)):
+async def verify_invitation(
+    token: str, db: AsyncSession = Depends(get_db)
+) -> dict[str, object]:
     """Verify an invitation token and return details including project name."""
     try:
         payload = decode_invitation_token(token)
@@ -54,7 +57,7 @@ async def accept_invitation(
     data: InvitationAccept,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
-):
+) -> dict[str, object]:
     """
     Accept an invitation using an existing account.
     The email in the token must match the current user's email.

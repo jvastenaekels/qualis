@@ -39,7 +39,7 @@ else:
         role: str
 
     @router.post("/init")
-    async def init_test_db(db: AsyncSession = Depends(get_db)):
+    async def init_test_db(db: AsyncSession = Depends(get_db)) -> dict[str, str]:
         """
         Initialize test database - ensure tables exist
         This is typically handled by app startup, but useful for explicit initialization
@@ -62,7 +62,9 @@ else:
             )
 
     @router.post("/seed")
-    async def seed_test_data(data: TestSeedData, db: AsyncSession = Depends(get_db)):
+    async def seed_test_data(
+        data: TestSeedData, db: AsyncSession = Depends(get_db)
+    ) -> dict[str, object]:
         """
         Seed base test data: user and project
         Idempotent - won't create duplicates
@@ -138,7 +140,9 @@ else:
             raise HTTPException(status_code=500, detail=f"Seeding failed: {str(e)}")
 
     @router.post("/members")
-    async def add_test_member(data: TestMemberData, db: AsyncSession = Depends(get_db)):
+    async def add_test_member(
+        data: TestMemberData, db: AsyncSession = Depends(get_db)
+    ) -> dict[str, object]:
         """
         Add a user to a project for testing purposes
         """
@@ -193,7 +197,9 @@ else:
             )
 
     @router.post("/cleanup")
-    async def cleanup_test_data(db: AsyncSession = Depends(get_db)):
+    async def cleanup_test_data(
+        db: AsyncSession = Depends(get_db),
+    ) -> dict[str, str]:
         """
         Cleanup test data between tests
         Removes all data except the base test user and project
@@ -224,7 +230,9 @@ else:
             raise HTTPException(status_code=500, detail=f"Cleanup failed: {str(e)}")
 
     @router.post("/cleanup-all")
-    async def cleanup_all_test_data(db: AsyncSession = Depends(get_db)):
+    async def cleanup_all_test_data(
+        db: AsyncSession = Depends(get_db),
+    ) -> dict[str, str]:
         """
         Full cleanup including users and projects
         Use at end of test suite
@@ -260,6 +268,6 @@ else:
             )
 
     @router.get("/health")
-    async def test_health():
+    async def test_health() -> dict[str, str]:
         """Simple health check for test router"""
         return {"status": "ok", "environment": settings.ENVIRONMENT}
