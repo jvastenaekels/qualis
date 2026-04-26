@@ -44,3 +44,31 @@ def test_totp_enable_response_shape():
     resp = TOTPEnableResponse(status="enabled", backup_codes=["abc", "def"])
     assert resp.status == "enabled"
     assert len(resp.backup_codes) == 2
+
+
+def test_resolved_study_config_preserves_extra_keys():
+    """The `extra='allow'` config is the load-bearing reason these schemas exist
+    (so orval generates real interfaces, not opaque dicts). Pin it with a
+    round-trip test: any unknown key must survive model_dump()."""
+    from app.schemas.responses import ResolvedStudyConfigResponse
+
+    payload = {
+        "slug": "demo",
+        "title": "Demo Study",
+        "description": "A study",
+        "statements": [{"id": 1, "text": "A statement"}],
+        "grid_config": [{"score": -1, "capacity": 1}],
+    }
+    resolved = ResolvedStudyConfigResponse.model_validate(payload)
+    out = resolved.model_dump()
+    assert out["statements"] == [{"id": 1, "text": "A statement"}]
+    assert out["grid_config"] == [{"score": -1, "capacity": 1}]
+
+
+def test_study_dump_response_rejects_missing_required_fields():
+    """Symmetric to test_storage_usage_response_rejects_missing_fields:
+    `extra='allow'` does not relax the required-field validation."""
+    from app.schemas.responses import StudyDumpResponse
+
+    with pytest.raises(ValidationError):
+        StudyDumpResponse(slug="x")  # missing required `id`
