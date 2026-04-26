@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use Qualis in your research, please cite both the software (this entry) and the SoftwareX paper (preferred-citation below)."
+message: "If you use Qualis in your research, please cite this software entry."
 type: software
 title: "Qualis: An open-source platform for Q-methodology research"
 abstract: >-
@@ -15,26 +15,20 @@ date-released: "2026-04-25"
 url: "https://github.com/jvastenaekels/qualis"
 repository-code: "https://github.com/jvastenaekels/qualis"
 license: "AGPL-3.0-or-later"
-# After tagging v0.1.0-softwarex and the Zenodo webhook archives the release,
-# replace the placeholder below with the assigned DOI.
-# doi: "10.5281/zenodo.XXXXXXX"
 authors:
   - family-names: "Vastenaekels"
     given-names: "Julien"
     email: "julien.vastenaekels@univ-reims.fr"
     affiliation: "Université de Reims Champagne-Ardenne"
-    # Replace with real ORCID before submission:
     # orcid: "https://orcid.org/0000-0000-0000-0000"
   - family-names: "Dedinger"
     given-names: "Clémence"
     email: "clemence.dedinger@univ-reims.fr"
     affiliation: "Université de Reims Champagne-Ardenne"
-    # Replace with real ORCID before submission:
     # orcid: "https://orcid.org/0000-0000-0000-0000"
 # CFF 1.2.0 has no per-author "roles" field. The contribution distribution is:
 #   J. Vastenaekels — software design, implementation, documentation, maintenance
-#   C. Dedinger — methodological design, testing, conceptual feedback, and co-author
-#                 of the accompanying SoftwareX paper (no direct code contribution)
+#   C. Dedinger — methodological design, testing, conceptual feedback (no direct code contribution)
 # This distinction is documented in the README ## Acknowledgments section.
 keywords:
   - "Q methodology"
@@ -44,19 +38,3 @@ keywords:
   - "online data collection"
   - "open science"
   - "research software"
-preferred-citation:
-  type: article
-  title: "Qualis: An open-source platform for Q-methodology research"
-  authors:
-    - family-names: "Vastenaekels"
-      given-names: "Julien"
-      email: "julien.vastenaekels@univ-reims.fr"
-      affiliation: "Université de Reims Champagne-Ardenne"
-    - family-names: "Dedinger"
-      given-names: "Clémence"
-      email: "clemence.dedinger@univ-reims.fr"
-      affiliation: "Université de Reims Champagne-Ardenne"
-  journal: "SoftwareX"
-  year: 2026
-  # Replace on acceptance:
-  # doi: "10.1016/j.softx.2026.XXXXXX"

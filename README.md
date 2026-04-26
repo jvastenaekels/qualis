@@ -216,8 +216,8 @@ If you use Qualis in your research, please refer to the machine-readable metadat
 
 **Author contributions:**
 
-- **Julien Vastenaekels:** software architecture, implementation, documentation, maintenance, paper co-author.
-- **Clémence Dedinger** (Université de Reims Champagne-Ardenne): methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology, paper co-author. No direct code contribution.
+- **Julien Vastenaekels:** software architecture, implementation, documentation, maintenance.
+- **Clémence Dedinger** (Université de Reims Champagne-Ardenne): methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology. No direct code contribution.
 
 **Methodological grounding:** Qualis's design draws on the critical Q-methodology literature, in particular Stainton Rogers (1997), Stenner (2011), Watts & Stenner (2012), and Sneegas (2020).
 
@@ -227,17 +227,7 @@ If you use Qualis in your research, please refer to the machine-readable metadat
 
 ## AI usage disclosure
 
-Following [Elsevier's policy on AI tool use in scientific software](https://www.elsevier.com/about/policies/publishing-ethics) and the [JOSS reviewer guidelines](https://joss.readthedocs.io/en/latest/review_criteria.html), the following disclosure applies to Qualis's development:
-
-Generative AI assistants (primarily Anthropic Claude, with occasional cross-checks via OpenAI Codex) were used during development and documentation:
-
-- **Code generation and refactoring:** AI assistants drafted parts of the implementation (notably some boilerplate FastAPI routers, React components, and test scaffolding), which were then reviewed, edited, and integrated by the human author.
-- **Documentation drafting:** README, tutorials, and inline documentation were partially drafted with AI assistance and edited for accuracy and tone.
-- **Code review and audit:** A multi-axis pre-submission code audit was conducted with AI sub-agents (see `docs/audits/`); findings were reviewed and prioritised by the human author before remediation.
-
-**Human responsibility:** All architectural decisions, methodological choices (extraction method, rotation, flagging logic), security-sensitive code paths, and the final published version are the responsibility of the listed authors. AI-generated content was reviewed and edited prior to inclusion.
-
-**Reproducibility:** This disclosure is also recorded in the SoftwareX submission letter and in the project's commit history (commits co-authored with `Claude Opus 4.7` and `Codex` markers in trailer lines).
+Generative AI assistants were used during Qualis's development under human review. See [`AI_USAGE.md`](AI_USAGE.md) for the full disclosure.
 
 ---
 
