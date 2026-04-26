@@ -33,9 +33,21 @@ const demoAdminStudy: StudyRead = {
         },
     ],
     statements: [
-        { id: 1, code: 's1', translations: [{ id: 1, statement_id: 1, language_code: 'en', text: 'Statement 1' }] },
-        { id: 2, code: 's2', translations: [{ id: 2, statement_id: 2, language_code: 'en', text: 'Statement 2' }] },
-        { id: 3, code: 's3', translations: [{ id: 3, statement_id: 3, language_code: 'en', text: 'Statement 3' }] },
+        {
+            id: 1,
+            code: 's1',
+            translations: [{ id: 1, statement_id: 1, language_code: 'en', text: 'Statement 1' }],
+        },
+        {
+            id: 2,
+            code: 's2',
+            translations: [{ id: 2, statement_id: 2, language_code: 'en', text: 'Statement 2' }],
+        },
+        {
+            id: 3,
+            code: 's3',
+            translations: [{ id: 3, statement_id: 3, language_code: 'en', text: 'Statement 3' }],
+        },
     ],
     grid_config: [
         { score: -1, capacity: 1 },

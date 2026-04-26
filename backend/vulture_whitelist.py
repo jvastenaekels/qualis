@@ -295,3 +295,15 @@ factor_correlation
 # --- app/services/export_service.py ---
 # Reported in export manifest for human review
 size_kb
+
+# --- app/routers/admin/analysis.py (G1: card_comment endpoint) ---
+list_comments_for_participants
+
+# --- app/schemas/analysis.py (G2: factor_notes Pydantic field_validator + ParticipantCardComment field) ---
+validate_factor_notes
+statement_text
+
+# --- app/schemas/responses.py (Pydantic response model fields, used at JSON boundary) ---
+usage_percent
+backup_codes
+already_submitted

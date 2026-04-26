@@ -300,10 +300,7 @@ export default function InteractiveDataView({
         }
     }, [slug, queryClient, t]);
 
-    const liveParticipants = useMemo(
-        () => effectiveParticipants,
-        [effectiveParticipants]
-    );
+    const liveParticipants = useMemo(() => effectiveParticipants, [effectiveParticipants]);
 
     const liveCount = liveParticipants.length;
     const newsletterCount = liveParticipants.filter(
