@@ -32,8 +32,11 @@ class AnalysisRun(Base):
 
     Every successful call to the analysis endpoint creates one row. The
     researcher can annotate runs with a `notes` field (e.g., "final
-    analysis used in submission") and delete experimental runs they no
-    longer need.
+    analysis used in submission"), document a per-factor interpretive
+    narrative in `factor_notes` (Sneegas 2020 — narrative interpretation
+    of each factor is part of critical Q practice), and delete experimental
+    runs they no longer need. Both `notes` and `factor_notes` are mutable;
+    the analytical choices and the `result` payload are immutable.
     """
 
     __tablename__ = "analysis_runs"
@@ -60,6 +63,14 @@ class AnalysisRun(Base):
 
     # Researcher annotation (free text, e.g. "submission v2", "exploratory")
     notes: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    # Per-factor interpretive narrative. Keys are stringified 1-indexed
+    # factor numbers ("1", "2", ...); values are free-text narratives capped
+    # at 4000 chars at the API boundary. Defaults to {} for new and pre-existing
+    # rows (server_default in the migration covers the latter).
+    factor_notes: Mapped[dict[str, str]] = mapped_column(
+        JSON, default=dict, server_default="{}"
+    )
 
     # Full result payload (the AnalysisResult Pydantic model serialized).
     # JSON (not JSONB) to stay consistent with other persisted configs.

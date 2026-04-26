@@ -1536,14 +1536,6 @@
         },
         "consent_desc": "Les participants doivent accepter ces conditions avant de commencer."
       },
-      "positionality": {
-        "title": "Positionnalité du chercheur·euse",
-        "subtitle": "Mémo de réflexivité (non visible des participants)",
-        "helper": "Documentez qui vous êtes comme chercheur·euse, comment le concourse a été constitué, qui vous avez recruté et pourquoi, et quelles voix pourraient manquer. Cette transparence est constitutive d'une approche Q critique (Robbins & Krueger 2000 ; Sneegas 2020).",
-        "field_label": "Mémo de positionnalité",
-        "placeholder": "Par ex. Je suis sociologue formé·e à… J'ai constitué ce concourse à partir de… J'ai recruté via… Les discours suivants pourraient être sous-représentés…",
-        "admin_only_badge": "Admin uniquement"
-      },
       "condition": {
         "title": "Condition d'instruction",
         "label": "Définir la condition d'instruction",

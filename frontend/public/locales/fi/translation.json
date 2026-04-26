@@ -1498,14 +1498,6 @@
                 },
                 "consent_desc": "Osallistujien on hyväksyttävä nämä ehdot ennen aloittamista."
             },
-            "positionality": {
-                "title": "Researcher positionality",
-                "subtitle": "Reflexivity memo (not shown to participants)",
-                "helper": "Document who you are as a researcher, how the concourse was constructed, who you recruited and why, and which voices may be missing. This transparency is constitutive of a critical Q-methodology approach (Robbins & Krueger 2000; Sneegas 2020).",
-                "field_label": "Positionality memo",
-                "placeholder": "e.g. I am a sociologist trained in… I built this concourse from… I recruited via… I expect the following discourses may be under-represented…",
-                "admin_only_badge": "Admin-only"
-            },
             "condition": {
                 "title": "Ohjeistuksen ehto",
                 "label": "Määritä ohjeistuksen ehto",

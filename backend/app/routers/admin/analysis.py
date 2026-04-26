@@ -5,7 +5,7 @@ import logging
 import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from numpy.typing import NDArray
-from sqlalchemy import desc, select
+from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -14,7 +14,16 @@ from datetime import UTC, datetime, timedelta
 from ...database import get_db
 from ...dependencies import check_study_permission, get_current_user
 from ...limiter import limiter
-from ...models import AnalysisRun, AudioRecording, Participant, Study, StudyRole, User
+from ...models import (
+    AnalysisRun,
+    AudioRecording,
+    Participant,
+    QSortEntry,
+    Statement,
+    Study,
+    StudyRole,
+    User,
+)
 from ...schemas import (
     AnalysisRequest,
     AnalysisResult,
@@ -24,6 +33,7 @@ from ...schemas import (
     EigenvalueResult,
     FactorCharacteristic,
     ParticipantAudioRecording,
+    ParticipantCardComment,
     ParticipantLoading,
     StatementClassification,
     StatementScore,
@@ -281,6 +291,7 @@ async def run_factor_analysis(
         rotation_method=body.rotation,
         flagging_mode=body.flagging,
         notes=None,
+        factor_notes={},
         result=analysis_result.model_dump(mode="json"),
     )
     db.add(run)
@@ -331,6 +342,7 @@ def _to_summary(run: AnalysisRun) -> AnalysisRunSummary:
         rotation_method=run.rotation_method,
         flagging_mode=run.flagging_mode,
         notes=run.notes,
+        factor_notes=run.factor_notes or {},
     )
 
 
@@ -369,6 +381,7 @@ async def get_analysis_run(
         rotation_method=run.rotation_method,
         flagging_mode=run.flagging_mode,
         notes=run.notes,
+        factor_notes=run.factor_notes or {},
         result=run.result,
     )
 
@@ -380,14 +393,40 @@ async def update_analysis_run(
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> AnalysisRunSummary:
-    """Update the researcher annotation (`notes`) on a persisted run.
+    """Update the researcher annotations on a persisted run.
 
-    Only `notes` is editable; analytical choices and the result payload
-    are immutable for audit-trail integrity.
+    `notes` (run-level) and `factor_notes` (per-factor) are mutable;
+    analytical choices and the result payload are immutable for audit-trail
+    integrity. `factor_notes` keys must correspond to actual factors of the
+    run (1 ≤ int(k) ≤ run.n_factors); the schema validates format and per-
+    value length, and the route validates the upper bound against the run.
     """
     run = await _load_run(db, study.id, run_id)
     if body.notes is not None:
         run.notes = body.notes
+    if body.factor_notes is not None:
+        for key in body.factor_notes:
+            k_int = int(key)
+            if k_int > run.n_factors:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail=(
+                        f"factor_notes key {k_int} exceeds run n_factors "
+                        f"({run.n_factors})"
+                    ),
+                )
+        # Merge semantics (PATCH): keys present in the patch overwrite their
+        # current value; an empty/whitespace-only value clears the entry;
+        # keys absent from the patch are left unchanged. This means the
+        # frontend can update one factor's narrative without worrying about
+        # wiping the others.
+        merged = dict(run.factor_notes or {})
+        for key, value in body.factor_notes.items():
+            if value.strip():
+                merged[key] = value
+            else:
+                merged.pop(key, None)
+        run.factor_notes = merged
     await db.commit()
     await db.refresh(run)
     return _to_summary(run)
@@ -501,6 +540,102 @@ async def list_audios_for_participants(
                 created_at=recording.created_at,
                 presigned_url=url,
                 url_expires_at=expires_at if url else None,
+            )
+        )
+    return out
+
+
+# ---- Card comments linked to factor membership ----
+
+
+def _pick_statement_text(stmt: Statement, lang: str) -> str:
+    """Return the statement text in the preferred language, with sensible fallbacks."""
+    for tr in stmt.translations:
+        if tr.language_code == lang:
+            return tr.text
+    if stmt.translations:
+        return stmt.translations[0].text
+    return stmt.code
+
+
+@router.get("/{slug}/analysis/comments")
+async def list_comments_for_participants(
+    participant_ids: str,
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+) -> list[ParticipantCardComment]:
+    """Fetch non-empty `card_comment` entries for a set of participants.
+
+    Used by the analysis UI to show post-sort textual rationales linked to
+    factor membership: the frontend looks up which participants are flagged
+    on a factor (from the analysis result), then calls this endpoint with
+    their participant_db_ids to render the written rationales beside the
+    audio recordings already returned by `/analysis/audios`. Together the two
+    endpoints support the critical Q-methodology practice of grounding factor
+    interpretation in the words of the people who define each factor
+    (Sneegas 2020; Robbins & Krueger 2000).
+
+    Comments are returned ordered per participant by descending |grid_score|
+    (extreme placements first) — typically the most interpretable rationales
+    when reading a factor.
+
+    Query params:
+        participant_ids: comma-separated participant database ids
+            (e.g., "12,17,22"). Empty string returns []. Up to 200 ids
+            accepted (a single factor rarely flags more than ~20).
+    """
+    if not participant_ids.strip():
+        return []
+    try:
+        ids = [int(x) for x in participant_ids.split(",") if x.strip()]
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="participant_ids must be comma-separated integers",
+        )
+    if len(ids) > 200:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="At most 200 participant ids per request",
+        )
+    if not ids:
+        return []
+
+    study_lang = study.default_language or "en"
+
+    stmt = (
+        select(QSortEntry, Participant.id.label("participant_db_id"))
+        .join(Participant, QSortEntry.participant_id == Participant.id)
+        .where(
+            Participant.study_id == study.id,
+            Participant.id.in_(ids),
+            QSortEntry.card_comment.is_not(None),
+            func.length(func.trim(QSortEntry.card_comment)) > 0,
+        )
+        .order_by(
+            QSortEntry.participant_id,
+            func.abs(QSortEntry.grid_score).desc(),
+            QSortEntry.statement_id,
+        )
+    )
+    result = await db.execute(stmt)
+
+    out: list[ParticipantCardComment] = []
+    for entry, participant_db_id in result.all():
+        statement = entry.statement
+        comment = entry.card_comment or ""
+        if not comment.strip():
+            # Defensive: SQL filter should already exclude these, but a NULL/empty
+            # round-trip via JSON columns is theoretically possible.
+            continue
+        out.append(
+            ParticipantCardComment(
+                participant_db_id=participant_db_id,
+                statement_id=statement.id,
+                statement_code=statement.code,
+                statement_text=_pick_statement_text(statement, study_lang),
+                grid_score=entry.grid_score,
+                comment=comment,
             )
         )
     return out

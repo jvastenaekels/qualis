@@ -7,6 +7,7 @@
 import type { AnalysisRunSummaryRanByUserId } from './analysisRunSummaryRanByUserId';
 import type { AnalysisRunSummaryRanByEmail } from './analysisRunSummaryRanByEmail';
 import type { AnalysisRunSummaryNotes } from './analysisRunSummaryNotes';
+import type { AnalysisRunSummaryFactorNotes } from './analysisRunSummaryFactorNotes';
 
 /**
  * Lightweight summary of a persisted analysis run, used in list views.
@@ -22,4 +23,6 @@ export interface AnalysisRunSummary {
     rotation_method: string;
     flagging_mode: string;
     notes?: AnalysisRunSummaryNotes;
+    /** Per-factor interpretive narrative (Sneegas 2020). Keys are stringified 1-indexed factor numbers; values are free-text. */
+    factor_notes?: AnalysisRunSummaryFactorNotes;
 }

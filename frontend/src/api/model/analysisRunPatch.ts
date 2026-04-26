@@ -5,11 +5,16 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AnalysisRunPatchNotes } from './analysisRunPatchNotes';
+import type { AnalysisRunPatchFactorNotes } from './analysisRunPatchFactorNotes';
 
 /**
- * Partial update for a persisted run. Only `notes` is editable.
+ * Partial update for a persisted run. Only `notes` and `factor_notes`
+are editable; analytical choices and the result payload are immutable
+for audit-trail integrity.
  */
 export interface AnalysisRunPatch {
     /** Researcher annotation, e.g. 'final analysis used in submission'. */
     notes?: AnalysisRunPatchNotes;
+    /** Per-factor narratives keyed by stringified 1-indexed factor number. The router validates that each key matches an actual factor of the run (1 ≤ int(k) ≤ run.n_factors); values are capped at 4000 chars per factor. */
+    factor_notes?: AnalysisRunPatchFactorNotes;
 }

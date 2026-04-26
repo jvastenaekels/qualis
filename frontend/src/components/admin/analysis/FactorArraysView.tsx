@@ -4,13 +4,23 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Info } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import type { AnalysisResult } from '@/api/model';
+import type { AnalysisResult, AnalysisRunSummary } from '@/api/model';
+import { FactorNoteEditor } from './FactorNoteEditor';
 
 interface FactorArraysViewProps {
     result: AnalysisResult;
+    /**
+     * The persisted AnalysisRun for the result on screen, or `null` if no
+     * run is yet associated (e.g., right after first mount before a fetch
+     * completes). When set, each factor column gets a per-factor narrative
+     * editor that PATCHes `factor_notes` on this run.
+     */
+    currentRun?: AnalysisRunSummary | null;
+    /** Study slug — passed to the per-factor narrative editor for the PATCH endpoint. */
+    slug?: string;
 }
 
-export function FactorArraysView({ result }: FactorArraysViewProps) {
+export function FactorArraysView({ result, currentRun, slug }: FactorArraysViewProps) {
     const { t } = useTranslation();
 
     const distinguishingIds = useMemo(
@@ -48,6 +58,10 @@ export function FactorArraysView({ result }: FactorArraysViewProps) {
                 // Find max count per column for table rows
                 const maxRows = Math.max(...sortedScores.map((s) => groups.get(s)?.length ?? 0));
 
+                const factorKey = String(f + 1);
+                const noteForFactor =
+                    (currentRun?.factor_notes && currentRun.factor_notes[factorKey]) || '';
+
                 return (
                     <div key={f} className="space-y-3">
                         <div className="flex items-center gap-2">
@@ -75,6 +89,16 @@ export function FactorArraysView({ result }: FactorArraysViewProps) {
                                 </Tooltip>
                             </TooltipProvider>
                         </div>
+
+                        {/* Per-factor interpretive narrative (Sneegas 2020) */}
+                        {currentRun && slug && (
+                            <FactorNoteEditor
+                                slug={slug}
+                                runId={currentRun.id}
+                                factorIndex={f}
+                                currentNote={noteForFactor}
+                            />
+                        )}
                         <div className="relative">
                             <div className="overflow-x-auto pb-2">
                                 <table

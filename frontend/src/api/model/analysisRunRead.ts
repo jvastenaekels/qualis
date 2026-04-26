@@ -7,6 +7,7 @@
 import type { AnalysisRunReadRanByUserId } from './analysisRunReadRanByUserId';
 import type { AnalysisRunReadRanByEmail } from './analysisRunReadRanByEmail';
 import type { AnalysisRunReadNotes } from './analysisRunReadNotes';
+import type { AnalysisRunReadFactorNotes } from './analysisRunReadFactorNotes';
 import type { AnalysisRunReadResult } from './analysisRunReadResult';
 
 /**
@@ -23,6 +24,8 @@ export interface AnalysisRunRead {
     rotation_method: string;
     flagging_mode: string;
     notes?: AnalysisRunReadNotes;
+    /** Per-factor interpretive narrative (Sneegas 2020). Keys are stringified 1-indexed factor numbers; values are free-text. */
+    factor_notes?: AnalysisRunReadFactorNotes;
     /** Full AnalysisResult payload as it was returned at run time. */
     result: AnalysisRunReadResult;
 }

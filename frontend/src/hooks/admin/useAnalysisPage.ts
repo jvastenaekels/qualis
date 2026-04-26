@@ -19,9 +19,12 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { ApiError } from '@/api/client';
+import { useQueryClient } from '@tanstack/react-query';
 import {
     useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet,
     useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost,
+    listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet,
+    getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey,
 } from '@/api/generated';
 import type { AnalysisResult, AnalysisRunSummary } from '@/api/model';
 import { generateAnalysisXlsx } from '@/utils/analysisXlsxExport';
@@ -115,6 +118,13 @@ export interface AnalysisPageApi {
     result: AnalysisResult | null;
     viewingRun: AnalysisRunSummary | null;
     isViewingHistorical: boolean;
+    /**
+     * The AnalysisRun summary for the result currently displayed, regardless
+     * of whether it came from a fresh run or was loaded from history. Used by
+     * the per-factor narrative editor to know which run id to PATCH.
+     * `null` until the first analysis is run/loaded.
+     */
+    currentRun: AnalysisRunSummary | null;
 
     // Handlers
     handleRunAnalysis: () => void;
@@ -130,6 +140,7 @@ export interface AnalysisPageApi {
 
 export function useAnalysisPage(slug: string): AnalysisPageApi {
     const { t } = useTranslation();
+    const queryClient = useQueryClient();
     const [, setSearchParams] = useSearchParams();
     const [searchParamsSnapshot] = useSearchParams();
 
@@ -154,6 +165,12 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
     // ── Result / history state ────────────────────────────────────
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [viewingRun, setViewingRun] = useState<AnalysisRunSummary | null>(null);
+    // `freshRun` holds the AnalysisRunSummary that the just-completed POST
+    // /analysis/run created. Distinct from `viewingRun`, which is set only
+    // when the user clicks a historical run in the history panel. Together
+    // they let `currentRun` always point to the run summary for the result
+    // on screen — needed by the per-factor narrative editor.
+    const [freshRun, setFreshRun] = useState<AnalysisRunSummary | null>(null);
     const [isExporting, setIsExporting] = useState(false);
 
     // ── URL sync ──────────────────────────────────────────────────
@@ -224,7 +241,7 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
                 },
             },
             {
-                onSuccess: (data) => {
+                onSuccess: async (data) => {
                     setResult(data);
                     setViewingRun(null);
                     syncParams(extraction, nFactors, rotation, flagging);
@@ -233,6 +250,24 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
                             n: data.n_factors,
                         })
                     );
+                    // Invalidate the runs list so the history panel refreshes,
+                    // then fetch the freshest run and store it as `freshRun`.
+                    // This lets the per-factor narrative editor know which run
+                    // id to PATCH when the analyst writes a factor narrative,
+                    // without changing `viewingRun` (which means "loaded from
+                    // history" — distinct from a fresh result).
+                    const runsQueryKey =
+                        getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey(slug);
+                    queryClient.invalidateQueries({ queryKey: runsQueryKey });
+                    try {
+                        const runs = await listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet(slug);
+                        // Runs are sorted desc by ran_at server-side.
+                        setFreshRun(runs.length > 0 ? (runs[0] ?? null) : null);
+                    } catch {
+                        // Non-fatal: the analyst can reload from history if
+                        // they want to write factor narratives.
+                        setFreshRun(null);
+                    }
                 },
                 onError: (error) => {
                     const message = error instanceof Error ? error.message : String(error);
@@ -252,6 +287,7 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
         analysisMutation,
         syncParams,
         t,
+        queryClient,
     ]);
 
     const handleLoadHistoricalRun = useCallback(
@@ -262,6 +298,11 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
             }
             setResult(historicalResult);
             setViewingRun(run);
+            // Loading a historical run takes precedence over the freshly-run
+            // tracker. `currentRun` reads viewingRun first (see the API
+            // assembly below), so this is implicitly handled, but we clear
+            // freshRun to keep state tidy.
+            setFreshRun(null);
         },
         []
     );
@@ -302,7 +343,8 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
             if (type === 'xlsx') {
                 setIsExporting(true);
                 try {
-                    const blob = await generateAnalysisXlsx(result);
+                    const factorNotes = (viewingRun ?? freshRun)?.factor_notes ?? undefined;
+                    const blob = await generateAnalysisXlsx(result, factorNotes);
                     downloadBlob(blob, `${slug}_analysis.xlsx`);
                 } catch {
                     toast.error(
@@ -318,7 +360,7 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             downloadBlob(blob, `${slug}_analysis_${type}.csv`);
         },
-        [result, slug, t]
+        [result, slug, t, viewingRun, freshRun]
     );
 
     const handleRefetchEigenvalues = useCallback(() => {
@@ -357,6 +399,7 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
         result,
         viewingRun,
         isViewingHistorical: viewingRun !== null,
+        currentRun: viewingRun ?? freshRun,
         handleRunAnalysis,
         handleLoadHistoricalRun,
         handleClearHistoricalView,

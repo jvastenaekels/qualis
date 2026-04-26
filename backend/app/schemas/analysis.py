@@ -149,6 +149,11 @@ class AnalysisRunSummary(BaseModel):
     rotation_method: str
     flagging_mode: str
     notes: str | None = None
+    factor_notes: dict[str, str] = Field(
+        default_factory=dict,
+        description="Per-factor interpretive narrative (Sneegas 2020). "
+        "Keys are stringified 1-indexed factor numbers; values are free-text.",
+    )
 
 
 class AnalysisRunRead(AnalysisRunSummary):
@@ -160,10 +165,75 @@ class AnalysisRunRead(AnalysisRunSummary):
 
 
 class AnalysisRunPatch(BaseModel):
-    """Partial update for a persisted run. Only `notes` is editable."""
+    """Partial update for a persisted run. Only `notes` and `factor_notes`
+    are editable; analytical choices and the result payload are immutable
+    for audit-trail integrity.
+    """
 
     notes: str | None = Field(
         None,
         max_length=2000,
         description="Researcher annotation, e.g. 'final analysis used in submission'.",
     )
+    factor_notes: dict[str, str] | None = Field(
+        None,
+        description="Per-factor narratives keyed by stringified 1-indexed "
+        "factor number. The router validates that each key matches an "
+        "actual factor of the run (1 ≤ int(k) ≤ run.n_factors); values "
+        "are capped at 4000 chars per factor.",
+    )
+
+    @field_validator("factor_notes")
+    @classmethod
+    def validate_factor_notes(cls, v: dict[str, str] | None) -> dict[str, str] | None:
+        """Reject malformed keys and over-long values at the schema layer.
+
+        Bound to the *run's* n_factors is enforced in the router (we don't
+        have access to it here).
+        """
+        if v is None:
+            return v
+        for key, value in v.items():
+            try:
+                k_int = int(key)
+            except (TypeError, ValueError):
+                raise ValueError(
+                    f"factor_notes keys must be integer strings, got: {key!r}"
+                )
+            if k_int < 1:
+                raise ValueError(
+                    f"factor_notes keys must be ≥ 1 (1-indexed), got: {k_int}"
+                )
+            if not isinstance(value, str):
+                raise ValueError(f"factor_notes value for key {key!r} must be a string")
+            if len(value) > 4000:
+                raise ValueError(
+                    f"factor_notes value for factor {key} exceeds 4000 chars"
+                )
+        return v
+
+
+# ---- Per-statement card comments linked to factor membership ----
+
+
+class ParticipantCardComment(BaseModel):
+    """A single non-empty `card_comment` written by a participant during post-sort.
+
+    Returned by the analysis comments endpoint to support critical
+    Q-methodology interpretation: the analyst reads the textual rationales
+    of participants flagged on a given factor, alongside the audio recordings
+    already surfaced by `ParticipantAudioRecording` (Sneegas 2020;
+    Robbins & Krueger 2000).
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    participant_db_id: int
+    statement_id: int
+    statement_code: str
+    statement_text: str = Field(
+        description="Statement text in the study's default language, with fallback "
+        "to the first available translation, then to the code.",
+    )
+    grid_score: int
+    comment: str = Field(description="Non-empty textual rationale.")

@@ -174,7 +174,11 @@ export default function GeneralSettingsPage() {
         queryFn: async () => {
             if (!slug) throw new Error('No slug');
             const response = await getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet(slug);
-            return response as StorageUsageResponse;
+            // Cast via unknown: backend returns dict[str, Any] without a
+            // Pydantic response_model, so orval generates an opaque
+            // {[key:string]:unknown} type that doesn't structurally overlap
+            // with our hand-written StorageUsageResponse.
+            return response as unknown as StorageUsageResponse;
         },
         enabled: !!slug && isAudioEnabled,
         refetchInterval: 30000, // Refresh every 30s

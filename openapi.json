@@ -5321,6 +5321,70 @@
           }
         }
       }
+    },
+    "/api/admin/studies/{slug}/analysis/comments": {
+      "get": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "List Comments For Participants",
+        "description": "Fetch non-empty `card_comment` entries for a set of participants.\n\nUsed by the analysis UI to show post-sort textual rationales linked to\nfactor membership: the frontend looks up which participants are flagged\non a factor (from the analysis result), then calls this endpoint with\ntheir participant_db_ids to render the written rationales beside the\naudio recordings already returned by `/analysis/audios`. Together the two\nendpoints support the critical Q-methodology practice of grounding factor\ninterpretation in the words of the people who define each factor\n(Sneegas 2020; Robbins & Krueger 2000).\n\nComments are returned ordered per participant by descending |grid_score|\n(extreme placements first) \u2014 typically the most interpretable rationales\nwhen reading a factor.\n\nQuery params:\n    participant_ids: comma-separated participant database ids\n        (e.g., \"12,17,22\"). Empty string returns []. Up to 200 ids\n        accepted (a single factor rarely flags more than ~20).",
+        "operationId": "list_comments_for_participants_api_admin_studies__slug__analysis_comments_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "participant_ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Participant Ids"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ParticipantCardComment"
+                  },
+                  "title": "Response List Comments For Participants Api Admin Studies  Slug  Analysis Comments Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -5522,11 +5586,26 @@
             ],
             "title": "Notes",
             "description": "Researcher annotation, e.g. 'final analysis used in submission'."
+          },
+          "factor_notes": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Factor Notes",
+            "description": "Per-factor narratives keyed by stringified 1-indexed factor number. The router validates that each key matches an actual factor of the run (1 \u2264 int(k) \u2264 run.n_factors); values are capped at 4000 chars per factor."
           }
         },
         "type": "object",
         "title": "AnalysisRunPatch",
-        "description": "Partial update for a persisted run. Only `notes` is editable."
+        "description": "Partial update for a persisted run. Only `notes` and `factor_notes`\nare editable; analytical choices and the result payload are immutable\nfor audit-trail integrity."
       },
       "AnalysisRunRead": {
         "properties": {
@@ -5588,6 +5667,14 @@
               }
             ],
             "title": "Notes"
+          },
+          "factor_notes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Factor Notes",
+            "description": "Per-factor interpretive narrative (Sneegas 2020). Keys are stringified 1-indexed factor numbers; values are free-text."
           },
           "result": {
             "additionalProperties": true,
@@ -5669,6 +5756,14 @@
               }
             ],
             "title": "Notes"
+          },
+          "factor_notes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Factor Notes",
+            "description": "Per-factor interpretive narrative (Sneegas 2020). Keys are stringified 1-indexed factor numbers; values are free-text."
           }
         },
         "type": "object",
@@ -10019,6 +10114,47 @@
           "has_postsort"
         ],
         "title": "ValidationSummary"
+      },
+      "ParticipantCardComment": {
+        "properties": {
+          "participant_db_id": {
+            "type": "integer",
+            "title": "Participant Db Id"
+          },
+          "statement_id": {
+            "type": "integer",
+            "title": "Statement Id"
+          },
+          "statement_code": {
+            "type": "string",
+            "title": "Statement Code"
+          },
+          "statement_text": {
+            "type": "string",
+            "title": "Statement Text",
+            "description": "Statement text in the study's default language, with fallback to the first available translation, then to the code."
+          },
+          "grid_score": {
+            "type": "integer",
+            "title": "Grid Score"
+          },
+          "comment": {
+            "type": "string",
+            "title": "Comment",
+            "description": "Non-empty textual rationale."
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_db_id",
+          "statement_id",
+          "statement_code",
+          "statement_text",
+          "grid_score",
+          "comment"
+        ],
+        "title": "ParticipantCardComment",
+        "description": "A single non-empty `card_comment` written by a participant during post-sort.\n\nReturned by the analysis comments endpoint to support critical\nQ-methodology interpretation: the analyst reads the textual rationales\nof participants flagged on a given factor, alongside the audio recordings\nalready surfaced by `ParticipantAudioRecording` (Sneegas 2020;\nRobbins & Krueger 2000)."
       }
     },
     "securitySchemes": {

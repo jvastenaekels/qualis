@@ -390,6 +390,144 @@ class TestAnalysisRunHistory:
             == "final analysis used in submission"
         )
 
+    async def test_patch_run_factor_notes_persists_and_validates(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """factor_notes is editable via PATCH; bound to run.n_factors and
+        per-value length; round-trips through GET /runs/{id}.
+        """
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+            headers=headers,
+        )
+        run_id = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs", headers=headers
+            )
+        ).json()[0]["id"]
+
+        # Valid PATCH: two factor narratives.
+        ok = await client.patch(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            json={
+                "factor_notes": {
+                    "1": "Technocratic-ecological discourse",
+                    "2": "Distributive-justice discourse",
+                }
+            },
+            headers=headers,
+        )
+        assert ok.status_code == 200
+        body = ok.json()
+        assert body["factor_notes"]["1"].startswith("Technocratic")
+        assert body["factor_notes"]["2"].startswith("Distributive")
+
+        # Round-trip via GET /runs/{id}
+        full = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            headers=headers,
+        )
+        assert full.status_code == 200
+        assert full.json()["factor_notes"]["1"].startswith("Technocratic")
+
+        # Invalid: key out of range (n_factors=2, key=3) → 422
+        out_of_range = await client.patch(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            json={"factor_notes": {"3": "should fail"}},
+            headers=headers,
+        )
+        assert out_of_range.status_code == 422
+
+        # Invalid: malformed key (non-integer) → 422 (schema-level)
+        bad_key = await client.patch(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            json={"factor_notes": {"abc": "should fail"}},
+            headers=headers,
+        )
+        assert bad_key.status_code == 422
+
+        # Invalid: value too long → 422 (schema-level)
+        too_long = await client.patch(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            json={"factor_notes": {"1": "x" * 4001}},
+            headers=headers,
+        )
+        assert too_long.status_code == 422
+
+        # Empty string clears that factor entry without affecting others.
+        cleared = await client.patch(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            json={"factor_notes": {"1": "", "2": "kept"}},
+            headers=headers,
+        )
+        assert cleared.status_code == 200
+        assert cleared.json()["factor_notes"] == {"2": "kept"}
+
+    async def test_patch_factor_notes_merges_does_not_wipe_unmentioned_keys(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """A PATCH that touches one factor's narrative must NOT wipe the
+        narratives of factors not mentioned in the patch (merge semantics).
+        """
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+            headers=headers,
+        )
+        run_id = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs", headers=headers
+            )
+        ).json()[0]["id"]
+
+        # Seed both narratives.
+        await client.patch(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            json={"factor_notes": {"1": "first narrative", "2": "second narrative"}},
+            headers=headers,
+        )
+
+        # PATCH only key "1" — "2" must survive untouched.
+        single = await client.patch(
+            f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+            json={"factor_notes": {"1": "first revised"}},
+            headers=headers,
+        )
+        assert single.status_code == 200
+        assert single.json()["factor_notes"] == {
+            "1": "first revised",
+            "2": "second narrative",
+        }
+
     async def test_delete_run(
         self,
         client: AsyncClient,
@@ -509,6 +647,141 @@ class TestAnalysisRunHistory:
         # Non-integer -> 400
         bad = await client.get(
             f"/api/admin/studies/{study.slug}/analysis/audios?participant_ids=abc",
+            headers=headers,
+        )
+        assert bad.status_code == 400
+
+    async def test_comments_endpoint_filters_empty_and_orders_by_abs_score(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """Card comments endpoint returns only non-empty comments for the
+        requested participants, ordered per participant by |grid_score| desc.
+        """
+        from sqlalchemy import select as sel
+
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        # Seed factory creates 3 participants with [1,0,0,-1] / [1,0,-1,0] /
+        # [-1,0,0,1] grid scores across 4 statements. We attach card_comments
+        # to the first participant: one extreme, one middle, one whitespace-only.
+        ps_result = await db.execute(
+            sel(Participant.id)
+            .where(Participant.study_id == study.id)
+            .order_by(Participant.id)
+        )
+        participant_ids = [row[0] for row in ps_result.all()]
+        first_p = participant_ids[0]
+
+        entries_result = await db.execute(
+            sel(QSortEntry)
+            .where(QSortEntry.participant_id == first_p)
+            .order_by(QSortEntry.statement_id)
+        )
+        entries = list(entries_result.scalars().all())
+        # entries are ordered by statement_id; scores were [1, 0, 0, -1]
+        entries[0].card_comment = "I strongly agree (extreme +1)"  # |score|=1
+        entries[1].card_comment = "Lukewarm middle thought"  # |score|=0
+        entries[2].card_comment = "   "  # whitespace-only → must be filtered
+        entries[3].card_comment = "Strong disagreement explained"  # |score|=1
+        await db.commit()
+
+        response = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/comments"
+            f"?participant_ids={first_p}",
+            headers=headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        # Whitespace-only comment is excluded; we expect 3 valid comments.
+        assert len(data) == 3
+        assert all(d["comment"].strip() for d in data)
+        assert all(d["participant_db_id"] == first_p for d in data)
+
+        # Ordered by |grid_score| desc → the two |1| entries come before |0|.
+        abs_scores = [abs(d["grid_score"]) for d in data]
+        assert abs_scores == sorted(abs_scores, reverse=True)
+        assert abs_scores[0] == 1
+        assert abs_scores[-1] == 0
+
+        # Each comment carries the statement code + text from the study.
+        for d in data:
+            assert d["statement_code"]
+            assert d["statement_text"]
+
+    async def test_comments_endpoint_is_study_scoped(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """Out-of-study participant ids must be silently dropped (no leakage)."""
+        from sqlalchemy import select as sel
+
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        ps_result = await db.execute(
+            sel(Participant.id).where(Participant.study_id == study.id)
+        )
+        study_participant_ids = [row[0] for row in ps_result.all()]
+        first_p = study_participant_ids[0]
+
+        # Attach a comment so the endpoint has something to potentially leak.
+        entry_result = await db.execute(
+            sel(QSortEntry)
+            .where(QSortEntry.participant_id == first_p)
+            .limit(1)
+        )
+        entry = entry_result.scalar_one()
+        entry.card_comment = "in-study rationale"
+        await db.commit()
+
+        # Pass a clearly out-of-study id alongside the real one.
+        ids_param = f"{first_p},999999"
+        response = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/comments"
+            f"?participant_ids={ids_param}",
+            headers=headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        # Only the legitimate id contributes — 999999 is dropped.
+        assert all(d["participant_db_id"] == first_p for d in data)
+
+    async def test_comments_endpoint_validates_input(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        # Empty -> []
+        empty = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/comments?participant_ids=",
+            headers=headers,
+        )
+        assert empty.status_code == 200
+        assert empty.json() == []
+
+        # Non-integer -> 400
+        bad = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/comments?participant_ids=abc",
             headers=headers,
         )
         assert bad.status_code == 400

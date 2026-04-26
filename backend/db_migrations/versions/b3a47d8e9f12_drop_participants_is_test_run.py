@@ -1,7 +1,7 @@
 """drop participants.is_test_run column
 
 Revision ID: b3a47d8e9f12
-Revises: 090c4286d21a
+Revises: f547a0b1a6d1
 Create Date: 2026-04-26 11:00:00.000000
 
 Removes the vestigial `is_test_run` column from `participants`. The
@@ -26,7 +26,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = 'b3a47d8e9f12'
-down_revision: Union[str, Sequence[str], None] = '090c4286d21a'
+down_revision: Union[str, Sequence[str], None] = 'f547a0b1a6d1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

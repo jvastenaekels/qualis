@@ -55,8 +55,15 @@ function freezeHeaderRow(ws: WorkSheet) {
 /**
  * Generates a multi-sheet XLSX workbook with the complete analysis.
  * Uses dynamic import to keep SheetJS out of the main bundle.
+ *
+ * `factorNotes` (optional) is the per-factor interpretive narrative dict
+ * keyed by stringified 1-indexed factor number. When provided and at least
+ * one entry is non-empty, a "Factor Narratives" sheet is included.
  */
-export async function generateAnalysisXlsx(result: AnalysisResult): Promise<Blob> {
+export async function generateAnalysisXlsx(
+    result: AnalysisResult,
+    factorNotes?: Record<string, string> | null
+): Promise<Blob> {
     const XLSX = await import('xlsx');
     const wb = XLSX.utils.book_new();
     const nf = result.n_factors;
@@ -218,6 +225,27 @@ export async function generateAnalysisXlsx(result: AnalysisResult): Promise<Blob
     freezeHeaderRow(wsCorr);
     formatRange(wsCorr, 1, corrRows.length, 1, nf, '0.000');
     XLSX.utils.book_append_sheet(wb, wsCorr, 'Correlation Matrix');
+
+    // 8. Factor Narratives (per-factor interpretive memos, when provided).
+    // Skipped entirely if no narratives were authored — no empty sheet.
+    if (factorNotes) {
+        const narrativeRows: (string | number)[][] = [['Factor', 'Narrative']];
+        let any = false;
+        for (let f = 0; f < nf; f++) {
+            const note = factorNotes[String(f + 1)] ?? '';
+            if (note.trim()) {
+                any = true;
+                narrativeRows.push([`F${f + 1}`, note]);
+            }
+        }
+        if (any) {
+            const wsNotes = makeSheet(narrativeRows);
+            freezeHeaderRow(wsNotes);
+            // Wider second column to fit prose; row heights default.
+            wsNotes['!cols'] = [{ wch: 8 }, { wch: 80 }];
+            XLSX.utils.book_append_sheet(wb, wsNotes, 'Factor Narratives');
+        }
+    }
 
     // Write to binary and return as Blob
     const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });

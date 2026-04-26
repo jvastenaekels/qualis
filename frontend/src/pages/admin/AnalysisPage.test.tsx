@@ -35,10 +35,17 @@ vi.mock('@/api/generated', () => ({
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey: vi.fn(() => [
         '/api/admin/studies/test-study/analysis/runs',
     ]),
-    // FactorVoicesPanel renders inside the results tab and calls this hook
-    // — return an idle/empty query so the panel renders the empty state
+    // FactorVoicesPanel renders inside the results tab and calls these hooks
+    // — return idle/empty queries so the panel renders the empty state
     // without a real network call.
     useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet: () => ({
+        data: [],
+        isLoading: false,
+        isSuccess: true,
+        isError: false,
+        error: null,
+    }),
+    useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet: () => ({
         data: [],
         isLoading: false,
         isSuccess: true,

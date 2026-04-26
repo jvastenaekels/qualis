@@ -51,9 +51,12 @@ const demoStudy: StudyRead = {
 };
 
 export const handlers = [
-    // Specific overrides
+    // Specific overrides — cast via unknown for the public study endpoint
+    // because the backend currently returns dict[str, Any] without a
+    // response_model, so orval types it as an opaque dict that doesn't
+    // structurally overlap with StudyRead.
     getGetStudyApiAdminStudiesSlugGetMockHandler(demoStudy),
-    getGetStudyApiStudySlugGetMockHandler(demoStudy),
+    getGetStudyApiStudySlugGetMockHandler(demoStudy as unknown as never),
 
     // Fallback to auto-generated mocks for everything else
     ...getQualisAPIMock(),

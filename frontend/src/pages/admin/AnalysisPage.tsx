@@ -506,7 +506,11 @@ export default function AnalysisPage() {
                                         </li>
                                     </ul>
                                 </GuidanceCard>
-                                <FactorArraysView result={analysisResult} />
+                                <FactorArraysView
+                                    result={analysisResult}
+                                    currentRun={api.currentRun}
+                                    slug={slug}
+                                />
                             </TabsContent>
 
                             <TabsContent value="statements" className="space-y-3">
