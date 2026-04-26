@@ -294,11 +294,10 @@ class StudyService:
 
     @staticmethod
     async def _has_real_participants(db: AsyncSession, study_id: int) -> bool:
-        """Check if a study has non-test participants."""
+        """Check if a study has any participants."""
         result = await db.execute(
             select(func.count(Participant.id)).where(
                 Participant.study_id == study_id,
-                Participant.is_test_run.is_(False),
             )
         )
         return (result.scalar() or 0) > 0

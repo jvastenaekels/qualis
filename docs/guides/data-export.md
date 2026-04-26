@@ -16,7 +16,7 @@ For the corresponding API endpoints (with rate limits and authorisation), see [`
 | **Research package ZIP** | Archiving, journal submission, reproducibility. | All of the above + codebook + study metadata + audio metadata. |
 | **JSON dump** | Backups; bespoke pipelines. | Complete study + every participant placement. |
 
-Test runs and discarded participants are excluded from CSV / PQMethod / R-Kit / Package by default. To inspect them, use the JSON dump.
+Discarded participants are excluded from CSV / PQMethod / R-Kit / Package by default. To inspect them, use the JSON dump. (Pilot-mode previews never reach the database, so they cannot appear in any export.)
 
 ## Export the whole study
 
@@ -68,7 +68,7 @@ Use exports when you need a tool that Qualis does not provide (manual / judgment
 Before exporting, audit responses to decide which to keep:
 
 1. **Grid reconstruction** — Clicking a participant opens a high-fidelity visual of their final Q-sort.
-2. **Quality flags** — Completion duration, device type, and test-run flag are surfaced in the participant table.
+2. **Quality flags** — Completion duration and device type are surfaced in the participant table; sort by either to spot anomalies.
 3. **Qualitative context** — Card comments and audio responses are shown alongside the grid.
 
 Mark problematic rows with **Discard** (a reason is required). Discarded rows are excluded from analysis and from the CSV / PQMethod / R-Kit / Package exports, but are preserved in the database for audit.

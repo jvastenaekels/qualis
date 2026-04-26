@@ -210,7 +210,6 @@ async def test_update_study_grid_config_blocked_when_participants_exist(
         session_token=uuid.uuid4(),
         language_used="en",
         status=ParticipantStatus.started,
-        is_test_run=False,
         last_step_reached=1,
         last_step_reached_at=__import__("datetime").datetime.now(),
     )

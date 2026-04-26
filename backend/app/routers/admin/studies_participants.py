@@ -155,28 +155,6 @@ async def discard_participant(
     return participant
 
 
-@router.delete("/{slug}/test-runs", status_code=status.HTTP_204_NO_CONTENT)
-@limiter.limit("30/minute")
-async def clear_test_runs(
-    request: Request,
-    study: Study = Depends(check_study_permission(StudyRole.editor)),
-    db: AsyncSession = Depends(get_db),
-) -> None:
-    """Delete all participants flagged as is_test_run for this study."""
-    from app.services.study_data_service import StudyDataService
-
-    await StudyDataService.delete_audio_files_for_study(
-        db, study.id, test_runs_only=True
-    )
-    await db.execute(
-        delete(Participant).where(
-            Participant.study_id == study.id, Participant.is_test_run.is_(True)
-        )
-    )
-    await db.commit()
-    return None
-
-
 @router.delete("/{slug}/participants", status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit("30/minute")
 async def clear_all_participants(

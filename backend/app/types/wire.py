@@ -138,7 +138,6 @@ class ParticipantDumpRecord(TypedDict):
     language: str | None
     is_discarded: bool
     discard_reason: str | None
-    is_test_run: bool
     status: str
     recruitment_token: str | None
     ip_address: str | None
@@ -181,7 +180,6 @@ class SortParticipantRecord(TypedDict):
     db_id: int
     scores: list[int | None]
     is_discarded: bool
-    is_test_run: bool
     status: str
 
 

@@ -58,7 +58,6 @@ const mockInventory: DataInventory = {
         started: 10,
         completed: 30,
         discarded: 8,
-        test_runs: 2,
         anonymised: 5,
     },
     audio: {

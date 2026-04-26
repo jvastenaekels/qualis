@@ -24,7 +24,6 @@ From the **Data** page, open any participant row to see the reconstructed Q-sort
 
 - **Duration** — sort by duration to spot suspiciously fast completions.
 - **Device** — exceptionally short mobile sessions sometimes indicate an aborted attempt.
-- **Test runs** — the `is_test_run` flag is set for sessions opened via Preview; clear them in bulk before exporting.
 
 To exclude a response, use **Discard** from the row's action menu and provide a reason. Discarded rows stay in the database for audit but are excluded from analysis and exports.
 
@@ -36,9 +35,9 @@ The **Analysis** page runs PCA or centroid extraction with optional varimax rota
 
 Five formats are available from **Data → Export**: CSV (wide), PQMethod ZIP, R-Kit ZIP, Research Package ZIP, and a JSON dump. Pick the format that matches the downstream tool — see the [Data Export guide](data-export.md) for which is which.
 
-## Test runs and pilot mode
+## Preview a study before activating it
 
-Use the **Test Run** action in the designer toolbar to walk through the participant experience yourself. Sessions opened this way are flagged `is_test_run` and excluded from exports and analysis. Pilot mode (the **Preview** action in the designer) goes one step further: it loads the current draft from local storage instead of the database, so nothing persists at all. Use it to walk a study through the full flow before activation.
+Use the **Preview** action in the designer toolbar (pilot mode) to walk through the participant experience yourself. The participant view loads the current draft from local storage, the submit step is short-circuited in the browser, and a local `PILOT-XXXXX` confirmation code is shown — nothing reaches the database. This is the right way to test a study end-to-end without polluting the dataset, and it works on any draft (you do not need to activate first).
 
 ## Study lifecycle
 

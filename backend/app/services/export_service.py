@@ -107,7 +107,6 @@ class ExportService:
             "User_Agent",
             "Is_Discarded",
             "Discard_Reason",
-            "Is_Test_Run",
         ]
 
         # Add Presort questions with labels
@@ -169,7 +168,6 @@ class ExportService:
                 p.user_agent or "",
                 "True" if p.is_discarded else "False",
                 p.discard_reason or "",
-                "True" if p.is_test_run else "False",
             ]
 
             # Presort

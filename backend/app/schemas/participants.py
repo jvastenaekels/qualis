@@ -44,7 +44,6 @@ class ConsentInput(BaseModel):
     session_token: UUID
     consent_hash: str | None = None
     language_code: str = Field(..., pattern="^[a-z]{2}(-[A-Z]{2})?$", max_length=5)
-    is_test_run: bool = False
 
 
 class ProgressUpdate(BaseModel):
@@ -67,7 +66,6 @@ class SubmissionInput(BaseModel):
     qsort: list[QSortEntryInput]
     postsort_answers: dict[str, Any] | None = {}
     link_token: str | None = None
-    is_test_run: bool = False
 
     @field_validator("qsort")
     @classmethod
@@ -126,7 +124,6 @@ class ParticipantRead(BaseModel):
     created_at: datetime
     submitted_at: datetime | None
     is_discarded: bool
-    is_test_run: bool
     discard_reason: str | None
     user_agent: str | None
 

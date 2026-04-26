@@ -28,7 +28,6 @@ export interface DumpParticipant {
     language: string;
     is_discarded: boolean;
     discard_reason: string | null;
-    is_test_run: boolean;
     submitted_at?: string;
     recruitment_token?: string;
     status: string;

@@ -278,7 +278,6 @@ erDiagram
         string random_seed
         enum status "started | completed"
         string confirmation_code UK
-        boolean is_test_run
         boolean is_discarded
         string discard_reason
         string ip_address

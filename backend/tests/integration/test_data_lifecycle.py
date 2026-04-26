@@ -25,8 +25,8 @@ async def study_with_mixed_participants(
     active_study: Study, db: AsyncSession
 ) -> Study:
     """Seed an active study with a known mix of participants for inventory
-    testing: 1 started, 2 completed (one old, one recent), 1 discarded,
-    1 test_run, 1 already-anonymised."""
+    testing: 1 started, 5 completed (one >1y old, one recent, one
+    discarded, one recent en, one already-anonymised). 6 total."""
     now = datetime.now(timezone.utc)
 
     db.add_all(
@@ -64,7 +64,6 @@ async def study_with_mixed_participants(
                 session_token=uuid.uuid4(),
                 language_used="en",
                 status=ParticipantStatus.completed,
-                is_test_run=True,
                 submitted_at=now - timedelta(days=3),
             ),
             Participant(
@@ -126,7 +125,6 @@ async def test_data_inventory_returns_correct_buckets(
     assert data["participants"]["started"] == 1
     assert data["participants"]["completed"] == 5  # status==completed
     assert data["participants"]["discarded"] == 1
-    assert data["participants"]["test_runs"] == 1
     assert data["participants"]["anonymised"] == 1
 
     # 1 audio of 2 MB

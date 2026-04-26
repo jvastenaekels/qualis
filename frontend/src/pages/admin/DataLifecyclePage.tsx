@@ -242,10 +242,6 @@ export default function DataLifecyclePage() {
                                 value={participants.discarded}
                             />
                             <Stat
-                                label={t('admin.lifecycle.stat_test_runs', 'Test runs')}
-                                value={participants.test_runs}
-                            />
-                            <Stat
                                 label={t('admin.lifecycle.stat_anonymised', 'Anonymised')}
                                 value={participants.anonymised}
                                 highlight

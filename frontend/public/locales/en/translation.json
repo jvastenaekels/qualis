@@ -840,12 +840,26 @@
       "factor_voices": {
         "title": "Voices on Factor {{n}}",
         "no_audio": "No post-sort audio recordings from participants flagged on this factor.",
+        "no_material": "No post-sort audio recordings or written comments from participants flagged on this factor.",
         "loading": "Loading recordings…",
         "error": "Could not load audio recordings. Please try again.",
-        "context": "In critical Q-methodology (Sneegas 2020), grounding factor interpretation in the words of the people who define each factor is part of the analytical practice.",
+        "context": "In critical Q-methodology (Sneegas 2020), grounding factor interpretation in the words of the people who define each factor — both their audio rationales and their written card comments — is part of the analytical practice.",
         "context_aria": "About this panel",
         "audio_label": "Recording: {{key}} by {{participant}}",
-        "url_unavailable": "Audio URL not available."
+        "url_unavailable": "Audio URL not available.",
+        "comments_label": "Card comments"
+      },
+      "factor_note": {
+        "label": "Factor narrative",
+        "placeholder": "Write the interpretive narrative for this factor — the discourse, voices, and tensions it foregrounds.",
+        "empty_hint": "Add an interpretive narrative for this factor",
+        "char_count": "{{n}}/{{max}}",
+        "edit_aria": "Edit factor {{n}} narrative",
+        "save_aria": "Save factor narrative",
+        "cancel_aria": "Cancel editing",
+        "aria": "Edit factor {{n}} narrative",
+        "saved": "Factor narrative saved.",
+        "error": "Failed to save the factor narrative."
       }
     },
     "project": {
@@ -1500,6 +1514,14 @@
         },
         "consent_desc": "Participants must agree to these terms before starting."
       },
+      "positionality": {
+        "title": "Researcher positionality",
+        "subtitle": "Reflexivity memo (not shown to participants)",
+        "helper": "Document who you are as a researcher, how the concourse was constructed, who you recruited and why, and which voices may be missing. This transparency is constitutive of a critical Q-methodology approach (Robbins & Krueger 2000; Sneegas 2020).",
+        "field_label": "Positionality memo",
+        "placeholder": "e.g. I am a sociologist trained in… I built this concourse from… I recruited via… I expect the following discourses may be under-represented…",
+        "admin_only_badge": "Admin-only"
+      },
       "condition": {
         "title": "Condition of instruction",
         "label": "Define condition of instruction",
@@ -1831,10 +1853,6 @@
         "discard": "Discard",
         "restore": "Restore",
         "export": "Export",
-        "clear_test_runs": "Clear test runs",
-        "clear_test_runs_confirm": "Are you sure you want to delete all test submissions? This cannot be undone.",
-        "clear_test_runs_success": "Test runs cleared",
-        "clear_test_runs_error": "Failed to clear test runs",
         "clear_all": "Reset all data",
         "clear_all_confirm": "DANGER: This will permanently delete ALL participant data for this study. This cannot be undone.",
         "clear_all_success": "All data cleared",
@@ -2082,7 +2100,6 @@
       "stat_started": "Started",
       "stat_completed": "Completed",
       "stat_discarded": "Discarded",
-      "stat_test_runs": "Test runs",
       "stat_anonymised": "Anonymised",
       "older_1y": "Older than 1 year (not anonymised)",
       "older_2y": "Older than 2 years (not anonymised)",
@@ -2215,7 +2232,6 @@
         "submitted": "Submitted",
         "id": "Internal ID",
         "ip_hash": "IP Hash",
-        "test_run": "Test Run",
         "recruitment_token": "Recruitment Token",
         "device": {
           "mobile": "Mobile",

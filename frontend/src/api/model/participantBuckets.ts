@@ -9,7 +9,6 @@ export interface ParticipantBuckets {
     started: number;
     completed: number;
     discarded: number;
-    test_runs: number;
     anonymised: number;
     total: number;
 }

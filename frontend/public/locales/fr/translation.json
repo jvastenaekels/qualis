@@ -825,12 +825,26 @@
       "factor_voices": {
         "title": "Voix sur le facteur {{n}}",
         "no_audio": "Aucun enregistrement audio post-tri de la part des participants définissant ce facteur.",
+        "no_material": "Aucun enregistrement audio ni commentaire écrit des participants définissant ce facteur.",
         "loading": "Chargement des enregistrements…",
         "error": "Impossible de charger les enregistrements audio. Veuillez réessayer.",
-        "context": "En méthodologie Q critique (Sneegas 2020), ancrer l'interprétation des facteurs dans les mots des personnes qui les définissent fait partie de la pratique analytique.",
+        "context": "En méthodologie Q critique (Sneegas 2020), ancrer l'interprétation des facteurs dans les mots des personnes qui les définissent — leurs justifications audio comme leurs commentaires écrits sur les cartes — fait partie de la pratique analytique.",
         "context_aria": "À propos de ce panneau",
         "audio_label": "Enregistrement : {{key}} par {{participant}}",
-        "url_unavailable": "URL audio non disponible."
+        "url_unavailable": "URL audio non disponible.",
+        "comments_label": "Commentaires sur les cartes"
+      },
+      "factor_note": {
+        "label": "Narration du facteur",
+        "placeholder": "Rédigez la narration interprétative de ce facteur — le discours, les voix et les tensions qu'il met en avant.",
+        "empty_hint": "Ajouter une narration interprétative pour ce facteur",
+        "char_count": "{{n}}/{{max}}",
+        "edit_aria": "Modifier la narration du facteur {{n}}",
+        "save_aria": "Enregistrer la narration",
+        "cancel_aria": "Annuler la modification",
+        "aria": "Modifier la narration du facteur {{n}}",
+        "saved": "Narration du facteur enregistrée.",
+        "error": "Impossible d'enregistrer la narration du facteur."
       }
     },
     "project": {
@@ -1522,6 +1536,14 @@
         },
         "consent_desc": "Les participants doivent accepter ces conditions avant de commencer."
       },
+      "positionality": {
+        "title": "Positionnalité du chercheur·euse",
+        "subtitle": "Mémo de réflexivité (non visible des participants)",
+        "helper": "Documentez qui vous êtes comme chercheur·euse, comment le concourse a été constitué, qui vous avez recruté et pourquoi, et quelles voix pourraient manquer. Cette transparence est constitutive d'une approche Q critique (Robbins & Krueger 2000 ; Sneegas 2020).",
+        "field_label": "Mémo de positionnalité",
+        "placeholder": "Par ex. Je suis sociologue formé·e à… J'ai constitué ce concourse à partir de… J'ai recruté via… Les discours suivants pourraient être sous-représentés…",
+        "admin_only_badge": "Admin uniquement"
+      },
       "condition": {
         "title": "Condition d'instruction",
         "label": "Définir la condition d'instruction",
@@ -1854,10 +1876,6 @@
         "discard": "Écarter",
         "restore": "Restaurer",
         "export": "Exporter",
-        "clear_test_runs": "Effacer les tests",
-        "clear_test_runs_confirm": "Êtes-vous sûr de vouloir supprimer tous les tests ? Cette action est irréversible.",
-        "clear_test_runs_success": "Tests effacés",
-        "clear_test_runs_error": "Erreur lors de l'effacement des tests",
         "clear_all": "Réinitialiser toutes les données",
         "clear_all_confirm": "DANGER : Cela supprimera définitivement TOUTES les données des participants pour cette étude. Cette action est irréversible.",
         "clear_all_success": "Toutes les données ont été effacées",
@@ -2067,7 +2085,6 @@
       "stat_started": "Commencé",
       "stat_completed": "Complété",
       "stat_discarded": "Rejeté",
-      "stat_test_runs": "Tests",
       "stat_anonymised": "Anonymisé",
       "older_1y": "Anciens de plus d'un an (non anonymisés)",
       "older_2y": "Anciens de plus de deux ans (non anonymisés)",
@@ -2215,7 +2232,6 @@
         "submitted": "Soumis",
         "id": "ID interne",
         "ip_hash": "Hash IP",
-        "test_run": "Test",
         "recruitment_token": "Jeton de recrutement",
         "device": {
           "mobile": "Mobile",

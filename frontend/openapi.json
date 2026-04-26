@@ -202,7 +202,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Change Password Api Me Password Post"
+                }
               }
             }
           },
@@ -274,7 +280,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Enable Totp Api Me 2Fa Enable Post"
+                }
               }
             }
           },
@@ -319,7 +331,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Disable Totp Api Me 2Fa Disable Post"
+                }
               }
             }
           },
@@ -1229,49 +1247,6 @@
         }
       }
     },
-    "/api/admin/studies/{slug}/test-runs": {
-      "delete": {
-        "tags": [
-          "admin-studies"
-        ],
-        "summary": "Clear Test Runs",
-        "description": "Delete all participants flagged as is_test_run for this study.",
-        "operationId": "clear_test_runs_api_admin_studies__slug__test_runs_delete",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "slug",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "The slug of the study",
-              "title": "Slug"
-            },
-            "description": "The slug of the study"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/admin/studies/{slug}/participants/{participant_id}/personal-data": {
       "delete": {
         "tags": [
@@ -1585,7 +1560,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Study Storage Usage Api Admin Studies  Slug  Storage Usage Get"
+                }
               }
             }
           },
@@ -1834,7 +1813,7 @@
           "Admin Analysis"
         ],
         "summary": "Update Analysis Run",
-        "description": "Update the researcher annotation (`notes`) on a persisted run.\n\nOnly `notes` is editable; analytical choices and the result payload\nare immutable for audit-trail integrity.",
+        "description": "Update the researcher annotations on a persisted run.\n\n`notes` (run-level) and `factor_notes` (per-factor) are mutable;\nanalytical choices and the result payload are immutable for audit-trail\nintegrity. `factor_notes` keys must correspond to actual factors of the\nrun (1 \u2264 int(k) \u2264 run.n_factors); the schema validates format and per-\nvalue length, and the route validates the upper bound against the run.",
         "operationId": "update_analysis_run_api_admin_studies__slug__analysis_runs__run_id__patch",
         "security": [
           {
@@ -1995,6 +1974,70 @@
                     "$ref": "#/components/schemas/ParticipantAudioRecording"
                   },
                   "title": "Response List Audios For Participants Api Admin Studies  Slug  Analysis Audios Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/analysis/comments": {
+      "get": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "List Comments For Participants",
+        "description": "Fetch non-empty `card_comment` entries for a set of participants.\n\nUsed by the analysis UI to show post-sort textual rationales linked to\nfactor membership: the frontend looks up which participants are flagged\non a factor (from the analysis result), then calls this endpoint with\ntheir participant_db_ids to render the written rationales beside the\naudio recordings already returned by `/analysis/audios`. Together the two\nendpoints support the critical Q-methodology practice of grounding factor\ninterpretation in the words of the people who define each factor\n(Sneegas 2020; Robbins & Krueger 2000).\n\nComments are returned ordered per participant by descending |grid_score|\n(extreme placements first) \u2014 typically the most interpretable rationales\nwhen reading a factor.\n\nQuery params:\n    participant_ids: comma-separated participant database ids\n        (e.g., \"12,17,22\"). Empty string returns []. Up to 200 ids\n        accepted (a single factor rarely flags more than ~20).",
+        "operationId": "list_comments_for_participants_api_admin_studies__slug__analysis_comments_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "participant_ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Participant Ids"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ParticipantCardComment"
+                  },
+                  "title": "Response List Comments For Participants Api Admin Studies  Slug  Analysis Comments Get"
                 }
               }
             }
@@ -2303,7 +2346,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Study Dump Api Admin Studies  Slug  Dump Get"
+                }
               }
             }
           },
@@ -2419,7 +2466,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Export Participant Json Api Admin Studies  Slug  Participants  Participant Id  Export Json Get"
+                }
               }
             }
           },
@@ -4655,7 +4706,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Submit Study Api Submit Post"
+                }
               }
             }
           },
@@ -4772,7 +4827,11 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Study Api Study  Slug  Get"
+                }
               }
             }
           },
@@ -4823,7 +4882,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Unlock Study Api Study  Slug  Unlock Post"
+                }
               }
             }
           },
@@ -4931,7 +4996,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Update Progress Api Study  Slug  Progress Patch"
+                }
               }
             }
           },
@@ -4984,7 +5055,13 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Save Draft Api Study  Slug  Save Draft Put"
+                }
               }
             }
           },
@@ -5522,11 +5599,26 @@
             ],
             "title": "Notes",
             "description": "Researcher annotation, e.g. 'final analysis used in submission'."
+          },
+          "factor_notes": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Factor Notes",
+            "description": "Per-factor narratives keyed by stringified 1-indexed factor number. The router validates that each key matches an actual factor of the run (1 \u2264 int(k) \u2264 run.n_factors); values are capped at 4000 chars per factor."
           }
         },
         "type": "object",
         "title": "AnalysisRunPatch",
-        "description": "Partial update for a persisted run. Only `notes` is editable."
+        "description": "Partial update for a persisted run. Only `notes` and `factor_notes`\nare editable; analytical choices and the result payload are immutable\nfor audit-trail integrity."
       },
       "AnalysisRunRead": {
         "properties": {
@@ -5588,6 +5680,14 @@
               }
             ],
             "title": "Notes"
+          },
+          "factor_notes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Factor Notes",
+            "description": "Per-factor interpretive narrative (Sneegas 2020). Keys are stringified 1-indexed factor numbers; values are free-text."
           },
           "result": {
             "additionalProperties": true,
@@ -5669,6 +5769,14 @@
               }
             ],
             "title": "Notes"
+          },
+          "factor_notes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Factor Notes",
+            "description": "Per-factor interpretive narrative (Sneegas 2020). Keys are stringified 1-indexed factor numbers; values are free-text."
           }
         },
         "type": "object",
@@ -6814,11 +6922,6 @@
             "maxLength": 5,
             "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
             "title": "Language Code"
-          },
-          "is_test_run": {
-            "type": "boolean",
-            "title": "Is Test Run",
-            "default": false
           }
         },
         "type": "object",
@@ -7399,10 +7502,6 @@
             "type": "integer",
             "title": "Discarded"
           },
-          "test_runs": {
-            "type": "integer",
-            "title": "Test Runs"
-          },
           "anonymised": {
             "type": "integer",
             "title": "Anonymised"
@@ -7417,11 +7516,51 @@
           "started",
           "completed",
           "discarded",
-          "test_runs",
           "anonymised",
           "total"
         ],
         "title": "ParticipantBuckets"
+      },
+      "ParticipantCardComment": {
+        "properties": {
+          "participant_db_id": {
+            "type": "integer",
+            "title": "Participant Db Id"
+          },
+          "statement_id": {
+            "type": "integer",
+            "title": "Statement Id"
+          },
+          "statement_code": {
+            "type": "string",
+            "title": "Statement Code"
+          },
+          "statement_text": {
+            "type": "string",
+            "title": "Statement Text",
+            "description": "Statement text in the study's default language, with fallback to the first available translation, then to the code."
+          },
+          "grid_score": {
+            "type": "integer",
+            "title": "Grid Score"
+          },
+          "comment": {
+            "type": "string",
+            "title": "Comment",
+            "description": "Non-empty textual rationale."
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_db_id",
+          "statement_id",
+          "statement_code",
+          "statement_text",
+          "grid_score",
+          "comment"
+        ],
+        "title": "ParticipantCardComment",
+        "description": "A single non-empty `card_comment` written by a participant during post-sort.\n\nReturned by the analysis comments endpoint to support critical\nQ-methodology interpretation: the analyst reads the textual rationales\nof participants flagged on a given factor, alongside the audio recordings\nalready surfaced by `ParticipantAudioRecording` (Sneegas 2020;\nRobbins & Krueger 2000)."
       },
       "ParticipantDetailRead": {
         "properties": {
@@ -7465,10 +7604,6 @@
           "is_discarded": {
             "type": "boolean",
             "title": "Is Discarded"
-          },
-          "is_test_run": {
-            "type": "boolean",
-            "title": "Is Test Run"
           },
           "discard_reason": {
             "anyOf": [
@@ -7562,7 +7697,6 @@
           "created_at",
           "submitted_at",
           "is_discarded",
-          "is_test_run",
           "discard_reason",
           "user_agent",
           "presort_answers",
@@ -7676,10 +7810,6 @@
             "type": "boolean",
             "title": "Is Discarded"
           },
-          "is_test_run": {
-            "type": "boolean",
-            "title": "Is Test Run"
-          },
           "discard_reason": {
             "anyOf": [
               {
@@ -7747,7 +7877,6 @@
           "created_at",
           "submitted_at",
           "is_discarded",
-          "is_test_run",
           "discard_reason",
           "user_agent"
         ],
@@ -9133,6 +9262,18 @@
             ],
             "title": "Pre Instruction"
           },
+          "researcher_positionality": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Researcher Positionality"
+          },
           "consent_title": {
             "anyOf": [
               {
@@ -9277,6 +9418,18 @@
               }
             ],
             "title": "Pre Instruction"
+          },
+          "researcher_positionality": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 10000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Researcher Positionality"
           },
           "consent_title": {
             "anyOf": [
@@ -9624,11 +9777,6 @@
               }
             ],
             "title": "Link Token"
-          },
-          "is_test_run": {
-            "type": "boolean",
-            "title": "Is Test Run",
-            "default": false
           }
         },
         "type": "object",

@@ -111,8 +111,6 @@ def build_sort_matrix(
     for p in dump["participants"]:
         if p.get("is_discarded"):
             continue
-        if p.get("is_test_run"):
-            continue
         if p.get("status") != "completed":
             continue
 

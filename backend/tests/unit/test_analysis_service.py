@@ -70,7 +70,6 @@ def sample_dump():
                 "db_id": p + 1,
                 "status": "completed",
                 "is_discarded": False,
-                "is_test_run": False,
                 "scores": [int(REFERENCE_DATASET[s, p]) for s in range(n_statements)],
             }
         )
@@ -97,11 +96,6 @@ class TestBuildSortMatrix:
         matrix, participants, _ = build_sort_matrix(sample_dump)
         assert matrix.shape == (9, 7)
         assert len(participants) == 7
-
-    def test_excludes_test_runs(self, sample_dump):
-        sample_dump["participants"][0]["is_test_run"] = True
-        matrix, participants, _ = build_sort_matrix(sample_dump)
-        assert matrix.shape == (9, 7)
 
     def test_excludes_incomplete(self, sample_dump):
         sample_dump["participants"][0]["status"] = "started"

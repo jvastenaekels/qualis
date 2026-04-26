@@ -14,8 +14,8 @@ async def test_study_locking_logic(
     auth_token_factory,
 ):
     """
-    Test that study design (grid/statements) is locked when participants exist,
-    but not when only test runs exist.
+    Test that study design (grid/statements) is editable when no participants
+    exist, and locked once any participant is created.
     """
     headers = {
         **auth_token_factory(test_user),
@@ -64,37 +64,16 @@ async def test_study_locking_logic(
     assert response.status_code == 200
     assert response.json()["grid_config"] == new_grid
 
-    # 3. Add a test run participant
-    p_test = Participant(
-        study_id=study.id,
-        is_test_run=True,
-        language_used="en",
-        created_at=datetime.now(timezone.utc),
-    )
-    db.add(p_test)
-    await db.commit()
-
-    # 4. Update grid again (SHOULD BE ALLOWED - only test runs exist)
-    another_grid = [{"score": 0, "capacity": 3}]
-    response = await client.patch(
-        f"/api/admin/studies/{study_slug}",
-        json={"grid_config": another_grid},
-        headers=headers,
-    )
-    assert response.status_code == 200
-    assert response.json()["grid_config"] == another_grid
-
-    # 5. Add a REAL participant
+    # 3. Add a real participant
     p_real = Participant(
         study_id=study.id,
-        is_test_run=False,
         language_used="en",
         created_at=datetime.now(timezone.utc),
     )
     db.add(p_real)
     await db.commit()
 
-    # 6. Update grid (SHOULD FAIL - real participants exist)
+    # 4. Update grid (SHOULD FAIL - participants exist)
     final_grid = [{"score": 0, "capacity": 4}]
     response = await client.patch(
         f"/api/admin/studies/{study_slug}",
@@ -105,7 +84,7 @@ async def test_study_locking_logic(
     json_resp = response.json()
     assert "Cannot modify grid configuration" in json_resp["message"]
 
-    # 7. Try to change statements (SHOULD FAIL)
+    # 5. Try to change statements structurally (SHOULD FAIL)
     response = await client.patch(
         f"/api/admin/studies/{study_slug}",
         json={
@@ -120,16 +99,13 @@ async def test_study_locking_logic(
         headers=headers,
     )
     assert response.status_code == 400
-    # The message for statements is slightly different in studies.py (built-in logic)
-    # Actually I updated studies.py to check has_participants.
-    # We should get a 400.
 
-    # 8. Verify participant_count in StudyRead
+    # 6. Verify participant_count in StudyRead (only counts completed, non-discarded)
     response = await client.get(f"/api/admin/studies/{study_slug}", headers=headers)
     assert response.status_code == 200
-    assert response.json()["participant_count"] == 0  # Only completed, non-discarded
+    assert response.json()["participant_count"] == 0
 
-    # 9. Try to change statement TEXT (SHOULD BE ALLOWED - non-structural)
+    # 7. Try to change statement TEXT (SHOULD BE ALLOWED - non-structural)
     response = await client.patch(
         f"/api/admin/studies/{study_slug}",
         json={

@@ -256,7 +256,6 @@ export default function InteractiveDataView({
                 postsort: {},
                 language: p.language_used || 'en',
                 is_discarded: p.is_discarded,
-                is_test_run: p.is_test_run,
                 discard_reason: p.discard_reason,
                 created_at: p.created_at,
                 submitted_at: p.submitted_at || p.created_at,
@@ -302,7 +301,7 @@ export default function InteractiveDataView({
     }, [slug, queryClient, t]);
 
     const liveParticipants = useMemo(
-        () => effectiveParticipants.filter((p) => !p.is_test_run),
+        () => effectiveParticipants,
         [effectiveParticipants]
     );
 

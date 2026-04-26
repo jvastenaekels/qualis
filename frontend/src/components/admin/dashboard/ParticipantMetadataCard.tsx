@@ -42,7 +42,6 @@ interface ParticipantMetadataCardProps {
         submitted_at?: string;
         duration_seconds?: number | null;
         language_used?: string;
-        is_test_run?: boolean;
         is_discarded?: boolean;
         discard_reason?: string | null;
         recruitment_token?: string;
@@ -125,14 +124,6 @@ export function ParticipantMetadataCard({
                                     </span>
                                 )}
                             </div>
-                        )}
-                        {participant.is_test_run && (
-                            <Badge
-                                variant="outline"
-                                className="bg-amber-50 text-amber-600 border-amber-100 font-black text-2xs"
-                            >
-                                {t('admin.participant.metadata.test_run', 'Test Run')}
-                            </Badge>
                         )}
                         <Badge
                             variant="secondary"

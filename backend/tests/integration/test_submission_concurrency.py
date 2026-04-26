@@ -284,7 +284,6 @@ async def test_process_submission_completed_without_consent_raises(
         study_slug=active_study.slug,
         language_used="en",
         status=ParticipantStatus.completed,
-        is_test_run=False,
         qsort=_make_valid_qsort(active_study),
     )
 

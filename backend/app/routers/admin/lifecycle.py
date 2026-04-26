@@ -41,7 +41,6 @@ class ParticipantBuckets(BaseModel):
     started: int
     completed: int
     discarded: int
-    test_runs: int
     anonymised: int
     total: int
 
@@ -104,7 +103,7 @@ async def get_data_inventory(
     Designed to be cheap (a handful of aggregated counts); refreshes on
     every page load. Refresh frequency is up to the operator.
     """
-    # Participant counts split by status / discarded / test-run / anonymised
+    # Participant counts split by status / discarded / anonymised
     counts_q = select(
         func.count(Participant.id).label("total"),
         func.count(Participant.id)
@@ -116,9 +115,6 @@ async def get_data_inventory(
         func.count(Participant.id)
         .filter(Participant.is_discarded.is_(True))
         .label("discarded"),
-        func.count(Participant.id)
-        .filter(Participant.is_test_run.is_(True))
-        .label("test_runs"),
         func.count(Participant.id)
         .filter(Participant.anonymised_at.isnot(None))
         .label("anonymised"),
@@ -181,7 +177,6 @@ async def get_data_inventory(
             started=counts_row.started or 0,
             completed=counts_row.completed or 0,
             discarded=counts_row.discarded or 0,
-            test_runs=counts_row.test_runs or 0,
             anonymised=counts_row.anonymised or 0,
             total=counts_row.total or 0,
         ),

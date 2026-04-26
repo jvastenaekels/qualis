@@ -190,11 +190,11 @@ Upload a **logo**, set an **accent color**, and add **partner logos** that appea
 
 ---
 
-## Step 9: Test Your Study
+## Step 9: Preview Your Study
 
-1. In the designer toolbar, click the **Test Run** button. This opens the study in a new tab in test mode.
+1. In the designer toolbar, click the **Preview** button. This opens the study in a new tab in pilot mode.
 2. Walk through the entire participant flow: **Welcome, Consent, Presort, Rough Sort, Fine Sort, Post-Sort.** Qualis splits the sort into two stages: a quick triage (the *rough sort*: agree / neutral / disagree) followed by drag-into-grid placement (the *fine sort*). The rough sort lowers cognitive load before the participant has to commit to specific positions.
-3. Test runs are automatically flagged and do not count toward real data.
+3. At the end you get a local `PILOT-XXXXX` confirmation code. Nothing is persisted to the database — you can preview as many times as you like without polluting the eventual dataset.
 
 ---
 

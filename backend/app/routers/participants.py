@@ -54,7 +54,6 @@ async def record_consent(
             consent_hash=data.consent_hash,
             ip_address=client_ip,
             user_agent=user_agent,
-            is_test_run=data.is_test_run,
         ),
     )
 

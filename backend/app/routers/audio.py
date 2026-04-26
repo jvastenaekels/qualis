@@ -131,7 +131,7 @@ async def upload_audio(
     participant, study = row
 
     # Check study is still active
-    if study.state != StudyState.active and not participant.is_test_run:
+    if study.state != StudyState.active:
         raise HTTPException(
             status_code=403,
             detail=f"Study is not active (state: {study.state.value}). Audio upload not allowed.",

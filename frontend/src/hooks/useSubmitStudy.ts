@@ -101,7 +101,6 @@ export const useSubmitStudy = () => {
                         ...postsort,
                     },
                     link_token: linkToken,
-                    is_test_run: isTestMode,
                 };
 
                 if (isTestMode) {

@@ -33,7 +33,7 @@ const StudyOverviewPage = () => {
     const revalidator = useRevalidator();
     const { t } = useTranslation();
 
-    const validParticipants = participants?.filter((p) => !p.is_discarded && !p.is_test_run) || [];
+    const validParticipants = participants?.filter((p) => !p.is_discarded) || [];
 
     const getStatusLabel = (state: string) => {
         return t(`admin.status.${state}`, state.charAt(0).toUpperCase() + state.slice(1));

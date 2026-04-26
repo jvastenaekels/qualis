@@ -74,7 +74,6 @@ Study.participant_count = column_property(  # type: ignore[attr-defined]
     select(func.count(Participant.id))
     .where(
         Participant.study_id == Study.id,
-        Participant.is_test_run.is_(False),
         Participant.is_discarded.is_(False),
         Participant.status == ParticipantStatus.completed,
     )

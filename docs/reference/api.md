@@ -183,7 +183,6 @@ Wired only when `ENVIRONMENT in ("development", "test")`. The router is not regi
 | GET | `.../participants/{participant_id}` | Researcher | — | Detail: Q-sort entries, postsort answers, audio metadata |
 | PATCH | `.../participants/{participant_id}/discard` | Researcher | 30/min | Flag/unflag a participant for exclusion (preserves the record) |
 | DELETE | `.../participants` | Editor | 30/min | Delete all participants (study must be in DRAFT) |
-| DELETE | `.../test-runs` | Editor | 30/min | Delete only the participants flagged as test runs |
 | DELETE | `.../participants/{participant_id}/personal-data` | Editor | 30/min | Admin-mediated GDPR Art. 17 erasure (preserves Q-sort data) |
 
 ### Admin — projects (`/api/admin/projects`)

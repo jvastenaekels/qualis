@@ -76,7 +76,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 - **Recruitment links** (public, single-use, or capacity-limited) with QR code generation and funnel tracking (started vs. completed).
 - **Monitoring dashboard** with submission timelines, device breakdowns, and completion rates.
 - **Session review** with grid reconstruction, survey responses, and audio playback.
-- **Test run management** to separate pilot data from real submissions.
+- **Pilot mode** to walk the full participant flow end-to-end without persisting anything to the database.
 - **Discard with reason** to flag problematic responses while preserving the audit trail.
 
 ### Export and interoperability

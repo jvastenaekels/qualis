@@ -91,7 +91,7 @@ Interaction mode (drag, tap-to-place) and overall interface style.
 | ------ | ----- |
 | Export configuration | JSON; excludes participant data. Filename `{slug}_config_{YYYYMMDD}.json`. |
 | Import study | Validates JSON via `POST /api/admin/studies/validate-import`, then creates a new DRAFT study with an editable slug. |
-| Preview (pilot mode) | Opens the participant view with `?mode=test`, loading the current draft from local storage. No data is persisted. |
+| Preview (pilot mode) | Opens the participant view with `?mode=test`, loading the current draft from local storage. The submit step is short-circuited locally; nothing reaches the backend. |
 
 ---
 
@@ -110,7 +110,7 @@ Interaction mode (drag, tap-to-place) and overall interface style.
 
 ### Participant table
 
-Columns: anonymous ID, status, submission timestamp, duration, language, device type, test-run flag, discard status. Searchable and sortable; pagination is server-side.
+Columns: anonymous ID, status, submission timestamp, duration, language, device type, discard status. Searchable and sortable; pagination is server-side.
 
 ### Charts
 
@@ -131,9 +131,9 @@ Click any row to open the inspector (three tabs: Visual Sort, Responses, Environ
 
 Discarding a participant requires a reason. Discarded rows are excluded from analysis and exports but are preserved for audit.
 
-### Test runs
+### Pilot-mode sessions
 
-Sessions opened via Preview (pilot mode) carry an `is_test_run` flag and can be deleted in bulk via `DELETE /api/admin/studies/{slug}/test-runs`.
+Sessions opened via Preview (pilot mode) never reach the database — the frontend short-circuits the submit step and generates a local `PILOT-XXXXX` confirmation code instead. The Data page therefore shows zero pilot records by default.
 
 ### Exports
 
@@ -177,7 +177,7 @@ Eigenvalues with a Kaiser reference line at `λ = 1`. Source: `GET /api/admin/st
 
 Each run is persisted to the audit trail (`AnalysisRun`); past runs are accessible from the history panel and can be reloaded or deleted. Notes on a run are editable; results are immutable.
 
-Test runs and discarded participants are excluded automatically. Minimum: 2 non-discarded participants.
+Discarded participants are excluded automatically. Minimum: 2 non-discarded participants.
 
 ---
 

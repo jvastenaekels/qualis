@@ -41,8 +41,6 @@ class StudyDataService:
     async def delete_audio_files_for_study(
         db: AsyncSession,
         study_id: int,
-        *,
-        test_runs_only: bool = False,
     ) -> None:
         """Delete S3 audio files for participants of a study.
 
@@ -56,8 +54,6 @@ class StudyDataService:
             .join(Participant)
             .where(Participant.study_id == study_id)
         )
-        if test_runs_only:
-            query = query.where(Participant.is_test_run.is_(True))
 
         result = await db.execute(query)
         s3_keys = result.scalars().all()
@@ -170,7 +166,6 @@ class StudyDataService:
         stmt = select(Participant).where(
             Participant.study_id == study_id,
             Participant.is_discarded.is_(False),
-            Participant.is_test_run.is_(False),
         )
         result = await db.execute(stmt)
         participants = result.scalars().all()
@@ -315,7 +310,6 @@ class StudyDataService:
                     language=p.language_used,
                     is_discarded=p.is_discarded,
                     discard_reason=p.discard_reason,
-                    is_test_run=p.is_test_run,
                     status=p.status.value,
                     recruitment_token=getattr(p, "recruitment_token", None),
                     ip_address=p.ip_address,
@@ -379,13 +373,12 @@ class StudyDataService:
         if not study:
             raise NotFoundError("Study")
 
-        # 2. Only completed, non-discarded, non-test participants (with Q-sort entries only)
+        # 2. Only completed, non-discarded participants (with Q-sort entries only)
         p_stmt = (
             select(Participant)
             .where(
                 Participant.study_id == study_id,
                 Participant.is_discarded.is_(False),
-                Participant.is_test_run.is_(False),
                 Participant.status == ParticipantStatus.completed,
             )
             .options(selectinload(Participant.qsort_entries))
@@ -413,7 +406,6 @@ class StudyDataService:
                     db_id=p.id,
                     scores=scores,
                     is_discarded=False,
-                    is_test_run=False,
                     status="completed",
                 )
             )

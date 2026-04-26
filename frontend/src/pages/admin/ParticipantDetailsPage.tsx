@@ -180,7 +180,6 @@ export default function ParticipantDetailsPage() {
             audio_recordings,
             language: participant.language_used || 'en',
             is_discarded: participant.is_discarded,
-            is_test_run: participant.is_test_run,
             discard_reason: participant.discard_reason,
             status: participant.status,
             user_agent: participant.user_agent || undefined,

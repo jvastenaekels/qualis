@@ -24,7 +24,6 @@ export interface ParticipantRead {
     created_at: string;
     submitted_at: ParticipantReadSubmittedAt;
     is_discarded: boolean;
-    is_test_run: boolean;
     discard_reason: ParticipantReadDiscardReason;
     user_agent: ParticipantReadUserAgent;
     last_step_reached?: ParticipantReadLastStepReached;

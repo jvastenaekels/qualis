@@ -41,7 +41,6 @@ class SubmissionService:
         consent_hash: str | None = None,
         ip_address: str | None = None,
         user_agent: str | None = None,
-        is_test_run: bool = False,
     ) -> dict[str, Any]:
         """Records the exact time and version (hash) of consent."""
         # 1. Get Study
@@ -77,7 +76,6 @@ class SubmissionService:
                     ip_address=hashed_ip,
                     user_agent=user_agent,
                     status=ParticipantStatus.started,
-                    is_test_run=is_test_run,
                     last_step_reached=1,
                     last_step_reached_at=datetime.now(timezone.utc),
                 )
@@ -130,8 +128,6 @@ class SubmissionService:
             participant.language_used = language_code
             participant.ip_address = hashed_ip
             participant.user_agent = user_agent
-            if is_test_run:
-                participant.is_test_run = True
             # Generate resume code if missing (e.g. pre-existing participant)
             if not participant.resume_code:
                 from ..resume_codes import generate_unique_resume_code
@@ -245,13 +241,13 @@ class SubmissionService:
             raise ValidationError("Study configuration error: Statements not loaded.")
 
         # 2.5 Validation: Study State
-        if study.state != StudyState.active and not data.is_test_run:
+        if study.state != StudyState.active:
             raise ValidationError(
                 f"Study is not active (state: {study.state.value}). Submissions are not allowed."
             )
 
         # 2.5b Validation: Date-based closure (DB state stays 'active' past end_date)
-        if study.state == StudyState.active and not data.is_test_run:
+        if study.state == StudyState.active:
             now = datetime.now(timezone.utc)
             if study.end_date:
                 end_dt = study.end_date
@@ -340,7 +336,6 @@ class SubmissionService:
                     if data.status == ParticipantStatus.completed
                     else 1,
                     last_step_reached_at=datetime.now(timezone.utc),
-                    is_test_run=data.is_test_run,
                 )
                 db.add(participant)
                 await db.flush()
@@ -377,10 +372,9 @@ class SubmissionService:
                     f"Database error while creating participant: {str(e)}"
                 )
 
-        # 6. Validation: Consent must be recorded for completed non-test submissions
+        # 6. Validation: Consent must be recorded for completed submissions
         if (
             data.status == ParticipantStatus.completed
-            and not data.is_test_run
             and participant
             and not participant.consented_at
         ):
@@ -414,7 +408,6 @@ class SubmissionService:
             participant.confirmation_code = confirmation_code
             participant.ip_address = hashed_ip
             participant.user_agent = user_agent
-            participant.is_test_run = data.is_test_run
             if data.status == ParticipantStatus.completed:
                 participant.submitted_at = datetime.now(timezone.utc)
                 participant.last_step_reached = 5
