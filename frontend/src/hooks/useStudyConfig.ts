@@ -216,7 +216,7 @@ export const useStudyConfig = () => {
         if (slug && config?.slug && config.slug !== slug) {
             resetAllStores();
         }
-    }, [slug, config]);
+    }, [slug, config?.slug]);
 
     // --- Effect: Sync Loading State ---
     useEffect(() => {
@@ -243,6 +243,13 @@ export const useStudyConfig = () => {
 
     // --- Effect: Sync Data on Success ---
     useEffect(() => {
+        // Defensive guard: ignore responses whose slug doesn't match the current
+        // URL slug. This can happen during navigation (stale in-flight request)
+        // or when a fixture/server returns the wrong study. Without this guard,
+        // setConfig(data) writes the wrong slug, the slug-guard above fires and
+        // resets everything — including the query cache — which triggers a refetch,
+        // and the cycle repeats until the heap is exhausted.
+        if (data?.slug && slug && data.slug !== slug) return;
         if (data && !isTestMode) {
             setConfig(data);
 
