@@ -11,7 +11,7 @@ from app.database import get_db
 from app.exceptions import ServiceError
 from app.limiter import limiter
 from app.schemas import SubmissionInput
-from app.schemas.responses import AckResponse
+from app.schemas.responses import AckResponse, ResolvedStudyConfigResponse
 from app.services.study_service import StudyService
 from app.services.recruitment_service import RecruitmentService
 from app.utils.security import verify_password
@@ -65,7 +65,7 @@ async def submit_study(
         )
 
 
-@router.get("/study/{slug}")
+@router.get("/study/{slug}", response_model=ResolvedStudyConfigResponse)
 @limiter.limit("120/minute")
 async def get_study(
     request: Request,
@@ -77,7 +77,7 @@ async def get_study(
     link_token: str | None = Query(None, description="Recruitment link token"),
     password: str | None = Query(None, description="Study access password"),
     db: AsyncSession = Depends(get_db),
-) -> dict[str, Any]:
+) -> ResolvedStudyConfigResponse:
     """Fetches study configuration for the frontend, including language resolution.
 
     If the study has randomize_statement_order=True and a session_token is provided,
@@ -107,12 +107,13 @@ async def get_study(
         # Return only basic metadata if password is not provided or incorrect
         metadata = StudyService.get_basic_metadata(study, lang)
         metadata["requires_password"] = True
-        return metadata
+        return ResolvedStudyConfigResponse.model_validate(metadata)
 
     # Delegate complex resolution and transformation to service layer
-    return await StudyService.get_resolved_study_config(
+    resolved = await StudyService.get_resolved_study_config(
         study=study, lang=lang, session_token=session_token
     )
+    return ResolvedStudyConfigResponse.model_validate(resolved)
 
 
 @router.post("/study/{slug}/unlock", response_model=AckResponse)
