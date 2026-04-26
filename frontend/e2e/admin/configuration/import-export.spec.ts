@@ -1,6 +1,5 @@
 import { test, expect } from '../../fixtures/db-setup';
 import { AdminPage } from '../../pages/AdminPage';
-import fs from 'node:fs';
 
 test.describe('Import/Export Study Configuration', () => {
     let adminPage: AdminPage;
@@ -9,202 +8,103 @@ test.describe('Import/Export Study Configuration', () => {
         adminPage = new AdminPage(page);
     });
 
-    // FIXME: this test was written against pre-Phase-5D UI and has multiple
-    // accumulated drifts that need a focused rewrite (not just selector swaps):
-    //   - access_password export is now bcrypt-hashed (line 110 expects plaintext);
-    //     either the test should check field presence + format, OR the export
-    //     should not include sensitive fields (genuine product decision).
-    //   - "Workspace Dashboard" text + "Import Study" button label + "/admin?dashboard"
-    //     route are all from the workspace→project rename era.
-    //   - The dashboard "Import" button + ImportStudyDialog flow has a different
-    //     UX shape from what the test scripts.
-    // Skipping until the test can be rewritten end-to-end against the current UI.
-    test.fixme(
-        'should export a study config and import it as a new study',
-        async ({ page, testDb, authToken }) => {
-            // 1. Setup: Create a study with specific configuration via API
-            const sourceSlug = `source-study-${Date.now()}`;
-            const sourceTitle = 'Source Study for Export';
+    test('export a study config and re-import it via paste-JSON', async ({
+        page,
+        testDb,
+        authToken,
+    }) => {
+        // 1. Set up a source study via API + minimal UI (login).
+        const sourceSlug = `source-${Date.now()}`;
+        const sourceTitle = 'Source Study for Export';
 
-            await testDb.loginToAdminUI(page);
-            await adminPage.createStudy(sourceTitle, sourceSlug);
+        await testDb.loginToAdminUI(page);
+        await adminPage.createStudy(sourceTitle, sourceSlug);
 
-            const statements = [
+        const statements = [
+            { code: 'S1', translations: [{ language_code: 'en', text: 'Original Statement 1' }] },
+            { code: 'S2', translations: [{ language_code: 'en', text: 'Original Statement 2' }] },
+            { code: 'S3', translations: [{ language_code: 'en', text: 'Original Statement 3' }] },
+        ];
+        const gridConfig = [
+            { score: -1, capacity: 1 },
+            { score: 0, capacity: 1 },
+            { score: 1, capacity: 1 },
+        ];
+
+        await testDb.updateStudy(authToken, sourceSlug, {
+            statements,
+            grid_config: gridConfig,
+            start_date: '2025-01-01T00:00:00Z',
+            end_date: '2025-12-31T23:59:59Z',
+            translations: [
                 {
-                    code: 'S1',
-                    translations: [{ language_code: 'en', text: 'Original Statement 1' }],
+                    language_code: 'en',
+                    title: sourceTitle,
+                    description: 'Description preserved',
+                    instructions: 'Instructions preserved',
+                    condition_of_instruction: 'Condition preserved',
+                    consent_title: 'Consent Title',
+                    consent_description: 'Consent Description',
                 },
-                {
-                    code: 'S2',
-                    translations: [{ language_code: 'en', text: 'Original Statement 2' }],
-                },
-                {
-                    code: 'S3',
-                    translations: [{ language_code: 'en', text: 'Original Statement 3' }],
-                },
-            ];
+            ],
+        });
 
-            const gridConfig = [
-                { score: -1, capacity: 1 },
-                { score: 0, capacity: 1 },
-                { score: 1, capacity: 1 },
-            ];
+        // 2. Export via the StudyDesign toolbar button.
+        // Post-Phase-5D: route is /app/{project}/studies/{slug}/design.
+        const projectSlug = testDb.getWorkspaceSlug();
+        await page.goto(`/app/${projectSlug}/studies/${sourceSlug}/design`);
 
-            await testDb.updateStudy(authToken, sourceSlug, {
-                statements,
-                grid_config: gridConfig,
-                access_password: 'secret-password',
-                start_date: '2025-01-01T00:00:00Z',
-                end_date: '2025-12-31T23:59:59Z',
-                translations: [
-                    {
-                        language_code: 'en',
-                        title: sourceTitle,
-                        description: 'Description to be preserved',
-                        instructions: 'Instructions to be preserved',
-                        condition_of_instruction: 'Condition to be preserved',
-                        consent_title: 'Consent Title',
-                        consent_description: 'Consent Description',
-                    },
-                ],
-            });
+        // ExportConfigButton triggers a client-side blob download via
+        // window.URL.createObjectURL — Playwright's waitForEvent('download') catches it.
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole('button', { name: /export configuration/i }).click();
+        const download = await downloadPromise;
+        const exportedJson = JSON.parse(
+            await download.createReadStream().then(async (s) => {
+                const chunks: Buffer[] = [];
+                for await (const chunk of s) chunks.push(chunk as Buffer);
+                return Buffer.concat(chunks).toString('utf-8');
+            })
+        );
 
-            // 2. Export Configuration
-            // Navigate to Study Design page
-            await page.goto(`/admin/studies/${sourceSlug}/design`);
+        // 3. Verify export content (without asserting on access_password,
+        // which is bcrypt-hashed at rest and not a useful round-trip check).
+        expect(exportedJson.version).toBe('1.0');
+        expect(exportedJson.study.slug).toBe(sourceSlug);
+        expect(exportedJson.study.statements).toHaveLength(3);
+        expect(exportedJson.study.statements[0].translations[0].text).toBe('Original Statement 1');
+        expect(exportedJson.study.start_date).toBe('2025-01-01T00:00:00Z');
+        expect(exportedJson.study.end_date).toBe('2025-12-31T23:59:59Z');
 
-            // Trigger Export
-            // The export button is likely in a toolbar or menu. Based on previous steps, it was added to StudyDesignPage toolbar.
-            // It might be an icon button or labelled text.
-            // Assuming it has a specific aria-label or text. The translation key is 'export.config' -> "Export Configuration".
-            // But the button might just have an icon or be inside a menu.
-            // Let's look at ExportConfigButton.tsx to see what it renders.
-            // It renders a Button with Download icon and title/aria-label?
-            // Wait, looking at ExportConfigButton.tsx usage, it might just be the button itself.
-            // Ideally we should have added a tooltop or accessible label.
+        // 4. Open the import dialog from the project dashboard.
+        // Phase 5D rename: /admin?dashboard → /app/{project}/dashboard.
+        // Dashboard "Import" button label is admin.dashboard.import_study = "Import".
+        await page.goto(`/app/${projectSlug}/dashboard`);
+        await page
+            .getByRole('button', { name: /^import$/i })
+            .first()
+            .click();
 
-            // Let's click the button that triggers export.
-            const downloadPromise = page.waitForEvent('download');
+        // ImportStudyDialog renders a Tabs control: "File Upload" | "Paste JSON".
+        // Paste-JSON path is simpler and more reliable in CI than the file dropzone.
+        await page.getByRole('tab', { name: /paste json/i }).click();
+        await page.getByLabel(/paste json configuration/i).fill(JSON.stringify(exportedJson));
+        await page.getByRole('button', { name: /validate.*continue/i }).click();
 
-            // Finding the button:
-            // In StudyDesignPage.tsx, it was added to the toolbar.
-            // Let's try locating by text if visible, or icon.
-            // I'll search for the button by the text "Export Configuration" if I added it, or maybe just look for the Download icon.
-            // But verifying the text "Export Configuration" is safer if it exists.
-            // In the translation file, export.config is "Export Configuration".
+        // 5. Validation step: "Configuration is valid" alert + slug input + Create Study.
+        await expect(page.getByText('Configuration is valid')).toBeVisible();
 
-            // Wait, I didn't verify the ExportConfigButton render output.
-            // Let's assume it has the button text "Export Configuration" or tooltip.
-            // If it's an icon only button, I might need a better selector.
-            // Let's try to locate by role 'button' that contains text or matches specific attributes.
+        const newSlug = `imported-${Date.now()}`;
+        await page.getByLabel(/new study slug/i).fill(newSlug);
+        await page.getByRole('button', { name: /^create study$/i }).click();
 
-            // Actually, let's look at ExportConfigButton.tsx again to be sure.
-            // It uses `t('export.config')` inside a TooltipContent, and maybe the button itself?
-            // The previous `view_file` of `ExportConfigButton.tsx` (which I created in previous session)
-            // showed:
-            // <Button variant="ghost" size="sm" onClick={handleExport} disabled={isExporting} title={t('export.config')}>
-            //     <Download className="h-4 w-4 mr-2" />
-            //     <span className="hidden lg:inline">{t('export.config')}</span>
-            // </Button>
-            // So on desktop (lg), it has text.
-
-            await page.getByRole('button', { name: 'Export Configuration' }).click();
-
-            const download = await downloadPromise;
-            const filePath = 'temp-export.json';
-            await download.saveAs(filePath);
-
-            // 3. Verify Export Content
-            // 3. Verify Export Content
-            expect(fs.existsSync(filePath)).toBeTruthy();
-            const fileContent = fs.readFileSync(filePath, 'utf-8');
-            const exportedJson = JSON.parse(fileContent);
-
-            expect(exportedJson.version).toBe('1.0');
-            expect(exportedJson.study.slug).toBe(sourceSlug);
-            expect(exportedJson.study.statements).toHaveLength(3);
-            expect(exportedJson.study.statements[0].translations[0].text).toBe(
-                'Original Statement 1'
-            );
-            expect(exportedJson.study.access_password).toBe('secret-password');
-            expect(exportedJson.study.start_date).toBe('2025-01-01T00:00:00Z');
-            expect(exportedJson.study.end_date).toBe('2025-12-31T23:59:59Z');
-
-            // 4. Import Configuration
-            // Navigate back to Dashboard
-            await page.goto('/admin?dashboard');
-
-            // Wait for dashboard to load
-            await expect(page.getByText('Workspace Dashboard')).toBeVisible();
-
-            // Click Import Study button
-            await page.getByRole('button', { name: 'Import Study' }).click();
-
-            await expect(page.getByText('File Upload')).toBeVisible();
-
-            // Dropzone creates an input[type=file].
-            await page.locator('input[type="file"]').setInputFiles(filePath);
-
-            // 5. Validation Step
-            const validLocator = page.getByText('Configuration is valid');
-            const errorLocator = page.getByText('Configuration has errors');
-            const invalidJsonLocator = page.getByText('Invalid JSON');
-
-            // Wait for any result
-            await Promise.race([
-                validLocator.waitFor({ state: 'visible' }),
-                errorLocator.waitFor({ state: 'visible' }),
-                invalidJsonLocator.waitFor({ state: 'visible' }),
-            ]);
-
-            if (await errorLocator.isVisible()) {
-                // If errors are visible, fail the test
-                throw new Error('Import validation showed errors. Check screenshot.');
-            }
-
-            if (await invalidJsonLocator.isVisible()) {
-                throw new Error('Import showed Invalid JSON error.');
-            }
-
-            await expect(validLocator).toBeVisible();
-            await expect(page.getByText('Study Summary')).toBeVisible();
-            // The title is in a dd element, separate from the label
-            await expect(page.getByText(sourceTitle, { exact: true })).toBeVisible();
-
-            await expect(page.getByText('Statements')).toBeVisible();
-            // Check for '3' in the dd for statements. Might be ambiguous, let's just check the text '3' exists near statements or generally.
-            // Or specific locator:
-            // await expect(page.locator('dd', { hasText: '3' })).toBeVisible();
-            await expect(page.getByText('3', { exact: true })).toBeVisible();
-
-            // Enter new slug
-            const newSlug = `imported-study-${Date.now()}`;
-            const slugInput = page.getByLabel('New Study Slug');
-            await slugInput.fill(newSlug);
-
-            // Submit
-            await page.getByRole('button', { name: 'Create Study' }).click();
-
-            // 6. Verify Creation
-            // Should redirect to design page of new study
-            await expect(page).toHaveURL(new RegExp(`/studies/${newSlug}`));
-
-            // Verify Content on page (e.g. Statements tab)
-            // Switch to Q-sort tab to use test id which is safer
-            await page.getByTestId('tab-q-sort').click();
-
-            // Check if statements are there
-            await expect(page.getByText('Original Statement 1')).toBeVisible();
-            await expect(page.getByText('Original Statement 2')).toBeVisible();
-            await expect(page.getByText('Original Statement 3')).toBeVisible();
-
-            // 7. Backend Verification
-            // Verify via API that constraints (grid) were preserved
-            // We can check this by fetching the study config via API if needed,
-            // but seeing the statements in UI is a strong signal.
-            // Let's verify the grid config size via UI roughly (e.g. 3 columns).
-            await page.getByRole('tab', { name: 'Q-sort' }).click();
-            // Maybe check grid visual if possible, or just trust the functional part.
-        }
-    );
+        // 6. After creation the dialog closes. Navigate to the new study's
+        // design page and confirm the statements made the round-trip.
+        await page.goto(`/app/${projectSlug}/studies/${newSlug}/design`);
+        await page.getByTestId('tab-q-sort').click();
+        await page.getByTestId('subtab-statements').click();
+        await expect(page.getByText('Original Statement 1')).toBeVisible();
+        await expect(page.getByText('Original Statement 2')).toBeVisible();
+        await expect(page.getByText('Original Statement 3')).toBeVisible();
+    });
 });
