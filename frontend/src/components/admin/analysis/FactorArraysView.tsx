@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Info } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { AnalysisResult, AnalysisRunSummary } from '@/api/model';
 import { FactorNoteEditor } from './FactorNoteEditor';
@@ -18,9 +20,24 @@ interface FactorArraysViewProps {
     currentRun?: AnalysisRunSummary | null;
     /** Study slug — passed to the per-factor narrative editor for the PATCH endpoint. */
     slug?: string;
+    /**
+     * Per-analyst preference for showing the per-factor narrative editor.
+     * Defaults to `true` (editor visible). When `false`, the editor is
+     * hidden — useful for classical Q workflows that don't write narratives.
+     * Hiding does NOT delete already-saved narratives.
+     */
+    showFactorNarratives?: boolean;
+    /** Callback invoked when the analyst flips the narratives toggle. */
+    onToggleFactorNarratives?: () => void;
 }
 
-export function FactorArraysView({ result, currentRun, slug }: FactorArraysViewProps) {
+export function FactorArraysView({
+    result,
+    currentRun,
+    slug,
+    showFactorNarratives = true,
+    onToggleFactorNarratives,
+}: FactorArraysViewProps) {
     const { t } = useTranslation();
 
     const distinguishingIds = useMemo(
@@ -41,8 +58,35 @@ export function FactorArraysView({ result, currentRun, slug }: FactorArraysViewP
         );
     }
 
+    // The narratives toggle only makes sense when the editor would be
+    // rendered at all (i.e., we have a persisted run + slug to PATCH).
+    const canShowNarrativesToggle =
+        currentRun != null && !!slug && onToggleFactorNarratives !== undefined;
+
     return (
         <div className="space-y-6">
+            {canShowNarrativesToggle && (
+                <div className="flex justify-end items-center gap-2 -mb-2">
+                    <Label
+                        htmlFor="show-factor-narratives"
+                        className="text-2xs font-medium text-slate-500 cursor-pointer"
+                    >
+                        {t(
+                            'admin.analysis.factor_arrays.toggle_narratives',
+                            'Show factor narratives'
+                        )}
+                    </Label>
+                    <Switch
+                        id="show-factor-narratives"
+                        checked={showFactorNarratives}
+                        onCheckedChange={onToggleFactorNarratives}
+                        aria-label={t(
+                            'admin.analysis.factor_arrays.toggle_narratives_aria',
+                            'Toggle per-factor interpretive narratives'
+                        )}
+                    />
+                </div>
+            )}
             {Array.from({ length: result.n_factors }, (_, f) => {
                 // Group statements by their factor array score for this factor
                 const groups = new Map<number, typeof result.statement_scores>();
@@ -90,8 +134,11 @@ export function FactorArraysView({ result, currentRun, slug }: FactorArraysViewP
                             </TooltipProvider>
                         </div>
 
-                        {/* Per-factor interpretive narrative (Sneegas 2020) */}
-                        {currentRun && slug && (
+                        {/* Per-factor interpretive narrative.
+                         *  Hidden via the per-analyst `showFactorNarratives`
+                         *  toggle for classical Q workflows. Already-saved
+                         *  narratives stay in the database when hidden. */}
+                        {showFactorNarratives && currentRun && slug && (
                             <FactorNoteEditor
                                 slug={slug}
                                 runId={currentRun.id}

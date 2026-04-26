@@ -195,7 +195,7 @@ export function AnalysisHistoryPanel({ slug, currentRunId, onLoadRun }: Analysis
                             <p className="text-xs text-slate-400">
                                 {t(
                                     'admin.analysis.history.empty_explainer',
-                                    'Critical Q-methodology requires analytical choices to be transparent. Each run is logged here so you can document and revisit every decision.'
+                                    'Documenting analytical choices supports reproducibility — a core requirement of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020). Each run is logged here so you can document and revisit every decision.'
                                 )}
                             </p>
                         </div>

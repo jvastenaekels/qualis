@@ -403,4 +403,56 @@ describe('useAnalysisPage', () => {
 
         expect(result.current.isRunning).toBe(true);
     });
+
+    describe('showFactorNarratives toggle (localStorage-persisted)', () => {
+        const studySlug = 'narratives-toggle-study';
+        const lsKey = `qualis-analysis-show-narratives-${studySlug}`;
+
+        beforeEach(() => {
+            window.localStorage.removeItem(lsKey);
+        });
+
+        it('defaults to true when no localStorage entry exists', () => {
+            const { result } = renderHook(() => useAnalysisPage(studySlug), {
+                wrapper: AllTheProviders,
+            });
+            expect(result.current.showFactorNarratives).toBe(true);
+        });
+
+        it('initializes from localStorage when a previous preference exists', () => {
+            window.localStorage.setItem(lsKey, 'false');
+            const { result } = renderHook(() => useAnalysisPage(studySlug), {
+                wrapper: AllTheProviders,
+            });
+            expect(result.current.showFactorNarratives).toBe(false);
+        });
+
+        it('setShowFactorNarratives writes the value to localStorage', () => {
+            const { result } = renderHook(() => useAnalysisPage(studySlug), {
+                wrapper: AllTheProviders,
+            });
+
+            act(() => {
+                result.current.setShowFactorNarratives(false);
+            });
+
+            expect(result.current.showFactorNarratives).toBe(false);
+            expect(window.localStorage.getItem(lsKey)).toBe('false');
+
+            act(() => {
+                result.current.setShowFactorNarratives(true);
+            });
+
+            expect(window.localStorage.getItem(lsKey)).toBe('true');
+        });
+
+        it('uses a per-study localStorage key (does not leak across studies)', () => {
+            window.localStorage.setItem('qualis-analysis-show-narratives-other-study', 'false');
+            const { result } = renderHook(() => useAnalysisPage(studySlug), {
+                wrapper: AllTheProviders,
+            });
+            // The other-study preference must NOT bleed into this study's hook.
+            expect(result.current.showFactorNarratives).toBe(true);
+        });
+    });
 });

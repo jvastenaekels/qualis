@@ -207,9 +207,13 @@ export const useStudyConfig = () => {
     ]);
 
     // --- Effect: Handle Stale Data (Reset on Slug Change) ---
-    // This is the "Slug Guard" - it ensures clean slate when switching studies
+    // This is the "Slug Guard" - it ensures clean slate when switching studies.
+    // Guard against empty/partial config (e.g. when an in-flight request
+    // resolves with no slug yet, or when a test mock returns a partial body):
+    // we only reset when the loaded config carries a *different* slug than
+    // the URL — never when it has no slug at all.
     useEffect(() => {
-        if (slug && config && config.slug !== slug) {
+        if (slug && config?.slug && config.slug !== slug) {
             resetAllStores();
         }
     }, [slug, config]);

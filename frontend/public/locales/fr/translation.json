@@ -762,6 +762,10 @@
       "loadings_help": "Les saturations factorielles montrent la corrélation entre le tri de chaque participant et chaque facteur. Les cellules surlignées dépassent le seuil de significativité indiqué ci-dessus.",
       "factor_array_help": "Q-sort composite montrant le patron de tri idéalisé pour ce facteur. Les énoncés sont placés dans la distribution selon leurs scores z pondérés.",
       "factor_array_label": "Tri composite du facteur {{n}}",
+      "factor_arrays": {
+        "toggle_narratives": "Afficher les narrations par facteur",
+        "toggle_narratives_aria": "Activer/désactiver les narrations interprétatives par facteur"
+      },
       "statements_help": "Les scores z montrent la position standardisée de chaque facteur sur chaque énoncé. D = distinctif (différence significative entre facteurs), C = consensus (aucune différence significative).",
       "z_scores_description": "Scores z et positions dans le tableau factoriel par énoncé",
       "factor_statistics": "Statistiques factorielles",
@@ -797,7 +801,7 @@
         "loading": "Chargement de l'historique…",
         "fetch_error": "Impossible de charger l'historique des analyses.",
         "empty": "Aucune analyse précédente pour cette étude — lancez-en une pour démarrer la piste d'audit.",
-        "empty_explainer": "La méthodologie Q critique exige la transparence des choix analytiques. Chaque exécution est enregistrée ici afin de documenter et réexaminer chaque décision.",
+        "empty_explainer": "Documenter les choix analytiques favorise la reproductibilité — exigence centrale d'une pratique Q-méthodologique rigoureuse (Watts & Stenner 2012 ; Sneegas 2020). Chaque exécution est enregistrée ici afin de documenter et réexaminer chaque décision.",
         "load_error": "Impossible de charger cette analyse.",
         "load_run_aria": "Charger l'analyse du {{date}}",
         "loading_run": "Chargement…",
@@ -828,7 +832,7 @@
         "no_material": "Aucun enregistrement audio ni commentaire écrit des participants définissant ce facteur.",
         "loading": "Chargement des enregistrements…",
         "error": "Impossible de charger les enregistrements audio. Veuillez réessayer.",
-        "context": "En méthodologie Q critique (Sneegas 2020), ancrer l'interprétation des facteurs dans les mots des personnes qui les définissent — leurs justifications audio comme leurs commentaires écrits sur les cartes — fait partie de la pratique analytique.",
+        "context": "Ancrer l'interprétation des facteurs dans les mots des participants eux-mêmes — leurs justifications audio comme leurs commentaires écrits sur les cartes — est un élément central d'une pratique Q-méthodologique rigoureuse (Watts & Stenner 2012 ; Sneegas 2020).",
         "context_aria": "À propos de ce panneau",
         "audio_label": "Enregistrement : {{key}} par {{participant}}",
         "url_unavailable": "URL audio non disponible.",

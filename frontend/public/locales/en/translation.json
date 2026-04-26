@@ -777,6 +777,10 @@
       "loadings_help": "Factor loadings show how strongly each participant's sort correlates with each factor. Highlighted cells exceed the significance threshold shown above.",
       "factor_array_help": "Composite Q-sort showing the idealized sort pattern for this factor. Statements are placed in the distribution based on their weighted z-scores.",
       "factor_array_label": "Factor {{n}} composite sort",
+      "factor_arrays": {
+        "toggle_narratives": "Show factor narratives",
+        "toggle_narratives_aria": "Toggle per-factor interpretive narratives"
+      },
       "statements_help": "Z-scores show each factor's standardized position on each statement. D = distinguishing (significantly different between factors), C = consensus (no significant differences).",
       "z_scores_description": "Z-scores and factor array positions per statement",
       "factor_statistics": "Factor Statistics",
@@ -812,7 +816,7 @@
         "loading": "Loading history…",
         "fetch_error": "Could not load analysis history.",
         "empty": "No previous analyses for this study yet — run one to start the audit trail.",
-        "empty_explainer": "Critical Q-methodology requires analytical choices to be transparent. Each run is logged here so you can document and revisit every decision.",
+        "empty_explainer": "Documenting analytical choices supports reproducibility — a core requirement of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020). Each run is logged here so you can document and revisit every decision.",
         "load_error": "Failed to load the analysis run.",
         "load_run_aria": "Load analysis run from {{date}}",
         "loading_run": "Loading…",
@@ -843,7 +847,7 @@
         "no_material": "No post-sort audio recordings or written comments from participants flagged on this factor.",
         "loading": "Loading recordings…",
         "error": "Could not load audio recordings. Please try again.",
-        "context": "In critical Q-methodology (Sneegas 2020), grounding factor interpretation in the words of the people who define each factor — both their audio rationales and their written card comments — is part of the analytical practice.",
+        "context": "Grounding factor interpretation in participants' own words — their audio rationales and their written card comments — is a core element of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020).",
         "context_aria": "About this panel",
         "audio_label": "Recording: {{key}} by {{participant}}",
         "url_unavailable": "Audio URL not available.",

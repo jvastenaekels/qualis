@@ -126,6 +126,17 @@ export interface AnalysisPageApi {
      */
     currentRun: AnalysisRunSummary | null;
 
+    /**
+     * Per-analyst, per-study UI preference for showing the per-factor
+     * narrative editor in the Factor Arrays view. Persisted in localStorage
+     * (`qualis-analysis-show-narratives-{slug}`) so the toggle survives
+     * across visits to the same study in the same browser. Independent
+     * across co-authors — toggling does not affect other users' views, and
+     * does not delete already-written narratives (it only hides the editor).
+     */
+    showFactorNarratives: boolean;
+    setShowFactorNarratives: (v: boolean) => void;
+
     // Handlers
     handleRunAnalysis: () => void;
     handleLoadHistoricalRun: (historicalResult: AnalysisResult, run: AnalysisRunSummary) => void;
@@ -172,6 +183,34 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
     // on screen — needed by the per-factor narrative editor.
     const [freshRun, setFreshRun] = useState<AnalysisRunSummary | null>(null);
     const [isExporting, setIsExporting] = useState(false);
+
+    // ── Per-analyst, per-study view prefs (localStorage-persisted) ───
+    // The "show factor narratives" toggle lets analysts hide the per-factor
+    // narrative editor when working in a more classical Q-method mode.
+    // localStorage is per-user-per-browser, which is the right granularity
+    // for a private view preference: co-authors don't override each other.
+    const narrativesPrefKey = `qualis-analysis-show-narratives-${slug || ''}`;
+    const [showFactorNarratives, setShowFactorNarrativesState] = useState<boolean>(() => {
+        if (!slug) return true;
+        try {
+            const raw = window.localStorage.getItem(narrativesPrefKey);
+            if (raw === null) return true;
+            return raw === 'true';
+        } catch {
+            return true;
+        }
+    });
+    const setShowFactorNarratives = useCallback(
+        (v: boolean) => {
+            setShowFactorNarrativesState(v);
+            try {
+                window.localStorage.setItem(narrativesPrefKey, String(v));
+            } catch {
+                // Ignore localStorage errors (e.g., quota exceeded, private mode).
+            }
+        },
+        [narrativesPrefKey]
+    );
 
     // ── URL sync ──────────────────────────────────────────────────
     const syncParams = useCallback(
@@ -400,6 +439,8 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
         viewingRun,
         isViewingHistorical: viewingRun !== null,
         currentRun: viewingRun ?? freshRun,
+        showFactorNarratives,
+        setShowFactorNarratives,
         handleRunAnalysis,
         handleLoadHistoricalRun,
         handleClearHistoricalView,

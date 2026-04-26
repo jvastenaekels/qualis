@@ -129,9 +129,7 @@ describe('AnalysisHistoryPanel', () => {
 
         expect(screen.getByText(/No previous analyses for this study yet/i)).toBeInTheDocument();
         expect(
-            screen.getByText(
-                /Critical Q-methodology requires analytical choices to be transparent/i
-            )
+            screen.getByText(/Documenting analytical choices supports reproducibility/i)
         ).toBeInTheDocument();
     });
 

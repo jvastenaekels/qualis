@@ -510,6 +510,10 @@ export default function AnalysisPage() {
                                     result={analysisResult}
                                     currentRun={api.currentRun}
                                     slug={slug}
+                                    showFactorNarratives={api.showFactorNarratives}
+                                    onToggleFactorNarratives={() =>
+                                        api.setShowFactorNarratives(!api.showFactorNarratives)
+                                    }
                                 />
                             </TabsContent>
 

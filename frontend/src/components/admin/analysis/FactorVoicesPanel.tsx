@@ -183,7 +183,7 @@ export function FactorVoicesPanel({ slug, factorIndex, participants }: FactorVoi
                         <div className="absolute left-0 top-6 z-20 w-72 rounded-lg bg-white border border-slate-200 shadow-lg p-3 text-xs text-slate-600 leading-relaxed">
                             {t(
                                 'admin.analysis.factor_voices.context',
-                                'In critical Q-methodology (Sneegas 2020), grounding factor interpretation in the words of the people who define each factor — both their audio rationales and their written card comments — is part of the analytical practice.'
+                                "Grounding factor interpretation in participants' own words — their audio rationales and their written card comments — is a core element of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020)."
                             )}
                         </div>
                     )}
