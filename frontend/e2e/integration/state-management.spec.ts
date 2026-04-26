@@ -193,33 +193,33 @@ test.describe('State Management Flow Tests', () => {
         // Post-Sort
         await expect(page).toHaveURL(/post-sort/);
 
-        // Post-sort has multiple steps (feedback then questionnaire). The
-        // final submit lives in Step2_Questionnaire under a stable testid.
-        // Walk the wizard via the generic Continue/Next chain until the
-        // submit testid appears, then click it.
+        // Post-sort has two steps: Step1_Feedback then Step2_Questionnaire.
+        // Each "next" trigger has a stable testid; the role-based regex
+        // collides with the header's "Continue later" button, so we drive
+        // the wizard through testids directly.
         const submitButton = page.getByTestId('postsort-submit-btn');
-        const continueButton = page.getByRole('button', { name: /Continue|Next/i });
+        const step1Next = page.getByTestId('postsort-step1-next-btn');
 
-        for (let i = 0; i < 5 && !(await submitButton.isVisible().catch(() => false)); i++) {
-            if (await continueButton.isVisible().catch(() => false)) {
-                await continueButton.click();
-                await page.waitForTimeout(250);
-            } else {
-                break;
-            }
-        }
+        await expect(step1Next).toBeVisible({ timeout: 10000 });
+        await step1Next.click();
+        await expect(submitButton).toBeVisible({ timeout: 10000 });
         await submitButton.click();
 
         // Verify completion
         await expect(page.getByTestId('thank-you-message')).toBeVisible();
 
-        // Verify submission was recorded in database
+        // Verify submission was recorded in database. The endpoint returns
+        // a PaginatedResponse<ParticipantRead> ({ items, total, limit, offset }),
+        // not a bare array.
         const response = await fetch(participantApiUrl, {
             headers: { Authorization: `Bearer ${await testDb.login()}` },
         });
-        const participants = (await response.json()) as { status: string }[];
+        const payload = (await response.json()) as {
+            items: { status: string }[];
+            total: number;
+        };
 
-        expect(participants.length).toBeGreaterThan(0);
-        expect(participants[0].status).toBe('completed');
+        expect(payload.total).toBeGreaterThan(0);
+        expect(payload.items[0].status).toBe('completed');
     });
 });

@@ -80,8 +80,9 @@ test.describe('Import/Export Study Configuration', () => {
         // Phase 5D rename: /admin?dashboard → /app/{project}/dashboard.
         // Dashboard "Import" button label is admin.dashboard.import_study = "Import".
         await page.goto(`/app/${projectSlug}/dashboard`);
+        // Locale label is "Import study" (admin.dashboard.import_study).
         await page
-            .getByRole('button', { name: /^import$/i })
+            .getByRole('button', { name: /^import study$/i })
             .first()
             .click();
 
