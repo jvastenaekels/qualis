@@ -208,19 +208,7 @@ Contributions are welcome. Please read the guidelines before submitting a PR:
 
 ## Citation
 
-If you use Qualis in your research, please cite both the software and the accompanying paper. Machine-readable metadata is in [`CITATION.cff`](CITATION.cff) at the repository root (GitHub displays a "Cite this repository" button in the sidebar).
-
-**Software (Zenodo archive):**
-
-> Vastenaekels, J., & Dedinger, C. (2026). *Qualis: An open-source platform for Q-methodology research* (Version 0.1.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.XXXXXXX
-
-(DOI assigned automatically by Zenodo at the first tagged release; will be filled in here once available.)
-
-**Paper (SoftwareX):**
-
-> Vastenaekels, J., & Dedinger, C. (2026). Qualis: An open-source platform for Q-methodology research. *SoftwareX*. https://doi.org/10.1016/j.softx.2026.XXXXXX
-
-(DOI assigned by Elsevier on acceptance.)
+If you use Qualis in your research, please refer to the machine-readable metadata in [`CITATION.cff`](CITATION.cff) at the repository root (GitHub displays a "Cite this repository" button in the sidebar). Full software (Zenodo) and paper (SoftwareX) citations will be added here once their DOIs are assigned.
 
 ---
 
