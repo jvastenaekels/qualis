@@ -22,7 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
-import type { StudyRead, StudyUpdate } from '@/api/model';
+import type { StorageUsageResponse, StudyRead, StudyUpdate } from '@/api/model';
 import { AdminService } from '@/api/admin';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import {
@@ -38,16 +38,6 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet } from '@/api/generated';
 import { Progress } from '@/components/ui/progress';
-
-// Storage usage response type
-interface StorageUsageResponse {
-    total_bytes: number;
-    total_mb: number;
-    file_count: number;
-    quota_mb: number;
-    quota_bytes: number;
-    usage_percent: number;
-}
 
 export default function GeneralSettingsPage() {
     const navigate = useNavigate();
@@ -173,12 +163,7 @@ export default function GeneralSettingsPage() {
         queryKey: ['storage-usage', slug],
         queryFn: async () => {
             if (!slug) throw new Error('No slug');
-            const response = await getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet(slug);
-            // Cast via unknown: backend returns dict[str, Any] without a
-            // Pydantic response_model, so orval generates an opaque
-            // {[key:string]:unknown} type that doesn't structurally overlap
-            // with our hand-written StorageUsageResponse.
-            return response as unknown as StorageUsageResponse;
+            return await getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet(slug);
         },
         enabled: !!slug && isAudioEnabled,
         refetchInterval: 30000, // Refresh every 30s

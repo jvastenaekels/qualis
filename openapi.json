@@ -202,7 +202,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
               }
             }
           },
@@ -274,7 +276,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/TOTPEnableResponse"
+                }
               }
             }
           },
@@ -319,7 +323,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
               }
             }
           },
@@ -1229,49 +1235,6 @@
         }
       }
     },
-    "/api/admin/studies/{slug}/test-runs": {
-      "delete": {
-        "tags": [
-          "admin-studies"
-        ],
-        "summary": "Clear Test Runs",
-        "description": "Delete all participants flagged as is_test_run for this study.",
-        "operationId": "clear_test_runs_api_admin_studies__slug__test_runs_delete",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "slug",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "The slug of the study",
-              "title": "Slug"
-            },
-            "description": "The slug of the study"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Successful Response"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/admin/studies/{slug}/participants/{participant_id}/personal-data": {
       "delete": {
         "tags": [
@@ -1585,7 +1548,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StorageUsageResponse"
+                }
               }
             }
           },
@@ -1834,7 +1799,7 @@
           "Admin Analysis"
         ],
         "summary": "Update Analysis Run",
-        "description": "Update the researcher annotation (`notes`) on a persisted run.\n\nOnly `notes` is editable; analytical choices and the result payload\nare immutable for audit-trail integrity.",
+        "description": "Update the researcher annotations on a persisted run.\n\n`notes` (run-level) and `factor_notes` (per-factor) are mutable;\nanalytical choices and the result payload are immutable for audit-trail\nintegrity. `factor_notes` keys must correspond to actual factors of the\nrun (1 \u2264 int(k) \u2264 run.n_factors); the schema validates format and per-\nvalue length, and the route validates the upper bound against the run.",
         "operationId": "update_analysis_run_api_admin_studies__slug__analysis_runs__run_id__patch",
         "security": [
           {
@@ -1995,6 +1960,70 @@
                     "$ref": "#/components/schemas/ParticipantAudioRecording"
                   },
                   "title": "Response List Audios For Participants Api Admin Studies  Slug  Analysis Audios Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/studies/{slug}/analysis/comments": {
+      "get": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "List Comments For Participants",
+        "description": "Fetch non-empty `card_comment` entries for a set of participants.\n\nUsed by the analysis UI to show post-sort textual rationales linked to\nfactor membership: the frontend looks up which participants are flagged\non a factor (from the analysis result), then calls this endpoint with\ntheir participant_db_ids to render the written rationales beside the\naudio recordings already returned by `/analysis/audios`. Together the two\nendpoints support the critical Q-methodology practice of grounding factor\ninterpretation in the words of the people who define each factor\n(Sneegas 2020; Robbins & Krueger 2000).\n\nComments are returned ordered per participant by descending |grid_score|\n(extreme placements first) \u2014 typically the most interpretable rationales\nwhen reading a factor.\n\nQuery params:\n    participant_ids: comma-separated participant database ids\n        (e.g., \"12,17,22\"). Empty string returns []. Up to 200 ids\n        accepted (a single factor rarely flags more than ~20).",
+        "operationId": "list_comments_for_participants_api_admin_studies__slug__analysis_comments_get",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          },
+          {
+            "name": "participant_ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Participant Ids"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ParticipantCardComment"
+                  },
+                  "title": "Response List Comments For Participants Api Admin Studies  Slug  Analysis Comments Get"
                 }
               }
             }
@@ -2303,7 +2332,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/StudyDumpResponse"
+                }
               }
             }
           },
@@ -2419,7 +2450,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ParticipantExportResponse"
+                }
               }
             }
           },
@@ -4655,7 +4688,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionResultResponse"
+                }
               }
             }
           },
@@ -4772,7 +4807,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/ResolvedStudyConfigResponse"
+                }
               }
             }
           },
@@ -4823,7 +4860,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
               }
             }
           },
@@ -4931,7 +4970,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
               }
             }
           },
@@ -4984,7 +5025,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
               }
             }
           },
@@ -5321,74 +5364,37 @@
           }
         }
       }
-    },
-    "/api/admin/studies/{slug}/analysis/comments": {
-      "get": {
-        "tags": [
-          "admin-analysis",
-          "Admin Analysis"
-        ],
-        "summary": "List Comments For Participants",
-        "description": "Fetch non-empty `card_comment` entries for a set of participants.\n\nUsed by the analysis UI to show post-sort textual rationales linked to\nfactor membership: the frontend looks up which participants are flagged\non a factor (from the analysis result), then calls this endpoint with\ntheir participant_db_ids to render the written rationales beside the\naudio recordings already returned by `/analysis/audios`. Together the two\nendpoints support the critical Q-methodology practice of grounding factor\ninterpretation in the words of the people who define each factor\n(Sneegas 2020; Robbins & Krueger 2000).\n\nComments are returned ordered per participant by descending |grid_score|\n(extreme placements first) \u2014 typically the most interpretable rationales\nwhen reading a factor.\n\nQuery params:\n    participant_ids: comma-separated participant database ids\n        (e.g., \"12,17,22\"). Empty string returns []. Up to 200 ids\n        accepted (a single factor rarely flags more than ~20).",
-        "operationId": "list_comments_for_participants_api_admin_studies__slug__analysis_comments_get",
-        "security": [
-          {
-            "OAuth2PasswordBearer": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "slug",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "description": "The slug of the study",
-              "title": "Slug"
-            },
-            "description": "The slug of the study"
-          },
-          {
-            "name": "participant_ids",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Participant Ids"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ParticipantCardComment"
-                  },
-                  "title": "Response List Comments For Participants Api Admin Studies  Slug  Analysis Comments Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
     "schemas": {
+      "AckResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "Short status token, e.g. 'ok' or 'unlocked'."
+          },
+          "details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details",
+            "description": "Optional human-readable explanation."
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "AckResponse",
+        "description": "Generic acknowledgement: `{status: \"...\", details?: \"...\"}`.\n\nUsed by endpoints that mutate state and only need to confirm success\n(save_draft, update_progress, change_password, disable_totp, unlock_study)."
+      },
       "AnalysisRequest": {
         "properties": {
           "extraction": {
@@ -6909,11 +6915,6 @@
             "maxLength": 5,
             "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
             "title": "Language Code"
-          },
-          "is_test_run": {
-            "type": "boolean",
-            "title": "Is Test Run",
-            "default": false
           }
         },
         "type": "object",
@@ -7494,10 +7495,6 @@
             "type": "integer",
             "title": "Discarded"
           },
-          "test_runs": {
-            "type": "integer",
-            "title": "Test Runs"
-          },
           "anonymised": {
             "type": "integer",
             "title": "Anonymised"
@@ -7512,11 +7509,51 @@
           "started",
           "completed",
           "discarded",
-          "test_runs",
           "anonymised",
           "total"
         ],
         "title": "ParticipantBuckets"
+      },
+      "ParticipantCardComment": {
+        "properties": {
+          "participant_db_id": {
+            "type": "integer",
+            "title": "Participant Db Id"
+          },
+          "statement_id": {
+            "type": "integer",
+            "title": "Statement Id"
+          },
+          "statement_code": {
+            "type": "string",
+            "title": "Statement Code"
+          },
+          "statement_text": {
+            "type": "string",
+            "title": "Statement Text",
+            "description": "Statement text in the study's default language, with fallback to the first available translation, then to the code."
+          },
+          "grid_score": {
+            "type": "integer",
+            "title": "Grid Score"
+          },
+          "comment": {
+            "type": "string",
+            "title": "Comment",
+            "description": "Non-empty textual rationale."
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_db_id",
+          "statement_id",
+          "statement_code",
+          "statement_text",
+          "grid_score",
+          "comment"
+        ],
+        "title": "ParticipantCardComment",
+        "description": "A single non-empty `card_comment` written by a participant during post-sort.\n\nReturned by the analysis comments endpoint to support critical\nQ-methodology interpretation: the analyst reads the textual rationales\nof participants flagged on a given factor, alongside the audio recordings\nalready surfaced by `ParticipantAudioRecording` (Sneegas 2020;\nRobbins & Krueger 2000)."
       },
       "ParticipantDetailRead": {
         "properties": {
@@ -7560,10 +7597,6 @@
           "is_discarded": {
             "type": "boolean",
             "title": "Is Discarded"
-          },
-          "is_test_run": {
-            "type": "boolean",
-            "title": "Is Test Run"
           },
           "discard_reason": {
             "anyOf": [
@@ -7657,7 +7690,6 @@
           "created_at",
           "submitted_at",
           "is_discarded",
-          "is_test_run",
           "discard_reason",
           "user_agent",
           "presort_answers",
@@ -7692,6 +7724,36 @@
         ],
         "title": "ParticipantDiscardUpdate",
         "description": "Schema for discarding/flagging a participant."
+      },
+      "ParticipantExportResponse": {
+        "properties": {
+          "study": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Study"
+          },
+          "participant": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Participant"
+          },
+          "statement_id_to_index": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Statement Id To Index"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "study",
+          "participant",
+          "statement_id_to_index"
+        ],
+        "title": "ParticipantExportResponse",
+        "description": "Admin participant JSON export (GET /admin/.../participants/{id}/export/json).\n\nOpen shape \u2014 the payload is `{study, participant, statement_id_to_index}`,\na single-participant slice of the full StudyDump. `extra='allow'` lets\nadditional dynamic keys survive round-tripping."
       },
       "ParticipantLoading": {
         "properties": {
@@ -7771,10 +7833,6 @@
             "type": "boolean",
             "title": "Is Discarded"
           },
-          "is_test_run": {
-            "type": "boolean",
-            "title": "Is Test Run"
-          },
           "discard_reason": {
             "anyOf": [
               {
@@ -7842,7 +7900,6 @@
           "created_at",
           "submitted_at",
           "is_discarded",
-          "is_test_run",
           "discard_reason",
           "user_agent"
         ],
@@ -8427,6 +8484,58 @@
         "title": "RecruitmentLinkType",
         "description": "Enum for types of recruitment links."
       },
+      "ResolvedStudyConfigResponse": {
+        "properties": {
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description",
+            "default": ""
+          },
+          "instructions": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Instructions"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "requires_password": {
+            "type": "boolean",
+            "title": "Requires Password",
+            "default": false
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "slug",
+          "title"
+        ],
+        "title": "ResolvedStudyConfigResponse",
+        "description": "Public study config returned by GET /api/study/{slug}.\n\nThe runtime payload is rich and partially dynamic (translation-resolved\nfields, optional pre/post-sort configs, ui_labels, branding) \u2014 too much\nto enumerate exhaustively here without dragging the StudyConfig zod\nschema's structure into Pydantic. We declare the well-known top-level\nfields the frontend always reads and accept additional keys via\n`extra='allow'`. This is enough for orval to emit a real interface\ninstead of an opaque dict."
+      },
       "ResumeResponse": {
         "properties": {
           "session_token": {
@@ -8770,6 +8879,45 @@
         "title": "StatementUpdate",
         "description": "Schema for updating a statement text (by code)."
       },
+      "StorageUsageResponse": {
+        "properties": {
+          "total_bytes": {
+            "type": "integer",
+            "title": "Total Bytes"
+          },
+          "total_mb": {
+            "type": "number",
+            "title": "Total Mb"
+          },
+          "file_count": {
+            "type": "integer",
+            "title": "File Count"
+          },
+          "quota_mb": {
+            "type": "integer",
+            "title": "Quota Mb"
+          },
+          "quota_bytes": {
+            "type": "integer",
+            "title": "Quota Bytes"
+          },
+          "usage_percent": {
+            "type": "number",
+            "title": "Usage Percent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_bytes",
+          "total_mb",
+          "file_count",
+          "quota_mb",
+          "quota_bytes",
+          "usage_percent"
+        ],
+        "title": "StorageUsageResponse",
+        "description": "Audio storage usage for a study (returned by GET /storage-usage)."
+      },
       "StudyCreate": {
         "properties": {
           "slug": {
@@ -8887,6 +9035,39 @@
         ],
         "title": "StudyCreate",
         "description": "Schema for creating a study."
+      },
+      "StudyDumpResponse": {
+        "properties": {
+          "study": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Study"
+          },
+          "participants": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Participants"
+          },
+          "statement_id_to_index": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Statement Id To Index"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "study",
+          "participants",
+          "statement_id_to_index"
+        ],
+        "title": "StudyDumpResponse",
+        "description": "Admin full-study dump (GET /admin/studies/{slug}/dump).\n\nOpen shape \u2014 the runtime payload is the StudyDump TypedDict from\n`app.types.wire`: `{study, participants, statement_id_to_index}`. We\ndeclare the well-known top-level keys as `dict` / `list` and accept\nadditional keys via `extra='allow'` so orval emits a named interface\nrather than an opaque dict."
       },
       "StudyImportRequest": {
         "properties": {
@@ -9719,11 +9900,6 @@
               }
             ],
             "title": "Link Token"
-          },
-          "is_test_run": {
-            "type": "boolean",
-            "title": "Is Test Run",
-            "default": false
           }
         },
         "type": "object",
@@ -9735,6 +9911,64 @@
         ],
         "title": "SubmissionInput",
         "description": "Schema for the full study submission/completion."
+      },
+      "SubmissionResultResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "confirmation_code": {
+            "type": "string",
+            "title": "Confirmation Code"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "already_submitted": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Already Submitted"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "status",
+          "confirmation_code",
+          "id"
+        ],
+        "title": "SubmissionResultResponse",
+        "description": "Result of a participant Q-sort submission (POST /api/submit).\n\nReturned by the submit endpoint after StudyService.process_submission\ncompletes. `already_submitted` is only present when re-submitting a\ncompleted participation. `extra='allow'` covers any future additions."
+      },
+      "TOTPEnableResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "backup_codes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Backup Codes",
+            "description": "One-time backup codes to store offline."
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "TOTPEnableResponse",
+        "description": "Result of enabling 2FA: status token + backup recovery codes."
       },
       "TOTPSetup": {
         "properties": {
@@ -10114,47 +10348,6 @@
           "has_postsort"
         ],
         "title": "ValidationSummary"
-      },
-      "ParticipantCardComment": {
-        "properties": {
-          "participant_db_id": {
-            "type": "integer",
-            "title": "Participant Db Id"
-          },
-          "statement_id": {
-            "type": "integer",
-            "title": "Statement Id"
-          },
-          "statement_code": {
-            "type": "string",
-            "title": "Statement Code"
-          },
-          "statement_text": {
-            "type": "string",
-            "title": "Statement Text",
-            "description": "Statement text in the study's default language, with fallback to the first available translation, then to the code."
-          },
-          "grid_score": {
-            "type": "integer",
-            "title": "Grid Score"
-          },
-          "comment": {
-            "type": "string",
-            "title": "Comment",
-            "description": "Non-empty textual rationale."
-          }
-        },
-        "type": "object",
-        "required": [
-          "participant_db_id",
-          "statement_id",
-          "statement_code",
-          "statement_text",
-          "grid_score",
-          "comment"
-        ],
-        "title": "ParticipantCardComment",
-        "description": "A single non-empty `card_comment` written by a participant during post-sort.\n\nReturned by the analysis comments endpoint to support critical\nQ-methodology interpretation: the analyst reads the textual rationales\nof participants flagged on a given factor, alongside the audio recordings\nalready surfaced by `ParticipantAudioRecording` (Sneegas 2020;\nRobbins & Krueger 2000)."
       }
     },
     "securitySchemes": {

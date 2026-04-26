@@ -91,6 +91,7 @@ import {
 } from './model';
 import type {
     AcceptInvitationApiAdminInvitationsAcceptPost200,
+    AckResponse,
     AnalysisResult,
     AnalysisRunRead,
     AnalysisRunSummary,
@@ -117,18 +118,24 @@ import type {
     ParticipantAudioRecording,
     ParticipantCardComment,
     ParticipantDetailRead,
+    ParticipantExportResponse,
     ParticipantRead,
     ProjectMemberRead,
     ProjectRead,
     ProjectWithRole,
     RecruitmentLinkRead,
     ReportLogApiLogsPost200,
+    ResolvedStudyConfigResponse,
     ResumeResponse,
     RevokeRecruitmentLinkApiAdminRecruitmentLinksLinkIdDelete200,
     StaleStatementRead,
+    StorageUsageResponse,
+    StudyDumpResponse,
     StudyImportResponse,
     StudyRead,
     StudyStatsRead,
+    SubmissionResultResponse,
+    TOTPEnableResponse,
     TOTPSetup,
     Token,
     UserRead,
@@ -534,7 +541,7 @@ export const changePasswordApiMePasswordPost = (
     passwordChange: PasswordChange,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
+    return customInstance<AckResponse>({
         url: `/api/me/password`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -731,7 +738,7 @@ export function useSetupTotpApiMe2faSetupGet<
  * @summary Enable Totp
  */
 export const enableTotpApiMe2faEnablePost = (tOTPVerify: TOTPVerify, signal?: AbortSignal) => {
-    return customInstance<unknown>({
+    return customInstance<TOTPEnableResponse>({
         url: `/api/me/2fa/enable`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -813,7 +820,7 @@ export const disableTotpApiMe2faDisablePost = (
     passwordConfirm: PasswordConfirm,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
+    return customInstance<AckResponse>({
         url: `/api/me/2fa/disable`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2681,83 +2688,6 @@ export const useDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscar
 };
 
 /**
- * Delete all participants flagged as is_test_run for this study.
- * @summary Clear Test Runs
- */
-export const clearTestRunsApiAdminStudiesSlugTestRunsDelete = (slug: string) => {
-    return customInstance<void>({ url: `/api/admin/studies/${slug}/test-runs`, method: 'DELETE' });
-};
-
-export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationOptions = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(options?: {
-    mutation?: UseMutationOptions<
-        Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-        TError,
-        { slug: string },
-        TContext
-    >;
-}): UseMutationOptions<
-    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-    TError,
-    { slug: string },
-    TContext
-> => {
-    const mutationKey = ['clearTestRunsApiAdminStudiesSlugTestRunsDelete'];
-    const { mutation: mutationOptions } = options
-        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-            ? options
-            : { ...options, mutation: { ...options.mutation, mutationKey } }
-        : { mutation: { mutationKey } };
-
-    const mutationFn: MutationFunction<
-        Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-        { slug: string }
-    > = (props) => {
-        const { slug } = props ?? {};
-
-        return clearTestRunsApiAdminStudiesSlugTestRunsDelete(slug);
-    };
-
-    return { mutationFn, ...mutationOptions };
-};
-
-export type ClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationResult = NonNullable<
-    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>
->;
-
-export type ClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationError = HTTPValidationError;
-
-/**
- * @summary Clear Test Runs
- */
-export const useClearTestRunsApiAdminStudiesSlugTestRunsDelete = <
-    TError = HTTPValidationError,
-    TContext = unknown,
->(
-    options?: {
-        mutation?: UseMutationOptions<
-            Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-            TError,
-            { slug: string },
-            TContext
-        >;
-    },
-    queryClient?: QueryClient
-): UseMutationResult<
-    Awaited<ReturnType<typeof clearTestRunsApiAdminStudiesSlugTestRunsDelete>>,
-    TError,
-    { slug: string },
-    TContext
-> => {
-    const mutationOptions =
-        getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMutationOptions(options);
-
-    return useMutation(mutationOptions, queryClient);
-};
-
-/**
  * Admin-mediated GDPR Art. 17 erasure of a participant's personal data.
 
 Use this endpoint when a participant has emailed the researcher to
@@ -3362,7 +3292,7 @@ export const getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet = (
     slug: string,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
+    return customInstance<StorageUsageResponse>({
         url: `/api/admin/studies/${slug}/storage-usage`,
         method: 'GET',
         signal,
@@ -4101,10 +4031,13 @@ export function useGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet<
 }
 
 /**
- * Update the researcher annotation (`notes`) on a persisted run.
+ * Update the researcher annotations on a persisted run.
 
-Only `notes` is editable; analytical choices and the result payload
-are immutable for audit-trail integrity.
+`notes` (run-level) and `factor_notes` (per-factor) are mutable;
+analytical choices and the result payload are immutable for audit-trail
+integrity. `factor_notes` keys must correspond to actual factors of the
+run (1 ≤ int(k) ≤ run.n_factors); the schema validates format and per-
+value length, and the route validates the upper bound against the run.
  * @summary Update Analysis Run
  */
 export const updateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatch = (
@@ -4487,6 +4420,245 @@ export function useListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGet
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions =
         getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetQueryOptions(
+            slug,
+            params,
+            options
+        );
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * Fetch non-empty `card_comment` entries for a set of participants.
+
+Used by the analysis UI to show post-sort textual rationales linked to
+factor membership: the frontend looks up which participants are flagged
+on a factor (from the analysis result), then calls this endpoint with
+their participant_db_ids to render the written rationales beside the
+audio recordings already returned by `/analysis/audios`. Together the two
+endpoints support the critical Q-methodology practice of grounding factor
+interpretation in the words of the people who define each factor
+(Sneegas 2020; Robbins & Krueger 2000).
+
+Comments are returned ordered per participant by descending |grid_score|
+(extreme placements first) — typically the most interpretable rationales
+when reading a factor.
+
+Query params:
+    participant_ids: comma-separated participant database ids
+        (e.g., "12,17,22"). Empty string returns []. Up to 200 ids
+        accepted (a single factor rarely flags more than ~20).
+ * @summary List Comments For Participants
+ */
+export const listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet = (
+    slug: string,
+    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<ParticipantCardComment[]>({
+        url: `/api/admin/studies/${slug}/analysis/comments`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryKey = (
+    slug?: string,
+    params?: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams
+) => {
+    return [`/api/admin/studies/${slug}/analysis/comments`, ...(params ? [params] : [])] as const;
+};
+
+export const getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryOptions = <
+    TData = Awaited<
+        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ??
+        getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryKey(slug, params);
+
+    const queryFn: QueryFunction<
+        Awaited<
+            ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
+        >
+    > = ({ signal }) =>
+        listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet(slug, params, signal);
+
+    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+        Awaited<
+            ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
+        >,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryResult =
+    NonNullable<
+        Awaited<
+            ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
+        >
+    >;
+export type ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryError =
+    HTTPValidationError;
+
+export function useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet<
+    TData = Awaited<
+        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet<
+    TData = Awaited<
+        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<
+                        ReturnType<
+                            typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
+                        >
+                    >,
+                    TError,
+                    Awaited<
+                        ReturnType<
+                            typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
+                        >
+                    >
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet<
+    TData = Awaited<
+        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary List Comments For Participants
+ */
+
+export function useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet<
+    TData = Awaited<
+        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
+    >,
+    TError = HTTPValidationError,
+>(
+    slug: string,
+    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<
+                    ReturnType<
+                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
+                    >
+                >,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions =
+        getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryOptions(
             slug,
             params,
             options
@@ -5218,7 +5390,7 @@ export function useExportRKitApiAdminStudiesSlugExportRKitGet<
  * @summary Get Study Dump
  */
 export const getStudyDumpApiAdminStudiesSlugDumpGet = (slug: string, signal?: AbortSignal) => {
-    return customInstance<unknown>({
+    return customInstance<StudyDumpResponse>({
         url: `/api/admin/studies/${slug}/dump`,
         method: 'GET',
         signal,
@@ -5616,7 +5788,7 @@ export const exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdEx
     participantId: number,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
+    return customInstance<ParticipantExportResponse>({
         url: `/api/admin/studies/${slug}/participants/${participantId}/export/json`,
         method: 'GET',
         signal,
@@ -9999,7 +10171,7 @@ export const submitStudyApiSubmitPost = (
     submissionInput: SubmissionInput,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
+    return customInstance<SubmissionResultResponse>({
         url: `/api/submit`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -10086,7 +10258,12 @@ export const getStudyApiStudySlugGet = (
     params?: GetStudyApiStudySlugGetParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({ url: `/api/study/${slug}`, method: 'GET', params, signal });
+    return customInstance<ResolvedStudyConfigResponse>({
+        url: `/api/study/${slug}`,
+        method: 'GET',
+        params,
+        signal,
+    });
 };
 
 export const getGetStudyApiStudySlugGetQueryKey = (
@@ -10220,7 +10397,7 @@ export const unlockStudyApiStudySlugUnlockPost = (
     params: UnlockStudyApiStudySlugUnlockPostParams,
     signal?: AbortSignal
 ) => {
-    return customInstance<unknown>({
+    return customInstance<AckResponse>({
         url: `/api/study/${slug}/unlock`,
         method: 'POST',
         params,
@@ -10390,7 +10567,7 @@ export const updateProgressApiStudySlugProgressPatch = (
     slug: string,
     progressUpdate: ProgressUpdate
 ) => {
-    return customInstance<unknown>({
+    return customInstance<AckResponse>({
         url: `/api/study/${slug}/progress`,
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -10471,7 +10648,7 @@ export const useUpdateProgressApiStudySlugProgressPatch = <
  * @summary Save Draft
  */
 export const saveDraftApiStudySlugSaveDraftPut = (slug: string, draftSaveInput: DraftSaveInput) => {
-    return customInstance<unknown>({
+    return customInstance<AckResponse>({
         url: `/api/study/${slug}/save-draft`,
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -11394,245 +11571,6 @@ export function useHealthCheckHealthGet<
     return query;
 }
 
-/**
- * Fetch non-empty `card_comment` entries for a set of participants.
-
-Used by the analysis UI to show post-sort textual rationales linked to
-factor membership: the frontend looks up which participants are flagged
-on a factor (from the analysis result), then calls this endpoint with
-their participant_db_ids to render the written rationales beside the
-audio recordings already returned by `/analysis/audios`. Together the two
-endpoints support the critical Q-methodology practice of grounding factor
-interpretation in the words of the people who define each factor
-(Sneegas 2020; Robbins & Krueger 2000).
-
-Comments are returned ordered per participant by descending |grid_score|
-(extreme placements first) — typically the most interpretable rationales
-when reading a factor.
-
-Query params:
-    participant_ids: comma-separated participant database ids
-        (e.g., "12,17,22"). Empty string returns []. Up to 200 ids
-        accepted (a single factor rarely flags more than ~20).
- * @summary List Comments For Participants
- */
-export const listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet = (
-    slug: string,
-    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
-    signal?: AbortSignal
-) => {
-    return customInstance<ParticipantCardComment[]>({
-        url: `/api/admin/studies/${slug}/analysis/comments`,
-        method: 'GET',
-        params,
-        signal,
-    });
-};
-
-export const getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryKey = (
-    slug?: string,
-    params?: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams
-) => {
-    return [`/api/admin/studies/${slug}/analysis/comments`, ...(params ? [params] : [])] as const;
-};
-
-export const getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryOptions = <
-    TData = Awaited<
-        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
-    >,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<
-                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
-                    >
-                >,
-                TError,
-                TData
-            >
-        >;
-    }
-) => {
-    const { query: queryOptions } = options ?? {};
-
-    const queryKey =
-        queryOptions?.queryKey ??
-        getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryKey(slug, params);
-
-    const queryFn: QueryFunction<
-        Awaited<
-            ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
-        >
-    > = ({ signal }) =>
-        listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet(slug, params, signal);
-
-    return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
-        Awaited<
-            ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
-        >,
-        TError,
-        TData
-    > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryResult =
-    NonNullable<
-        Awaited<
-            ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
-        >
-    >;
-export type ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryError =
-    HTTPValidationError;
-
-export function useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet<
-    TData = Awaited<
-        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
-    >,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
-    options: {
-        query: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<
-                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
-                    >
-                >,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                DefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<
-                            typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
-                        >
-                    >,
-                    TError,
-                    Awaited<
-                        ReturnType<
-                            typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
-                        >
-                    >
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet<
-    TData = Awaited<
-        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
-    >,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<
-                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
-                    >
-                >,
-                TError,
-                TData
-            >
-        > &
-            Pick<
-                UndefinedInitialDataOptions<
-                    Awaited<
-                        ReturnType<
-                            typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
-                        >
-                    >,
-                    TError,
-                    Awaited<
-                        ReturnType<
-                            typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
-                        >
-                    >
-                >,
-                'initialData'
-            >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet<
-    TData = Awaited<
-        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
-    >,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<
-                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
-                    >
-                >,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-/**
- * @summary List Comments For Participants
- */
-
-export function useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet<
-    TData = Awaited<
-        ReturnType<typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet>
-    >,
-    TError = HTTPValidationError,
->(
-    slug: string,
-    params: ListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetParams,
-    options?: {
-        query?: Partial<
-            UseQueryOptions<
-                Awaited<
-                    ReturnType<
-                        typeof listCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet
-                    >
-                >,
-                TError,
-                TData
-            >
-        >;
-    },
-    queryClient?: QueryClient
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-    const queryOptions =
-        getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetQueryOptions(
-            slug,
-            params,
-            options
-        );
-
-    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-        queryKey: DataTag<QueryKey, TData, TError>;
-    };
-
-    query.queryKey = queryOptions.queryKey;
-
-    return query;
-}
-
 export const getReadUsersMeApiMeGetResponseMock = (
     overrideResponse: Partial<UserRead> = {}
 ): UserRead => ({
@@ -11697,11 +11635,46 @@ export const getRegisterUserApiRegisterPostResponseMock = (
     ...overrideResponse,
 });
 
+export const getChangePasswordApiMePasswordPostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
 export const getSetupTotpApiMe2faSetupGetResponseMock = (
     overrideResponse: Partial<TOTPSetup> = {}
 ): TOTPSetup => ({
     secret: faker.string.alpha({ length: { min: 10, max: 20 } }),
     qr_code_uri: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ...overrideResponse,
+});
+
+export const getEnableTotpApiMe2faEnablePostResponseMock = (
+    overrideResponse: Partial<TOTPEnableResponse> = {}
+): TOTPEnableResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    backup_codes: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() =>
+            faker.string.alpha({ length: { min: 10, max: 20 } })
+        ),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getDisableTotpApiMe2faDisablePostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     ...overrideResponse,
 });
 
@@ -14186,6 +14159,18 @@ export const getImportStudyConfigApiAdminStudiesImportPostResponseMock = (
     ...overrideResponse,
 });
 
+export const getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetResponseMock = (
+    overrideResponse: Partial<StorageUsageResponse> = {}
+): StorageUsageResponse => ({
+    total_bytes: faker.number.int({ min: undefined, max: undefined }),
+    total_mb: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    file_count: faker.number.int({ min: undefined, max: undefined }),
+    quota_mb: faker.number.int({ min: undefined, max: undefined }),
+    quota_bytes: faker.number.int({ min: undefined, max: undefined }),
+    usage_percent: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+    ...overrideResponse,
+});
+
 export const getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetResponseMock = (
     overrideResponse: Partial<EigenvalueResult> = {}
 ): EigenvalueResult => ({
@@ -14481,6 +14466,17 @@ export const getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetRes
             participant_db_id: faker.number.int({ min: undefined, max: undefined }),
         }));
 
+export const getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetResponseMock =
+    (): ParticipantCardComment[] =>
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            participant_db_id: faker.number.int({ min: undefined, max: undefined }),
+            statement_id: faker.number.int({ min: undefined, max: undefined }),
+            statement_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            statement_text: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            grid_score: faker.number.int({ min: undefined, max: undefined }),
+            comment: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        }));
+
 export const getGetDataInventoryApiAdminStudiesSlugDataInventoryGetResponseMock = (
     overrideResponse: Partial<DataInventory> = {}
 ): DataInventory => ({
@@ -14531,6 +14527,30 @@ export const getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost
     skipped_already_anonymous: faker.number.int({ min: undefined, max: undefined }),
     ...overrideResponse,
 });
+
+export const getGetStudyDumpApiAdminStudiesSlugDumpGetResponseMock = (
+    overrideResponse: Partial<StudyDumpResponse> = {}
+): StudyDumpResponse => ({
+    study: {},
+    participants: Array.from(
+        { length: faker.number.int({ min: 1, max: 10 }) },
+        (_, i) => i + 1
+    ).map(() => ({})),
+    statement_id_to_index: {
+        [faker.string.alphanumeric(5)]: faker.number.int({ min: undefined, max: undefined }),
+    },
+    ...overrideResponse,
+});
+
+export const getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetResponseMock =
+    (overrideResponse: Partial<ParticipantExportResponse> = {}): ParticipantExportResponse => ({
+        study: {},
+        participant: {},
+        statement_id_to_index: {
+            [faker.string.alphanumeric(5)]: faker.number.int({ min: undefined, max: undefined }),
+        },
+        ...overrideResponse,
+    });
 
 export const getVerifyInvitationApiAdminInvitationsVerifyGetResponseMock =
     (): VerifyInvitationApiAdminInvitationsVerifyGet200 => ({});
@@ -15334,11 +15354,78 @@ export const getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdComment
         ...overrideResponse,
     });
 
+export const getSubmitStudyApiSubmitPostResponseMock = (
+    overrideResponse: Partial<SubmissionResultResponse> = {}
+): SubmissionResultResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    confirmation_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    id: faker.number.int({ min: undefined, max: undefined }),
+    already_submitted: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.datatype.boolean(), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getGetStudyApiStudySlugGetResponseMock = (
+    overrideResponse: Partial<ResolvedStudyConfigResponse> = {}
+): ResolvedStudyConfigResponse => ({
+    slug: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    description: faker.helpers.arrayElement([
+        faker.string.alpha({ length: { min: 10, max: 20 } }),
+        undefined,
+    ]),
+    instructions: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    language: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    requires_password: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    ...overrideResponse,
+});
+
+export const getUnlockStudyApiStudySlugUnlockPostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
 export const getRecordConsentApiStudySlugConsentPostResponseMock = (
     overrideResponse: Partial<ConsentResponse> = {}
 ): ConsentResponse => ({
     status: faker.string.alpha({ length: { min: 10, max: 20 } }),
     resume_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    ...overrideResponse,
+});
+
+export const getUpdateProgressApiStudySlugProgressPatchResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getSaveDraftApiStudySlugSaveDraftPutResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     ...overrideResponse,
 });
 
@@ -15402,17 +15489,6 @@ export const getGetAudioUrlApiAudioRecordingIdUrlGetResponseMock = (
     ]),
     ...overrideResponse,
 });
-
-export const getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetResponseMock =
-    (): ParticipantCardComment[] =>
-        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
-            participant_db_id: faker.number.int({ min: undefined, max: undefined }),
-            statement_id: faker.number.int({ min: undefined, max: undefined }),
-            statement_code: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            statement_text: faker.string.alpha({ length: { min: 10, max: 20 } }),
-            grid_score: faker.number.int({ min: undefined, max: undefined }),
-            comment: faker.string.alpha({ length: { min: 10, max: 20 } }),
-        }));
 
 export const getReadUsersMeApiMeGetMockHandler = (
     overrideResponse?:
@@ -15512,17 +15588,25 @@ export const getRegisterUserApiRegisterPostMockHandler = (
 
 export const getChangePasswordApiMePasswordPostMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
         '*/api/me/password',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getChangePasswordApiMePasswordPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -15554,17 +15638,25 @@ export const getSetupTotpApiMe2faSetupGetMockHandler = (
 
 export const getEnableTotpApiMe2faEnablePostMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+        | TOTPEnableResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<TOTPEnableResponse> | TOTPEnableResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
         '*/api/me/2fa/enable',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getEnableTotpApiMe2faEnablePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -15572,17 +15664,25 @@ export const getEnableTotpApiMe2faEnablePostMockHandler = (
 
 export const getDisableTotpApiMe2faDisablePostMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
         '*/api/me/2fa/disable',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getDisableTotpApiMe2faDisablePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -15978,24 +16078,6 @@ export const getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscar
         );
     };
 
-export const getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler = (
-    overrideResponse?:
-        | void
-        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
-    options?: RequestHandlerOptions
-) => {
-    return http.delete(
-        '*/api/admin/studies/:slug/test-runs',
-        async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 204 });
-        },
-        options
-    );
-};
-
 export const getAdminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDeleteMockHandler =
     (
         overrideResponse?:
@@ -16113,17 +16195,25 @@ export const getImportStudyConfigApiAdminStudiesImportPostMockHandler = (
 
 export const getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+        | StorageUsageResponse
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<StorageUsageResponse> | StorageUsageResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
         '*/api/admin/studies/:slug/storage-usage',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -16303,6 +16393,32 @@ export const getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetMoc
     );
 };
 
+export const getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetMockHandler = (
+    overrideResponse?:
+        | ParticipantCardComment[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ParticipantCardComment[]> | ParticipantCardComment[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:slug/analysis/comments',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getGetDataInventoryApiAdminStudiesSlugDataInventoryGetMockHandler = (
     overrideResponse?:
         | DataInventory
@@ -16411,17 +16527,25 @@ export const getExportRKitApiAdminStudiesSlugExportRKitGetMockHandler = (
 
 export const getGetStudyDumpApiAdminStudiesSlugDumpGetMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+        | StudyDumpResponse
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<StudyDumpResponse> | StudyDumpResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
         '*/api/admin/studies/:slug/dump',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetStudyDumpApiAdminStudiesSlugDumpGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -16449,17 +16573,25 @@ export const getExportParticipantCsvApiAdminStudiesSlugParticipantsParticipantId
 export const getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetMockHandler =
     (
         overrideResponse?:
-            | unknown
-            | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+            | ParticipantExportResponse
+            | ((
+                  info: Parameters<Parameters<typeof http.get>[1]>[0]
+              ) => Promise<ParticipantExportResponse> | ParticipantExportResponse),
         options?: RequestHandlerOptions
     ) => {
         return http.get(
             '*/api/admin/studies/:slug/participants/:participantId/export/json',
             async (info) => {
-                if (typeof overrideResponse === 'function') {
-                    await overrideResponse(info);
-                }
-                return new HttpResponse(null, { status: 200 });
+                return new HttpResponse(
+                    JSON.stringify(
+                        overrideResponse !== undefined
+                            ? typeof overrideResponse === 'function'
+                                ? await overrideResponse(info)
+                                : overrideResponse
+                            : getExportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGetResponseMock()
+                    ),
+                    { status: 200, headers: { 'Content-Type': 'application/json' } }
+                );
             },
             options
         );
@@ -17318,17 +17450,25 @@ export const getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdComment
 
 export const getSubmitStudyApiSubmitPostMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+        | SubmissionResultResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<SubmissionResultResponse> | SubmissionResultResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
         '*/api/submit',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getSubmitStudyApiSubmitPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -17336,17 +17476,25 @@ export const getSubmitStudyApiSubmitPostMockHandler = (
 
 export const getGetStudyApiStudySlugGetMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<unknown> | unknown),
+        | ResolvedStudyConfigResponse
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<ResolvedStudyConfigResponse> | ResolvedStudyConfigResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.get(
         '*/api/study/:slug',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetStudyApiStudySlugGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -17354,17 +17502,25 @@ export const getGetStudyApiStudySlugGetMockHandler = (
 
 export const getUnlockStudyApiStudySlugUnlockPostMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<unknown> | unknown),
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
         '*/api/study/:slug/unlock',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUnlockStudyApiStudySlugUnlockPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -17398,17 +17554,25 @@ export const getRecordConsentApiStudySlugConsentPostMockHandler = (
 
 export const getUpdateProgressApiStudySlugProgressPatchMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Promise<unknown> | unknown),
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.patch(
         '*/api/study/:slug/progress',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateProgressApiStudySlugProgressPatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -17416,17 +17580,25 @@ export const getUpdateProgressApiStudySlugProgressPatchMockHandler = (
 
 export const getSaveDraftApiStudySlugSaveDraftPutMockHandler = (
     overrideResponse?:
-        | unknown
-        | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Promise<unknown> | unknown),
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.put>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.put(
         '*/api/study/:slug/save-draft',
         async (info) => {
-            if (typeof overrideResponse === 'function') {
-                await overrideResponse(info);
-            }
-            return new HttpResponse(null, { status: 200 });
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getSaveDraftApiStudySlugSaveDraftPutResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
         },
         options
     );
@@ -17599,32 +17771,6 @@ export const getHealthCheckHealthGetMockHandler = (
         options
     );
 };
-
-export const getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetMockHandler = (
-    overrideResponse?:
-        | ParticipantCardComment[]
-        | ((
-              info: Parameters<Parameters<typeof http.get>[1]>[0]
-          ) => Promise<ParticipantCardComment[]> | ParticipantCardComment[]),
-    options?: RequestHandlerOptions
-) => {
-    return http.get(
-        '*/api/admin/studies/:slug/analysis/comments',
-        async (info) => {
-            return new HttpResponse(
-                JSON.stringify(
-                    overrideResponse !== undefined
-                        ? typeof overrideResponse === 'function'
-                            ? await overrideResponse(info)
-                            : overrideResponse
-                        : getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetResponseMock()
-                ),
-                { status: 200, headers: { 'Content-Type': 'application/json' } }
-            );
-        },
-        options
-    );
-};
 export const getQualisAPIMock = () => [
     getReadUsersMeApiMeGetMockHandler(),
     getUpdateUserMeApiMePatchMockHandler(),
@@ -17650,7 +17796,6 @@ export const getQualisAPIMock = () => [
     getClearAllParticipantsApiAdminStudiesSlugParticipantsDeleteMockHandler(),
     getGetParticipantApiAdminStudiesParticipantsParticipantIdGetMockHandler(),
     getDiscardParticipantApiAdminStudiesParticipantsParticipantIdDiscardPatchMockHandler(),
-    getClearTestRunsApiAdminStudiesSlugTestRunsDeleteMockHandler(),
     getAdminEraseParticipantPersonalDataApiAdminStudiesSlugParticipantsParticipantIdPersonalDataDeleteMockHandler(),
     getGetStudyStatsApiAdminStudiesSlugStatsGetMockHandler(),
     getExportStudyConfigApiAdminStudiesSlugExportConfigGetMockHandler(),
@@ -17664,6 +17809,7 @@ export const getQualisAPIMock = () => [
     getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMockHandler(),
     getDeleteAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdDeleteMockHandler(),
     getListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetMockHandler(),
+    getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetMockHandler(),
     getGetDataInventoryApiAdminStudiesSlugDataInventoryGetMockHandler(),
     getBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPostMockHandler(),
     getExportCsvApiAdminStudiesSlugExportCsvGetMockHandler(),
@@ -17720,5 +17866,4 @@ export const getQualisAPIMock = () => [
     getDeleteAudioRecordingApiAudioRecordingIdDeleteMockHandler(),
     getGetAudioUrlApiAudioRecordingIdUrlGetMockHandler(),
     getHealthCheckHealthGetMockHandler(),
-    getListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGetMockHandler(),
 ];
