@@ -74,31 +74,44 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
         await page.locator('tbody tr').first().click();
         await expect(page.getByRole('heading', { name: /participant profile/i })).toBeVisible();
 
-        // Find whichever action button is visible and click it.
-        // Locale buttons are just "Discard" / "Restore" (not "...Participant"),
-        // and other "Discard" buttons may exist on the page (recovery dialogs);
-        // anchor on the participant-detail panel via the heading container.
-        const discardButton = page.getByRole('button', { name: /^discard$/i });
-        const restoreButton = page.getByRole('button', { name: /^restore$/i });
+        // The card's "Discard"/"Restore" button only opens an AlertDialog;
+        // the actual mutation happens when the user clicks the dialog's
+        // confirm action button (also labelled "Discard"/"Restore"). The
+        // dialog action lives in role="alertdialog", so we scope to that
+        // container to disambiguate from the trigger.
+        const cardToggle = () =>
+            page
+                .getByRole('button', { name: /^(discard|restore)$/i, exact: false })
+                .first();
 
-        if (await discardButton.isVisible()) {
-            // Discard the participant
-            await discardButton.click();
+        const confirmDialogAction = () =>
+            page.getByRole('alertdialog').getByRole('button', { name: /^(discard|restore)$/i });
+
+        const initialLabel = (await cardToggle().textContent())?.trim() ?? '';
+
+        // Helper: open dialog, confirm, wait for it to close before
+        // returning. Without the close-wait, the next cardToggle().click()
+        // can race with the still-open overlay and silently re-open it.
+        const performToggle = async () => {
+            await cardToggle().click();
+            await expect(page.getByRole('alertdialog')).toBeVisible();
+            await confirmDialogAction().click();
+            await expect(page.getByRole('alertdialog')).not.toBeVisible({ timeout: 5000 });
+        };
+
+        await performToggle();
+
+        if (/^discard$/i.test(initialLabel)) {
+            // Discarded → badge appears, card button now reads "Restore".
             await expect(page.getByTestId('discarded-badge')).toBeVisible({ timeout: 5000 });
-
-            // Now restore
-            await expect(restoreButton).toBeVisible();
-            await restoreButton.click();
+            await expect(cardToggle()).toHaveText(/^restore$/i, { timeout: 5000 });
+            await performToggle();
             await expect(page.getByTestId('discarded-badge')).not.toBeVisible({ timeout: 5000 });
         } else {
-            // Restore the participant
-            await expect(restoreButton).toBeVisible();
-            await restoreButton.click();
+            // Restored → badge disappears, card button now reads "Discard".
             await expect(page.getByTestId('discarded-badge')).not.toBeVisible({ timeout: 5000 });
-
-            // Now discard
-            await expect(discardButton).toBeVisible();
-            await discardButton.click();
+            await expect(cardToggle()).toHaveText(/^discard$/i, { timeout: 5000 });
+            await performToggle();
             await expect(page.getByTestId('discarded-badge')).toBeVisible({ timeout: 5000 });
         }
     });

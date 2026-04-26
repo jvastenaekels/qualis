@@ -164,16 +164,24 @@ export class AdminPage extends BasePage {
         expect(download.suggestedFilename()).toContain('.csv');
     }
 
-    async closeStudy(slug?: string) {
-        if (slug) {
-            await this.page.goto(`/admin/studies/${slug}`);
+    async closeStudy(slug?: string, projectSlug?: string) {
+        // Phase 5D: legacy /admin/studies/{slug} redirects via LegacyRedirect,
+        // but the redirect is async (useEffect) and racing the next click is
+        // unreliable. Go straight to the new URL.
+        if (slug && projectSlug) {
+            await this.page.goto(`/app/${projectSlug}/studies/${slug}`);
         }
-        // Click the 'Closed' card to trigger the dialog
+        // StudyStatusControl renders state-step cards as <div role="button">.
+        // The accessible name is "{label} {description}" — for the closed
+        // state it reads "Closed Analysis & export".
+        await this.page.getByRole('button', { name: /^Closed/ }).click();
+        // The AlertDialog has a footer action labelled "Close Study"
+        // (admin.study_status.dialog.closed.action). Scope to the dialog so
+        // we don't catch any other "Close" button on the page.
         await this.page
-            .getByRole('button', { name: /Closed/i })
-            .first()
+            .getByRole('alertdialog')
+            .getByRole('button', { name: /^close study$/i })
             .click();
-        await this.page.getByRole('button', { name: /Close Study/i }).click();
 
         // Wait for status badge to update
         await expect(this.page.getByTestId('study-status')).toHaveText(/Closed/i);

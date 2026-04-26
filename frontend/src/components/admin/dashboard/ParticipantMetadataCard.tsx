@@ -114,6 +114,7 @@ export function ParticipantMetadataCard({
                             <div className="flex items-center gap-1.5">
                                 <Badge
                                     variant="outline"
+                                    data-testid="discarded-badge"
                                     className="bg-rose-50 text-rose-600 border-rose-200 font-black text-2xs"
                                 >
                                     {t('admin.data.detail.discarded_badge', 'Discarded')}

@@ -125,7 +125,7 @@ test.describe('Admin Flow (Real Backend)', () => {
         await adminPage.exportCSV();
 
         // 7. CLOSE
-        await adminPage.closeStudy(slug);
+        await adminPage.closeStudy(slug, projectSlug);
 
         // 8. LOGOUT
         await adminPage.logout();
