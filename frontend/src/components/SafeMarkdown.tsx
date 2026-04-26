@@ -7,13 +7,19 @@ import { useHyphenation } from '@/hooks/useHyphenation';
 interface Props extends Options {
     children: string | null | undefined;
     allowLinks?: boolean;
+    className?: string;
 }
 
 /**
  * A secure wrapper around ReactMarkdown that sanitizes input using DOMPurify.
  * Use this component instead of raw ReactMarkdown to prevent XSS.
  */
-export const SafeMarkdown: React.FC<Props> = ({ children, allowLinks = true, ...props }) => {
+export const SafeMarkdown: React.FC<Props> = ({
+    children,
+    allowLinks = true,
+    className,
+    ...props
+}) => {
     const hyphenateText = useHyphenation();
 
     const sanitizedContent = useMemo(() => {
@@ -40,13 +46,15 @@ export const SafeMarkdown: React.FC<Props> = ({ children, allowLinks = true, ...
         return url;
     };
 
+    // react-markdown v10 dropped the `className` prop. Wrap the output in a
+    // div so callers can keep passing className for prose styling.
     return (
-        <ReactMarkdown
-            {...props}
-            urlTransform={urlTransform}
-            className={`prose prose-sm max-w-none text-slate-600 [hyphens:manual] ${props.className || ''}`}
+        <div
+            className={`prose prose-sm max-w-none text-slate-600 [hyphens:manual] ${className || ''}`}
         >
-            {sanitizedContent}
-        </ReactMarkdown>
+            <ReactMarkdown {...props} urlTransform={urlTransform}>
+                {sanitizedContent}
+            </ReactMarkdown>
+        </div>
     );
 };
