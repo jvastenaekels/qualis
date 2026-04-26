@@ -25,7 +25,6 @@ if (!i18n.isInitialized) {
         react: {
             useSuspense: false,
         },
-        initImmediate: true, // Ensure synchronous initialization
     });
 } else {
     // If already initialized, ensure resources are loaded
