@@ -105,8 +105,11 @@ test.describe('Admin Flow (Real Backend)', () => {
         // (though we could open a context, but let's use testDb for speed)
         await testDb.createParticipant(authToken, slug, testDataBuilders.participantResult());
 
-        // Go to Data tab to see results
-        await page.getByRole('link', { name: /data/i }).first().click();
+        // Go to Data tab to see results.
+        // Sidebar link click was unreliable (multiple links match /data/i,
+        // including "Data lifecycle"); navigate directly via URL.
+        const projectSlug = testDb.getWorkspaceSlug();
+        await page.goto(`/app/${projectSlug}/studies/${slug}/data`);
 
         // Verify participant visible
         // Wait for table

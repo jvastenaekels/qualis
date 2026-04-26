@@ -74,9 +74,12 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
         await page.locator('tbody tr').first().click();
         await expect(page.getByRole('heading', { name: /participant profile/i })).toBeVisible();
 
-        // Find whichever action button is visible and click it
-        const discardButton = page.getByRole('button', { name: /discard participant/i });
-        const restoreButton = page.getByRole('button', { name: /restore participant/i });
+        // Find whichever action button is visible and click it.
+        // Locale buttons are just "Discard" / "Restore" (not "...Participant"),
+        // and other "Discard" buttons may exist on the page (recovery dialogs);
+        // anchor on the participant-detail panel via the heading container.
+        const discardButton = page.getByRole('button', { name: /^discard$/i });
+        const restoreButton = page.getByRole('button', { name: /^restore$/i });
 
         if (await discardButton.isVisible()) {
             // Discard the participant

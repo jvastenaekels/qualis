@@ -150,17 +150,16 @@ export class AdminPage extends BasePage {
     }
 
     async exportCSV() {
-        // Navigate to Analytics/Exports
-        await this.page.getByRole('link', { name: /data/i }).first().click();
-
-        // Switch to Export data tab
-        await this.page.getByRole('tab', { name: /Export data/i }).click();
-
-        const csvBtn = this.page.getByRole('button', {
-            name: /export universal csv/i,
-        });
+        // Post-Phase-5D: caller is expected to already be on /data
+        // (admin-flow does an explicit page.goto). InteractiveDataView is
+        // single-page (no tabs); export lives behind an "Export" dropdown
+        // whose menu items include "Universal CSV".
+        const exportButton = this.page.getByRole('button', { name: /^export data$/i }).first();
+        await exportButton.click();
         const downloadPromise = this.page.waitForEvent('download');
-        await csvBtn.click();
+        // Dropdown items: Research Package (ZIP), CSV, PQMethod (ZIP), R-Kit (ZIP), JSON Dump.
+        // ^CSV$ avoids matching the others; case-insensitive for safety.
+        await this.page.getByRole('menuitem', { name: /^csv$/i }).click();
         const download = await downloadPromise;
         expect(download.suggestedFilename()).toContain('.csv');
     }

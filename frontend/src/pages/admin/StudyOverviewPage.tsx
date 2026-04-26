@@ -52,6 +52,7 @@ const StudyOverviewPage = () => {
                     <Badge
                         variant="outline"
                         role="status"
+                        data-testid="study-status"
                         className={cn(
                             'font-semibold text-2xs px-2 py-0.5 rounded-full',
                             study?.state === 'active'
