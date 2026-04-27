@@ -12,13 +12,9 @@ import {
     Search,
     Settings,
     Download,
-    Users,
     Settings2,
-    Wand2,
-    Table,
     ShieldCheck,
 } from 'lucide-react';
-import { StudySwitcher } from './StudySwitcher';
 import { ProjectSwitcher } from './ProjectSwitcher';
 import { FocusModeHeader } from './FocusModeHeader';
 import { UserAvatar } from './UserAvatar';
@@ -42,7 +38,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -176,7 +171,6 @@ function NavUser({ user, projectSlug }: { user: any; projectSlug?: string }) {
 import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-    const { activeStudyId, activeProjectId } = useAdminStore();
     const { currentProject } = useAuthStore();
     const { user } = useAuth();
     const location = useLocation();
@@ -203,11 +197,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const studies = studiesData?.items;
 
     const { can } = usePermission();
-
-    // For legacy routes
-    const isValidStudy =
-        activeStudyId &&
-        studies?.some((s) => s.slug === activeStudyId && s.project_id === activeProjectId);
 
     // Project-level navigation (always visible in new architecture)
     const projectNav = projectSlug
@@ -282,93 +271,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               ].filter((item) => item.show)
             : [];
 
-    const activeStudy = studies?.find(
-        (s) => s.slug === activeStudyId && s.project_id === activeProjectId
-    );
-
-    // Legacy navigation for backward compatibility
-    const navMain = isValidStudy
-        ? [
-              {
-                  title: t('layout.navigation'),
-                  url: '#',
-                  isActive: true,
-                  items: [
-                      {
-                          title: t('admin.sidebar.overview', 'Overview'),
-                          url:
-                              projectSlug && activeStudyId
-                                  ? `/app/${projectSlug}/studies/${activeStudyId}`
-                                  : activeStudy?.project?.slug && activeStudyId
-                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}`
-                                    : `/admin/studies/${activeStudyId}`,
-                          icon: LayoutDashboard,
-                      },
-                      {
-                          title: t('admin.sidebar.design', 'Design'),
-                          url:
-                              projectSlug && activeStudyId
-                                  ? `/app/${projectSlug}/studies/${activeStudyId}/design`
-                                  : activeStudy?.project?.slug && activeStudyId
-                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/design`
-                                    : `/admin/studies/${activeStudyId}/design`,
-                          icon: Wand2,
-                      },
-                      {
-                          title: t('admin.sidebar.recruitment', 'Recruitment'),
-                          url:
-                              projectSlug && activeStudyId
-                                  ? `/app/${projectSlug}/studies/${activeStudyId}/recruitment`
-                                  : activeStudy?.project?.slug && activeStudyId
-                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/recruitment`
-                                    : `/admin/studies/${activeStudyId}/recruitment`,
-                          icon: Users,
-                      },
-                      {
-                          title: t('admin.sidebar.data_exports', 'Data & Exports'),
-                          url:
-                              projectSlug && activeStudyId
-                                  ? `/app/${projectSlug}/studies/${activeStudyId}/data`
-                                  : activeStudy?.project?.slug && activeStudyId
-                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/data`
-                                    : `/admin/studies/${activeStudyId}/exports`,
-                          icon: Table,
-                      },
-                      {
-                          title: t('admin.sidebar.lifecycle', 'Data lifecycle'),
-                          url:
-                              projectSlug && activeStudyId
-                                  ? `/app/${projectSlug}/studies/${activeStudyId}/lifecycle`
-                                  : activeStudy?.project?.slug && activeStudyId
-                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/lifecycle`
-                                    : `/admin/studies/${activeStudyId}/lifecycle`,
-                          icon: ShieldCheck,
-                      },
-                      {
-                          title: t('admin.sidebar.analysis', 'Analysis'),
-                          url:
-                              projectSlug && activeStudyId
-                                  ? `/app/${projectSlug}/studies/${activeStudyId}/analysis`
-                                  : activeStudy?.project?.slug && activeStudyId
-                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/analysis`
-                                    : `/admin/studies/${activeStudyId}/analysis`,
-                          icon: ChartColumnStacked,
-                      },
-                      {
-                          title: t('admin.sidebar.settings', 'Study settings'),
-                          url:
-                              projectSlug && activeStudyId
-                                  ? `/app/${projectSlug}/studies/${activeStudyId}/settings`
-                                  : activeStudy?.project?.slug && activeStudyId
-                                    ? `/app/${activeStudy.project.slug}/studies/${activeStudyId}/settings`
-                                    : `/admin/studies/${activeStudyId}/settings`,
-                          icon: Settings,
-                      },
-                  ],
-              },
-          ]
-        : [];
-
     const focusStudy =
         isFocusMode && params.studySlug
             ? studies?.find(
@@ -376,126 +278,64 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               )
             : undefined;
 
-    // Render new architecture sidebar
-    if (isNewArchitecture) {
-        return (
-            <Sidebar variant="inset" {...props}>
-                <SidebarHeader>
-                    {isFocusMode && params.studySlug ? (
-                        <FocusModeHeader
-                            projectSlug={projectSlug}
-                            projectTitle={currentProject?.title}
-                            study={focusStudy}
-                            studySlug={params.studySlug}
-                        />
-                    ) : (
-                        <ProjectSwitcher />
-                    )}
-                </SidebarHeader>
-                <SidebarContent>
-                    {isFocusMode ? (
-                        // Focus Mode: Study navigation
-                        <SidebarGroup>
-                            <SidebarMenu>
-                                <SidebarMenuItem className="px-2 mb-4">
-                                    <SidebarMenuButton
-                                        size="sm"
-                                        className="bg-muted/50 hover:bg-muted border border-border/50 text-slate-700 transition-all duration-200"
-                                        onClick={() => {
-                                            window.dispatchEvent(
-                                                new CustomEvent('open-command-menu')
-                                            );
-                                        }}
-                                    >
-                                        <Search className="size-3.5 mr-2" />
-                                        <span className="text-xs">
-                                            {t('admin.sidebar.search', 'Search')}
-                                        </span>
-                                        <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-2xs font-medium text-muted-foreground opacity-100">
-                                            <span className="text-xs">⌘</span>K
-                                        </kbd>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            </SidebarMenu>
-                            <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
-                                {t('admin.sidebar.study_tools', 'Study Tools')}
-                            </SidebarGroupLabel>
-                            <SidebarMenu>
-                                {studyNav.map((item) => (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton
-                                            asChild
-                                            isActive={location.pathname === item.url}
-                                        >
-                                            <Link to={item.url}>
-                                                <item.icon />
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroup>
-                    ) : (
-                        // Project View: Project navigation
-                        <SidebarGroup>
-                            <SidebarMenu>
-                                <SidebarMenuItem className="px-2 mb-4">
-                                    <SidebarMenuButton
-                                        size="sm"
-                                        className="bg-muted/50 hover:bg-muted border border-border/50 text-slate-700 transition-all duration-200"
-                                        onClick={() => {
-                                            window.dispatchEvent(
-                                                new CustomEvent('open-command-menu')
-                                            );
-                                        }}
-                                    >
-                                        <Search className="size-3.5 mr-2" />
-                                        <span className="text-xs">{t('admin.sidebar.search')}</span>
-                                        <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-2xs font-medium text-muted-foreground opacity-100">
-                                            <span className="text-xs">⌘</span>K
-                                        </kbd>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            </SidebarMenu>
-                            <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
-                                {t('admin.sidebar.project', 'Project')}
-                            </SidebarGroupLabel>
-                            <SidebarMenu>
-                                {projectNav.map((item) => (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton
-                                            asChild
-                                            isActive={location.pathname === item.url}
-                                        >
-                                            <Link to={item.url}>
-                                                <item.icon />
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))}
-                            </SidebarMenu>
-                        </SidebarGroup>
-                    )}
-                </SidebarContent>
-                <SidebarFooter className="gap-2">
-                    <NavLanguage />
-                    <NavUser user={user} projectSlug={projectSlug} />
-                </SidebarFooter>
-            </Sidebar>
-        );
-    }
-
-    // Legacy sidebar for backward compatibility
     return (
         <Sidebar variant="inset" {...props}>
             <SidebarHeader>
-                <ProjectSwitcher />
-                <StudySwitcher />
+                {isFocusMode && params.studySlug ? (
+                    <FocusModeHeader
+                        projectSlug={projectSlug}
+                        projectTitle={currentProject?.title}
+                        study={focusStudy}
+                        studySlug={params.studySlug}
+                    />
+                ) : (
+                    <ProjectSwitcher />
+                )}
             </SidebarHeader>
             <SidebarContent>
-                {isValidStudy ? (
+                {isFocusMode ? (
+                    // Focus Mode: Study navigation
+                    <SidebarGroup>
+                        <SidebarMenu>
+                            <SidebarMenuItem className="px-2 mb-4">
+                                <SidebarMenuButton
+                                    size="sm"
+                                    className="bg-muted/50 hover:bg-muted border border-border/50 text-slate-700 transition-all duration-200"
+                                    onClick={() => {
+                                        window.dispatchEvent(new CustomEvent('open-command-menu'));
+                                    }}
+                                >
+                                    <Search className="size-3.5 mr-2" />
+                                    <span className="text-xs">
+                                        {t('admin.sidebar.search', 'Search')}
+                                    </span>
+                                    <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-background px-1.5 font-mono text-2xs font-medium text-muted-foreground opacity-100">
+                                        <span className="text-xs">⌘</span>K
+                                    </kbd>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        </SidebarMenu>
+                        <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
+                            {t('admin.sidebar.study_tools', 'Study Tools')}
+                        </SidebarGroupLabel>
+                        <SidebarMenu>
+                            {studyNav.map((item) => (
+                                <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={location.pathname === item.url}
+                                    >
+                                        <Link to={item.url}>
+                                            <item.icon />
+                                            <span>{item.title}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
+                        </SidebarMenu>
+                    </SidebarGroup>
+                ) : (
+                    // Project View: Project navigation
                     <SidebarGroup>
                         <SidebarMenu>
                             <SidebarMenuItem className="px-2 mb-4">
@@ -514,32 +354,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
-
+                        <SidebarGroupLabel className="px-2 text-xs font-semibold text-slate-600">
+                            {t('admin.sidebar.project', 'Project')}
+                        </SidebarGroupLabel>
                         <SidebarMenu>
-                            {navMain.map((group) =>
-                                group.items.map((item) => (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton
-                                            asChild
-                                            isActive={location.pathname === item.url}
-                                        >
-                                            <Link to={item.url}>
-                                                <item.icon />
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                ))
-                            )}
+                            {projectNav.map((item) => (
+                                <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuButton
+                                        asChild
+                                        isActive={location.pathname === item.url}
+                                    >
+                                        <Link to={item.url}>
+                                            <item.icon />
+                                            <span>{item.title}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
                         </SidebarMenu>
                     </SidebarGroup>
-                ) : (
-                    <div className="p-4 text-sm text-muted-foreground text-center">
-                        {t(
-                            'admin.sidebar.select_study_msg',
-                            'Please select or create a study to begin.'
-                        )}
-                    </div>
                 )}
             </SidebarContent>
             <SidebarFooter className="gap-2">
