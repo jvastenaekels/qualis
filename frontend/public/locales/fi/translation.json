@@ -506,7 +506,8 @@
                 "saving": "Tallennetaan...",
                 "success": "Profiili päivitetty onnistuneesti",
                 "error": "Profiilin päivitys epäonnistui",
-                "cannot_remove_self": "Et voi poistaa itseäsi"
+                "cannot_remove_self": "Et voi poistaa itseäsi",
+                "name_required": "Koko nimi vaaditaan"
             },
             "security": {
                 "title": "Turvallisuus & 2FA",
@@ -528,7 +529,9 @@
                 "cancel": "Peruuta",
                 "enabled_success": "Kaksivaiheinen todennus otettu käyttöön",
                 "disabled_success": "Kaksivaiheinen todennus poistettu käytöstä",
-                "secret_copied": "Salaisuus kopioitu"
+                "secret_copied": "Salaisuus kopioitu",
+                "invalid_token": "Virheellinen vahvistuskoodi",
+                "disable_error": "2FA-tunnistautumisen poistaminen epäonnistui"
             },
             "password": {
                 "title": "Salasanan hallinta",
