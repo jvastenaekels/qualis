@@ -3,7 +3,48 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationInfo,
+    field_validator,
+    model_validator,
+)
+
+
+class ManualRotation(BaseModel):
+    """A single judgmental rotation step.
+
+    Each step is a 2-D Givens rotation on the (factor_a, factor_b) column
+    pair of the loadings matrix by `angle_deg` degrees. Used by the
+    'judgmental' rotation method to align factors with substantively
+    meaningful positions (Brown 1980; Watts & Stenner 2012).
+    """
+
+    factor_a: int = Field(
+        ...,
+        ge=1,
+        description="1-indexed factor number to rotate.",
+    )
+    factor_b: int = Field(
+        ...,
+        ge=1,
+        description="1-indexed factor number to rotate around. Must differ from factor_a.",
+    )
+    angle_deg: float = Field(
+        ...,
+        ge=-180.0,
+        le=180.0,
+        description="Rotation angle in degrees, in [-180, 180].",
+    )
+
+    @field_validator("factor_b")
+    @classmethod
+    def validate_distinct(cls, v: int, info: ValidationInfo) -> int:
+        if "factor_a" in info.data and v == info.data["factor_a"]:
+            raise ValueError("factor_a and factor_b must be distinct")
+        return v
 
 
 class AnalysisRequest(BaseModel):
@@ -13,11 +54,27 @@ class AnalysisRequest(BaseModel):
         "pca", description="Factor extraction method: 'pca' or 'centroid'"
     )
     n_factors: int = Field(3, ge=1, le=20, description="Number of factors to extract")
-    rotation: str = Field("varimax", description="Rotation method: 'varimax' or 'none'")
+    rotation: str = Field(
+        "varimax",
+        description="Rotation method: 'varimax', 'none', or 'judgmental'",
+    )
     flagging: str = Field("auto", description="Flagging method: 'auto' or 'manual'")
     manual_flags: dict[int, int] | None = Field(
         None,
         description="Manual participant-to-factor assignments (participant_db_id → factor_number, 1-indexed)",
+    )
+    manual_rotations: list[ManualRotation] | None = Field(
+        None,
+        description="Sequence of judgmental rotations to apply (only used when "
+        "rotation='judgmental'). Each entry rotates the (factor_a, factor_b) "
+        "pair by angle_deg degrees; rotations are applied in list order.",
+    )
+    bootstrap_iterations: int | None = Field(
+        None,
+        ge=100,
+        le=5000,
+        description="Optional: run a non-parametric bootstrap with B iterations "
+        "to estimate SEs on z-scores (Zabala & Pascual 2016). None = skip.",
     )
 
     @field_validator("extraction")
@@ -30,8 +87,8 @@ class AnalysisRequest(BaseModel):
     @field_validator("rotation")
     @classmethod
     def validate_rotation(cls, v: str) -> str:
-        if v not in ("varimax", "none"):
-            raise ValueError("rotation must be 'varimax' or 'none'")
+        if v not in ("varimax", "none", "judgmental"):
+            raise ValueError("rotation must be 'varimax', 'none', or 'judgmental'")
         return v
 
     @field_validator("flagging")
@@ -40,6 +97,33 @@ class AnalysisRequest(BaseModel):
         if v not in ("auto", "manual"):
             raise ValueError("flagging must be 'auto' or 'manual'")
         return v
+
+    @model_validator(mode="after")
+    def validate_manual_rotations_consistency(self) -> "AnalysisRequest":
+        """Cross-field validation for judgmental rotation.
+
+        - rotation='judgmental' requires a non-empty manual_rotations list.
+        - rotation != 'judgmental' must not carry manual_rotations data
+          (reject mixed configs to avoid silent drops on the backend).
+        - every factor index referenced in manual_rotations must be ≤ n_factors.
+        """
+        if self.rotation == "judgmental":
+            if not self.manual_rotations:
+                raise ValueError(
+                    "rotation='judgmental' requires a non-empty manual_rotations list"
+                )
+            for i, mr in enumerate(self.manual_rotations):
+                if mr.factor_a > self.n_factors or mr.factor_b > self.n_factors:
+                    raise ValueError(
+                        f"manual_rotations[{i}] references factor "
+                        f"({mr.factor_a}, {mr.factor_b}) but n_factors={self.n_factors}"
+                    )
+        else:
+            if self.manual_rotations:
+                raise ValueError(
+                    "manual_rotations is only valid when rotation='judgmental'"
+                )
+        return self
 
 
 class ParticipantLoading(BaseModel):
@@ -91,6 +175,46 @@ class FactorCharacteristic(BaseModel):
     se_factor_scores: float = Field(description="Standard error of factor scores")
 
 
+class BootstrapStatementStability(BaseModel):
+    """SE/CI for a single statement on a single factor.
+
+    Output of a non-parametric bootstrap of Q-sorts (Zabala & Pascual 2016):
+    the analysis is rerun B times on resampled Q-sort columns and the
+    distribution of z-scores per (statement, factor) yields a mean, an SE,
+    and a 95% empirical confidence interval.
+    """
+
+    statement_id: int
+    factor: int = Field(description="1-indexed factor number")
+    z_mean: float
+    z_se: float
+    ci_lower: float = Field(description="2.5th percentile of bootstrapped z-scores")
+    ci_upper: float = Field(description="97.5th percentile of bootstrapped z-scores")
+
+
+class BootstrapResult(BaseModel):
+    """Bootstrap stability output (Zabala & Pascual 2016).
+
+    Returned alongside the regular analysis result when the analyst opted in
+    by setting ``bootstrap_iterations`` on the request.
+    """
+
+    n_iterations: int = Field(
+        description="Number of bootstrap iterations B that were attempted."
+    )
+    n_converged: int = Field(
+        description="Number of iterations that produced a usable factor solution. "
+        "Pathological resamples (degenerate correlation matrix, etc.) are skipped."
+    )
+    statements: list[BootstrapStatementStability] = Field(
+        description="One entry per (statement, factor) pair with non-empty samples."
+    )
+    factor_mean_se: list[float] = Field(
+        description="Per-factor mean SE of z-scores, length = n_factors. "
+        "Powers the 'Mean SE (z)' column in the factor characteristics table."
+    )
+
+
 class AnalysisResult(BaseModel):
     """Complete result of a Q-method factor analysis."""
 
@@ -117,6 +241,16 @@ class AnalysisResult(BaseModel):
     factor_characteristics: list[FactorCharacteristic]
     correlation_matrix: list[list[float]] = Field(
         description="Between-factor correlation matrix: n_factors x n_factors"
+    )
+    manual_rotations: list[ManualRotation] = Field(
+        default_factory=list,
+        description="The judgmental rotations applied to produce this result, "
+        "in list order. Empty for 'varimax' or 'none' rotation.",
+    )
+    bootstrap: BootstrapResult | None = Field(
+        None,
+        description="Bootstrap stability output (Zabala & Pascual 2016). Set "
+        "only when the request opted in via `bootstrap_iterations`.",
     )
 
 
@@ -153,6 +287,18 @@ class AnalysisRunSummary(BaseModel):
         default_factory=dict,
         description="Per-factor interpretive narrative (Sneegas 2020). "
         "Keys are stringified 1-indexed factor numbers; values are free-text.",
+    )
+    manual_rotations: list[ManualRotation] = Field(
+        default_factory=list,
+        description="The judgmental rotations applied to this run, in list "
+        "order. Empty for 'varimax' or 'none' rotation. Persisted on the run "
+        "for audit-trail traceability of which rotations produced the result "
+        "(Brown 1980; Watts & Stenner 2012).",
+    )
+    bootstrap_iterations: int | None = Field(
+        None,
+        description="Number of bootstrap iterations B used by this run "
+        "(Zabala & Pascual 2016). None = bootstrap was not run.",
     )
 
 

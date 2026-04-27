@@ -8,6 +8,8 @@ import type { AnalysisRunSummaryRanByUserId } from './analysisRunSummaryRanByUse
 import type { AnalysisRunSummaryRanByEmail } from './analysisRunSummaryRanByEmail';
 import type { AnalysisRunSummaryNotes } from './analysisRunSummaryNotes';
 import type { AnalysisRunSummaryFactorNotes } from './analysisRunSummaryFactorNotes';
+import type { ManualRotation } from './manualRotation';
+import type { AnalysisRunSummaryBootstrapIterations } from './analysisRunSummaryBootstrapIterations';
 
 /**
  * Lightweight summary of a persisted analysis run, used in list views.
@@ -25,4 +27,8 @@ export interface AnalysisRunSummary {
     notes?: AnalysisRunSummaryNotes;
     /** Per-factor interpretive narrative (Sneegas 2020). Keys are stringified 1-indexed factor numbers; values are free-text. */
     factor_notes?: AnalysisRunSummaryFactorNotes;
+    /** The judgmental rotations applied to this run, in list order. Empty for 'varimax' or 'none' rotation. Persisted on the run for audit-trail traceability of which rotations produced the result (Brown 1980; Watts & Stenner 2012). */
+    manual_rotations?: ManualRotation[];
+    /** Number of bootstrap iterations B used by this run (Zabala & Pascual 2016). None = bootstrap was not run. */
+    bootstrap_iterations?: AnalysisRunSummaryBootstrapIterations;
 }

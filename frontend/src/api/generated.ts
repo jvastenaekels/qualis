@@ -14362,6 +14362,53 @@ export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostResponseMock 
             faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })
         )
     ),
+    manual_rotations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            factor_a: faker.number.int({ min: 1, max: undefined }),
+            factor_b: faker.number.int({ min: 1, max: undefined }),
+            angle_deg: faker.number.float({ min: -180, max: 180, fractionDigits: 2 }),
+        })),
+        undefined,
+    ]),
+    bootstrap: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([
+            {
+                n_iterations: faker.number.int({ min: undefined, max: undefined }),
+                n_converged: faker.number.int({ min: undefined, max: undefined }),
+                statements: Array.from(
+                    { length: faker.number.int({ min: 1, max: 10 }) },
+                    (_, i) => i + 1
+                ).map(() => ({
+                    statement_id: faker.number.int({ min: undefined, max: undefined }),
+                    factor: faker.number.int({ min: undefined, max: undefined }),
+                    z_mean: faker.number.float({
+                        min: undefined,
+                        max: undefined,
+                        fractionDigits: 2,
+                    }),
+                    z_se: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+                    ci_lower: faker.number.float({
+                        min: undefined,
+                        max: undefined,
+                        fractionDigits: 2,
+                    }),
+                    ci_upper: faker.number.float({
+                        min: undefined,
+                        max: undefined,
+                        fractionDigits: 2,
+                    }),
+                })),
+                factor_mean_se: Array.from(
+                    { length: faker.number.int({ min: 1, max: 10 }) },
+                    (_, i) => i + 1
+                ).map(() =>
+                    faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })
+                ),
+            },
+            null,
+        ]),
+        undefined,
+    ]),
     ...overrideResponse,
 });
 
@@ -14403,6 +14450,23 @@ export const getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetResponseMock =
                 },
                 undefined,
             ]),
+            manual_rotations: faker.helpers.arrayElement([
+                Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+                    () => ({
+                        factor_a: faker.number.int({ min: 1, max: undefined }),
+                        factor_b: faker.number.int({ min: 1, max: undefined }),
+                        angle_deg: faker.number.float({ min: -180, max: 180, fractionDigits: 2 }),
+                    })
+                ),
+                undefined,
+            ]),
+            bootstrap_iterations: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                undefined,
+            ]),
         }));
 
 export const getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetResponseMock = (
@@ -14430,6 +14494,18 @@ export const getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetResponseMoc
         {
             [faker.string.alphanumeric(5)]: faker.string.alpha({ length: { min: 10, max: 20 } }),
         },
+        undefined,
+    ]),
+    manual_rotations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            factor_a: faker.number.int({ min: 1, max: undefined }),
+            factor_b: faker.number.int({ min: 1, max: undefined }),
+            angle_deg: faker.number.float({ min: -180, max: 180, fractionDigits: 2 }),
+        })),
+        undefined,
+    ]),
+    bootstrap_iterations: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
         undefined,
     ]),
     result: {},
@@ -14461,6 +14537,18 @@ export const getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchRespon
         {
             [faker.string.alphanumeric(5)]: faker.string.alpha({ length: { min: 10, max: 20 } }),
         },
+        undefined,
+    ]),
+    manual_rotations: faker.helpers.arrayElement([
+        Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+            factor_a: faker.number.int({ min: 1, max: undefined }),
+            factor_b: faker.number.int({ min: 1, max: undefined }),
+            angle_deg: faker.number.float({ min: -180, max: 180, fractionDigits: 2 }),
+        })),
+        undefined,
+    ]),
+    bootstrap_iterations: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.number.int({ min: undefined, max: undefined }), null]),
         undefined,
     ]),
     ...overrideResponse,

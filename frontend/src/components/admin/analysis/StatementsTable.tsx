@@ -42,6 +42,23 @@ export function StatementsTable({ result }: StatementsTableProps) {
         [result.consensus]
     );
 
+    // Bootstrap stability lookup: (statement_id, factor 1-indexed) → SE/CI.
+    // Empty map when no bootstrap was run, so the JSX falls back to the
+    // plain z-score render path (Zabala & Pascual 2016).
+    const bootstrapMap = useMemo(() => {
+        const map = new Map<string, { z_se: number; ci_lower: number; ci_upper: number }>();
+        if (result.bootstrap) {
+            for (const s of result.bootstrap.statements) {
+                map.set(`${s.statement_id}:${s.factor}`, {
+                    z_se: s.z_se,
+                    ci_lower: s.ci_lower,
+                    ci_upper: s.ci_upper,
+                });
+            }
+        }
+        return map;
+    }, [result.bootstrap]);
+
     const handleSort = (key: SortKey) => {
         if (sortKey === key) {
             setSortAsc(!sortAsc);
@@ -240,18 +257,34 @@ export function StatementsTable({ result }: StatementsTableProps) {
                                             </UiTooltip>
                                         </TooltipProvider>
                                     </td>
-                                    {stmt.z_scores.map((z, f) => (
-                                        <td
-                                            key={`z${f}`}
-                                            className={cn(
-                                                'text-right py-1.5 px-2 font-mono text-xs tabular-nums',
-                                                zScoreColor(z)
-                                            )}
-                                        >
-                                            {z > 0 ? '+' : ''}
-                                            {z.toFixed(2)}
-                                        </td>
-                                    ))}
+                                    {stmt.z_scores.map((z, f) => {
+                                        const stab = bootstrapMap.get(
+                                            `${stmt.statement_id}:${f + 1}`
+                                        );
+                                        return (
+                                            <td
+                                                key={`z${f}`}
+                                                className={cn(
+                                                    'text-right py-1.5 px-2 font-mono text-xs tabular-nums',
+                                                    zScoreColor(z)
+                                                )}
+                                                title={
+                                                    stab
+                                                        ? `95% CI [${stab.ci_lower.toFixed(2)}, ${stab.ci_upper.toFixed(2)}]`
+                                                        : undefined
+                                                }
+                                            >
+                                                {z > 0 ? '+' : ''}
+                                                {z.toFixed(2)}
+                                                {stab && (
+                                                    <span className="text-slate-400 font-normal">
+                                                        {' '}
+                                                        ±{stab.z_se.toFixed(2)}
+                                                    </span>
+                                                )}
+                                            </td>
+                                        );
+                                    })}
                                     {stmt.factor_arrays.map((a, f) => (
                                         <td
                                             key={`a${f}`}

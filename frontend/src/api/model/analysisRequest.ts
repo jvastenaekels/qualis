@@ -5,6 +5,8 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AnalysisRequestManualFlags } from './analysisRequestManualFlags';
+import type { AnalysisRequestManualRotations } from './analysisRequestManualRotations';
+import type { AnalysisRequestBootstrapIterations } from './analysisRequestBootstrapIterations';
 
 /**
  * Schema for requesting a Q-method factor analysis.
@@ -18,10 +20,14 @@ export interface AnalysisRequest {
      * @maximum 20
      */
     n_factors?: number;
-    /** Rotation method: 'varimax' or 'none' */
+    /** Rotation method: 'varimax', 'none', or 'judgmental' */
     rotation?: string;
     /** Flagging method: 'auto' or 'manual' */
     flagging?: string;
     /** Manual participant-to-factor assignments (participant_db_id → factor_number, 1-indexed) */
     manual_flags?: AnalysisRequestManualFlags;
+    /** Sequence of judgmental rotations to apply (only used when rotation='judgmental'). Each entry rotates the (factor_a, factor_b) pair by angle_deg degrees; rotations are applied in list order. */
+    manual_rotations?: AnalysisRequestManualRotations;
+    /** Optional: run a non-parametric bootstrap with B iterations to estimate SEs on z-scores (Zabala & Pascual 2016). None = skip. */
+    bootstrap_iterations?: AnalysisRequestBootstrapIterations;
 }

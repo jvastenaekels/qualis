@@ -61,6 +61,38 @@ class StatementClassEntry(TypedDict):
     significance: dict[str, str]
 
 
+class BootstrapStatementEntry(TypedDict):
+    """Stability of one statement on one factor across the bootstrap.
+
+    Output of ``compute_bootstrap_stability``. ``statement_idx`` is the
+    row-index in the dataset matrix; the router maps it to the real
+    statement_id (matching the regular ``z_scores`` -> ``statement_scores``
+    translation).
+    """
+
+    statement_idx: int
+    factor: int
+    z_mean: float
+    z_se: float
+    ci_lower: float
+    ci_upper: float
+
+
+class BootstrapStabilityResult(TypedDict):
+    """Return type of ``compute_bootstrap_stability``.
+
+    Per-iteration distributions of z-scores are summarised into mean, SE
+    and 95% empirical CI per (statement, factor). ``factor_mean_se``
+    powers the per-factor mean-SE column in the factor characteristics
+    table; the per-statement breakdown drives statement-level CI display.
+    """
+
+    n_iterations: int
+    n_converged: int
+    statements: list[BootstrapStatementEntry]
+    factor_mean_se: list[float]
+
+
 class AnalysisRunResult(TypedDict):
     """Return type of run_analysis().
 
@@ -84,6 +116,7 @@ class AnalysisRunResult(TypedDict):
     factor_correlation: NDArray[np.float64]
     distinguishing: list[StatementClassEntry]
     consensus: list[StatementClassEntry]
+    manual_rotations: list[dict[str, object]]
 
 
 def build_sort_matrix(
@@ -375,6 +408,60 @@ def rotate_varimax(
     # Denormalize: restore original communalities
     rotated = rotated * communalities
     return cast(NDArray[np.float64], rotated)
+
+
+def apply_judgmental_rotations(
+    unrotated: NDArray[np.float64],
+    manual_rotations: list[dict[str, object]],
+) -> NDArray[np.float64]:
+    """Apply a sequence of judgmental rotations to factor loadings.
+
+    Each rotation is a 2-D Givens rotation on the column pair
+    (factor_a-1, factor_b-1) by the specified angle in degrees, applied
+    using the same sign convention as ``rotate_varimax`` (lines 363-364):
+
+        col_a' =  col_a * cos(θ) + col_b * sin(θ)
+        col_b' = -col_a * sin(θ) + col_b * cos(θ)
+
+    Rotations are applied in list order. Used for "judgmental" rotation:
+    the researcher specifies rotations to align factors with substantively
+    meaningful positions rather than relying on automatic varimax
+    (Brown 1980; Watts & Stenner 2012).
+
+    Args:
+        unrotated: Loadings matrix (n_participants x n_factors)
+        manual_rotations: List of dicts with keys 'factor_a' (1-indexed),
+            'factor_b' (1-indexed, distinct), 'angle_deg' (-180 to 180).
+
+    Returns:
+        Rotated loadings matrix, same shape as ``unrotated``.
+
+    Raises:
+        ValueError: If a factor index is out of range or factor_a == factor_b.
+    """
+    n_factors = unrotated.shape[1]
+    rotated = unrotated.copy()
+    for rotation in manual_rotations:
+        # Cast through cast() — values from JSON columns / Pydantic dumps
+        # arrive typed as ``object`` but are guaranteed to be ints/floats by
+        # the schema-level validators that run before this function.
+        a = int(cast(int, rotation["factor_a"])) - 1  # convert to 0-indexed
+        b = int(cast(int, rotation["factor_b"])) - 1
+        if not (0 <= a < n_factors) or not (0 <= b < n_factors):
+            raise ValueError(
+                f"manual rotation factor indices ({a + 1}, {b + 1}) out of range "
+                f"for {n_factors}-factor solution"
+            )
+        if a == b:
+            raise ValueError("manual rotation requires distinct factors")
+        angle_rad = np.radians(float(cast(float, rotation["angle_deg"])))
+        cos_a = np.cos(angle_rad)
+        sin_a = np.sin(angle_rad)
+        col_a = rotated[:, a].copy()
+        col_b = rotated[:, b].copy()
+        rotated[:, a] = col_a * cos_a + col_b * sin_a
+        rotated[:, b] = -col_a * sin_a + col_b * cos_a
+    return rotated
 
 
 def standardize_factor_signs(
@@ -766,6 +853,7 @@ def run_analysis(
     rotation: str = "varimax",
     flagging: str = "auto",
     manual_flags_matrix: NDArray[np.bool_] | None = None,
+    manual_rotations: list[dict[str, object]] | None = None,
     grid_config: list[dict[str, object]] | None = None,
 ) -> AnalysisRunResult:
     """Run the complete Q-method factor analysis pipeline.
@@ -777,9 +865,13 @@ def run_analysis(
         dataset: Sort matrix (n_statements x n_participants)
         n_factors: Number of factors to extract
         extraction: 'pca' or 'centroid'
-        rotation: 'varimax' or 'none'
+        rotation: 'varimax', 'none', or 'judgmental'
         flagging: 'auto' or 'manual'
         manual_flags_matrix: Required if flagging='manual'
+        manual_rotations: Required if rotation='judgmental'. List of dicts
+            with keys 'factor_a' (1-indexed), 'factor_b' (1-indexed,
+            distinct), 'angle_deg' (-180 to 180). Rotations are applied
+            in list order (Brown 1980; Watts & Stenner 2012).
         grid_config: Study grid configuration for the forced distribution.
             If None, distribution is inferred from the first participant.
 
@@ -816,6 +908,12 @@ def run_analysis(
     # Step 4: Rotation
     if rotation == "varimax" and n_factors >= 2:
         rotated = rotate_varimax(unrotated)
+    elif rotation == "judgmental" and n_factors >= 2:
+        if not manual_rotations:
+            raise ValueError(
+                "rotation='judgmental' requires a non-empty manual_rotations list"
+            )
+        rotated = apply_judgmental_rotations(unrotated, manual_rotations)
     else:
         rotated = unrotated.copy()
 
@@ -865,4 +963,126 @@ def run_analysis(
         factor_correlation=factor_cor,
         distinguishing=dist_list,
         consensus=cons_list,
+        manual_rotations=list(manual_rotations) if manual_rotations else [],
+    )
+
+
+def compute_bootstrap_stability(
+    dataset: NDArray[np.float64],
+    n_iterations: int,
+    *,
+    n_factors: int,
+    extraction: str,
+    rotation: str,
+    manual_rotations: list[dict[str, object]] | None,
+    grid_config: list[dict[str, object]] | None,
+    rng_seed: int = 42,
+) -> BootstrapStabilityResult:
+    """Non-parametric bootstrap of Q-sorts (Zabala & Pascual 2016).
+
+    For each iteration, resamples the participant columns of the dataset
+    with replacement, re-runs the full analysis pipeline, and accumulates
+    z-scores per (statement, factor). Returns SE and 95% CI per
+    statement-factor cell, plus the per-factor mean SE.
+
+    Manual flagging is dropped during resampling (the resample destroys
+    the participant identity required for manual flags); flagging falls
+    back to 'auto' even when the calling run used 'manual'. Judgmental
+    rotation is preserved (the rotation list is replayed unchanged on
+    each resample), so bootstrap stability reflects the rotated solution
+    the analyst actually saw.
+
+    Iterations whose resample produces a degenerate correlation matrix
+    (or otherwise fails the pipeline) are skipped; the count of usable
+    iterations is reported as ``n_converged``.
+
+    The ``statement_idx`` in the per-statement entries is the row-index
+    of the dataset (0-indexed); the router maps it to the real statement
+    id (the same translation used for the regular result).
+
+    Args:
+        dataset: Sort matrix (n_statements x n_participants).
+        n_iterations: B, the number of bootstrap iterations.
+        n_factors: Number of factors to extract on each iteration.
+        extraction: 'pca' or 'centroid' (must match the calling run).
+        rotation: 'varimax', 'none', or 'judgmental'.
+        manual_rotations: Replayed when rotation='judgmental'.
+        grid_config: Forced distribution (passed through to run_analysis).
+        rng_seed: Seed for the resampling RNG; deterministic given the
+            same dataset and seed.
+
+    Returns:
+        BootstrapStabilityResult with per-(statement, factor) SE/CI and
+        per-factor mean SE.
+    """
+    rng = np.random.default_rng(rng_seed)
+    n_statements, n_participants = dataset.shape
+
+    # Accumulators of z-scores per (statement, factor) across iterations.
+    z_acc: list[list[list[float]]] = [
+        [[] for _ in range(n_factors)] for _ in range(n_statements)
+    ]
+    n_converged = 0
+
+    for _ in range(n_iterations):
+        cols = rng.integers(0, n_participants, size=n_participants)
+        boot = dataset[:, cols]
+        try:
+            res = run_analysis(
+                boot,
+                n_factors=n_factors,
+                extraction=extraction,
+                rotation=rotation,
+                flagging="auto",
+                manual_flags_matrix=None,
+                manual_rotations=manual_rotations,
+                grid_config=grid_config,
+            )
+        except (ValueError, np.linalg.LinAlgError):
+            # Skip iterations whose resample is too degenerate to factor —
+            # tracked via n_converged so the caller can flag a low-quality
+            # bootstrap.
+            continue
+        n_converged += 1
+        z = res["z_scores"]
+        for s in range(n_statements):
+            for f in range(n_factors):
+                value = z[s, f]
+                if not np.isnan(value):
+                    z_acc[s][f].append(float(value))
+
+    statement_stab: list[BootstrapStatementEntry] = []
+    factor_se_acc: list[list[float]] = [[] for _ in range(n_factors)]
+    for s in range(n_statements):
+        for f in range(n_factors):
+            samples = z_acc[s][f]
+            if not samples:
+                continue
+            arr = np.array(samples, dtype=np.float64)
+            z_mean = float(np.mean(arr))
+            z_se = float(np.std(arr, ddof=1)) if arr.size > 1 else 0.0
+            ci_lo = float(np.percentile(arr, 2.5))
+            ci_hi = float(np.percentile(arr, 97.5))
+            statement_stab.append(
+                BootstrapStatementEntry(
+                    statement_idx=s,
+                    factor=f + 1,
+                    z_mean=z_mean,
+                    z_se=z_se,
+                    ci_lower=ci_lo,
+                    ci_upper=ci_hi,
+                )
+            )
+            factor_se_acc[f].append(z_se)
+
+    factor_mean_se = [
+        float(np.mean(factor_se_acc[f])) if factor_se_acc[f] else 0.0
+        for f in range(n_factors)
+    ]
+
+    return BootstrapStabilityResult(
+        n_iterations=n_iterations,
+        n_converged=n_converged,
+        statements=statement_stab,
+        factor_mean_se=factor_mean_se,
     )

@@ -894,6 +894,30 @@
         "aria": "Edit factor {{n}} narrative",
         "saved": "Factor narrative saved.",
         "error": "Failed to save the factor narrative."
+      },
+      "rotation": {
+        "judgmental": {
+          "label": "Judgmental (manual)",
+          "tooltip": "Manually rotate factor pairs by chosen angles to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012)."
+        }
+      },
+      "manual_rotations": {
+        "title": "Manual rotations",
+        "helper": "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order. Used to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012).",
+        "add": "Add rotation",
+        "remove_aria": "Remove rotation",
+        "empty": "Add at least one rotation to run the analysis.",
+        "factor_a_label": "Rotate factor",
+        "angle_label": "by",
+        "factor_b_label": "around factor"
+      },
+      "bootstrap": {
+        "toggle_label": "Run bootstrap stability",
+        "iterations_label": "Iterations (B)",
+        "helper": "Optional. Bootstrap resamples your Q-sorts with replacement and re-runs the analysis B times to estimate standard errors on z-scores. Useful when you want confidence intervals on factor scores (Zabala & Pascual 2016).",
+        "running": "Running bootstrap…",
+        "se_column": "Mean SE (z)",
+        "tooltip": "Non-parametric bootstrap of Q-sorts (resampled with replacement); the analysis is repeated B times to estimate SEs and 95% CIs on z-scores (Zabala & Pascual 2016)."
       }
     },
     "project": {

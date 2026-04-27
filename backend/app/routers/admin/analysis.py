@@ -30,6 +30,8 @@ from ...schemas import (
     AnalysisRunPatch,
     AnalysisRunRead,
     AnalysisRunSummary,
+    BootstrapResult,
+    BootstrapStatementStability,
     EigenvalueResult,
     FactorCharacteristic,
     ParticipantAudioRecording,
@@ -41,6 +43,7 @@ from ...schemas import (
 from ...services.analysis_service import (
     apply_manual_flags,
     build_sort_matrix,
+    compute_bootstrap_stability,
     compute_eigenvalues,
     correlation_matrix,
     run_analysis,
@@ -168,6 +171,16 @@ async def run_factor_analysis(
     # Extract grid_config for the forced distribution
     grid_config = dump.get("study", {}).get("grid_config")
 
+    # Convert ManualRotation Pydantic models to plain dicts for the service.
+    # The service stays decoupled from Pydantic; the schema-level cross-field
+    # validator (rotation='judgmental' ⇒ non-empty manual_rotations) has
+    # already run by the time we get here.
+    manual_rotations_payload: list[dict[str, object]] | None = (
+        [r.model_dump() for r in body.manual_rotations]
+        if body.manual_rotations
+        else None
+    )
+
     try:
         result = await asyncio.to_thread(
             run_analysis,
@@ -177,6 +190,7 @@ async def run_factor_analysis(
             rotation=body.rotation,
             flagging=body.flagging,
             manual_flags_matrix=manual_flags_matrix,
+            manual_rotations=manual_rotations_payload,
             grid_config=grid_config,
         )
     except (ValueError, np.linalg.LinAlgError) as e:
@@ -255,6 +269,55 @@ async def run_factor_analysis(
             )
         )
 
+    # Optional: bootstrap stability (Zabala & Pascual 2016).
+    # Run AFTER the regular analysis so a fast-feedback failure of the
+    # main pipeline isn't masked by the long bootstrap loop. If the
+    # bootstrap itself fails we still return the regular result — the
+    # bootstrap is purely additive.
+    bootstrap_payload: BootstrapResult | None = None
+    if body.bootstrap_iterations is not None:
+        try:
+            bootstrap_raw = await asyncio.to_thread(
+                compute_bootstrap_stability,
+                dataset,
+                body.bootstrap_iterations,
+                n_factors=body.n_factors,
+                extraction=body.extraction,
+                rotation=body.rotation,
+                manual_rotations=manual_rotations_payload,
+                grid_config=grid_config,
+            )
+            # Translate row-indices in `statements` to real statement ids.
+            stability_out: list[BootstrapStatementStability] = []
+            for entry in bootstrap_raw["statements"]:
+                idx = entry["statement_idx"]
+                if idx < 0 or idx >= len(statements):
+                    continue
+                stability_out.append(
+                    BootstrapStatementStability(
+                        statement_id=statements[idx]["id"],
+                        factor=entry["factor"],
+                        z_mean=entry["z_mean"],
+                        z_se=entry["z_se"],
+                        ci_lower=entry["ci_lower"],
+                        ci_upper=entry["ci_upper"],
+                    )
+                )
+            bootstrap_payload = BootstrapResult(
+                n_iterations=bootstrap_raw["n_iterations"],
+                n_converged=bootstrap_raw["n_converged"],
+                statements=stability_out,
+                factor_mean_se=bootstrap_raw["factor_mean_se"],
+            )
+        except (ValueError, np.linalg.LinAlgError) as e:
+            # Non-fatal: log and continue. The regular result is still
+            # returned without bootstrap data.
+            logger.warning(
+                "Bootstrap failed for study=%s: %s — returning result without bootstrap.",
+                study.slug,
+                e,
+            )
+
     analysis_result = AnalysisResult(
         n_participants=result["n_participants"],
         n_statements=result["n_statements"],
@@ -278,6 +341,8 @@ async def run_factor_analysis(
         correlation_matrix=[
             [float(v) for v in row] for row in result["factor_correlation"]
         ],
+        manual_rotations=list(body.manual_rotations) if body.manual_rotations else [],
+        bootstrap=bootstrap_payload,
     )
 
     # Persist the run as part of the audit trail. We persist on the success
@@ -292,6 +357,13 @@ async def run_factor_analysis(
         flagging_mode=body.flagging,
         notes=None,
         factor_notes={},
+        manual_rotations=manual_rotations_payload,
+        bootstrap_iterations=body.bootstrap_iterations
+        if bootstrap_payload is not None
+        else None,
+        bootstrap_result=bootstrap_payload.model_dump(mode="json")
+        if bootstrap_payload is not None
+        else None,
         result=analysis_result.model_dump(mode="json"),
     )
     db.add(run)
@@ -332,6 +404,8 @@ async def _load_run(db: AsyncSession, study_id: int, run_id: int) -> AnalysisRun
 
 
 def _to_summary(run: AnalysisRun) -> AnalysisRunSummary:
+    # Pydantic constructs ManualRotation rows from the persisted JSON dicts
+    # when the field is typed list[ManualRotation]; mypy can't see this.
     return AnalysisRunSummary(
         id=run.id,
         ran_at=run.ran_at,
@@ -343,6 +417,8 @@ def _to_summary(run: AnalysisRun) -> AnalysisRunSummary:
         flagging_mode=run.flagging_mode,
         notes=run.notes,
         factor_notes=run.factor_notes or {},
+        manual_rotations=run.manual_rotations or [],  # type: ignore[arg-type]
+        bootstrap_iterations=run.bootstrap_iterations,
     )
 
 
@@ -382,6 +458,8 @@ async def get_analysis_run(
         flagging_mode=run.flagging_mode,
         notes=run.notes,
         factor_notes=run.factor_notes or {},
+        manual_rotations=run.manual_rotations or [],  # type: ignore[arg-type]
+        bootstrap_iterations=run.bootstrap_iterations,
         result=run.result,
     )
 

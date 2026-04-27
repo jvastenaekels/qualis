@@ -240,6 +240,13 @@ _get_real_ip
 validate_extraction
 validate_rotation
 validate_flagging
+validate_distinct  # ManualRotation field validator (judgmental rotation)
+validate_manual_rotations_consistency  # AnalysisRequest model validator (judgmental rotation)
+angle_deg  # ManualRotation field, consumed by service via dict access
+bootstrap_result  # AnalysisRun JSON column, written by router and read in tests/UI
+ci_lower  # Bootstrap stability — Pydantic field + TypedDict, consumed via JSON
+ci_upper  # Bootstrap stability — Pydantic field + TypedDict, consumed via JSON
+bootstrap  # AnalysisResult.bootstrap, consumed by frontend (TypeScript) only
 significance
 factor
 variance_explained

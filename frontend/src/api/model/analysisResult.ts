@@ -8,6 +8,8 @@ import type { ParticipantLoading } from './participantLoading';
 import type { StatementScore } from './statementScore';
 import type { StatementClassification } from './statementClassification';
 import type { FactorCharacteristic } from './factorCharacteristic';
+import type { ManualRotation } from './manualRotation';
+import type { AnalysisResultBootstrap } from './analysisResultBootstrap';
 
 /**
  * Complete result of a Q-method factor analysis.
@@ -33,4 +35,8 @@ export interface AnalysisResult {
     factor_characteristics: FactorCharacteristic[];
     /** Between-factor correlation matrix: n_factors x n_factors */
     correlation_matrix: number[][];
+    /** The judgmental rotations applied to produce this result, in list order. Empty for 'varimax' or 'none' rotation. */
+    manual_rotations?: ManualRotation[];
+    /** Bootstrap stability output (Zabala & Pascual 2016). Set only when the request opted in via `bootstrap_iterations`. */
+    bootstrap?: AnalysisResultBootstrap;
 }

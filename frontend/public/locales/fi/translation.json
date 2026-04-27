@@ -802,8 +802,32 @@
             "characteristics_help": "Ominaisarvot kuvastavat selitetyn varianssin määrää. Komposiittireliabiliteetti kuvastaa merkittyjen lajittelujen sisäistä yhdenmukaisuutta. Faktoripisteiden keskivirhe kuvastaa komposiittiestimaatin tarkkuutta.",
             "help_extraction": "PCA maksimoi selitetyn varianssin faktorien välillä. Sentroidi tuottaa matemaattisesti vähemmän rajoitettuja faktoreita, mitä jotkut Q-tutkijat suosivat teoreettisista syistä.",
             "help_n_factors": "Jokainen faktori edustaa erillistä näkökulmaa. Useammat faktorit tallentavat enemmän vivahteita mutta voivat jakaa yhtenäisiä näkemyksiä; vähemmän faktoreita antaa laajempia ryhmiä.",
-            "help_rotation": "Varimax maksimoi faktorien välisen erottelun, tuottaen yksinkertaisemman rakenteen. Ilman rotaatiota alkuperäinen matemaattinen ratkaisu säilyy.",
+            "help_rotation": "Varimax maksimoi faktorien välisen erottelun, tuottaen yksinkertaisemman rakenteen. Ilman rotaatiota alkuperäinen matemaattinen ratkaisu säilyy. Harkintaan perustuva rotaatio antaa määrittää rotaatiokulmat manuaalisesti.",
             "help_flagging": "Automaattinen merkitsee osallistujat, joiden kuormitus ylittää merkitsevyyskynnyksen täsmälleen yhdellä faktorilla. Manuaalinen antaa sinun määrittää merkinnät oman harkintasi mukaan.",
+            "rotation": {
+                "judgmental": {
+                    "label": "Harkintaan perustuva (manuaalinen)",
+                    "tooltip": "Käännä faktoripareja manuaalisesti valituilla kulmilla, jotta faktorit saadaan kohdistettua sisällöllisesti merkityksellisiin asentoihin (Brown 1980; Watts & Stenner 2012)."
+                }
+            },
+            "manual_rotations": {
+                "title": "Manuaaliset rotaatiot",
+                "helper": "Määritä rotaatiot muodossa 'käännä faktoria F kulmalla Δ° faktorin G ympäri'. Rotaatiot suoritetaan järjestyksessä. Käytetään faktorien kohdistamiseen sisällöllisesti merkityksellisiin asentoihin (Brown 1980; Watts & Stenner 2012).",
+                "add": "Lisää rotaatio",
+                "remove_aria": "Poista rotaatio",
+                "empty": "Lisää vähintään yksi rotaatio analyysin suorittamiseksi.",
+                "factor_a_label": "Käännä faktoria",
+                "angle_label": "kulmalla",
+                "factor_b_label": "faktorin ympäri"
+            },
+            "bootstrap": {
+                "toggle_label": "Suorita bootstrap-vakausanalyysi",
+                "iterations_label": "Iteraatiot (B)",
+                "helper": "Valinnainen. Bootstrap ottaa Q-lajitteluistasi otokset takaisinpalauttaen ja toistaa analyysin B kertaa arvioidakseen z-arvojen keskivirheet. Hyödyllinen, kun haluat luottamusvälit faktoripisteille (Zabala & Pascual 2016).",
+                "running": "Bootstrap käynnissä…",
+                "se_column": "Keskim. KV (z)",
+                "tooltip": "Q-lajittelujen ei-parametrinen bootstrap (otokset takaisinpalauttaen); analyysi toistetaan B kertaa z-arvojen keskivirheiden ja 95 %:n luottamusvälien arvioimiseksi (Zabala & Pascual 2016)."
+            },
             "guide_loadings_title": "Faktorikuormitusten lukeminen",
             "guide_loadings_1": "Jokainen kuormitus on korrelaatio (-1 – +1) osallistujan ja faktorin (jaetun näkökulman) välillä.",
             "guide_loadings_2": "Korostetut arvot ylittävät taulukon yläpuolella näkyvän merkitsevyyskynnyksen.",

@@ -26,7 +26,7 @@ import {
     listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet,
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey,
 } from '@/api/generated';
-import type { AnalysisResult, AnalysisRunSummary } from '@/api/model';
+import type { AnalysisResult, AnalysisRunSummary, ManualRotation } from '@/api/model';
 import { generateAnalysisXlsx } from '@/utils/analysisXlsxExport';
 
 // ────────────────────────────────────────────────────────────────
@@ -100,6 +100,31 @@ export interface AnalysisPageApi {
     setFlagging: (value: 'auto' | 'manual') => void;
     manualFlags: Record<number, number[]>;
 
+    /**
+     * Sequence of judgmental rotations to apply when `rotation === 'judgmental'`.
+     * Each entry rotates the (factor_a, factor_b) factor pair by `angle_deg`
+     * degrees; rotations are applied in list order. Empty for varimax/none
+     * (Brown 1980; Watts & Stenner 2012).
+     */
+    manualRotations: ManualRotation[];
+    addManualRotation: () => void;
+    updateManualRotation: (index: number, partial: Partial<ManualRotation>) => void;
+    removeManualRotation: (index: number) => void;
+
+    /** True when the Run button should be disabled because the judgmental
+     * rotation list is empty (without this rotations would silently be a no-op). */
+    isJudgmentalWithoutRotations: boolean;
+
+    /**
+     * Optional non-parametric bootstrap of Q-sorts (Zabala & Pascual 2016).
+     * When enabled, the analysis is repeated B times on resampled Q-sorts to
+     * estimate SEs on z-scores. Off by default; existing behaviour unchanged.
+     */
+    bootstrapEnabled: boolean;
+    setBootstrapEnabled: (value: boolean) => void;
+    bootstrapIterations: number;
+    setBootstrapIterations: (value: number) => void;
+
     // Derived / query state
     maxFactors: number;
     hasEigenvalues: boolean;
@@ -158,11 +183,14 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
     // ── Form state (persisted in URL) ─────────────────────────────
     const [extraction, setExtraction] = useState(searchParamsSnapshot.get('extraction') || 'pca');
     const [nFactors, setNFactors] = useState(Number(searchParamsSnapshot.get('nFactors')) || 3);
-    const [rotation, setRotation] = useState(searchParamsSnapshot.get('rotation') || 'varimax');
+    const [rotation, setRotationRaw] = useState(searchParamsSnapshot.get('rotation') || 'varimax');
     const [flagging, setFlaggingRaw] = useState<'auto' | 'manual'>(
         (searchParamsSnapshot.get('flagging') as 'auto' | 'manual') || 'auto'
     );
     const [manualFlags, setManualFlags] = useState<Record<number, number[]>>({});
+    const [manualRotations, setManualRotations] = useState<ManualRotation[]>([]);
+    const [bootstrapEnabled, setBootstrapEnabled] = useState<boolean>(false);
+    const [bootstrapIterations, setBootstrapIterations] = useState<number>(1000);
 
     // Wrap setFlagging so that switching to auto always clears manualFlags
     const setFlagging = useCallback((value: 'auto' | 'manual') => {
@@ -172,6 +200,28 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
         }
     }, []);
     const manualFlagsInitialized = useRef(false);
+
+    // Wrap setRotation: leaving 'judgmental' clears the manual rotation list
+    // (the backend rejects mixed configs anyway; this keeps the UI consistent
+    // with what would actually be sent).
+    const setRotation = useCallback((value: string) => {
+        setRotationRaw(value);
+        if (value !== 'judgmental') {
+            setManualRotations([]);
+        }
+    }, []);
+
+    const addManualRotation = useCallback(() => {
+        setManualRotations((prev) => [...prev, { factor_a: 1, factor_b: 2, angle_deg: 0 }]);
+    }, []);
+
+    const updateManualRotation = useCallback((index: number, partial: Partial<ManualRotation>) => {
+        setManualRotations((prev) => prev.map((r, i) => (i === index ? { ...r, ...partial } : r)));
+    }, []);
+
+    const removeManualRotation = useCallback((index: number) => {
+        setManualRotations((prev) => prev.filter((_, i) => i !== index));
+    }, []);
 
     // ── Result / history state ────────────────────────────────────
     const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -277,6 +327,8 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
                     rotation,
                     flagging,
                     manual_flags: manualFlagsPayload,
+                    manual_rotations: rotation === 'judgmental' ? manualRotations : null,
+                    bootstrap_iterations: bootstrapEnabled ? bootstrapIterations : null,
                 },
             },
             {
@@ -323,6 +375,9 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
         rotation,
         flagging,
         manualFlags,
+        manualRotations,
+        bootstrapEnabled,
+        bootstrapIterations,
         analysisMutation,
         syncParams,
         t,
@@ -414,6 +469,8 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
     const isEigenvalueError = eigenvaluesQuery.isError && !isTooFewParticipants;
     const hasEigenvalues = eigenvaluesQuery.isSuccess && !!eigenvaluesQuery.data;
 
+    const isJudgmentalWithoutRotations = rotation === 'judgmental' && manualRotations.length === 0;
+
     return {
         slug,
         extraction,
@@ -425,6 +482,15 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
         flagging,
         setFlagging,
         manualFlags,
+        manualRotations,
+        addManualRotation,
+        updateManualRotation,
+        removeManualRotation,
+        isJudgmentalWithoutRotations,
+        bootstrapEnabled,
+        setBootstrapEnabled,
+        bootstrapIterations,
+        setBootstrapIterations,
         maxFactors,
         hasEigenvalues,
         isTooFewParticipants,

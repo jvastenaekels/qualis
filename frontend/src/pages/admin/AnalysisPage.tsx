@@ -13,6 +13,7 @@ import {
     Download,
     RefreshCw,
     History,
+    Plus,
     X,
 } from 'lucide-react';
 
@@ -27,6 +28,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
     DropdownMenu,
@@ -234,12 +236,18 @@ export default function AnalysisPage() {
                                         <SelectItem value="none">
                                             {t('admin.analysis.none', 'None')}
                                         </SelectItem>
+                                        <SelectItem value="judgmental">
+                                            {t(
+                                                'admin.analysis.rotation.judgmental.label',
+                                                'Judgmental (manual)'
+                                            )}
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <p className="text-xs text-muted-foreground leading-snug">
                                     {t(
                                         'admin.analysis.help_rotation',
-                                        'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution.'
+                                        'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution. Judgmental lets you specify rotation angles manually.'
                                     )}
                                 </p>
                             </div>
@@ -280,11 +288,202 @@ export default function AnalysisPage() {
                         </div>
                     </div>
 
+                    {/* Judgmental rotations sub-panel — only when rotation === 'judgmental' */}
+                    {api.rotation === 'judgmental' && (
+                        <div className="space-y-3 pt-2 border-t border-slate-100">
+                            <div>
+                                <h3 className="text-sm font-black text-slate-800">
+                                    {t('admin.analysis.manual_rotations.title', 'Manual rotations')}
+                                </h3>
+                                <p className="text-xs text-muted-foreground leading-snug mt-1">
+                                    {t(
+                                        'admin.analysis.manual_rotations.helper',
+                                        "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order. Used to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012)."
+                                    )}
+                                </p>
+                            </div>
+
+                            {api.manualRotations.length === 0 && (
+                                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+                                    {t(
+                                        'admin.analysis.manual_rotations.empty',
+                                        'Add at least one rotation to run the analysis.'
+                                    )}
+                                </p>
+                            )}
+
+                            <ul className="space-y-2">
+                                {api.manualRotations.map((mr, idx) => (
+                                    <li key={idx} className="flex flex-wrap items-center gap-2">
+                                        <span className="text-xs text-slate-600">
+                                            {t(
+                                                'admin.analysis.manual_rotations.factor_a_label',
+                                                'Rotate factor'
+                                            )}
+                                        </span>
+                                        <Input
+                                            type="number"
+                                            min={1}
+                                            max={api.nFactors}
+                                            step={1}
+                                            value={mr.factor_a}
+                                            onChange={(e) =>
+                                                api.updateManualRotation(idx, {
+                                                    factor_a: Number(e.target.value),
+                                                })
+                                            }
+                                            disabled={api.isRunning}
+                                            className="w-16 h-8 text-sm"
+                                            aria-label={t(
+                                                'admin.analysis.manual_rotations.factor_a_label',
+                                                'Rotate factor'
+                                            )}
+                                        />
+                                        <span className="text-xs text-slate-600">
+                                            {t('admin.analysis.manual_rotations.angle_label', 'by')}
+                                        </span>
+                                        <Input
+                                            type="number"
+                                            min={-180}
+                                            max={180}
+                                            step={1}
+                                            value={mr.angle_deg}
+                                            onChange={(e) =>
+                                                api.updateManualRotation(idx, {
+                                                    angle_deg: Number(e.target.value),
+                                                })
+                                            }
+                                            disabled={api.isRunning}
+                                            className="w-20 h-8 text-sm"
+                                            aria-label={t(
+                                                'admin.analysis.manual_rotations.angle_label',
+                                                'by'
+                                            )}
+                                        />
+                                        <span className="text-xs text-slate-600">
+                                            °{' '}
+                                            {t(
+                                                'admin.analysis.manual_rotations.factor_b_label',
+                                                'around factor'
+                                            )}
+                                        </span>
+                                        <Input
+                                            type="number"
+                                            min={1}
+                                            max={api.nFactors}
+                                            step={1}
+                                            value={mr.factor_b}
+                                            onChange={(e) =>
+                                                api.updateManualRotation(idx, {
+                                                    factor_b: Number(e.target.value),
+                                                })
+                                            }
+                                            disabled={api.isRunning}
+                                            className="w-16 h-8 text-sm"
+                                            aria-label={t(
+                                                'admin.analysis.manual_rotations.factor_b_label',
+                                                'around factor'
+                                            )}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => api.removeManualRotation(idx)}
+                                            disabled={api.isRunning}
+                                            aria-label={t(
+                                                'admin.analysis.manual_rotations.remove_aria',
+                                                'Remove rotation'
+                                            )}
+                                            className="h-8 w-8 p-0"
+                                        >
+                                            <X className="size-4" aria-hidden="true" />
+                                        </Button>
+                                    </li>
+                                ))}
+                            </ul>
+
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={api.addManualRotation}
+                                disabled={api.isRunning}
+                                className="gap-1.5"
+                            >
+                                <Plus className="size-3.5" aria-hidden="true" />
+                                {t('admin.analysis.manual_rotations.add', 'Add rotation')}
+                            </Button>
+                        </div>
+                    )}
+
+                    {/* Bootstrap stability toggle (Zabala & Pascual 2016) */}
+                    <div className="space-y-3 pt-2 border-t border-slate-100">
+                        <div className="flex items-start gap-3">
+                            <input
+                                id="bootstrap-toggle"
+                                type="checkbox"
+                                checked={api.bootstrapEnabled}
+                                onChange={(e) => api.setBootstrapEnabled(e.target.checked)}
+                                disabled={api.isRunning}
+                                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                            />
+                            <div className="flex-1 space-y-1.5">
+                                <Label
+                                    htmlFor="bootstrap-toggle"
+                                    className="text-sm font-black text-slate-800 cursor-pointer"
+                                >
+                                    {t(
+                                        'admin.analysis.bootstrap.toggle_label',
+                                        'Run bootstrap stability'
+                                    )}
+                                </Label>
+                                <p className="text-xs text-muted-foreground leading-snug">
+                                    {t(
+                                        'admin.analysis.bootstrap.helper',
+                                        'Optional. Bootstrap resamples your Q-sorts with replacement and re-runs the analysis B times to estimate standard errors on z-scores. Useful when you want confidence intervals on factor scores (Zabala & Pascual 2016).'
+                                    )}
+                                </p>
+                            </div>
+                        </div>
+
+                        {api.bootstrapEnabled && (
+                            <div className="flex flex-wrap items-center gap-2 pl-7">
+                                <Label
+                                    htmlFor="bootstrap-iterations"
+                                    className="text-2xs font-black text-slate-500"
+                                >
+                                    {t(
+                                        'admin.analysis.bootstrap.iterations_label',
+                                        'Iterations (B)'
+                                    )}
+                                </Label>
+                                <Input
+                                    id="bootstrap-iterations"
+                                    type="number"
+                                    min={100}
+                                    max={5000}
+                                    step={100}
+                                    value={api.bootstrapIterations}
+                                    onChange={(e) =>
+                                        api.setBootstrapIterations(Number(e.target.value))
+                                    }
+                                    disabled={api.isRunning}
+                                    className="w-24 h-8 text-sm"
+                                />
+                            </div>
+                        )}
+                    </div>
+
                     {/* Action buttons — visually separated */}
                     <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
                         <Button
                             onClick={api.handleRunAnalysis}
-                            disabled={api.isRunning || !api.hasEigenvalues}
+                            disabled={
+                                api.isRunning ||
+                                !api.hasEigenvalues ||
+                                api.isJudgmentalWithoutRotations
+                            }
                             className="gap-2"
                         >
                             {api.isRunning ? (
@@ -293,7 +492,9 @@ export default function AnalysisPage() {
                                 <Play className="size-4" aria-hidden="true" />
                             )}
                             {api.isRunning
-                                ? t('admin.analysis.running', 'Analyzing...')
+                                ? api.bootstrapEnabled
+                                    ? t('admin.analysis.bootstrap.running', 'Running bootstrap…')
+                                    : t('admin.analysis.running', 'Analyzing...')
                                 : t('admin.analysis.run', 'Run Analysis')}
                         </Button>
 

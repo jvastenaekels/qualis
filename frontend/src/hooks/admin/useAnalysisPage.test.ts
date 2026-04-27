@@ -404,6 +404,209 @@ describe('useAnalysisPage', () => {
         expect(result.current.isRunning).toBe(true);
     });
 
+    describe('judgmental rotation', () => {
+        it('manualRotations is empty by default', () => {
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+            expect(result.current.manualRotations).toEqual([]);
+            expect(result.current.isJudgmentalWithoutRotations).toBe(false);
+        });
+
+        it('addManualRotation appends a row with default values', () => {
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.addManualRotation();
+            });
+            expect(result.current.manualRotations).toHaveLength(1);
+            expect(result.current.manualRotations[0]).toEqual({
+                factor_a: 1,
+                factor_b: 2,
+                angle_deg: 0,
+            });
+        });
+
+        it('updateManualRotation mutates only the targeted row', () => {
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.addManualRotation();
+                result.current.addManualRotation();
+            });
+            act(() => {
+                result.current.updateManualRotation(1, { angle_deg: 45 });
+            });
+            expect(result.current.manualRotations[0]?.angle_deg).toBe(0);
+            expect(result.current.manualRotations[1]?.angle_deg).toBe(45);
+        });
+
+        it('removeManualRotation removes the row at the given index', () => {
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.addManualRotation();
+                result.current.addManualRotation();
+            });
+            expect(result.current.manualRotations).toHaveLength(2);
+            act(() => {
+                result.current.removeManualRotation(0);
+            });
+            expect(result.current.manualRotations).toHaveLength(1);
+        });
+
+        it('switching rotation away from judgmental clears manualRotations', () => {
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.setRotation('judgmental');
+            });
+            act(() => {
+                result.current.addManualRotation();
+            });
+            expect(result.current.manualRotations).toHaveLength(1);
+
+            act(() => {
+                result.current.setRotation('varimax');
+            });
+            expect(result.current.manualRotations).toEqual([]);
+        });
+
+        it('isJudgmentalWithoutRotations is true when rotation is judgmental and list is empty', () => {
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.setRotation('judgmental');
+            });
+            expect(result.current.isJudgmentalWithoutRotations).toBe(true);
+
+            act(() => {
+                result.current.addManualRotation();
+            });
+            expect(result.current.isJudgmentalWithoutRotations).toBe(false);
+        });
+
+        it('handleRunAnalysis sends manual_rotations only when rotation is judgmental', () => {
+            const mockMutate = vi.fn();
+            mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
+            mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
+
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+
+            // Default rotation = 'varimax' → manual_rotations should be null
+            act(() => {
+                result.current.handleRunAnalysis();
+            });
+            expect(mockMutate).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    data: expect.objectContaining({
+                        rotation: 'varimax',
+                        manual_rotations: null,
+                    }),
+                }),
+                expect.any(Object)
+            );
+
+            // Switch to judgmental + add a rotation → manual_rotations sent
+            act(() => {
+                result.current.setRotation('judgmental');
+            });
+            act(() => {
+                result.current.addManualRotation();
+            });
+            act(() => {
+                result.current.updateManualRotation(0, { angle_deg: 30 });
+            });
+            act(() => {
+                result.current.handleRunAnalysis();
+            });
+            expect(mockMutate).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    data: expect.objectContaining({
+                        rotation: 'judgmental',
+                        manual_rotations: [{ factor_a: 1, factor_b: 2, angle_deg: 30 }],
+                    }),
+                }),
+                expect.any(Object)
+            );
+        });
+    });
+
+    describe('bootstrap stability (Zabala & Pascual 2016)', () => {
+        it('bootstrapEnabled defaults to false and bootstrapIterations defaults to 1000', () => {
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+            expect(result.current.bootstrapEnabled).toBe(false);
+            expect(result.current.bootstrapIterations).toBe(1000);
+        });
+
+        it('setBootstrapEnabled and setBootstrapIterations update state', () => {
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.setBootstrapEnabled(true);
+            });
+            expect(result.current.bootstrapEnabled).toBe(true);
+            act(() => {
+                result.current.setBootstrapIterations(500);
+            });
+            expect(result.current.bootstrapIterations).toBe(500);
+        });
+
+        it('handleRunAnalysis sends bootstrap_iterations=null when disabled', () => {
+            const mockMutate = vi.fn();
+            mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
+            mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
+
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+
+            act(() => {
+                result.current.handleRunAnalysis();
+            });
+            expect(mockMutate).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    data: expect.objectContaining({ bootstrap_iterations: null }),
+                }),
+                expect.any(Object)
+            );
+        });
+
+        it('handleRunAnalysis sends bootstrap_iterations=value when enabled', () => {
+            const mockMutate = vi.fn();
+            mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
+            mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
+
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+
+            act(() => {
+                result.current.setBootstrapEnabled(true);
+                result.current.setBootstrapIterations(500);
+            });
+            act(() => {
+                result.current.handleRunAnalysis();
+            });
+            expect(mockMutate).toHaveBeenLastCalledWith(
+                expect.objectContaining({
+                    data: expect.objectContaining({ bootstrap_iterations: 500 }),
+                }),
+                expect.any(Object)
+            );
+        });
+    });
+
     describe('showFactorNarratives toggle (localStorage-persisted)', () => {
         const studySlug = 'narratives-toggle-study';
         const lsKey = `qualis-analysis-show-narratives-${studySlug}`;

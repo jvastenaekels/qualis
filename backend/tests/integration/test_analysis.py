@@ -259,6 +259,259 @@ class TestAnalysisRun:
 
 
 @pytest.mark.asyncio
+class TestAnalysisRunJudgmental:
+    """Tests for POST /{slug}/analysis/run with rotation='judgmental'."""
+
+    async def test_judgmental_persisted_on_run(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        manual_rotations = [
+            {"factor_a": 1, "factor_b": 2, "angle_deg": 15.0},
+            {"factor_a": 1, "factor_b": 2, "angle_deg": -5.0},
+        ]
+        run_response = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "judgmental",
+                "flagging": "auto",
+                "manual_rotations": manual_rotations,
+            },
+            headers=headers,
+        )
+        assert run_response.status_code == 200
+        data = run_response.json()
+        assert data["rotation"] == "judgmental"
+        assert data["manual_rotations"] == manual_rotations
+
+        # The run should appear in the runs list with manual_rotations echoed
+        runs = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs", headers=headers
+            )
+        ).json()
+        assert len(runs) == 1
+        assert runs[0]["rotation_method"] == "judgmental"
+        assert runs[0]["manual_rotations"] == manual_rotations
+
+        # GET single run should also surface manual_rotations
+        run_id = runs[0]["id"]
+        full = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs/{run_id}",
+                headers=headers,
+            )
+        ).json()
+        assert full["manual_rotations"] == manual_rotations
+
+    async def test_judgmental_rejects_factor_index_out_of_range(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """A manual rotation referencing factor 4 on a 2-factor solution → 422."""
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "judgmental",
+                "flagging": "auto",
+                "manual_rotations": [
+                    {"factor_a": 1, "factor_b": 4, "angle_deg": 30.0}
+                ],
+            },
+            headers=headers,
+        )
+        assert response.status_code == 422
+
+    async def test_judgmental_rejects_empty_manual_rotations(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """rotation='judgmental' with no manual_rotations → 422."""
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "judgmental",
+                "flagging": "auto",
+            },
+            headers=headers,
+        )
+        assert response.status_code == 422
+
+    async def test_non_judgmental_rejects_manual_rotations(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """rotation='varimax' with manual_rotations payload → 422 (mixed config)."""
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+                "manual_rotations": [
+                    {"factor_a": 1, "factor_b": 2, "angle_deg": 30.0}
+                ],
+            },
+            headers=headers,
+        )
+        assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+class TestAnalysisRunBootstrap:
+    """Tests for POST /{slug}/analysis/run with bootstrap_iterations.
+
+    Bootstrap stability (Zabala & Pascual 2016) is opt-in and additive:
+    the regular result is unchanged when bootstrap is disabled.
+    """
+
+    async def test_bootstrap_attached_to_response_and_persisted(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+                "bootstrap_iterations": 200,
+            },
+            headers=headers,
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["bootstrap"] is not None
+        boot = data["bootstrap"]
+        assert boot["n_iterations"] == 200
+        assert 0 <= boot["n_converged"] <= 200
+        assert isinstance(boot["statements"], list)
+        assert len(boot["factor_mean_se"]) == 2
+        # Statement_id must be the real study statement id, not the row index.
+        if boot["statements"]:
+            real_ids = {s["statement_id"] for s in boot["statements"]}
+            assert all(isinstance(sid, int) and sid > 0 for sid in real_ids)
+
+        # The persisted run carries bootstrap_iterations on the summary.
+        runs = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs", headers=headers
+            )
+        ).json()
+        assert len(runs) == 1
+        assert runs[0]["bootstrap_iterations"] == 200
+
+    async def test_bootstrap_omitted_keeps_regular_response(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """When bootstrap_iterations is null/omitted, response.bootstrap is null
+        and the persisted columns are null (no behaviour change for existing flows)."""
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+            headers=headers,
+        )
+        assert response.status_code == 200
+        assert response.json().get("bootstrap") is None
+
+        runs = (
+            await client.get(
+                f"/api/admin/studies/{study.slug}/analysis/runs", headers=headers
+            )
+        ).json()
+        assert len(runs) == 1
+        assert runs[0]["bootstrap_iterations"] is None
+
+    async def test_bootstrap_below_minimum_iterations_rejected(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """bootstrap_iterations below the schema floor (100) → 422."""
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        response = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/run",
+            json={
+                "extraction": "pca",
+                "n_factors": 2,
+                "rotation": "varimax",
+                "flagging": "auto",
+                "bootstrap_iterations": 50,
+            },
+            headers=headers,
+        )
+        assert response.status_code == 422
+
+
+@pytest.mark.asyncio
 class TestAnalysisRunHistory:
     """Tests for the persisted-run audit-trail endpoints."""
 

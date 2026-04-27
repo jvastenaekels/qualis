@@ -879,6 +879,30 @@
         "aria": "Modifier la narration du facteur {{n}}",
         "saved": "Narration du facteur enregistrée.",
         "error": "Impossible d'enregistrer la narration du facteur."
+      },
+      "rotation": {
+        "judgmental": {
+          "label": "Manuelle (jugement)",
+          "tooltip": "Pivote manuellement les paires de facteurs selon des angles choisis pour aligner les facteurs sur des positions substantiellement significatives (Brown 1980 ; Watts & Stenner 2012)."
+        }
+      },
+      "manual_rotations": {
+        "title": "Rotations manuelles",
+        "helper": "Spécifiez les rotations sous la forme « pivoter le facteur F de Δ° autour du facteur G ». Les rotations sont appliquées dans l'ordre. Utilisées pour aligner les facteurs sur des positions substantiellement significatives (Brown 1980 ; Watts & Stenner 2012).",
+        "add": "Ajouter une rotation",
+        "remove_aria": "Supprimer la rotation",
+        "empty": "Ajoutez au moins une rotation pour lancer l'analyse.",
+        "factor_a_label": "Pivoter le facteur",
+        "angle_label": "de",
+        "factor_b_label": "autour du facteur"
+      },
+      "bootstrap": {
+        "toggle_label": "Lancer le bootstrap de stabilité",
+        "iterations_label": "Itérations (B)",
+        "helper": "Optionnel. Le bootstrap rééchantillonne vos Q-sorts avec remise et relance l'analyse B fois pour estimer les erreurs-types des z-scores. Utile lorsque vous voulez des intervalles de confiance sur les scores factoriels (Zabala & Pascual 2016).",
+        "running": "Bootstrap en cours…",
+        "se_column": "Erreur-type moyenne (z)",
+        "tooltip": "Bootstrap non paramétrique des Q-sorts (rééchantillonnés avec remise) ; l'analyse est répétée B fois pour estimer les erreurs-types et les IC à 95 % des z-scores (Zabala & Pascual 2016)."
       }
     },
     "project": {

@@ -9,9 +9,11 @@ import numpy as np
 import pytest
 
 from app.services.analysis_service import (
+    apply_judgmental_rotations,
     apply_manual_flags,
     build_sort_matrix,
     classify_statements,
+    compute_bootstrap_stability,
     compute_eigenvalues,
     compute_factor_characteristics,
     compute_factor_scores,
@@ -966,3 +968,285 @@ class TestStandardizeFactorSigns:
             assert col[np.argmax(np.abs(col))] > 0, (
                 f"Factor {f}: largest loading should be positive after standardization"
             )
+
+
+# --- apply_judgmental_rotations ---
+
+
+class TestApplyJudgmentalRotations:
+    """Tests for the judgmental (manual) rotation primitive."""
+
+    def test_zero_angle_is_identity(self):
+        """Rotating by 0° must leave the loadings unchanged."""
+        loadings = np.array(
+            [[0.8, 0.1], [0.6, 0.3], [-0.2, 0.7], [0.4, -0.5]],
+            dtype=np.float64,
+        )
+        rotated = apply_judgmental_rotations(
+            loadings, [{"factor_a": 1, "factor_b": 2, "angle_deg": 0.0}]
+        )
+        np.testing.assert_array_almost_equal(rotated, loadings, decimal=10)
+
+    def test_90deg_swaps_columns_with_sign(self):
+        """Rotate factor 1 around factor 2 by 90°.
+
+        With Givens convention col_a' = col_a*cos+col_b*sin,
+        col_b' = -col_a*sin+col_b*cos: at 90°, cos=0, sin=1, so
+        col_a' = col_b and col_b' = -col_a.
+        """
+        loadings = np.array(
+            [[0.8, 0.1], [0.6, 0.3], [-0.2, 0.7]],
+            dtype=np.float64,
+        )
+        rotated = apply_judgmental_rotations(
+            loadings, [{"factor_a": 1, "factor_b": 2, "angle_deg": 90.0}]
+        )
+        np.testing.assert_array_almost_equal(rotated[:, 0], loadings[:, 1], decimal=10)
+        np.testing.assert_array_almost_equal(rotated[:, 1], -loadings[:, 0], decimal=10)
+
+    def test_invalid_factor_indices_raise_value_error(self):
+        """Out-of-range factor indices must raise ValueError."""
+        loadings = np.array([[0.8, 0.1], [0.6, 0.3]], dtype=np.float64)
+        with pytest.raises(ValueError, match="out of range"):
+            apply_judgmental_rotations(
+                loadings, [{"factor_a": 3, "factor_b": 1, "angle_deg": 30.0}]
+            )
+        with pytest.raises(ValueError, match="out of range"):
+            apply_judgmental_rotations(
+                loadings, [{"factor_a": 0, "factor_b": 1, "angle_deg": 30.0}]
+            )
+
+    def test_same_factor_raises_value_error(self):
+        """factor_a == factor_b must raise ValueError."""
+        loadings = np.array([[0.8, 0.1], [0.6, 0.3]], dtype=np.float64)
+        with pytest.raises(ValueError, match="distinct"):
+            apply_judgmental_rotations(
+                loadings, [{"factor_a": 1, "factor_b": 1, "angle_deg": 30.0}]
+            )
+
+    def test_sequence_is_order_dependent(self):
+        """Applying [(1,2,30°), (2,3,45°)] should differ from the reverse order."""
+        loadings = np.array(
+            [
+                [0.8, 0.1, 0.2],
+                [0.6, 0.3, -0.1],
+                [-0.2, 0.7, 0.4],
+                [0.4, -0.5, 0.3],
+            ],
+            dtype=np.float64,
+        )
+        forward = apply_judgmental_rotations(
+            loadings,
+            [
+                {"factor_a": 1, "factor_b": 2, "angle_deg": 30.0},
+                {"factor_a": 2, "factor_b": 3, "angle_deg": 45.0},
+            ],
+        )
+        reverse = apply_judgmental_rotations(
+            loadings,
+            [
+                {"factor_a": 2, "factor_b": 3, "angle_deg": 45.0},
+                {"factor_a": 1, "factor_b": 2, "angle_deg": 30.0},
+            ],
+        )
+        # Order matters — results must differ.
+        assert not np.allclose(forward, reverse)
+
+    def test_does_not_mutate_input(self):
+        """The input loadings array must not be modified in place."""
+        loadings = np.array(
+            [[0.8, 0.1], [0.6, 0.3]],
+            dtype=np.float64,
+        )
+        original = loadings.copy()
+        apply_judgmental_rotations(
+            loadings, [{"factor_a": 1, "factor_b": 2, "angle_deg": 45.0}]
+        )
+        np.testing.assert_array_equal(loadings, original)
+
+
+class TestRunAnalysisJudgmental:
+    """Tests for run_analysis with rotation='judgmental'."""
+
+    def test_judgmental_zero_angle_matches_no_rotation(self, dataset):
+        """A judgmental rotation of 0° should leave the unrotated loadings
+        intact (modulo sign standardisation), like rotation='none'."""
+        result = run_analysis(
+            dataset,
+            n_factors=2,
+            extraction="pca",
+            rotation="judgmental",
+            manual_rotations=[{"factor_a": 1, "factor_b": 2, "angle_deg": 0.0}],
+        )
+        # rotated_loadings should match unrotated_loadings up to sign
+        # standardisation (compare absolute values).
+        np.testing.assert_array_almost_equal(
+            np.abs(result["rotated_loadings"]),
+            np.abs(result["unrotated_loadings"]),
+            decimal=8,
+        )
+        assert result["rotation"] == "judgmental"
+        assert result["manual_rotations"] == [
+            {"factor_a": 1, "factor_b": 2, "angle_deg": 0.0}
+        ]
+
+    def test_judgmental_requires_manual_rotations(self, dataset):
+        """rotation='judgmental' with empty/None manual_rotations → ValueError."""
+        with pytest.raises(ValueError, match="manual_rotations"):
+            run_analysis(
+                dataset,
+                n_factors=2,
+                extraction="pca",
+                rotation="judgmental",
+                manual_rotations=None,
+            )
+        with pytest.raises(ValueError, match="manual_rotations"):
+            run_analysis(
+                dataset,
+                n_factors=2,
+                extraction="pca",
+                rotation="judgmental",
+                manual_rotations=[],
+            )
+
+    def test_judgmental_rotation_changes_loadings(self, dataset):
+        """A non-zero judgmental rotation should produce loadings that differ
+        from the unrotated solution (not just sign-flipped)."""
+        result = run_analysis(
+            dataset,
+            n_factors=2,
+            extraction="pca",
+            rotation="judgmental",
+            manual_rotations=[{"factor_a": 1, "factor_b": 2, "angle_deg": 30.0}],
+        )
+        # Loadings should not be identical (or merely sign-flipped) to the
+        # unrotated solution.
+        diff = np.abs(result["rotated_loadings"]) - np.abs(result["unrotated_loadings"])
+        assert np.max(np.abs(diff)) > 0.01
+
+    def test_judgmental_echoes_manual_rotations(self, dataset):
+        """The result must echo back the manual_rotations list verbatim."""
+        manual = [
+            {"factor_a": 1, "factor_b": 2, "angle_deg": 15.0},
+            {"factor_a": 1, "factor_b": 2, "angle_deg": -5.0},
+        ]
+        result = run_analysis(
+            dataset,
+            n_factors=2,
+            extraction="pca",
+            rotation="judgmental",
+            manual_rotations=manual,
+        )
+        assert result["manual_rotations"] == manual
+
+    def test_non_judgmental_has_empty_manual_rotations(self, dataset):
+        """Varimax/none rotation → manual_rotations is [] in the result."""
+        for rotation in ("varimax", "none"):
+            result = run_analysis(
+                dataset, n_factors=2, extraction="pca", rotation=rotation
+            )
+            assert result["manual_rotations"] == []
+
+
+# --- compute_bootstrap_stability (Zabala & Pascual 2016) ---
+
+
+class TestBootstrapStability:
+    """Tests for the non-parametric bootstrap of Q-sorts."""
+
+    def test_deterministic_under_fixed_seed(self, dataset):
+        """Same dataset + same seed → identical bootstrap output."""
+        kwargs = dict(
+            n_factors=2,
+            extraction="pca",
+            rotation="varimax",
+            manual_rotations=None,
+            grid_config=None,
+        )
+        a = compute_bootstrap_stability(dataset, 200, rng_seed=7, **kwargs)
+        b = compute_bootstrap_stability(dataset, 200, rng_seed=7, **kwargs)
+        assert a["n_iterations"] == b["n_iterations"] == 200
+        assert a["n_converged"] == b["n_converged"]
+        assert a["factor_mean_se"] == b["factor_mean_se"]
+        assert len(a["statements"]) == len(b["statements"])
+        for sa_, sb in zip(a["statements"], b["statements"]):
+            assert sa_["statement_idx"] == sb["statement_idx"]
+            assert sa_["factor"] == sb["factor"]
+            assert sa_["z_se"] == pytest.approx(sb["z_se"])
+
+    def test_se_stabilises_with_more_iterations(self, dataset):
+        """Mean SE per factor should be similar at B=200 vs B=1000 (within tolerance).
+
+        We don't enforce strict shrinkage — bootstrap SE is an empirical
+        estimate of a fixed sampling-distribution quantity, so it should
+        *converge* (not necessarily monotonically shrink) with B.
+        """
+        small = compute_bootstrap_stability(
+            dataset,
+            200,
+            n_factors=2,
+            extraction="pca",
+            rotation="varimax",
+            manual_rotations=None,
+            grid_config=None,
+            rng_seed=11,
+        )
+        large = compute_bootstrap_stability(
+            dataset,
+            1000,
+            n_factors=2,
+            extraction="pca",
+            rotation="varimax",
+            manual_rotations=None,
+            grid_config=None,
+            rng_seed=11,
+        )
+        assert small["n_converged"] >= 100
+        assert large["n_converged"] >= 500
+        # Per-factor mean SEs should agree to ~0.2 on the reference dataset.
+        for s_se, l_se in zip(small["factor_mean_se"], large["factor_mean_se"]):
+            assert abs(s_se - l_se) < 0.2
+
+    def test_per_statement_entries_have_factor_index_and_se(self, dataset):
+        """Each statement entry exposes (statement_idx, factor, z_mean, z_se, ci_*)."""
+        res = compute_bootstrap_stability(
+            dataset,
+            150,
+            n_factors=2,
+            extraction="pca",
+            rotation="varimax",
+            manual_rotations=None,
+            grid_config=None,
+        )
+        # We expect ~ n_statements x n_factors entries; some pathological
+        # iterations may drop some, but for this clean dataset we should
+        # see entries for every cell at least once.
+        assert len(res["statements"]) == dataset.shape[0] * 2
+        for entry in res["statements"]:
+            assert 0 <= entry["statement_idx"] < dataset.shape[0]
+            assert entry["factor"] in (1, 2)
+            assert entry["z_se"] >= 0.0
+            assert entry["ci_lower"] <= entry["z_mean"] <= entry["ci_upper"]
+        assert len(res["factor_mean_se"]) == 2
+
+    def test_pathological_iterations_handled(self):
+        """A degenerate dataset (all-zero columns) should not raise; n_converged
+        records how many iterations produced a usable factor solution."""
+        dataset = np.zeros((6, 4), dtype=np.float64)
+        # Make one column slightly varying so build_sort_matrix-equivalent
+        # filtering would normally exclude it; here we feed the matrix
+        # directly to the bootstrap, so iterations may fail at the
+        # correlation step and be skipped gracefully.
+        dataset[0, 0] = 1.0
+        res = compute_bootstrap_stability(
+            dataset,
+            50,
+            n_factors=2,
+            extraction="pca",
+            rotation="varimax",
+            manual_rotations=None,
+            grid_config=None,
+        )
+        assert res["n_iterations"] == 50
+        # Many or all iterations may fail; the call must not raise.
+        assert 0 <= res["n_converged"] <= 50

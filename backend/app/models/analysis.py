@@ -72,6 +72,25 @@ class AnalysisRun(Base):
         JSON, default=dict, server_default="{}"
     )
 
+    # Judgmental rotation history (Brown 1980; Watts & Stenner 2012).
+    # When rotation_method == 'judgmental', this stores the list of
+    # {factor_a, factor_b, angle_deg} dicts in the order they were applied.
+    # Null for 'varimax' or 'none'. Stored as JSON for audit-trail traceability
+    # of which rotations produced a given run.
+    manual_rotations: Mapped[list[dict[str, Any]] | None] = mapped_column(
+        JSON, nullable=True
+    )
+
+    # Bootstrap stability (Zabala & Pascual 2016).
+    # When the analyst opts in, the analysis is repeated B times on Q-sorts
+    # resampled with replacement. `bootstrap_iterations` records B (None = not
+    # run); `bootstrap_result` stores SE/CI per (statement, factor) plus the
+    # convergence metadata. Stored as JSON for audit-trail traceability.
+    bootstrap_iterations: Mapped[int | None] = mapped_column(
+        SmallInteger, nullable=True
+    )
+    bootstrap_result: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+
     # Full result payload (the AnalysisResult Pydantic model serialized).
     # JSON (not JSONB) to stay consistent with other persisted configs.
     result: Mapped[dict[str, Any]] = mapped_column(JSON)

@@ -103,6 +103,16 @@ export function FactorCharacteristicsTable({ result }: FactorCharacteristicsTabl
         },
     ];
 
+    // Append a "Mean SE (z)" row when bootstrap was run, so the column is
+    // hidden entirely otherwise (Zabala & Pascual 2016).
+    if (result.bootstrap) {
+        const factorMeanSe = result.bootstrap.factor_mean_se;
+        rows.push({
+            label: t('admin.analysis.bootstrap.se_column', 'Mean SE (z)'),
+            values: chars.map((_c, i) => (factorMeanSe[i] ?? 0).toFixed(3)),
+        });
+    }
+
     return (
         <div className="space-y-4">
             <div className="relative">
