@@ -1168,6 +1168,7 @@
             "step_launch": "Käynnistä rekrytointi",
             "step_launch_desc": "Luo osallistumislinkit ja jaa ne.",
             "go_to_concourse": "Avaa concourse",
+            "go_to_qset": "Avaa Q-setti",
             "concourse": "Concourse",
             "concourse_empty": "Ei kohteita. Aloita lausekokoelmasi rakentaminen.",
             "team": "Tiimi",

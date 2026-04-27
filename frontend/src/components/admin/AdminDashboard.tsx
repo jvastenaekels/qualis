@@ -222,6 +222,8 @@ export function AdminDashboard() {
                                     'admin.dashboard.step_qset_desc',
                                     'Review and accept the items that will form your Q-set.'
                                 )}
+                                action={() => navigate(`/app/${projectSlug}/concourses`)}
+                                actionLabel={t('admin.dashboard.go_to_qset', 'Open Q-set')}
                             />
                             <OnboardingStep
                                 step={4}

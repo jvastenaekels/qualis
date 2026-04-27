@@ -1183,6 +1183,7 @@
       "step_launch": "Launch recruitment",
       "step_launch_desc": "Generate participation links and share them.",
       "go_to_concourse": "Open concourse",
+      "go_to_qset": "Open Q-set",
       "concourse": "Concourse",
       "concourse_empty": "No items yet. Start building your statement collection.",
       "team": "Team",

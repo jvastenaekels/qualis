@@ -1168,6 +1168,7 @@
       "step_launch": "Lancer le recrutement",
       "step_launch_desc": "Générez des liens de participation et partagez-les.",
       "go_to_concourse": "Ouvrir le concours",
+      "go_to_qset": "Ouvrir le Q-set",
       "concourse": "Concours",
       "concourse_empty": "Aucun item. Commencez à construire votre collection d'énoncés.",
       "team": "Équipe",
