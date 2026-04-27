@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { formatDistanceToNow, format } from 'date-fns';
-import { enUS, fr, fi } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 import { Button } from '@/components/ui/button';
@@ -26,17 +25,13 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useListStudiesApiAdminStudiesGet } from '@/api/generated';
 import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
 import { ImportStudyDialog } from '@/components/admin/ImportStudyDialog';
-import { useAdminStore } from '@/store/useAdminStore';
 import { useTranslation } from 'react-i18next';
+import { useAdminDashboard } from '@/hooks/admin/useAdminDashboard';
 import type { StudyRead } from '@/api/model/studyRead';
 
 type TranslateFn = ReturnType<typeof useTranslation>['t'];
-
-// biome-ignore lint/suspicious/noExplicitAny: date locales from date-fns
-const DATE_LOCALES: Record<string, any> = { en: enUS, fr, fi };
 
 function getStateColor(state: string | undefined): string {
     switch (state) {
@@ -78,77 +73,26 @@ function getStateIcon(state: string | undefined) {
 export function AdminDashboard() {
     const { currentProject } = useAuthStore();
     const navigate = useNavigate();
-    const { setActiveStudy } = useAdminStore();
-    const [showCreateDialog, setShowCreateDialog] = useState(false);
-    const [showImportDialog, setShowImportDialog] = useState(false);
-    const { t, i18n } = useTranslation();
-    const currentLocale = DATE_LOCALES[i18n.language] || enUS;
-    const projectSlug = currentProject?.slug || '';
-
-    // Data fetching
-    const { data: allStudiesData, isLoading: studiesLoading } = useListStudiesApiAdminStudiesGet(
-        undefined,
-        { query: { enabled: !!currentProject?.id } }
-    );
-
-    const studies = allStudiesData?.items?.filter((s) => s.project_id === currentProject?.id);
-
-    // Derived data
-    const activeStudies = studies?.filter((s) => s.state === 'active') ?? [];
-    const draftStudies = studies?.filter((s) => s.state === 'draft') ?? [];
-    const pausedStudies = studies?.filter((s) => s.state === 'paused') ?? [];
-    const closedStudies =
-        studies?.filter((s) => s.state === 'closed' || s.state === 'archived') ?? [];
-    const totalParticipants = studies?.reduce((sum, s) => sum + (s.participant_count ?? 0), 0) ?? 0;
-
-    // Alerts
-    const alerts: Array<{
-        key: string;
-        message: string;
-        action?: () => void;
-        actionLabel?: string;
-    }> = [];
-
-    // Check for studies near deadline with low participation
-    for (const study of activeStudies) {
-        if (study.end_date) {
-            const endDate = new Date(study.end_date as string);
-            const now = new Date();
-            const daysLeft = Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-            if (daysLeft <= 7 && daysLeft > 0) {
-                const title = getStudyTitle(study);
-                alerts.push({
-                    key: `deadline-${study.id}`,
-                    message: t('admin.dashboard.alert_deadline', {
-                        study: title,
-                        days: daysLeft,
-                        count: study.participant_count ?? 0,
-                        defaultValue:
-                            '{{study}}: closing in {{days}} days with {{count}} participants',
-                    }),
-                    action: () => handleOpenStudy(study.slug),
-                    actionLabel: t('admin.dashboard.view', 'View'),
-                });
-            }
-        }
-    }
-
-    const isLoading = studiesLoading;
-
-    function getStudyTitle(study: NonNullable<typeof studies>[number]): string {
-        const translation = study.translations?.find((tr) => tr.language_code === i18n.language);
-        if (translation?.title) return translation.title;
-        const fallback = study.translations?.find((tr) => tr.language_code === 'en');
-        if (fallback?.title) return fallback.title;
-        const anyTranslation = study.translations?.find((tr) => tr.title);
-        if (anyTranslation?.title) return anyTranslation.title;
-        return study.slug;
-    }
-
-    function handleOpenStudy(studySlug: string) {
-        setActiveStudy(studySlug);
-        navigate(`/app/${projectSlug}/studies/${studySlug}`);
-    }
+    const { t } = useTranslation();
+    const {
+        isLoading,
+        hasStudies,
+        projectSlug,
+        studies,
+        activeStudies,
+        draftStudies,
+        pausedStudies,
+        closedStudies,
+        totalParticipants,
+        alerts,
+        currentLocale,
+        showCreateDialog,
+        showImportDialog,
+        setShowCreateDialog,
+        setShowImportDialog,
+        getStudyTitle,
+        handleOpenStudy,
+    } = useAdminDashboard();
 
     if (isLoading) {
         return (
@@ -163,8 +107,6 @@ export function AdminDashboard() {
             </div>
         );
     }
-
-    const hasStudies = studies && studies.length > 0;
 
     // Show onboarding only until a study is created
     if (!hasStudies) {
