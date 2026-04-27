@@ -12,7 +12,6 @@ import {
     Search,
     Settings,
     UserPlus,
-    Users,
 } from 'lucide-react';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -251,7 +250,7 @@ export const CommandMenu = () => {
                                 onSelect={() =>
                                     runCommand(() =>
                                         navigate(
-                                            `/app/${currentProject?.slug}/studies/${activeStudyId}/exports`
+                                            `/app/${currentProject?.slug}/studies/${activeStudyId}/data`
                                         )
                                     )
                                 }
@@ -261,22 +260,6 @@ export const CommandMenu = () => {
                                     <BarChart3 className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
                                 </div>
                                 <span>{t('admin.sidebar.data')}</span>
-                            </Command.Item>
-                            <Command.Item
-                                value="team management collaborators"
-                                onSelect={() =>
-                                    runCommand(() =>
-                                        navigate(
-                                            `/app/${currentProject?.slug}/studies/${activeStudyId}/team`
-                                        )
-                                    )
-                                }
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer aria-selected:bg-slate-100 dark:aria-selected:bg-slate-800"
-                            >
-                                <div className="flex h-6 w-6 items-center justify-center rounded bg-blue-100 dark:bg-blue-900/40">
-                                    <Users className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                                </div>
-                                <span>{t('admin.sidebar.team')}</span>
                             </Command.Item>
                             <Command.Item
                                 value="settings configuration"
