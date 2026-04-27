@@ -233,7 +233,19 @@ export default function ConcourseDetailPage() {
                 }
             />
 
-            {/* Construction memo (critical-Q reflexivity) */}
+            {/* Methodological context — neutral umbrella for optional documentation fields. */}
+            <div className="space-y-1">
+                <h2 className="text-sm font-semibold text-slate-700">
+                    {t('admin.concourse.methodological_context.title', 'Methodological context')}
+                </h2>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                    {t(
+                        'admin.concourse.methodological_context.subtitle',
+                        "Optional documentation fields. Fill in what's relevant to your design; leave others blank."
+                    )}
+                </p>
+            </div>
+
             <Card className="rounded-xl border-slate-200">
                 <CardContent className="p-4 sm:p-6 space-y-3">
                     <div>
@@ -246,7 +258,7 @@ export default function ConcourseDetailPage() {
                         <p className="mt-1 text-xs text-slate-500 leading-relaxed">
                             {t(
                                 'admin.concourse.construction_memo.helper',
-                                'Document how this concourse was constructed: which sources you canvassed, which voices you retained or set aside, and the rationale for sampling. A concourse is a curatorial act, not a neutral inventory (Sneegas 2020; Robbins & Krueger 2000) — making the construction visible is part of the analysis.'
+                                'Optional. Document how this concourse was constructed: sources canvassed, voices retained or set aside, sampling rationale. Useful for transparency about the curation process (Sneegas 2020; Robbins & Krueger 2000). Leave blank if not applicable to your design.'
                             )}
                         </p>
                     </div>

@@ -659,9 +659,13 @@
             "diff_text": "teksti",
             "diff_tags": "tunnisteet",
             "diff_changed": "Muutettu:",
+            "methodological_context": {
+                "title": "Metodologinen konteksti",
+                "subtitle": "Valinnaisia dokumentointikenttiä. Täytä mikä on tutkimusasetelmasi kannalta merkityksellistä; jätä muut tyhjäksi."
+            },
             "construction_memo": {
                 "title": "Rakentamisen muistio",
-                "helper": "Dokumentoi, kuinka tämä lausekokoelma rakennettiin: mitä lähteitä kartoitettiin, mitkä äänet säilytettiin tai jätettiin pois ja millä perusteella otanta tehtiin. Lausekokoelma on kuratoiva teko, ei neutraali inventaario (Sneegas 2020; Robbins & Krueger 2000) — rakennusprosessin näkyväksi tekeminen on osa analyysiä.",
+                "helper": "Valinnainen. Dokumentoi, kuinka tämä lausekokoelma rakennettiin: kartoitetut lähteet, säilytetyt tai pois jätetyt äänet, otantaperuste. Hyödyllinen kuratointiprosessin läpinäkyvyyden kannalta (Sneegas 2020; Robbins & Krueger 2000). Jätä tyhjäksi, jos ei sovi tutkimusasetelmaasi.",
                 "placeholder": "Dokumentoi, kuinka tämä lausekokoelma rakennettiin: lähteet, säilytetyt tai pois jätetyt äänet, otantaperuste…",
                 "save": "Tallenna muistio",
                 "saved": "Rakentamisen muistio tallennettu",

@@ -659,9 +659,13 @@
       "diff_text": "texte",
       "diff_tags": "étiquettes",
       "diff_changed": "Modifié :",
+      "methodological_context": {
+        "title": "Contexte méthodologique",
+        "subtitle": "Champs de documentation optionnels. Remplissez ce qui est pertinent pour votre design ; laissez le reste vide."
+      },
       "construction_memo": {
         "title": "Mémo de construction",
-        "helper": "Documentez comment ce concours a été constitué : sources mobilisées, voix retenues ou écartées, rationnel de l'échantillonnage. Un concours est un acte curatorial, non un inventaire neutre (Sneegas 2020 ; Robbins & Krueger 2000) — rendre cette construction visible fait partie de l'analyse.",
+        "helper": "Optionnel. Documentez comment ce concours a été constitué : sources mobilisées, voix retenues ou écartées, rationnel d'échantillonnage. Utile pour rendre transparent le processus de curation (Sneegas 2020 ; Robbins & Krueger 2000). Laissez vide si non pertinent pour votre design.",
         "placeholder": "Documentez comment ce concours a été construit : sources, voix retenues ou écartées, rationnel de l'échantillonnage…",
         "save": "Enregistrer le mémo",
         "saved": "Mémo de construction enregistré",
