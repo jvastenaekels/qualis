@@ -290,7 +290,7 @@ export default function ProjectSettingsPage() {
                                                             disabled={!isAdmin}
                                                         />
                                                         <div className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 select-none border-r pr-3 mr-3 h-4 flex items-center">
-                                                            /admin/w/
+                                                            /app/
                                                         </div>
                                                     </div>
                                                 </FormControl>
