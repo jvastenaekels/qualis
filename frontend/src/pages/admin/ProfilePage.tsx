@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -11,6 +13,14 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { customInstance } from '@/api/mutator';
@@ -25,17 +35,32 @@ import { Badge } from '@/components/ui/badge';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
+import { parseApiErrorSync } from '@/lib/error-utils';
 
-// Define types manually since generation might lag
-interface UserUpdate {
-    email?: string;
-    full_name?: string;
+type Translator = (key: string, fallback: string) => string;
+
+export function makeProfileSchema(t: Translator) {
+    return z.object({
+        email: z.string().optional(),
+        full_name: z
+            .string()
+            .min(1, t('admin.profile.personal.name_required', 'Full name is required')),
+    });
 }
 
-interface PasswordChange {
-    current_password: string;
-    new_password: string;
+export function makePasswordSchema(t: Translator) {
+    return z.object({
+        current_password: z
+            .string()
+            .min(1, t('admin.profile.password.validation.required', 'Required')),
+        new_password: z
+            .string()
+            .min(8, t('admin.profile.password.validation.min_length', 'Min 8 characters')),
+    });
 }
+
+type ProfileFormValues = z.infer<ReturnType<typeof makeProfileSchema>>;
+type PasswordFormValues = z.infer<ReturnType<typeof makePasswordSchema>>;
 
 const ProfilePage = () => {
     const { user, refetch: refetchUser } = useAuth();
@@ -65,9 +90,13 @@ const ProfilePage = () => {
                 setTotpToken('');
                 refetchUser();
             },
-            // biome-ignore lint/suspicious/noExplicitAny: error handling
-            onError: (err: any) => {
-                toast.error(err?.response?.data?.detail || 'Invalid token');
+            onError: (err: unknown) => {
+                toast.error(
+                    parseApiErrorSync(
+                        err,
+                        t('admin.profile.security.invalid_token', 'Invalid verification code')
+                    )
+                );
             },
         },
     });
@@ -85,47 +114,57 @@ const ProfilePage = () => {
                 setConfirmPassword('');
                 refetchUser();
             },
-            // biome-ignore lint/suspicious/noExplicitAny: error handling
-            onError: (err: any) => {
-                toast.error(err?.response?.data?.detail || 'Failed to disable 2FA');
+            onError: (err: unknown) => {
+                toast.error(
+                    parseApiErrorSync(
+                        err,
+                        t('admin.profile.security.disable_error', 'Failed to disable 2FA')
+                    )
+                );
             },
         },
     });
 
-    const { register: registerProfile, handleSubmit: handleProfileSubmit } = useForm<UserUpdate>({
+    const profileSchema = useMemo(() => makeProfileSchema(t), [t]);
+    const passwordSchema = useMemo(() => makePasswordSchema(t), [t]);
+
+    const profileForm = useForm<ProfileFormValues>({
+        resolver: zodResolver(profileSchema),
         values: {
-            email: user?.email,
-            full_name: user?.full_name || '',
+            email: user?.email ?? undefined,
+            full_name: user?.full_name ?? '',
         },
     });
 
-    const {
-        register: registerPassword,
-        handleSubmit: handlePasswordSubmit,
-        reset: resetPassword,
-        formState: { errors: passwordErrors },
-    } = useForm<PasswordChange>();
+    const passwordForm = useForm<PasswordFormValues>({
+        resolver: zodResolver(passwordSchema),
+        defaultValues: { current_password: '', new_password: '' },
+    });
 
-    const onProfileSubmit = async (data: UserUpdate) => {
+    const onProfileSubmit = async ({ full_name }: ProfileFormValues) => {
         setIsUpdating(true);
         try {
             await customInstance<void>({
                 url: '/api/me',
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                data,
+                data: { full_name },
             });
             toast.success(t('admin.profile.personal.success', 'Profile updated successfully'));
             refetchUser();
         } catch (error) {
-            toast.error(t('admin.profile.personal.error', 'Failed to update profile'));
-            console.error(error);
+            toast.error(
+                parseApiErrorSync(
+                    error,
+                    t('admin.profile.personal.error', 'Failed to update profile')
+                )
+            );
         } finally {
             setIsUpdating(false);
         }
     };
 
-    const onPasswordSubmit = async (data: PasswordChange) => {
+    const onPasswordSubmit = async (data: PasswordFormValues) => {
         setIsChangingPassword(true);
         try {
             await customInstance<void>({
@@ -135,15 +174,17 @@ const ProfilePage = () => {
                 data,
             });
             toast.success(t('admin.profile.password.success', 'Password changed successfully'));
-            resetPassword();
+            passwordForm.reset();
         } catch (error) {
             toast.error(
-                t(
-                    'admin.profile.password.error',
-                    'Failed to change password. Check current password.'
+                parseApiErrorSync(
+                    error,
+                    t(
+                        'admin.profile.password.error',
+                        'Failed to change password. Check current password.'
+                    )
                 )
             );
-            console.error(error);
         } finally {
             setIsChangingPassword(false);
         }
@@ -175,55 +216,70 @@ const ProfilePage = () => {
                             )}
                         </CardDescription>
                     </CardHeader>
-                    <form onSubmit={handleProfileSubmit(onProfileSubmit)}>
-                        <CardContent className="space-y-4">
-                            <div className="grid gap-2">
-                                <Label
-                                    htmlFor="email"
-                                    className="text-2xs font-black text-slate-500"
-                                >
-                                    {t('admin.profile.personal.email', 'Email address')}
-                                </Label>
-                                <Input
-                                    id="email"
-                                    {...registerProfile('email')}
-                                    disabled
-                                    className="h-11 rounded-xl bg-slate-50 border-slate-200"
-                                />
-                                <p className="text-2xs text-slate-400 italic">
-                                    {t(
-                                        'admin.profile.personal.email_locked',
-                                        'Email cannot be changed directly. Contact admin.'
+                    <Form {...profileForm}>
+                        <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
+                            <CardContent className="space-y-4">
+                                <FormField
+                                    control={profileForm.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-2xs font-black text-slate-500">
+                                                {t('admin.profile.personal.email', 'Email address')}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    value={field.value ?? ''}
+                                                    disabled
+                                                    className="h-11 rounded-xl bg-slate-50 border-slate-200"
+                                                />
+                                            </FormControl>
+                                            <p className="text-2xs text-slate-400 italic">
+                                                {t(
+                                                    'admin.profile.personal.email_locked',
+                                                    'Email cannot be changed directly. Contact admin.'
+                                                )}
+                                            </p>
+                                        </FormItem>
                                     )}
-                                </p>
-                            </div>
-                            <div className="grid gap-2">
-                                <Label
-                                    htmlFor="full_name"
-                                    className="text-2xs font-black text-slate-500"
-                                >
-                                    {t('admin.profile.personal.name', 'Full name')}
-                                </Label>
-                                <Input
-                                    id="full_name"
-                                    placeholder={t('admin.profile.personal.name', 'Full name')}
-                                    {...registerProfile('full_name')}
-                                    className="h-11 rounded-xl"
                                 />
-                            </div>
-                        </CardContent>
-                        <CardFooter className="border-t border-slate-50 px-6 py-4 justify-end">
-                            <Button
-                                type="submit"
-                                disabled={isUpdating}
-                                className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-                            >
-                                {isUpdating
-                                    ? t('admin.profile.personal.saving', 'Saving...')
-                                    : t('admin.profile.personal.save', 'Save changes')}
-                            </Button>
-                        </CardFooter>
-                    </form>
+                                <FormField
+                                    control={profileForm.control}
+                                    name="full_name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-2xs font-black text-slate-500">
+                                                {t('admin.profile.personal.name', 'Full name')}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    placeholder={t(
+                                                        'admin.profile.personal.name',
+                                                        'Full name'
+                                                    )}
+                                                    className="h-11 rounded-xl"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </CardContent>
+                            <CardFooter className="border-t border-slate-50 px-6 py-4 justify-end">
+                                <Button
+                                    type="submit"
+                                    disabled={isUpdating}
+                                    className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                >
+                                    {isUpdating
+                                        ? t('admin.profile.personal.saving', 'Saving...')
+                                        : t('admin.profile.personal.save', 'Save changes')}
+                                </Button>
+                            </CardFooter>
+                        </form>
+                    </Form>
                 </Card>
 
                 {/* Two-Factor Authentication (2FA) */}
@@ -479,68 +535,64 @@ const ProfilePage = () => {
                             )}
                         </CardDescription>
                     </CardHeader>
-                    <form onSubmit={handlePasswordSubmit(onPasswordSubmit)}>
-                        <CardContent className="space-y-4">
-                            <div className="grid gap-2">
-                                <Label
-                                    htmlFor="current_password"
-                                    className="text-2xs font-black text-slate-500"
-                                >
-                                    {t('admin.profile.password.current', 'Current password')}
-                                </Label>
-                                <Input
-                                    id="current_password"
-                                    type="password"
-                                    {...registerPassword('current_password', { required: true })}
-                                    className="h-11 rounded-xl"
+                    <Form {...passwordForm}>
+                        <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>
+                            <CardContent className="space-y-4">
+                                <FormField
+                                    control={passwordForm.control}
+                                    name="current_password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-2xs font-black text-slate-500">
+                                                {t(
+                                                    'admin.profile.password.current',
+                                                    'Current password'
+                                                )}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    type="password"
+                                                    className="h-11 rounded-xl"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
                                 />
-                                {passwordErrors.current_password && (
-                                    <span className="text-red-500 text-xs">
-                                        {t(
-                                            'admin.profile.password.validation.required',
-                                            'Required'
-                                        )}
-                                    </span>
-                                )}
-                            </div>
-                            <div className="grid gap-2">
-                                <Label
-                                    htmlFor="new_password"
-                                    className="text-2xs font-black text-slate-500"
-                                >
-                                    {t('admin.profile.password.new', 'New password')}
-                                </Label>
-                                <Input
-                                    id="new_password"
-                                    type="password"
-                                    {...registerPassword('new_password', {
-                                        required: true,
-                                        minLength: 8,
-                                    })}
-                                    className="h-11 rounded-xl"
+                                <FormField
+                                    control={passwordForm.control}
+                                    name="new_password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-2xs font-black text-slate-500">
+                                                {t('admin.profile.password.new', 'New password')}
+                                            </FormLabel>
+                                            <FormControl>
+                                                <Input
+                                                    {...field}
+                                                    type="password"
+                                                    className="h-11 rounded-xl"
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
                                 />
-                                {passwordErrors.new_password && (
-                                    <span className="text-red-500 text-xs">
-                                        {t(
-                                            'admin.profile.password.validation.min_length',
-                                            'Min 8 characters required'
-                                        )}
-                                    </span>
-                                )}
-                            </div>
-                        </CardContent>
-                        <CardFooter className="border-t border-slate-50 px-6 py-4 justify-end">
-                            <Button
-                                type="submit"
-                                disabled={isChangingPassword}
-                                className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-                            >
-                                {isChangingPassword
-                                    ? t('admin.profile.password.updating', 'Updating...')
-                                    : t('admin.profile.password.change_btn', 'Change password')}
-                            </Button>
-                        </CardFooter>
-                    </form>
+                            </CardContent>
+                            <CardFooter className="border-t border-slate-50 px-6 py-4 justify-end">
+                                <Button
+                                    type="submit"
+                                    disabled={isChangingPassword}
+                                    className="h-11 rounded-xl px-6 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                                >
+                                    {isChangingPassword
+                                        ? t('admin.profile.password.updating', 'Updating...')
+                                        : t('admin.profile.password.change_btn', 'Change password')}
+                                </Button>
+                            </CardFooter>
+                        </form>
+                    </Form>
                 </Card>
             </div>
         </div>

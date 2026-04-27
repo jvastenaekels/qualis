@@ -521,7 +521,8 @@
         "saving": "Saving...",
         "success": "Profile updated successfully",
         "error": "Failed to update profile",
-        "cannot_remove_self": "You cannot remove yourself"
+        "cannot_remove_self": "You cannot remove yourself",
+        "name_required": "Full name is required"
       },
       "security": {
         "title": "Security & 2FA",
@@ -543,7 +544,9 @@
         "cancel": "Cancel",
         "enabled_success": "Two-factor authentication enabled",
         "disabled_success": "Two-factor authentication disabled",
-        "secret_copied": "Secret copied"
+        "secret_copied": "Secret copied",
+        "invalid_token": "Invalid verification code",
+        "disable_error": "Failed to disable 2FA"
       },
       "password": {
         "title": "Password management",
