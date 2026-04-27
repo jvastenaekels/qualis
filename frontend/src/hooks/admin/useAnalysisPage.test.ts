@@ -421,11 +421,23 @@ describe('useAnalysisPage', () => {
                 result.current.addManualRotation();
             });
             expect(result.current.manualRotations).toHaveLength(1);
-            expect(result.current.manualRotations[0]).toEqual({
-                factor_a: 1,
-                factor_b: 2,
-                angle_deg: 0,
+            const [row] = result.current.manualRotations;
+            expect(row).toMatchObject({ factor_a: 1, factor_b: 2, angle_deg: 0 });
+            expect(typeof row?.id).toBe('string');
+            expect(row?.id.length).toBeGreaterThan(0);
+        });
+
+        it('addManualRotation gives each row a unique stable id', () => {
+            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
             });
+            act(() => {
+                result.current.addManualRotation();
+                result.current.addManualRotation();
+                result.current.addManualRotation();
+            });
+            const ids = result.current.manualRotations.map((r) => r.id);
+            expect(new Set(ids).size).toBe(3);
         });
 
         it('updateManualRotation mutates only the targeted row', () => {

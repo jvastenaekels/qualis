@@ -27,6 +27,21 @@ import {
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey,
 } from '@/api/generated';
 import type { AnalysisResult, AnalysisRunSummary, ManualRotation } from '@/api/model';
+
+/**
+ * Client-side draft of a manual rotation row. Carries a stable `id` used as the
+ * React key so removing or reordering rows mid-edit doesn't mis-mount the Input
+ * fields (focus + cursor preserved). The id is stripped before the rotation is
+ * POSTed to the analysis API.
+ */
+export type ManualRotationDraft = ManualRotation & { id: string };
+
+function newRotationId(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+        return crypto.randomUUID();
+    }
+    return `mr-${Math.random().toString(36).slice(2)}-${Date.now().toString(36)}`;
+}
 import { generateAnalysisXlsx } from '@/utils/analysisXlsxExport';
 
 // ────────────────────────────────────────────────────────────────
@@ -105,8 +120,12 @@ export interface AnalysisPageApi {
      * Each entry rotates the (factor_a, factor_b) factor pair by `angle_deg`
      * degrees; rotations are applied in list order. Empty for varimax/none
      * (Brown 1980; Watts & Stenner 2012).
+     *
+     * `id` is a client-only stable key for React reconciliation; it is stripped
+     * before the rotation is sent to the API so removing/reordering items mid-edit
+     * doesn't mis-mount input fields.
      */
-    manualRotations: ManualRotation[];
+    manualRotations: ManualRotationDraft[];
     addManualRotation: () => void;
     updateManualRotation: (index: number, partial: Partial<ManualRotation>) => void;
     removeManualRotation: (index: number) => void;
@@ -188,7 +207,7 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
         (searchParamsSnapshot.get('flagging') as 'auto' | 'manual') || 'auto'
     );
     const [manualFlags, setManualFlags] = useState<Record<number, number[]>>({});
-    const [manualRotations, setManualRotations] = useState<ManualRotation[]>([]);
+    const [manualRotations, setManualRotations] = useState<ManualRotationDraft[]>([]);
     const [bootstrapEnabled, setBootstrapEnabled] = useState<boolean>(false);
     const [bootstrapIterations, setBootstrapIterations] = useState<number>(1000);
 
@@ -212,7 +231,10 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
     }, []);
 
     const addManualRotation = useCallback(() => {
-        setManualRotations((prev) => [...prev, { factor_a: 1, factor_b: 2, angle_deg: 0 }]);
+        setManualRotations((prev) => [
+            ...prev,
+            { id: newRotationId(), factor_a: 1, factor_b: 2, angle_deg: 0 },
+        ]);
     }, []);
 
     const updateManualRotation = useCallback((index: number, partial: Partial<ManualRotation>) => {
@@ -327,7 +349,14 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
                     rotation,
                     flagging,
                     manual_flags: manualFlagsPayload,
-                    manual_rotations: rotation === 'judgmental' ? manualRotations : null,
+                    manual_rotations:
+                        rotation === 'judgmental'
+                            ? manualRotations.map(({ factor_a, factor_b, angle_deg }) => ({
+                                  factor_a,
+                                  factor_b,
+                                  angle_deg,
+                              }))
+                            : null,
                     bootstrap_iterations: bootstrapEnabled ? bootstrapIterations : null,
                 },
             },

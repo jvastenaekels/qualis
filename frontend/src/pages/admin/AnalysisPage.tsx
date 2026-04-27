@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useCallback } from 'react';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     ChartColumnStacked,
@@ -54,8 +54,26 @@ export default function AnalysisPage() {
     const slug = studySlug ?? '';
     const { t } = useTranslation();
 
-    // Visual-only state: active results tab (Radix UI, not testable logic)
-    const [activeTab, setActiveTab] = useState('loadings');
+    // Active results tab persisted to ?tab= so reload + share-links are stable.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('tab') ?? 'loadings';
+    const setActiveTab = useCallback(
+        (next: string) => {
+            setSearchParams(
+                (prev) => {
+                    const params = new URLSearchParams(prev);
+                    if (next === 'loadings') {
+                        params.delete('tab');
+                    } else {
+                        params.set('tab', next);
+                    }
+                    return params;
+                },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
 
     const api = useAnalysisPage(slug);
     // Capture result in local const so TypeScript narrows it through JSX callback boundaries
@@ -314,7 +332,7 @@ export default function AnalysisPage() {
 
                             <ul className="space-y-2">
                                 {api.manualRotations.map((mr, idx) => (
-                                    <li key={idx} className="flex flex-wrap items-center gap-2">
+                                    <li key={mr.id} className="flex flex-wrap items-center gap-2">
                                         <span className="text-xs text-slate-600">
                                             {t(
                                                 'admin.analysis.manual_rotations.factor_a_label',
@@ -474,6 +492,22 @@ export default function AnalysisPage() {
                             </div>
                         )}
                     </div>
+
+                    {/* Warn before re-running when a result is already on screen */}
+                    {analysisResult && (
+                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 flex items-start gap-2">
+                            <AlertTriangle
+                                className="size-3.5 mt-0.5 shrink-0"
+                                aria-hidden="true"
+                            />
+                            <span>
+                                {t(
+                                    'admin.analysis.run_will_replace',
+                                    'Running again will replace the current results view. Use the history panel to compare runs.'
+                                )}
+                            </span>
+                        </p>
+                    )}
 
                     {/* Action buttons — visually separated */}
                     <div className="flex items-center gap-3 pt-1 border-t border-slate-100">

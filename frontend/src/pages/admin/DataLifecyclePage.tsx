@@ -412,14 +412,20 @@ export default function DataLifecyclePage() {
                         {/* Preview / candidate count */}
                         <div className="bg-slate-50 rounded-xl p-4 text-sm">
                             <span className="font-semibold text-slate-700">
-                                {t('admin.lifecycle.preview_label', 'Estimated candidates:')}
+                                {t('admin.lifecycle.preview_label', 'Lower-bound estimate:')}
                             </span>{' '}
-                            <span className="font-bold text-slate-900">{candidateCount}</span>
+                            <span className="font-bold text-slate-900">≥ {candidateCount}</span>
+                            <p className="text-xs text-slate-500 mt-1 italic">
+                                {t(
+                                    'admin.lifecycle.preview_bucket_note',
+                                    'Counts are computed against year-bucket thresholds (≥1y, ≥2y) — for cutoffs between buckets the displayed number is conservative. The actual count anonymised may be higher; see the bucket counts above.'
+                                )}
+                            </p>
                             {candidateCount === 0 && (
                                 <p className="text-xs text-slate-400 mt-1">
                                     {t(
                                         'admin.lifecycle.preview_zero',
-                                        'No participants qualify for this cutoff. Try an earlier date.'
+                                        'No participants qualify for this cutoff under the year buckets. Pick a date ≥ 1 year ago to see a non-zero estimate, or wait for the precise server-side preview.'
                                     )}
                                 </p>
                             )}
