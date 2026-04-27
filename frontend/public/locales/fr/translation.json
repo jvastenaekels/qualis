@@ -2094,7 +2094,12 @@
         "description": "Les actions effectuées ici sont irréversibles.",
         "notice": "La suppression d'une étude efface TOUTES les données (participants, réponses, configuration) de façon permanente. L'étude doit être archivée avant suppression.",
         "delete_button": "Supprimer l'étude",
-        "delete_confirm": "Êtes-vous sûr ? Cette action est IRRÉVERSIBLE."
+        "delete_confirm": "Êtes-vous sûr ? Cette action est IRRÉVERSIBLE.",
+        "delete_dialog_title": "Supprimer cette étude ?",
+        "delete_dialog_intro": "Tous les tris, enregistrements audio et analyses de cette étude seront supprimés définitivement. Cette action est irréversible.",
+        "delete_dialog_typed_label": "Saisir le slug de l'étude pour confirmer",
+        "delete_dialog_typed_placeholder": "{{slug}}",
+        "delete_dialog_action": "Supprimer définitivement"
       },
       "save_button": "Enregistrer les modifications",
       "save_success": "Paramètres mis à jour",

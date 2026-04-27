@@ -2094,7 +2094,12 @@
                 "description": "Nämä toiminnot ovat peruuttamattomia.",
                 "notice": "Tutkimuksen poistaminen poistaa KAIKKI tiedot (osallistujat, vastaukset, asetukset) pysyvästi. Tutkimus on arkistoitava ennen poistamista.",
                 "delete_button": "Poista tutkimus",
-                "delete_confirm": "Oletko varma? Tätä toimintoa EI VOI PERUUTTAA."
+                "delete_confirm": "Oletko varma? Tätä toimintoa EI VOI PERUUTTAA.",
+                "delete_dialog_title": "Poistetaanko tämä tutkimus?",
+                "delete_dialog_intro": "Kaikki lajittelut, äänitallenteet ja analyysit poistetaan pysyvästi. Tätä ei voi kumota.",
+                "delete_dialog_typed_label": "Vahvista kirjoittamalla tutkimuksen slug",
+                "delete_dialog_typed_placeholder": "{{slug}}",
+                "delete_dialog_action": "Poista pysyvästi"
             },
             "save_button": "Tallenna muutokset",
             "save_success": "Asetukset päivitetty",

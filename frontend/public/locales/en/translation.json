@@ -2109,7 +2109,12 @@
         "description": "Actions here are irreversible.",
         "notice": "Deleting a study removes ALL data (participants, answers, config) permanently. Study must be archived before deletion.",
         "delete_button": "Delete study",
-        "delete_confirm": "Are you sure? This action is IRREVERSIBLE."
+        "delete_confirm": "Are you sure? This action is IRREVERSIBLE.",
+        "delete_dialog_title": "Delete this study?",
+        "delete_dialog_intro": "All sorts, audio recordings, and analysis runs for this study will be permanently deleted. This cannot be undone.",
+        "delete_dialog_typed_label": "Type the study slug to confirm",
+        "delete_dialog_typed_placeholder": "{{slug}}",
+        "delete_dialog_action": "Delete permanently"
       },
       "save_button": "Save changes",
       "save_success": "Settings updated",

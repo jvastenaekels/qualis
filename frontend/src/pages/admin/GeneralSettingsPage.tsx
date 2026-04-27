@@ -1,6 +1,17 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Label } from '@/components/ui/label';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useNavigate, useParams, useRevalidator } from 'react-router-dom';
@@ -57,6 +68,8 @@ export default function GeneralSettingsPage() {
     const revalidator = useRevalidator();
     const [quotaMb, setQuotaMb] = useState<number | null>(null);
     const [isSavingQuota, setIsSavingQuota] = useState(false);
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [typedSlug, setTypedSlug] = useState('');
 
     const study = initialStudy;
     const slug = initialSlug;
@@ -87,16 +100,12 @@ export default function GeneralSettingsPage() {
     };
     const handleDelete = async () => {
         if (!study || !slug) return;
-        if (!confirm(t('admin.settings.danger.delete_confirm'))) return;
         try {
             await AdminService.deleteStudy(slug);
             useAdminStore.getState().setActiveStudy(null);
-
-            // Invalidate studies list query to remove deleted study from sidebar
             await queryClient.invalidateQueries({
                 queryKey: getListStudiesApiAdminStudiesGetQueryKey(),
             });
-
             toast.success(t('admin.settings.delete_success'), {
                 description: t('admin.settings.delete_success_desc'),
             });
@@ -106,9 +115,10 @@ export default function GeneralSettingsPage() {
             navigate(targetHome);
         } catch (error) {
             const message = parseApiErrorSync(error, t('admin.settings.delete_error'));
-            toast.error(t('admin.settings.delete_error'), {
-                description: message,
-            });
+            toast.error(t('admin.settings.delete_error'), { description: message });
+        } finally {
+            setDeleteOpen(false);
+            setTypedSlug('');
         }
     };
 
@@ -405,7 +415,7 @@ export default function GeneralSettingsPage() {
                             <Button
                                 variant="destructive"
                                 disabled={!isArchived}
-                                onClick={handleDelete}
+                                onClick={() => setDeleteOpen(true)}
                                 className="w-full sm:w-auto rounded-xl font-black shadow-lg shadow-red-100 flex items-center gap-2 px-6"
                             >
                                 <Trash2 size={16} />
@@ -420,6 +430,59 @@ export default function GeneralSettingsPage() {
                     </Card>
                 )}
             </div>
+
+            <AlertDialog
+                open={deleteOpen}
+                onOpenChange={(open) => {
+                    setDeleteOpen(open);
+                    if (!open) setTypedSlug('');
+                }}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            {t('admin.settings.danger.delete_dialog_title', 'Delete this study?')}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="space-y-2 text-left">
+                            <span className="block">
+                                {t(
+                                    'admin.settings.danger.delete_dialog_intro',
+                                    'All sorts, audio recordings, and analysis runs for this study will be permanently deleted. This cannot be undone.'
+                                )}
+                            </span>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <div className="space-y-2 px-1">
+                        <Label
+                            htmlFor="delete-typed-slug"
+                            className="text-xs font-semibold text-slate-700"
+                        >
+                            {t(
+                                'admin.settings.danger.delete_dialog_typed_label',
+                                'Type the study slug to confirm'
+                            )}
+                        </Label>
+                        <Input
+                            id="delete-typed-slug"
+                            value={typedSlug}
+                            onChange={(e) => setTypedSlug(e.target.value)}
+                            placeholder={slug}
+                            autoComplete="off"
+                            spellCheck={false}
+                        />
+                    </div>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel', 'Cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                            disabled={typedSlug !== slug}
+                            onClick={handleDelete}
+                            className="bg-red-600 hover:bg-red-700"
+                        >
+                            {t('admin.settings.danger.delete_dialog_action', 'Delete permanently')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }
