@@ -12,7 +12,6 @@ import { Separator } from '@/components/ui/separator';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
-import { useGetStudyApiAdminStudiesSlugGet } from '@/api/generated';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useAdminContext } from '@/hooks/useAdminContext';
 import { useEffect } from 'react';
@@ -23,14 +22,8 @@ export default function AdminLayout() {
     const location = useLocation();
     const { activeStudyId, setActiveStudy } = useAdminStore();
     const { currentProject } = useAuthStore();
+    const { project: adminProject, study: adminStudy } = useAdminContext();
     const { t } = useTranslation();
-
-    // Fetch study data to get the actual title
-    const { data: study } = useGetStudyApiAdminStudiesSlugGet(activeStudyId ?? '', {
-        query: {
-            enabled: !!activeStudyId,
-        },
-    });
 
     useEffect(() => {
         const match = location.pathname.match(/\/app\/[^/]+\/studies\/([^/]+)/);
@@ -77,8 +70,6 @@ export default function AdminLayout() {
         return mapping[last] || last.charAt(0).toUpperCase() + last.slice(1);
     };
 
-    const { project: adminProject, study: adminStudy } = useAdminContext();
-
     return (
         <SidebarProvider>
             <CommandMenu />
@@ -113,17 +104,19 @@ export default function AdminLayout() {
                                 )}
 
                                 {/* Study Context (if on study page) */}
-                                {activeStudyId && study && (
+                                {activeStudyId && adminStudy && (
                                     <>
                                         <BreadcrumbItem className="hidden md:block min-w-0 max-w-[160px] lg:max-w-[280px]">
                                             <BreadcrumbLink
                                                 href={`/app/${currentProject?.slug}/studies/${activeStudyId}`}
                                                 className="text-sm font-semibold text-slate-700 hover:text-indigo-600 transition-colors truncate block"
                                                 title={
-                                                    study.translations?.[0]?.title || activeStudyId
+                                                    adminStudy.translations?.[0]?.title ||
+                                                    activeStudyId
                                                 }
                                             >
-                                                {study.translations?.[0]?.title || activeStudyId}
+                                                {adminStudy.translations?.[0]?.title ||
+                                                    activeStudyId}
                                             </BreadcrumbLink>
                                         </BreadcrumbItem>
                                         <BreadcrumbSeparator className="hidden md:block shrink-0" />
@@ -151,7 +144,7 @@ export default function AdminLayout() {
                     <Outlet
                         context={{
                             project: adminProject,
-                            study: adminStudy || study, // Use context study if available, else re-fetched study
+                            study: adminStudy,
                         }}
                     />
                 </div>
