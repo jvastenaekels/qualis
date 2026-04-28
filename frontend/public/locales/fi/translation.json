@@ -764,6 +764,12 @@
                 "contract_body": "Q-metodologian faktorianalyysi vaatii vähintään 2 osallistujaa, jotka ovat suorittaneet lajittelun. Konfiguraatiovalinnat (poimintatapa, faktorit, rotaatio, merkintä) saavat merkityksensä, kun dataa on saatavilla. Jaa tutkimuslinkki yleisnäkymästä aloittaaksesi vastausten keräämisen.",
                 "contract_cta": "Avaa tutkimuksen yleisnäkymä"
             },
+            "advanced": {
+                "title": "Lisäasetukset",
+                "summary": "Rotaatio: {{rotation}} · Merkintä: {{flagging}} · Bootstrap: {{bootstrap}}",
+                "bootstrap_off": "pois",
+                "bootstrap_on": "{{n}} iteraatiota"
+            },
             "tab_loadings": "Lataukset",
             "tab_factor_arrays": "Faktoritaulukot",
             "tab_statements": "Väittämät",
@@ -827,6 +833,7 @@
             "rotation": {
                 "judgmental": {
                     "label": "Harkintaan perustuva (manuaalinen)",
+                    "short": "Harkintaan",
                     "tooltip": "Käännä faktoripareja manuaalisesti valituilla kulmilla, jotta faktorit saadaan kohdistettua sisällöllisesti merkityksellisiin asentoihin (Brown 1980; Watts & Stenner 2012)."
                 }
             },

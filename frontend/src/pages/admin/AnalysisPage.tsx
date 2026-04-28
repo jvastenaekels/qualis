@@ -23,6 +23,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
+    Accordion,
+    AccordionItem,
+    AccordionTrigger,
+    AccordionContent,
+} from '@/components/ui/accordion';
+import {
     Select,
     SelectContent,
     SelectItem,
@@ -206,8 +212,13 @@ export default function AnalysisPage() {
                             )}
                         {!api.hasEigenvalues && !api.eigenvaluesIsLoading && <div />}
 
-                        {/* Parameters */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-x-4 gap-y-3 lg:w-[320px]">
+                        {/* Parameters — Wave C: only Extraction + Facteurs are
+                            primary-visible. Rotation / Flagging / Bootstrap
+                            move into the "Advanced settings" Accordion below
+                            (audit REPORT.md finding 🔴3, when analysis IS
+                            possible). Reduces decision surface from 4 dropdowns
+                            + 4 rationale paragraphs to 2 dropdowns. */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 lg:w-[320px]">
                             <div className="space-y-1.5">
                                 <Label
                                     htmlFor="extraction-select"
@@ -270,267 +281,358 @@ export default function AnalysisPage() {
                                     )}
                                 </p>
                             </div>
-
-                            <div className="space-y-1.5">
-                                <Label
-                                    htmlFor="rotation-select"
-                                    className="text-2xs font-black text-slate-500"
-                                >
-                                    {t('admin.analysis.rotation_method', 'Rotation')}
-                                </Label>
-                                <Select
-                                    value={api.rotation}
-                                    onValueChange={api.setRotation}
-                                    disabled={api.isRunning}
-                                >
-                                    <SelectTrigger id="rotation-select">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="varimax">
-                                            {t('admin.analysis.varimax', 'Varimax')}
-                                        </SelectItem>
-                                        <SelectItem value="none">
-                                            {t('admin.analysis.none', 'None')}
-                                        </SelectItem>
-                                        <SelectItem value="judgmental">
-                                            {t(
-                                                'admin.analysis.rotation.judgmental.label',
-                                                'Judgmental (manual)'
-                                            )}
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <p className="text-xs text-muted-foreground leading-snug">
-                                    {t(
-                                        'admin.analysis.help_rotation',
-                                        'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution. Judgmental lets you specify rotation angles manually.'
-                                    )}
-                                </p>
-                            </div>
-
-                            <div className="space-y-1.5">
-                                <Label
-                                    htmlFor="flagging-select"
-                                    className="text-2xs font-black text-slate-500"
-                                >
-                                    {t('admin.analysis.flagging_method', 'Flagging')}
-                                </Label>
-                                <Select
-                                    value={api.flagging}
-                                    onValueChange={(v) => {
-                                        api.setFlagging(v as 'auto' | 'manual');
-                                    }}
-                                    disabled={api.isRunning}
-                                >
-                                    <SelectTrigger id="flagging-select">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="auto">
-                                            {t('admin.analysis.auto', 'Auto')}
-                                        </SelectItem>
-                                        <SelectItem value="manual">
-                                            {t('admin.analysis.manual', 'Manual')}
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <p className="text-xs text-muted-foreground leading-snug">
-                                    {t(
-                                        'admin.analysis.help_flagging',
-                                        'Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.'
-                                    )}
-                                </p>
-                            </div>
                         </div>
                     </div>
 
-                    {/* Judgmental rotations sub-panel — only when rotation === 'judgmental' */}
-                    {api.rotation === 'judgmental' && (
-                        <div className="space-y-3 pt-2 border-t border-slate-100">
-                            <div>
-                                <h3 className="text-sm font-black text-slate-800">
-                                    {t('admin.analysis.manual_rotations.title', 'Manual rotations')}
-                                </h3>
-                                <p className="text-xs text-muted-foreground leading-snug mt-1">
-                                    {t(
-                                        'admin.analysis.manual_rotations.helper',
-                                        "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order. Used to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012)."
-                                    )}
-                                </p>
-                            </div>
-
-                            {api.manualRotations.length === 0 && (
-                                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-                                    {t(
-                                        'admin.analysis.manual_rotations.empty',
-                                        'Add at least one rotation to run the analysis.'
-                                    )}
-                                </p>
-                            )}
-
-                            <ul className="space-y-2">
-                                {api.manualRotations.map((mr, idx) => (
-                                    <li key={mr.id} className="flex flex-wrap items-center gap-2">
-                                        <span className="text-xs text-slate-600">
-                                            {t(
-                                                'admin.analysis.manual_rotations.factor_a_label',
-                                                'Rotate factor'
-                                            )}
-                                        </span>
-                                        <Input
-                                            type="number"
-                                            min={1}
-                                            max={api.nFactors}
-                                            step={1}
-                                            value={mr.factor_a}
-                                            onChange={(e) =>
-                                                api.updateManualRotation(idx, {
-                                                    factor_a: Number(e.target.value),
-                                                })
+                    {/* Wave C — Advanced settings Accordion. Defaults open
+                        when the user previously chose non-default values
+                        (judgmental rotation, manual flagging, or bootstrap),
+                        otherwise closed so most studies start clean. */}
+                    <Accordion
+                        type="multiple"
+                        defaultValue={
+                            api.rotation !== 'varimax' ||
+                            api.flagging !== 'auto' ||
+                            api.bootstrapEnabled
+                                ? ['advanced']
+                                : []
+                        }
+                    >
+                        <AccordionItem
+                            value="advanced"
+                            className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/30"
+                        >
+                            <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-200">
+                                <div className="flex flex-col items-start text-left">
+                                    <span className="text-sm font-bold text-slate-700">
+                                        {t('admin.analysis.advanced.title', 'Advanced settings')}
+                                    </span>
+                                    <span className="text-xs font-medium text-slate-500 mt-0.5">
+                                        {t(
+                                            'admin.analysis.advanced.summary',
+                                            'Rotation: {{rotation}} · Flagging: {{flagging}} · Bootstrap: {{bootstrap}}',
+                                            {
+                                                rotation:
+                                                    api.rotation === 'varimax'
+                                                        ? t('admin.analysis.varimax', 'Varimax')
+                                                        : api.rotation === 'none'
+                                                          ? t('admin.analysis.none', 'None')
+                                                          : t(
+                                                                'admin.analysis.rotation.judgmental.short',
+                                                                'Judgmental'
+                                                            ),
+                                                flagging:
+                                                    api.flagging === 'auto'
+                                                        ? t('admin.analysis.auto', 'Auto')
+                                                        : t('admin.analysis.manual', 'Manual'),
+                                                bootstrap: api.bootstrapEnabled
+                                                    ? t(
+                                                          'admin.analysis.advanced.bootstrap_on',
+                                                          '{{n}} iterations',
+                                                          { n: api.bootstrapIterations }
+                                                      )
+                                                    : t(
+                                                          'admin.analysis.advanced.bootstrap_off',
+                                                          'off'
+                                                      ),
                                             }
-                                            disabled={api.isRunning}
-                                            className="w-16 h-8 text-sm"
-                                            aria-label={t(
-                                                'admin.analysis.manual_rotations.factor_a_label',
-                                                'Rotate factor'
-                                            )}
-                                        />
-                                        <span className="text-xs text-slate-600">
-                                            {t('admin.analysis.manual_rotations.angle_label', 'by')}
-                                        </span>
-                                        <Input
-                                            type="number"
-                                            min={-180}
-                                            max={180}
-                                            step={1}
-                                            value={mr.angle_deg}
-                                            onChange={(e) =>
-                                                api.updateManualRotation(idx, {
-                                                    angle_deg: Number(e.target.value),
-                                                })
-                                            }
-                                            disabled={api.isRunning}
-                                            className="w-20 h-8 text-sm"
-                                            aria-label={t(
-                                                'admin.analysis.manual_rotations.angle_label',
-                                                'by'
-                                            )}
-                                        />
-                                        <span className="text-xs text-slate-600">
-                                            °{' '}
-                                            {t(
-                                                'admin.analysis.manual_rotations.factor_b_label',
-                                                'around factor'
-                                            )}
-                                        </span>
-                                        <Input
-                                            type="number"
-                                            min={1}
-                                            max={api.nFactors}
-                                            step={1}
-                                            value={mr.factor_b}
-                                            onChange={(e) =>
-                                                api.updateManualRotation(idx, {
-                                                    factor_b: Number(e.target.value),
-                                                })
-                                            }
-                                            disabled={api.isRunning}
-                                            className="w-16 h-8 text-sm"
-                                            aria-label={t(
-                                                'admin.analysis.manual_rotations.factor_b_label',
-                                                'around factor'
-                                            )}
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={() => api.removeManualRotation(idx)}
-                                            disabled={api.isRunning}
-                                            aria-label={t(
-                                                'admin.analysis.manual_rotations.remove_aria',
-                                                'Remove rotation'
-                                            )}
-                                            className="h-8 w-8 p-0"
-                                        >
-                                            <X className="size-4" aria-hidden="true" />
-                                        </Button>
-                                    </li>
-                                ))}
-                            </ul>
+                                        )}
+                                    </span>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="px-4 py-4 space-y-5">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                                        <div className="space-y-1.5">
+                                            <Label
+                                                htmlFor="rotation-select"
+                                                className="text-2xs font-black text-slate-500"
+                                            >
+                                                {t('admin.analysis.rotation_method', 'Rotation')}
+                                            </Label>
+                                            <Select
+                                                value={api.rotation}
+                                                onValueChange={api.setRotation}
+                                                disabled={api.isRunning}
+                                            >
+                                                <SelectTrigger id="rotation-select">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="varimax">
+                                                        {t('admin.analysis.varimax', 'Varimax')}
+                                                    </SelectItem>
+                                                    <SelectItem value="none">
+                                                        {t('admin.analysis.none', 'None')}
+                                                    </SelectItem>
+                                                    <SelectItem value="judgmental">
+                                                        {t(
+                                                            'admin.analysis.rotation.judgmental.label',
+                                                            'Judgmental (manual)'
+                                                        )}
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <p className="text-xs text-muted-foreground leading-snug">
+                                                {t(
+                                                    'admin.analysis.help_rotation',
+                                                    'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution. Judgmental lets you specify rotation angles manually.'
+                                                )}
+                                            </p>
+                                        </div>
 
-                            <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={api.addManualRotation}
-                                disabled={api.isRunning}
-                                className="gap-1.5"
-                            >
-                                <Plus className="size-3.5" aria-hidden="true" />
-                                {t('admin.analysis.manual_rotations.add', 'Add rotation')}
-                            </Button>
-                        </div>
-                    )}
+                                        <div className="space-y-1.5">
+                                            <Label
+                                                htmlFor="flagging-select"
+                                                className="text-2xs font-black text-slate-500"
+                                            >
+                                                {t('admin.analysis.flagging_method', 'Flagging')}
+                                            </Label>
+                                            <Select
+                                                value={api.flagging}
+                                                onValueChange={(v) => {
+                                                    api.setFlagging(v as 'auto' | 'manual');
+                                                }}
+                                                disabled={api.isRunning}
+                                            >
+                                                <SelectTrigger id="flagging-select">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="auto">
+                                                        {t('admin.analysis.auto', 'Auto')}
+                                                    </SelectItem>
+                                                    <SelectItem value="manual">
+                                                        {t('admin.analysis.manual', 'Manual')}
+                                                    </SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                            <p className="text-xs text-muted-foreground leading-snug">
+                                                {t(
+                                                    'admin.analysis.help_flagging',
+                                                    'Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.'
+                                                )}
+                                            </p>
+                                        </div>
+                                    </div>
 
-                    {/* Bootstrap stability toggle (Zabala & Pascual 2016) */}
-                    <div className="space-y-3 pt-2 border-t border-slate-100">
-                        <div className="flex items-start gap-3">
-                            <input
-                                id="bootstrap-toggle"
-                                type="checkbox"
-                                checked={api.bootstrapEnabled}
-                                onChange={(e) => api.setBootstrapEnabled(e.target.checked)}
-                                disabled={api.isRunning}
-                                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                            />
-                            <div className="flex-1 space-y-1.5">
-                                <Label
-                                    htmlFor="bootstrap-toggle"
-                                    className="text-sm font-black text-slate-800 cursor-pointer"
-                                >
-                                    {t(
-                                        'admin.analysis.bootstrap.toggle_label',
-                                        'Run bootstrap stability'
-                                    )}
-                                </Label>
-                                <p className="text-xs text-muted-foreground leading-snug">
-                                    {t(
-                                        'admin.analysis.bootstrap.helper',
-                                        'Optional. Bootstrap resamples your Q-sorts with replacement and re-runs the analysis B times to estimate standard errors on z-scores. Useful when you want confidence intervals on factor scores (Zabala & Pascual 2016).'
-                                    )}
-                                </p>
-                            </div>
-                        </div>
+                                    {/* Judgmental rotations sub-panel — visible only when rotation === 'judgmental' */}
+                                    {api.rotation === 'judgmental' && (
+                                        <div className="space-y-3 pt-2 border-t border-slate-100">
+                                            <div>
+                                                <h3 className="text-sm font-black text-slate-800">
+                                                    {t(
+                                                        'admin.analysis.manual_rotations.title',
+                                                        'Manual rotations'
+                                                    )}
+                                                </h3>
+                                                <p className="text-xs text-muted-foreground leading-snug mt-1">
+                                                    {t(
+                                                        'admin.analysis.manual_rotations.helper',
+                                                        "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order. Used to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012)."
+                                                    )}
+                                                </p>
+                                            </div>
 
-                        {api.bootstrapEnabled && (
-                            <div className="flex flex-wrap items-center gap-2 pl-7">
-                                <Label
-                                    htmlFor="bootstrap-iterations"
-                                    className="text-2xs font-black text-slate-500"
-                                >
-                                    {t(
-                                        'admin.analysis.bootstrap.iterations_label',
-                                        'Iterations (B)'
+                                            {api.manualRotations.length === 0 && (
+                                                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+                                                    {t(
+                                                        'admin.analysis.manual_rotations.empty',
+                                                        'Add at least one rotation to run the analysis.'
+                                                    )}
+                                                </p>
+                                            )}
+
+                                            <ul className="space-y-2">
+                                                {api.manualRotations.map((mr, idx) => (
+                                                    <li
+                                                        key={mr.id}
+                                                        className="flex flex-wrap items-center gap-2"
+                                                    >
+                                                        <span className="text-xs text-slate-600">
+                                                            {t(
+                                                                'admin.analysis.manual_rotations.factor_a_label',
+                                                                'Rotate factor'
+                                                            )}
+                                                        </span>
+                                                        <Input
+                                                            type="number"
+                                                            min={1}
+                                                            max={api.nFactors}
+                                                            step={1}
+                                                            value={mr.factor_a}
+                                                            onChange={(e) =>
+                                                                api.updateManualRotation(idx, {
+                                                                    factor_a: Number(
+                                                                        e.target.value
+                                                                    ),
+                                                                })
+                                                            }
+                                                            disabled={api.isRunning}
+                                                            className="w-16 h-8 text-sm"
+                                                            aria-label={t(
+                                                                'admin.analysis.manual_rotations.factor_a_label',
+                                                                'Rotate factor'
+                                                            )}
+                                                        />
+                                                        <span className="text-xs text-slate-600">
+                                                            {t(
+                                                                'admin.analysis.manual_rotations.angle_label',
+                                                                'by'
+                                                            )}
+                                                        </span>
+                                                        <Input
+                                                            type="number"
+                                                            min={-180}
+                                                            max={180}
+                                                            step={1}
+                                                            value={mr.angle_deg}
+                                                            onChange={(e) =>
+                                                                api.updateManualRotation(idx, {
+                                                                    angle_deg: Number(
+                                                                        e.target.value
+                                                                    ),
+                                                                })
+                                                            }
+                                                            disabled={api.isRunning}
+                                                            className="w-20 h-8 text-sm"
+                                                            aria-label={t(
+                                                                'admin.analysis.manual_rotations.angle_label',
+                                                                'by'
+                                                            )}
+                                                        />
+                                                        <span className="text-xs text-slate-600">
+                                                            °{' '}
+                                                            {t(
+                                                                'admin.analysis.manual_rotations.factor_b_label',
+                                                                'around factor'
+                                                            )}
+                                                        </span>
+                                                        <Input
+                                                            type="number"
+                                                            min={1}
+                                                            max={api.nFactors}
+                                                            step={1}
+                                                            value={mr.factor_b}
+                                                            onChange={(e) =>
+                                                                api.updateManualRotation(idx, {
+                                                                    factor_b: Number(
+                                                                        e.target.value
+                                                                    ),
+                                                                })
+                                                            }
+                                                            disabled={api.isRunning}
+                                                            className="w-16 h-8 text-sm"
+                                                            aria-label={t(
+                                                                'admin.analysis.manual_rotations.factor_b_label',
+                                                                'around factor'
+                                                            )}
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() =>
+                                                                api.removeManualRotation(idx)
+                                                            }
+                                                            disabled={api.isRunning}
+                                                            aria-label={t(
+                                                                'admin.analysis.manual_rotations.remove_aria',
+                                                                'Remove rotation'
+                                                            )}
+                                                            className="h-8 w-8 p-0"
+                                                        >
+                                                            <X
+                                                                className="size-4"
+                                                                aria-hidden="true"
+                                                            />
+                                                        </Button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={api.addManualRotation}
+                                                disabled={api.isRunning}
+                                                className="gap-1.5"
+                                            >
+                                                <Plus className="size-3.5" aria-hidden="true" />
+                                                {t(
+                                                    'admin.analysis.manual_rotations.add',
+                                                    'Add rotation'
+                                                )}
+                                            </Button>
+                                        </div>
                                     )}
-                                </Label>
-                                <Input
-                                    id="bootstrap-iterations"
-                                    type="number"
-                                    min={100}
-                                    max={5000}
-                                    step={100}
-                                    value={api.bootstrapIterations}
-                                    onChange={(e) =>
-                                        api.setBootstrapIterations(Number(e.target.value))
-                                    }
-                                    disabled={api.isRunning}
-                                    className="w-24 h-8 text-sm"
-                                />
-                            </div>
-                        )}
-                    </div>
+
+                                    {/* Bootstrap stability toggle (Zabala & Pascual 2016) */}
+                                    <div className="space-y-3 pt-2 border-t border-slate-100">
+                                        <div className="flex items-start gap-3">
+                                            <input
+                                                id="bootstrap-toggle"
+                                                type="checkbox"
+                                                checked={api.bootstrapEnabled}
+                                                onChange={(e) =>
+                                                    api.setBootstrapEnabled(e.target.checked)
+                                                }
+                                                disabled={api.isRunning}
+                                                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                            />
+                                            <div className="flex-1 space-y-1.5">
+                                                <Label
+                                                    htmlFor="bootstrap-toggle"
+                                                    className="text-sm font-black text-slate-800 cursor-pointer"
+                                                >
+                                                    {t(
+                                                        'admin.analysis.bootstrap.toggle_label',
+                                                        'Run bootstrap stability'
+                                                    )}
+                                                </Label>
+                                                <p className="text-xs text-muted-foreground leading-snug">
+                                                    {t(
+                                                        'admin.analysis.bootstrap.helper',
+                                                        'Optional. Bootstrap resamples your Q-sorts with replacement and re-runs the analysis B times to estimate standard errors on z-scores. Useful when you want confidence intervals on factor scores (Zabala & Pascual 2016).'
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {api.bootstrapEnabled && (
+                                            <div className="flex flex-wrap items-center gap-2 pl-7">
+                                                <Label
+                                                    htmlFor="bootstrap-iterations"
+                                                    className="text-2xs font-black text-slate-500"
+                                                >
+                                                    {t(
+                                                        'admin.analysis.bootstrap.iterations_label',
+                                                        'Iterations (B)'
+                                                    )}
+                                                </Label>
+                                                <Input
+                                                    id="bootstrap-iterations"
+                                                    type="number"
+                                                    min={100}
+                                                    max={5000}
+                                                    step={100}
+                                                    value={api.bootstrapIterations}
+                                                    onChange={(e) =>
+                                                        api.setBootstrapIterations(
+                                                            Number(e.target.value)
+                                                        )
+                                                    }
+                                                    disabled={api.isRunning}
+                                                    className="w-24 h-8 text-sm"
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
 
                     {/* Warn before re-running when a result is already on screen */}
                     {analysisResult && (

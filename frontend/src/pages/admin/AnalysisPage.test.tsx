@@ -293,12 +293,38 @@ describe('AnalysisPage', () => {
 
         renderWithProviders(<AnalysisPage />);
 
-        // Controls should be present (use exact id selectors to avoid sr-only listbox matches)
+        // Wave C: Extraction + Factors are primary-visible; Rotation + Flagging
+        // moved into the "Advanced settings" Accordion (collapsed by default
+        // when values are at their defaults: varimax/auto/no bootstrap).
         expect(screen.getByRole('combobox', { name: /Extraction/i })).toBeInTheDocument();
         expect(screen.getByRole('combobox', { name: /^Factors$/i })).toBeInTheDocument();
-        expect(screen.getByRole('combobox', { name: /Rotation/i })).toBeInTheDocument();
-        expect(screen.getByRole('combobox', { name: /Flagging/i })).toBeInTheDocument();
+        expect(screen.queryByRole('combobox', { name: /Rotation/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('combobox', { name: /Flagging/i })).not.toBeInTheDocument();
         expect(screen.getByRole('button', { name: /Run Analysis/i })).toBeInTheDocument();
+    });
+
+    it('reveals Rotation/Flagging when "Advanced settings" Accordion is opened (Wave C)', async () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+
+        const user = userEvent.setup();
+        renderWithProviders(<AnalysisPage />);
+
+        // The Accordion trigger is a button; clicking it expands the panel
+        const advancedTrigger = screen.getByRole('button', { name: /Advanced settings/i });
+        await user.click(advancedTrigger);
+
+        // After expanding, Rotation + Flagging dropdowns appear
+        expect(await screen.findByRole('combobox', { name: /Rotation/i })).toBeInTheDocument();
+        expect(screen.getByRole('combobox', { name: /Flagging/i })).toBeInTheDocument();
+        // Bootstrap toggle is also inside the advanced panel
+        expect(screen.getByLabelText(/Run bootstrap stability/i)).toBeInTheDocument();
     });
 
     it('factor dropdown is capped at eigenvalues.length - 1', () => {
@@ -414,12 +440,17 @@ describe('AnalysisPage', () => {
 
         renderWithProviders(<AnalysisPage />);
 
+        // Wave C: PCA + Factors help texts are primary-visible.
         expect(screen.getByText(/PCA maximizes explained variance/i)).toBeInTheDocument();
         expect(
             screen.getByText(/Each factor represents a distinct viewpoint/i)
         ).toBeInTheDocument();
-        expect(screen.getByText(/Varimax maximizes the separation/i)).toBeInTheDocument();
-        expect(screen.getByText(/Auto flags participants whose loading/i)).toBeInTheDocument();
+        // Rotation + Flagging help texts now live inside the collapsed
+        // "Advanced settings" Accordion — not visible on initial render.
+        expect(screen.queryByText(/Varimax maximizes the separation/i)).not.toBeInTheDocument();
+        expect(
+            screen.queryByText(/Auto flags participants whose loading/i)
+        ).not.toBeInTheDocument();
     });
 
     it('shows interpretation guidance in results tabs', async () => {

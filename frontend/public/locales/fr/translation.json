@@ -764,6 +764,12 @@
         "contract_body": "L'analyse factorielle Q nécessite au moins 2 participants ayant complété le tri. Les choix de configuration (extraction, facteurs, rotation, marquage) prennent leur sens une fois les données disponibles. Partagez le lien d'étude depuis la vue d'ensemble pour commencer à collecter des réponses.",
         "contract_cta": "Ouvrir la vue d'ensemble"
       },
+      "advanced": {
+        "title": "Paramètres avancés",
+        "summary": "Rotation : {{rotation}} · Marquage : {{flagging}} · Bootstrap : {{bootstrap}}",
+        "bootstrap_off": "désactivé",
+        "bootstrap_on": "{{n}} itérations"
+      },
       "tab_loadings": "Saturations",
       "tab_factor_arrays": "Tableaux factoriels",
       "tab_statements": "Énoncés",
@@ -903,6 +909,7 @@
       "rotation": {
         "judgmental": {
           "label": "Manuelle (jugement)",
+          "short": "Manuelle",
           "tooltip": "Pivote manuellement les paires de facteurs selon des angles choisis pour aligner les facteurs sur des positions substantiellement significatives (Brown 1980 ; Watts & Stenner 2012)."
         }
       },

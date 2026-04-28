@@ -779,6 +779,12 @@
         "contract_body": "Q-methodology factor analysis requires at least 2 participants who have completed the sort. Configuration choices (extraction, factors, rotation, flagging) carry meaning once data exists. Share the study link from the overview to start collecting responses.",
         "contract_cta": "Open study overview"
       },
+      "advanced": {
+        "title": "Advanced settings",
+        "summary": "Rotation: {{rotation}} · Flagging: {{flagging}} · Bootstrap: {{bootstrap}}",
+        "bootstrap_off": "off",
+        "bootstrap_on": "{{n}} iterations"
+      },
       "tab_loadings": "Loadings",
       "tab_factor_arrays": "Factor Arrays",
       "tab_statements": "Statements",
@@ -918,6 +924,7 @@
       "rotation": {
         "judgmental": {
           "label": "Judgmental (manual)",
+          "short": "Judgmental",
           "tooltip": "Manually rotate factor pairs by chosen angles to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012)."
         }
       },
