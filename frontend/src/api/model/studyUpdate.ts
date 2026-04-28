@@ -20,6 +20,7 @@ import type { StudyUpdateStatements } from './studyUpdateStatements';
 import type { StudyUpdateAccessPassword } from './studyUpdateAccessPassword';
 import type { StudyUpdateStartDate } from './studyUpdateStartDate';
 import type { StudyUpdateEndDate } from './studyUpdateEndDate';
+import type { StudyUpdateMethodologyMemo } from './studyUpdateMethodologyMemo';
 import type { StudyUpdateLastUpdatedAt } from './studyUpdateLastUpdatedAt';
 
 /**
@@ -42,5 +43,6 @@ export interface StudyUpdate {
     access_password?: StudyUpdateAccessPassword;
     start_date?: StudyUpdateStartDate;
     end_date?: StudyUpdateEndDate;
+    methodology_memo?: StudyUpdateMethodologyMemo;
     last_updated_at?: StudyUpdateLastUpdatedAt;
 }

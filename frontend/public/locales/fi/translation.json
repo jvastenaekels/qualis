@@ -1859,7 +1859,13 @@
                     "max": "Maks"
                 }
             },
-            "title": "Tutkimuksen suunnittelu"
+            "title": "Tutkimuksen suunnittelu",
+            "methodology_memo": {
+                "title": "Metodologinen muistio",
+                "help": "Valinnainen. Dokumentoi miksi tämä jakauma, nämä ohjeet, tämä Q-setin koko. Hyödyllistä toistettavuuden ja esirekisteröinnin kannalta (Watts & Stenner 2012; Sneegas 2020). Jätä tyhjäksi, jos ei ole olennaista.",
+                "label": "Muistio (mikä tahansa kieli)",
+                "placeholder": "Dokumentoi suunnitteluvalintojesi rationaali…"
+            }
         },
         "data": {
             "title": "Analytiikka & Tiedot",

@@ -9351,6 +9351,17 @@
             ],
             "title": "End Date"
           },
+          "methodology_memo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Methodology Memo"
+          },
           "translations": {
             "items": {
               "$ref": "#/components/schemas/StudyTranslationCreate"
@@ -9542,6 +9553,17 @@
               }
             ],
             "title": "End Date"
+          },
+          "methodology_memo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Methodology Memo"
           },
           "id": {
             "type": "integer",
@@ -10167,6 +10189,17 @@
               }
             ],
             "title": "End Date"
+          },
+          "methodology_memo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Methodology Memo"
           },
           "last_updated_at": {
             "anyOf": [

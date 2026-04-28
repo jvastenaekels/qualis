@@ -1897,7 +1897,13 @@
           "max": "Max"
         }
       },
-      "title": "Conception de l'étude"
+      "title": "Conception de l'étude",
+      "methodology_memo": {
+        "title": "Mémo méthodologique",
+        "help": "Optionnel. Documentez pourquoi cette distribution, ces consignes, cette taille de Q-set. Utile pour la réplication et la préinscription (Watts & Stenner 2012 ; Sneegas 2020). Laissez vide si non pertinent.",
+        "label": "Mémo (toutes langues)",
+        "placeholder": "Documentez le rationnel de vos choix de design…"
+      }
     },
     "data": {
       "title": "Explorateur de données",

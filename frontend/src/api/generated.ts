@@ -11987,6 +11987,10 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
     ]),
+    methodology_memo: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     id: faker.number.int({ min: undefined, max: undefined }),
     project_id: faker.number.int({ min: undefined, max: undefined }),
     project: faker.helpers.arrayElement([
@@ -12274,6 +12278,13 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
             end_date: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                undefined,
+            ]),
+            methodology_memo: faker.helpers.arrayElement([
+                faker.helpers.arrayElement([
+                    faker.string.alpha({ length: { min: 10, max: 20 } }),
                     null,
                 ]),
                 undefined,
@@ -12571,6 +12582,10 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
     ]),
+    methodology_memo: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     id: faker.number.int({ min: undefined, max: undefined }),
     project_id: faker.number.int({ min: undefined, max: undefined }),
     project: faker.helpers.arrayElement([
@@ -12845,6 +12860,10 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     ]),
     end_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    methodology_memo: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
@@ -13126,6 +13145,10 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
     ]),
+    methodology_memo: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
     id: faker.number.int({ min: undefined, max: undefined }),
     project_id: faker.number.int({ min: undefined, max: undefined }),
     project: faker.helpers.arrayElement([
@@ -13400,6 +13423,10 @@ export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostRespons
     ]),
     end_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    methodology_memo: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),
@@ -13704,6 +13731,13 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
             faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
             undefined,
         ]),
+        methodology_memo: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 20 } }),
+                null,
+            ]),
+            undefined,
+        ]),
         id: faker.number.int({ min: undefined, max: undefined }),
         project_id: faker.number.int({ min: undefined, max: undefined }),
         project: faker.helpers.arrayElement([
@@ -13987,6 +14021,10 @@ export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostRespons
     ]),
     end_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
+        undefined,
+    ]),
+    methodology_memo: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
     id: faker.number.int({ min: undefined, max: undefined }),

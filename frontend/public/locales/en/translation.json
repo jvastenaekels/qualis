@@ -1874,6 +1874,12 @@
           "drag_drop": "Drag & drop or click to upload",
           "max": "Max"
         }
+      },
+      "methodology_memo": {
+        "title": "Methodology memo",
+        "help": "Optional. Document why this distribution, these conditions of instruction, this Q-set size. Useful for replication and pre-registration (Watts & Stenner 2012; Sneegas 2020). Leave empty if not relevant.",
+        "label": "Memo (any language)",
+        "placeholder": "Document the rationale behind your design choices…"
       }
     },
     "data": {

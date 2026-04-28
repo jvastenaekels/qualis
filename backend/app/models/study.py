@@ -97,6 +97,11 @@ class Study(Base):
         JSON, nullable=True
     )  # e.g. {"logo_url": "...", "accent_color": "..."}
     access_password: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Optional, free-text methodological memo (mirrors the per-concourse
+    # construction_memo). Surfaces the rationale behind distribution,
+    # conditions of instruction, Q-set size — useful for replication and
+    # pre-registration (Watts & Stenner 2012; Sneegas 2020).
+    methodology_memo: Mapped[str | None] = mapped_column(String, nullable=True)
 
     # Relationships
     project: Mapped["Project"] = relationship(back_populates="studies", lazy="selectin")  # type: ignore[name-defined]  # noqa: F821

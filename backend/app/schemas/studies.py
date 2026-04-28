@@ -195,6 +195,7 @@ class StudyBase(BaseModel):
     distribution_mode: DistributionMode = DistributionMode.forced
     start_date: datetime | None = None
     end_date: datetime | None = None
+    methodology_memo: str | None = None
 
 
 class StudyCreate(StudyBase):
@@ -223,6 +224,7 @@ class StudyUpdate(BaseModel):
     access_password: str | None = None
     start_date: datetime | None = None
     end_date: datetime | None = None
+    methodology_memo: str | None = None
     last_updated_at: datetime | None = None
 
     # Note: Symmetry validation is skipped for drafts/updates to allow partial saves.
