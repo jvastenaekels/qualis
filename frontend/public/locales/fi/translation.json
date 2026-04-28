@@ -694,7 +694,8 @@
                 "save": "Tallenna muistio",
                 "saved": "Rakentamisen muistio tallennettu",
                 "save_error": "Rakentamisen muistion tallennus epäonnistui"
-            }
+            },
+            "status_pills_aria": "Hyväksytty: {{a}}; Ehdotettu: {{p}}; Hylätty: {{r}}"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",
@@ -1059,7 +1060,8 @@
                 "token": "Tunniste",
                 "usage": "Kapasiteetti",
                 "status": "Tila",
-                "actions": "Hallitse"
+                "actions": "Hallitse",
+                "type_help": "Julkinen, kertakäyttöinen tai kapasiteettirajoitettu — katso strategiakuvaukset \"Uusi käyttöoikeuslinkki\" -valintaikkunasta."
             },
             "status": {
                 "public": "Julkinen",
@@ -1206,6 +1208,15 @@
                     "tablet": "Tabletti",
                     "unknown": "Tuntematon"
                 }
+            },
+            "n_studies_help": "Tämän projektin tutkimusten kokonaismäärä, mukaan lukien luonnokset ja suljetut.",
+            "n_active_help": "Tutkimukset, jotka ottavat parhaillaan vastaan osallistujien vastauksia (tila = active).",
+            "n_participants_total_help": "Loppuun saaneiden osallistujien summa kaikissa projektin tutkimuksissa.",
+            "tool_help": {
+                "design": "Tutkimuksen asetukset: jakaumaruudukko, ohjeet, lauseet, suostumus.",
+                "recruit": "Rekrytointilinkit, käyttöoikeussäännöt ja URL-asetukset.",
+                "data": "Osallistujien vastaukset ja viennit (CSV, Q-sort-tuonnit).",
+                "analysis": "Faktorianalyysin asetukset ja aiempien ajojen historia."
             }
         },
         "export": {
@@ -1452,7 +1463,8 @@
                 "back_to_study": "Palaa tutkimukseen",
                 "editing_language": "Muokkauskieli",
                 "manage_langs": "Kielten hallinta",
-                "select_lang": "Valitse kieli"
+                "select_lang": "Valitse kieli",
+                "test_run_help": "Avaa osallistujan esikatselun. Testiajot merkitään is_test_run=true eivätkä koskaan sisälly julkaistuihin tietoihin."
             },
             "sync": {
                 "saving": "Tallennetaan...",

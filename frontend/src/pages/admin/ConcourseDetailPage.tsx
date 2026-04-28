@@ -468,26 +468,37 @@ export default function ConcourseDetailPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-2 text-xs">
+                                    <div
+                                        role="group"
+                                        className="flex items-center gap-2 text-xs"
+                                        aria-label={t(
+                                            'admin.concourse.status_pills_aria',
+                                            'Accepted: {{a}}; Proposed: {{p}}; Rejected: {{r}}',
+                                            { a: acceptedCt, p: proposedCt, r: rejectedCt }
+                                        )}
+                                    >
                                         <span
+                                            title={t('admin.concourse.status.accepted', 'Accepted')}
                                             className={cn(
-                                                'rounded-lg border px-2 py-0.5 font-bold',
+                                                'rounded-lg border px-2 py-0.5 font-bold cursor-help',
                                                 STATUS_COLORS.accepted
                                             )}
                                         >
                                             {acceptedCt}
                                         </span>
                                         <span
+                                            title={t('admin.concourse.status.proposed', 'Proposed')}
                                             className={cn(
-                                                'rounded-lg border px-2 py-0.5 font-bold',
+                                                'rounded-lg border px-2 py-0.5 font-bold cursor-help',
                                                 STATUS_COLORS.proposed
                                             )}
                                         >
                                             {proposedCt}
                                         </span>
                                         <span
+                                            title={t('admin.concourse.status.rejected', 'Rejected')}
                                             className={cn(
-                                                'rounded-lg border px-2 py-0.5 font-bold',
+                                                'rounded-lg border px-2 py-0.5 font-bold cursor-help',
                                                 STATUS_COLORS.rejected
                                             )}
                                         >

@@ -709,7 +709,8 @@
         "save": "Save memo",
         "saved": "Construction memo saved",
         "save_error": "Failed to save construction memo"
-      }
+      },
+      "status_pills_aria": "Accepted: {{a}}; Proposed: {{p}}; Rejected: {{r}}"
     },
     "concourse_import": {
       "title": "Import from Concourse",
@@ -1074,7 +1075,8 @@
         "token": "Security token",
         "usage": "Capacity",
         "status": "State",
-        "actions": "Manage"
+        "actions": "Manage",
+        "type_help": "Public, Single-use, or Capacity-limited — see strategy descriptions in the \"New access link\" dialog."
       },
       "status": {
         "public": "Public",
@@ -1221,6 +1223,15 @@
           "tablet": "Tablet",
           "unknown": "Unknown"
         }
+      },
+      "n_studies_help": "Total number of studies in this project, including drafts and closed.",
+      "n_active_help": "Studies currently accepting participant submissions (state = active).",
+      "n_participants_total_help": "Sum of completed participants across all studies in this project.",
+      "tool_help": {
+        "design": "Configure the study: distribution grid, conditions of instruction, statements, consent.",
+        "recruit": "Recruitment links, access rules, and study URL settings.",
+        "data": "Participant responses and exports (CSV, Q-sort dumps).",
+        "analysis": "Factor analysis configuration and historical runs."
       }
     },
     "export": {
@@ -1468,7 +1479,8 @@
         "back_to_study": "Back to study",
         "editing_language": "Editing language",
         "manage_langs": "Manage languages",
-        "select_lang": "Select language"
+        "select_lang": "Select language",
+        "test_run_help": "Open a participant preview. Test runs are flagged as is_test_run=true and never count toward your published data."
       },
       "sync": {
         "saving": "Saving...",

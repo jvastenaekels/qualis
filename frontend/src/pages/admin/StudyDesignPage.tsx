@@ -208,6 +208,10 @@ const StudyDesignPage = () => {
                                 size="sm"
                                 onClick={api.handleTestRun}
                                 disabled={!api.isLaunchReady}
+                                title={t(
+                                    'admin.design.toolbar.test_run_help',
+                                    'Open a participant preview. Test runs are flagged as is_test_run=true and never count toward your published data.'
+                                )}
                                 className={cn(
                                     'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-2 sm:px-3',
                                     api.isLaunchReady

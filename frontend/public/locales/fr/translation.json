@@ -694,7 +694,8 @@
         "save": "Enregistrer le mémo",
         "saved": "Mémo de construction enregistré",
         "save_error": "Échec de l'enregistrement du mémo de construction"
-      }
+      },
+      "status_pills_aria": "Accepté : {{a}} ; Proposé : {{p}} ; Rejeté : {{r}}"
     },
     "concourse_import": {
       "title": "Importer depuis un concours",
@@ -1059,7 +1060,8 @@
         "token": "Jeton",
         "usage": "Capacité",
         "status": "État",
-        "actions": "Gérer"
+        "actions": "Gérer",
+        "type_help": "Public, Usage unique, ou Capacité limitée — voir les descriptions de stratégie dans la boîte de dialogue « Nouveau lien d’accès »."
       },
       "status": {
         "public": "Public",
@@ -1206,6 +1208,15 @@
           "tablet": "Tablette",
           "unknown": "Inconnu"
         }
+      },
+      "n_studies_help": "Nombre total d’études dans ce projet, brouillons et fermées comprises.",
+      "n_active_help": "Études actuellement ouvertes aux participants (état = actif).",
+      "n_participants_total_help": "Somme des participants ayant terminé, toutes études confondues dans ce projet.",
+      "tool_help": {
+        "design": "Configurer l’étude : grille de distribution, consignes, énoncés, consentement.",
+        "recruit": "Liens de recrutement, règles d’accès et configuration de l’URL.",
+        "data": "Réponses des participants et exports (CSV, dumps Q-sort).",
+        "analysis": "Configuration de l’analyse factorielle et runs historiques."
       }
     },
     "export": {
@@ -1490,7 +1501,8 @@
         "back_to_study": "Retour à l'étude",
         "editing_language": "Édition",
         "manage_langs": "Gérer les langues",
-        "select_lang": "Choisir la langue"
+        "select_lang": "Choisir la langue",
+        "test_run_help": "Ouvre un aperçu participant. Les runs de test sont marqués is_test_run=true et n’entrent jamais dans les données publiées."
       },
       "sync": {
         "saving": "Enregistrement...",

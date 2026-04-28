@@ -798,7 +798,11 @@ const RecruitmentPage = () => {
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black text-slate-400"
+                                    className="py-4 text-2xs font-black text-slate-400 cursor-help"
+                                    title={t(
+                                        'admin.recruitment.table.type_help',
+                                        'Public, Single-use, or Capacity-limited — see strategy descriptions in the “New access link” dialog.'
+                                    )}
                                 >
                                     {t('admin.recruitment.table.type', 'Type')}
                                 </TableHead>
