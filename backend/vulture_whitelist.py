@@ -317,3 +317,9 @@ statement_text
 usage_percent
 backup_codes
 already_submitted
+
+# --- app/models/study.py + app/schemas/studies.py (UX-audit Phase 3) ---
+# Read/written via Pydantic model_dump() and SQLAlchemy ORM column access;
+# vulture cannot see those dynamic dispatch sites.
+methodology_memo
+data_retention_months

@@ -8,6 +8,7 @@ import type { ParticipantBuckets } from './participantBuckets';
 import type { AudioInventory } from './audioInventory';
 import type { TimelineSnapshot } from './timelineSnapshot';
 import type { DataInventoryLocales } from './dataInventoryLocales';
+import type { DataInventoryDataRetentionMonths } from './dataInventoryDataRetentionMonths';
 
 /**
  * Per-study data inventory snapshot.
@@ -20,4 +21,6 @@ export interface DataInventory {
     timeline: TimelineSnapshot;
     /** Participant count by language_used */
     locales?: DataInventoryLocales;
+    /** Study-level retention policy in months, used by the frontend to compute the default cutoff. NULL = use system default (12). */
+    data_retention_months?: DataInventoryDataRetentionMonths;
 }

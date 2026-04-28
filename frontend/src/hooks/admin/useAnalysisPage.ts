@@ -296,8 +296,20 @@ export function useAnalysisPage(slug: string): AnalysisPageApi {
     );
 
     // ── Eigenvalues query ─────────────────────────────────────────
+    // 4xx responses (e.g. 400 "Need at least 2 valid participants") are
+    // not transient — retrying them just delays the user-visible alert
+    // and burns console errors. Settle immediately on 4xx; keep the
+    // small retry budget for genuine network/5xx blips.
     const eigenvaluesQuery = useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet(slug, {
-        query: { enabled: !!slug },
+        query: {
+            enabled: !!slug,
+            retry: (failureCount, error) => {
+                if (error instanceof ApiError && error.status >= 400 && error.status < 500) {
+                    return false;
+                }
+                return failureCount < 2;
+            },
+        },
     });
 
     // ── Derived: maxFactors ───────────────────────────────────────

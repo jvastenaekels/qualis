@@ -120,12 +120,17 @@ export const customInstance = async <T>({
                 // biome-ignore lint/suspicious/noExplicitAny: window hack
                 (window as any).__isAutoLogout = true;
 
+                // Distinguish "had a token, lost it" (session_expired) from
+                // "never authenticated" (auth_required) — the latter occurs
+                // when a cold visitor opens /admin and is bounced through 401.
+                const hadToken = useAuthStore.getState().token !== null;
                 useAuthStore.getState().logout();
                 useSessionStore.getState().resetSession();
                 useResponseStore.getState().resetResponses();
                 // Optional: Redirect to login if not already there
                 if (!window.location.pathname.includes('/login')) {
-                    window.location.href = '/login?reason=session_expired';
+                    const reason = hadToken ? 'session_expired' : 'auth_required';
+                    window.location.href = `/login?reason=${reason}`;
                 }
             }
 

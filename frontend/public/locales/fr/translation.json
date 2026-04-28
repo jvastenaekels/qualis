@@ -179,7 +179,9 @@
       "powered_by": "Propulsé par",
       "welcome_back": "Ravi de vous revoir !",
       "error_401": "E-mail ou mot de passe invalide",
-      "error_generic": "Une erreur est survenue. Veuillez réessayer."
+      "error_generic": "Une erreur est survenue. Veuillez réessayer.",
+      "reason_session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
+      "reason_auth_required": "Connectez-vous pour accéder au panneau d'administration."
     },
     "register": {
       "title": "Créer un compte",
@@ -580,6 +582,7 @@
       "title": "Concours",
       "description": "Gérer les énoncés candidats pour votre étude Q-méthodologie",
       "default_title": "Concours",
+      "default_title_for_project": "{{project}} — Concours",
       "create": "Nouveau concours",
       "create_success": "Concours créé",
       "create_error": "Échec de la création du concours",
@@ -666,7 +669,7 @@
       "bulk_clear": "Effacer",
       "bulk_status_success": "{{count}} éléments mis à jour",
       "bulk_status_error": "Échec de la mise à jour de certains éléments",
-      "qset_title": "Q-set",
+      "qset_title": "Curation",
       "qset_pending": "{{count}} items encore à examiner",
       "qset_complete": "Tous les items ont été examinés",
       "show_pending": "À examiner",
@@ -691,7 +694,13 @@
         "save": "Enregistrer le mémo",
         "saved": "Mémo de construction enregistré",
         "save_error": "Échec de l'enregistrement du mémo de construction"
-      }
+      },
+      "status_pills_aria": "Accepté : {{a}} ; Proposé : {{p}} ; Rejeté : {{r}}",
+      "import_from_csv": "Importer CSV/TSV…",
+      "import_csv_hint": "Le fichier CSV/TSV doit avoir les en-têtes code, language, text. Les lignes dans la langue sélectionnée sont chargées dans la zone de texte ci-dessus.",
+      "import_csv_no_match": "Aucune ligne ne correspond à la langue sélectionnée ({{lang}}).",
+      "import_csv_skipped": "{{count}} ligne(s) ignorée(s) dans d’autres langues : {{langs}}.",
+      "import_csv_more_errors": "{{count}} autres problèmes"
     },
     "concourse_import": {
       "title": "Importer depuis un concours",
@@ -1056,7 +1065,8 @@
         "token": "Jeton",
         "usage": "Capacité",
         "status": "État",
-        "actions": "Gérer"
+        "actions": "Gérer",
+        "type_help": "Public, Usage unique, ou Capacité limitée — voir les descriptions de stratégie dans la boîte de dialogue « Nouveau lien d’accès »."
       },
       "status": {
         "public": "Public",
@@ -1203,6 +1213,15 @@
           "tablet": "Tablette",
           "unknown": "Inconnu"
         }
+      },
+      "n_studies_help": "Nombre total d’études dans ce projet, brouillons et fermées comprises.",
+      "n_active_help": "Études actuellement ouvertes aux participants (état = actif).",
+      "n_participants_total_help": "Somme des participants ayant terminé, toutes études confondues dans ce projet.",
+      "tool_help": {
+        "design": "Configurer l’étude : grille de distribution, consignes, énoncés, consentement.",
+        "recruit": "Liens de recrutement, règles d’accès et configuration de l’URL.",
+        "data": "Réponses des participants et exports (CSV, dumps Q-sort).",
+        "analysis": "Configuration de l’analyse factorielle et runs historiques."
       }
     },
     "export": {
@@ -1434,6 +1453,7 @@
       "translation_needed": "Révision requise (Copie)",
       "translation_needed_desc": "Ce contenu a été automatiquement copié d'une autre langue. Veuillez le réviser et le localiser.",
       "reset_defaults": "Réinitialiser par défaut",
+      "editing_language_banner": "Vous éditez la version {{language}}. Utilisez le sélecteur de langue dans la barre d'outils pour changer.",
       "multilang": {
         "view_others": "Voir dans d'autres langues",
         "other_formulations": "Autres formulations"
@@ -1486,7 +1506,8 @@
         "back_to_study": "Retour à l'étude",
         "editing_language": "Édition",
         "manage_langs": "Gérer les langues",
-        "select_lang": "Choisir la langue"
+        "select_lang": "Choisir la langue",
+        "test_run_help": "Ouvre un aperçu participant. Les runs de test sont marqués is_test_run=true et n’entrent jamais dans les données publiées."
       },
       "sync": {
         "saving": "Enregistrement...",
@@ -1881,7 +1902,24 @@
           "max": "Max"
         }
       },
-      "title": "Conception de l'étude"
+      "title": "Conception de l'étude",
+      "methodology_memo": {
+        "title": "Mémo méthodologique",
+        "help": "Optionnel. Documentez pourquoi cette distribution, ces consignes, cette taille de Q-set. Utile pour la réplication et la préinscription (Watts & Stenner 2012 ; Sneegas 2020). Laissez vide si non pertinent.",
+        "label": "Mémo (toutes langues)",
+        "placeholder": "Documentez le rationnel de vos choix de design…"
+      },
+      "activate_dialog": {
+        "title": "Activer cette étude ?",
+        "description": "L’activation ouvre le recrutement et déverrouille les liens publics. De vrais participants peuvent commencer à répondre.",
+        "checklist_title": "Vérifications préalables",
+        "languages_title": "Langues",
+        "lang_ready": "Prêt",
+        "lang_incomplete": "Incomplet",
+        "required": "(requis)",
+        "attestation": "J’ai relu le texte de consentement, la politique de conservation, et je confirme que cette étude est prête à recevoir de vrais participants.",
+        "confirm": "Activer l’étude"
+      }
     },
     "data": {
       "title": "Explorateur de données",
@@ -2131,6 +2169,15 @@
         "warning_high_usage": "L'utilisation du stockage est élevée. Envisagez d'augmenter le quota ou de supprimer d'anciens enregistrements.",
         "save_success": "Quota de stockage mis à jour",
         "save_error": "Échec de la mise à jour du quota de stockage"
+      },
+      "retention": {
+        "title": "Conservation des données",
+        "description": "Nombre de mois pendant lesquels conserver des données identifiables avant de recommander l’anonymisation. Détermine la date seuil par défaut dans Cycle de vie des données. Laissez vide pour utiliser la valeur système (12 mois).",
+        "months_label": "Conservation (mois)",
+        "help": "Les chercheurs UE doivent aligner cette valeur sur leur politique de conservation RGPD. Valeurs courantes : 6, 12, 24, 60.",
+        "save_success": "Politique de conservation mise à jour",
+        "save_error": "Échec de la mise à jour de la politique de conservation",
+        "range_error": "La durée de conservation doit être un entier entre 1 et 240 mois."
       }
     },
     "lifecycle": {
@@ -2173,7 +2220,8 @@
       "confirm_preserved": "Les classements des énoncés seront conservés en tant que données de recherche anonymes — ils ne seront plus liés à aucun individu.",
       "confirm_irreversible": "Cette action est immédiate et irréversible.",
       "confirm_in_progress": "Anonymisation en cours…",
-      "confirm_action": "Oui, anonymiser"
+      "confirm_action": "Oui, anonymiser",
+      "cutoff_from_policy": "Valeur par défaut dérivée de la politique de conservation de l’étude ({{months}} mois)."
     },
     "projects": {
       "title": "Projets",

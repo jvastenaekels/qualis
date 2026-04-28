@@ -31,10 +31,19 @@ export default function ConcourseListPage() {
         creatingRef.current = true;
         setError(null);
 
+        // Derive the default title from the project so that listings, search
+        // results, and audit logs across multiple projects show distinct names.
+        // Falls back to the bare 'Concourse' when the project title is unset.
+        const defaultTitle = workspace.title
+            ? t('admin.concourse.default_title_for_project', '{{project}} — Concourse', {
+                  project: workspace.title,
+              })
+            : t('admin.concourse.default_title', 'Concourse');
+
         createMutation
             .mutateAsync({
                 data: {
-                    title: t('admin.concourse.default_title', 'Concourse'),
+                    title: defaultTitle,
                     description: null,
                 },
             })
@@ -50,7 +59,7 @@ export default function ConcourseListPage() {
                     )
                 );
             });
-    }, [workspace?.slug, createMutation, t, navigate]);
+    }, [workspace?.slug, workspace?.title, createMutation, t, navigate]);
 
     useEffect(() => {
         if (isLoading || !workspace?.slug) return;

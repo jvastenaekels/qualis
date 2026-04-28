@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
@@ -52,6 +52,19 @@ function oneYearAgo(): string {
     return d.toISOString().slice(0, 10);
 }
 
+/**
+ * Default cutoff for the bulk-anonymisation date picker.
+ *
+ * If the study declares a retention policy (months), use today − months.
+ * Otherwise fall back to the legacy one-year-ago default.
+ */
+function defaultCutoff(retentionMonths: number | null | undefined): string {
+    if (!retentionMonths || retentionMonths < 1) return oneYearAgo();
+    const d = new Date();
+    d.setMonth(d.getMonth() - retentionMonths);
+    return d.toISOString().slice(0, 10);
+}
+
 function formatDate(iso: string | null | undefined): string {
     if (!iso) return '—';
     return new Date(iso).toLocaleDateString(undefined, {
@@ -84,6 +97,10 @@ export default function DataLifecyclePage() {
 
     const [cutoffDate, setCutoffDate] = useState<string>(oneYearAgo());
     const [confirmOpen, setConfirmOpen] = useState(false);
+    // Track whether the user has manually edited the cutoff. We only seed
+    // the policy-derived default while the input is untouched, so subsequent
+    // inventory refetches don't clobber the researcher's pick.
+    const userTouchedCutoffRef = useRef(false);
 
     // ── data fetch ──────────────────────────────────────────────────────────
     const {
@@ -93,6 +110,13 @@ export default function DataLifecyclePage() {
     } = useGetDataInventoryApiAdminStudiesSlugDataInventoryGet(effectiveSlug, {
         query: { enabled: !!effectiveSlug },
     });
+
+    // ── Effect: seed cutoff from study retention policy on first load ──
+    useEffect(() => {
+        if (!inventory || userTouchedCutoffRef.current) return;
+        const seeded = defaultCutoff(inventory.data_retention_months);
+        setCutoffDate(seeded);
+    }, [inventory]);
 
     // ── mutation ────────────────────────────────────────────────────────────
     const anonymiseMutation = useBulkAnonymiseOldParticipantsApiAdminStudiesSlugAnonymiseBulkPost({
@@ -388,7 +412,10 @@ export default function DataLifecyclePage() {
                                 type="date"
                                 value={cutoffDate}
                                 max={new Date().toISOString().slice(0, 10)}
-                                onChange={(e) => setCutoffDate(e.target.value)}
+                                onChange={(e) => {
+                                    userTouchedCutoffRef.current = true;
+                                    setCutoffDate(e.target.value);
+                                }}
                                 className="h-10 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                             <p className="text-xs text-slate-400">
@@ -397,6 +424,15 @@ export default function DataLifecyclePage() {
                                     'Only completed participants submitted strictly before this date will be anonymised.'
                                 )}
                             </p>
+                            {inventory?.data_retention_months && !userTouchedCutoffRef.current && (
+                                <p className="text-xs text-indigo-600">
+                                    {t(
+                                        'admin.lifecycle.cutoff_from_policy',
+                                        'Default derived from study retention policy ({{months}} months).',
+                                        { months: inventory.data_retention_months }
+                                    )}
+                                </p>
+                            )}
                         </div>
 
                         {/* Preview / candidate count */}

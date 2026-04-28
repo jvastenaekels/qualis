@@ -17,6 +17,7 @@ import {
     ChevronLeft,
     ChevronRight,
     Save,
+    Languages,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,6 +39,7 @@ import { GuidanceCard } from '@/components/admin/GuidanceCard';
 import { ExportConfigButton } from '@/components/admin/designer/ExportConfigButton';
 import { ImportConfigButton } from '@/components/admin/designer/ImportConfigButton';
 import { UnsavedChangesDialog } from '@/components/admin/designer/UnsavedChangesDialog';
+import { ActivateStudyDialog } from '@/components/admin/designer/ActivateStudyDialog';
 import { formatBackendError } from '@/utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
 import {
@@ -54,7 +56,8 @@ import { useStudyDesignPage, type DesignStepId } from '@/hooks/admin/useStudyDes
 
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from 7 step-editor panels + toolbar + checklist + read-only overlay; all logic lives in useStudyDesignPage
 const StudyDesignPage = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const [activateDialogOpen, setActivateDialogOpen] = useState(false);
     const api = useStudyDesignPage();
 
     // Visual-only state: tab-list scroll chevrons (tightly coupled to the DOM ref)
@@ -207,6 +210,10 @@ const StudyDesignPage = () => {
                                 size="sm"
                                 onClick={api.handleTestRun}
                                 disabled={!api.isLaunchReady}
+                                title={t(
+                                    'admin.design.toolbar.test_run_help',
+                                    'Open a participant preview. Test runs are flagged as is_test_run=true and never count toward your published data.'
+                                )}
                                 className={cn(
                                     'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-2 sm:px-3',
                                     api.isLaunchReady
@@ -274,10 +281,10 @@ const StudyDesignPage = () => {
 
                         <div className="h-6 w-px bg-slate-200 hidden md:block" />
 
-                        {/* Activate Button */}
+                        {/* Activate Button — opens confirmation dialog */}
                         <Button
                             size="sm"
-                            onClick={api.handleActivate}
+                            onClick={() => setActivateDialogOpen(true)}
                             disabled={api.isActivating || api.isFullyReadOnly}
                             className={cn(
                                 'transition-all h-9 font-bold rounded-lg shadow-sm px-3 sm:px-4',
@@ -301,6 +308,17 @@ const StudyDesignPage = () => {
 
             <LanguageManagerModal isOpen={api.isLangModalOpen} onClose={api.closeLangModal} />
             <UnsavedChangesDialog blocker={api.blocker} />
+            <ActivateStudyDialog
+                open={activateDialogOpen}
+                onOpenChange={setActivateDialogOpen}
+                checklist={api.checklist}
+                languageReadiness={api.languageReadiness}
+                isActivating={api.isActivating}
+                onConfirm={async () => {
+                    await api.handleActivate();
+                    setActivateDialogOpen(false);
+                }}
+            />
 
             {/* Main Content */}
             <div className="flex flex-1 overflow-hidden relative max-w-full min-w-0">
@@ -361,6 +379,36 @@ const StudyDesignPage = () => {
                 )}
                 {/* Left Pane: Editor */}
                 <div className="flex-1 overflow-y-auto overflow-x-hidden bg-muted/30 p-4 sm:p-6 min-w-0">
+                    {(() => {
+                        // Banner: chrome locale ≠ language being edited.
+                        // Researchers are editing one language while reading the
+                        // form chrome in another — easy to overwrite the wrong
+                        // version unless we say so explicitly.
+                        const chromeLocale = (i18n.resolvedLanguage ?? '').toLowerCase();
+                        const editing = (api.activeLocale ?? '').toLowerCase();
+                        if (!editing || !chromeLocale || chromeLocale === editing) return null;
+                        return (
+                            <div className="max-w-full lg:max-w-5xl mx-auto mb-4">
+                                <div
+                                    role="status"
+                                    aria-live="polite"
+                                    className="flex items-start gap-2 px-3 py-2 rounded-md text-sm bg-amber-50 border border-amber-200 text-amber-900"
+                                >
+                                    <Languages
+                                        className="h-4 w-4 mt-0.5 flex-shrink-0 text-amber-700"
+                                        aria-hidden="true"
+                                    />
+                                    <span>
+                                        {t(
+                                            'admin.design.editing_language_banner',
+                                            'Editing the {{language}} version. Use the language selector in the toolbar to switch.',
+                                            { language: api.activeLocale.toUpperCase() }
+                                        )}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })()}
                     <Tabs
                         value={api.activeStep}
                         onValueChange={(v: string) => api.setActiveStep(v as DesignStepId)}
@@ -672,7 +720,7 @@ const StudyDesignPage = () => {
                                     </Button>
                                 ) : (
                                     <Button
-                                        onClick={api.handleActivate}
+                                        onClick={() => setActivateDialogOpen(true)}
                                         disabled={
                                             api.isActivating ||
                                             api.isFullyReadOnly ||

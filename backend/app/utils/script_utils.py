@@ -62,7 +62,14 @@ class APIClient:
         print("DEBUG: Fetching projects for context...")
         ws_response = await self.client.get("/api/admin/projects")
         if ws_response.status_code == 200:
-            projects = ws_response.json()
+            payload = ws_response.json()
+            # /api/admin/projects became paginated: {items, total, limit, offset}.
+            # Tolerate the legacy flat-list shape too in case a deployment lags.
+            projects = (
+                payload["items"]
+                if isinstance(payload, dict) and "items" in payload
+                else payload
+            )
             if projects and len(projects) > 0:
                 # Use the first project as default
                 first_proj_id = projects[0]["id"]

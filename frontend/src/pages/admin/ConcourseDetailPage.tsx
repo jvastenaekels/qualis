@@ -4,7 +4,9 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import {
     Library,
     Plus,
@@ -22,7 +24,9 @@ import {
     CheckSquare,
     Filter,
     Globe,
+    FileSpreadsheet,
 } from 'lucide-react';
+import { parseConcourseCsv } from '@/utils/parseCsvTsv';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -166,6 +170,41 @@ export default function ConcourseDetailPage() {
         isSavingConstructionMemo,
         exportCsv,
     } = api;
+
+    // ── Bulk-import file picker ─────────────────────────────────────
+    // Researchers can also drop a CSV/TSV file into the bulk-import
+    // dialog. We parse client-side, surface per-row errors, and feed the
+    // text-only column into the existing textarea so the user can review
+    // before clicking Importer (no backend contract change).
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const [csvErrors, setCsvErrors] = useState<string[]>([]);
+    const [csvSkippedLangs, setCsvSkippedLangs] = useState<string[]>([]);
+
+    const handleCsvFile = async (file: File) => {
+        const text = await file.text();
+        const result = parseConcourseCsv(text);
+        const targetLang = (importLocale || activeLocale).toLowerCase();
+        const matchingRows = result.rows.filter((r) => r.language === targetLang);
+        const skippedLangs = Array.from(
+            new Set(result.rows.filter((r) => r.language !== targetLang).map((r) => r.language))
+        );
+
+        if (result.errors.length === 0 && matchingRows.length === 0 && result.rows.length > 0) {
+            toast.error(
+                t(
+                    'admin.concourse.import_csv_no_match',
+                    'No rows match the selected language ({{lang}}).',
+                    { lang: targetLang.toUpperCase() }
+                )
+            );
+        }
+
+        setCsvErrors(result.errors);
+        setCsvSkippedLangs(skippedLangs);
+        if (matchingRows.length > 0) {
+            setImportText(matchingRows.map((r) => r.text).join('\n'));
+        }
+    };
 
     if (isLoading) {
         return (
@@ -468,26 +507,37 @@ export default function ConcourseDetailPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-2 text-xs">
+                                    <div
+                                        role="group"
+                                        className="flex items-center gap-2 text-xs"
+                                        aria-label={t(
+                                            'admin.concourse.status_pills_aria',
+                                            'Accepted: {{a}}; Proposed: {{p}}; Rejected: {{r}}',
+                                            { a: acceptedCt, p: proposedCt, r: rejectedCt }
+                                        )}
+                                    >
                                         <span
+                                            title={t('admin.concourse.status.accepted', 'Accepted')}
                                             className={cn(
-                                                'rounded-lg border px-2 py-0.5 font-bold',
+                                                'rounded-lg border px-2 py-0.5 font-bold cursor-help',
                                                 STATUS_COLORS.accepted
                                             )}
                                         >
                                             {acceptedCt}
                                         </span>
                                         <span
+                                            title={t('admin.concourse.status.proposed', 'Proposed')}
                                             className={cn(
-                                                'rounded-lg border px-2 py-0.5 font-bold',
+                                                'rounded-lg border px-2 py-0.5 font-bold cursor-help',
                                                 STATUS_COLORS.proposed
                                             )}
                                         >
                                             {proposedCt}
                                         </span>
                                         <span
+                                            title={t('admin.concourse.status.rejected', 'Rejected')}
                                             className={cn(
-                                                'rounded-lg border px-2 py-0.5 font-bold',
+                                                'rounded-lg border px-2 py-0.5 font-bold cursor-help',
                                                 STATUS_COLORS.rejected
                                             )}
                                         >
@@ -1187,6 +1237,17 @@ export default function ConcourseDetailPage() {
                                         />
                                     </SelectTrigger>
                                     <SelectContent className="rounded-xl max-h-60">
+                                        {/* Study languages first — these are the languages the
+                                            researcher actually configured for this study. */}
+                                        {languages.map((lang) => (
+                                            <SelectItem key={lang} value={lang}>
+                                                {langDisplayName(lang)} ({lang})
+                                            </SelectItem>
+                                        ))}
+                                        {/* Other ISO languages after, for the rare case where
+                                            the researcher wants to add an item in a language
+                                            not yet declared on the study. Mirrors the bulk-
+                                            import dialog so behavior is consistent. */}
                                         {commonLanguages.map((lang) => (
                                             <SelectItem key={lang.code} value={lang.code}>
                                                 {lang.name} ({lang.code})
@@ -1410,11 +1471,38 @@ export default function ConcourseDetailPage() {
                             </Select>
                         </div>
                         <div className="space-y-1">
-                            <Label className="text-2xs font-black text-slate-500">
-                                {t('admin.concourse.import_statements', 'Statements')}
-                                {(importLocale || activeLocale) &&
-                                    ` (${langDisplayName(importLocale || activeLocale)})`}
-                            </Label>
+                            <div className="flex items-center justify-between gap-2">
+                                <Label className="text-2xs font-black text-slate-500">
+                                    {t('admin.concourse.import_statements', 'Statements')}
+                                    {(importLocale || activeLocale) &&
+                                        ` (${langDisplayName(importLocale || activeLocale)})`}
+                                </Label>
+                                <div className="flex items-center gap-1">
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept=".csv,.tsv,text/csv,text/tab-separated-values"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                void handleCsvFile(file);
+                                            }
+                                            // allow reselecting the same file later
+                                            e.target.value = '';
+                                        }}
+                                    />
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="h-7 rounded-lg text-xs font-semibold gap-1.5"
+                                    >
+                                        <FileSpreadsheet className="size-3.5" />
+                                        {t('admin.concourse.import_from_csv', 'Import CSV/TSV…')}
+                                    </Button>
+                                </div>
+                            </div>
                             <Textarea
                                 value={importText}
                                 onChange={(e) => setImportText(e.target.value)}
@@ -1424,6 +1512,43 @@ export default function ConcourseDetailPage() {
                                 )}
                                 className="rounded-xl min-h-[200px] font-mono text-sm"
                             />
+                            <p className="text-xs text-slate-400">
+                                {t(
+                                    'admin.concourse.import_csv_hint',
+                                    'CSV/TSV must have headers code, language, text. Rows in the selected language are loaded into the textarea above.'
+                                )}
+                            </p>
+                            {csvErrors.length > 0 && (
+                                <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg p-2 space-y-0.5">
+                                    {csvErrors.slice(0, 5).map((err) => (
+                                        <p key={err}>• {err}</p>
+                                    ))}
+                                    {csvErrors.length > 5 && (
+                                        <p>
+                                            …{' '}
+                                            {t(
+                                                'admin.concourse.import_csv_more_errors',
+                                                '{{count}} more issues',
+                                                { count: csvErrors.length - 5 }
+                                            )}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+                            {csvSkippedLangs.length > 0 && (
+                                <p className="text-xs text-amber-700">
+                                    {t(
+                                        'admin.concourse.import_csv_skipped',
+                                        'Skipped {{count}} row(s) in other languages: {{langs}}.',
+                                        {
+                                            count: csvSkippedLangs.length,
+                                            langs: csvSkippedLangs
+                                                .map((l) => l.toUpperCase())
+                                                .join(', '),
+                                        }
+                                    )}
+                                </p>
+                            )}
                         </div>
                         {importText.trim() && (
                             <p className="text-xs text-slate-400">

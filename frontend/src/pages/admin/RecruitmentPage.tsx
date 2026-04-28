@@ -624,35 +624,56 @@ const RecruitmentPage = () => {
                                                     />
                                                 </SelectTrigger>
                                                 <SelectContent>
+                                                    {/* Each option shows its title + a one-line
+                                                        rationale so users can compare strategies
+                                                        without trial-selecting each one. */}
                                                     <SelectItem value="public">
-                                                        <div className="flex items-center gap-2">
-                                                            <Globe className="h-4 w-4 text-blue-500" />
-                                                            <span>
+                                                        <div className="flex flex-col gap-0.5 py-0.5">
+                                                            <span className="flex items-center gap-2 font-medium">
+                                                                <Globe className="h-4 w-4 text-blue-500 flex-shrink-0" />
                                                                 {t(
                                                                     'admin.recruitment.types.public',
                                                                     'Public (Multiple usage)'
                                                                 )}
                                                             </span>
+                                                            <span className="text-xs text-slate-500 italic pl-6">
+                                                                {t(
+                                                                    'admin.recruitment.guidance.public',
+                                                                    'Ideal for social media or generic newsletters. Anyone with this link can participate multiple times.'
+                                                                )}
+                                                            </span>
                                                         </div>
                                                     </SelectItem>
                                                     <SelectItem value="individual">
-                                                        <div className="flex items-center gap-2">
-                                                            <Users className="h-4 w-4 text-indigo-500" />
-                                                            <span>
+                                                        <div className="flex flex-col gap-0.5 py-0.5">
+                                                            <span className="flex items-center gap-2 font-medium">
+                                                                <Users className="h-4 w-4 text-indigo-500 flex-shrink-0" />
                                                                 {t(
                                                                     'admin.recruitment.types.individual',
                                                                     'Individual (Single usage)'
                                                                 )}
                                                             </span>
+                                                            <span className="text-xs text-slate-500 italic pl-6">
+                                                                {t(
+                                                                    'admin.recruitment.guidance.individual',
+                                                                    'Each link is unique and expires after one submission. Best for controlled samples.'
+                                                                )}
+                                                            </span>
                                                         </div>
                                                     </SelectItem>
                                                     <SelectItem value="limited">
-                                                        <div className="flex items-center gap-2">
-                                                            <Lock className="h-4 w-4 text-orange-500" />
-                                                            <span>
+                                                        <div className="flex flex-col gap-0.5 py-0.5">
+                                                            <span className="flex items-center gap-2 font-medium">
+                                                                <Lock className="h-4 w-4 text-orange-500 flex-shrink-0" />
                                                                 {t(
                                                                     'admin.recruitment.types.limited',
                                                                     'Limited (Set capacity)'
+                                                                )}
+                                                            </span>
+                                                            <span className="text-xs text-slate-500 italic pl-6">
+                                                                {t(
+                                                                    'admin.recruitment.guidance.limited',
+                                                                    'Set a maximum number of submissions for a single link. Good for small target groups.'
                                                                 )}
                                                             </span>
                                                         </div>
@@ -777,7 +798,11 @@ const RecruitmentPage = () => {
                                 </TableHead>
                                 <TableHead
                                     scope="col"
-                                    className="py-4 text-2xs font-black text-slate-400"
+                                    className="py-4 text-2xs font-black text-slate-400 cursor-help"
+                                    title={t(
+                                        'admin.recruitment.table.type_help',
+                                        'Public, Single-use, or Capacity-limited — see strategy descriptions in the “New access link” dialog.'
+                                    )}
                                 >
                                     {t('admin.recruitment.table.type', 'Type')}
                                 </TableHead>

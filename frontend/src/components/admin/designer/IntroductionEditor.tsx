@@ -363,6 +363,55 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     </CardContent>
                 </Card>
             </section>
+
+            {/* Methodology memo — language-neutral free text. Mirrors the
+                per-concourse Mémo de construction; surfaces the rationale
+                behind distribution / conditions of instruction / Q-set size
+                for replication and pre-registration documentation. */}
+            <section>
+                <Card className="border-none shadow-sm bg-slate-50/50 rounded-2xl overflow-hidden border border-slate-200/60">
+                    <CardHeader className="pb-4">
+                        <div className="flex items-start gap-3">
+                            <Settings2 className="h-5 w-5 text-slate-500 mt-0.5" />
+                            <div>
+                                <CardTitle className="text-sm font-black">
+                                    {t('admin.design.methodology_memo.title', 'Methodology memo')}
+                                </CardTitle>
+                                <CardDescription className="text-xs font-medium text-slate-500">
+                                    {t(
+                                        'admin.design.methodology_memo.help',
+                                        'Optional. Document why this distribution, these conditions of instruction, this Q-set size. Useful for replication and pre-registration (Watts & Stenner 2012; Sneegas 2020). Leave empty if not relevant.'
+                                    )}
+                                </CardDescription>
+                            </div>
+                        </div>
+                    </CardHeader>
+                    <CardContent>
+                        <Label
+                            htmlFor="methodology-memo"
+                            className="text-xs font-bold text-slate-600 mb-1.5 block"
+                        >
+                            {t('admin.design.methodology_memo.label', 'Memo (any language)')}
+                        </Label>
+                        <textarea
+                            id="methodology-memo"
+                            value={draft.methodology_memo ?? ''}
+                            onChange={(e) =>
+                                updateDraft((d) => {
+                                    d.methodology_memo = e.target.value || null;
+                                })
+                            }
+                            placeholder={t(
+                                'admin.design.methodology_memo.placeholder',
+                                'Document the rationale behind your design choices…'
+                            )}
+                            rows={6}
+                            readOnly={readOnly}
+                            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 disabled:cursor-not-allowed disabled:opacity-50"
+                        />
+                    </CardContent>
+                </Card>
+            </section>
         </div>
     );
 };

@@ -75,6 +75,13 @@ class DataInventory(BaseModel):
         default_factory=dict,
         description="Participant count by language_used",
     )
+    data_retention_months: int | None = Field(
+        default=None,
+        description=(
+            "Study-level retention policy in months, used by the frontend "
+            "to compute the default cutoff. NULL = use system default (12)."
+        ),
+    )
 
 
 class BulkAnonymiseRequest(BaseModel):
@@ -211,6 +218,7 @@ async def get_data_inventory(
             completed_older_than_2y=older_row.older_2y or 0,
         ),
         locales={lang: int(c) for lang, c in locales_rows if lang},
+        data_retention_months=study.data_retention_months,
     )
 
 

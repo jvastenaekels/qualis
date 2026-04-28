@@ -169,6 +169,56 @@ async def test_update_study_partial_preserves_untouched_fields(
 
 
 @pytest.mark.asyncio
+async def test_update_study_methodology_memo_round_trip(
+    db: AsyncSession, seed_study: Study
+):
+    """methodology_memo: a free-text optional field round-trips through PATCH.
+
+    Mirrors the per-concourse construction_memo pattern. Surfaces the
+    rationale behind distribution / conditions of instruction / Q-set size
+    for replication and pre-registration documentation.
+    """
+    assert seed_study.methodology_memo is None
+
+    memo = (
+        "Forced distribution chosen per Watts & Stenner 2012; "
+        "Q-set size 36 per Sneegas 2020 sampling rationale."
+    )
+    updated = await StudyService.update_study(
+        db, seed_study, StudyUpdate(methodology_memo=memo)
+    )
+    assert updated.methodology_memo == memo
+
+    cleared = await StudyService.update_study(
+        db, seed_study, StudyUpdate(methodology_memo=None)
+    )
+    # Update with explicit None must clear the memo (not leave it stale).
+    assert cleared.methodology_memo is None
+
+
+@pytest.mark.asyncio
+async def test_update_study_data_retention_months_round_trip(
+    db: AsyncSession, seed_study: Study
+):
+    """data_retention_months: optional integer drives the default cutoff
+    offered by the data-lifecycle anonymisation flow.
+
+    Bounds (1..240) are enforced by Pydantic; the service layer only stores.
+    """
+    assert seed_study.data_retention_months is None
+
+    updated = await StudyService.update_study(
+        db, seed_study, StudyUpdate(data_retention_months=18)
+    )
+    assert updated.data_retention_months == 18
+
+    cleared = await StudyService.update_study(
+        db, seed_study, StudyUpdate(data_retention_months=None)
+    )
+    assert cleared.data_retention_months is None
+
+
+@pytest.mark.asyncio
 async def test_update_study_translation_sync(
     db: AsyncSession, seed_study: Study
 ):

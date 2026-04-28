@@ -670,4 +670,52 @@ describe('useAnalysisPage', () => {
             expect(result.current.showFactorNarratives).toBe(true);
         });
     });
+
+    describe('eigenvalues query retry policy', () => {
+        // The endpoint returns 400 "Need at least 2 valid participants"
+        // for fresh studies. Retrying delays the user-visible amber alert
+        // and emits 4 console errors — short-circuit retries on 4xx.
+        function getRetryFn(): (failureCount: number, error: unknown) => boolean {
+            renderHook(() => useAnalysisPage('test-study'), {
+                wrapper: AllTheProviders,
+            });
+            const lastCall = mockEigenvaluesHook.mock.calls.at(-1);
+            const opts = lastCall?.[1] as
+                | { query?: { retry?: (n: number, e: unknown) => boolean } }
+                | undefined;
+            const retry = opts?.query?.retry;
+            if (typeof retry !== 'function') {
+                throw new Error('Expected query.retry to be a function');
+            }
+            return retry;
+        }
+
+        it('does not retry on 4xx ApiError responses', async () => {
+            const { ApiError } = await import('@/api/client');
+            const retry = getRetryFn();
+
+            const apiError400 = new ApiError(400, 'Need at least 2 valid participants');
+            const apiError404 = new ApiError(404, 'Not found');
+
+            expect(retry(0, apiError400)).toBe(false);
+            expect(retry(1, apiError400)).toBe(false);
+            expect(retry(0, apiError404)).toBe(false);
+        });
+
+        it('retries on network errors and 5xx up to a small budget', async () => {
+            const { ApiError } = await import('@/api/client');
+            const retry = getRetryFn();
+
+            const networkError = new Error('Network');
+            const apiError503 = new ApiError(503, 'Service Unavailable');
+
+            expect(retry(0, networkError)).toBe(true);
+            expect(retry(1, networkError)).toBe(true);
+            // Cap at 2 retries — beyond that, the user has waited long enough.
+            expect(retry(2, networkError)).toBe(false);
+
+            expect(retry(0, apiError503)).toBe(true);
+            expect(retry(2, apiError503)).toBe(false);
+        });
+    });
 });

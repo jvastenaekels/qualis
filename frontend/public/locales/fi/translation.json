@@ -179,7 +179,9 @@
             "powered_by": "Tarjoaa",
             "welcome_back": "Tervetuloa takaisin!",
             "error_401": "Virheellinen sähköposti tai salasana",
-            "error_generic": "Jotain meni vikaan. Yritä uudelleen."
+            "error_generic": "Jotain meni vikaan. Yritä uudelleen.",
+            "reason_session_expired": "Istuntosi on vanhentunut. Kirjaudu sisään uudelleen.",
+            "reason_auth_required": "Kirjaudu sisään päästäksesi hallintapaneeliin."
         },
         "register": {
             "title": "Luo tili",
@@ -580,6 +582,7 @@
             "title": "Lausekokoelma",
             "description": "Hallitse ehdokaslauseita Q-metodologiatutkimustasi varten",
             "default_title": "Lausekokoelma",
+            "default_title_for_project": "{{project}} — Lausekokoelma",
             "create": "Uusi lausekokoelma",
             "create_success": "Lausekokoelma luotu",
             "create_error": "Lausekokoelman luonti epäonnistui",
@@ -666,7 +669,7 @@
             "bulk_clear": "Tyhjennä",
             "bulk_status_success": "{{count}} kohdetta päivitetty",
             "bulk_status_error": "Joidenkin kohteiden päivitys epäonnistui",
-            "qset_title": "Q-set",
+            "qset_title": "Kuratointi",
             "qset_pending": "{{count}} kohdetta vielä tarkistettavana",
             "qset_complete": "Kaikki kohteet tarkistettu",
             "show_pending": "Tarkistettavat",
@@ -691,7 +694,13 @@
                 "save": "Tallenna muistio",
                 "saved": "Rakentamisen muistio tallennettu",
                 "save_error": "Rakentamisen muistion tallennus epäonnistui"
-            }
+            },
+            "status_pills_aria": "Hyväksytty: {{a}}; Ehdotettu: {{p}}; Hylätty: {{r}}",
+            "import_from_csv": "Tuo CSV/TSV…",
+            "import_csv_hint": "CSV/TSV-tiedostossa on oltava otsikot code, language, text. Valitun kielen rivit ladataan yllä olevaan tekstilaatikkoon.",
+            "import_csv_no_match": "Mikään rivi ei vastaa valittua kieltä ({{lang}}).",
+            "import_csv_skipped": "Ohitettu {{count}} rivi(ä) muilla kielillä: {{langs}}.",
+            "import_csv_more_errors": "{{count}} lisää ongelmaa"
         },
         "concourse_import": {
             "title": "Tuo lausekokoelmasta",
@@ -1056,7 +1065,8 @@
                 "token": "Tunniste",
                 "usage": "Kapasiteetti",
                 "status": "Tila",
-                "actions": "Hallitse"
+                "actions": "Hallitse",
+                "type_help": "Julkinen, kertakäyttöinen tai kapasiteettirajoitettu — katso strategiakuvaukset \"Uusi käyttöoikeuslinkki\" -valintaikkunasta."
             },
             "status": {
                 "public": "Julkinen",
@@ -1203,6 +1213,15 @@
                     "tablet": "Tabletti",
                     "unknown": "Tuntematon"
                 }
+            },
+            "n_studies_help": "Tämän projektin tutkimusten kokonaismäärä, mukaan lukien luonnokset ja suljetut.",
+            "n_active_help": "Tutkimukset, jotka ottavat parhaillaan vastaan osallistujien vastauksia (tila = active).",
+            "n_participants_total_help": "Loppuun saaneiden osallistujien summa kaikissa projektin tutkimuksissa.",
+            "tool_help": {
+                "design": "Tutkimuksen asetukset: jakaumaruudukko, ohjeet, lauseet, suostumus.",
+                "recruit": "Rekrytointilinkit, käyttöoikeussäännöt ja URL-asetukset.",
+                "data": "Osallistujien vastaukset ja viennit (CSV, Q-sort-tuonnit).",
+                "analysis": "Faktorianalyysin asetukset ja aiempien ajojen historia."
             }
         },
         "export": {
@@ -1396,6 +1415,7 @@
             "translation_needed": "Tarkistus vaaditaan (Kopio)",
             "translation_needed_desc": "Tämä sisältö on kopioitu automaattisesti toisesta kielestä. Tarkista ja lokalisoi se.",
             "reset_defaults": "Palauta oletukset",
+            "editing_language_banner": "Muokkaat versiota {{language}}. Vaihda työkalupalkin kielivalitsimella.",
             "multilang": {
                 "view_others": "Näytä muilla kielillä",
                 "other_formulations": "Muut muotoilut"
@@ -1448,7 +1468,8 @@
                 "back_to_study": "Palaa tutkimukseen",
                 "editing_language": "Muokkauskieli",
                 "manage_langs": "Kielten hallinta",
-                "select_lang": "Valitse kieli"
+                "select_lang": "Valitse kieli",
+                "test_run_help": "Avaa osallistujan esikatselun. Testiajot merkitään is_test_run=true eivätkä koskaan sisälly julkaistuihin tietoihin."
             },
             "sync": {
                 "saving": "Tallennetaan...",
@@ -1843,7 +1864,24 @@
                     "max": "Maks"
                 }
             },
-            "title": "Tutkimuksen suunnittelu"
+            "title": "Tutkimuksen suunnittelu",
+            "methodology_memo": {
+                "title": "Metodologinen muistio",
+                "help": "Valinnainen. Dokumentoi miksi tämä jakauma, nämä ohjeet, tämä Q-setin koko. Hyödyllistä toistettavuuden ja esirekisteröinnin kannalta (Watts & Stenner 2012; Sneegas 2020). Jätä tyhjäksi, jos ei ole olennaista.",
+                "label": "Muistio (mikä tahansa kieli)",
+                "placeholder": "Dokumentoi suunnitteluvalintojesi rationaali…"
+            },
+            "activate_dialog": {
+                "title": "Aktivoidaanko tämä tutkimus?",
+                "description": "Aktivointi avaa rekrytoinnin ja vapauttaa julkiset linkit. Todelliset osallistujat voivat alkaa vastata.",
+                "checklist_title": "Esitarkistukset",
+                "languages_title": "Kielet",
+                "lang_ready": "Valmis",
+                "lang_incomplete": "Keskeneräinen",
+                "required": "(pakollinen)",
+                "attestation": "Olen tarkistanut suostumustekstin, säilytyspolitiikan ja vahvistan, että tutkimus on valmis vastaanottamaan todellisia osallistujia.",
+                "confirm": "Aktivoi tutkimus"
+            }
         },
         "data": {
             "title": "Analytiikka & Tiedot",
@@ -2131,6 +2169,15 @@
                 "warning_high_usage": "Tallennustilan käyttö on korkea. Harkitse kiintiön kasvattamista tai vanhojen tallenteiden poistamista.",
                 "save_success": "Tallennustilakiintiö päivitetty",
                 "save_error": "Tallennustilakiintiön päivitys epäonnistui"
+            },
+            "retention": {
+                "title": "Tietojen säilytys",
+                "description": "Kuukausien määrä, jonka ajan tunnistettavia osallistujatietoja säilytetään ennen anonymisoinnin suosittelua. Määrittää oletusrajan tietojen elinkaarella. Jätä tyhjäksi käyttääksesi järjestelmän oletusta (12 kuukautta).",
+                "months_label": "Säilytys (kuukautta)",
+                "help": "EU-tutkijoiden tulisi sovittaa tämä RGPD-säilytyspolitiikkaansa. Yleisiä arvoja: 6, 12, 24, 60.",
+                "save_success": "Säilytyspolitiikka päivitetty",
+                "save_error": "Säilytyspolitiikan päivitys epäonnistui",
+                "range_error": "Säilytyksen on oltava kokonaisluku väliltä 1–240 kuukautta."
             }
         },
         "projects": {
@@ -2318,7 +2365,8 @@
             "confirm_preserved": "Q-sort statement rankings will be preserved as anonymous research data — they will no longer link to any individual.",
             "confirm_irreversible": "This action is immediate and cannot be undone.",
             "confirm_in_progress": "Anonymising…",
-            "confirm_action": "Yes, anonymise"
+            "confirm_action": "Yes, anonymise",
+            "cutoff_from_policy": "Oletusarvo johdettu tutkimuksen säilytyspolitiikasta ({{months}} kuukautta)."
         }
     },
     "resume": {

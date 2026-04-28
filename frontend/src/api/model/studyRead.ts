@@ -13,6 +13,8 @@ import type { StudyReadDefaultLanguage } from './studyReadDefaultLanguage';
 import type { DistributionMode } from './distributionMode';
 import type { StudyReadStartDate } from './studyReadStartDate';
 import type { StudyReadEndDate } from './studyReadEndDate';
+import type { StudyReadMethodologyMemo } from './studyReadMethodologyMemo';
+import type { StudyReadDataRetentionMonths } from './studyReadDataRetentionMonths';
 import type { StudyReadProject } from './studyReadProject';
 import type { StudyTranslationRead } from './studyTranslationRead';
 import type { StatementRead } from './statementRead';
@@ -40,6 +42,8 @@ export interface StudyRead {
     distribution_mode?: DistributionMode;
     start_date?: StudyReadStartDate;
     end_date?: StudyReadEndDate;
+    methodology_memo?: StudyReadMethodologyMemo;
+    data_retention_months?: StudyReadDataRetentionMonths;
     id: number;
     project_id: number;
     project?: StudyReadProject;

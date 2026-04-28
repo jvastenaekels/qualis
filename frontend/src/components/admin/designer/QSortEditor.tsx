@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import type { StudyTranslationCreate } from '@/api/model';
 import { toast } from 'sonner';
+import { parseCsvTsv } from '@/utils/parseCsvTsv';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -292,56 +293,7 @@ function SortableStatementItem({
     );
 }
 
-/**
- * Robust CSV/TSV parser that handles quoted fields and internal newlines.
- */
-function parseCSVOrTSV(text: string, separator: string = '\t') {
-    const result: string[][] = [];
-    let row: string[] = [];
-    let currentField = '';
-    let inQuotes = false;
-
-    for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const nextChar = text[i + 1];
-
-        if (inQuotes) {
-            if (char === '"' && nextChar === '"') {
-                currentField += '"';
-                i++; // Skip next quote
-            } else if (char === '"') {
-                inQuotes = false;
-            } else {
-                currentField += char;
-            }
-        } else {
-            if (char === '"') {
-                inQuotes = true;
-            } else if (char === separator) {
-                row.push(currentField.trim());
-                currentField = '';
-            } else if (char === '\n' || (char === '\r' && nextChar === '\n')) {
-                if (char === '\r') i++;
-                row.push(currentField.trim());
-                result.push(row);
-                row = [];
-                currentField = '';
-            } else if (char === '\r') {
-                row.push(currentField.trim());
-                result.push(row);
-                row = [];
-                currentField = '';
-            } else {
-                currentField += char;
-            }
-        }
-    }
-    if (row.length > 0 || currentField !== '') {
-        row.push(currentField.trim());
-        result.push(row);
-    }
-    return result.filter((r) => r.length > 0 && r.some((c) => c !== ''));
-}
+// CSV/TSV parsing moved to @/utils/parseCsvTsv (shared with ConcourseDetailPage).
 
 const QSortEditor = ({
     readOnly,
@@ -511,7 +463,7 @@ const QSortEditor = ({
         let parsedItems: any[] = [];
 
         if (detectedFormat.type === 'excel') {
-            const rows = parseCSVOrTSV(bulkText, '\t');
+            const rows = parseCsvTsv(bulkText, '\t');
             const headerRow = rows[0];
             if (!headerRow) return;
 

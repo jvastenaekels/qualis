@@ -4,7 +4,7 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { customInstance } from './mutator';
 
 // No mock for ./client here, we will verify reportBug via its fetch calls
@@ -127,5 +127,81 @@ describe('customInstance', () => {
 
         const result = await customInstance({ url: '/test', method: 'GET' });
         expect(result).toEqual({});
+    });
+});
+
+describe('customInstance: 401 redirect reason', () => {
+    // The /admin cold path used to bounce visitors to
+    // /login?reason=session_expired even when no session ever existed.
+    // Distinguish prior-token (session_expired) from cold (auth_required).
+
+    let setHrefSpy: ReturnType<typeof vi.fn>;
+
+    beforeEach(async () => {
+        const { useAuthStore } = await import('@/store/useAuthStore');
+        useAuthStore.setState({ token: null });
+
+        // Stub window.location with a writable href so we can observe the redirect
+        // without actually navigating during tests.
+        setHrefSpy = vi.fn();
+        Object.defineProperty(window, 'location', {
+            configurable: true,
+            value: {
+                pathname: '/somewhere',
+                get href() {
+                    return '';
+                },
+                set href(v: string) {
+                    setHrefSpy(v);
+                },
+            },
+        });
+    });
+
+    afterEach(async () => {
+        vi.unstubAllGlobals();
+        const { useAuthStore } = await import('@/store/useAuthStore');
+        useAuthStore.setState({ token: null });
+    });
+
+    it('uses reason=auth_required when no prior token existed', async () => {
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: false,
+                status: 401,
+                text: async () => '{"message": "Not authenticated"}',
+            })
+        );
+
+        try {
+            await customInstance({ url: '/api/me', method: 'GET' });
+        } catch (_e) {
+            // Expected: ApiError
+        }
+
+        expect(setHrefSpy).toHaveBeenCalledWith(expect.stringContaining('reason=auth_required'));
+    });
+
+    it('uses reason=session_expired when a token was present', async () => {
+        const { useAuthStore } = await import('@/store/useAuthStore');
+        useAuthStore.setState({ token: 'tok-xyz' });
+
+        vi.stubGlobal(
+            'fetch',
+            vi.fn().mockResolvedValue({
+                ok: false,
+                status: 401,
+                text: async () => '{"message": "Token expired"}',
+            })
+        );
+
+        try {
+            await customInstance({ url: '/api/me', method: 'GET' });
+        } catch (_e) {
+            // Expected
+        }
+
+        expect(setHrefSpy).toHaveBeenCalledWith(expect.stringContaining('reason=session_expired'));
     });
 });

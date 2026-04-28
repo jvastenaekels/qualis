@@ -7269,6 +7269,18 @@
             "type": "object",
             "title": "Locales",
             "description": "Participant count by language_used"
+          },
+          "data_retention_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Retention Months",
+            "description": "Study-level retention policy in months, used by the frontend to compute the default cutoff. NULL = use system default (12)."
           }
         },
         "type": "object",
@@ -9351,6 +9363,30 @@
             ],
             "title": "End Date"
           },
+          "methodology_memo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Methodology Memo"
+          },
+          "data_retention_months": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 240.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Retention Months"
+          },
           "translations": {
             "items": {
               "$ref": "#/components/schemas/StudyTranslationCreate"
@@ -9542,6 +9578,30 @@
               }
             ],
             "title": "End Date"
+          },
+          "methodology_memo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Methodology Memo"
+          },
+          "data_retention_months": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 240.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Retention Months"
           },
           "id": {
             "type": "integer",
@@ -10167,6 +10227,30 @@
               }
             ],
             "title": "End Date"
+          },
+          "methodology_memo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Methodology Memo"
+          },
+          "data_retention_months": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 240.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Retention Months"
           },
           "last_updated_at": {
             "anyOf": [

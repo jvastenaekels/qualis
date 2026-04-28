@@ -45,6 +45,7 @@ import {
     Settings,
     HardDrive,
     AlertTriangle,
+    Clock,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { getStudyStorageUsageApiAdminStudiesSlugStorageUsageGet } from '@/api/generated';
@@ -68,6 +69,10 @@ export default function GeneralSettingsPage() {
     const revalidator = useRevalidator();
     const [quotaMb, setQuotaMb] = useState<number | null>(null);
     const [isSavingQuota, setIsSavingQuota] = useState(false);
+    const [retentionMonths, setRetentionMonths] = useState<number | ''>(
+        initialStudy.data_retention_months ?? ''
+    );
+    const [isSavingRetention, setIsSavingRetention] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [typedSlug, setTypedSlug] = useState('');
 
@@ -119,6 +124,44 @@ export default function GeneralSettingsPage() {
         } finally {
             setDeleteOpen(false);
             setTypedSlug('');
+        }
+    };
+
+    const handleSaveRetention = async () => {
+        if (!slug) return;
+        const parsed = retentionMonths === '' ? null : Number(retentionMonths);
+        if (parsed !== null && (!Number.isInteger(parsed) || parsed < 1 || parsed > 240)) {
+            toast.error(
+                t(
+                    'admin.settings.retention.range_error',
+                    'Retention must be an integer between 1 and 240 months.'
+                )
+            );
+            return;
+        }
+        setIsSavingRetention(true);
+        try {
+            await AdminService.updateStudy(slug, {
+                data_retention_months: parsed,
+            } as unknown as StudyUpdate);
+            toast.success(
+                t('admin.settings.retention.save_success', 'Data retention policy updated')
+            );
+            await queryClient.invalidateQueries({
+                queryKey: getGetStudyApiAdminStudiesSlugGetQueryKey(slug),
+            });
+            revalidator.revalidate();
+        } catch (error) {
+            const message = parseApiErrorSync(
+                error,
+                t('admin.settings.retention.save_error', 'Failed to update data retention policy')
+            );
+            toast.error(
+                t('admin.settings.retention.save_error', 'Failed to update data retention policy'),
+                { description: message }
+            );
+        } finally {
+            setIsSavingRetention(false);
         }
     };
 
@@ -339,6 +382,70 @@ export default function GeneralSettingsPage() {
                         )}
                     </Card>
                 )}
+
+                {/* Data retention policy — drives the default cutoff
+                    offered by the data-lifecycle anonymisation flow. */}
+                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                    <CardHeader className="border-b border-slate-50 pb-4">
+                        <div className="flex items-center gap-2 mb-1">
+                            <Clock className="h-5 w-5 text-indigo-500" />
+                            <CardTitle className="text-lg font-black text-slate-900">
+                                {t('admin.settings.retention.title', 'Data retention')}
+                            </CardTitle>
+                        </div>
+                        <CardDescription className="text-sm font-medium text-slate-500">
+                            {t(
+                                'admin.settings.retention.description',
+                                'Number of months to keep identifiable participant data before recommending anonymisation. Drives the default cutoff in Data Lifecycle. Leave empty to use the system default (12 months).'
+                            )}
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-6 space-y-3">
+                        <Label
+                            htmlFor="retention-months"
+                            className="text-2xs font-black text-slate-500"
+                        >
+                            {t('admin.settings.retention.months_label', 'Retention (months)')}
+                        </Label>
+                        <Input
+                            id="retention-months"
+                            type="number"
+                            min={1}
+                            max={240}
+                            placeholder="12"
+                            value={retentionMonths}
+                            onChange={(e) => {
+                                const v = e.target.value;
+                                setRetentionMonths(v === '' ? '' : Number(v));
+                            }}
+                            disabled={isArchived || isSavingRetention}
+                            className="h-11 rounded-xl max-w-xs"
+                        />
+                        <p className="text-xs text-slate-500">
+                            {t(
+                                'admin.settings.retention.help',
+                                'Researchers in the EU should align this with their RGPD retention policy. Common values: 6, 12, 24, 60.'
+                            )}
+                        </p>
+                    </CardContent>
+                    {(retentionMonths === '' ? null : Number(retentionMonths)) !==
+                        (study.data_retention_months ?? null) && (
+                        <CardFooter className="flex justify-end border-t border-slate-50 px-6 py-4">
+                            <Button
+                                onClick={handleSaveRetention}
+                                disabled={isSavingRetention || isArchived}
+                                className="rounded-xl px-6 font-black bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-sm"
+                            >
+                                {isSavingRetention ? (
+                                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                ) : (
+                                    <Save className="w-4 h-4 mr-2" />
+                                )}
+                                {t('admin.settings.save_button')}
+                            </Button>
+                        </CardFooter>
+                    )}
+                </Card>
 
                 {/* Archiving Section */}
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden mt-8">

@@ -19,7 +19,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Lock, AtSign, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Loader2, Lock, AtSign, ArrowRight, ShieldCheck, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { parseApiErrorSync } from '@/lib/error-utils';
@@ -136,6 +136,34 @@ const LoginPage = () => {
                             </CardTitle>
                             <CardDescription>{t('auth.login.card_description')}</CardDescription>
                         </CardHeader>
+                        {(() => {
+                            const reason = searchParams.get('reason');
+                            if (reason !== 'session_expired' && reason !== 'auth_required') {
+                                return null;
+                            }
+                            const messageKey =
+                                reason === 'session_expired'
+                                    ? 'auth.login.reason_session_expired'
+                                    : 'auth.login.reason_auth_required';
+                            const fallback =
+                                reason === 'session_expired'
+                                    ? 'Your session has expired. Please sign in again.'
+                                    : 'Please sign in to access the admin panel.';
+                            return (
+                                <div className="px-6 pb-2">
+                                    <div
+                                        role="status"
+                                        className="flex items-start gap-2 px-3 py-2 rounded-md text-sm bg-slate-50 border border-slate-200 text-slate-700"
+                                    >
+                                        <Info
+                                            className="h-4 w-4 mt-0.5 flex-shrink-0 text-slate-500"
+                                            aria-hidden="true"
+                                        />
+                                        <span>{t(messageKey, fallback)}</span>
+                                    </div>
+                                </div>
+                            );
+                        })()}
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="email">{t('auth.login.email_label')}</Label>

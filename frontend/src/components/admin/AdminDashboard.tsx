@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuthStore } from '@/store/useAuthStore';
 import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
 import { ImportStudyDialog } from '@/components/admin/ImportStudyDialog';
@@ -203,26 +204,58 @@ export function AdminDashboard() {
                         </h1>
                     </div>
                     <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
-                        <span>
-                            {t('admin.dashboard.n_studies', {
-                                count: studies?.length ?? 0,
-                                defaultValue: '{{count}} studies',
-                            })}
-                        </span>
-                        <span className="text-border">|</span>
-                        <span>
-                            {t('admin.dashboard.n_active', {
-                                count: activeStudies.length,
-                                defaultValue: '{{count}} active',
-                            })}
-                        </span>
-                        <span className="text-border">|</span>
-                        <span>
-                            {t('admin.dashboard.n_participants_total', {
-                                count: totalParticipants,
-                                defaultValue: '{{count}} participants',
-                            })}
-                        </span>
+                        <TooltipProvider delayDuration={300}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <span className="cursor-help underline decoration-dotted decoration-slate-300 underline-offset-4">
+                                        {t('admin.dashboard.n_studies', {
+                                            count: studies?.length ?? 0,
+                                            defaultValue: '{{count}} studies',
+                                        })}
+                                    </span>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-xs text-xs">
+                                    {t(
+                                        'admin.dashboard.n_studies_help',
+                                        'Total number of studies in this project, including drafts and closed.'
+                                    )}
+                                </TooltipContent>
+                            </Tooltip>
+                            <span className="text-border">|</span>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <span className="cursor-help underline decoration-dotted decoration-slate-300 underline-offset-4">
+                                        {t('admin.dashboard.n_active', {
+                                            count: activeStudies.length,
+                                            defaultValue: '{{count}} active',
+                                        })}
+                                    </span>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-xs text-xs">
+                                    {t(
+                                        'admin.dashboard.n_active_help',
+                                        'Studies currently accepting participant submissions (state = active).'
+                                    )}
+                                </TooltipContent>
+                            </Tooltip>
+                            <span className="text-border">|</span>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <span className="cursor-help underline decoration-dotted decoration-slate-300 underline-offset-4">
+                                        {t('admin.dashboard.n_participants_total', {
+                                            count: totalParticipants,
+                                            defaultValue: '{{count}} participants',
+                                        })}
+                                    </span>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-xs text-xs">
+                                    {t(
+                                        'admin.dashboard.n_participants_total_help',
+                                        'Sum of completed participants across all studies in this project.'
+                                    )}
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -395,24 +428,40 @@ function SingleStudyCard({
             key: 'design',
             icon: PencilRuler,
             label: t('admin.sidebar.design', 'Design'),
+            help: t(
+                'admin.dashboard.tool_help.design',
+                'Configure the study: distribution grid, conditions of instruction, statements, consent.'
+            ),
             url: `${studyBase}/design`,
         },
         {
             key: 'recruit',
             icon: Link2,
             label: t('admin.sidebar.recruit', 'Access'),
+            help: t(
+                'admin.dashboard.tool_help.recruit',
+                'Recruitment links, access rules, and study URL settings.'
+            ),
             url: `${studyBase}/recruitment`,
         },
         {
             key: 'data',
             icon: Download,
             label: t('admin.sidebar.data', 'Data'),
+            help: t(
+                'admin.dashboard.tool_help.data',
+                'Participant responses and exports (CSV, Q-sort dumps).'
+            ),
             url: `${studyBase}/data`,
         },
         {
             key: 'analysis',
             icon: ChartColumnStacked,
             label: t('admin.sidebar.analysis', 'Analysis'),
+            help: t(
+                'admin.dashboard.tool_help.analysis',
+                'Factor analysis configuration and historical runs.'
+            ),
             url: `${studyBase}/analysis`,
         },
     ];
@@ -494,20 +543,30 @@ function SingleStudyCard({
 
                     {/* Quick-action tool links */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 pt-3 border-t">
-                        {tools.map((tool) => (
-                            <button
-                                type="button"
-                                key={tool.key}
-                                className="flex flex-col items-center gap-1.5 py-2 px-1 rounded-lg hover:bg-slate-50 transition-colors text-muted-foreground hover:text-foreground"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(tool.url);
-                                }}
-                            >
-                                <tool.icon className="h-4 w-4" />
-                                <span className="text-2xs font-medium">{tool.label}</span>
-                            </button>
-                        ))}
+                        <TooltipProvider delayDuration={300}>
+                            {tools.map((tool) => (
+                                <Tooltip key={tool.key}>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            type="button"
+                                            className="flex flex-col items-center gap-1.5 py-2 px-1 rounded-lg hover:bg-slate-50 transition-colors text-muted-foreground hover:text-foreground"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate(tool.url);
+                                            }}
+                                        >
+                                            <tool.icon className="h-4 w-4" />
+                                            <span className="text-2xs font-medium">
+                                                {tool.label}
+                                            </span>
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top" className="max-w-xs text-xs">
+                                        {tool.help}
+                                    </TooltipContent>
+                                </Tooltip>
+                            ))}
+                        </TooltipProvider>
                     </div>
                 </CardContent>
             </Card>
