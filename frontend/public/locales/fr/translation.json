@@ -1903,6 +1903,17 @@
         "help": "Optionnel. Documentez pourquoi cette distribution, ces consignes, cette taille de Q-set. Utile pour la réplication et la préinscription (Watts & Stenner 2012 ; Sneegas 2020). Laissez vide si non pertinent.",
         "label": "Mémo (toutes langues)",
         "placeholder": "Documentez le rationnel de vos choix de design…"
+      },
+      "activate_dialog": {
+        "title": "Activer cette étude ?",
+        "description": "L’activation ouvre le recrutement et déverrouille les liens publics. De vrais participants peuvent commencer à répondre.",
+        "checklist_title": "Vérifications préalables",
+        "languages_title": "Langues",
+        "lang_ready": "Prêt",
+        "lang_incomplete": "Incomplet",
+        "required": "(requis)",
+        "attestation": "J’ai relu le texte de consentement, la politique de conservation, et je confirme que cette étude est prête à recevoir de vrais participants.",
+        "confirm": "Activer l’étude"
       }
     },
     "data": {

@@ -39,6 +39,7 @@ import { GuidanceCard } from '@/components/admin/GuidanceCard';
 import { ExportConfigButton } from '@/components/admin/designer/ExportConfigButton';
 import { ImportConfigButton } from '@/components/admin/designer/ImportConfigButton';
 import { UnsavedChangesDialog } from '@/components/admin/designer/UnsavedChangesDialog';
+import { ActivateStudyDialog } from '@/components/admin/designer/ActivateStudyDialog';
 import { formatBackendError } from '@/utils/i18nHelpers';
 import { useTranslation } from 'react-i18next';
 import {
@@ -56,6 +57,7 @@ import { useStudyDesignPage, type DesignStepId } from '@/hooks/admin/useStudyDes
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from 7 step-editor panels + toolbar + checklist + read-only overlay; all logic lives in useStudyDesignPage
 const StudyDesignPage = () => {
     const { t, i18n } = useTranslation();
+    const [activateDialogOpen, setActivateDialogOpen] = useState(false);
     const api = useStudyDesignPage();
 
     // Visual-only state: tab-list scroll chevrons (tightly coupled to the DOM ref)
@@ -279,10 +281,10 @@ const StudyDesignPage = () => {
 
                         <div className="h-6 w-px bg-slate-200 hidden md:block" />
 
-                        {/* Activate Button */}
+                        {/* Activate Button — opens confirmation dialog */}
                         <Button
                             size="sm"
-                            onClick={api.handleActivate}
+                            onClick={() => setActivateDialogOpen(true)}
                             disabled={api.isActivating || api.isFullyReadOnly}
                             className={cn(
                                 'transition-all h-9 font-bold rounded-lg shadow-sm px-3 sm:px-4',
@@ -306,6 +308,17 @@ const StudyDesignPage = () => {
 
             <LanguageManagerModal isOpen={api.isLangModalOpen} onClose={api.closeLangModal} />
             <UnsavedChangesDialog blocker={api.blocker} />
+            <ActivateStudyDialog
+                open={activateDialogOpen}
+                onOpenChange={setActivateDialogOpen}
+                checklist={api.checklist}
+                languageReadiness={api.languageReadiness}
+                isActivating={api.isActivating}
+                onConfirm={async () => {
+                    await api.handleActivate();
+                    setActivateDialogOpen(false);
+                }}
+            />
 
             {/* Main Content */}
             <div className="flex flex-1 overflow-hidden relative max-w-full min-w-0">
@@ -707,7 +720,7 @@ const StudyDesignPage = () => {
                                     </Button>
                                 ) : (
                                     <Button
-                                        onClick={api.handleActivate}
+                                        onClick={() => setActivateDialogOpen(true)}
                                         disabled={
                                             api.isActivating ||
                                             api.isFullyReadOnly ||

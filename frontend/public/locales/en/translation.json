@@ -1880,6 +1880,17 @@
         "help": "Optional. Document why this distribution, these conditions of instruction, this Q-set size. Useful for replication and pre-registration (Watts & Stenner 2012; Sneegas 2020). Leave empty if not relevant.",
         "label": "Memo (any language)",
         "placeholder": "Document the rationale behind your design choices…"
+      },
+      "activate_dialog": {
+        "title": "Activate this study?",
+        "description": "Activating opens recruitment and unlocks public links. Real participants can begin submitting.",
+        "checklist_title": "Pre-flight checks",
+        "languages_title": "Languages",
+        "lang_ready": "Ready",
+        "lang_incomplete": "Incomplete",
+        "required": "(required)",
+        "attestation": "I have reviewed the consent text, the retention policy, and confirm this study is ready to receive real participants.",
+        "confirm": "Activate study"
       }
     },
     "data": {

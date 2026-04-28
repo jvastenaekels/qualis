@@ -1865,6 +1865,17 @@
                 "help": "Valinnainen. Dokumentoi miksi tämä jakauma, nämä ohjeet, tämä Q-setin koko. Hyödyllistä toistettavuuden ja esirekisteröinnin kannalta (Watts & Stenner 2012; Sneegas 2020). Jätä tyhjäksi, jos ei ole olennaista.",
                 "label": "Muistio (mikä tahansa kieli)",
                 "placeholder": "Dokumentoi suunnitteluvalintojesi rationaali…"
+            },
+            "activate_dialog": {
+                "title": "Aktivoidaanko tämä tutkimus?",
+                "description": "Aktivointi avaa rekrytoinnin ja vapauttaa julkiset linkit. Todelliset osallistujat voivat alkaa vastata.",
+                "checklist_title": "Esitarkistukset",
+                "languages_title": "Kielet",
+                "lang_ready": "Valmis",
+                "lang_incomplete": "Keskeneräinen",
+                "required": "(pakollinen)",
+                "attestation": "Olen tarkistanut suostumustekstin, säilytyspolitiikan ja vahvistan, että tutkimus on valmis vastaanottamaan todellisia osallistujia.",
+                "confirm": "Aktivoi tutkimus"
             }
         },
         "data": {
