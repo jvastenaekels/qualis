@@ -179,7 +179,9 @@
       "powered_by": "Powered by",
       "welcome_back": "Welcome back!",
       "error_401": "Invalid email or password",
-      "error_generic": "Something went wrong. Please try again."
+      "error_generic": "Something went wrong. Please try again.",
+      "reason_session_expired": "Your session has expired. Please sign in again.",
+      "reason_auth_required": "Please sign in to access the admin panel."
     },
     "register": {
       "title": "Create account",

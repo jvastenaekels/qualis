@@ -179,7 +179,9 @@
             "powered_by": "Tarjoaa",
             "welcome_back": "Tervetuloa takaisin!",
             "error_401": "Virheellinen sähköposti tai salasana",
-            "error_generic": "Jotain meni vikaan. Yritä uudelleen."
+            "error_generic": "Jotain meni vikaan. Yritä uudelleen.",
+            "reason_session_expired": "Istuntosi on vanhentunut. Kirjaudu sisään uudelleen.",
+            "reason_auth_required": "Kirjaudu sisään päästäksesi hallintapaneeliin."
         },
         "register": {
             "title": "Luo tili",

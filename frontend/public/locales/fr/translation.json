@@ -179,7 +179,9 @@
       "powered_by": "Propulsé par",
       "welcome_back": "Ravi de vous revoir !",
       "error_401": "E-mail ou mot de passe invalide",
-      "error_generic": "Une erreur est survenue. Veuillez réessayer."
+      "error_generic": "Une erreur est survenue. Veuillez réessayer.",
+      "reason_session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
+      "reason_auth_required": "Connectez-vous pour accéder au panneau d'administration."
     },
     "register": {
       "title": "Créer un compte",

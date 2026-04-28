@@ -190,10 +190,14 @@ async function request(
         }
 
         if (response.status === 401 && !url.includes('/api/token')) {
-            // Handle session expiry for manual fetches too
+            // Handle session expiry for manual fetches too. Distinguish
+            // 'had a token, lost it' from 'never authenticated' so a
+            // first-time admin visitor doesn't see 'session_expired'.
+            const hadToken = useAuthStore.getState().token !== null;
             useAuthStore.getState().logout();
             if (!window.location.pathname.includes('/login')) {
-                window.location.href = '/login?reason=session_expired';
+                const reason = hadToken ? 'session_expired' : 'auth_required';
+                window.location.href = `/login?reason=${reason}`;
             }
         }
 
