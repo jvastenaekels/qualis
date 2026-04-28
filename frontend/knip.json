@@ -26,7 +26,6 @@
     "ignoreDependencies": [
         "@fontsource/google-sans-flex",
         "@dnd-kit/modifiers",
-        "@radix-ui/react-collapsible",
         "next-themes",
         "vaul",
         "@types/dompurify",
