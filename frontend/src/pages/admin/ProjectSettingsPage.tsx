@@ -519,6 +519,34 @@ export default function ProjectSettingsPage() {
                         </CardHeader>
                         <CardContent className="space-y-4 pt-2">
                             <div className="space-y-3">
+                                {/* Wave D — D4: Owner role was undocumented in
+                                    the matrix even though it appears in the
+                                    members-table dropdown (audit 🟡10). */}
+                                <div className="space-y-1">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-2xs font-black text-slate-900">
+                                            {t(
+                                                'admin.projects.settings.team.permissions_matrix.owner.label',
+                                                'Owner'
+                                            )}
+                                        </span>
+                                        <Badge
+                                            variant="outline"
+                                            className="text-[8px] h-4 bg-indigo-50 border-indigo-100 text-indigo-700"
+                                        >
+                                            {t(
+                                                'admin.projects.settings.team.permissions_matrix.owner.badge',
+                                                'Full access'
+                                            )}
+                                        </Badge>
+                                    </div>
+                                    <p className="text-2xs text-slate-500 leading-tight">
+                                        {t(
+                                            'admin.projects.settings.team.permissions_matrix.owner.desc',
+                                            'Manages project settings, members, and all studies. Can promote or remove other members.'
+                                        )}
+                                    </p>
+                                </div>
                                 <div className="space-y-1">
                                     <div className="flex items-center justify-between">
                                         <span className="text-2xs font-black text-slate-900">

@@ -689,6 +689,8 @@
             },
             "construction_memo": {
                 "title": "Rakentamisen muistio",
+                "summary_empty": "Valinnainen · kuratointiprosessin läpinäkyvyyteen",
+                "summary_filled": "{{n}} merkkiä · klikkaa nähdäksesi tai muokataksesi",
                 "helper": "Valinnainen. Dokumentoi, kuinka tämä lausekokoelma rakennettiin: kartoitetut lähteet, säilytetyt tai pois jätetyt äänet, otantaperuste. Hyödyllinen kuratointiprosessin läpinäkyvyyden kannalta (Sneegas 2020; Robbins & Krueger 2000). Jätä tyhjäksi, jos ei sovi tutkimusasetelmaasi.",
                 "placeholder": "Dokumentoi, kuinka tämä lausekokoelma rakennettiin: lähteet, säilytetyt tai pois jätetyt äänet, otantaperuste…",
                 "save": "Tallenna muistio",
@@ -996,6 +998,8 @@
                 "password_locked": "Salasanasuojausta voi muuttaa vain kun tutkimus on luonnostilassa.",
                 "password_set": "Salasana on tällä hetkellä asetettu. Syötä uusi arvo vaihtaaksesi tai poista käytöstä poistaaksesi.",
                 "collection_window": "Keruuikkuna",
+                "window_toggle": "Rajoita keruuikkuna",
+                "window_toggle_help": "Rajaa osallistujien pääsy tiettyyn aikajaksoon.",
                 "start_date_label": "Avautuu",
                 "end_date_label": "Sulkeutuu",
                 "date_hint": "Jätä tyhjäksi, jos aikarajoitusta ei ole.",
@@ -2132,8 +2136,8 @@
             "draft": "Luonnos"
         },
         "settings": {
-            "title": "Tutkimuksen elinkaari",
-            "description": "Tallennustilan hallinta, arkistointi ja tutkimuksen poistaminen.",
+            "title": "Asetukset",
+            "description": "Tietojen säilytys, arkistointi ja tutkimuksen poistaminen.",
             "lifecycle": {
                 "title": "Arkistointi",
                 "description": "Arkistoi tutkimus tehdäksesi siitä vain luku -tilaan kaikille.",
@@ -2232,6 +2236,11 @@
                             "label": "Admin",
                             "badge": "Täysi pääsy",
                             "desc": "Voi hallita projektin asetuksia, jäseniä ja kaikkia tutkimuksia."
+                        },
+                        "owner": {
+                            "label": "Omistaja",
+                            "badge": "Täysi pääsy",
+                            "desc": "Hallinnoi projektin asetuksia, jäseniä ja kaikkia tutkimuksia. Voi ylentää tai poistaa muita jäseniä."
                         },
                         "researcher": {
                             "label": "Tutkija",

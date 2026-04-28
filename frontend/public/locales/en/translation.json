@@ -704,6 +704,8 @@
       },
       "construction_memo": {
         "title": "Construction memo",
+        "summary_empty": "Optional · for transparency about the curation process",
+        "summary_filled": "{{n}} characters · click to view or edit",
         "helper": "Optional. Document how this concourse was constructed: sources canvassed, voices retained or set aside, sampling rationale. Useful for transparency about the curation process (Sneegas 2020; Robbins & Krueger 2000). Leave blank if not applicable to your design.",
         "placeholder": "Document how this concourse was constructed: sources, voices retained or excluded, sampling rationale...",
         "save": "Save memo",
@@ -1011,6 +1013,8 @@
         "password_locked": "Password protection can only be changed while the study is in draft mode.",
         "password_set": "A password is currently set. Enter a new value to change it, or toggle off to remove.",
         "collection_window": "Collection window",
+        "window_toggle": "Limit collection window",
+        "window_toggle_help": "Restrict participant access to a specific time range.",
         "start_date_label": "Opens at",
         "end_date_label": "Closes at",
         "date_hint": "Leave empty for no time restriction.",
@@ -2147,8 +2151,8 @@
       "draft": "Draft"
     },
     "settings": {
-      "title": "Study lifecycle",
-      "description": "Storage management, archiving, and study deletion.",
+      "title": "Settings",
+      "description": "Data retention, archiving, and study deletion.",
       "lifecycle": {
         "title": "Archiving",
         "description": "Archive the study to make it read-only for everyone.",
@@ -2295,6 +2299,11 @@
               "label": "Admin",
               "badge": "Full access",
               "desc": "Can manage project settings, members, and all studies."
+            },
+            "owner": {
+              "label": "Owner",
+              "badge": "Full access",
+              "desc": "Manages project settings, members, and all studies. Can promote or remove other members."
             },
             "researcher": {
               "label": "Researcher",

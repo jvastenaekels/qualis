@@ -121,10 +121,13 @@ describe('AdminDashboard', () => {
 
         renderWithProviders(<AdminDashboard />);
 
-        // SingleStudyCard shows study title and tools (Design, Access, Data, Analysis)
+        // Wave D — D5: SingleStudyCard no longer shows the 4-button sub-action
+        // grid (Design / Access / Data / Analysis). The card carries title +
+        // metadata + state badge; sub-actions live in the study sidebar after
+        // clicking through. Asserting on the title is enough.
         expect(screen.getByText('My Study')).toBeInTheDocument();
-        expect(screen.getByText('Design')).toBeInTheDocument();
-        expect(screen.getByText('Analysis')).toBeInTheDocument();
+        expect(screen.queryByText('Design')).not.toBeInTheDocument();
+        expect(screen.queryByText('Analysis')).not.toBeInTheDocument();
     });
 
     it('shows StudyGroups when multiple studies exist', () => {

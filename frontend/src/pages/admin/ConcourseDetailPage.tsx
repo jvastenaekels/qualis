@@ -28,6 +28,12 @@ import {
 } from 'lucide-react';
 import { parseConcourseCsv } from '@/utils/parseCsvTsv';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+    Accordion,
+    AccordionItem,
+    AccordionTrigger,
+    AccordionContent,
+} from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -272,72 +278,90 @@ export default function ConcourseDetailPage() {
                 }
             />
 
-            {/* Methodological context — neutral umbrella for optional documentation fields. */}
-            <div className="space-y-1">
-                <h2 className="text-sm font-semibold text-slate-700">
-                    {t('admin.concourse.methodological_context.title', 'Methodological context')}
-                </h2>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                    {t(
-                        'admin.concourse.methodological_context.subtitle',
-                        "Optional documentation fields. Fill in what's relevant to your design; leave others blank."
-                    )}
-                </p>
-            </div>
-
-            <Card className="rounded-xl border-slate-200">
-                <CardContent className="p-4 sm:p-6 space-y-3">
-                    <div>
-                        <Label
-                            htmlFor="construction-memo"
-                            className="text-sm font-bold text-slate-900"
-                        >
-                            {t('admin.concourse.construction_memo.title', 'Construction memo')}
-                        </Label>
-                        <p className="mt-1 text-xs text-slate-500 leading-relaxed">
-                            {t(
-                                'admin.concourse.construction_memo.helper',
-                                'Optional. Document how this concourse was constructed: sources canvassed, voices retained or set aside, sampling rationale. Useful for transparency about the curation process (Sneegas 2020; Robbins & Krueger 2000). Leave blank if not applicable to your design.'
-                            )}
-                        </p>
-                    </div>
-                    <Textarea
-                        id="construction-memo"
-                        rows={8}
-                        maxLength={10000}
-                        value={constructionMemo}
-                        onChange={(e) => setConstructionMemo(e.target.value)}
-                        placeholder={t(
-                            'admin.concourse.construction_memo.placeholder',
-                            'Document how this concourse was constructed: sources, voices retained or excluded, sampling rationale...'
-                        )}
-                        disabled={!canEdit || isSavingConstructionMemo}
-                        className="rounded-xl bg-white text-sm leading-relaxed"
-                    />
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400">
-                            {constructionMemo.length > 9000
-                                ? `${constructionMemo.length} / 10000`
-                                : ''}
-                        </span>
-                        {canEdit && (
-                            <Button
-                                size="sm"
-                                className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
-                                onClick={saveConstructionMemo}
-                                disabled={!isConstructionMemoDirty || isSavingConstructionMemo}
-                            >
-                                {isSavingConstructionMemo ? (
-                                    <Loader2 className="size-4 mr-1 animate-spin" />
-                                ) : (
-                                    <Check className="size-4 mr-1" />
+            {/* Construction memo — Wave D (D1 + D7-bonus from REPORT.md):
+                - dropped the redundant "Methodological context" wrapper section
+                  (H7) — the Accordion trigger carries the field's intent.
+                - wrapped in Accordion: expanded-by-default when empty (invites
+                  first entry), collapsed-by-default once the researcher has
+                  saved content (40% vertical real-estate reclaimed for the
+                  actual item list). */}
+            <Accordion
+                type="multiple"
+                defaultValue={constructionMemo.trim().length === 0 ? ['memo'] : []}
+                className="space-y-2"
+            >
+                <AccordionItem
+                    value="memo"
+                    className="border border-slate-200 rounded-xl overflow-hidden bg-white"
+                >
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-100">
+                        <div className="flex flex-col items-start text-left">
+                            <span className="text-sm font-bold text-slate-900">
+                                {t('admin.concourse.construction_memo.title', 'Construction memo')}
+                            </span>
+                            <span className="text-xs font-medium text-slate-500 mt-0.5">
+                                {constructionMemo.trim().length > 0
+                                    ? t(
+                                          'admin.concourse.construction_memo.summary_filled',
+                                          '{{n}} characters · click to view or edit',
+                                          { n: constructionMemo.length }
+                                      )
+                                    : t(
+                                          'admin.concourse.construction_memo.summary_empty',
+                                          'Optional · for transparency about the curation process'
+                                      )}
+                            </span>
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                        <CardContent className="p-4 sm:p-6 space-y-3">
+                            <p className="text-xs text-slate-500 leading-relaxed">
+                                {t(
+                                    'admin.concourse.construction_memo.helper',
+                                    'Optional. Document how this concourse was constructed: sources canvassed, voices retained or set aside, sampling rationale. Useful for transparency about the curation process (Sneegas 2020; Robbins & Krueger 2000). Leave blank if not applicable to your design.'
                                 )}
-                                {t('admin.concourse.construction_memo.save', 'Save memo')}
-                            </Button>
-                        )}
-                    </div>
-                </CardContent>
-            </Card>
+                            </p>
+                            <Textarea
+                                id="construction-memo"
+                                rows={8}
+                                maxLength={10000}
+                                value={constructionMemo}
+                                onChange={(e) => setConstructionMemo(e.target.value)}
+                                placeholder={t(
+                                    'admin.concourse.construction_memo.placeholder',
+                                    'Document how this concourse was constructed: sources, voices retained or excluded, sampling rationale...'
+                                )}
+                                disabled={!canEdit || isSavingConstructionMemo}
+                                className="rounded-xl bg-white text-sm leading-relaxed"
+                            />
+                            <div className="flex items-center justify-between">
+                                <span className="text-xs text-slate-400">
+                                    {constructionMemo.length > 9000
+                                        ? `${constructionMemo.length} / 10000`
+                                        : ''}
+                                </span>
+                                {canEdit && (
+                                    <Button
+                                        size="sm"
+                                        className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
+                                        onClick={saveConstructionMemo}
+                                        disabled={
+                                            !isConstructionMemoDirty || isSavingConstructionMemo
+                                        }
+                                    >
+                                        {isSavingConstructionMemo ? (
+                                            <Loader2 className="size-4 mr-1 animate-spin" />
+                                        ) : (
+                                            <Check className="size-4 mr-1" />
+                                        )}
+                                        {t('admin.concourse.construction_memo.save', 'Save memo')}
+                                    </Button>
+                                )}
+                            </div>
+                        </CardContent>
+                    </AccordionContent>
+                </AccordionItem>
+            </Accordion>
 
             {/* Filters */}
             <div className="flex flex-col gap-2">

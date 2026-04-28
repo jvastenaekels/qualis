@@ -689,6 +689,8 @@
       },
       "construction_memo": {
         "title": "Mémo de construction",
+        "summary_empty": "Optionnel · pour la transparence du processus de curation",
+        "summary_filled": "{{n}} caractères · cliquez pour voir ou modifier",
         "helper": "Optionnel. Documentez comment ce concours a été constitué : sources mobilisées, voix retenues ou écartées, rationnel d'échantillonnage. Utile pour rendre transparent le processus de curation (Sneegas 2020 ; Robbins & Krueger 2000). Laissez vide si non pertinent pour votre design.",
         "placeholder": "Documentez comment ce concours a été construit : sources, voix retenues ou écartées, rationnel de l'échantillonnage…",
         "save": "Enregistrer le mémo",
@@ -996,6 +998,8 @@
         "password_locked": "La protection par mot de passe ne peut être modifiée que lorsque l'étude est en mode brouillon.",
         "password_set": "Un mot de passe est actuellement défini. Saisissez une nouvelle valeur pour le modifier, ou désactivez pour le supprimer.",
         "collection_window": "Fenêtre de collecte",
+        "window_toggle": "Limiter la fenêtre de collecte",
+        "window_toggle_help": "Restreindre l'accès des participants à une plage horaire spécifique.",
         "start_date_label": "Ouvre le",
         "end_date_label": "Ferme le",
         "date_hint": "Laissez vide pour aucune restriction de temps.",
@@ -2132,8 +2136,8 @@
       "draft": "Brouillon"
     },
     "settings": {
-      "title": "Cycle de vie",
-      "description": "Gestion du stockage, archivage et suppression de l'étude.",
+      "title": "Réglages",
+      "description": "Conservation des données, archivage et suppression de l'étude.",
       "lifecycle": {
         "title": "Archivage",
         "description": "Archivez l'étude pour la rendre accessible en lecture seule pour tous.",
@@ -2280,6 +2284,11 @@
               "label": "Admin",
               "badge": "Accès complet",
               "desc": "Peut gérer les paramètres du projet, les membres et toutes les études."
+            },
+            "owner": {
+              "label": "Propriétaire",
+              "badge": "Accès complet",
+              "desc": "Gère les paramètres du projet, les membres et toutes les études. Peut promouvoir ou retirer d'autres membres."
             },
             "researcher": {
               "label": "Chercheur",

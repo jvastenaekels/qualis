@@ -433,98 +433,150 @@ const RecruitmentPage = () => {
 
                         <Separator />
 
-                        {/* Collection Window */}
+                        {/* Collection Window — D2 from progressive-disclosure
+                            audit (REPORT.md 🟡12). Most studies don't need a
+                            time window; the date pickers were unconditional
+                            visual noise. Now gated behind a toggle that
+                            derives its initial state from the form values:
+                            on if either date was previously set. */}
                         <div className="space-y-4">
-                            <Label className="text-2xs font-black text-slate-400 uppercase tracking-wider">
-                                {t(
-                                    'admin.recruitment.access_rules.collection_window',
-                                    'Collection window'
-                                )}
-                            </Label>
-                            <div className="grid gap-4 sm:grid-cols-2">
-                                <div className="space-y-2">
-                                    <Label
-                                        htmlFor="start-date"
-                                        className="text-2xs font-black text-slate-500"
-                                    >
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="space-y-0.5">
+                                    <Label className="text-sm font-black text-slate-700">
                                         {t(
-                                            'admin.recruitment.access_rules.start_date_label',
-                                            'Opens at'
+                                            'admin.recruitment.access_rules.window_toggle',
+                                            'Limit collection window'
                                         )}
                                     </Label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                                        <Input
-                                            id="start-date"
-                                            type="datetime-local"
-                                            disabled={isArchived}
-                                            {...accessForm.register('startDate')}
-                                            className="h-11 pl-10 pr-10 rounded-xl bg-slate-50 border-slate-100 text-xs focus-visible:ring-indigo-500"
-                                        />
-                                        {accessForm.watch('startDate') && !isArchived && (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    accessForm.setValue('startDate', '', {
-                                                        shouldDirty: true,
-                                                    })
-                                                }
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                                aria-label={t(
-                                                    'admin.recruitment.access_rules.clear_date',
-                                                    'Clear date'
-                                                )}
-                                            >
-                                                <X className="size-3.5" />
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label
-                                        htmlFor="end-date"
-                                        className="text-2xs font-black text-slate-500"
-                                    >
+                                    <p className="text-xs text-slate-400 font-medium">
                                         {t(
-                                            'admin.recruitment.access_rules.end_date_label',
-                                            'Closes at'
+                                            'admin.recruitment.access_rules.window_toggle_help',
+                                            'Restrict participant access to a specific time range.'
                                         )}
-                                    </Label>
-                                    <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-                                        <Input
-                                            id="end-date"
-                                            type="datetime-local"
-                                            disabled={isArchived}
-                                            {...accessForm.register('endDate')}
-                                            className="h-11 pl-10 pr-10 rounded-xl bg-slate-50 border-slate-100 text-xs focus-visible:ring-indigo-500"
-                                        />
-                                        {accessForm.watch('endDate') && !isArchived && (
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    accessForm.setValue('endDate', '', {
-                                                        shouldDirty: true,
-                                                    })
-                                                }
-                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                                                aria-label={t(
-                                                    'admin.recruitment.access_rules.clear_date',
-                                                    'Clear date'
-                                                )}
-                                            >
-                                                <X className="size-3.5" />
-                                            </button>
-                                        )}
-                                    </div>
+                                    </p>
                                 </div>
+                                <Switch
+                                    checked={
+                                        !!accessForm.watch('startDate') ||
+                                        !!accessForm.watch('endDate') ||
+                                        accessForm.watch('windowEnabledOverride') === true
+                                    }
+                                    onCheckedChange={(checked) => {
+                                        if (checked) {
+                                            accessForm.setValue('windowEnabledOverride', true, {
+                                                shouldDirty: true,
+                                            });
+                                        } else {
+                                            accessForm.setValue('startDate', '', {
+                                                shouldDirty: true,
+                                            });
+                                            accessForm.setValue('endDate', '', {
+                                                shouldDirty: true,
+                                            });
+                                            accessForm.setValue('windowEnabledOverride', false, {
+                                                shouldDirty: true,
+                                            });
+                                        }
+                                    }}
+                                    disabled={isArchived}
+                                />
                             </div>
-                            <p className="text-xs text-slate-400 font-medium">
-                                {t(
-                                    'admin.recruitment.access_rules.date_hint',
-                                    'Leave empty for no time restriction.'
-                                )}
-                            </p>
+                            {(!!accessForm.watch('startDate') ||
+                                !!accessForm.watch('endDate') ||
+                                accessForm.watch('windowEnabledOverride') === true) && (
+                                <>
+                                    <Label className="text-2xs font-black text-slate-400 uppercase tracking-wider">
+                                        {t(
+                                            'admin.recruitment.access_rules.collection_window',
+                                            'Collection window'
+                                        )}
+                                    </Label>
+                                    <div className="grid gap-4 sm:grid-cols-2">
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="start-date"
+                                                className="text-2xs font-black text-slate-500"
+                                            >
+                                                {t(
+                                                    'admin.recruitment.access_rules.start_date_label',
+                                                    'Opens at'
+                                                )}
+                                            </Label>
+                                            <div className="relative">
+                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                                <Input
+                                                    id="start-date"
+                                                    type="datetime-local"
+                                                    disabled={isArchived}
+                                                    {...accessForm.register('startDate')}
+                                                    className="h-11 pl-10 pr-10 rounded-xl bg-slate-50 border-slate-100 text-xs focus-visible:ring-indigo-500"
+                                                />
+                                                {accessForm.watch('startDate') && !isArchived && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            accessForm.setValue('startDate', '', {
+                                                                shouldDirty: true,
+                                                            })
+                                                        }
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                                        aria-label={t(
+                                                            'admin.recruitment.access_rules.clear_date',
+                                                            'Clear date'
+                                                        )}
+                                                    >
+                                                        <X className="size-3.5" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label
+                                                htmlFor="end-date"
+                                                className="text-2xs font-black text-slate-500"
+                                            >
+                                                {t(
+                                                    'admin.recruitment.access_rules.end_date_label',
+                                                    'Closes at'
+                                                )}
+                                            </Label>
+                                            <div className="relative">
+                                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                                                <Input
+                                                    id="end-date"
+                                                    type="datetime-local"
+                                                    disabled={isArchived}
+                                                    {...accessForm.register('endDate')}
+                                                    className="h-11 pl-10 pr-10 rounded-xl bg-slate-50 border-slate-100 text-xs focus-visible:ring-indigo-500"
+                                                />
+                                                {accessForm.watch('endDate') && !isArchived && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            accessForm.setValue('endDate', '', {
+                                                                shouldDirty: true,
+                                                            })
+                                                        }
+                                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                                        aria-label={t(
+                                                            'admin.recruitment.access_rules.clear_date',
+                                                            'Clear date'
+                                                        )}
+                                                    >
+                                                        <X className="size-3.5" />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="text-xs text-slate-400 font-medium">
+                                        {t(
+                                            'admin.recruitment.access_rules.date_hint',
+                                            'Leave empty for no time restriction.'
+                                        )}
+                                    </p>
+                                </>
+                            )}
                         </div>
 
                         <div className="flex justify-end">

@@ -292,49 +292,61 @@ export default function DataLifecyclePage() {
                             />
                         </div>
 
-                        {/* older-than hints */}
+                        {/* Aged-data alerts — only render when there is actual
+                            risk to flag. Yellow alert bars for "0 records older
+                            than X" train the user to ignore the channel; D9
+                            from the progressive-disclosure audit (REPORT.md
+                            finding H3). */}
                         <div className="mt-5 space-y-2">
-                            <OlderThanHint
-                                label={t(
-                                    'admin.lifecycle.older_1y',
-                                    'Older than 1 year (not anonymised)'
-                                )}
-                                count={timeline.completed_older_than_1y}
-                            />
-                            <OlderThanHint
-                                label={t(
-                                    'admin.lifecycle.older_2y',
-                                    'Older than 2 years (not anonymised)'
-                                )}
-                                count={timeline.completed_older_than_2y}
-                            />
+                            {timeline.completed_older_than_1y > 0 && (
+                                <OlderThanHint
+                                    label={t(
+                                        'admin.lifecycle.older_1y',
+                                        'Older than 1 year (not anonymised)'
+                                    )}
+                                    count={timeline.completed_older_than_1y}
+                                />
+                            )}
+                            {timeline.completed_older_than_2y > 0 && (
+                                <OlderThanHint
+                                    label={t(
+                                        'admin.lifecycle.older_2y',
+                                        'Older than 2 years (not anonymised)'
+                                    )}
+                                    count={timeline.completed_older_than_2y}
+                                />
+                            )}
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* ── Section 2: Audio storage ──────────────────────────── */}
-                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                    <CardHeader className="border-b border-slate-50 pb-4">
-                        <div className="flex items-center gap-2 mb-1">
-                            <Mic2 className="h-5 w-5 text-violet-500" />
-                            <CardTitle className="text-lg font-black text-slate-900">
-                                {t('admin.lifecycle.audio_title', 'Audio storage')}
-                            </CardTitle>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="p-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            <Stat
-                                label={t('admin.lifecycle.audio_count', 'Recordings')}
-                                value={audio.count}
-                            />
-                            <Stat
-                                label={t('admin.lifecycle.audio_mb', 'Total size')}
-                                value={`${audio.total_mb.toFixed(2)} MB`}
-                            />
-                        </div>
-                    </CardContent>
-                </Card>
+                {/* ── Section 2: Audio storage ─ D8: render only when audio
+                    was actually collected; otherwise the panel is permanent
+                    "0 / 0.00 MB" noise (audit REPORT.md finding H8). */}
+                {audio.count > 0 && (
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                        <CardHeader className="border-b border-slate-50 pb-4">
+                            <div className="flex items-center gap-2 mb-1">
+                                <Mic2 className="h-5 w-5 text-violet-500" />
+                                <CardTitle className="text-lg font-black text-slate-900">
+                                    {t('admin.lifecycle.audio_title', 'Audio storage')}
+                                </CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div className="grid grid-cols-2 gap-4">
+                                <Stat
+                                    label={t('admin.lifecycle.audio_count', 'Recordings')}
+                                    value={audio.count}
+                                />
+                                <Stat
+                                    label={t('admin.lifecycle.audio_mb', 'Total size')}
+                                    value={`${audio.total_mb.toFixed(2)} MB`}
+                                />
+                            </div>
+                        </CardContent>
+                    </Card>
+                )}
 
                 {/* ── Section 3: Locale breakdown ──────────────────────── */}
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">

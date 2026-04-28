@@ -72,6 +72,11 @@ export const accessRulesSchema = z.object({
     accessPassword: z.string().optional().or(z.literal('')),
     startDate: z.string().optional().or(z.literal('')),
     endDate: z.string().optional().or(z.literal('')),
+    // Wave D: when both dates are empty but the user explicitly toggled the
+    // window on (intent to set, no value yet), persist that intent so the
+    // pickers stay visible across re-renders without polluting the API
+    // payload. Server-side ignores this field.
+    windowEnabledOverride: z.boolean().optional(),
 });
 
 export type AccessRulesValues = z.infer<typeof accessRulesSchema>;
@@ -180,6 +185,7 @@ export function useRecruitmentPage(): RecruitmentPageApi {
             accessPassword: '',
             startDate: study.start_date ? toLocalDatetimeString(study.start_date) : '',
             endDate: study.end_date ? toLocalDatetimeString(study.end_date) : '',
+            windowEnabledOverride: false,
         },
     });
 
@@ -190,6 +196,7 @@ export function useRecruitmentPage(): RecruitmentPageApi {
                 accessPassword: '',
                 startDate: study.start_date ? toLocalDatetimeString(study.start_date) : '',
                 endDate: study.end_date ? toLocalDatetimeString(study.end_date) : '',
+                windowEnabledOverride: false,
             });
         }
     }, [study, accessForm]);

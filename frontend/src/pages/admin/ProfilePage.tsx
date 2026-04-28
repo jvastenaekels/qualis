@@ -201,7 +201,10 @@ const ProfilePage = () => {
                 icon={Shield}
             />
 
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 pb-12">
+            {/* Wave D — D6: Profile sections now stack vertically in a single
+                column (max-w-3xl) instead of an asymmetric 2-col grid that
+                left 2FA orphaned in a right rail (audit 🟢14 + C5). */}
+            <div className="space-y-8 pb-12 max-w-3xl">
                 {/* Profile Information */}
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden h-fit">
                     <CardHeader className="border-b border-slate-50 pb-4">

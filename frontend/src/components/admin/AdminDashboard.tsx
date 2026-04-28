@@ -9,10 +9,6 @@ import {
     CheckCircle2,
     Circle,
     Clock,
-    PencilRuler,
-    Link2,
-    Download,
-    ChartColumnStacked,
     Briefcase,
     FlaskConical,
 } from 'lucide-react';
@@ -423,49 +419,6 @@ function SingleStudyCard({
         study.translations?.map((tr) => tr.language_code.toUpperCase()).join(', ') ?? '';
     const studyBase = `/app/${projectSlug}/studies/${study.slug}`;
 
-    const tools = [
-        {
-            key: 'design',
-            icon: PencilRuler,
-            label: t('admin.sidebar.design', 'Design'),
-            help: t(
-                'admin.dashboard.tool_help.design',
-                'Configure the study: distribution grid, conditions of instruction, statements, consent.'
-            ),
-            url: `${studyBase}/design`,
-        },
-        {
-            key: 'recruit',
-            icon: Link2,
-            label: t('admin.sidebar.recruit', 'Access'),
-            help: t(
-                'admin.dashboard.tool_help.recruit',
-                'Recruitment links, access rules, and study URL settings.'
-            ),
-            url: `${studyBase}/recruitment`,
-        },
-        {
-            key: 'data',
-            icon: Download,
-            label: t('admin.sidebar.data', 'Data'),
-            help: t(
-                'admin.dashboard.tool_help.data',
-                'Participant responses and exports (CSV, Q-sort dumps).'
-            ),
-            url: `${studyBase}/data`,
-        },
-        {
-            key: 'analysis',
-            icon: ChartColumnStacked,
-            label: t('admin.sidebar.analysis', 'Analysis'),
-            help: t(
-                'admin.dashboard.tool_help.analysis',
-                'Factor analysis configuration and historical runs.'
-            ),
-            url: `${studyBase}/analysis`,
-        },
-    ];
-
     return (
         <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -540,34 +493,12 @@ function SingleStudyCard({
                         </div>
                         <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
                     </div>
-
-                    {/* Quick-action tool links */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 pt-3 border-t">
-                        <TooltipProvider delayDuration={300}>
-                            {tools.map((tool) => (
-                                <Tooltip key={tool.key}>
-                                    <TooltipTrigger asChild>
-                                        <button
-                                            type="button"
-                                            className="flex flex-col items-center gap-1.5 py-2 px-1 rounded-lg hover:bg-slate-50 transition-colors text-muted-foreground hover:text-foreground"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigate(tool.url);
-                                            }}
-                                        >
-                                            <tool.icon className="h-4 w-4" />
-                                            <span className="text-2xs font-medium">
-                                                {tool.label}
-                                            </span>
-                                        </button>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="top" className="max-w-xs text-xs">
-                                        {tool.help}
-                                    </TooltipContent>
-                                </Tooltip>
-                            ))}
-                        </TooltipProvider>
-                    </div>
+                    {/* Wave D — D5: Removed the 4-button sub-action grid
+                        (Conception / Accès / Données / Analyse). The single-
+                        study card is now visually consistent with the multi-
+                        study StudyRow (audit 🟡11). Sub-actions remain one
+                        click away via the study sidebar after opening the
+                        card. */}
                 </CardContent>
             </Card>
         </div>
