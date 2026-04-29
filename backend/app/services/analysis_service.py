@@ -812,6 +812,40 @@ def compute_eigenvalues(
     return eigenvalues_list, max(suggested, 1)
 
 
+def compute_parallel_analysis_n(
+    dataset: NDArray[np.float64],
+    n_simulations: int = 1000,
+    seed: int = 42,
+) -> int:
+    """Horn (1965) parallel analysis on the participant-correlation matrix.
+
+    Compares observed eigenvalues against the 95th percentile of eigenvalues
+    from random Gaussian datasets of matching shape. Returns the count of
+    factors whose observed eigenvalue exceeds the simulated threshold,
+    floored at 1 (the analysis always needs at least one factor).
+
+    Args:
+        dataset: (n_statements x n_participants) Q-sort matrix.
+        n_simulations: Monte-Carlo iterations. Default 1000.
+        seed: RNG seed for reproducibility.
+
+    Returns:
+        Number of factors retained (>= 1).
+    """
+    n_statements, n_participants = dataset.shape
+    rng = np.random.default_rng(seed)
+    sim_eigs = np.zeros((n_simulations, n_participants))
+    for i in range(n_simulations):
+        sim = rng.standard_normal(size=(n_statements, n_participants))
+        sim_cor = correlation_matrix(sim)
+        evs = np.linalg.eigvalsh(sim_cor)
+        sim_eigs[i] = np.sort(evs)[::-1]
+    threshold = np.percentile(sim_eigs, 95, axis=0)
+    obs_cor = correlation_matrix(dataset)
+    obs_eigs = np.sort(np.linalg.eigvalsh(obs_cor))[::-1]
+    return max(int(np.sum(obs_eigs > threshold)), 1)
+
+
 def _distribution_from_grid_config(
     grid_config: list[dict[str, object]],
 ) -> NDArray[np.int64]:
