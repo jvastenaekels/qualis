@@ -45,6 +45,8 @@ from ...services.analysis_service import (
     build_sort_matrix,
     compute_bootstrap_stability,
     compute_eigenvalues,
+    compute_parallel_analysis_n,
+    compute_velicer_map_n,
     correlation_matrix,
     run_analysis,
 )
@@ -105,16 +107,27 @@ async def get_eigenvalues(
         raise HTTPException(status_code=400, detail=str(e))
 
     try:
-        eigenvalues, suggested = await asyncio.to_thread(
-            lambda: compute_eigenvalues(correlation_matrix(dataset))
+        cor = correlation_matrix(dataset)
+        eigenvalues, kaiser_n = await asyncio.to_thread(
+            lambda: compute_eigenvalues(cor)
         )
+        parallel_n = await asyncio.to_thread(
+            lambda: compute_parallel_analysis_n(dataset)
+        )
+        map_n = await asyncio.to_thread(lambda: compute_velicer_map_n(cor))
     except (np.linalg.LinAlgError, ValueError) as e:
         raise HTTPException(
             status_code=400,
             detail=f"Failed to compute eigenvalues: {e}",
         )
 
-    return EigenvalueResult(eigenvalues=eigenvalues, suggested_n_factors=suggested)
+    return EigenvalueResult(
+        eigenvalues=eigenvalues,
+        kaiser_n=kaiser_n,
+        parallel_analysis_n=parallel_n,
+        velicer_map_n=map_n,
+        suggested_n_factors=kaiser_n,
+    )
 
 
 @router.post("/{slug}/analysis/run")

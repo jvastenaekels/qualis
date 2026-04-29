@@ -128,6 +128,36 @@ class TestAnalysisEigenvalues:
         )
         assert response.status_code == 401
 
+    async def test_get_eigenvalues_returns_kaiser_parallel_map(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """GET /eigenvalues should return the three retention indicators."""
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+
+        resp = await client.get(
+            f"/api/admin/studies/{study.slug}/analysis/eigenvalues",
+            headers=headers,
+        )
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "eigenvalues" in body
+        # Backward-compat field still present.
+        assert "suggested_n_factors" in body
+        # New retention indicators.
+        assert "kaiser_n" in body
+        assert "parallel_analysis_n" in body
+        assert "velicer_map_n" in body
+        for key in ("kaiser_n", "parallel_analysis_n", "velicer_map_n"):
+            assert isinstance(body[key], int)
+            assert body[key] >= 1
+
 
 @pytest.mark.asyncio
 class TestAnalysisRun:

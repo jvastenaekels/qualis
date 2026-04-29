@@ -255,11 +255,27 @@ class AnalysisResult(BaseModel):
 
 
 class EigenvalueResult(BaseModel):
-    """Eigenvalues for scree plot (pre-analysis)."""
+    """Eigenvalues for the scree plot plus three retention indicators.
+
+    All three indicators are advisory — Watts & Stenner (2012) emphasise
+    that factor retention in Q-methodology also depends on interpretability
+    and stability, not just statistical thresholds.
+    """
 
     eigenvalues: list[float]
+    kaiser_n: int = Field(
+        description="Kaiser criterion: number of eigenvalues > 1."
+    )
+    parallel_analysis_n: int = Field(
+        description="Horn (1965) parallel analysis: count of observed eigenvalues "
+        "exceeding the 95th percentile of random-data eigenvalues.",
+    )
+    velicer_map_n: int = Field(
+        description="Velicer (1976) Minimum Average Partial.",
+    )
     suggested_n_factors: int = Field(
-        description="Suggested number of factors (Kaiser criterion: eigenvalue > 1)"
+        description="Backward-compatible alias for kaiser_n. Frontends should "
+        "prefer the three explicit fields."
     )
 
 
