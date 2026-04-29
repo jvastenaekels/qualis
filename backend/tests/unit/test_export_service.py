@@ -421,6 +421,247 @@ class TestRenderMemoMd:
             assert "memo/memo.md" not in z.namelist()
 
 
+class TestRenderMemoDiscussionMd:
+    """Unit tests for ExportService.render_memo_discussion_md (pure, no DB)."""
+
+    def test_returns_empty_when_no_entries(self) -> None:
+        """render_memo_discussion_md returns '' when the memo has no entries."""
+        from app.schemas.memos import MemoRead
+
+        memo = MemoRead(parent_type="study", parent_id=1, entries=[])
+        assert ExportService.render_memo_discussion_md(memo, {}) == ""
+
+    def test_returns_empty_when_entries_have_no_comments(self) -> None:
+        """Returns '' when all entries have empty comment lists."""
+        from datetime import datetime, timezone
+
+        from app.schemas.memos import MemoEntryRead, MemoRead
+
+        entry = MemoEntryRead(
+            id=1,
+            parent_type="study",
+            parent_id=1,
+            title="No comments here",
+            body="Just a body",
+            position=10,
+            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 1, 2, tzinfo=timezone.utc),
+            created_by=1,
+            last_edited_by=1,
+            comments=[],
+        )
+        memo = MemoRead(parent_type="study", parent_id=1, entries=[entry])
+        assert ExportService.render_memo_discussion_md(memo, {}) == ""
+
+    def test_renders_comment_with_author_and_timestamp(self) -> None:
+        """Renders entry title and comment line with email and ISO timestamp."""
+        from datetime import datetime, timezone
+
+        from app.schemas.memos import MemoCommentRead, MemoEntryRead, MemoRead
+
+        comment = MemoCommentRead(
+            id=1,
+            entry_id=1,
+            user_id=7,
+            body="why forced symmetry?",
+            mentions=[],
+            resolved=False,
+            resolved_at=None,
+            resolved_by=None,
+            deleted=False,
+            created_at=datetime(2026, 4, 15, 9, 30, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 15, 9, 30, tzinfo=timezone.utc),
+        )
+        entry = MemoEntryRead(
+            id=1,
+            parent_type="study",
+            parent_id=42,
+            title="Distribution rationale",
+            body="Forced symmetry.",
+            position=10,
+            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 1, tzinfo=timezone.utc),
+            created_by=7,
+            last_edited_by=7,
+            comments=[comment],
+        )
+        memo = MemoRead(parent_type="study", parent_id=42, entries=[entry])
+        result = ExportService.render_memo_discussion_md(memo, {7: "alice@example.com"})
+
+        assert "# Memo discussion — study #42" in result
+        assert "## Distribution rationale" in result
+        assert "- alice@example.com · 2026-04-15 09:30: why forced symmetry?" in result
+
+    def test_resolved_comment_has_tag(self) -> None:
+        """A resolved comment gets a ' [resolved]' tag between timestamp and body."""
+        from datetime import datetime, timezone
+
+        from app.schemas.memos import MemoCommentRead, MemoEntryRead, MemoRead
+
+        comment = MemoCommentRead(
+            id=2,
+            entry_id=1,
+            user_id=7,
+            body="Agreed, closing.",
+            mentions=[],
+            resolved=True,
+            resolved_at=datetime(2026, 4, 16, tzinfo=timezone.utc),
+            resolved_by=7,
+            deleted=False,
+            created_at=datetime(2026, 4, 15, 10, 0, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 16, tzinfo=timezone.utc),
+        )
+        entry = MemoEntryRead(
+            id=1,
+            parent_type="study",
+            parent_id=1,
+            title="Q-set size",
+            body="",
+            position=10,
+            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 1, tzinfo=timezone.utc),
+            created_by=7,
+            last_edited_by=7,
+            comments=[comment],
+        )
+        memo = MemoRead(parent_type="study", parent_id=1, entries=[entry])
+        result = ExportService.render_memo_discussion_md(memo, {7: "alice@example.com"})
+
+        assert "[resolved]" in result
+        assert "- alice@example.com · 2026-04-15 10:00 [resolved]: Agreed, closing." in result
+
+    def test_deleted_comment_shows_placeholder(self) -> None:
+        """A deleted comment renders as '[deleted comment]' regardless of its body."""
+        from datetime import datetime, timezone
+
+        from app.schemas.memos import MemoCommentRead, MemoEntryRead, MemoRead
+
+        comment = MemoCommentRead(
+            id=3,
+            entry_id=1,
+            user_id=7,
+            body="secret content",
+            mentions=[],
+            resolved=False,
+            resolved_at=None,
+            resolved_by=None,
+            deleted=True,
+            created_at=datetime(2026, 4, 10, 8, 0, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 10, 8, 5, tzinfo=timezone.utc),
+        )
+        entry = MemoEntryRead(
+            id=1,
+            parent_type="study",
+            parent_id=1,
+            title="Sampling frame",
+            body="",
+            position=10,
+            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 1, tzinfo=timezone.utc),
+            created_by=7,
+            last_edited_by=7,
+            comments=[comment],
+        )
+        memo = MemoRead(parent_type="study", parent_id=1, entries=[entry])
+        result = ExportService.render_memo_discussion_md(memo, {7: "alice@example.com"})
+
+        assert "[deleted comment]" in result
+        assert "secret content" not in result
+
+    def test_anonymized_user_id_renders_as_removed(self) -> None:
+        """A comment with user_id=None renders the author as '(removed)'."""
+        from datetime import datetime, timezone
+
+        from app.schemas.memos import MemoCommentRead, MemoEntryRead, MemoRead
+
+        comment = MemoCommentRead(
+            id=4,
+            entry_id=1,
+            user_id=None,
+            body="Anonymous remark.",
+            mentions=[],
+            resolved=False,
+            resolved_at=None,
+            resolved_by=None,
+            deleted=False,
+            created_at=datetime(2026, 4, 12, 14, 0, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 12, 14, 0, tzinfo=timezone.utc),
+        )
+        entry = MemoEntryRead(
+            id=1,
+            parent_type="study",
+            parent_id=1,
+            title="Participant selection",
+            body="",
+            position=10,
+            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 1, tzinfo=timezone.utc),
+            created_by=None,
+            last_edited_by=None,
+            comments=[comment],
+        )
+        memo = MemoRead(parent_type="study", parent_id=1, entries=[entry])
+        result = ExportService.render_memo_discussion_md(memo, {})
+
+        assert "(removed)" in result
+        assert "- (removed) · 2026-04-12 14:00: Anonymous remark." in result
+
+    def test_skips_entries_without_comments(self) -> None:
+        """Entries with no comments are omitted; only commented entries appear."""
+        from datetime import datetime, timezone
+
+        from app.schemas.memos import MemoCommentRead, MemoEntryRead, MemoRead
+
+        comment = MemoCommentRead(
+            id=5,
+            entry_id=2,
+            user_id=7,
+            body="Good point.",
+            mentions=[],
+            resolved=False,
+            resolved_at=None,
+            resolved_by=None,
+            deleted=False,
+            created_at=datetime(2026, 4, 20, 11, 0, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 20, 11, 0, tzinfo=timezone.utc),
+        )
+        entry_no_comments = MemoEntryRead(
+            id=1,
+            parent_type="study",
+            parent_id=1,
+            title="Silent entry",
+            body="No discussion here.",
+            position=10,
+            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 1, tzinfo=timezone.utc),
+            created_by=7,
+            last_edited_by=7,
+            comments=[],
+        )
+        entry_with_comment = MemoEntryRead(
+            id=2,
+            parent_type="study",
+            parent_id=1,
+            title="Active discussion",
+            body="Something to discuss.",
+            position=20,
+            created_at=datetime(2026, 1, 2, tzinfo=timezone.utc),
+            updated_at=datetime(2026, 4, 2, tzinfo=timezone.utc),
+            created_by=7,
+            last_edited_by=7,
+            comments=[comment],
+        )
+        memo = MemoRead(
+            parent_type="study", parent_id=1,
+            entries=[entry_no_comments, entry_with_comment],
+        )
+        result = ExportService.render_memo_discussion_md(memo, {7: "alice@example.com"})
+
+        assert "## Active discussion" in result
+        assert "## Silent entry" not in result
+        assert "Good point." in result
+
+
 @pytest.mark.asyncio
 class TestMemoMdIntegration:
     """Integration tests: render_memo_md + generate_research_package with real DB."""
@@ -528,3 +769,83 @@ class TestMemoMdIntegration:
 
         with zipfile.ZipFile(io.BytesIO(zip_bytes)) as z:
             assert "memo/memo.md" not in z.namelist()
+
+    async def test_export_includes_discussion_only_with_flag(
+        self,
+        db: Any,
+        seed_study: Any,
+        seed_user_id: int,
+    ) -> None:
+        """include_discussion=False → no discussion file; True → file present with content."""
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+
+        from app.models import MemoParentType, Participant, Statement, Study
+        from app.services.export_service import ExportService
+        from app.services.memo_service import MemoService
+
+        entry = await MemoService.add_entry(
+            db,
+            parent_type=MemoParentType.study,
+            parent_id=seed_study.id,
+            title="Distribution rationale",
+            body="Forced symmetry to surface compensatory positions.",
+            user_id=seed_user_id,
+        )
+        await MemoService.add_comment(
+            db,
+            entry_id=entry.id,
+            user_id=seed_user_id,
+            body="why forced symmetry?",
+            mentions=[],
+        )
+
+        memo = await MemoService.get_memo(
+            db,
+            parent_type=MemoParentType.study,
+            parent_id=seed_study.id,
+        )
+        user_emails = {seed_user_id: "alice@example.com"}
+        memo_md = ExportService.render_memo_md(memo, user_emails)
+
+        # Without flag — empty discussion string → no file
+        discussion_md_off = ""
+        # With flag — render the discussion
+        discussion_md_on = ExportService.render_memo_discussion_md(memo, user_emails)
+        assert "why forced symmetry?" in discussion_md_on
+
+        full_study = (
+            await db.execute(
+                select(Study)
+                .where(Study.id == seed_study.id)
+                .options(
+                    selectinload(Study.statements).selectinload(Statement.translations),
+                    selectinload(Study.participants).selectinload(
+                        Participant.qsort_entries
+                    ),
+                    selectinload(Study.translations),
+                )
+            )
+        ).scalar_one()
+
+        zip_off = ExportService.generate_research_package(
+            full_study,
+            full_study.participants,
+            memo_md=memo_md if memo_md else None,
+            memo_discussion_md=discussion_md_off if discussion_md_off else None,
+        )
+        zip_on = ExportService.generate_research_package(
+            full_study,
+            full_study.participants,
+            memo_md=memo_md if memo_md else None,
+            memo_discussion_md=discussion_md_on if discussion_md_on else None,
+        )
+
+        with zipfile.ZipFile(io.BytesIO(zip_off)) as z:
+            assert "memo/memo-discussion.md" not in z.namelist()
+
+        with zipfile.ZipFile(io.BytesIO(zip_on)) as z:
+            assert "memo/memo-discussion.md" in z.namelist()
+            body = z.read("memo/memo-discussion.md").decode()
+            assert "why forced symmetry?" in body
+            assert "Distribution rationale" in body

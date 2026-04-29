@@ -351,6 +351,7 @@ def _mime_to_extension(mime_type: str) -> str:
 @limiter.limit("10/minute")
 async def get_research_package(
     request: Request,
+    include_discussion: bool = False,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
@@ -387,26 +388,34 @@ async def get_research_package(
         db, parent_type=MemoParentType.study, parent_id=study.id
     )
 
+    user_ids = {e.last_edited_by for e in memo.entries if e.last_edited_by is not None}
+    # Also collect comment authors when discussion is requested
+    if include_discussion:
+        for e in memo.entries:
+            for c in e.comments:
+                if c.user_id is not None:
+                    user_ids.add(c.user_id)
+
     user_emails: dict[int, str] = {}
-    if memo.entries:
-        user_ids = {
-            e.last_edited_by for e in memo.entries if e.last_edited_by is not None
-        }
-        if user_ids:
-            rows = (
-                await db.execute(
-                    select(User.id, User.email).where(User.id.in_(user_ids))
-                )
-            ).all()
-            user_emails = {row.id: row.email for row in rows}
+    if user_ids:
+        rows = (
+            await db.execute(select(User.id, User.email).where(User.id.in_(user_ids)))
+        ).all()
+        user_emails = {row.id: row.email for row in rows}
 
     memo_md = ExportService.render_memo_md(memo, user_emails)
+    memo_discussion_md = (
+        ExportService.render_memo_discussion_md(memo, user_emails)
+        if include_discussion
+        else ""
+    )
 
     zip_content = ExportService.generate_research_package(
         full_study,
         full_study.participants,
         full_dump=full_dump,
         memo_md=memo_md if memo_md else None,
+        memo_discussion_md=memo_discussion_md if memo_discussion_md else None,
     )
 
     return StreamingResponse(

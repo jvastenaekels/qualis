@@ -320,11 +320,62 @@ class ExportService:
         return "\n".join(lines)
 
     @staticmethod
+    def render_memo_discussion_md(
+        memo: MemoRead,
+        user_emails: dict[int, str],
+    ) -> str:
+        """Render the memo's discussion threads to Markdown.
+
+        Output structure:
+            # Memo discussion — {parent_type} #{parent_id}
+
+            ## {entry title}
+
+            - {author} · {YYYY-MM-DD HH:MM}: {body}
+            - {author} · {YYYY-MM-DD HH:MM} [resolved]: {body}
+            - {author} · {YYYY-MM-DD HH:MM}: [deleted comment]
+
+        Entries with no comments are skipped. Returns "" if no entries have
+        any comments.
+
+        `user_emails` maps user_id → email; missing user_id becomes "(removed)".
+        """
+        if not memo.entries:
+            return ""
+
+        sections: list[str] = []
+        has_any_comment = False
+        sections.append(f"# Memo discussion — {memo.parent_type} #{memo.parent_id}\n")
+
+        for e in memo.entries:
+            if not e.comments:
+                continue
+            has_any_comment = True
+            sections.append(f"## {e.title}\n")
+            for c in e.comments:
+                ts = c.created_at.strftime("%Y-%m-%d %H:%M")
+                author = (
+                    user_emails.get(c.user_id, f"user #{c.user_id}")
+                    if c.user_id is not None
+                    else "(removed)"
+                )
+                tag = " [resolved]" if c.resolved else ""
+                body = "[deleted comment]" if c.deleted else c.body
+                sections.append(f"- {author} · {ts}{tag}: {body}")
+            sections.append("")
+
+        if not has_any_comment:
+            return ""
+
+        return "\n".join(sections)
+
+    @staticmethod
     def generate_research_package(
         study: Study,
         participants: list[Participant],
         full_dump: "StudyDump | None" = None,
         memo_md: str | None = None,
+        memo_discussion_md: str | None = None,
     ) -> bytes:
         """Generates a ZIP containing the complete research data package."""
         zip_buffer = io.BytesIO()
@@ -374,6 +425,10 @@ class ExportService:
             # 7. Memo (only when the study has at least one memo entry)
             if memo_md:
                 zip_file.writestr("memo/memo.md", memo_md)
+
+            # 8. Memo discussion (opt-in)
+            if memo_discussion_md:
+                zip_file.writestr("memo/memo-discussion.md", memo_discussion_md)
 
         return zip_buffer.getvalue()
 
