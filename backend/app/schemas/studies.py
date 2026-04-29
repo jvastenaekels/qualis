@@ -195,7 +195,6 @@ class StudyBase(BaseModel):
     distribution_mode: DistributionMode = DistributionMode.forced
     start_date: datetime | None = None
     end_date: datetime | None = None
-    methodology_memo: str | None = None
     data_retention_months: int | None = Field(None, ge=1, le=240)
 
 
@@ -225,7 +224,6 @@ class StudyUpdate(BaseModel):
     access_password: str | None = None
     start_date: datetime | None = None
     end_date: datetime | None = None
-    methodology_memo: str | None = None
     data_retention_months: int | None = Field(None, ge=1, le=240)
     last_updated_at: datetime | None = None
 
