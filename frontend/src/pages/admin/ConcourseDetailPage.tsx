@@ -61,6 +61,10 @@ import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ItemDetailSheet } from '@/components/admin/concourse/ItemDetailSheet';
 import { useConcourseDetailPage } from '@/hooks/admin/useConcourseDetailPage';
+import { MemoSection } from '@/components/admin/memo/MemoSection';
+import { useAuthStore } from '@/store/useAuthStore';
+import { usePermission } from '@/hooks/usePermission';
+import { useAdminContext } from '@/hooks/useAdminContext';
 
 const STATUS_COLORS: Record<string, string> = {
     proposed: 'bg-amber-100 text-amber-800 border-amber-200',
@@ -72,6 +76,13 @@ const STATUS_COLORS: Record<string, string> = {
 export default function ConcourseDetailPage() {
     const { t } = useTranslation();
     const api = useConcourseDetailPage();
+    const { user: currentUser } = useAuthStore();
+    const { role: projectRole } = usePermission();
+    const { project } = useAdminContext();
+    const projectMembers = (project?.members ?? []).map((m) => ({
+        user_id: m.user_id,
+        display_name: m.user.full_name ?? m.user.email,
+    }));
     const {
         id,
         canEdit,
@@ -299,14 +310,20 @@ export default function ConcourseDetailPage() {
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <CardContent className="p-4 sm:p-6">
-                            <p className="text-xs italic text-slate-500">
-                                {t(
-                                    'admin.memo.upgrading',
-                                    'Memo system upgraded; collaborative entries arrive in the next release.'
-                                )}
-                            </p>
-                        </CardContent>
+                        <div className="p-4 sm:p-6">
+                            {concourse && currentUser && (
+                                <MemoSection
+                                    parentType="concourse"
+                                    parentId={concourse.id}
+                                    currentUserId={currentUser.id}
+                                    isOwner={projectRole === 'owner'}
+                                    canEdit={
+                                        projectRole === 'owner' || projectRole === 'researcher'
+                                    }
+                                    members={projectMembers}
+                                />
+                            )}
+                        </div>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

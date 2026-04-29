@@ -2230,7 +2230,6 @@
             "no_projects": "Ei projekteja. Luo ensimmäinen projektisi aloittaaksesi."
         },
         "memo": {
-            "upgrading": "Muistio päivitetty; yhteistoiminnalliset merkinnät tulevat seuraavassa julkaisussa.",
             "title_concourse": "Kokoelman muistio",
             "title_study": "Metodologiamuistio",
             "summary_empty_concourse": "Valinnainen · läpinäkyvyyttä kuratointiprosessiin",

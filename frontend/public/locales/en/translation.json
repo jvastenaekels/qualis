@@ -447,7 +447,6 @@
       "no_projects": "No projects yet. Create your first project to get started."
     },
     "memo": {
-      "upgrading": "Memo system upgraded; collaborative entries arrive in the next release.",
       "title_concourse": "Construction memo",
       "title_study": "Methodology memo",
       "summary_empty_concourse": "Optional · for transparency about the curation process",

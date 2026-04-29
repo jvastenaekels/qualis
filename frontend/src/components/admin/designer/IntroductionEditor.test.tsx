@@ -45,10 +45,11 @@ describe('IntroductionEditor — Wave B progressive disclosure', () => {
         // Closed-by-default sections: their interior content should NOT be visible.
         // Consent title input ('Informed consent' value) is gated by the consent accordion
         expect(screen.queryByDisplayValue('Informed consent')).not.toBeInTheDocument();
-        // Methodology memo upgrade notice NOT visible when collapsed
-        expect(
-            screen.queryByText(/Memo system upgraded|Système de mémos/i)
-        ).not.toBeInTheDocument();
+        // Methodology memo accordion trigger exists but is closed
+        const memoTrigger = screen.getByRole('button', {
+            name: /Methodology memo|Mémo méthodologique/i,
+        });
+        expect(memoTrigger).toHaveAttribute('data-state', 'closed');
     });
 
     it('expands a collapsed section when its trigger is clicked (B1)', async () => {
@@ -61,9 +62,7 @@ describe('IntroductionEditor — Wave B progressive disclosure', () => {
         });
         await user.click(memoTrigger);
 
-        // Now the upgrade placeholder notice is visible
-        expect(
-            await screen.findByText(/Memo system upgraded|Système de mémos/i)
-        ).toBeInTheDocument();
+        // Trigger is now open (accordion expanded)
+        expect(memoTrigger).toHaveAttribute('data-state', 'open');
     });
 });

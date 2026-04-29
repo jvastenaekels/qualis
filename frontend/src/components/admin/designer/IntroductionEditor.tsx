@@ -1,4 +1,8 @@
 import { useStudyDesigner } from '@/store/useStudyDesigner';
+import { useAuthStore } from '@/store/useAuthStore';
+import { usePermission } from '@/hooks/usePermission';
+import { useAdminContext } from '@/hooks/useAdminContext';
+import { MemoSection } from '@/components/admin/memo/MemoSection';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -26,9 +30,17 @@ import {
 import { SUPPORTED_LANGUAGES, type Language } from '@/constants/languages';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: declarative shell with many accordion sections; hook calls for memo context (useAuthStore, usePermission, useAdminContext) add scope without meaningful branching
 const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { t } = useTranslation();
-    const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
+    const { draft, original, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
+    const { user: currentUser } = useAuthStore();
+    const { role: projectRole } = usePermission();
+    const { project } = useAdminContext();
+    const projectMembers = (project?.members ?? []).map((m) => ({
+        user_id: m.user_id,
+        display_name: m.user.full_name ?? m.user.email,
+    }));
 
     if (!draft) return null;
 
@@ -413,14 +425,20 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <CardContent>
-                            <p className="text-xs italic text-slate-500">
-                                {t(
-                                    'admin.memo.upgrading',
-                                    'Memo system upgraded; collaborative entries arrive in the next release.'
-                                )}
-                            </p>
-                        </CardContent>
+                        <div className="px-5 pb-5">
+                            {original && currentUser && (
+                                <MemoSection
+                                    parentType="study"
+                                    parentId={original.id}
+                                    currentUserId={currentUser.id}
+                                    isOwner={projectRole === 'owner'}
+                                    canEdit={
+                                        projectRole === 'owner' || projectRole === 'researcher'
+                                    }
+                                    members={projectMembers}
+                                />
+                            )}
+                        </div>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>
