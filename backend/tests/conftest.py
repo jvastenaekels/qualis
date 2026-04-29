@@ -386,3 +386,44 @@ async def seed_entry_id(
         user_id=seed_user_id,
     )
     return entry.id
+
+
+@pytest_asyncio.fixture
+def auth_headers_for_seed_user(test_user: User) -> dict[str, str]:
+    """Bearer token for the seed user (project owner — passes researcher+ checks)."""
+    from app.utils.security import create_access_token
+    from datetime import timedelta
+
+    token = create_access_token(
+        subject=test_user.email, expires_delta=timedelta(minutes=30)
+    )
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest_asyncio.fixture
+async def auth_headers_for_viewer(
+    db: AsyncSession, test_project: Project
+) -> dict[str, str]:
+    """Bearer token for a viewer-role member of the seed project."""
+    import uuid
+    from datetime import timedelta
+
+    from app.utils.security import create_access_token, get_password_hash
+
+    email = f"viewer_{uuid.uuid4()}@example.com"
+    viewer = User(email=email, hashed_password=get_password_hash("viewerpassword"))
+    db.add(viewer)
+    await db.flush()
+
+    member = ProjectMember(
+        project_id=test_project.id,
+        user_id=viewer.id,
+        role=ProjectRole.viewer,
+    )
+    db.add(member)
+    await db.commit()
+
+    token = create_access_token(
+        subject=email, expires_delta=timedelta(minutes=30)
+    )
+    return {"Authorization": f"Bearer {token}"}

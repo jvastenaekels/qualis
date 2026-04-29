@@ -1,7 +1,8 @@
-"""Memo entry CRUD via MemoService."""
+"""Memo entry CRUD via MemoService (+ API-level smoke/permission tests)."""
 from __future__ import annotations
 
 import pytest
+from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import MemoParentType
@@ -87,3 +88,80 @@ async def test_delete_entry_cascades_to_comments(
         parent_id=seed_concourse_id,
     )
     assert memo.entries == []
+
+
+# ---------------------------------------------------------------------------
+# API-level smoke + permission tests
+# ---------------------------------------------------------------------------
+
+
+async def test_get_concourse_memo_endpoint_returns_empty_for_fresh(
+    client: AsyncClient,
+    seed_concourse_id: int,
+    auth_headers_for_seed_user: dict[str, str],
+) -> None:
+    response = await client.get(
+        f"/api/admin/concourses/{seed_concourse_id}/memo",
+        headers=auth_headers_for_seed_user,
+    )
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["entries"] == []
+    assert payload["parent_type"] == "concourse"
+
+
+async def test_create_concourse_entry_endpoint(
+    client: AsyncClient,
+    seed_concourse_id: int,
+    auth_headers_for_seed_user: dict[str, str],
+) -> None:
+    response = await client.post(
+        f"/api/admin/concourses/{seed_concourse_id}/memo/entries",
+        json={"title": "First entry", "body": "rationale"},
+        headers=auth_headers_for_seed_user,
+    )
+    assert response.status_code == 201
+    payload = response.json()
+    assert payload["title"] == "First entry"
+    assert payload["position"] == 10
+    assert payload["comments"] == []
+
+
+async def test_viewer_cannot_create_entry(
+    client: AsyncClient,
+    seed_concourse_id: int,
+    auth_headers_for_viewer: dict[str, str],
+) -> None:
+    response = await client.post(
+        f"/api/admin/concourses/{seed_concourse_id}/memo/entries",
+        json={"title": "denied", "body": ""},
+        headers=auth_headers_for_viewer,
+    )
+    assert response.status_code == 403
+
+
+async def test_viewer_can_post_comment(
+    client: AsyncClient,
+    seed_entry_id: int,
+    auth_headers_for_viewer: dict[str, str],
+) -> None:
+    response = await client.post(
+        f"/api/admin/memo-entries/{seed_entry_id}/comments",
+        json={"body": "viewer-input", "mentions": []},
+        headers=auth_headers_for_viewer,
+    )
+    assert response.status_code == 201
+
+
+async def test_get_templates_for_concourse(
+    client: AsyncClient,
+    auth_headers_for_seed_user: dict[str, str],
+) -> None:
+    response = await client.get(
+        "/api/admin/memo/templates?parent_type=concourse",
+        headers=auth_headers_for_seed_user,
+    )
+    assert response.status_code == 200
+    titles = [t["title"] for t in response.json()]
+    assert "Sources canvassed" in titles
+    assert "Voices excluded" in titles

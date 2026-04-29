@@ -33,6 +33,7 @@ from app.routers.admin import recruitment as admin_recruitment
 from app.routers.admin import studies as admin_studies
 from app.routers.admin import users as admin_users
 from app.routers.admin import projects as admin_projects
+from app.routers.admin import memos as admin_memos
 from app.core.config import settings
 
 # Import test router (only active in test/dev environments)
@@ -180,6 +181,7 @@ app.include_router(
     prefix="/api/admin/concourses",
     tags=["admin-concourses"],
 )
+app.include_router(admin_memos.router, prefix="/api", tags=["admin-memos"])
 app.include_router(submissions.router, prefix="/api", tags=["submissions"])
 app.include_router(
     participants.router, prefix="/api/study/{slug}", tags=["participants"]
