@@ -169,11 +169,6 @@ export default function ConcourseDetailPage() {
         sheetTab,
         openSheet,
         closeSheet,
-        constructionMemo,
-        setConstructionMemo,
-        isConstructionMemoDirty,
-        saveConstructionMemo,
-        isSavingConstructionMemo,
         exportCsv,
     } = api;
 
@@ -285,11 +280,7 @@ export default function ConcourseDetailPage() {
                   first entry), collapsed-by-default once the researcher has
                   saved content (40% vertical real-estate reclaimed for the
                   actual item list). */}
-            <Accordion
-                type="multiple"
-                defaultValue={constructionMemo.trim().length === 0 ? ['memo'] : []}
-                className="space-y-2"
-            >
+            <Accordion type="multiple" defaultValue={['memo']} className="space-y-2">
                 <AccordionItem
                     value="memo"
                     className="border border-slate-200 rounded-xl overflow-hidden bg-white"
@@ -300,58 +291,21 @@ export default function ConcourseDetailPage() {
                                 {t('admin.concourse.construction_memo.title', 'Construction memo')}
                             </span>
                             <span className="text-xs font-medium text-slate-500 mt-0.5">
-                                {constructionMemo.trim().length > 0
-                                    ? t(
-                                          'admin.concourse.construction_memo.summary_filled',
-                                          '{{n}} characters · click to view or edit',
-                                          { n: constructionMemo.length }
-                                      )
-                                    : t(
-                                          'admin.concourse.construction_memo.summary_empty',
-                                          'Optional · for transparency about the curation process'
-                                      )}
+                                {t(
+                                    'admin.concourse.construction_memo.summary_empty',
+                                    'Optional · for transparency about the curation process'
+                                )}
                             </span>
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <CardContent className="p-4 sm:p-6 space-y-3">
-                            <Textarea
-                                id="construction-memo"
-                                rows={8}
-                                maxLength={10000}
-                                value={constructionMemo}
-                                onChange={(e) => setConstructionMemo(e.target.value)}
-                                placeholder={t(
-                                    'admin.concourse.construction_memo.placeholder',
-                                    'Document how this concourse was constructed: sources, voices retained or excluded, sampling rationale...'
+                        <CardContent className="p-4 sm:p-6">
+                            <p className="text-xs italic text-slate-500">
+                                {t(
+                                    'admin.memo.upgrading',
+                                    'Memo system upgraded; collaborative entries arrive in the next release.'
                                 )}
-                                disabled={!canEdit || isSavingConstructionMemo}
-                                className="rounded-xl bg-white text-sm leading-relaxed"
-                            />
-                            <div className="flex items-center justify-between">
-                                <span className="text-xs text-slate-400">
-                                    {constructionMemo.length > 9000
-                                        ? `${constructionMemo.length} / 10000`
-                                        : ''}
-                                </span>
-                                {canEdit && (
-                                    <Button
-                                        size="sm"
-                                        className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
-                                        onClick={saveConstructionMemo}
-                                        disabled={
-                                            !isConstructionMemoDirty || isSavingConstructionMemo
-                                        }
-                                    >
-                                        {isSavingConstructionMemo ? (
-                                            <Loader2 className="size-4 mr-1 animate-spin" />
-                                        ) : (
-                                            <Check className="size-4 mr-1" />
-                                        )}
-                                        {t('admin.concourse.construction_memo.save', 'Save memo')}
-                                    </Button>
-                                )}
-                            </div>
+                            </p>
                         </CardContent>
                     </AccordionContent>
                 </AccordionItem>

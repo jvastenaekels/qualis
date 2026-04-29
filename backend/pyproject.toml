@@ -299,6 +299,28 @@ disallow_untyped_defs = true
 warn_return_any = true
 strict_equality = true
 
+[[tool.mypy.overrides]]
+# Memo subsystem — service is a leaf with no JSON columns or stub leakage.
+module = ["app.services.memo_service"]
+disallow_any_explicit = true
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+# Memo router — Pydantic models in router (BaseModel stubs leak Any).
+module = ["app.routers.admin.memos"]
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+# Memo schemas — Pydantic v2 BaseModel stubs.
+module = ["app.schemas.memos"]
+disallow_untyped_defs = true
+warn_return_any = true
+strict_equality = true
+
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
 DEP003 = ["botocore"]  # Transitive dependency of boto3

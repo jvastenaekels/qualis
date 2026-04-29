@@ -675,15 +675,6 @@
                 "title": "Metodologinen konteksti",
                 "subtitle": "Valinnaisia dokumentointikenttiä. Täytä mikä on tutkimusasetelmasi kannalta merkityksellistä; jätä muut tyhjäksi."
             },
-            "construction_memo": {
-                "title": "Rakentamisen muistio",
-                "summary_empty": "Valinnainen · kuratointiprosessin läpinäkyvyyteen",
-                "summary_filled": "{{n}} merkkiä · klikkaa nähdäksesi tai muokataksesi",
-                "placeholder": "Dokumentoi, kuinka tämä lausekokoelma rakennettiin: lähteet, säilytetyt tai pois jätetyt äänet, otantaperuste…",
-                "save": "Tallenna muistio",
-                "saved": "Rakentamisen muistio tallennettu",
-                "save_error": "Rakentamisen muistion tallennus epäonnistui"
-            },
             "import_from_csv": "Tuo CSV/TSV…",
             "import_csv_hint": "CSV/TSV: sarakkeet code, language, text.",
             "import_csv_no_match": "Mikään rivi ei vastaa valittua kieltä ({{lang}}).",
@@ -1847,13 +1838,6 @@
                 }
             },
             "title": "Tutkimuksen suunnittelu",
-            "methodology_memo": {
-                "title": "Metodologinen muistio",
-                "summary": "Valinnainen · toistettavuuteen & esirekisteröintiin",
-                "help": "Valinnainen. Dokumentoi peruste tälle jakaumalle, näille ohjeille ja Q-setin koolle.",
-                "label": "Muistio (mikä tahansa kieli)",
-                "placeholder": "Dokumentoi suunnitteluvalintojesi rationaali…"
-            },
             "activate_dialog": {
                 "title": "Aktivoidaanko tämä tutkimus?",
                 "description": "Aktivointi avaa rekrytoinnin ja vapauttaa julkiset linkit. Todelliset osallistujat voivat alkaa vastata.",
@@ -2244,6 +2228,9 @@
             "collecting": "Tiedonkeruu käynnissä",
             "no_studies": "Ei tutkimuksia",
             "no_projects": "Ei projekteja. Luo ensimmäinen projektisi aloittaaksesi."
+        },
+        "memo": {
+            "upgrading": "Muistio päivitetty; yhteistoiminnalliset merkinnät tulevat seuraavassa julkaisussa."
         },
         "participants": {
             "title": "Osallistujat",

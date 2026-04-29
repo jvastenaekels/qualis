@@ -415,37 +415,13 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                         </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <CardHeader className="pb-4">
-                            <CardDescription className="text-xs font-medium text-slate-500">
-                                {t(
-                                    'admin.design.methodology_memo.help',
-                                    'Optional. Document why this distribution, these conditions of instruction, this Q-set size. Useful for replication and pre-registration (Watts & Stenner 2012; Sneegas 2020). Leave empty if not relevant.'
-                                )}
-                            </CardDescription>
-                        </CardHeader>
                         <CardContent>
-                            <Label
-                                htmlFor="methodology-memo"
-                                className="text-xs font-bold text-slate-600 mb-1.5 block"
-                            >
-                                {t('admin.design.methodology_memo.label', 'Memo (any language)')}
-                            </Label>
-                            <textarea
-                                id="methodology-memo"
-                                value={draft.methodology_memo ?? ''}
-                                onChange={(e) =>
-                                    updateDraft((d) => {
-                                        d.methodology_memo = e.target.value || null;
-                                    })
-                                }
-                                placeholder={t(
-                                    'admin.design.methodology_memo.placeholder',
-                                    'Document the rationale behind your design choices…'
+                            <p className="text-xs italic text-slate-500">
+                                {t(
+                                    'admin.memo.upgrading',
+                                    'Memo system upgraded; collaborative entries arrive in the next release.'
                                 )}
-                                rows={6}
-                                readOnly={readOnly}
-                                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 disabled:cursor-not-allowed disabled:opacity-50"
-                            />
+                            </p>
                         </CardContent>
                     </AccordionContent>
                 </AccordionItem>

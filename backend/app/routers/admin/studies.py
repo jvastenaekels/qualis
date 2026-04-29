@@ -22,6 +22,7 @@ from app.dependencies import (
 )
 from app.limiter import limiter
 from app.models import (
+    MemoParentType,
     Statement,
     Study,
     StudyRole,
@@ -257,11 +258,15 @@ async def delete_study(
             detail="Study must be ARCHIVED before it can be deleted.",
         )
 
+    from app.services.memo_service import MemoService
     from app.services.study_data_service import StudyDataService
 
     deleted_slug = study.slug
     deleted_id = study.id
     await StudyDataService.delete_audio_files_for_study(db, study.id)
+    await MemoService.cleanup_for_parent(
+        db, parent_type=MemoParentType.study, parent_id=study.id
+    )
     await db.delete(study)
     await db.commit()
     log_admin_action(

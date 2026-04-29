@@ -34,7 +34,6 @@ class Concourse(Base):
     )
     title: Mapped[str] = mapped_column(String)
     description: Mapped[str | None] = mapped_column(String, nullable=True)
-    construction_memo: Mapped[str | None] = mapped_column(String, nullable=True)
     created_by: Mapped[int | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )

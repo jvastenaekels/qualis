@@ -13,7 +13,6 @@ import type { StudyCreateDefaultLanguage } from './studyCreateDefaultLanguage';
 import type { DistributionMode } from './distributionMode';
 import type { StudyCreateStartDate } from './studyCreateStartDate';
 import type { StudyCreateEndDate } from './studyCreateEndDate';
-import type { StudyCreateMethodologyMemo } from './studyCreateMethodologyMemo';
 import type { StudyCreateDataRetentionMonths } from './studyCreateDataRetentionMonths';
 import type { StudyTranslationCreate } from './studyTranslationCreate';
 import type { StatementCreate } from './statementCreate';
@@ -40,7 +39,6 @@ export interface StudyCreate {
     distribution_mode?: DistributionMode;
     start_date?: StudyCreateStartDate;
     end_date?: StudyCreateEndDate;
-    methodology_memo?: StudyCreateMethodologyMemo;
     data_retention_months?: StudyCreateDataRetentionMonths;
     translations: StudyTranslationCreate[];
     statements?: StatementCreate[];

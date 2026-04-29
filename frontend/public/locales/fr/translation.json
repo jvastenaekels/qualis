@@ -675,15 +675,6 @@
         "title": "Contexte méthodologique",
         "subtitle": "Champs de documentation optionnels. Remplissez ce qui est pertinent pour votre design ; laissez le reste vide."
       },
-      "construction_memo": {
-        "title": "Mémo de construction",
-        "summary_empty": "Optionnel · pour la transparence du processus de curation",
-        "summary_filled": "{{n}} caractères · cliquez pour voir ou modifier",
-        "placeholder": "Documentez comment ce concours a été construit : sources, voix retenues ou écartées, rationnel de l'échantillonnage…",
-        "save": "Enregistrer le mémo",
-        "saved": "Mémo de construction enregistré",
-        "save_error": "Échec de l'enregistrement du mémo de construction"
-      },
       "import_from_csv": "Importer CSV/TSV…",
       "import_csv_hint": "CSV/TSV : colonnes code, language, text.",
       "import_csv_no_match": "Aucune ligne ne correspond à la langue sélectionnée ({{lang}}).",
@@ -1885,13 +1876,6 @@
         }
       },
       "title": "Conception de l'étude",
-      "methodology_memo": {
-        "title": "Mémo méthodologique",
-        "summary": "Optionnel · pour la réplication & la préinscription",
-        "help": "Optionnel. Documentez le rationnel de cette distribution, ces consignes, et cette taille de Q-set.",
-        "label": "Mémo (toutes langues)",
-        "placeholder": "Documentez le rationnel de vos choix de design…"
-      },
       "activate_dialog": {
         "title": "Activer cette étude ?",
         "description": "L’activation ouvre le recrutement et déverrouille les liens publics. De vrais participants peuvent commencer à répondre.",
@@ -2289,6 +2273,9 @@
       "collecting": "Collecte en cours",
       "no_studies": "Aucune étude",
       "no_projects": "Aucun projet. Créez votre premier projet pour commencer."
+    },
+    "memo": {
+      "upgrading": "Système de mémos en cours de modernisation ; les entrées collaboratives arrivent dans la prochaine version."
     },
     "participants": {
       "title": "Participants",

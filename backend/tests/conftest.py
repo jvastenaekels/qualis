@@ -327,3 +327,103 @@ async def active_study(db, seed_study):
     await db.commit()
     await db.refresh(seed_study)
     return seed_study
+
+
+@pytest_asyncio.fixture
+async def seed_user_id(test_user: User) -> int:
+    """Return the int PK of the seeded test user."""
+    return test_user.id
+
+
+@pytest_asyncio.fixture
+async def seed_other_user_id(db: AsyncSession) -> int:
+    """Return the int PK of a second distinct user (no project membership required for T4)."""
+    hashed = get_password_hash("otherpassword")
+    user = User(email="other@example.com", hashed_password=hashed)
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user.id
+
+
+@pytest_asyncio.fixture
+async def seed_concourse_id(db: AsyncSession, test_project: Project, test_user: User) -> int:
+    """Return the int PK of a concourse owned by test_project."""
+    from app.models import Concourse
+
+    concourse = Concourse(
+        project_id=test_project.id,
+        title="Seed Concourse",
+        description="For memo tests",
+        created_by=test_user.id,
+    )
+    db.add(concourse)
+    await db.commit()
+    await db.refresh(concourse)
+    return concourse.id
+
+
+@pytest_asyncio.fixture
+async def seed_project_id(test_project: Project) -> int:
+    """Return the int PK of the test project (for memo comment tests)."""
+    return test_project.id
+
+
+@pytest_asyncio.fixture
+async def seed_entry_id(
+    db: AsyncSession, seed_concourse_id: int, seed_user_id: int
+) -> int:
+    """Return the int PK of a MemoEntry linked to the seed concourse."""
+    from app.models import MemoParentType
+    from app.services.memo_service import MemoService
+
+    entry = await MemoService.add_entry(
+        db,
+        parent_type=MemoParentType.concourse,
+        parent_id=seed_concourse_id,
+        title="Seed Entry",
+        body="seed body",
+        user_id=seed_user_id,
+    )
+    return entry.id
+
+
+@pytest_asyncio.fixture
+def auth_headers_for_seed_user(test_user: User) -> dict[str, str]:
+    """Bearer token for the seed user (project owner — passes researcher+ checks)."""
+    from app.utils.security import create_access_token
+    from datetime import timedelta
+
+    token = create_access_token(
+        subject=test_user.email, expires_delta=timedelta(minutes=30)
+    )
+    return {"Authorization": f"Bearer {token}"}
+
+
+@pytest_asyncio.fixture
+async def auth_headers_for_viewer(
+    db: AsyncSession, test_project: Project
+) -> dict[str, str]:
+    """Bearer token for a viewer-role member of the seed project."""
+    import uuid
+    from datetime import timedelta
+
+    from app.utils.security import create_access_token, get_password_hash
+
+    email = f"viewer_{uuid.uuid4()}@example.com"
+    viewer = User(email=email, hashed_password=get_password_hash("viewerpassword"))
+    db.add(viewer)
+    await db.flush()
+
+    member = ProjectMember(
+        project_id=test_project.id,
+        user_id=viewer.id,
+        role=ProjectRole.viewer,
+    )
+    db.add(member)
+    await db.commit()
+
+    token = create_access_token(
+        subject=email, expires_delta=timedelta(minutes=30)
+    )
+    return {"Authorization": f"Bearer {token}"}

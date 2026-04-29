@@ -145,54 +145,6 @@ class TestConcourseCRUD:
         # description should remain unchanged
         assert updated.description == concourse.description
 
-    async def test_create_with_construction_memo_round_trips(
-        self, db: AsyncSession, test_project: Project, test_user: User
-    ):
-        memo = (
-            "Sources: 12 semi-structured interviews with farmers in the "
-            "Hesbaye region (Oct-Nov 2025), one focus group with extension "
-            "agents, and grey literature from regional cooperatives. Voices "
-            "intentionally excluded at this stage: industrial agribusiness "
-            "lobbies (separate study planned). Sampling rationale: maximum "
-            "variation across farm size and tenure status."
-        )
-        data = ConcourseCreate(
-            title="Hesbaye agroecology",
-            description="Pilot concourse",
-            construction_memo=memo,
-        )
-        created = await ConcourseService.create_concourse(
-            db, test_project.id, data, test_user.id
-        )
-        assert created.construction_memo == memo
-        # Round-trip via GET
-        fetched = await ConcourseService.get_concourse(db, created.id)
-        assert fetched.construction_memo == memo
-
-    async def test_update_construction_memo_only(
-        self, db: AsyncSession, test_project: Project, concourse: Concourse
-    ):
-        # Original concourse has no memo
-        assert concourse.construction_memo is None
-        memo = "Initial draft of the construction rationale."
-        updated = await ConcourseService.update_concourse(
-            db,
-            test_project.id,
-            concourse.id,
-            ConcourseUpdate(construction_memo=memo),
-        )
-        assert updated.construction_memo == memo
-        # Title and description must be untouched
-        assert updated.title == concourse.title
-        assert updated.description == concourse.description
-
-    async def test_construction_memo_max_length_boundary(self):
-        # 10 000 chars is allowed
-        ConcourseCreate(title="t", construction_memo="x" * 10000)
-        # 10 001 chars must raise
-        with pytest.raises(ValueError):
-            ConcourseCreate(title="t", construction_memo="x" * 10001)
-
     async def test_update_concourse_wrong_project(
         self, db: AsyncSession, concourse: Concourse
     ):
@@ -1082,3 +1034,43 @@ class TestStalenessAndSync:
             await ConcourseService.sync_statement_from_concourse(
                 db, study, statement.id
             )
+
+
+# ---------------------------------------------------------------------------
+# Memo cleanup on delete
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_deleting_concourse_cleans_up_memo(
+    db: AsyncSession, seed_concourse_id: int, seed_user_id: int
+) -> None:
+    """Deleting a concourse cascades to memo_entries (no DB-level FK)."""
+    from sqlalchemy import func, select
+
+    from app.models import MemoEntry, MemoParentType
+    from app.services.memo_service import MemoService
+
+    # Seed a memo entry for the concourse
+    await MemoService.add_entry(
+        db,
+        parent_type=MemoParentType.concourse,
+        parent_id=seed_concourse_id,
+        title="Notes",
+        body="cleaned up",
+        user_id=seed_user_id,
+    )
+
+    # Delete the concourse via the service
+    await ConcourseService.delete_concourse(db, concourse_id=seed_concourse_id)
+
+    # Verify no orphan memo_entries remain
+    count = (
+        await db.execute(
+            select(func.count(MemoEntry.id)).where(
+                MemoEntry.parent_type == MemoParentType.concourse,
+                MemoEntry.parent_id == seed_concourse_id,
+            )
+        )
+    ).scalar()
+    assert count == 0

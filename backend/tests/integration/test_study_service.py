@@ -169,34 +169,6 @@ async def test_update_study_partial_preserves_untouched_fields(
 
 
 @pytest.mark.asyncio
-async def test_update_study_methodology_memo_round_trip(
-    db: AsyncSession, seed_study: Study
-):
-    """methodology_memo: a free-text optional field round-trips through PATCH.
-
-    Mirrors the per-concourse construction_memo pattern. Surfaces the
-    rationale behind distribution / conditions of instruction / Q-set size
-    for replication and pre-registration documentation.
-    """
-    assert seed_study.methodology_memo is None
-
-    memo = (
-        "Forced distribution chosen per Watts & Stenner 2012; "
-        "Q-set size 36 per Sneegas 2020 sampling rationale."
-    )
-    updated = await StudyService.update_study(
-        db, seed_study, StudyUpdate(methodology_memo=memo)
-    )
-    assert updated.methodology_memo == memo
-
-    cleared = await StudyService.update_study(
-        db, seed_study, StudyUpdate(methodology_memo=None)
-    )
-    # Update with explicit None must clear the memo (not leave it stale).
-    assert cleared.methodology_memo is None
-
-
-@pytest.mark.asyncio
 async def test_update_study_data_retention_months_round_trip(
     db: AsyncSession, seed_study: Study
 ):
@@ -556,3 +528,49 @@ async def test_validate_for_activation_multiple_errors_accumulate():
 
     errors = StudyService.validate_for_activation(study)
     assert len(errors) >= 2
+
+
+# ---------------------------------------------------------------------------
+# Memo cleanup on delete
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_deleting_study_cleans_up_memo(
+    db: AsyncSession, seed_study: Study, seed_user_id: int
+) -> None:
+    """Deleting a study cascades to memo_entries (no DB-level FK)."""
+    from sqlalchemy import func, select
+
+    from app.models import MemoEntry, MemoParentType
+    from app.services.memo_service import MemoService
+
+    study_id = seed_study.id
+
+    # Seed a memo entry for the study
+    await MemoService.add_entry(
+        db,
+        parent_type=MemoParentType.study,
+        parent_id=study_id,
+        title="Research notes",
+        body="should be removed",
+        user_id=seed_user_id,
+    )
+
+    # Simulate the router-level delete path: cleanup then delete, single tx
+    await MemoService.cleanup_for_parent(
+        db, parent_type=MemoParentType.study, parent_id=study_id
+    )
+    await db.delete(seed_study)
+    await db.commit()
+
+    # Verify no orphan memo_entries remain
+    count = (
+        await db.execute(
+            select(func.count(MemoEntry.id)).where(
+                MemoEntry.parent_type == MemoParentType.study,
+                MemoEntry.parent_id == study_id,
+            )
+        )
+    ).scalar()
+    assert count == 0
