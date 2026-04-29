@@ -114,6 +114,7 @@ import { QuestionDistributionCharts } from './charts/QuestionDistributionCharts'
 import { SubmissionsTimelineChart } from './charts/SubmissionsTimelineChart';
 import { DeviceBreakdownChart } from './charts/DeviceBreakdownChart';
 import { EmptyState } from '@/components/ui/empty-state';
+import { ExportPackageDialog } from './ExportPackageDialog';
 
 interface InteractiveDataViewProps {
     slug: string;
@@ -223,6 +224,7 @@ export default function InteractiveDataView({
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
     const [stepFilter, setStepFilter] = useState<StepFilter>('all');
     const [isExportLoading, setIsExportLoading] = useState(false);
+    const [packageDialogOpen, setPackageDialogOpen] = useState(false);
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: PAGE_SIZE });
     const [clearAllDialogOpen, setClearAllDialogOpen] = useState(false);
 
@@ -1579,13 +1581,10 @@ export default function InteractiveDataView({
                             >
                                 <DropdownMenuItem
                                     disabled={isExportLoading}
-                                    onClick={() =>
-                                        runExport(async () => {
-                                            const blob =
-                                                await AdminService.exportResearchPackage(slug);
-                                            downloadBlob(blob, `${slug}_research_package.zip`);
-                                        })
-                                    }
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setPackageDialogOpen(true);
+                                    }}
                                     className="font-bold cursor-pointer text-indigo-600 bg-indigo-50/50 gap-2"
                                 >
                                     <Package className="h-4 w-4" />
@@ -1679,6 +1678,20 @@ export default function InteractiveDataView({
                         )}
                     </div>
                 </div>
+
+                <ExportPackageDialog
+                    open={packageDialogOpen}
+                    onOpenChange={setPackageDialogOpen}
+                    isExportLoading={isExportLoading}
+                    onDownload={(includeDiscussion) =>
+                        runExport(async () => {
+                            const blob = await AdminService.exportResearchPackage(slug, {
+                                includeDiscussion,
+                            });
+                            downloadBlob(blob, `${slug}_research_package.zip`);
+                        })
+                    }
+                />
 
                 <AlertDialog open={clearAllDialogOpen} onOpenChange={setClearAllDialogOpen}>
                     <AlertDialogContent className="border-none shadow-2xl">

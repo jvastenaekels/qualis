@@ -41,6 +41,7 @@ import type {
     DeleteAudioRecordingApiAudioRecordingIdDeleteParams,
     DraftSaveInput,
     GetAudioUrlApiAudioRecordingIdUrlGetParams,
+    GetResearchPackageApiAdminStudiesSlugExportPackageGetParams,
     GetStudyApiStudySlugGetParams,
     GetTemplatesApiAdminMemoTemplatesGetParams,
     HTTPValidationError,
@@ -6515,17 +6516,22 @@ export function useExportParticipantAudioApiAdminStudiesSlugParticipantsParticip
  */
 export const getResearchPackageApiAdminStudiesSlugExportPackageGet = (
     slug: string,
+    params?: GetResearchPackageApiAdminStudiesSlugExportPackageGetParams,
     signal?: AbortSignal
 ) => {
     return customInstance<unknown>({
         url: `/api/admin/studies/${slug}/export/package`,
         method: 'GET',
+        params,
         signal,
     });
 };
 
-export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryKey = (slug?: string) => {
-    return [`/api/admin/studies/${slug}/export/package`] as const;
+export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryKey = (
+    slug?: string,
+    params?: GetResearchPackageApiAdminStudiesSlugExportPackageGetParams
+) => {
+    return [`/api/admin/studies/${slug}/export/package`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryOptions = <
@@ -6533,6 +6539,7 @@ export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryOption
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: GetResearchPackageApiAdminStudiesSlugExportPackageGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -6547,11 +6554,11 @@ export const getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryOption
 
     const queryKey =
         queryOptions?.queryKey ??
-        getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryKey(slug);
+        getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryKey(slug, params);
 
     const queryFn: QueryFunction<
         Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>
-    > = ({ signal }) => getResearchPackageApiAdminStudiesSlugExportPackageGet(slug, signal);
+    > = ({ signal }) => getResearchPackageApiAdminStudiesSlugExportPackageGet(slug, params, signal);
 
     return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
         Awaited<ReturnType<typeof getResearchPackageApiAdminStudiesSlugExportPackageGet>>,
@@ -6570,6 +6577,7 @@ export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
     TError = HTTPValidationError,
 >(
     slug: string,
+    params: undefined | GetResearchPackageApiAdminStudiesSlugExportPackageGetParams,
     options: {
         query: Partial<
             UseQueryOptions<
@@ -6598,6 +6606,7 @@ export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: GetResearchPackageApiAdminStudiesSlugExportPackageGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -6626,6 +6635,7 @@ export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: GetResearchPackageApiAdminStudiesSlugExportPackageGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -6646,6 +6656,7 @@ export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
     TError = HTTPValidationError,
 >(
     slug: string,
+    params?: GetResearchPackageApiAdminStudiesSlugExportPackageGetParams,
     options?: {
         query?: Partial<
             UseQueryOptions<
@@ -6659,6 +6670,7 @@ export function useGetResearchPackageApiAdminStudiesSlugExportPackageGet<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
     const queryOptions = getGetResearchPackageApiAdminStudiesSlugExportPackageGetQueryOptions(
         slug,
+        params,
         options
     );
 

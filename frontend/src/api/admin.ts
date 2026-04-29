@@ -184,12 +184,19 @@ export const AdminService = {
     /**
      * Export complete research package (ZIP)
      */
-    exportResearchPackage: async (slug: string, signal?: AbortSignal) => {
-        const response = await fetch(`/api/admin/studies/${slug}/export/package`, {
+    exportResearchPackage: async (
+        slug: string,
+        options: { includeDiscussion?: boolean; signal?: AbortSignal } = {}
+    ) => {
+        const params = new URLSearchParams();
+        if (options.includeDiscussion) params.set('include_discussion', 'true');
+        const qs = params.toString();
+        const url = `/api/admin/studies/${slug}/export/package${qs ? `?${qs}` : ''}`;
+        const response = await fetch(url, {
             headers: {
                 Authorization: `Bearer ${useAuthStore.getState().token}`,
             },
-            signal,
+            signal: options.signal,
         });
         if (!response.ok) throw new Error('Failed to export research package');
         return response.blob();

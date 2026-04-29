@@ -2613,6 +2613,16 @@
               "title": "Slug"
             },
             "description": "The slug of the study"
+          },
+          {
+            "name": "include_discussion",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Include Discussion"
+            }
           }
         ],
         "responses": {

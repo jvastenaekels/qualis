@@ -114,6 +114,7 @@ export * from './draftSaveInputDraftResponses';
 export * from './eigenvalueResult';
 export * from './factorCharacteristic';
 export * from './getAudioUrlApiAudioRecordingIdUrlGetParams';
+export * from './getResearchPackageApiAdminStudiesSlugExportPackageGetParams';
 export * from './getStudyApiStudySlugGetParams';
 export * from './getTemplatesApiAdminMemoTemplatesGetParams';
 export * from './getTemplatesApiAdminMemoTemplatesGetParentType';

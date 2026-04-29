@@ -1219,6 +1219,12 @@
                 "rkit": "R-Kit (ZIP)",
                 "package": "Tutkimuspaketti (ZIP)",
                 "json": "JSON-vedos"
+            },
+            "download": "Lataa",
+            "package_dialog": {
+                "title": "Lataa tutkimuspaketti",
+                "description": "Kokoaa kaikki tutkimustiedot yhdeksi ZIP-tiedostoksi OSF:ää / esirekisteröintiä varten.",
+                "discussion_hint": "Lisää memo/memo-discussion.md kaikilla kommenttiketjuilla (allekirjoitettuina ja päivättyinä). Oletuksena pois päältä — pidä vientisi siistinä, ellei sinulla ole tarvetta harkintajäljelle."
             }
         },
         "import": {
