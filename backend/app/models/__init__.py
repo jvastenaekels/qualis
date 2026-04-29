@@ -24,6 +24,7 @@ from .base import ForeignKey as ForeignKey
 from .base import Integer as Integer
 from .base import JSON as JSON
 from .base import Mapped as Mapped
+from .base import MemoParentType as MemoParentType
 from .base import ParticipantStatus as ParticipantStatus
 from .base import ProjectRole as ProjectRole
 from .base import RecruitmentLinkType as RecruitmentLinkType
@@ -67,6 +68,8 @@ from .concourse import ConcourseItemTranslation as ConcourseItemTranslation
 from .concourse import ConcourseItemVersion as ConcourseItemVersion
 from .concourse import ConcourseTag as ConcourseTag
 from .analysis import AnalysisRun as AnalysisRun
+from .memo import MemoComment as MemoComment
+from .memo import MemoEntry as MemoEntry
 
 # Computed column properties (defined after all models to avoid circular references)
 # Study.participant_count references Participant, so it must be set here after

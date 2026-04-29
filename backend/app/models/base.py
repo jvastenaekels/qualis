@@ -74,6 +74,13 @@ class StudyRole(str, Enum):
     viewer = "viewer"
 
 
+class MemoParentType(str, Enum):
+    """Discriminator for the polymorphic memo subsystem."""
+
+    concourse = "concourse"
+    study = "study"
+
+
 class RecruitmentLinkType(str, Enum):
     """Enum for types of recruitment links."""
 
@@ -118,5 +125,6 @@ __all__ = [
     "ParticipantStatus",
     "ProjectRole",
     "StudyRole",
+    "MemoParentType",
     "RecruitmentLinkType",
 ]
