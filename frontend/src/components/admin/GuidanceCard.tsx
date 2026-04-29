@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Lightbulb, Info, AlertTriangle, ChevronDown } from 'lucide-react';
 import * as Collapsible from '@radix-ui/react-collapsible';
 import { cn } from '@/lib/utils';
@@ -11,7 +11,40 @@ interface GuidanceCardProps {
     type?: 'info' | 'tip' | 'warning';
     collapsible?: boolean;
     defaultOpen?: boolean;
+    /**
+     * Wave E (E10): when set, the open/closed state is persisted in
+     * localStorage under `qualis.guidance.{persistKey}`. After the user
+     * dismisses the card once, it stays collapsed across sessions —
+     * eliminates the per-visit friction the audit flagged on
+     * always-open help blocks (REPORT.md finding H6).
+     *
+     * Only applies when `collapsible` is true. The first-ever render
+     * uses `defaultOpen`; subsequent renders read from storage.
+     */
+    persistKey?: string;
     className?: string;
+}
+
+const STORAGE_PREFIX = 'qualis.guidance.';
+
+function readPersisted(persistKey: string | undefined, fallback: boolean): boolean {
+    if (!persistKey || typeof window === 'undefined') return fallback;
+    try {
+        const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${persistKey}`);
+        if (raw === null) return fallback;
+        return raw === '1';
+    } catch {
+        return fallback;
+    }
+}
+
+function writePersisted(persistKey: string | undefined, open: boolean): void {
+    if (!persistKey || typeof window === 'undefined') return;
+    try {
+        window.localStorage.setItem(`${STORAGE_PREFIX}${persistKey}`, open ? '1' : '0');
+    } catch {
+        // Quota exceeded or storage disabled — fail silently.
+    }
 }
 
 export const GuidanceCard: React.FC<GuidanceCardProps> = ({
@@ -21,9 +54,14 @@ export const GuidanceCard: React.FC<GuidanceCardProps> = ({
     type = 'tip',
     collapsible = false,
     defaultOpen = true,
+    persistKey,
     className,
 }) => {
-    const [open, setOpen] = useState(defaultOpen);
+    const [open, setOpen] = useState(() => readPersisted(persistKey, defaultOpen));
+
+    useEffect(() => {
+        writePersisted(persistKey, open);
+    }, [persistKey, open]);
 
     const icons = {
         info: <Info className="size-4 text-blue-500" />,

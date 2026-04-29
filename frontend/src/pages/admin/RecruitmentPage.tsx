@@ -109,11 +109,15 @@ const RecruitmentPage = () => {
                 icon={Link2}
             />
 
-            {/* Guidance Card */}
+            {/* Guidance Card — Wave E (E10): persistent dismissal across
+                sessions. First-time visitors see it open; once dismissed it
+                stays collapsed so returning admins aren't re-greeted by help
+                they have already read (audit REPORT.md finding H6). */}
             <GuidanceCard
                 type="info"
                 collapsible
                 defaultOpen
+                persistKey="recruitment.guidance"
                 title={t('admin.recruitment.guidance_title', 'How participant access works')}
             >
                 <p className="text-sm font-medium opacity-80 leading-relaxed max-w-2xl">

@@ -26,7 +26,8 @@ test.describe('Project Management E2E Tests (Real Backend)', () => {
         const slugInput = page.locator('input[name="slug"]');
         await slugInput.fill(newSlug);
 
-        await page.getByRole('button', { name: /save changes/i }).click();
+        // Wave E (E1) — save-button label standardised from "Save changes" → "Save"
+        await page.getByRole('button', { name: /^save$/i }).click();
         await expect(page.getByText(/project updated/i)).toBeVisible();
         await expect(page).toHaveURL(/\/updated-.*\/settings/);
 

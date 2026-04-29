@@ -227,7 +227,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         isFocusMode && params.studySlug
             ? [
                   {
-                      title: t('admin.sidebar.dashboard'),
+                      // Wave E (E4): study-scope sidebar item is "Overview" /
+                      // "Vue d'ensemble" — distinct from the project-scope
+                      // "Dashboard" above. Both used the same label before;
+                      // breadcrumbs already say "Vue d'ensemble" so the page
+                      // and sidebar now agree (audit REPORT.md finding C4).
+                      title: t('admin.sidebar.overview', 'Overview'),
                       url: `/app/${projectSlug}/studies/${params.studySlug}`,
                       icon: LayoutDashboard,
                       show: true,

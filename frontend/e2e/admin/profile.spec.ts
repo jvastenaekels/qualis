@@ -24,7 +24,8 @@ test.describe('Admin Profile Management', () => {
         // Update name and verify persistence
         const newName = `Admin User ${Date.now()}`;
         await page.getByLabel('Full Name').fill(newName);
-        await page.getByRole('button', { name: 'Save Changes' }).click();
+        // Wave E (E1) — save-button label standardised from "Save Changes" → "Save"
+        await page.getByRole('button', { name: 'Save', exact: true }).click();
         await page.waitForLoadState('domcontentloaded');
         await expect(page.getByLabel('Full Name')).toHaveValue(newName);
 
