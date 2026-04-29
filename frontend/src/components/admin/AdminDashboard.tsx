@@ -255,7 +255,13 @@ export function AdminDashboard() {
                     </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                    <Button onClick={() => setShowImportDialog(true)} variant="outline" size="sm">
+                    {/* Wave E (E8): "Import" demoted from outline to ghost so
+                        the visual hierarchy reflects relative frequency —
+                        most projects create studies; importing from a JSON
+                        config is the rarer, power-user path. The primary
+                        "Create study" stays a filled blue CTA (audit
+                        REPORT.md finding H4). */}
+                    <Button onClick={() => setShowImportDialog(true)} variant="ghost" size="sm">
                         <Upload className="mr-2 h-3.5 w-3.5" />
                         {t('admin.dashboard.import_study', 'Import')}
                     </Button>
