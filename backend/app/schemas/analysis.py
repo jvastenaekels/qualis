@@ -263,9 +263,7 @@ class EigenvalueResult(BaseModel):
     """
 
     eigenvalues: list[float]
-    kaiser_n: int = Field(
-        description="Kaiser criterion: number of eigenvalues > 1."
-    )
+    kaiser_n: int = Field(description="Kaiser criterion: number of eigenvalues > 1.")
     parallel_analysis_n: int = Field(
         description="Horn (1965) parallel analysis: count of observed eigenvalues "
         "exceeding the 95th percentile of random-data eigenvalues.",

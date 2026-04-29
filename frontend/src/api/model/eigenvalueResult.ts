@@ -6,10 +6,20 @@
  */
 
 /**
- * Eigenvalues for scree plot (pre-analysis).
+ * Eigenvalues for the scree plot plus three retention indicators.
+
+All three indicators are advisory — Watts & Stenner (2012) emphasise
+that factor retention in Q-methodology also depends on interpretability
+and stability, not just statistical thresholds.
  */
 export interface EigenvalueResult {
     eigenvalues: number[];
-    /** Suggested number of factors (Kaiser criterion: eigenvalue > 1) */
+    /** Kaiser criterion: number of eigenvalues > 1. */
+    kaiser_n: number;
+    /** Horn (1965) parallel analysis: count of observed eigenvalues exceeding the 95th percentile of random-data eigenvalues. */
+    parallel_analysis_n: number;
+    /** Velicer (1976) Minimum Average Partial. */
+    velicer_map_n: number;
+    /** Backward-compatible alias for kaiser_n. Frontends should prefer the three explicit fields. */
     suggested_n_factors: number;
 }

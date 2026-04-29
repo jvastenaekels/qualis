@@ -457,9 +457,7 @@ async def preview_range(
             detail=f"Preview range computation failed: {e}",
         )
 
-    return PreviewRangeResponse(
-        rows=[PreviewRangeRow(**r) for r in rows]
-    )
+    return PreviewRangeResponse(rows=[PreviewRangeRow(**r) for r in rows])
 
 
 # ---- AnalysisRun history endpoints (audit trail) ----

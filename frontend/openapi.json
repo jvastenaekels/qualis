@@ -1679,6 +1679,67 @@
         }
       }
     },
+    "/api/admin/studies/{slug}/analysis/preview-range": {
+      "post": {
+        "tags": [
+          "admin-analysis",
+          "Admin Analysis"
+        ],
+        "summary": "Preview Range",
+        "description": "Compute summaries for a range of n_factors values without persisting.\n\nGated to PCA + varimax (or no rotation): centroid extraction (Brown 1980)\nand judgmental rotation are path-dependent, so previewing them would\nsilently mislead. Bootstrap is excluded \u2014 it is not a retention criterion\nand would dominate the cost budget.",
+        "operationId": "preview_range_api_admin_studies__slug__analysis_preview_range_post",
+        "security": [
+          {
+            "OAuth2PasswordBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The slug of the study",
+              "title": "Slug"
+            },
+            "description": "The slug of the study"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewRangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreviewRangeResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies/{slug}/analysis/runs": {
       "get": {
         "tags": [
@@ -8038,19 +8099,37 @@
             "type": "array",
             "title": "Eigenvalues"
           },
+          "kaiser_n": {
+            "type": "integer",
+            "title": "Kaiser N",
+            "description": "Kaiser criterion: number of eigenvalues > 1."
+          },
+          "parallel_analysis_n": {
+            "type": "integer",
+            "title": "Parallel Analysis N",
+            "description": "Horn (1965) parallel analysis: count of observed eigenvalues exceeding the 95th percentile of random-data eigenvalues."
+          },
+          "velicer_map_n": {
+            "type": "integer",
+            "title": "Velicer Map N",
+            "description": "Velicer (1976) Minimum Average Partial."
+          },
           "suggested_n_factors": {
             "type": "integer",
             "title": "Suggested N Factors",
-            "description": "Suggested number of factors (Kaiser criterion: eigenvalue > 1)"
+            "description": "Backward-compatible alias for kaiser_n. Frontends should prefer the three explicit fields."
           }
         },
         "type": "object",
         "required": [
           "eigenvalues",
+          "kaiser_n",
+          "parallel_analysis_n",
+          "velicer_map_n",
           "suggested_n_factors"
         ],
         "title": "EigenvalueResult",
-        "description": "Eigenvalues for scree plot (pre-analysis)."
+        "description": "Eigenvalues for the scree plot plus three retention indicators.\n\nAll three indicators are advisory \u2014 Watts & Stenner (2012) emphasise\nthat factor retention in Q-methodology also depends on interpretability\nand stability, not just statistical thresholds."
       },
       "FactorCharacteristic": {
         "properties": {
@@ -9371,6 +9450,106 @@
         ],
         "title": "PasswordConfirm",
         "description": "Schema for confirming identity with current password."
+      },
+      "PreviewRangeRequest": {
+        "properties": {
+          "n_factors_range": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 8,
+            "minItems": 1,
+            "title": "N Factors Range",
+            "description": "Candidate k values, e.g. [2, 3, 4, 5, 6]."
+          },
+          "extraction": {
+            "type": "string",
+            "title": "Extraction",
+            "default": "pca"
+          },
+          "rotation": {
+            "type": "string",
+            "title": "Rotation",
+            "default": "varimax"
+          },
+          "flagging": {
+            "type": "string",
+            "title": "Flagging",
+            "default": "auto"
+          }
+        },
+        "type": "object",
+        "required": [
+          "n_factors_range"
+        ],
+        "title": "PreviewRangeRequest",
+        "description": "Request body for POST /analysis/preview-range."
+      },
+      "PreviewRangeResponse": {
+        "properties": {
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/PreviewRangeRow"
+            },
+            "type": "array",
+            "title": "Rows"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rows"
+        ],
+        "title": "PreviewRangeResponse"
+      },
+      "PreviewRangeRow": {
+        "properties": {
+          "n_factors": {
+            "type": "integer",
+            "title": "N Factors"
+          },
+          "cumulative_variance": {
+            "type": "number",
+            "title": "Cumulative Variance"
+          },
+          "pct_flagged": {
+            "type": "number",
+            "title": "Pct Flagged"
+          },
+          "n_distinguishing": {
+            "type": "integer",
+            "title": "N Distinguishing"
+          },
+          "n_cross_loaders": {
+            "type": "integer",
+            "title": "N Cross Loaders"
+          },
+          "n_consensus": {
+            "type": "integer",
+            "title": "N Consensus"
+          },
+          "min_defining_sorts": {
+            "type": "integer",
+            "title": "Min Defining Sorts"
+          },
+          "has_empty_factor": {
+            "type": "boolean",
+            "title": "Has Empty Factor"
+          }
+        },
+        "type": "object",
+        "required": [
+          "n_factors",
+          "cumulative_variance",
+          "pct_flagged",
+          "n_distinguishing",
+          "n_cross_loaders",
+          "n_consensus",
+          "min_defining_sorts",
+          "has_empty_factor"
+        ],
+        "title": "PreviewRangeRow",
+        "description": "One PreviewSummary row, mirrors the service TypedDict."
       },
       "ProcessStep": {
         "properties": {

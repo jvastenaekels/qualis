@@ -68,6 +68,7 @@ import type {
     PasswordChange,
     PasswordConfirm,
     PreviewAnonymiseCandidatesApiAdminStudiesSlugAnonymisePreviewGetParams,
+    PreviewRangeRequest,
     ProgressUpdate,
     ProjectCreate,
     ProjectInvitationCreate,
@@ -135,6 +136,7 @@ import type {
     ParticipantDetailRead,
     ParticipantExportResponse,
     ParticipantRead,
+    PreviewRangeResponse,
     ProjectMemberRead,
     ProjectRead,
     ProjectWithRole,
@@ -3715,6 +3717,100 @@ export const useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost = <
 > => {
     const mutationOptions =
         getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Compute summaries for a range of n_factors values without persisting.
+
+Gated to PCA + varimax (or no rotation): centroid extraction (Brown 1980)
+and judgmental rotation are path-dependent, so previewing them would
+silently mislead. Bootstrap is excluded — it is not a retention criterion
+and would dominate the cost budget.
+ * @summary Preview Range
+ */
+export const previewRangeApiAdminStudiesSlugAnalysisPreviewRangePost = (
+    slug: string,
+    previewRangeRequest: PreviewRangeRequest,
+    signal?: AbortSignal
+) => {
+    return customInstance<PreviewRangeResponse>({
+        url: `/api/admin/studies/${slug}/analysis/preview-range`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: previewRangeRequest,
+        signal,
+    });
+};
+
+export const getPreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof previewRangeApiAdminStudiesSlugAnalysisPreviewRangePost>>,
+        TError,
+        { slug: string; data: PreviewRangeRequest },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof previewRangeApiAdminStudiesSlugAnalysisPreviewRangePost>>,
+    TError,
+    { slug: string; data: PreviewRangeRequest },
+    TContext
+> => {
+    const mutationKey = ['previewRangeApiAdminStudiesSlugAnalysisPreviewRangePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof previewRangeApiAdminStudiesSlugAnalysisPreviewRangePost>>,
+        { slug: string; data: PreviewRangeRequest }
+    > = (props) => {
+        const { slug, data } = props ?? {};
+
+        return previewRangeApiAdminStudiesSlugAnalysisPreviewRangePost(slug, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type PreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof previewRangeApiAdminStudiesSlugAnalysisPreviewRangePost>>
+>;
+export type PreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePostMutationBody =
+    PreviewRangeRequest;
+export type PreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Preview Range
+ */
+export const usePreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof previewRangeApiAdminStudiesSlugAnalysisPreviewRangePost>>,
+            TError,
+            { slug: string; data: PreviewRangeRequest },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof previewRangeApiAdminStudiesSlugAnalysisPreviewRangePost>>,
+    TError,
+    { slug: string; data: PreviewRangeRequest },
+    TContext
+> => {
+    const mutationOptions =
+        getPreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -16027,6 +16123,9 @@ export const getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetResponseM
     eigenvalues: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
         () => faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 })
     ),
+    kaiser_n: faker.number.int({ min: undefined, max: undefined }),
+    parallel_analysis_n: faker.number.int({ min: undefined, max: undefined }),
+    velicer_map_n: faker.number.int({ min: undefined, max: undefined }),
     suggested_n_factors: faker.number.int({ min: undefined, max: undefined }),
     ...overrideResponse,
 });
@@ -16226,6 +16325,28 @@ export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostResponseMock 
         ]),
         undefined,
     ]),
+    ...overrideResponse,
+});
+
+export const getPreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePostResponseMock = (
+    overrideResponse: Partial<PreviewRangeResponse> = {}
+): PreviewRangeResponse => ({
+    rows: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            n_factors: faker.number.int({ min: undefined, max: undefined }),
+            cumulative_variance: faker.number.float({
+                min: undefined,
+                max: undefined,
+                fractionDigits: 2,
+            }),
+            pct_flagged: faker.number.float({ min: undefined, max: undefined, fractionDigits: 2 }),
+            n_distinguishing: faker.number.int({ min: undefined, max: undefined }),
+            n_cross_loaders: faker.number.int({ min: undefined, max: undefined }),
+            n_consensus: faker.number.int({ min: undefined, max: undefined }),
+            min_defining_sorts: faker.number.int({ min: undefined, max: undefined }),
+            has_empty_factor: faker.datatype.boolean(),
+        })
+    ),
     ...overrideResponse,
 });
 
@@ -18632,6 +18753,32 @@ export const getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMockHandler =
     );
 };
 
+export const getPreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePostMockHandler = (
+    overrideResponse?:
+        | PreviewRangeResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<PreviewRangeResponse> | PreviewRangeResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:slug/analysis/preview-range',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getPreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetMockHandler = (
     overrideResponse?:
         | AnalysisRunSummary[]
@@ -20539,6 +20686,7 @@ export const getQualisAPIMock = () => [
     getGetStudyStorageUsageApiAdminStudiesSlugStorageUsageGetMockHandler(),
     getGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGetMockHandler(),
     getRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPostMockHandler(),
+    getPreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePostMockHandler(),
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetMockHandler(),
     getGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGetMockHandler(),
     getUpdateAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdPatchMockHandler(),

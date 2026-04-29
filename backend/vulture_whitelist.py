@@ -338,3 +338,16 @@ create_concourse_entry
 create_study_entry
 post_comment
 delete_comment
+
+# --- analysis interpretive workspace (Phase 1: diagnostics + preview-range) ---
+# Pydantic response-model fields and TypedDict keys consumed at the JSON
+# boundary or via **dict spread — vulture cannot see those dispatch sites.
+parallel_analysis_n
+velicer_map_n
+pct_flagged
+n_distinguishing
+n_cross_loaders
+n_consensus
+min_defining_sorts
+has_empty_factor
+preview_range
