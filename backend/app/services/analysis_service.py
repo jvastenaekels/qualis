@@ -93,6 +93,25 @@ class BootstrapStabilityResult(TypedDict):
     factor_mean_se: list[float]
 
 
+class PreviewSummary(TypedDict):
+    """Per-k summary returned by compute_preview_range.
+
+    All fields are descriptive — see the Phase Explorer spec for usage.
+    `min_defining_sorts` is the minimum across factors of the count of
+    flagged participants on each factor; `has_empty_factor` is True when
+    at least one factor has zero defining sorts (over-factorisation).
+    """
+
+    n_factors: int
+    cumulative_variance: float
+    pct_flagged: float
+    n_distinguishing: int
+    n_cross_loaders: int
+    n_consensus: int
+    min_defining_sorts: int
+    has_empty_factor: bool
+
+
 class AnalysisRunResult(TypedDict):
     """Return type of run_analysis().
 
@@ -1156,3 +1175,69 @@ def compute_bootstrap_stability(
         statements=statement_stab,
         factor_mean_se=factor_mean_se,
     )
+
+
+def compute_preview_range(
+    dump: SortDataDump,
+    n_factors_range: list[int],
+    extraction: str,
+    rotation: str,
+    flagging: str,
+) -> list[PreviewSummary]:
+    """Run analysis once per k and summarise each result.
+
+    Used by POST /analysis/preview-range to populate the Phase Explorer
+    preview table. The function deliberately calls run_analysis N times
+    rather than truncating a single high-k extraction — centroid is
+    iterative on residuals (Brown 1980) and judgmental rotation is
+    path-dependent, so a single-pass shortcut would silently misrepresent
+    those configurations. Caller is responsible for gating the extraction
+    and rotation values upstream (see router validation).
+
+    Args:
+        dump: SortDataDump as returned by _get_analysis_dump.
+        n_factors_range: Sorted list of candidate k values.
+        extraction: 'pca' or 'centroid'.
+        rotation: 'varimax', 'none', or 'judgmental'.
+        flagging: 'auto' or 'manual' (manual treated as auto here — preview
+            is exploratory only; manual flagging is committed-run territory).
+
+    Returns:
+        One PreviewSummary per k, in the input order.
+    """
+    del flagging  # preview always uses auto flagging
+    dataset, _participants, _statements = build_sort_matrix(dump)
+    grid_config = dump["study"]["grid_config"]
+    rows: list[PreviewSummary] = []
+    for k in n_factors_range:
+        result = run_analysis(
+            dataset,
+            n_factors=k,
+            extraction=extraction,
+            rotation=rotation,
+            flagging="auto",
+            grid_config=grid_config,
+        )
+        flags = result["flags"]
+        n_participants = flags.shape[0]
+        any_flag = flags.any(axis=1)
+        cross = flags.sum(axis=1) >= 2
+        per_factor_flagged = flags.sum(axis=0)
+        cumulative_variance = (
+            float(result["factor_characteristics"][-1]["cumulative_variance"])
+            if result["factor_characteristics"]
+            else 0.0
+        )
+        rows.append(
+            PreviewSummary(
+                n_factors=k,
+                cumulative_variance=cumulative_variance,
+                pct_flagged=float(any_flag.sum()) / max(n_participants, 1),
+                n_distinguishing=len(result["distinguishing"]),
+                n_cross_loaders=int(cross.sum()),
+                n_consensus=len(result["consensus"]),
+                min_defining_sorts=int(per_factor_flagged.min()) if k > 0 else 0,
+                has_empty_factor=bool((per_factor_flagged == 0).any()),
+            )
+        )
+    return rows

@@ -1316,3 +1316,66 @@ def test_compute_velicer_map_n_minimum_size():
     cor = np.eye(3)
     n = compute_velicer_map_n(cor)
     assert n == 1
+
+
+# --- compute_preview_range ---
+
+
+def test_compute_preview_range_pca_varimax(sample_dump):
+    """compute_preview_range returns one PreviewSummary per k.
+
+    For PCA + varimax + auto flagging on the reference study, summaries for
+    k in [2, 3] should be coherent: cumulative_variance non-decreasing,
+    pct_flagged in [0, 1], counts non-negative.
+    """
+    from app.services.analysis_service import compute_preview_range
+
+    rows = compute_preview_range(
+        dump=sample_dump,
+        n_factors_range=[2, 3],
+        extraction="pca",
+        rotation="varimax",
+        flagging="auto",
+    )
+    assert [r["n_factors"] for r in rows] == [2, 3]
+    cv2, cv3 = rows[0]["cumulative_variance"], rows[1]["cumulative_variance"]
+    assert cv3 >= cv2  # variance is monotonic in k
+    for r in rows:
+        assert 0.0 <= r["pct_flagged"] <= 1.0
+        assert r["n_distinguishing"] >= 0
+        assert r["n_cross_loaders"] >= 0
+        assert r["n_consensus"] >= 0
+        assert r["min_defining_sorts"] >= 0
+        assert isinstance(r["has_empty_factor"], bool)
+
+
+def test_compute_preview_range_consistency_with_run_analysis(sample_dump):
+    """preview-range row for k must equal a real run_analysis run for k.
+
+    The preview is *not* a single-pass approximation — it's literally
+    N runs. This test pins that contract.
+    """
+    from app.services.analysis_service import (
+        build_sort_matrix,
+        compute_preview_range,
+        run_analysis,
+    )
+
+    rows = compute_preview_range(
+        dump=sample_dump,
+        n_factors_range=[3],
+        extraction="pca",
+        rotation="varimax",
+        flagging="auto",
+    )
+    dataset, _, _ = build_sort_matrix(sample_dump)
+    real = run_analysis(
+        dataset,
+        n_factors=3,
+        extraction="pca",
+        rotation="varimax",
+        flagging="auto",
+        grid_config=sample_dump["study"]["grid_config"],
+    )
+    assert rows[0]["n_distinguishing"] == len(real["distinguishing"])
+    assert rows[0]["n_consensus"] == len(real["consensus"])
