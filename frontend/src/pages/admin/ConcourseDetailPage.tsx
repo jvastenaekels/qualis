@@ -288,11 +288,11 @@ export default function ConcourseDetailPage() {
                     <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-100">
                         <div className="flex flex-col items-start text-left">
                             <span className="text-sm font-bold text-slate-900">
-                                {t('admin.concourse.construction_memo.title', 'Construction memo')}
+                                {t('admin.memo.title_concourse', 'Construction memo')}
                             </span>
                             <span className="text-xs font-medium text-slate-500 mt-0.5">
                                 {t(
-                                    'admin.concourse.construction_memo.summary_empty',
+                                    'admin.memo.summary_empty_concourse',
                                     'Optional · for transparency about the curation process'
                                 )}
                             </span>

@@ -402,12 +402,10 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 <BookOpen className="h-5 w-5 text-indigo-600" />
                             </div>
                             <div className="flex flex-col items-start">
-                                <span>
-                                    {t('admin.design.methodology_memo.title', 'Methodology memo')}
-                                </span>
+                                <span>{t('admin.memo.title_study', 'Methodology memo')}</span>
                                 <span className="text-xs font-medium text-slate-500 mt-0.5">
                                     {t(
-                                        'admin.design.methodology_memo.summary',
+                                        'admin.memo.summary_empty_study',
                                         'Optional · for replication & pre-registration'
                                     )}
                                 </span>
