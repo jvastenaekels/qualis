@@ -823,18 +823,6 @@ export default function AnalysisPage() {
                                                 'Highlighted values exceed the significance threshold shown above the table.'
                                             )}
                                         </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_loadings_3',
-                                                'A "flagged" participant defines that factor. Look for clean structure: each person on one factor.'
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_loadings_4',
-                                                'Participants not flagged on any factor hold a unique view not captured by the solution.'
-                                            )}
-                                        </li>
                                     </ul>
                                 </GuidanceCard>
                                 <FactorLoadingsTable
@@ -866,18 +854,6 @@ export default function AnalysisPage() {
                                             {t(
                                                 'admin.analysis.guide_arrays_2',
                                                 'Read left-to-right as most disagreed to most agreed. Extreme positions carry the strongest signal for interpretation.'
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_arrays_3',
-                                                'Amber-highlighted statements are distinguishing — placed significantly differently compared to other factors.'
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_arrays_4',
-                                                'Compare arrays across factors to see where viewpoints diverge and converge.'
                                             )}
                                         </li>
                                     </ul>
@@ -916,18 +892,6 @@ export default function AnalysisPage() {
                                                 'D = distinguishing (placed significantly differently across factors). Stars indicate significance level.'
                                             )}
                                         </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_statements_3',
-                                                "C = consensus (all factors agree on placement). These don't help differentiate viewpoints."
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_statements_4',
-                                                'D statements reveal what makes each viewpoint unique. C statements show where viewpoints converge.'
-                                            )}
-                                        </li>
                                     </ul>
                                 </GuidanceCard>
                                 <StatementsTable result={analysisResult} />
@@ -954,18 +918,6 @@ export default function AnalysisPage() {
                                             {t(
                                                 'admin.analysis.guide_summary_2',
                                                 'Composite reliability reflects how consistently the flagged sorts define each factor. Higher values mean the factor estimate is based on more agreement among its defining sorts.'
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_summary_3',
-                                                'Factor correlations show how much overlap exists between viewpoints. Higher correlations mean the factors share more common ground; lower correlations mean they are more distinct.'
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_summary_4',
-                                                'Total variance explained indicates how much of the overall variation in sorting patterns is captured by your solution.'
                                             )}
                                         </li>
                                     </ul>

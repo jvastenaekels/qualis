@@ -4,12 +4,10 @@ import type { StudyRead, ParticipantRead, StudyStatsRead } from '@/api/model';
 import RecruitmentModule from '@/components/admin/dashboard/RecruitmentModule';
 import RecentActivityCard from '@/components/admin/dashboard/RecentActivityCard';
 
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Users, CheckCircle2, Clock, AlertTriangle, LayoutDashboard } from 'lucide-react';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import StudyStatusControl from '@/components/admin/dashboard/StudyStatusControl';
-import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 import { useAdminContext } from '@/hooks/useAdminContext';
 
@@ -35,38 +33,11 @@ const StudyOverviewPage = () => {
 
     const validParticipants = participants?.filter((p) => !p.is_discarded) || [];
 
-    const getStatusLabel = (state: string) => {
-        return t(`admin.status.${state}`, state.charAt(0).toUpperCase() + state.slice(1));
-    };
-
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6 pt-2">
             <StudyPageHeader
                 title={t('admin.study_overview.title', 'Overview')}
-                description={t(
-                    'admin.study_overview.subtitle',
-                    'Real-time analytics and participant overview for this study.'
-                )}
                 icon={LayoutDashboard}
-                statusBadge={
-                    <Badge
-                        variant="outline"
-                        role="status"
-                        data-testid="study-status"
-                        className={cn(
-                            'font-semibold text-2xs px-2 py-0.5 rounded-full',
-                            study?.state === 'active'
-                                ? 'bg-emerald-50 text-emerald-700 border-emerald-100'
-                                : study?.state === 'paused'
-                                  ? 'bg-orange-50 text-orange-700 border-orange-100'
-                                  : study?.state === 'closed'
-                                    ? 'bg-slate-50 text-slate-700 border-slate-100'
-                                    : 'bg-amber-50 text-amber-700 border-amber-100'
-                        )}
-                    >
-                        {getStatusLabel(study?.state || 'draft')}
-                    </Badge>
-                }
                 actions={null}
             />
 
@@ -165,9 +136,6 @@ const StudyOverviewPage = () => {
                                         </span>
                                     )}
                             </div>
-                            <p className="text-2xs text-slate-400 font-medium">
-                                {t('admin.study_overview.time_to_complete', 'Time to complete')}
-                            </p>
                         </div>
                     </div>
 

@@ -30,7 +30,7 @@ import {
     useDisableTotpApiMe2faDisablePost,
 } from '@/api/generated';
 import { QRCodeSVG } from 'qrcode.react';
-import { Shield, ShieldCheck, ShieldAlert, Key, Copy, AlertCircle } from 'lucide-react';
+import { Shield, ShieldCheck, Key, Copy, AlertCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { cn } from '@/lib/utils';
@@ -212,12 +212,6 @@ const ProfilePage = () => {
                             <Key className="size-5 text-indigo-500" />
                             {t('admin.profile.personal.title', 'Personal information')}
                         </CardTitle>
-                        <CardDescription className="text-sm font-medium text-slate-500">
-                            {t(
-                                'admin.profile.personal.description',
-                                'Update your name and contact details.'
-                            )}
-                        </CardDescription>
                     </CardHeader>
                     <Form {...profileForm}>
                         <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
@@ -241,7 +235,7 @@ const ProfilePage = () => {
                                             <p className="text-2xs text-slate-400 italic">
                                                 {t(
                                                     'admin.profile.personal.email_locked',
-                                                    'Email cannot be changed directly. Contact admin.'
+                                                    'Contact an admin to change.'
                                                 )}
                                             </p>
                                         </FormItem>
@@ -315,33 +309,12 @@ const ProfilePage = () => {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {!user?.is_totp_enabled && !is2FASetupMode && (
-                            <div className="flex flex-col items-start gap-4 p-6 border rounded-2xl bg-slate-50 border-slate-100 shadow-inner">
-                                <div className="flex items-start gap-4">
-                                    <div className="p-2.5 bg-white rounded-xl border border-slate-200 shadow-sm mt-1">
-                                        <ShieldAlert size={24} className="text-amber-500" />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <h4 className="font-bold text-slate-900">
-                                            {t(
-                                                'admin.profile.security.status_inactive',
-                                                'Account security is low'
-                                            )}
-                                        </h4>
-                                        <p className="text-sm text-slate-500 font-medium">
-                                            {t(
-                                                'admin.profile.security.status_inactive_desc',
-                                                'Enable two-factor authentication to protect your sensitive data and studies.'
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
-                                <Button
-                                    onClick={() => setIs2FASetupMode(true)}
-                                    className="h-11 rounded-xl px-8 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
-                                >
-                                    {t('admin.profile.security.setup_cta', 'Setup 2FA now')}
-                                </Button>
-                            </div>
+                            <Button
+                                onClick={() => setIs2FASetupMode(true)}
+                                className="h-11 rounded-xl px-8 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                            >
+                                {t('admin.profile.security.setup_cta', 'Setup 2FA now')}
+                            </Button>
                         )}
 
                         {!user?.is_totp_enabled && is2FASetupMode && (
@@ -453,24 +426,6 @@ const ProfilePage = () => {
 
                         {user?.is_totp_enabled && (
                             <div className="space-y-6">
-                                <div className="p-4 border border-green-100 bg-green-50/50 rounded-xl flex items-start gap-3">
-                                    <ShieldCheck size={20} className="text-green-600 mt-1" />
-                                    <div className="space-y-1">
-                                        <h4 className="font-semibold text-green-900">
-                                            {t(
-                                                'admin.profile.security.active_msg',
-                                                '2FA is active'
-                                            )}
-                                        </h4>
-                                        <p className="text-sm text-green-700/80">
-                                            {t(
-                                                'admin.profile.security.status_active',
-                                                'Your account is secured with two-factor authentication.'
-                                            )}
-                                        </p>
-                                    </div>
-                                </div>
-
                                 {!showDisableConfirm ? (
                                     <Button
                                         variant="outline"
@@ -531,12 +486,6 @@ const ProfilePage = () => {
                             <Shield size={20} className="text-indigo-500" />
                             {t('admin.profile.password.title', 'Password management')}
                         </CardTitle>
-                        <CardDescription className="text-sm font-medium text-slate-500">
-                            {t(
-                                'admin.profile.password.description',
-                                'Update your password to keep your account secure.'
-                            )}
-                        </CardDescription>
                     </CardHeader>
                     <Form {...passwordForm}>
                         <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}>

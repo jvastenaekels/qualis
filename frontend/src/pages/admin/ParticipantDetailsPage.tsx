@@ -287,9 +287,6 @@ export default function ParticipantDetailsPage() {
                 <div className="flex items-center justify-between gap-4">
                     <StudyPageHeader
                         title={t('admin.data.detail.title', 'Participant Details')}
-                        description={`${t('admin.sidebar.study', 'Study')}: ${
-                            study?.translations?.[0]?.title || study?.slug
-                        }`}
                         icon={User}
                     />
 

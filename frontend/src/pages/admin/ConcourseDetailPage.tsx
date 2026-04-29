@@ -315,12 +315,6 @@ export default function ConcourseDetailPage() {
                     </AccordionTrigger>
                     <AccordionContent>
                         <CardContent className="p-4 sm:p-6 space-y-3">
-                            <p className="text-xs text-slate-500 leading-relaxed">
-                                {t(
-                                    'admin.concourse.construction_memo.helper',
-                                    'Optional. Document how this concourse was constructed: sources canvassed, voices retained or set aside, sampling rationale. Useful for transparency about the curation process (Sneegas 2020; Robbins & Krueger 2000). Leave blank if not applicable to your design.'
-                                )}
-                            </p>
                             <Textarea
                                 id="construction-memo"
                                 rows={8}
@@ -531,43 +525,6 @@ export default function ConcourseDetailPage() {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <div
-                                        role="group"
-                                        className="flex items-center gap-2 text-xs"
-                                        aria-label={t(
-                                            'admin.concourse.status_pills_aria',
-                                            'Accepted: {{a}}; Proposed: {{p}}; Rejected: {{r}}',
-                                            { a: acceptedCt, p: proposedCt, r: rejectedCt }
-                                        )}
-                                    >
-                                        <span
-                                            title={t('admin.concourse.status.accepted', 'Accepted')}
-                                            className={cn(
-                                                'rounded-lg border px-2 py-0.5 font-bold cursor-help',
-                                                STATUS_COLORS.accepted
-                                            )}
-                                        >
-                                            {acceptedCt}
-                                        </span>
-                                        <span
-                                            title={t('admin.concourse.status.proposed', 'Proposed')}
-                                            className={cn(
-                                                'rounded-lg border px-2 py-0.5 font-bold cursor-help',
-                                                STATUS_COLORS.proposed
-                                            )}
-                                        >
-                                            {proposedCt}
-                                        </span>
-                                        <span
-                                            title={t('admin.concourse.status.rejected', 'Rejected')}
-                                            className={cn(
-                                                'rounded-lg border px-2 py-0.5 font-bold cursor-help',
-                                                STATUS_COLORS.rejected
-                                            )}
-                                        >
-                                            {rejectedCt}
-                                        </span>
-                                    </div>
                                     <Button
                                         variant="outline"
                                         size="sm"
@@ -1223,12 +1180,6 @@ export default function ConcourseDetailPage() {
                         <DialogTitle className="text-lg font-black text-slate-900">
                             {t('admin.concourse.add_item', 'Add Item')}
                         </DialogTitle>
-                        <DialogDescription className="text-sm text-slate-500">
-                            {t(
-                                'admin.concourse.add_item_desc',
-                                'Add a new candidate statement to this concourse.'
-                            )}
-                        </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-3 py-2">
                         <div className="space-y-1">
@@ -1410,7 +1361,7 @@ export default function ConcourseDetailPage() {
                         <DialogDescription className="text-sm text-slate-500">
                             {t(
                                 'admin.concourse.delete_item_confirm',
-                                'Are you sure you want to delete this item? This cannot be undone.'
+                                'Delete this item? Cannot be undone.'
                             )}
                         </DialogDescription>
                     </DialogHeader>
@@ -1539,7 +1490,7 @@ export default function ConcourseDetailPage() {
                             <p className="text-xs text-slate-400">
                                 {t(
                                     'admin.concourse.import_csv_hint',
-                                    'CSV/TSV must have headers code, language, text. Rows in the selected language are loaded into the textarea above.'
+                                    'CSV/TSV needs columns: code, language, text.'
                                 )}
                             </p>
                             {csvErrors.length > 0 && (
@@ -1605,12 +1556,6 @@ export default function ConcourseDetailPage() {
                         <DialogTitle className="text-lg font-black text-slate-900">
                             {t('admin.concourse.manage_tags', 'Tags')}
                         </DialogTitle>
-                        <DialogDescription className="text-sm text-slate-500">
-                            {t(
-                                'admin.concourse.manage_tags_desc',
-                                'Create and manage tags to categorize concourse items by theme or dimension.'
-                            )}
-                        </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-2">
                         <div className="flex gap-2">

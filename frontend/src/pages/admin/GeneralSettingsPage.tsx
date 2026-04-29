@@ -241,12 +241,6 @@ export default function GeneralSettingsPage() {
                                     {t('admin.settings.storage.title', 'Audio Storage Usage')}
                                 </CardTitle>
                             </div>
-                            <CardDescription className="text-sm font-medium text-slate-500">
-                                {t(
-                                    'admin.settings.storage.description',
-                                    'Monitor audio recording storage for this study'
-                                )}
-                            </CardDescription>
                         </CardHeader>
 
                         <CardContent className="p-6">
@@ -289,26 +283,6 @@ export default function GeneralSettingsPage() {
                                             value={storageUsage.usage_percent}
                                             className="h-3"
                                         />
-
-                                        <div className="flex justify-between text-xs text-slate-500">
-                                            <span>
-                                                {t(
-                                                    'admin.settings.storage.files_count',
-                                                    'Files: {{count}}',
-                                                    { count: storageUsage.file_count }
-                                                )}
-                                            </span>
-                                            <span>
-                                                {t(
-                                                    'admin.settings.storage.percent_used',
-                                                    '{{percent}}% used',
-                                                    {
-                                                        percent:
-                                                            storageUsage.usage_percent.toFixed(1),
-                                                    }
-                                                )}
-                                            </span>
-                                        </div>
                                     </div>
 
                                     {storageUsage.usage_percent > 80 && (
@@ -393,12 +367,6 @@ export default function GeneralSettingsPage() {
                                 {t('admin.settings.retention.title', 'Data retention')}
                             </CardTitle>
                         </div>
-                        <CardDescription className="text-sm font-medium text-slate-500">
-                            {t(
-                                'admin.settings.retention.description',
-                                'Number of months to keep identifiable participant data before recommending anonymisation. Drives the default cutoff in Data Lifecycle. Leave empty to use the system default (12 months).'
-                            )}
-                        </CardDescription>
                     </CardHeader>
                     <CardContent className="p-6 space-y-3">
                         <Label
@@ -424,7 +392,7 @@ export default function GeneralSettingsPage() {
                         <p className="text-xs text-slate-500">
                             {t(
                                 'admin.settings.retention.help',
-                                'Researchers in the EU should align this with their RGPD retention policy. Common values: 6, 12, 24, 60.'
+                                'Common values: 6, 12, 24, 60 months. Leave empty for system default (12).'
                             )}
                         </p>
                     </CardContent>
@@ -488,11 +456,6 @@ export default function GeneralSettingsPage() {
                                     <Archive className="w-4 h-4 mr-2" />
                                     {t('admin.settings.lifecycle.archive_button')}
                                 </Button>
-                                {!isClosed && (
-                                    <p className="text-2xs text-slate-400 font-medium ml-1">
-                                        * {t('admin.settings.lifecycle.notice').split('.')[0]}.
-                                    </p>
-                                )}
                             </>
                         )}
                     </CardFooter>
@@ -554,7 +517,7 @@ export default function GeneralSettingsPage() {
                             <span className="block">
                                 {t(
                                     'admin.settings.danger.delete_dialog_intro',
-                                    'All sorts, audio recordings, and analysis runs for this study will be permanently deleted. This cannot be undone.'
+                                    'Permanently deletes sorts, audio, and analysis runs.'
                                 )}
                             </span>
                         </AlertDialogDescription>

@@ -219,7 +219,7 @@ const StudyDesignPage = () => {
                                 disabled={!api.isLaunchReady}
                                 title={t(
                                     'admin.design.toolbar.test_run_help',
-                                    'Open a participant preview. Test runs are flagged as is_test_run=true and never count toward your published data.'
+                                    "Preview as a participant. These runs aren't included in your data."
                                 )}
                                 className={cn(
                                     'gap-2 h-9 font-bold rounded-lg shadow-sm transition-all px-2 sm:px-3',
@@ -322,30 +322,6 @@ const StudyDesignPage = () => {
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
-
-                        <div className="h-6 w-px bg-slate-200 hidden md:block" />
-
-                        {/* Activate Button — opens confirmation dialog */}
-                        <Button
-                            size="sm"
-                            onClick={() => setActivateDialogOpen(true)}
-                            disabled={api.isActivating || api.isFullyReadOnly}
-                            className={cn(
-                                'transition-all h-9 font-bold rounded-lg shadow-sm px-3 sm:px-4',
-                                !api.isFullyReadOnly
-                                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200'
-                                    : 'bg-slate-100 text-slate-400'
-                            )}
-                        >
-                            {api.isActivating ? (
-                                <Loader2 className="h-4 w-4 md:mr-2 animate-spin" />
-                            ) : (
-                                <Rocket className="h-4 w-4 md:mr-2" />
-                            )}
-                            <span className="hidden md:inline">
-                                {t('admin.study_status.state.activate', 'Activate Study')}
-                            </span>
-                        </Button>
                     </div>
                 </div>
             </div>
@@ -386,20 +362,13 @@ const StudyDesignPage = () => {
                                     <Lock className="h-10 w-10" />
                                 )}
                             </div>
-                            <h3 className="text-2xl font-bold text-slate-800 tracking-normal">
+                            <h3 className="text-2xl font-bold text-slate-800 tracking-normal mb-8">
                                 {draft.state === 'active'
                                     ? t('admin.design.qsort.grid.locked_active')
                                     : draft.state === 'paused'
                                       ? t('admin.design.qsort.grid.locked_paused')
                                       : t('admin.design.qsort.grid.locked_closed')}
                             </h3>
-                            <p className="text-base font-medium text-slate-500 mt-4 mb-8 text-pretty leading-relaxed">
-                                {draft.state === 'active'
-                                    ? t('admin.design.qsort.grid.locked_active_desc')
-                                    : draft.state === 'paused'
-                                      ? t('admin.design.qsort.grid.locked_paused_desc')
-                                      : t('admin.design.qsort.grid.locked_closed_desc')}
-                            </p>
                             {draft.state === 'active' && (
                                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                                     <Button
@@ -612,9 +581,6 @@ const StudyDesignPage = () => {
                                                 'Translation Required'
                                             )}
                                         </h4>
-                                        <p className="text-sm text-rose-900/70 font-bold leading-relaxed">
-                                            {t('admin.design.translation_needed_desc')}
-                                        </p>
                                     </div>
                                 </div>
                             );
@@ -844,31 +810,25 @@ const StudyDesignPage = () => {
                                         key={lang.code}
                                         className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-100"
                                     >
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs font-black text-slate-700">
-                                                {lang.code}
-                                            </span>
-                                        </div>
+                                        <span className="text-xs font-black text-slate-700">
+                                            {lang.code}
+                                        </span>
                                         {lang.isReady ? (
-                                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md">
-                                                <CheckCircle className="h-3 w-3" />
-                                                <span className="text-2xs font-bold">
-                                                    {t(
-                                                        'admin.design.checklist.status_ready',
-                                                        'Ready'
-                                                    )}
-                                                </span>
-                                            </div>
+                                            <CheckCircle
+                                                className="h-4 w-4 text-emerald-600"
+                                                aria-label={t(
+                                                    'admin.design.checklist.status_ready',
+                                                    'Ready'
+                                                )}
+                                            />
                                         ) : (
-                                            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-md">
-                                                <CircleDashed className="h-3 w-3" />
-                                                <span className="text-2xs font-bold">
-                                                    {t(
-                                                        'admin.design.checklist.status_pending',
-                                                        'Pending'
-                                                    )}
-                                                </span>
-                                            </div>
+                                            <CircleDashed
+                                                className="h-4 w-4 text-amber-600"
+                                                aria-label={t(
+                                                    'admin.design.checklist.status_pending',
+                                                    'Pending'
+                                                )}
+                                            />
                                         )}
                                     </div>
                                 ))}
@@ -890,7 +850,7 @@ const StudyDesignPage = () => {
                         <DialogDescription className="text-sm font-medium text-slate-500 mt-2">
                             {t(
                                 'admin.design.validation.failed_desc',
-                                'Your study cannot be activated yet. Please fix the following issues:'
+                                'Fix these issues to activate:'
                             )}
                         </DialogDescription>
                     </DialogHeader>

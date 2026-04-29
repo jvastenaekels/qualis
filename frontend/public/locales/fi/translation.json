@@ -166,22 +166,17 @@
     },
     "auth": {
         "login": {
-            "title": "Järjestelmänvalvojan kirjautuminen",
             "email_label": "Sähköpostiosoite",
             "password_label": "Salasana",
             "submit": "Jatka",
             "forgot_password": "Unohditko?",
             "loading": "Tunnistaudutaan...",
-            "subtitle": "Syötä tunnistetietosi tutkimusten hallintaa varten",
             "card_title": "Kirjaudu sisään",
-            "card_description": "Suojattu pääsy tutkimuksen hallintapaneeliin",
-            "privacy": "Kirjautumalla sisään hyväksyt käyttöehdot ja tietosuojakäytäntömme.",
-            "powered_by": "Tarjoaa",
             "welcome_back": "Tervetuloa takaisin!",
             "error_401": "Virheellinen sähköposti tai salasana",
             "error_generic": "Jotain meni vikaan. Yritä uudelleen.",
             "reason_session_expired": "Istuntosi on vanhentunut. Kirjaudu sisään uudelleen.",
-            "reason_auth_required": "Kirjaudu sisään päästäksesi hallintapaneeliin."
+            "reason_auth_required": "Kirjaudu sisään jatkaaksesi."
         },
         "register": {
             "title": "Luo tili",
@@ -439,14 +434,14 @@
         "study_design": {
             "distribution_mode": {
                 "title": "Jakauman tila",
-                "helper": "Valitse, kuinka tiukasti Q-lajitteluruudukkoa noudatetaan. Pakotettu: jokainen sarake on täytettävä ilmoitettuun kapasiteettiinsa (yleisin valinta; Brown 1980; Watts & Stenner 2012). Vapaa: mikä tahansa määrä kortteja sarakkeessa, kokonaismäärä = Q-joukon koko (Brown ym. 2015 mukaan jakauman muoto vaikuttaa tuloksiin vain vähän). Joustava: kokonaismäärä pakotettu, sarakkeiden kapasiteetit ovat ohjeellisia.",
+                "helper": "Valitse, kuinka tiukasti Q-lajitteluruudukkoa noudatetaan. Pakotettu: jokainen sarake on täytettävä ilmoitettuun kapasiteettiinsa (yleisin valinta). Vapaa: mikä tahansa määrä kortteja sarakkeessa, kokonaismäärä = Q-joukon koko. Joustava: kokonaismäärä pakotettu, sarakkeiden kapasiteetit ovat ohjeellisia.",
                 "forced": {
                     "label": "Pakotettu",
-                    "tooltip": "Jokaisen sarakkeen on sisällettävä täsmälleen ilmoitettu kapasiteettinsa. Brown 1980; Watts & Stenner 2012."
+                    "tooltip": "Jokaisen sarakkeen on sisällettävä täsmälleen ilmoitettu kapasiteettinsa."
                 },
                 "free": {
                     "label": "Vapaa",
-                    "tooltip": "Korttien kokonaismäärä = Q-joukon koko; sarakekohtainen määrä on rajoittamaton. Brown ym. 2015."
+                    "tooltip": "Korttien kokonaismäärä = Q-joukon koko; sarakekohtainen määrä on rajoittamaton."
                 },
                 "flexible": {
                     "label": "Joustava",
@@ -500,9 +495,8 @@
             "description": "Hallitse henkilökohtaisia tietojasi ja turvallisuusasetuksia.",
             "personal": {
                 "title": "Henkilökohtaiset tiedot",
-                "description": "Tilisi tiedot ja yhteystiedot.",
                 "email": "Sähköpostiosoite",
-                "email_locked": "Sähköpostia ei voi muuttaa suoraan. Ota yhteys ylläpitoon.",
+                "email_locked": "Pyydä ylläpitäjää muuttamaan.",
                 "name": "Koko nimi",
                 "save": "Tallenna",
                 "saving": "Tallennetaan...",
@@ -515,15 +509,11 @@
                 "title": "Turvallisuus & 2FA",
                 "description": "Suojaa tilisi kaksivaiheisella todennuksella.",
                 "enabled": "Käytössä",
-                "status_active": "Tilisi on suojattu kaksivaiheisella todennuksella.",
-                "status_inactive": "Tilin turvallisuus on alhainen",
-                "status_inactive_desc": "Ota kaksivaiheinen todennus käyttöön suojataksesi tietosi ja tutkimuksesi.",
                 "setup_cta": "Ota 2FA käyttöön",
                 "configure_title": "Määritä todennussovellus",
                 "scan_desc": "Skannaa tämä QR-koodi todennussovelluksellasi (Google Authenticator, Authy, jne.)",
                 "enter_code": "Syötä 6-numeroinen koodi",
                 "enable_btn": "Ota 2FA käyttöön",
-                "active_msg": "2FA on aktiivinen",
                 "disable_btn": "Poista 2FA käytöstä",
                 "confirm_disable": "Vahvista poistaminen",
                 "confirm_password_label": "Vahvista salasanalla",
@@ -537,7 +527,6 @@
             },
             "password": {
                 "title": "Salasanan hallinta",
-                "description": "Päivitä salasanasi pitääksesi tilisi turvassa.",
                 "current": "Nykyinen salasana",
                 "new": "Uusi salasana",
                 "change_btn": "Vaihda salasana",
@@ -602,7 +591,6 @@
             "empty_title": "Ei lausekokoelmia",
             "empty_desc": "Luo lausekokoelma aloittaaksesi ehdokaslauseiden keräämisen ja järjestämisen Q-metodologiatutkimustasi varten.",
             "add_item": "Lisää kohde",
-            "add_item_desc": "Lisää uusi ehdokaslause tähän lausekokoelmaan.",
             "bulk_import": "Massatuonti",
             "import_desc": "Liitä lauseet rivivälein erotettuna. Jokaisesta rivistä tulee yksi kohde.",
             "import_prefix": "Koodietuliite",
@@ -629,7 +617,7 @@
             "deleted": "Lausekokoelma poistettu",
             "delete_error": "Lausekokoelman poisto epäonnistui",
             "delete_item_title": "Poista kohde",
-            "delete_item_confirm": "Haluatko varmasti poistaa tämän kohteen? Tätä ei voi peruuttaa.",
+            "delete_item_confirm": "Poistetaanko tämä kohde? Toimintoa ei voi peruuttaa.",
             "status": {
                 "proposed": "Ehdotettu",
                 "accepted": "Hyväksytty",
@@ -647,7 +635,6 @@
             "version_label": "v{{n}}",
             "item_detail_desc": "Kohteen historia ja kommentit",
             "manage_tags": "Tunnisteet",
-            "manage_tags_desc": "Luo ja hallitse tunnisteita luokitellaksesi lausekokoelman kohteita teeman tai ulottuvuuden mukaan.",
             "tag_name_placeholder": "Tunnisteen nimi",
             "tag_color": "Tunnisteen väri",
             "tag_created": "Tunniste luotu",
@@ -692,15 +679,13 @@
                 "title": "Rakentamisen muistio",
                 "summary_empty": "Valinnainen · kuratointiprosessin läpinäkyvyyteen",
                 "summary_filled": "{{n}} merkkiä · klikkaa nähdäksesi tai muokataksesi",
-                "helper": "Valinnainen. Dokumentoi, kuinka tämä lausekokoelma rakennettiin: kartoitetut lähteet, säilytetyt tai pois jätetyt äänet, otantaperuste. Hyödyllinen kuratointiprosessin läpinäkyvyyden kannalta (Sneegas 2020; Robbins & Krueger 2000). Jätä tyhjäksi, jos ei sovi tutkimusasetelmaasi.",
                 "placeholder": "Dokumentoi, kuinka tämä lausekokoelma rakennettiin: lähteet, säilytetyt tai pois jätetyt äänet, otantaperuste…",
                 "save": "Tallenna muistio",
                 "saved": "Rakentamisen muistio tallennettu",
                 "save_error": "Rakentamisen muistion tallennus epäonnistui"
             },
-            "status_pills_aria": "Hyväksytty: {{a}}; Ehdotettu: {{p}}; Hylätty: {{r}}",
             "import_from_csv": "Tuo CSV/TSV…",
-            "import_csv_hint": "CSV/TSV-tiedostossa on oltava otsikot code, language, text. Valitun kielen rivit ladataan yllä olevaan tekstilaatikkoon.",
+            "import_csv_hint": "CSV/TSV: sarakkeet code, language, text.",
             "import_csv_no_match": "Mikään rivi ei vastaa valittua kieltä ({{lang}}).",
             "import_csv_skipped": "Ohitettu {{count}} rivi(ä) muilla kielillä: {{langs}}.",
             "import_csv_more_errors": "{{count}} lisää ongelmaa"
@@ -759,7 +744,7 @@
             "eigenvalue_error": "Analyysitietojen lataaminen epäonnistui. Yritä uudelleen.",
             "scree_plot_label": "Ominaisarvokaavio {{n}} faktorille",
             "loading_eigenvalues": "Ladataan ominaisarvoja...",
-            "empty_state": "Määritä parametrit yllä ja napsauta \"Suorita analyysi\" poimimaan faktorit Q-lajittelutiedoistasi.",
+            "empty_state": "Määritä parametrit ja suorita analyysi.",
             "empty": {
                 "contract_title": "Q-lajitteludataa ei ole vielä riittävästi",
                 "contract_body": "Q-metodologian faktorianalyysi vaatii vähintään 2 osallistujaa, jotka ovat suorittaneet lajittelun. Konfiguraatiovalinnat (poimintatapa, faktorit, rotaatio, merkintä) saavat merkityksensä, kun dataa on saatavilla. Jaa tutkimuslinkki yleisnäkymästä aloittaaksesi vastausten keräämisen.",
@@ -811,9 +796,9 @@
             "no_statement_scores": "Väittämäpisteitä ei saatavilla. Varmista, että osallistujia on merkitty vähintään yhdelle faktorille.",
             "no_characteristics": "Faktorien ominaisuustietoja ei saatavilla.",
             "export": "Vie",
-            "export_loadings": "CSV — Faktorikuormitukset",
-            "export_scores": "CSV — Väittämäpisteet",
-            "export_xlsx": "XLSX — Koko analyysi",
+            "export_loadings": "Faktorikuormitukset (CSV)",
+            "export_scores": "Väittämäpisteet (CSV)",
+            "export_xlsx": "Koko analyysi (XLSX)",
             "export_error": "XLSX-viennin luominen epäonnistui.",
             "select_factors": "Valitse faktorien lukumäärä",
             "loadings_help": "Faktorikuormitukset osoittavat, kuinka voimakkaasti kunkin osallistujan lajittelu korreloi kunkin faktorin kanssa. Korostetut solut ylittävät yllä näkyvän merkitsevyyskynnyksen.",
@@ -827,20 +812,20 @@
             "z_scores_description": "Väittämien z-arvot ja faktorijärjestyksen sijoitukset",
             "factor_statistics": "Faktoritilastot",
             "characteristics_help": "Ominaisarvot kuvastavat selitetyn varianssin määrää. Komposiittireliabiliteetti kuvastaa merkittyjen lajittelujen sisäistä yhdenmukaisuutta. Faktoripisteiden keskivirhe kuvastaa komposiittiestimaatin tarkkuutta.",
-            "help_extraction": "PCA maksimoi selitetyn varianssin faktorien välillä. Sentroidi tuottaa matemaattisesti vähemmän rajoitettuja faktoreita, mitä jotkut Q-tutkijat suosivat teoreettisista syistä.",
-            "help_n_factors": "Jokainen faktori edustaa erillistä näkökulmaa. Useammat faktorit tallentavat enemmän vivahteita mutta voivat jakaa yhtenäisiä näkemyksiä; vähemmän faktoreita antaa laajempia ryhmiä.",
-            "help_rotation": "Varimax maksimoi faktorien välisen erottelun, tuottaen yksinkertaisemman rakenteen. Ilman rotaatiota alkuperäinen matemaattinen ratkaisu säilyy. Harkintaan perustuva rotaatio antaa määrittää rotaatiokulmat manuaalisesti.",
-            "help_flagging": "Automaattinen merkitsee osallistujat, joiden kuormitus ylittää merkitsevyyskynnyksen täsmälleen yhdellä faktorilla. Manuaalinen antaa sinun määrittää merkinnät oman harkintasi mukaan.",
+            "help_extraction": "PCA maksimoi selitetyn varianssin. Sentroidi on matemaattisesti vähemmän rajoitettu.",
+            "help_n_factors": "Jokainen faktori edustaa erillistä näkökulmaa.",
+            "help_rotation": "Varimax erottaa faktorit yksinkertaisempaa rakennetta varten.",
+            "help_flagging": "Automaattinen: merkitsee yhdellä faktorilla kuormittavat osallistujat. Manuaalinen: säätö osallistujakohtaisesti.",
             "rotation": {
                 "judgmental": {
                     "label": "Harkintaan perustuva (manuaalinen)",
                     "short": "Harkintaan",
-                    "tooltip": "Käännä faktoripareja manuaalisesti valituilla kulmilla, jotta faktorit saadaan kohdistettua sisällöllisesti merkityksellisiin asentoihin (Brown 1980; Watts & Stenner 2012)."
+                    "tooltip": "Käännä faktoripareja manuaalisesti valituilla kulmilla, jotta faktorit saadaan kohdistettua sisällöllisesti merkityksellisiin asentoihin."
                 }
             },
             "manual_rotations": {
                 "title": "Manuaaliset rotaatiot",
-                "helper": "Määritä rotaatiot muodossa 'käännä faktoria F kulmalla Δ° faktorin G ympäri'. Rotaatiot suoritetaan järjestyksessä. Käytetään faktorien kohdistamiseen sisällöllisesti merkityksellisiin asentoihin (Brown 1980; Watts & Stenner 2012).",
+                "helper": "Määritä rotaatiot muodossa 'käännä faktoria F kulmalla Δ° faktorin G ympäri'. Rotaatiot suoritetaan järjestyksessä.",
                 "add": "Lisää rotaatio",
                 "remove_aria": "Poista rotaatio",
                 "empty": "Lisää vähintään yksi rotaatio analyysin suorittamiseksi.",
@@ -851,31 +836,23 @@
             "bootstrap": {
                 "toggle_label": "Suorita bootstrap-vakausanalyysi",
                 "iterations_label": "Iteraatiot (B)",
-                "helper": "Valinnainen. Bootstrap ottaa Q-lajitteluistasi otokset takaisinpalauttaen ja toistaa analyysin B kertaa arvioidakseen z-arvojen keskivirheet. Hyödyllinen, kun haluat luottamusvälit faktoripisteille (Zabala & Pascual 2016).",
+                "helper": "Valinnainen. Ottaa Q-lajitteluista otokset B kertaa luottamusvälien arvioimiseksi faktoripisteille.",
                 "running": "Bootstrap käynnissä…",
                 "se_column": "Keskim. KV (z)",
-                "tooltip": "Q-lajittelujen ei-parametrinen bootstrap (otokset takaisinpalauttaen); analyysi toistetaan B kertaa z-arvojen keskivirheiden ja 95 %:n luottamusvälien arvioimiseksi (Zabala & Pascual 2016)."
+                "tooltip": "Q-lajittelujen ei-parametrinen bootstrap (otokset takaisinpalauttaen); analyysi toistetaan B kertaa 95 %:n luottamusvälien arvioimiseksi z-arvoille."
             },
             "guide_loadings_title": "Faktorikuormitusten lukeminen",
             "guide_loadings_1": "Jokainen kuormitus on korrelaatio (-1 – +1) osallistujan ja faktorin (jaetun näkökulman) välillä.",
             "guide_loadings_2": "Korostetut arvot ylittävät taulukon yläpuolella näkyvän merkitsevyyskynnyksen.",
-            "guide_loadings_3": "\"Merkitty\" osallistuja määrittää kyseisen faktorin. Etsi selkeää rakennetta: kukin henkilö yhdellä faktorilla.",
-            "guide_loadings_4": "Millekään faktorille merkitsemättömillä osallistujilla on ainutlaatuinen näkemys, jota ratkaisu ei kata.",
             "guide_arrays_title": "Faktoritaulukoiden tulkinta",
             "guide_arrays_1": "Jokainen faktoritaulukko on komposiitti-Q-lajittelu, joka edustaa yhtä jaettua näkökulmaa.",
             "guide_arrays_2": "Lue vasemmalta oikealle: eniten eri mieltä – eniten samaa mieltä. Ääriasennot kantavat vahvimman signaalin tulkintaa varten.",
-            "guide_arrays_3": "Keltaisella korostetut väittämät ovat erottelevia — sijoitettu merkitsevästi eri tavalla muihin faktoreihin verrattuna.",
-            "guide_arrays_4": "Vertaa taulukoita faktorien välillä nähdäksesi, missä näkökulmat eroavat ja yhtyvät.",
             "guide_statements_title": "Väittämäpisteiden ymmärtäminen",
             "guide_statements_1": "Z-arvot osoittavat, kuinka voimakkaasti kukin faktori on samaa tai eri mieltä kunkin väittämän kanssa (0 = neutraali).",
             "guide_statements_2": "D = erotteleva (sijoitettu merkitsevästi eri tavalla faktorien välillä). Tähdet ilmaisevat merkitsevyystason.",
-            "guide_statements_3": "C = konsensus (kaikki faktorit ovat samaa mieltä sijoituksesta). Nämä eivät auta erottamaan näkökulmia.",
-            "guide_statements_4": "D-väittämät paljastavat, mikä tekee kustakin näkökulmasta ainutlaatuisen. C-väittämät osoittavat, missä näkökulmat yhtyvät.",
             "guide_summary_title": "Ratkaisun arviointi",
             "guide_summary_1": "Ominaisarvot mittaavat, kuinka paljon varianssia faktori selittää. Kaiserin kriteeri (ominaisarvo > 1) on yleinen heuristiikka säilytettävien faktorien lukumäärän päättämiseen.",
             "guide_summary_2": "Komposiittireliabiliteetti kuvastaa, kuinka yhdenmukaisesti merkityt lajittelut määrittävät kunkin faktorin. Korkeammat arvot tarkoittavat, että faktoriestimaatti perustuu suurempaan yksimielisyyteen sen määrittävien lajittelujen kesken.",
-            "guide_summary_3": "Faktorikorrelaatiot osoittavat, kuinka paljon päällekkäisyyttä näkökulmien välillä on. Korkeammat korrelaatiot tarkoittavat, että faktoreilla on enemmän yhteistä pohjaa; matalammat korrelaatiot tarkoittavat, että ne ovat erillisempiä.",
-            "guide_summary_4": "Kokonaisvarianssi kuvaa, kuinka suuri osa lajittelumallien kokonaisvaihtelusta on ratkaisusi kattama.",
             "benchmark_above": "Kynnyksen yläpuolella",
             "benchmark_below": "Kynnyksen alapuolella",
             "history": {
@@ -883,7 +860,7 @@
                 "loading": "Loading history…",
                 "fetch_error": "Could not load analysis history.",
                 "empty": "No previous analyses for this study yet — run one to start the audit trail.",
-                "empty_explainer": "Documenting analytical choices supports reproducibility — a core requirement of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020). Each run is logged here so you can document and revisit every decision.",
+                "empty_explainer": "Each run is logged here so you can document and revisit every decision.",
                 "load_error": "Failed to load the analysis run.",
                 "load_run_aria": "Load analysis run from {{date}}",
                 "loading_run": "Loading…",
@@ -914,7 +891,7 @@
                 "no_material": "No post-sort audio recordings or written comments from participants flagged on this factor.",
                 "loading": "Loading recordings…",
                 "error": "Could not load audio recordings. Please try again.",
-                "context": "Grounding factor interpretation in participants' own words — their audio rationales and their written card comments — is a core element of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020).",
+                "context": "Ground factor interpretation in participants' own words — their audio rationales and their written card comments.",
                 "context_aria": "About this panel",
                 "audio_label": "Recording: {{key}} by {{participant}}",
                 "url_unavailable": "Audio URL not available.",
@@ -951,9 +928,7 @@
             },
             "create": {
                 "title": "Luo projekti",
-                "description": "Luo uusi organisaatio hallinnoidaksesi tutkimuksiasi ja tiimiäsi.",
                 "card_title": "Projektin tiedot",
-                "card_description": "Syötä nimi ja URL-tunnus uudelle projektillesi.",
                 "name_label": "Projektin nimi",
                 "name_placeholder": "Yliopiston tutkimusryhmäni",
                 "url_label": "Projektin URL",
@@ -983,9 +958,7 @@
                 "slug_description": "Tutkimuksen URL-osoitteessa käytettävä yksilöllinen tunniste. Vain pienet kirjaimet, numerot ja väliviivat.",
                 "slug_locked": "URL-tunnistetta voi muuttaa vain kun tutkimus on luonnostilassa."
             },
-            "guidance_title": "Miten osallistujien pääsy toimii",
-            "guidance_body": "Tutkimuksen URL on tutkimuksesi julkinen verkko-osoite. Rekrytointilinkit lisäävät yksilöllisiä tunnuksia tähän URL-osoitteeseen osallistujien hallinnan ja seurannan mahdollistamiseksi. Jaa linkkejä suoraan, sähköpostitse tai tulosta QR-koodeja fyysisiin materiaaleihin.",
-            "state_draft": "Tutkimuksesi on luonnostilassa. Määritä URL ja valmistele rekrytointilinkit — osallistujat eivät pääse tutkimukseen ennen sen aktivointia.",
+            "state_draft": "Luonnostila — linkit toimivat aktivoinnin jälkeen.",
             "state_closed": "Tämä tutkimus on suljettu. Olemassa olevat linkit näkyvät edelleen, mutta uudet osallistujat eivät voi aloittaa.",
             "state_archived": "Tämä tutkimus on arkistoitu. Kaikki rekrytointitiedot ovat vain luku -tilassa.",
             "empty_title": "Ei rekrytointilinkkejä vielä",
@@ -1018,7 +991,6 @@
             },
             "new_link": "Uusi pääsulinkki",
             "create_title": "Luo pääsulinkejä",
-            "create_description": "Kohdista linkit erityisryhmille tai yleiseen jakeluun. Jokaisella linkillä on eri tietoturva- ja käyttöominaisuudet.",
             "link_type": "Pääsystrategia",
             "select_type": "Valitse rekrytointityyppi...",
             "campaign_name": "Kanava / Kampanjan nimi",
@@ -1029,11 +1001,9 @@
             "no_links": "Ei vielä luotuja rekrytointilinkkejä.",
             "unnamed": "Nimetön kanava",
             "revoked": "Pääsy peruutettu",
-            "qr_title": "Jaa pääsykoodi",
-            "qr_desc": "Osallistujat voivat skannata tämän koodin siirtyäkseen suoraan tutkimukseen.",
-            "copy_link": "Kopioi turvallinen URL",
-            "table_title": "Pääsynhallintapaneeli",
-            "table_description": "Aktiiviset kanavat ja linkkien elinkaaren hallinta.",
+            "qr_title": "Jaa QR-koodina",
+            "copy_link": "Kopioi URL",
+            "table_title": "Rekrytointilinkit",
             "share_title": "Jaa tutkimus",
             "share_desc": "Levitä tutkimuslinkkiä kutsuaksesi osallistujia.",
             "public_url_label": "Julkinen osallistumislinkki",
@@ -1337,7 +1307,6 @@
         },
         "study_overview": {
             "title": "Hallintapaneeli",
-            "subtitle": "",
             "back_to_overview": "Takaisin yhteenvetoon",
             "sample_size": "Osallistujamäärä (P-Set)",
             "valid": "kelvollinen",
@@ -1346,7 +1315,6 @@
             "mobile": "mobiili",
             "median_duration": "Keston mediaani",
             "suspect": "Epäilyttävä",
-            "time_to_complete": "Suoritusaika",
             "recent_activity": "Viimeaikainen toiminta",
             "latest_participants": "Viimeisimmät osallistujat ({{count}} / {{total}})",
             "recently_completed": "Viimeksi valmistuneet",
@@ -1430,7 +1398,6 @@
         },
         "design": {
             "translation_needed": "Tarkistus vaaditaan (Kopio)",
-            "translation_needed_desc": "Tämä sisältö on kopioitu automaattisesti toisesta kielestä. Tarkista ja lokalisoi se.",
             "reset_defaults": "Palauta oletukset",
             "editing_language_banner": "Muokkaat versiota {{language}}. Vaihda työkalupalkin kielivalitsimella.",
             "multilang": {
@@ -1486,7 +1453,7 @@
                 "editing_language": "Muokkauskieli",
                 "manage_langs": "Kielten hallinta",
                 "select_lang": "Valitse kieli",
-                "test_run_help": "Avaa osallistujan esikatselun. Testiajot merkitään is_test_run=true eivätkä koskaan sisälly julkaistuihin tietoihin.",
+                "test_run_help": "Esikatsele osallistujan tavoin. Testiajoja ei sisällytetä tietoihisi.",
                 "more_actions": "Lisää toimintoja"
             },
             "sync": {
@@ -1503,7 +1470,7 @@
             },
             "validation": {
                 "failed_title": "Määritys puutteellinen",
-                "failed_desc": "Tutkimustasi ei voida vielä aktivoida. Korjaa seuraavat ongelmat:",
+                "failed_desc": "Korjaa nämä ongelmat aktivoidaksesi:",
                 "errors": {
                     "no_statements": "Tutkimuksessa on oltava vähintään yksi väite.",
                     "no_grid": "Ruudukon määritykset puuttuvat.",
@@ -1745,12 +1712,9 @@
                     "tooltip_desc": "Q-metodologiassa pakotettu jakauma on yleensä lähes normaali. Tämä pakottaa osallistujan tekemään vaikeita valintoja ja erottelemaan kohteet selkeästi.",
                     "locked": "Suunnittelu lukittu",
                     "locked_desc": "Rakenteelliset muutokset (väittämäkoodit, ruudukko) on poistettu käytöstä, koska tutkimus on kerännyt aineistoa tai se ei ole enää luonnostilassa. Voit silti muokata käännöksiä.",
-                    "locked_active": "Tutkimus on aktiivinen",
-                    "locked_active_desc": "Tutkimus kerää parhaillaan tietoja. Muokataksesi suunnittelua, sinun on ensin palautettava se luonnostilaan.",
-                    "locked_paused": "Tutkimus on keskeytetty",
-                    "locked_paused_desc": "Tutkimus on tällä hetkellä keskeytetty. Suunnittelu pysyy lukittuna olemassa olevien tietojen suojaamiseksi.",
-                    "locked_closed": "Tutkimus on suljettu",
-                    "locked_closed_desc": "Tämä tutkimus on valmis. Suunnittelu on arkistoitu eikä sitä voi muuttaa.",
+                    "locked_active": "Tutkimus aktiivinen — palauta luonnostilaan muokataksesi",
+                    "locked_paused": "Tutkimus keskeytetty — palauta luonnostilaan muokataksesi",
+                    "locked_closed": "Tutkimus suljettu — suunnittelu on arkistoitu",
                     "mismatch_title": "Ruudukon kapasiteetti ei täsmää",
                     "mismatch_desc": "Sinulla on {{statements}} väitettä, mutta ruudukossa on vain {{slots}} paikkaa. Säädä sarakkeita alla.",
                     "unlock_hint": "Siirry Data-selaimeen tyhjentääksesi vastaukset ja avataksesi rakenteen muokkauksen"
@@ -1886,7 +1850,7 @@
             "methodology_memo": {
                 "title": "Metodologinen muistio",
                 "summary": "Valinnainen · toistettavuuteen & esirekisteröintiin",
-                "help": "Valinnainen. Dokumentoi miksi tämä jakauma, nämä ohjeet, tämä Q-setin koko. Hyödyllistä toistettavuuden ja esirekisteröinnin kannalta (Watts & Stenner 2012; Sneegas 2020). Jätä tyhjäksi, jos ei ole olennaista.",
+                "help": "Valinnainen. Dokumentoi peruste tälle jakaumalle, näille ohjeille ja Q-setin koolle.",
                 "label": "Muistio (mikä tahansa kieli)",
                 "placeholder": "Dokumentoi suunnitteluvalintojesi rationaali…"
             },
@@ -2073,7 +2037,7 @@
                 "no_participants_title": "Ei vielä osallistujia",
                 "no_participants_desc": "Jaa tutkimuksesi linkki aloittaaksesi vastausten keräämisen.",
                 "contract_title": "Ei vielä lähetyksiä",
-                "contract_body": "Tämä sivu listaa osallistujien lähetykset ja tarjoaa CSV/JSON-vientejä heti kun ensimmäinen vastaus saapuu. Jaa tutkimuslinkki yleisnäkymästä aloittaaksesi tietojen keräämisen.",
+                "contract_body": "Lähetykset ja viennit ilmestyvät tähän. Jaa tutkimuslinkki aloittaaksesi keräämisen.",
                 "contract_cta": "Avaa tutkimuksen yleisnäkymä"
             },
             "pagination": {
@@ -2161,7 +2125,7 @@
                 "delete_button": "Poista tutkimus",
                 "delete_confirm": "Oletko varma? Tätä toimintoa EI VOI PERUUTTAA.",
                 "delete_dialog_title": "Poistetaanko tämä tutkimus?",
-                "delete_dialog_intro": "Kaikki lajittelut, äänitallenteet ja analyysit poistetaan pysyvästi. Tätä ei voi kumota.",
+                "delete_dialog_intro": "Poistaa pysyvästi lajittelut, äänet ja analyysit.",
                 "delete_dialog_typed_label": "Vahvista kirjoittamalla tutkimuksen slug",
                 "delete_dialog_action": "Poista pysyvästi"
             },
@@ -2180,13 +2144,10 @@
             "delete_error_desc": "Tutkimuksen poistaminen epäonnistui.",
             "storage": {
                 "title": "Äänitallenteiden tallennustila",
-                "description": "Seuraa tämän tutkimuksen äänitallenteiden tallennustilan käyttöä.",
                 "used": "Käytetty tallennustila",
                 "quota": "Kiintiö",
                 "quota_label": "Tallennustilakiintiö",
                 "quota_help": "Tämän tutkimuksen äänitallenteiden enimmäistallennustila (10–1000 Mt).",
-                "files_count": "Tiedostoja: {{count}}",
-                "percent_used": "{{percent}} % käytetty",
                 "error": "Tallennustilan käytön lataaminen epäonnistui.",
                 "warning_high_usage": "Tallennustilan käyttö on korkea. Harkitse kiintiön kasvattamista tai vanhojen tallenteiden poistamista.",
                 "save_success": "Tallennustilakiintiö päivitetty",
@@ -2194,9 +2155,8 @@
             },
             "retention": {
                 "title": "Tietojen säilytys",
-                "description": "Kuukausien määrä, jonka ajan tunnistettavia osallistujatietoja säilytetään ennen anonymisoinnin suosittelua. Määrittää oletusrajan tietojen elinkaarella. Jätä tyhjäksi käyttääksesi järjestelmän oletusta (12 kuukautta).",
                 "months_label": "Säilytys (kuukautta)",
-                "help": "EU-tutkijoiden tulisi sovittaa tämä RGPD-säilytyspolitiikkaansa. Yleisiä arvoja: 6, 12, 24, 60.",
+                "help": "Yleisiä arvoja: 6, 12, 24, 60 kuukautta. Jätä tyhjäksi (oletus 12).",
                 "save_success": "Säilytyspolitiikka päivitetty",
                 "save_error": "Säilytyspolitiikan päivitys epäonnistui",
                 "range_error": "Säilytyksen on oltava kokonaisluku väliltä 1–240 kuukautta."
@@ -2242,36 +2202,30 @@
                         "title": "Käyttöoikeusmatriisi",
                         "admin": {
                             "label": "Admin",
-                            "badge": "Täysi pääsy",
                             "desc": "Voi hallita projektin asetuksia, jäseniä ja kaikkia tutkimuksia."
                         },
                         "owner": {
                             "label": "Omistaja",
-                            "badge": "Täysi pääsy",
-                            "desc": "Hallinnoi projektin asetuksia, jäseniä ja kaikkia tutkimuksia. Voi ylentää tai poistaa muita jäseniä."
+                            "desc": "Täysi hallinta projektista, jäsenistä ja tutkimuksista."
                         },
                         "researcher": {
                             "label": "Tutkija",
-                            "badge": "Luonti",
                             "desc": "Voi luoda ja hallita kaikkia tutkimuksia. Rajoitettu pääsy projektin asetuksiin."
                         },
                         "viewer": {
                             "label": "Katsoja",
-                            "badge": "Luku-oikeus",
                             "desc": "Vain luku -pääsy kaikkiin projektin tutkimuksiin ja tietoihin."
                         }
                     },
                     "coming_soon": "Tulossa pian",
                     "invite_modal": {
                         "title": "Kutsu yhteistyökumppani",
-                        "desc": "Lähetä suojattu kutsu liittyäksesi tutkimustiimiisi.",
                         "email_label": "Yhteistyökumppanin sähköposti",
                         "role_label": "Määritetty rooli",
                         "success": "Kutsulinkki luotu!",
                         "error": "Kutsun luominen epäonnistui.",
                         "send": "Luo ja lähetä kutsu",
-                        "copy_success": "Linkki kopioitu leikepöydälle!",
-                        "copy_hint": "Kopioi tämä linkki ja lähetä se manuaalisesti, jos sähköposti epäonnistuu."
+                        "copy_success": "Linkki kopioitu leikepöydälle!"
                     }
                 }
             }
@@ -2354,12 +2308,9 @@
         },
         "lifecycle": {
             "title": "Data inventory & lifecycle",
-            "header_desc": "GDPR Art. 5 data minimisation controls",
-            "intro": "This page gives you a real-time snapshot of personal data held for this study and lets you anonymise older records in bulk. Use it to enforce GDPR Art. 5 data-minimisation obligations once data collection is complete.",
+            "header_desc": "Inventory & anonymisation",
             "load_error": "Failed to load data inventory.",
             "participants_title": "Participants snapshot",
-            "participants_desc": "Current status of all participants in this study",
-            "stat_total": "Total",
             "stat_started": "Started",
             "stat_completed": "Completed",
             "stat_discarded": "Discarded",
@@ -2383,20 +2334,20 @@
             "cutoff_help": "Only completed participants submitted strictly before this date will be anonymised.",
             "preview_label": "Ehdokkaat:",
             "preview_zero": "Tällä rajalla ei ole sopivia osallistujia. Kokeile aikaisempaa päivämäärää.",
-            "anonymise_button": "Anonymise older than {{date}}",
+            "anonymise_button": "Anonymise",
             "anonymise_success": "Anonymisation complete",
             "anonymise_success_desc": "{{n}} participant(s) anonymised, {{s}} already anonymous.",
             "anonymise_error": "Anonymisation failed",
             "confirm_title": "Anonymise participant data?",
             "confirm_candidates": "{{count}} completed participant(s) submitted before {{date}} will be anonymised.",
-            "confirm_preserved": "Q-sort statement rankings will be preserved as anonymous research data — they will no longer link to any individual.",
+            "confirm_preserved": "Q-sort rankings are kept; identity is removed.",
             "confirm_irreversible": "This action is immediate and cannot be undone.",
             "confirm_in_progress": "Anonymising…",
             "confirm_action": "Yes, anonymise",
             "cutoff_from_policy": "Oletusarvo johdettu tutkimuksen säilytyspolitiikasta ({{months}} kuukautta).",
             "empty": {
                 "title": "Ei vielä osallistujadataa",
-                "body": "Tämä sivu aktivoi inventaarion ja joukkonimellistämisen ohjaimet (GDPR Art. 5) heti kun ensimmäinen osallistuja lähettää Q-lajittelun. Sitä ennen jaa tutkimuslinkki yleisnäkymästä aloittaaksesi vastausten keräämisen.",
+                "body": "Sivu aktivoituu, kun osallistujat lähettävät vastauksensa. Jaa ensin tutkimuslinkki.",
                 "cta": "Avaa tutkimuksen yleisnäkymä"
             }
         }

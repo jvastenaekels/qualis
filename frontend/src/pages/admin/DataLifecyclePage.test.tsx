@@ -106,8 +106,7 @@ describe('DataLifecyclePage', () => {
         // Page header
         expect(screen.getByText('Data inventory & lifecycle')).toBeInTheDocument();
 
-        // Participant stats
-        expect(screen.getByText('50')).toBeInTheDocument(); // total
+        // Participant stats (Total stat removed in text-trim wave; Started/Completed/Discarded/Anonymised remain)
         expect(screen.getByText('30')).toBeInTheDocument(); // completed
         expect(screen.getByText('5')).toBeInTheDocument(); // anonymised
 
@@ -187,7 +186,7 @@ describe('DataLifecyclePage', () => {
 
         // The anonymise button should be enabled (18 candidates for 1-year cutoff default)
         const anonymiseBtn = screen.getByRole('button', {
-            name: /anonymise older than/i,
+            name: /^anonymise$/i,
         });
         expect(anonymiseBtn).not.toBeDisabled();
 
@@ -198,9 +197,7 @@ describe('DataLifecyclePage', () => {
         expect(dialog).toBeInTheDocument();
         expect(screen.getByText(/anonymise participant data/i)).toBeInTheDocument();
         expect(screen.getByText(/18 completed participant/i)).toBeInTheDocument();
-        expect(
-            screen.getByText(/q-sort statement rankings will be preserved/i)
-        ).toBeInTheDocument();
+        expect(screen.getByText(/q-sort rankings are kept/i)).toBeInTheDocument();
         expect(screen.getByText(/cannot be undone/i)).toBeInTheDocument();
 
         // Confirm
@@ -258,8 +255,6 @@ describe('DataLifecyclePage', () => {
         // Inventory chrome is NOT shown
         expect(screen.queryByText('Participants snapshot')).not.toBeInTheDocument();
         expect(screen.queryByText('Bulk anonymisation')).not.toBeInTheDocument();
-        expect(
-            screen.queryByRole('button', { name: /anonymise older than/i })
-        ).not.toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: /^anonymise$/i })).not.toBeInTheDocument();
     });
 });

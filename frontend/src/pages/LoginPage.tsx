@@ -10,14 +10,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { Loader2, Lock, AtSign, ArrowRight, ShieldCheck, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -118,23 +111,18 @@ const LoginPage = () => {
                 transition={{ duration: 0.5, ease: 'easeOut' }}
                 className="w-full max-w-[400px] z-10"
             >
-                <div className="flex flex-col items-center mb-8">
-                    <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg mb-4">
+                <div className="flex justify-center mb-8">
+                    <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg">
                         <ShieldCheck className="text-white h-7 w-7" />
                     </div>
-                    <h1 className="text-2xl font-bold tracking-tight text-slate-900">
-                        {t('auth.login.title')}
-                    </h1>
-                    <p className="text-sm text-slate-500 mt-2">{t('auth.login.subtitle')}</p>
                 </div>
 
                 <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white/80 backdrop-blur-md">
                     <form onSubmit={handleLogin}>
-                        <CardHeader className="space-y-1 pb-4">
+                        <CardHeader className="pb-4">
                             <CardTitle className="text-xl font-black">
                                 {t('auth.login.card_title')}
                             </CardTitle>
-                            <CardDescription>{t('auth.login.card_description')}</CardDescription>
                         </CardHeader>
                         {(() => {
                             const reason = searchParams.get('reason');
@@ -148,7 +136,7 @@ const LoginPage = () => {
                             const fallback =
                                 reason === 'session_expired'
                                     ? 'Your session has expired. Please sign in again.'
-                                    : 'Please sign in to access the admin panel.';
+                                    : 'Please sign in to continue.';
                             return (
                                 <div className="px-6 pb-2">
                                     <div

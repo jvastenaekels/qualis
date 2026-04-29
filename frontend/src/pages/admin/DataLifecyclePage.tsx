@@ -169,10 +169,7 @@ export default function DataLifecyclePage() {
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
                     title={t('admin.lifecycle.title', 'Data inventory & lifecycle')}
-                    description={t(
-                        'admin.lifecycle.header_desc',
-                        'GDPR Art. 5 data minimisation controls'
-                    )}
+                    description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
                     icon={ShieldCheck}
                 />
                 <InventorySkeleton />
@@ -185,10 +182,7 @@ export default function DataLifecyclePage() {
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
                     title={t('admin.lifecycle.title', 'Data inventory & lifecycle')}
-                    description={t(
-                        'admin.lifecycle.header_desc',
-                        'GDPR Art. 5 data minimisation controls'
-                    )}
+                    description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
                     icon={ShieldCheck}
                 />
                 <Alert className="bg-red-50 border-red-200 max-w-4xl">
@@ -212,10 +206,7 @@ export default function DataLifecyclePage() {
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
                     title={t('admin.lifecycle.title', 'Data inventory & lifecycle')}
-                    description={t(
-                        'admin.lifecycle.header_desc',
-                        'GDPR Art. 5 data minimisation controls'
-                    )}
+                    description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
                     icon={ShieldCheck}
                 />
                 <EmptyStateContract
@@ -236,20 +227,9 @@ export default function DataLifecyclePage() {
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
                 title={t('admin.lifecycle.title', 'Data inventory & lifecycle')}
-                description={t(
-                    'admin.lifecycle.header_desc',
-                    'GDPR Art. 5 data minimisation controls'
-                )}
+                description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
                 icon={ShieldCheck}
             />
-
-            {/* Intro */}
-            <p className="text-sm text-slate-600 max-w-2xl leading-relaxed">
-                {t(
-                    'admin.lifecycle.intro',
-                    'This page gives you a real-time snapshot of personal data held for this study and lets you anonymise older records in bulk. Use it to enforce GDPR Art. 5 data-minimisation obligations once data collection is complete.'
-                )}
-            </p>
 
             <div className="space-y-6 max-w-4xl">
                 {/* ── Section 1: Participants ─────────────────────────────── */}
@@ -261,19 +241,9 @@ export default function DataLifecyclePage() {
                                 {t('admin.lifecycle.participants_title', 'Participants snapshot')}
                             </CardTitle>
                         </div>
-                        <CardDescription className="text-sm font-medium text-slate-500">
-                            {t(
-                                'admin.lifecycle.participants_desc',
-                                'Current status of all participants in this study'
-                            )}
-                        </CardDescription>
                     </CardHeader>
                     <CardContent className="p-6">
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            <Stat
-                                label={t('admin.lifecycle.stat_total', 'Total')}
-                                value={participants.total}
-                            />
                             <Stat
                                 label={t('admin.lifecycle.stat_started', 'Started')}
                                 value={participants.started}
@@ -509,11 +479,7 @@ export default function DataLifecyclePage() {
                             ) : (
                                 <ShieldAlert className="w-4 h-4 mr-2" />
                             )}
-                            {t(
-                                'admin.lifecycle.anonymise_button',
-                                'Anonymise older than {{date}}',
-                                { date: cutoffDate }
-                            )}
+                            {t('admin.lifecycle.anonymise_button', 'Anonymise')}
                         </Button>
                     </CardContent>
                 </Card>

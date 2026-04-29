@@ -166,22 +166,17 @@
   },
   "auth": {
     "login": {
-      "title": "Admin login",
       "email_label": "Email address",
       "password_label": "Password",
       "submit": "Continue",
       "forgot_password": "Forgot?",
       "loading": "Authenticating...",
-      "subtitle": "Enter your credentials to manage your studies",
       "card_title": "Sign in",
-      "card_description": "Secure access to your research dashboard",
-      "privacy": "By signing in, you agree to our terms and privacy policy.",
-      "powered_by": "Powered by",
       "welcome_back": "Welcome back!",
       "error_401": "Invalid email or password",
       "error_generic": "Something went wrong. Please try again.",
       "reason_session_expired": "Your session has expired. Please sign in again.",
-      "reason_auth_required": "Please sign in to access the admin panel."
+      "reason_auth_required": "Please sign in to continue."
     },
     "register": {
       "title": "Create account",
@@ -454,14 +449,14 @@
     "study_design": {
       "distribution_mode": {
         "title": "Distribution mode",
-        "helper": "Choose how strictly the Q-sort grid is enforced. Forced: each column must be filled to its declared capacity (the most common choice; Brown 1980; Watts & Stenner 2012). Free: any number of cards per column, total = Q-set size (Brown et al. 2015 argue distribution shape barely affects results). Flexible: total enforced, columns are soft hints.",
+        "helper": "Choose how strictly the Q-sort grid is enforced. Forced: each column must be filled to its declared capacity (the most common choice). Free: any number of cards per column, total = Q-set size. Flexible: total enforced, columns are soft hints.",
         "forced": {
           "label": "Forced",
-          "tooltip": "Each column must hold exactly its declared capacity. Brown 1980; Watts & Stenner 2012."
+          "tooltip": "Each column must hold exactly its declared capacity."
         },
         "free": {
           "label": "Free",
-          "tooltip": "Total cards = Q-set size; per-column count is unconstrained. Brown et al. 2015."
+          "tooltip": "Total cards = Q-set size; per-column count is unconstrained."
         },
         "flexible": {
           "label": "Flexible",
@@ -515,9 +510,8 @@
       "description": "Manage your personal information and security settings.",
       "personal": {
         "title": "Personal information",
-        "description": "Your account details and contact information.",
         "email": "Email address",
-        "email_locked": "Email cannot be changed directly. Contact admin.",
+        "email_locked": "Contact an admin to change.",
         "name": "Full name",
         "save": "Save",
         "saving": "Saving...",
@@ -530,15 +524,11 @@
         "title": "Security & 2FA",
         "description": "Secure your account with two-factor authentication.",
         "enabled": "Enabled",
-        "status_active": "Your account is secured with two-factor authentication.",
-        "status_inactive": "Account security is low",
-        "status_inactive_desc": "Enable two-factor authentication to protect your sensitive data and studies.",
         "setup_cta": "Setup 2FA now",
         "configure_title": "Configure authenticator app",
         "scan_desc": "Scan this QR code with your authenticator app (google authenticator, authy, etc.)",
         "enter_code": "Enter 6-digit code",
         "enable_btn": "Enable 2FA",
-        "active_msg": "2FA is active",
         "disable_btn": "Disable 2FA",
         "confirm_disable": "Confirm disable",
         "confirm_password_label": "Confirm with your password",
@@ -552,7 +542,6 @@
       },
       "password": {
         "title": "Password management",
-        "description": "Update your password to keep your account secure.",
         "current": "Current password",
         "new": "New password",
         "change_btn": "Change password",
@@ -617,7 +606,6 @@
       "empty_title": "No concourses yet",
       "empty_desc": "Create a concourse to start collecting and organizing candidate statements for your Q-methodology research.",
       "add_item": "Add Item",
-      "add_item_desc": "Add a new candidate statement to this concourse.",
       "bulk_import": "Bulk Import",
       "import_desc": "Paste statements separated by newlines. Each line becomes one item.",
       "import_prefix": "Code prefix",
@@ -644,7 +632,7 @@
       "deleted": "Concourse deleted",
       "delete_error": "Failed to delete concourse",
       "delete_item_title": "Delete Item",
-      "delete_item_confirm": "Are you sure you want to delete this item? This cannot be undone.",
+      "delete_item_confirm": "Delete this item? Cannot be undone.",
       "status": {
         "proposed": "Proposed",
         "accepted": "Accepted",
@@ -662,7 +650,6 @@
       "version_label": "v{{n}}",
       "item_detail_desc": "History and comments for this item",
       "manage_tags": "Tags",
-      "manage_tags_desc": "Create and manage tags to categorize concourse items by theme or dimension.",
       "tag_name_placeholder": "Tag name",
       "tag_color": "Tag color",
       "tag_created": "Tag created",
@@ -707,15 +694,13 @@
         "title": "Construction memo",
         "summary_empty": "Optional · for transparency about the curation process",
         "summary_filled": "{{n}} characters · click to view or edit",
-        "helper": "Optional. Document how this concourse was constructed: sources canvassed, voices retained or set aside, sampling rationale. Useful for transparency about the curation process (Sneegas 2020; Robbins & Krueger 2000). Leave blank if not applicable to your design.",
         "placeholder": "Document how this concourse was constructed: sources, voices retained or excluded, sampling rationale...",
         "save": "Save memo",
         "saved": "Construction memo saved",
         "save_error": "Failed to save construction memo"
       },
-      "status_pills_aria": "Accepted: {{a}}; Proposed: {{p}}; Rejected: {{r}}",
       "import_from_csv": "Import CSV/TSV…",
-      "import_csv_hint": "CSV/TSV must have headers code, language, text. Rows in the selected language are loaded into the textarea above.",
+      "import_csv_hint": "CSV/TSV needs columns: code, language, text.",
       "import_csv_no_match": "No rows match the selected language ({{lang}}).",
       "import_csv_skipped": "Skipped {{count}} row(s) in other languages: {{langs}}.",
       "import_csv_more_errors": "{{count}} more issues"
@@ -774,7 +759,7 @@
       "eigenvalue_error": "Failed to load analysis data. Please try again.",
       "scree_plot_label": "Scree plot showing eigenvalues for {{n}} factors",
       "loading_eigenvalues": "Loading eigenvalues...",
-      "empty_state": "Configure parameters above and click \"Run Analysis\" to extract factors from your Q-sort data.",
+      "empty_state": "Set parameters and run the analysis.",
       "empty": {
         "contract_title": "Not enough Q-sort data yet",
         "contract_body": "Q-methodology factor analysis requires at least 2 participants who have completed the sort. Configuration choices (extraction, factors, rotation, flagging) carry meaning once data exists. Share the study link from the overview to start collecting responses.",
@@ -826,9 +811,9 @@
       "no_statement_scores": "No statement scores available. Ensure participants are flagged for at least one factor.",
       "no_characteristics": "No factor characteristics available.",
       "export": "Export",
-      "export_loadings": "CSV — Factor Loadings",
-      "export_scores": "CSV — Statement Scores",
-      "export_xlsx": "XLSX — Complete Analysis",
+      "export_loadings": "Factor loadings (CSV)",
+      "export_scores": "Statement scores (CSV)",
+      "export_xlsx": "Complete analysis (XLSX)",
       "export_error": "Failed to generate XLSX export.",
       "select_factors": "Select number of factors",
       "loadings_help": "Factor loadings show how strongly each participant's sort correlates with each factor. Highlighted cells exceed the significance threshold shown above.",
@@ -842,30 +827,22 @@
       "z_scores_description": "Z-scores and factor array positions per statement",
       "factor_statistics": "Factor Statistics",
       "characteristics_help": "Eigenvalues reflect the amount of variance explained. Composite reliability reflects internal consistency among flagged sorts. SE of factor scores reflects the precision of the composite estimate.",
-      "help_extraction": "PCA maximizes explained variance across factors. Centroid produces less mathematically constrained factors, which some Q researchers prefer for theoretical reasons.",
-      "help_n_factors": "Each factor represents a distinct viewpoint. More factors capture more nuance but may split coherent views; fewer factors give broader groupings.",
-      "help_rotation": "Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution.",
-      "help_flagging": "Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.",
+      "help_extraction": "PCA maximises explained variance. Centroid is less mathematically constrained.",
+      "help_n_factors": "Each factor represents a distinct viewpoint.",
+      "help_rotation": "Varimax separates factors for simpler structure.",
+      "help_flagging": "Auto: flag participants loading on exactly one factor. Manual: override per participant.",
       "guide_loadings_title": "Reading Factor Loadings",
       "guide_loadings_1": "Each loading is a correlation (-1 to +1) between a participant and a factor (shared viewpoint).",
       "guide_loadings_2": "Highlighted values exceed the significance threshold shown above the table.",
-      "guide_loadings_3": "A \"flagged\" participant defines that factor. Look for clean structure: each person on one factor.",
-      "guide_loadings_4": "Participants not flagged on any factor hold a unique view not captured by the solution.",
       "guide_arrays_title": "Interpreting Factor Arrays",
       "guide_arrays_1": "Each factor array is the composite Q-sort representing one shared viewpoint.",
       "guide_arrays_2": "Read left-to-right as most disagreed to most agreed. Extreme positions carry the strongest signal for interpretation.",
-      "guide_arrays_3": "Amber-highlighted statements are distinguishing — placed significantly differently compared to other factors.",
-      "guide_arrays_4": "Compare arrays across factors to see where viewpoints diverge and converge.",
       "guide_statements_title": "Understanding Statement Scores",
       "guide_statements_1": "Z-scores show how strongly each factor agrees or disagrees with each statement (0 = neutral).",
       "guide_statements_2": "D = distinguishing (placed significantly differently across factors). Stars indicate significance level.",
-      "guide_statements_3": "C = consensus (all factors agree on placement). These don't help differentiate viewpoints.",
-      "guide_statements_4": "D statements reveal what makes each viewpoint unique. C statements show where viewpoints converge.",
       "guide_summary_title": "Evaluating Your Solution",
       "guide_summary_1": "Eigenvalues measure how much variance a factor explains. The Kaiser criterion (eigenvalue > 1) is one common heuristic for deciding how many factors to retain.",
       "guide_summary_2": "Composite reliability reflects how consistently the flagged sorts define each factor. Higher values mean the factor estimate is based on more agreement among its defining sorts.",
-      "guide_summary_3": "Factor correlations show how much overlap exists between viewpoints. Higher correlations mean the factors share more common ground; lower correlations mean they are more distinct.",
-      "guide_summary_4": "Total variance explained indicates how much of the overall variation in sorting patterns is captured by your solution.",
       "benchmark_above": "Above threshold",
       "benchmark_below": "Below threshold",
       "history": {
@@ -873,7 +850,7 @@
         "loading": "Loading history…",
         "fetch_error": "Could not load analysis history.",
         "empty": "No previous analyses for this study yet — run one to start the audit trail.",
-        "empty_explainer": "Documenting analytical choices supports reproducibility — a core requirement of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020). Each run is logged here so you can document and revisit every decision.",
+        "empty_explainer": "Each run is logged here so you can document and revisit every decision.",
         "load_error": "Failed to load the analysis run.",
         "load_run_aria": "Load analysis run from {{date}}",
         "loading_run": "Loading…",
@@ -904,7 +881,7 @@
         "no_material": "No post-sort audio recordings or written comments from participants flagged on this factor.",
         "loading": "Loading recordings…",
         "error": "Could not load audio recordings. Please try again.",
-        "context": "Grounding factor interpretation in participants' own words — their audio rationales and their written card comments — is a core element of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020).",
+        "context": "Ground factor interpretation in participants' own words — their audio rationales and their written card comments.",
         "context_aria": "About this panel",
         "audio_label": "Recording: {{key}} by {{participant}}",
         "url_unavailable": "Audio URL not available.",
@@ -926,12 +903,12 @@
         "judgmental": {
           "label": "Judgmental (manual)",
           "short": "Judgmental",
-          "tooltip": "Manually rotate factor pairs by chosen angles to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012)."
+          "tooltip": "Manually rotate factor pairs by chosen angles to align factors with substantively-meaningful positions."
         }
       },
       "manual_rotations": {
         "title": "Manual rotations",
-        "helper": "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order. Used to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012).",
+        "helper": "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order.",
         "add": "Add rotation",
         "remove_aria": "Remove rotation",
         "empty": "Add at least one rotation to run the analysis.",
@@ -942,10 +919,10 @@
       "bootstrap": {
         "toggle_label": "Run bootstrap stability",
         "iterations_label": "Iterations (B)",
-        "helper": "Optional. Bootstrap resamples your Q-sorts with replacement and re-runs the analysis B times to estimate standard errors on z-scores. Useful when you want confidence intervals on factor scores (Zabala & Pascual 2016).",
+        "helper": "Optional. Resamples Q-sorts B times to estimate confidence intervals on factor scores.",
         "running": "Running bootstrap…",
         "se_column": "Mean SE (z)",
-        "tooltip": "Non-parametric bootstrap of Q-sorts (resampled with replacement); the analysis is repeated B times to estimate SEs and 95% CIs on z-scores (Zabala & Pascual 2016)."
+        "tooltip": "Non-parametric bootstrap of Q-sorts (resampled with replacement); analysis is repeated B times to estimate 95% CIs on z-scores."
       }
     },
     "project": {
@@ -972,9 +949,7 @@
       },
       "create": {
         "title": "Create project",
-        "description": "Create a new organization to manage your studies and team.",
         "card_title": "Project details",
-        "card_description": "Enter the name and URL slug for your new project.",
         "name_label": "Project name",
         "name_placeholder": "My university research group",
         "url_label": "Project URL",
@@ -998,9 +973,7 @@
         "slug_description": "The unique identifier used in the study URL. Lowercase letters, numbers, and hyphens only.",
         "slug_locked": "The URL slug can only be changed while the study is in draft mode."
       },
-      "guidance_title": "How participant access works",
-      "guidance_body": "The Study URL is the public web address for your study. Recruitment links append unique tokens to this URL to control and track who can participate. Share links directly, via email, or print QR codes for physical materials.",
-      "state_draft": "Your study is in draft mode. Configure the URL and prepare recruitment links — participants cannot access the study until it is activated.",
+      "state_draft": "Draft mode — links work after you activate the study.",
       "state_closed": "This study is closed. Existing links remain visible but new participants cannot start.",
       "state_archived": "This study is archived. All recruitment data is read-only.",
       "empty_title": "No recruitment links yet",
@@ -1033,7 +1006,6 @@
       },
       "new_link": "New access link",
       "create_title": "Create access links",
-      "create_description": "Target specific cohorts or create general access. Each link type has different security and usage properties.",
       "link_type": "Access strategy",
       "select_type": "Choose a recruitment type...",
       "campaign_name": "Channel / campaign name",
@@ -1044,11 +1016,9 @@
       "no_links": "No recruitment links generated yet.",
       "unnamed": "Unnamed channel",
       "revoked": "Access revoked",
-      "qr_title": "Share access code",
-      "qr_desc": "Participants can scan this code to leap directly into the study.",
-      "copy_link": "Copy secure URL",
-      "table_title": "Access control panel",
-      "table_description": "Active channels and link lifecycle management.",
+      "qr_title": "Share via QR",
+      "copy_link": "Copy URL",
+      "table_title": "Recruitment links",
       "share_title": "Share study",
       "share_desc": "Distribute your study URL to invite participants.",
       "public_url_label": "Public participation URL",
@@ -1352,7 +1322,6 @@
     },
     "study_overview": {
       "title": "Overview",
-      "subtitle": "",
       "back_to_overview": "Back to overview",
       "sample_size": "Number of participants (P-Set)",
       "valid": "valid",
@@ -1361,7 +1330,6 @@
       "mobile": "mobile",
       "median_duration": "Median duration",
       "suspect": "Suspect",
-      "time_to_complete": "Time to complete",
       "recent_activity": "Recent activity",
       "latest_participants": "Latest participants (last {{count}} of {{total}})",
       "recently_completed": "Recently completed",
@@ -1446,7 +1414,6 @@
     "design": {
       "title": "Study design",
       "translation_needed": "Review required (copy)",
-      "translation_needed_desc": "This content was automatically copied from another language. Please review and localize it.",
       "reset_defaults": "Reset to defaults",
       "editing_language_banner": "Editing the {{language}} version. Use the language selector in the toolbar to switch.",
       "multilang": {
@@ -1502,7 +1469,7 @@
         "editing_language": "Editing language",
         "manage_langs": "Manage languages",
         "select_lang": "Select language",
-        "test_run_help": "Open a participant preview. Test runs are flagged as is_test_run=true and never count toward your published data.",
+        "test_run_help": "Preview as a participant. These runs aren't included in your data.",
         "more_actions": "More actions"
       },
       "sync": {
@@ -1519,7 +1486,7 @@
       },
       "validation": {
         "failed_title": "Configuration incomplete",
-        "failed_desc": "Your study cannot be activated yet. Please fix the following issues:",
+        "failed_desc": "Fix these issues to activate:",
         "errors": {
           "no_statements": "Study must have at least one statement.",
           "no_grid": "Grid configuration is missing.",
@@ -1761,12 +1728,9 @@
           "tooltip_desc": "Q-methodology uses a quasi-normal distribution (kurtosis > 0) to ensure participants make meaningful distinctions. The pyramid shape prevents central tendency bias.",
           "locked": "Design locked",
           "locked_desc": "Structural changes (statement codes, grid) are disabled because the study has collected data or is no longer in draft mode. You can still edit text translations.",
-          "locked_active": "Study is active",
-          "locked_active_desc": "The study is currently collecting data. To modify the design, you must first revert it to draft mode.",
-          "locked_paused": "Study is paused",
-          "locked_paused_desc": "The study is currently paused. Design remains locked to protect existing data.",
-          "locked_closed": "Study is closed",
-          "locked_closed_desc": "This study is completed. The design is archived and cannot be changed.",
+          "locked_active": "Study is active — switch to draft to edit",
+          "locked_paused": "Study is paused — switch to draft to edit",
+          "locked_closed": "Study is closed — design is archived",
           "mismatch_title": "Grid capacity mismatch",
           "mismatch_desc": "You have {{statements}} statements but the grid only has slots for {{slots}} items. Please adjust the columns below to match.",
           "unlock_hint": "Go to data explorer to purge sessions and unlock structure"
@@ -1901,7 +1865,7 @@
       "methodology_memo": {
         "title": "Methodology memo",
         "summary": "Optional · for replication & pre-registration",
-        "help": "Optional. Document why this distribution, these conditions of instruction, this Q-set size. Useful for replication and pre-registration (Watts & Stenner 2012; Sneegas 2020). Leave empty if not relevant.",
+        "help": "Optional. Document the rationale for this distribution, conditions of instruction, and Q-set size.",
         "label": "Memo (any language)",
         "placeholder": "Document the rationale behind your design choices…"
       },
@@ -2088,7 +2052,7 @@
         "no_participants_title": "No participants yet",
         "no_participants_desc": "Share your study link to start collecting responses.",
         "contract_title": "No submissions yet",
-        "contract_body": "This page will list participant submissions and offer CSV/JSON exports as soon as the first response arrives. Share the study link from the overview to start collecting data.",
+        "contract_body": "Submissions and exports will appear here. Share the study link to start collecting.",
         "contract_cta": "Open study overview"
       },
       "pagination": {
@@ -2176,7 +2140,7 @@
         "delete_button": "Delete study",
         "delete_confirm": "Are you sure? This action is IRREVERSIBLE.",
         "delete_dialog_title": "Delete this study?",
-        "delete_dialog_intro": "All sorts, audio recordings, and analysis runs for this study will be permanently deleted. This cannot be undone.",
+        "delete_dialog_intro": "Permanently deletes sorts, audio, and analysis runs.",
         "delete_dialog_typed_label": "Type the study slug to confirm",
         "delete_dialog_action": "Delete permanently"
       },
@@ -2195,13 +2159,10 @@
       "delete_error_desc": "Failed to delete study.",
       "storage": {
         "title": "Audio Storage Usage",
-        "description": "Monitor audio recording storage for this study.",
         "used": "Storage Used",
         "quota": "Quota",
         "quota_label": "Storage Quota",
         "quota_help": "Maximum total audio storage for this study (10–1000 MB).",
-        "files_count": "Files: {{count}}",
-        "percent_used": "{{percent}}% used",
         "error": "Failed to load storage usage.",
         "warning_high_usage": "Storage usage is high. Consider increasing the quota or removing old recordings.",
         "save_success": "Storage quota updated",
@@ -2209,9 +2170,8 @@
       },
       "retention": {
         "title": "Data retention",
-        "description": "Number of months to keep identifiable participant data before recommending anonymisation. Drives the default cutoff in Data Lifecycle. Leave empty to use the system default (12 months).",
         "months_label": "Retention (months)",
-        "help": "Researchers in the EU should align this with their RGPD retention policy. Common values: 6, 12, 24, 60.",
+        "help": "Common values: 6, 12, 24, 60 months. Leave empty for system default (12).",
         "save_success": "Data retention policy updated",
         "save_error": "Failed to update data retention policy",
         "range_error": "Retention must be an integer between 1 and 240 months."
@@ -2219,12 +2179,9 @@
     },
     "lifecycle": {
       "title": "Data inventory & lifecycle",
-      "header_desc": "GDPR Art. 5 data minimisation controls",
-      "intro": "This page gives you a real-time snapshot of personal data held for this study and lets you anonymise older records in bulk. Use it to enforce GDPR Art. 5 data-minimisation obligations once data collection is complete.",
+      "header_desc": "Inventory & anonymisation",
       "load_error": "Failed to load data inventory.",
       "participants_title": "Participants snapshot",
-      "participants_desc": "Current status of all participants in this study",
-      "stat_total": "Total",
       "stat_started": "Started",
       "stat_completed": "Completed",
       "stat_discarded": "Discarded",
@@ -2248,20 +2205,20 @@
       "cutoff_help": "Only completed participants submitted strictly before this date will be anonymised.",
       "preview_label": "Candidates:",
       "preview_zero": "No participants qualify for this cutoff. Try an earlier date.",
-      "anonymise_button": "Anonymise older than {{date}}",
+      "anonymise_button": "Anonymise",
       "anonymise_success": "Anonymisation complete",
       "anonymise_success_desc": "{{n}} participant(s) anonymised, {{s}} already anonymous.",
       "anonymise_error": "Anonymisation failed",
       "confirm_title": "Anonymise participant data?",
       "confirm_candidates": "{{count}} completed participant(s) submitted before {{date}} will be anonymised.",
-      "confirm_preserved": "Q-sort statement rankings will be preserved as anonymous research data — they will no longer link to any individual.",
+      "confirm_preserved": "Q-sort rankings are kept; identity is removed.",
       "confirm_irreversible": "This action is immediate and cannot be undone.",
       "confirm_in_progress": "Anonymising…",
       "confirm_action": "Yes, anonymise",
       "cutoff_from_policy": "Default derived from study retention policy ({{months}} months).",
       "empty": {
         "title": "No participant data yet",
-        "body": "This page will activate the inventory dashboards and bulk-anonymisation controls (GDPR Art. 5) as soon as the first participant submits a Q-sort. Until then, share the study link from the overview to start collecting responses.",
+        "body": "This page activates once participants submit. Share the study link first.",
         "cta": "Open study overview"
       }
     },
@@ -2305,36 +2262,30 @@
             "title": "Permissions matrix",
             "admin": {
               "label": "Admin",
-              "badge": "Full access",
               "desc": "Can manage project settings, members, and all studies."
             },
             "owner": {
               "label": "Owner",
-              "badge": "Full access",
-              "desc": "Manages project settings, members, and all studies. Can promote or remove other members."
+              "desc": "Full project, member, and study control."
             },
             "researcher": {
               "label": "Researcher",
-              "badge": "Creation",
               "desc": "Can create and manage all studies. Restricted from project settings."
             },
             "viewer": {
               "label": "Viewer",
-              "badge": "Read only",
               "desc": "Read-only access to all studies and data in the project."
             }
           },
           "coming_soon": "Coming soon",
           "invite_modal": {
             "title": "Invite collaborator",
-            "desc": "Send a secure invitation to join your research team.",
             "email_label": "Collaborator email",
             "role_label": "Assigned role",
             "success": "Invitation link generated!",
             "error": "Failed to create invitation.",
             "send": "Create & send invitation",
-            "copy_success": "Link copied to clipboard!",
-            "copy_hint": "Copy this link and send it manually if the email fails."
+            "copy_success": "Link copied to clipboard!"
           }
         }
       }

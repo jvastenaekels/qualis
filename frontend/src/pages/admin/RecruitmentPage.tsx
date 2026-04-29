@@ -20,7 +20,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
-import { GuidanceCard } from '@/components/admin/GuidanceCard';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -36,7 +35,6 @@ import {
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -114,21 +112,6 @@ const RecruitmentPage = () => {
                 sessions. First-time visitors see it open; once dismissed it
                 stays collapsed so returning admins aren't re-greeted by help
                 they have already read (audit REPORT.md finding H6). */}
-            <GuidanceCard
-                type="info"
-                collapsible
-                defaultOpen
-                persistKey="recruitment.guidance"
-                title={t('admin.recruitment.guidance_title', 'How participant access works')}
-            >
-                <p className="text-sm font-medium opacity-80 leading-relaxed max-w-2xl">
-                    {t(
-                        'admin.recruitment.guidance_body',
-                        'The Study URL is the public web address for your study. Recruitment links append unique tokens to this URL to control and track who can participate. Share links directly, via email, or print QR codes for physical materials.'
-                    )}
-                </p>
-            </GuidanceCard>
-
             {/* State-aware banner */}
             {study.state === 'draft' && (
                 <div
@@ -138,7 +121,7 @@ const RecruitmentPage = () => {
                     <FileEdit className="size-4 shrink-0" />
                     {t(
                         'admin.recruitment.state_draft',
-                        'Your study is in draft mode. Configure the URL and prepare recruitment links — participants cannot access the study until it is activated.'
+                        'Draft mode — links work after you activate the study.'
                     )}
                 </div>
             )}
@@ -199,7 +182,7 @@ const RecruitmentPage = () => {
                                 size="icon"
                                 className="h-10 w-10 rounded-xl shrink-0"
                                 onClick={() => copyToClipboard(studyUrl)}
-                                aria-label={t('admin.recruitment.copy_link', 'Copy secure URL')}
+                                aria-label={t('admin.recruitment.copy_link', 'Copy URL')}
                             >
                                 <Copy className="h-4 w-4" />
                             </Button>
@@ -221,14 +204,8 @@ const RecruitmentPage = () => {
                                             <QrCode className="h-8 w-8 text-indigo-600" />
                                         </div>
                                         <DialogTitle className="text-xl font-black tracking-tight">
-                                            {t('admin.recruitment.qr_title', 'Share Access')}
+                                            {t('admin.recruitment.qr_title', 'Share via QR')}
                                         </DialogTitle>
-                                        <DialogDescription className="max-w-[280px]">
-                                            {t(
-                                                'admin.recruitment.qr_desc',
-                                                'Participants can scan this code to access the study instantly.'
-                                            )}
-                                        </DialogDescription>
                                     </DialogHeader>
                                     <div className="p-6 bg-white rounded-xl shadow-inner border border-slate-100 my-4">
                                         <QRCodeSVG
@@ -354,12 +331,6 @@ const RecruitmentPage = () => {
                     >
                         {/* Password Protection */}
                         <div className="space-y-4">
-                            <Label className="text-2xs font-black text-slate-400 uppercase tracking-wider">
-                                {t(
-                                    'admin.recruitment.access_rules.password_toggle',
-                                    'Require a password'
-                                )}
-                            </Label>
                             <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
                                 <div className="space-y-0.5">
                                     <p className="text-sm font-bold text-slate-700">
@@ -614,14 +585,8 @@ const RecruitmentPage = () => {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div>
                             <CardTitle className="text-sm font-black text-slate-500">
-                                {t('admin.recruitment.table_title', 'Participant Access Control')}
+                                {t('admin.recruitment.table_title', 'Recruitment links')}
                             </CardTitle>
-                            <CardDescription className="text-sm font-medium text-slate-500">
-                                {t(
-                                    'admin.recruitment.table_description',
-                                    'Generate and manage secure entry points for your study cohorts.'
-                                )}
-                            </CardDescription>
                         </div>
                         <div className="flex items-center gap-3">
                             <Dialog
@@ -648,12 +613,6 @@ const RecruitmentPage = () => {
                                                 'Create Access Links'
                                             )}
                                         </DialogTitle>
-                                        <DialogDescription className="pt-2">
-                                            {t(
-                                                'admin.recruitment.create_description',
-                                                'Generate links for your participants. Individual links are valid for one submission only.'
-                                            )}
-                                        </DialogDescription>
                                     </DialogHeader>
                                     <div className="grid gap-5 py-4">
                                         <div className="grid gap-2">
@@ -681,59 +640,32 @@ const RecruitmentPage = () => {
                                                     />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {/* Each option shows its title + a one-line
-                                                        rationale so users can compare strategies
-                                                        without trial-selecting each one. */}
                                                     <SelectItem value="public">
-                                                        <div className="flex flex-col gap-0.5 py-0.5">
-                                                            <span className="flex items-center gap-2 font-medium">
-                                                                <Globe className="h-4 w-4 text-blue-500 flex-shrink-0" />
-                                                                {t(
-                                                                    'admin.recruitment.types.public',
-                                                                    'Public (Multiple usage)'
-                                                                )}
-                                                            </span>
-                                                            <span className="text-xs text-slate-500 italic pl-6">
-                                                                {t(
-                                                                    'admin.recruitment.guidance.public',
-                                                                    'Ideal for social media or generic newsletters. Anyone with this link can participate multiple times.'
-                                                                )}
-                                                            </span>
-                                                        </div>
+                                                        <span className="flex items-center gap-2 font-medium">
+                                                            <Globe className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                                                            {t(
+                                                                'admin.recruitment.types.public',
+                                                                'Public (Multiple usage)'
+                                                            )}
+                                                        </span>
                                                     </SelectItem>
                                                     <SelectItem value="individual">
-                                                        <div className="flex flex-col gap-0.5 py-0.5">
-                                                            <span className="flex items-center gap-2 font-medium">
-                                                                <Users className="h-4 w-4 text-indigo-500 flex-shrink-0" />
-                                                                {t(
-                                                                    'admin.recruitment.types.individual',
-                                                                    'Individual (Single usage)'
-                                                                )}
-                                                            </span>
-                                                            <span className="text-xs text-slate-500 italic pl-6">
-                                                                {t(
-                                                                    'admin.recruitment.guidance.individual',
-                                                                    'Each link is unique and expires after one submission. Best for controlled samples.'
-                                                                )}
-                                                            </span>
-                                                        </div>
+                                                        <span className="flex items-center gap-2 font-medium">
+                                                            <Users className="h-4 w-4 text-indigo-500 flex-shrink-0" />
+                                                            {t(
+                                                                'admin.recruitment.types.individual',
+                                                                'Individual (Single usage)'
+                                                            )}
+                                                        </span>
                                                     </SelectItem>
                                                     <SelectItem value="limited">
-                                                        <div className="flex flex-col gap-0.5 py-0.5">
-                                                            <span className="flex items-center gap-2 font-medium">
-                                                                <Lock className="h-4 w-4 text-orange-500 flex-shrink-0" />
-                                                                {t(
-                                                                    'admin.recruitment.types.limited',
-                                                                    'Limited (Set capacity)'
-                                                                )}
-                                                            </span>
-                                                            <span className="text-xs text-slate-500 italic pl-6">
-                                                                {t(
-                                                                    'admin.recruitment.guidance.limited',
-                                                                    'Set a maximum number of submissions for a single link. Good for small target groups.'
-                                                                )}
-                                                            </span>
-                                                        </div>
+                                                        <span className="flex items-center gap-2 font-medium">
+                                                            <Lock className="h-4 w-4 text-orange-500 flex-shrink-0" />
+                                                            {t(
+                                                                'admin.recruitment.types.limited',
+                                                                'Limited (Set capacity)'
+                                                            )}
+                                                        </span>
                                                     </SelectItem>
                                                 </SelectContent>
                                             </Select>
@@ -1097,15 +1029,9 @@ const RecruitmentPage = () => {
                                                             <DialogTitle className="text-xl font-black tracking-tight">
                                                                 {t(
                                                                     'admin.recruitment.qr_title',
-                                                                    'Share Access'
+                                                                    'Share via QR'
                                                                 )}
                                                             </DialogTitle>
-                                                            <DialogDescription className="max-w-[280px]">
-                                                                {t(
-                                                                    'admin.recruitment.qr_desc',
-                                                                    'Participants can scan this code to access the study instantly.'
-                                                                )}
-                                                            </DialogDescription>
                                                         </DialogHeader>
                                                         <div className="p-6 bg-white rounded-xl shadow-inner border border-slate-100 my-4">
                                                             <QRCodeSVG
