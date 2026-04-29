@@ -5,7 +5,6 @@
 """Memo entries and threaded comments. Polymorphic on (parent_type, parent_id)."""
 
 from .base import (
-    Any,
     Base,
     Boolean,
     DateTime,
