@@ -15,6 +15,10 @@ deploy.
 
 PostgreSQL DDL is transactional; a failed step rolls back the migration
 entirely (including the data step).
+
+See migration c5e12a8b3d04 for the curatorial-act framing
+(Sneegas 2020; Robbins & Krueger 2000) that the construction_memo
+column originally surfaced.
 """
 
 from typing import Sequence, Union
@@ -30,6 +34,8 @@ down_revision: Union[str, Sequence[str], None] = '8b649314aa4a'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+# Maximum body length for a memo entry.
+MEMO_BODY_MAX_LENGTH = 10000
 
 # create_type=False: we manage CREATE/DROP ourselves so create_table
 # does not emit a redundant CREATE TYPE.

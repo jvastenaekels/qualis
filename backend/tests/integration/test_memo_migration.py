@@ -21,10 +21,14 @@ actual migration SQL end-to-end.
 
 import os
 import subprocess
+import uuid
 from pathlib import Path
+from typing import Literal
 
 import asyncpg
 import pytest
+
+from tests.conftest import TEST_DATABASE_URL
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -38,17 +42,14 @@ PREV_REVISION = "8b649314aa4a"
 # The migration under test
 MEMO_REVISION = "db2ad904b167"
 
-# Raw asyncpg DSN (no driver prefix)
-RAW_TEST_DSN = os.getenv(
-    "TEST_ASYNCPG_DSN",
-    "postgresql://julien:xK7mQ9vR2pLw@localhost/qualis_test",
-)
+# Maximum body length enforced by the migration (mirrors migration cap)
+MEMO_BODY_MAX_LENGTH = 10000
 
 # SQLAlchemy-compatible URL for alembic subprocess
-SQLALCHEMY_TEST_URL = os.getenv(
-    "TEST_DATABASE_URL",
-    "postgresql+asyncpg://julien:xK7mQ9vR2pLw@localhost/qualis_test",
-)
+SQLALCHEMY_TEST_URL = TEST_DATABASE_URL
+
+# asyncpg expects no `+asyncpg` driver segment in the URL
+RAW_TEST_DSN = TEST_DATABASE_URL.replace("+asyncpg", "")
 
 
 # ---------------------------------------------------------------------------
@@ -149,8 +150,6 @@ async def _seed_study(
     conn: asyncpg.Connection, project_id: int, memo: str | None
 ) -> int:
     """Insert a study with the given methodology_memo; return id."""
-    import uuid
-
     study_id: int = await conn.fetchval(
         """
         INSERT INTO studies (
@@ -172,23 +171,32 @@ async def _seed_study(
     return study_id
 
 
-def _schema_has_users_table() -> bool:
-    """Return True if the 'users' table exists in the test DB (sync, via psql subprocess)."""
-    result = subprocess.run(
-        [
-            "psql",
-            RAW_TEST_DSN,
-            "-tAc",
-            "SELECT COUNT(*) FROM information_schema.tables "
-            "WHERE table_schema='public' AND table_name='users'",
-        ],
-        capture_output=True,
-        text=True,
-    )
-    return result.stdout.strip() == "1"
+async def _schema_has_users_table() -> bool:
+    """Return True if the 'users' table exists in the test DB."""
+    conn = await asyncpg.connect(RAW_TEST_DSN)
+    try:
+        return await conn.fetchval(
+            "SELECT to_regclass('public.users') IS NOT NULL"
+        )
+    finally:
+        await conn.close()
 
 
-def _reset_schema_to_prev_revision() -> None:
+async def _seed_oversized(target: Literal["concourse", "study"]) -> None:
+    """Seed a project + one parent of ``target`` type with a memo > MEMO_BODY_MAX_LENGTH."""
+    conn = await _get_conn()
+    try:
+        _, project_id = await _seed_minimal_project_user(conn)
+        oversized = "x" * (MEMO_BODY_MAX_LENGTH + 1)
+        if target == "concourse":
+            await _seed_concourse(conn, project_id, oversized)
+        else:
+            await _seed_study(conn, project_id, oversized)
+    finally:
+        await conn.close()
+
+
+async def _reset_schema_to_prev_revision() -> None:
     """Ensure the DB schema is at exactly PREV_REVISION.
 
     Handles two starting states:
@@ -198,7 +206,8 @@ def _reset_schema_to_prev_revision() -> None:
          alembic_version is stale): stamp base, upgrade head from scratch,
          then downgrade.
     """
-    if _schema_has_users_table():
+    has_users = await _schema_has_users_table()
+    if has_users:
         # Intact schema: upgrade then downgrade.
         _run_alembic("upgrade", "head")
         _run_alembic("downgrade", PREV_REVISION)
@@ -231,7 +240,7 @@ def _restore_to_prev_revision() -> None:
 @pytest.mark.asyncio
 async def test_upgrade_migrates_concourse_memo_into_entry() -> None:
     """Non-empty construction_memo → exactly one memo_entries row (Notes, pos 0)."""
-    _reset_schema_to_prev_revision()
+    await _reset_schema_to_prev_revision()
     await _wipe_application_data()
 
     conn = await _get_conn()
@@ -266,15 +275,22 @@ async def test_upgrade_migrates_concourse_memo_into_entry() -> None:
 
 
 @pytest.mark.asyncio
-async def test_upgrade_skips_empty_study_memo() -> None:
-    """Empty / whitespace-only methodology_memo → no memo_entries row for that study."""
-    _reset_schema_to_prev_revision()
+@pytest.mark.parametrize(
+    "memo,case_label",
+    [
+        ("   ", "whitespace"),
+        (None, "null"),
+    ],
+)
+async def test_upgrade_skips_empty_study_memo(memo: str | None, case_label: str) -> None:
+    """Empty / whitespace-only / NULL methodology_memo → no memo_entries row for that study."""
+    await _reset_schema_to_prev_revision()
     await _wipe_application_data()
 
     conn = await _get_conn()
     try:
         _, project_id = await _seed_minimal_project_user(conn)
-        study_id = await _seed_study(conn, project_id, "   ")  # whitespace only
+        study_id = await _seed_study(conn, project_id, memo)
     finally:
         await conn.close()
 
@@ -290,7 +306,7 @@ async def test_upgrade_skips_empty_study_memo() -> None:
             study_id,
         )
         assert count == 0, (
-            f"Expected 0 memo_entries for study with whitespace memo, got {count}"
+            f"Expected 0 memo_entries for study with {case_label} memo, got {count}"
         )
     finally:
         await conn.close()
@@ -299,47 +315,34 @@ async def test_upgrade_skips_empty_study_memo() -> None:
 
 @pytest.mark.asyncio
 async def test_upgrade_aborts_on_oversized_memo() -> None:
-    """A 10001-char construction_memo causes upgrade to abort with the cap message."""
-    _reset_schema_to_prev_revision()
+    """A memo > MEMO_BODY_MAX_LENGTH chars on a concourse causes upgrade to abort."""
+    await _reset_schema_to_prev_revision()
     await _wipe_application_data()
+    await _seed_oversized("concourse")
 
-    oversized = "x" * 10001
-    conn = await _get_conn()
     try:
-        _, project_id = await _seed_minimal_project_user(conn)
-        await _seed_concourse(conn, project_id, oversized)
+        with pytest.raises(RuntimeError, match="10000-char cap"):
+            _upgrade_to_memo_revision()
     finally:
-        await conn.close()
-
-    with pytest.raises(RuntimeError, match="10000-char cap"):
-        _upgrade_to_memo_revision()
-
-    # The migration rolled back (PostgreSQL DDL is transactional).
-    # Remove the oversized concourse before restoring to head so the next
-    # upgrade succeeds on clean data.
-    await _wipe_application_data()
-    _restore_to_prev_revision()
+        # The migration rolled back (PostgreSQL DDL is transactional).
+        # Remove the oversized concourse before restoring to head so the next
+        # upgrade succeeds on clean data.
+        await _wipe_application_data()
+        _restore_to_prev_revision()
 
 
 @pytest.mark.asyncio
 async def test_migration_aborts_when_study_methodology_memo_exceeds_cap() -> None:
-    """A studies.methodology_memo > 10000 chars aborts the migration."""
-    _reset_schema_to_prev_revision()
+    """A studies.methodology_memo > MEMO_BODY_MAX_LENGTH chars aborts the migration."""
+    await _reset_schema_to_prev_revision()
     await _wipe_application_data()
+    await _seed_oversized("study")
 
-    oversized = "y" * 10001
-    conn = await _get_conn()
     try:
-        _, project_id = await _seed_minimal_project_user(conn)
-        # Leave concourses empty; only seed an oversized study memo.
-        await _seed_study(conn, project_id, oversized)
+        with pytest.raises(RuntimeError, match="10000-char cap"):
+            _upgrade_to_memo_revision()
     finally:
-        await conn.close()
-
-    with pytest.raises(RuntimeError, match="10000-char cap"):
-        _upgrade_to_memo_revision()
-
-    # The migration rolled back (PostgreSQL DDL is transactional).
-    # Remove the oversized study before restoring so the next upgrade succeeds.
-    await _wipe_application_data()
-    _restore_to_prev_revision()
+        # The migration rolled back (PostgreSQL DDL is transactional).
+        # Remove the oversized study before restoring so the next upgrade succeeds.
+        await _wipe_application_data()
+        _restore_to_prev_revision()
