@@ -334,9 +334,7 @@ async def resolve_comment(
         await _check_member(db, project_id, user, ProjectRole.owner)
     else:
         await _check_member(db, project_id, user, ProjectRole.researcher)
-    resolved = await MemoService.resolve_comment(
-        db, comment_id=cid, user_id=user.id
-    )
+    resolved = await MemoService.resolve_comment(db, comment_id=cid, user_id=user.id)
     return MemoCommentRead.model_validate(resolved, from_attributes=True)
 
 

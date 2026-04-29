@@ -276,9 +276,7 @@ class MemoService:
         return c
 
     @staticmethod
-    async def soft_delete_comment(
-        db: AsyncSession, *, comment_id: int
-    ) -> MemoComment:
+    async def soft_delete_comment(db: AsyncSession, *, comment_id: int) -> MemoComment:
         c = await MemoService.get_comment(db, comment_id=comment_id)
         c.deleted = True
         await db.commit()
@@ -298,9 +296,7 @@ class MemoService:
         return c
 
     @staticmethod
-    async def unresolve_comment(
-        db: AsyncSession, *, comment_id: int
-    ) -> MemoComment:
+    async def unresolve_comment(db: AsyncSession, *, comment_id: int) -> MemoComment:
         c = await MemoService.get_comment(db, comment_id=comment_id)
         c.resolved = False
         c.resolved_by = None
