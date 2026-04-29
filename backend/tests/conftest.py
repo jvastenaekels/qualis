@@ -327,3 +327,37 @@ async def active_study(db, seed_study):
     await db.commit()
     await db.refresh(seed_study)
     return seed_study
+
+
+@pytest_asyncio.fixture
+async def seed_user_id(test_user: User) -> int:
+    """Return the int PK of the seeded test user."""
+    return test_user.id
+
+
+@pytest_asyncio.fixture
+async def seed_other_user_id(db: AsyncSession) -> int:
+    """Return the int PK of a second distinct user (no project membership required for T4)."""
+    hashed = get_password_hash("otherpassword")
+    user = User(email="other@example.com", hashed_password=hashed)
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return user.id
+
+
+@pytest_asyncio.fixture
+async def seed_concourse_id(db: AsyncSession, test_project: Project, test_user: User) -> int:
+    """Return the int PK of a concourse owned by test_project."""
+    from app.models import Concourse
+
+    concourse = Concourse(
+        project_id=test_project.id,
+        title="Seed Concourse",
+        description="For memo tests",
+        created_by=test_user.id,
+    )
+    db.add(concourse)
+    await db.commit()
+    await db.refresh(concourse)
+    return concourse.id
