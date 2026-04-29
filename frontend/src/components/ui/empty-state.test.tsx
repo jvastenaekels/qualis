@@ -55,4 +55,51 @@ describe('EmptyState — Wave E (E2) primitive', () => {
         expect(screen.queryByRole('heading')).not.toBeInTheDocument();
         expect(screen.getByText(/No matches/i)).toBeInTheDocument();
     });
+
+    it('card variant renders without a body when none is supplied', () => {
+        render(
+            <MemoryRouter>
+                <EmptyState icon={Inbox} title="Title only" />
+            </MemoryRouter>
+        );
+        expect(screen.getByRole('heading', { name: 'Title only' })).toBeInTheDocument();
+        // No paragraph element should exist apart from the heading
+        expect(screen.queryByText(/Share/i)).not.toBeInTheDocument();
+    });
+
+    it('renders the icon when one is supplied (review finding)', () => {
+        render(
+            <MemoryRouter>
+                <EmptyState icon={Inbox} title="With icon" />
+            </MemoryRouter>
+        );
+        // Lucide icons render <svg aria-hidden="true">
+        const svg = document.querySelector('svg[aria-hidden="true"]');
+        expect(svg).toBeInTheDocument();
+    });
+
+    it('respects headingLevel prop and defaults card→h2, inline→h3', () => {
+        const { rerender } = render(
+            <MemoryRouter>
+                <EmptyState title="Card default" variant="card" />
+            </MemoryRouter>
+        );
+        expect(screen.getByRole('heading', { level: 2, name: 'Card default' })).toBeInTheDocument();
+
+        rerender(
+            <MemoryRouter>
+                <EmptyState title="Inline default" variant="inline" />
+            </MemoryRouter>
+        );
+        expect(
+            screen.getByRole('heading', { level: 3, name: 'Inline default' })
+        ).toBeInTheDocument();
+
+        rerender(
+            <MemoryRouter>
+                <EmptyState title="Override" variant="inline" headingLevel={4} />
+            </MemoryRouter>
+        );
+        expect(screen.getByRole('heading', { level: 4, name: 'Override' })).toBeInTheDocument();
+    });
 });

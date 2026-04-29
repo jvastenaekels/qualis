@@ -27,6 +27,14 @@ import { cn } from '@/lib/utils';
  *   like "no matches" inside a populated table.
  */
 
+/**
+ * Discriminated union — a CTA is EITHER a route link (`to`) OR an
+ * in-page action (`onClick`), never both. Prevents the `Button asChild`
+ * gotcha where an `onClick` would silently be cloned onto the inner
+ * `<Link>` and fire on navigation.
+ */
+type EmptyStateCta = { label: string; to: string } | { label: string; onClick: () => void };
+
 interface EmptyStateProps {
     /**
      * Icon shown above the title. Optional. Skipped automatically in
@@ -35,19 +43,25 @@ interface EmptyStateProps {
     icon?: LucideIcon;
     /** Required short headline. */
     title: string;
-    /** Optional one-paragraph explanation. */
-    body?: string;
     /**
-     * Optional call-to-action. Supply `to` for an internal route link,
-     * `onClick` for an in-page action.
+     * Optional one-paragraph explanation. The audit (C2) recommended
+     * making `body` required; we keep it optional so the `compact`
+     * variant — which is a single inline sentence — doesn't need a
+     * dummy paragraph. For `card` and `inline`, supplying `body` is
+     * strongly encouraged.
      */
-    cta?: {
-        label: string;
-        to?: string;
-        onClick?: () => void;
-    };
+    body?: string;
+    /** Optional call-to-action. See {@link EmptyStateCta}. */
+    cta?: EmptyStateCta;
     /** Visual variant — see component docstring. */
     variant?: 'card' | 'inline' | 'compact';
+    /**
+     * Heading level for the title. Defaults: card → 2, inline → 3.
+     * Supply explicitly when nesting under an existing section heading
+     * to keep the document outline correct for assistive tech.
+     * Ignored on `compact` (which renders no heading at all).
+     */
+    headingLevel?: 2 | 3 | 4;
     className?: string;
 }
 
@@ -57,6 +71,7 @@ export function EmptyState({
     body,
     cta,
     variant = 'card',
+    headingLevel,
     className,
 }: EmptyStateProps) {
     if (variant === 'compact') {
@@ -67,6 +82,9 @@ export function EmptyState({
             </p>
         );
     }
+
+    // Tag chosen at render so assistive tech sees the right outline level.
+    const Heading = `h${headingLevel ?? (variant === 'card' ? 2 : 3)}` as 'h2' | 'h3' | 'h4';
 
     const containerClass =
         variant === 'card'
@@ -104,14 +122,19 @@ export function EmptyState({
                 </div>
             )}
             <div className={cn('space-y-2', wrapperAlign)}>
-                <h2 className={titleClass}>{title}</h2>
+                <Heading className={titleClass}>{title}</Heading>
                 {body && <p className={bodyClass}>{body}</p>}
             </div>
-            {cta && (
-                <Button asChild={!!cta.to} onClick={cta.onClick} className="rounded-xl">
-                    {cta.to ? <Link to={cta.to}>{cta.label}</Link> : cta.label}
-                </Button>
-            )}
+            {cta &&
+                ('to' in cta ? (
+                    <Button asChild className="rounded-xl">
+                        <Link to={cta.to}>{cta.label}</Link>
+                    </Button>
+                ) : (
+                    <Button onClick={cta.onClick} className="rounded-xl">
+                        {cta.label}
+                    </Button>
+                ))}
         </div>
     );
 }
