@@ -5,7 +5,6 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { ConcourseReadDescription } from './concourseReadDescription';
-import type { ConcourseReadConstructionMemo } from './concourseReadConstructionMemo';
 import type { ConcourseReadCreatedBy } from './concourseReadCreatedBy';
 
 /**
@@ -16,7 +15,6 @@ export interface ConcourseRead {
     project_id: number;
     title: string;
     description?: ConcourseReadDescription;
-    construction_memo?: ConcourseReadConstructionMemo;
     item_count?: number;
     created_by?: ConcourseReadCreatedBy;
     created_at: string;

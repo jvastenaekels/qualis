@@ -42,6 +42,7 @@ import type {
     DraftSaveInput,
     GetAudioUrlApiAudioRecordingIdUrlGetParams,
     GetStudyApiStudySlugGetParams,
+    GetTemplatesApiAdminMemoTemplatesGetParams,
     HTTPValidationError,
     InvitationAccept,
     ListAudiosForParticipantsApiAdminStudiesSlugAnalysisAudiosGetParams,
@@ -55,6 +56,10 @@ import type {
     ListStudyParticipantsApiAdminStudiesSlugParticipantsGetParams,
     ListUsersApiAdminUsersGetParams,
     LogEntry,
+    MemoCommentCreate,
+    MemoCommentUpdate,
+    MemoEntryCreate,
+    MemoEntryUpdate,
     ParticipantDiscardUpdate,
     ParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteParams,
     PasswordChange,
@@ -112,6 +117,10 @@ import type {
     DeleteAudioRecordingApiAudioRecordingIdDelete200,
     EigenvalueResult,
     InvitationLink,
+    MemoCommentRead,
+    MemoEntryRead,
+    MemoRead,
+    MemoTemplate,
     PaginatedResponseConcourseRead,
     PaginatedResponseParticipantRead,
     PaginatedResponseProjectMemberRead,
@@ -10389,6 +10398,1194 @@ export const useCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdComment
 };
 
 /**
+ * @summary Get Concourse Memo
+ */
+export const getConcourseMemoApiAdminConcoursesCidMemoGet = (cid: number, signal?: AbortSignal) => {
+    return customInstance<MemoRead>({
+        url: `/api/admin/concourses/${cid}/memo`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetConcourseMemoApiAdminConcoursesCidMemoGetQueryKey = (cid?: number) => {
+    return [`/api/admin/concourses/${cid}/memo`] as const;
+};
+
+export const getGetConcourseMemoApiAdminConcoursesCidMemoGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getGetConcourseMemoApiAdminConcoursesCidMemoGetQueryKey(cid);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>
+    > = ({ signal }) => getConcourseMemoApiAdminConcoursesCidMemoGet(cid, signal);
+
+    return { queryKey, queryFn, enabled: !!cid, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetConcourseMemoApiAdminConcoursesCidMemoGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>
+>;
+export type GetConcourseMemoApiAdminConcoursesCidMemoGetQueryError = HTTPValidationError;
+
+export function useGetConcourseMemoApiAdminConcoursesCidMemoGet<
+    TData = Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetConcourseMemoApiAdminConcoursesCidMemoGet<
+    TData = Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetConcourseMemoApiAdminConcoursesCidMemoGet<
+    TData = Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Concourse Memo
+ */
+
+export function useGetConcourseMemoApiAdminConcoursesCidMemoGet<
+    TData = Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    cid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getConcourseMemoApiAdminConcoursesCidMemoGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetConcourseMemoApiAdminConcoursesCidMemoGetQueryOptions(cid, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary Get Study Memo
+ */
+export const getStudyMemoApiAdminStudiesSidMemoGet = (sid: number, signal?: AbortSignal) => {
+    return customInstance<MemoRead>({
+        url: `/api/admin/studies/${sid}/memo`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getGetStudyMemoApiAdminStudiesSidMemoGetQueryKey = (sid?: number) => {
+    return [`/api/admin/studies/${sid}/memo`] as const;
+};
+
+export const getGetStudyMemoApiAdminStudiesSidMemoGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getGetStudyMemoApiAdminStudiesSidMemoGetQueryKey(sid);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>
+    > = ({ signal }) => getStudyMemoApiAdminStudiesSidMemoGet(sid, signal);
+
+    return { queryKey, queryFn, enabled: !!sid, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStudyMemoApiAdminStudiesSidMemoGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>
+>;
+export type GetStudyMemoApiAdminStudiesSidMemoGetQueryError = HTTPValidationError;
+
+export function useGetStudyMemoApiAdminStudiesSidMemoGet<
+    TData = Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetStudyMemoApiAdminStudiesSidMemoGet<
+    TData = Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetStudyMemoApiAdminStudiesSidMemoGet<
+    TData = Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Study Memo
+ */
+
+export function useGetStudyMemoApiAdminStudiesSidMemoGet<
+    TData = Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+    TError = HTTPValidationError,
+>(
+    sid: number,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getStudyMemoApiAdminStudiesSidMemoGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetStudyMemoApiAdminStudiesSidMemoGetQueryOptions(sid, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary Get Templates
+ */
+export const getTemplatesApiAdminMemoTemplatesGet = (
+    params: GetTemplatesApiAdminMemoTemplatesGetParams,
+    signal?: AbortSignal
+) => {
+    return customInstance<MemoTemplate[]>({
+        url: `/api/admin/memo/templates`,
+        method: 'GET',
+        params,
+        signal,
+    });
+};
+
+export const getGetTemplatesApiAdminMemoTemplatesGetQueryKey = (
+    params?: GetTemplatesApiAdminMemoTemplatesGetParams
+) => {
+    return [`/api/admin/memo/templates`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetTemplatesApiAdminMemoTemplatesGetQueryOptions = <
+    TData = Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+    TError = HTTPValidationError,
+>(
+    params: GetTemplatesApiAdminMemoTemplatesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+                TError,
+                TData
+            >
+        >;
+    }
+) => {
+    const { query: queryOptions } = options ?? {};
+
+    const queryKey =
+        queryOptions?.queryKey ?? getGetTemplatesApiAdminMemoTemplatesGetQueryKey(params);
+
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>
+    > = ({ signal }) => getTemplatesApiAdminMemoTemplatesGet(params, signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetTemplatesApiAdminMemoTemplatesGetQueryResult = NonNullable<
+    Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>
+>;
+export type GetTemplatesApiAdminMemoTemplatesGetQueryError = HTTPValidationError;
+
+export function useGetTemplatesApiAdminMemoTemplatesGet<
+    TData = Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+    TError = HTTPValidationError,
+>(
+    params: GetTemplatesApiAdminMemoTemplatesGetParams,
+    options: {
+        query: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetTemplatesApiAdminMemoTemplatesGet<
+    TData = Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+    TError = HTTPValidationError,
+>(
+    params: GetTemplatesApiAdminMemoTemplatesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+                TError,
+                TData
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+                    TError,
+                    Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetTemplatesApiAdminMemoTemplatesGet<
+    TData = Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+    TError = HTTPValidationError,
+>(
+    params: GetTemplatesApiAdminMemoTemplatesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get Templates
+ */
+
+export function useGetTemplatesApiAdminMemoTemplatesGet<
+    TData = Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+    TError = HTTPValidationError,
+>(
+    params: GetTemplatesApiAdminMemoTemplatesGetParams,
+    options?: {
+        query?: Partial<
+            UseQueryOptions<
+                Awaited<ReturnType<typeof getTemplatesApiAdminMemoTemplatesGet>>,
+                TError,
+                TData
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getGetTemplatesApiAdminMemoTemplatesGetQueryOptions(params, options);
+
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
+
+    query.queryKey = queryOptions.queryKey;
+
+    return query;
+}
+
+/**
+ * @summary Create Concourse Entry
+ */
+export const createConcourseEntryApiAdminConcoursesCidMemoEntriesPost = (
+    cid: number,
+    memoEntryCreate: MemoEntryCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<MemoEntryRead>({
+        url: `/api/admin/concourses/${cid}/memo/entries`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: memoEntryCreate,
+        signal,
+    });
+};
+
+export const getCreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createConcourseEntryApiAdminConcoursesCidMemoEntriesPost>>,
+        TError,
+        { cid: number; data: MemoEntryCreate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createConcourseEntryApiAdminConcoursesCidMemoEntriesPost>>,
+    TError,
+    { cid: number; data: MemoEntryCreate },
+    TContext
+> => {
+    const mutationKey = ['createConcourseEntryApiAdminConcoursesCidMemoEntriesPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createConcourseEntryApiAdminConcoursesCidMemoEntriesPost>>,
+        { cid: number; data: MemoEntryCreate }
+    > = (props) => {
+        const { cid, data } = props ?? {};
+
+        return createConcourseEntryApiAdminConcoursesCidMemoEntriesPost(cid, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createConcourseEntryApiAdminConcoursesCidMemoEntriesPost>>
+>;
+export type CreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostMutationBody = MemoEntryCreate;
+export type CreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostMutationError =
+    HTTPValidationError;
+
+/**
+ * @summary Create Concourse Entry
+ */
+export const useCreateConcourseEntryApiAdminConcoursesCidMemoEntriesPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createConcourseEntryApiAdminConcoursesCidMemoEntriesPost>>,
+            TError,
+            { cid: number; data: MemoEntryCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createConcourseEntryApiAdminConcoursesCidMemoEntriesPost>>,
+    TError,
+    { cid: number; data: MemoEntryCreate },
+    TContext
+> => {
+    const mutationOptions =
+        getCreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Create Study Entry
+ */
+export const createStudyEntryApiAdminStudiesSidMemoEntriesPost = (
+    sid: number,
+    memoEntryCreate: MemoEntryCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<MemoEntryRead>({
+        url: `/api/admin/studies/${sid}/memo/entries`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: memoEntryCreate,
+        signal,
+    });
+};
+
+export const getCreateStudyEntryApiAdminStudiesSidMemoEntriesPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof createStudyEntryApiAdminStudiesSidMemoEntriesPost>>,
+        TError,
+        { sid: number; data: MemoEntryCreate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof createStudyEntryApiAdminStudiesSidMemoEntriesPost>>,
+    TError,
+    { sid: number; data: MemoEntryCreate },
+    TContext
+> => {
+    const mutationKey = ['createStudyEntryApiAdminStudiesSidMemoEntriesPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof createStudyEntryApiAdminStudiesSidMemoEntriesPost>>,
+        { sid: number; data: MemoEntryCreate }
+    > = (props) => {
+        const { sid, data } = props ?? {};
+
+        return createStudyEntryApiAdminStudiesSidMemoEntriesPost(sid, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type CreateStudyEntryApiAdminStudiesSidMemoEntriesPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof createStudyEntryApiAdminStudiesSidMemoEntriesPost>>
+>;
+export type CreateStudyEntryApiAdminStudiesSidMemoEntriesPostMutationBody = MemoEntryCreate;
+export type CreateStudyEntryApiAdminStudiesSidMemoEntriesPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Create Study Entry
+ */
+export const useCreateStudyEntryApiAdminStudiesSidMemoEntriesPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof createStudyEntryApiAdminStudiesSidMemoEntriesPost>>,
+            TError,
+            { sid: number; data: MemoEntryCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof createStudyEntryApiAdminStudiesSidMemoEntriesPost>>,
+    TError,
+    { sid: number; data: MemoEntryCreate },
+    TContext
+> => {
+    const mutationOptions =
+        getCreateStudyEntryApiAdminStudiesSidMemoEntriesPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Update Entry
+ */
+export const updateEntryApiAdminMemoEntriesEidPatch = (
+    eid: number,
+    memoEntryUpdate: MemoEntryUpdate
+) => {
+    return customInstance<MemoEntryRead>({
+        url: `/api/admin/memo-entries/${eid}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: memoEntryUpdate,
+    });
+};
+
+export const getUpdateEntryApiAdminMemoEntriesEidPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateEntryApiAdminMemoEntriesEidPatch>>,
+        TError,
+        { eid: number; data: MemoEntryUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateEntryApiAdminMemoEntriesEidPatch>>,
+    TError,
+    { eid: number; data: MemoEntryUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateEntryApiAdminMemoEntriesEidPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateEntryApiAdminMemoEntriesEidPatch>>,
+        { eid: number; data: MemoEntryUpdate }
+    > = (props) => {
+        const { eid, data } = props ?? {};
+
+        return updateEntryApiAdminMemoEntriesEidPatch(eid, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateEntryApiAdminMemoEntriesEidPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateEntryApiAdminMemoEntriesEidPatch>>
+>;
+export type UpdateEntryApiAdminMemoEntriesEidPatchMutationBody = MemoEntryUpdate;
+export type UpdateEntryApiAdminMemoEntriesEidPatchMutationError = HTTPValidationError;
+
+/**
+ * @summary Update Entry
+ */
+export const useUpdateEntryApiAdminMemoEntriesEidPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateEntryApiAdminMemoEntriesEidPatch>>,
+            TError,
+            { eid: number; data: MemoEntryUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateEntryApiAdminMemoEntriesEidPatch>>,
+    TError,
+    { eid: number; data: MemoEntryUpdate },
+    TContext
+> => {
+    const mutationOptions = getUpdateEntryApiAdminMemoEntriesEidPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Delete Entry
+ */
+export const deleteEntryApiAdminMemoEntriesEidDelete = (eid: number) => {
+    return customInstance<void>({ url: `/api/admin/memo-entries/${eid}`, method: 'DELETE' });
+};
+
+export const getDeleteEntryApiAdminMemoEntriesEidDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof deleteEntryApiAdminMemoEntriesEidDelete>>,
+        TError,
+        { eid: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof deleteEntryApiAdminMemoEntriesEidDelete>>,
+    TError,
+    { eid: number },
+    TContext
+> => {
+    const mutationKey = ['deleteEntryApiAdminMemoEntriesEidDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof deleteEntryApiAdminMemoEntriesEidDelete>>,
+        { eid: number }
+    > = (props) => {
+        const { eid } = props ?? {};
+
+        return deleteEntryApiAdminMemoEntriesEidDelete(eid);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteEntryApiAdminMemoEntriesEidDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteEntryApiAdminMemoEntriesEidDelete>>
+>;
+
+export type DeleteEntryApiAdminMemoEntriesEidDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Delete Entry
+ */
+export const useDeleteEntryApiAdminMemoEntriesEidDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof deleteEntryApiAdminMemoEntriesEidDelete>>,
+            TError,
+            { eid: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof deleteEntryApiAdminMemoEntriesEidDelete>>,
+    TError,
+    { eid: number },
+    TContext
+> => {
+    const mutationOptions = getDeleteEntryApiAdminMemoEntriesEidDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Post Comment
+ */
+export const postCommentApiAdminMemoEntriesEidCommentsPost = (
+    eid: number,
+    memoCommentCreate: MemoCommentCreate,
+    signal?: AbortSignal
+) => {
+    return customInstance<MemoCommentRead>({
+        url: `/api/admin/memo-entries/${eid}/comments`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: memoCommentCreate,
+        signal,
+    });
+};
+
+export const getPostCommentApiAdminMemoEntriesEidCommentsPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof postCommentApiAdminMemoEntriesEidCommentsPost>>,
+        TError,
+        { eid: number; data: MemoCommentCreate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof postCommentApiAdminMemoEntriesEidCommentsPost>>,
+    TError,
+    { eid: number; data: MemoCommentCreate },
+    TContext
+> => {
+    const mutationKey = ['postCommentApiAdminMemoEntriesEidCommentsPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof postCommentApiAdminMemoEntriesEidCommentsPost>>,
+        { eid: number; data: MemoCommentCreate }
+    > = (props) => {
+        const { eid, data } = props ?? {};
+
+        return postCommentApiAdminMemoEntriesEidCommentsPost(eid, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type PostCommentApiAdminMemoEntriesEidCommentsPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof postCommentApiAdminMemoEntriesEidCommentsPost>>
+>;
+export type PostCommentApiAdminMemoEntriesEidCommentsPostMutationBody = MemoCommentCreate;
+export type PostCommentApiAdminMemoEntriesEidCommentsPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Post Comment
+ */
+export const usePostCommentApiAdminMemoEntriesEidCommentsPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof postCommentApiAdminMemoEntriesEidCommentsPost>>,
+            TError,
+            { eid: number; data: MemoCommentCreate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof postCommentApiAdminMemoEntriesEidCommentsPost>>,
+    TError,
+    { eid: number; data: MemoCommentCreate },
+    TContext
+> => {
+    const mutationOptions =
+        getPostCommentApiAdminMemoEntriesEidCommentsPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Update Comment
+ */
+export const updateCommentApiAdminMemoCommentsCidPatch = (
+    cid: number,
+    memoCommentUpdate: MemoCommentUpdate
+) => {
+    return customInstance<MemoCommentRead>({
+        url: `/api/admin/memo-comments/${cid}`,
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        data: memoCommentUpdate,
+    });
+};
+
+export const getUpdateCommentApiAdminMemoCommentsCidPatchMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof updateCommentApiAdminMemoCommentsCidPatch>>,
+        TError,
+        { cid: number; data: MemoCommentUpdate },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof updateCommentApiAdminMemoCommentsCidPatch>>,
+    TError,
+    { cid: number; data: MemoCommentUpdate },
+    TContext
+> => {
+    const mutationKey = ['updateCommentApiAdminMemoCommentsCidPatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof updateCommentApiAdminMemoCommentsCidPatch>>,
+        { cid: number; data: MemoCommentUpdate }
+    > = (props) => {
+        const { cid, data } = props ?? {};
+
+        return updateCommentApiAdminMemoCommentsCidPatch(cid, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateCommentApiAdminMemoCommentsCidPatchMutationResult = NonNullable<
+    Awaited<ReturnType<typeof updateCommentApiAdminMemoCommentsCidPatch>>
+>;
+export type UpdateCommentApiAdminMemoCommentsCidPatchMutationBody = MemoCommentUpdate;
+export type UpdateCommentApiAdminMemoCommentsCidPatchMutationError = HTTPValidationError;
+
+/**
+ * @summary Update Comment
+ */
+export const useUpdateCommentApiAdminMemoCommentsCidPatch = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof updateCommentApiAdminMemoCommentsCidPatch>>,
+            TError,
+            { cid: number; data: MemoCommentUpdate },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof updateCommentApiAdminMemoCommentsCidPatch>>,
+    TError,
+    { cid: number; data: MemoCommentUpdate },
+    TContext
+> => {
+    const mutationOptions = getUpdateCommentApiAdminMemoCommentsCidPatchMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Delete Comment
+ */
+export const deleteCommentApiAdminMemoCommentsCidDelete = (cid: number) => {
+    return customInstance<MemoCommentRead>({
+        url: `/api/admin/memo-comments/${cid}`,
+        method: 'DELETE',
+    });
+};
+
+export const getDeleteCommentApiAdminMemoCommentsCidDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof deleteCommentApiAdminMemoCommentsCidDelete>>,
+        TError,
+        { cid: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof deleteCommentApiAdminMemoCommentsCidDelete>>,
+    TError,
+    { cid: number },
+    TContext
+> => {
+    const mutationKey = ['deleteCommentApiAdminMemoCommentsCidDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof deleteCommentApiAdminMemoCommentsCidDelete>>,
+        { cid: number }
+    > = (props) => {
+        const { cid } = props ?? {};
+
+        return deleteCommentApiAdminMemoCommentsCidDelete(cid);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteCommentApiAdminMemoCommentsCidDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof deleteCommentApiAdminMemoCommentsCidDelete>>
+>;
+
+export type DeleteCommentApiAdminMemoCommentsCidDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Delete Comment
+ */
+export const useDeleteCommentApiAdminMemoCommentsCidDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof deleteCommentApiAdminMemoCommentsCidDelete>>,
+            TError,
+            { cid: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof deleteCommentApiAdminMemoCommentsCidDelete>>,
+    TError,
+    { cid: number },
+    TContext
+> => {
+    const mutationOptions = getDeleteCommentApiAdminMemoCommentsCidDeleteMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Resolve Comment
+ */
+export const resolveCommentApiAdminMemoCommentsCidResolvePost = (
+    cid: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<MemoCommentRead>({
+        url: `/api/admin/memo-comments/${cid}/resolve`,
+        method: 'POST',
+        signal,
+    });
+};
+
+export const getResolveCommentApiAdminMemoCommentsCidResolvePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof resolveCommentApiAdminMemoCommentsCidResolvePost>>,
+        TError,
+        { cid: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof resolveCommentApiAdminMemoCommentsCidResolvePost>>,
+    TError,
+    { cid: number },
+    TContext
+> => {
+    const mutationKey = ['resolveCommentApiAdminMemoCommentsCidResolvePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof resolveCommentApiAdminMemoCommentsCidResolvePost>>,
+        { cid: number }
+    > = (props) => {
+        const { cid } = props ?? {};
+
+        return resolveCommentApiAdminMemoCommentsCidResolvePost(cid);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ResolveCommentApiAdminMemoCommentsCidResolvePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof resolveCommentApiAdminMemoCommentsCidResolvePost>>
+>;
+
+export type ResolveCommentApiAdminMemoCommentsCidResolvePostMutationError = HTTPValidationError;
+
+/**
+ * @summary Resolve Comment
+ */
+export const useResolveCommentApiAdminMemoCommentsCidResolvePost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof resolveCommentApiAdminMemoCommentsCidResolvePost>>,
+            TError,
+            { cid: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof resolveCommentApiAdminMemoCommentsCidResolvePost>>,
+    TError,
+    { cid: number },
+    TContext
+> => {
+    const mutationOptions =
+        getResolveCommentApiAdminMemoCommentsCidResolvePostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Unresolve Comment
+ */
+export const unresolveCommentApiAdminMemoCommentsCidUnresolvePost = (
+    cid: number,
+    signal?: AbortSignal
+) => {
+    return customInstance<MemoCommentRead>({
+        url: `/api/admin/memo-comments/${cid}/unresolve`,
+        method: 'POST',
+        signal,
+    });
+};
+
+export const getUnresolveCommentApiAdminMemoCommentsCidUnresolvePostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof unresolveCommentApiAdminMemoCommentsCidUnresolvePost>>,
+        TError,
+        { cid: number },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof unresolveCommentApiAdminMemoCommentsCidUnresolvePost>>,
+    TError,
+    { cid: number },
+    TContext
+> => {
+    const mutationKey = ['unresolveCommentApiAdminMemoCommentsCidUnresolvePost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof unresolveCommentApiAdminMemoCommentsCidUnresolvePost>>,
+        { cid: number }
+    > = (props) => {
+        const { cid } = props ?? {};
+
+        return unresolveCommentApiAdminMemoCommentsCidUnresolvePost(cid);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type UnresolveCommentApiAdminMemoCommentsCidUnresolvePostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof unresolveCommentApiAdminMemoCommentsCidUnresolvePost>>
+>;
+
+export type UnresolveCommentApiAdminMemoCommentsCidUnresolvePostMutationError = HTTPValidationError;
+
+/**
+ * @summary Unresolve Comment
+ */
+export const useUnresolveCommentApiAdminMemoCommentsCidUnresolvePost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof unresolveCommentApiAdminMemoCommentsCidUnresolvePost>>,
+            TError,
+            { cid: number },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof unresolveCommentApiAdminMemoCommentsCidUnresolvePost>>,
+    TError,
+    { cid: number },
+    TContext
+> => {
+    const mutationOptions =
+        getUnresolveCommentApiAdminMemoCommentsCidUnresolvePostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * Submits or updates a study participation.
 
 Logic moved to StudyService for maintainability.
@@ -11987,10 +13184,6 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
     ]),
-    methodology_memo: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
-        undefined,
-    ]),
     data_retention_months: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
         undefined,
@@ -12282,13 +13475,6 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
             end_date: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     `${faker.date.past().toISOString().split('.')[0]}Z`,
-                    null,
-                ]),
-                undefined,
-            ]),
-            methodology_memo: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 20 } }),
                     null,
                 ]),
                 undefined,
@@ -12590,10 +13776,6 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
     ]),
-    methodology_memo: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
-        undefined,
-    ]),
     data_retention_months: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
         undefined,
@@ -12872,10 +14054,6 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     ]),
     end_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
-        undefined,
-    ]),
-    methodology_memo: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
     data_retention_months: faker.helpers.arrayElement([
@@ -13161,10 +14339,6 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
         undefined,
     ]),
-    methodology_memo: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
-        undefined,
-    ]),
     data_retention_months: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
         undefined,
@@ -13443,10 +14617,6 @@ export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostRespons
     ]),
     end_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
-        undefined,
-    ]),
-    methodology_memo: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
     data_retention_months: faker.helpers.arrayElement([
@@ -13755,13 +14925,6 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
             faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
             undefined,
         ]),
-        methodology_memo: faker.helpers.arrayElement([
-            faker.helpers.arrayElement([
-                faker.string.alpha({ length: { min: 10, max: 20 } }),
-                null,
-            ]),
-            undefined,
-        ]),
         data_retention_months: faker.helpers.arrayElement([
             faker.helpers.arrayElement([faker.number.int({ min: 1, max: 240 }), null]),
             undefined,
@@ -14049,10 +15212,6 @@ export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostRespons
     ]),
     end_date: faker.helpers.arrayElement([
         faker.helpers.arrayElement([`${faker.date.past().toISOString().split('.')[0]}Z`, null]),
-        undefined,
-    ]),
-    methodology_memo: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
     data_retention_months: faker.helpers.arrayElement([
@@ -15340,10 +16499,6 @@ export const getCreateConcourseApiAdminConcoursesPostResponseMock = (
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
-    construction_memo: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
-        undefined,
-    ]),
     item_count: faker.helpers.arrayElement([
         faker.number.int({ min: undefined, max: undefined }),
         undefined,
@@ -15366,13 +16521,6 @@ export const getListConcoursesApiAdminConcoursesGetResponseMock = (
             project_id: faker.number.int({ min: undefined, max: undefined }),
             title: faker.string.alpha({ length: { min: 10, max: 20 } }),
             description: faker.helpers.arrayElement([
-                faker.helpers.arrayElement([
-                    faker.string.alpha({ length: { min: 10, max: 20 } }),
-                    null,
-                ]),
-                undefined,
-            ]),
-            construction_memo: faker.helpers.arrayElement([
                 faker.helpers.arrayElement([
                     faker.string.alpha({ length: { min: 10, max: 20 } }),
                     null,
@@ -15407,10 +16555,6 @@ export const getGetConcourseApiAdminConcoursesConcourseIdGetResponseMock = (
     project_id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
-        undefined,
-    ]),
-    construction_memo: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
@@ -15492,10 +16636,6 @@ export const getUpdateConcourseApiAdminConcoursesConcourseIdPatchResponseMock = 
     project_id: faker.number.int({ min: undefined, max: undefined }),
     title: faker.string.alpha({ length: { min: 10, max: 20 } }),
     description: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
-        undefined,
-    ]),
-    construction_memo: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
         undefined,
     ]),
@@ -15801,6 +16941,411 @@ export const getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdComment
         updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
         ...overrideResponse,
     });
+
+export const getGetConcourseMemoApiAdminConcoursesCidMemoGetResponseMock = (
+    overrideResponse: Partial<MemoRead> = {}
+): MemoRead => ({
+    parent_type: faker.helpers.arrayElement(['concourse', 'study'] as const),
+    parent_id: faker.number.int({ min: undefined, max: undefined }),
+    entries: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            parent_type: faker.helpers.arrayElement(['concourse', 'study'] as const),
+            parent_id: faker.number.int({ min: undefined, max: undefined }),
+            title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            position: faker.number.int({ min: undefined, max: undefined }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            created_by: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            last_edited_by: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            comments: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => ({
+                id: faker.number.int({ min: undefined, max: undefined }),
+                entry_id: faker.number.int({ min: undefined, max: undefined }),
+                user_id: faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                mentions: Array.from(
+                    { length: faker.number.int({ min: 1, max: 10 }) },
+                    (_, i) => i + 1
+                ).map(() => faker.number.int({ min: undefined, max: undefined })),
+                resolved: faker.datatype.boolean(),
+                resolved_at: faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                resolved_by: faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                deleted: faker.datatype.boolean(),
+                created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            })),
+        })
+    ),
+    ...overrideResponse,
+});
+
+export const getGetStudyMemoApiAdminStudiesSidMemoGetResponseMock = (
+    overrideResponse: Partial<MemoRead> = {}
+): MemoRead => ({
+    parent_type: faker.helpers.arrayElement(['concourse', 'study'] as const),
+    parent_id: faker.number.int({ min: undefined, max: undefined }),
+    entries: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            parent_type: faker.helpers.arrayElement(['concourse', 'study'] as const),
+            parent_id: faker.number.int({ min: undefined, max: undefined }),
+            title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            position: faker.number.int({ min: undefined, max: undefined }),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            created_by: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            last_edited_by: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            comments: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => ({
+                id: faker.number.int({ min: undefined, max: undefined }),
+                entry_id: faker.number.int({ min: undefined, max: undefined }),
+                user_id: faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+                mentions: Array.from(
+                    { length: faker.number.int({ min: 1, max: 10 }) },
+                    (_, i) => i + 1
+                ).map(() => faker.number.int({ min: undefined, max: undefined })),
+                resolved: faker.datatype.boolean(),
+                resolved_at: faker.helpers.arrayElement([
+                    `${faker.date.past().toISOString().split('.')[0]}Z`,
+                    null,
+                ]),
+                resolved_by: faker.helpers.arrayElement([
+                    faker.number.int({ min: undefined, max: undefined }),
+                    null,
+                ]),
+                deleted: faker.datatype.boolean(),
+                created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+                updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            })),
+        })
+    ),
+    ...overrideResponse,
+});
+
+export const getGetTemplatesApiAdminMemoTemplatesGetResponseMock = (): MemoTemplate[] =>
+    Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        description: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    }));
+
+export const getCreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostResponseMock = (
+    overrideResponse: Partial<MemoEntryRead> = {}
+): MemoEntryRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    parent_type: faker.helpers.arrayElement(['concourse', 'study'] as const),
+    parent_id: faker.number.int({ min: undefined, max: undefined }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    position: faker.number.int({ min: undefined, max: undefined }),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    created_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    last_edited_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    comments: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            entry_id: faker.number.int({ min: undefined, max: undefined }),
+            user_id: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            mentions: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => faker.number.int({ min: undefined, max: undefined })),
+            resolved: faker.datatype.boolean(),
+            resolved_at: faker.helpers.arrayElement([
+                `${faker.date.past().toISOString().split('.')[0]}Z`,
+                null,
+            ]),
+            resolved_by: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            deleted: faker.datatype.boolean(),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })
+    ),
+    ...overrideResponse,
+});
+
+export const getCreateStudyEntryApiAdminStudiesSidMemoEntriesPostResponseMock = (
+    overrideResponse: Partial<MemoEntryRead> = {}
+): MemoEntryRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    parent_type: faker.helpers.arrayElement(['concourse', 'study'] as const),
+    parent_id: faker.number.int({ min: undefined, max: undefined }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    position: faker.number.int({ min: undefined, max: undefined }),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    created_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    last_edited_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    comments: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            entry_id: faker.number.int({ min: undefined, max: undefined }),
+            user_id: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            mentions: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => faker.number.int({ min: undefined, max: undefined })),
+            resolved: faker.datatype.boolean(),
+            resolved_at: faker.helpers.arrayElement([
+                `${faker.date.past().toISOString().split('.')[0]}Z`,
+                null,
+            ]),
+            resolved_by: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            deleted: faker.datatype.boolean(),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })
+    ),
+    ...overrideResponse,
+});
+
+export const getUpdateEntryApiAdminMemoEntriesEidPatchResponseMock = (
+    overrideResponse: Partial<MemoEntryRead> = {}
+): MemoEntryRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    parent_type: faker.helpers.arrayElement(['concourse', 'study'] as const),
+    parent_id: faker.number.int({ min: undefined, max: undefined }),
+    title: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    position: faker.number.int({ min: undefined, max: undefined }),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    created_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    last_edited_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    comments: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => ({
+            id: faker.number.int({ min: undefined, max: undefined }),
+            entry_id: faker.number.int({ min: undefined, max: undefined }),
+            user_id: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+            mentions: Array.from(
+                { length: faker.number.int({ min: 1, max: 10 }) },
+                (_, i) => i + 1
+            ).map(() => faker.number.int({ min: undefined, max: undefined })),
+            resolved: faker.datatype.boolean(),
+            resolved_at: faker.helpers.arrayElement([
+                `${faker.date.past().toISOString().split('.')[0]}Z`,
+                null,
+            ]),
+            resolved_by: faker.helpers.arrayElement([
+                faker.number.int({ min: undefined, max: undefined }),
+                null,
+            ]),
+            deleted: faker.datatype.boolean(),
+            created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+            updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+        })
+    ),
+    ...overrideResponse,
+});
+
+export const getPostCommentApiAdminMemoEntriesEidCommentsPostResponseMock = (
+    overrideResponse: Partial<MemoCommentRead> = {}
+): MemoCommentRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    entry_id: faker.number.int({ min: undefined, max: undefined }),
+    user_id: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    mentions: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => faker.number.int({ min: undefined, max: undefined })
+    ),
+    resolved: faker.datatype.boolean(),
+    resolved_at: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split('.')[0]}Z`,
+        null,
+    ]),
+    resolved_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    deleted: faker.datatype.boolean(),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ...overrideResponse,
+});
+
+export const getUpdateCommentApiAdminMemoCommentsCidPatchResponseMock = (
+    overrideResponse: Partial<MemoCommentRead> = {}
+): MemoCommentRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    entry_id: faker.number.int({ min: undefined, max: undefined }),
+    user_id: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    mentions: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => faker.number.int({ min: undefined, max: undefined })
+    ),
+    resolved: faker.datatype.boolean(),
+    resolved_at: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split('.')[0]}Z`,
+        null,
+    ]),
+    resolved_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    deleted: faker.datatype.boolean(),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ...overrideResponse,
+});
+
+export const getDeleteCommentApiAdminMemoCommentsCidDeleteResponseMock = (
+    overrideResponse: Partial<MemoCommentRead> = {}
+): MemoCommentRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    entry_id: faker.number.int({ min: undefined, max: undefined }),
+    user_id: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    mentions: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => faker.number.int({ min: undefined, max: undefined })
+    ),
+    resolved: faker.datatype.boolean(),
+    resolved_at: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split('.')[0]}Z`,
+        null,
+    ]),
+    resolved_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    deleted: faker.datatype.boolean(),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ...overrideResponse,
+});
+
+export const getResolveCommentApiAdminMemoCommentsCidResolvePostResponseMock = (
+    overrideResponse: Partial<MemoCommentRead> = {}
+): MemoCommentRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    entry_id: faker.number.int({ min: undefined, max: undefined }),
+    user_id: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    mentions: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => faker.number.int({ min: undefined, max: undefined })
+    ),
+    resolved: faker.datatype.boolean(),
+    resolved_at: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split('.')[0]}Z`,
+        null,
+    ]),
+    resolved_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    deleted: faker.datatype.boolean(),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ...overrideResponse,
+});
+
+export const getUnresolveCommentApiAdminMemoCommentsCidUnresolvePostResponseMock = (
+    overrideResponse: Partial<MemoCommentRead> = {}
+): MemoCommentRead => ({
+    id: faker.number.int({ min: undefined, max: undefined }),
+    entry_id: faker.number.int({ min: undefined, max: undefined }),
+    user_id: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    body: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    mentions: Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(
+        () => faker.number.int({ min: undefined, max: undefined })
+    ),
+    resolved: faker.datatype.boolean(),
+    resolved_at: faker.helpers.arrayElement([
+        `${faker.date.past().toISOString().split('.')[0]}Z`,
+        null,
+    ]),
+    resolved_by: faker.helpers.arrayElement([
+        faker.number.int({ min: undefined, max: undefined }),
+        null,
+    ]),
+    deleted: faker.datatype.boolean(),
+    created_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    updated_at: `${faker.date.past().toISOString().split('.')[0]}Z`,
+    ...overrideResponse,
+});
 
 export const getSubmitStudyApiSubmitPostResponseMock = (
     overrideResponse: Partial<SubmissionResultResponse> = {}
@@ -17922,6 +19467,306 @@ export const getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdComment
     );
 };
 
+export const getGetConcourseMemoApiAdminConcoursesCidMemoGetMockHandler = (
+    overrideResponse?:
+        | MemoRead
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<MemoRead> | MemoRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/concourses/:cid/memo',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetConcourseMemoApiAdminConcoursesCidMemoGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getGetStudyMemoApiAdminStudiesSidMemoGetMockHandler = (
+    overrideResponse?:
+        | MemoRead
+        | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Promise<MemoRead> | MemoRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/studies/:sid/memo',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetStudyMemoApiAdminStudiesSidMemoGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getGetTemplatesApiAdminMemoTemplatesGetMockHandler = (
+    overrideResponse?:
+        | MemoTemplate[]
+        | ((
+              info: Parameters<Parameters<typeof http.get>[1]>[0]
+          ) => Promise<MemoTemplate[]> | MemoTemplate[]),
+    options?: RequestHandlerOptions
+) => {
+    return http.get(
+        '*/api/admin/memo/templates',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getGetTemplatesApiAdminMemoTemplatesGetResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getCreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostMockHandler = (
+    overrideResponse?:
+        | MemoEntryRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<MemoEntryRead> | MemoEntryRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/concourses/:cid/memo/entries',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getCreateStudyEntryApiAdminStudiesSidMemoEntriesPostMockHandler = (
+    overrideResponse?:
+        | MemoEntryRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<MemoEntryRead> | MemoEntryRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/studies/:sid/memo/entries',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getCreateStudyEntryApiAdminStudiesSidMemoEntriesPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUpdateEntryApiAdminMemoEntriesEidPatchMockHandler = (
+    overrideResponse?:
+        | MemoEntryRead
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<MemoEntryRead> | MemoEntryRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/admin/memo-entries/:eid',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateEntryApiAdminMemoEntriesEidPatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteEntryApiAdminMemoEntriesEidDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/memo-entries/:eid',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
+export const getPostCommentApiAdminMemoEntriesEidCommentsPostMockHandler = (
+    overrideResponse?:
+        | MemoCommentRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<MemoCommentRead> | MemoCommentRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/memo-entries/:eid/comments',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getPostCommentApiAdminMemoEntriesEidCommentsPostResponseMock()
+                ),
+                { status: 201, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUpdateCommentApiAdminMemoCommentsCidPatchMockHandler = (
+    overrideResponse?:
+        | MemoCommentRead
+        | ((
+              info: Parameters<Parameters<typeof http.patch>[1]>[0]
+          ) => Promise<MemoCommentRead> | MemoCommentRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.patch(
+        '*/api/admin/memo-comments/:cid',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUpdateCommentApiAdminMemoCommentsCidPatchResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getDeleteCommentApiAdminMemoCommentsCidDeleteMockHandler = (
+    overrideResponse?:
+        | MemoCommentRead
+        | ((
+              info: Parameters<Parameters<typeof http.delete>[1]>[0]
+          ) => Promise<MemoCommentRead> | MemoCommentRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/admin/memo-comments/:cid',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getDeleteCommentApiAdminMemoCommentsCidDeleteResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getResolveCommentApiAdminMemoCommentsCidResolvePostMockHandler = (
+    overrideResponse?:
+        | MemoCommentRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<MemoCommentRead> | MemoCommentRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/memo-comments/:cid/resolve',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getResolveCommentApiAdminMemoCommentsCidResolvePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getUnresolveCommentApiAdminMemoCommentsCidUnresolvePostMockHandler = (
+    overrideResponse?:
+        | MemoCommentRead
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<MemoCommentRead> | MemoCommentRead),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/admin/memo-comments/:cid/unresolve',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getUnresolveCommentApiAdminMemoCommentsCidUnresolvePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getSubmitStudyApiSubmitPostMockHandler = (
     overrideResponse?:
         | SubmissionResultResponse
@@ -18328,6 +20173,18 @@ export const getQualisAPIMock = () => [
     getListItemVersionsApiAdminConcoursesConcourseIdItemsItemIdVersionsGetMockHandler(),
     getListItemCommentsApiAdminConcoursesConcourseIdItemsItemIdCommentsGetMockHandler(),
     getCreateItemCommentApiAdminConcoursesConcourseIdItemsItemIdCommentsPostMockHandler(),
+    getGetConcourseMemoApiAdminConcoursesCidMemoGetMockHandler(),
+    getGetStudyMemoApiAdminStudiesSidMemoGetMockHandler(),
+    getGetTemplatesApiAdminMemoTemplatesGetMockHandler(),
+    getCreateConcourseEntryApiAdminConcoursesCidMemoEntriesPostMockHandler(),
+    getCreateStudyEntryApiAdminStudiesSidMemoEntriesPostMockHandler(),
+    getUpdateEntryApiAdminMemoEntriesEidPatchMockHandler(),
+    getDeleteEntryApiAdminMemoEntriesEidDeleteMockHandler(),
+    getPostCommentApiAdminMemoEntriesEidCommentsPostMockHandler(),
+    getUpdateCommentApiAdminMemoCommentsCidPatchMockHandler(),
+    getDeleteCommentApiAdminMemoCommentsCidDeleteMockHandler(),
+    getResolveCommentApiAdminMemoCommentsCidResolvePostMockHandler(),
+    getUnresolveCommentApiAdminMemoCommentsCidUnresolvePostMockHandler(),
     getSubmitStudyApiSubmitPostMockHandler(),
     getGetStudyApiStudySlugGetMockHandler(),
     getUnlockStudyApiStudySlugUnlockPostMockHandler(),

@@ -10,7 +10,6 @@ describe('IntroductionEditor — Wave B progressive disclosure', () => {
         slug: 'test-study',
         state: 'draft',
         default_language: 'en',
-        methodology_memo: null,
         translations: [
             {
                 language_code: 'en',
@@ -46,8 +45,10 @@ describe('IntroductionEditor — Wave B progressive disclosure', () => {
         // Closed-by-default sections: their interior content should NOT be visible.
         // Consent title input ('Informed consent' value) is gated by the consent accordion
         expect(screen.queryByDisplayValue('Informed consent')).not.toBeInTheDocument();
-        // Methodology memo placeholder NOT visible when collapsed
-        expect(screen.queryByPlaceholderText(/rationale|rationnel/i)).not.toBeInTheDocument();
+        // Methodology memo upgrade notice NOT visible when collapsed
+        expect(
+            screen.queryByText(/Memo system upgraded|Système de mémos/i)
+        ).not.toBeInTheDocument();
     });
 
     it('expands a collapsed section when its trigger is clicked (B1)', async () => {
@@ -60,7 +61,9 @@ describe('IntroductionEditor — Wave B progressive disclosure', () => {
         });
         await user.click(memoTrigger);
 
-        // Now the memo placeholder is visible
-        expect(await screen.findByPlaceholderText(/rationale|rationnel/i)).toBeInTheDocument();
+        // Now the upgrade placeholder notice is visible
+        expect(
+            await screen.findByText(/Memo system upgraded|Système de mémos/i)
+        ).toBeInTheDocument();
     });
 });

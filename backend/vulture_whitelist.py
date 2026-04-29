@@ -322,3 +322,17 @@ already_submitted
 # Read/written via Pydantic model_dump() and SQLAlchemy ORM column access;
 # vulture cannot see those dynamic dispatch sites.
 data_retention_months
+
+# --- app/models/memo.py + app/schemas/memos.py + app/routers/admin/memos.py ---
+# Fields exposed at the JSON boundary; endpoints are FastAPI routes registered
+# via include_router — vulture cannot see dynamic dispatch sites.
+last_edited_by
+resolved_at
+resolved_by
+deleted
+get_concourse_memo
+get_study_memo
+create_concourse_entry
+create_study_entry
+post_comment
+delete_comment

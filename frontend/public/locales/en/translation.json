@@ -446,6 +446,9 @@
       "no_studies": "No studies yet",
       "no_projects": "No projects yet. Create your first project to get started."
     },
+    "memo": {
+      "upgrading": "Memo system upgraded; collaborative entries arrive in the next release."
+    },
     "study_design": {
       "distribution_mode": {
         "title": "Distribution mode",
@@ -689,15 +692,6 @@
       "methodological_context": {
         "title": "Methodological context",
         "subtitle": "Optional documentation fields. Fill in what's relevant to your design; leave others blank."
-      },
-      "construction_memo": {
-        "title": "Construction memo",
-        "summary_empty": "Optional · for transparency about the curation process",
-        "summary_filled": "{{n}} characters · click to view or edit",
-        "placeholder": "Document how this concourse was constructed: sources, voices retained or excluded, sampling rationale...",
-        "save": "Save memo",
-        "saved": "Construction memo saved",
-        "save_error": "Failed to save construction memo"
       },
       "import_from_csv": "Import CSV/TSV…",
       "import_csv_hint": "CSV/TSV needs columns: code, language, text.",
@@ -1861,13 +1855,6 @@
           "drag_drop": "Drag & drop or click to upload",
           "max": "Max"
         }
-      },
-      "methodology_memo": {
-        "title": "Methodology memo",
-        "summary": "Optional · for replication & pre-registration",
-        "help": "Optional. Document the rationale for this distribution, conditions of instruction, and Q-set size.",
-        "label": "Memo (any language)",
-        "placeholder": "Document the rationale behind your design choices…"
       },
       "activate_dialog": {
         "title": "Activate this study?",
