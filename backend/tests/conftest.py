@@ -361,3 +361,28 @@ async def seed_concourse_id(db: AsyncSession, test_project: Project, test_user: 
     await db.commit()
     await db.refresh(concourse)
     return concourse.id
+
+
+@pytest_asyncio.fixture
+async def seed_project_id(test_project: Project) -> int:
+    """Return the int PK of the test project (for memo comment tests)."""
+    return test_project.id
+
+
+@pytest_asyncio.fixture
+async def seed_entry_id(
+    db: AsyncSession, seed_concourse_id: int, seed_user_id: int
+) -> int:
+    """Return the int PK of a MemoEntry linked to the seed concourse."""
+    from app.models import MemoParentType
+    from app.services.memo_service import MemoService
+
+    entry = await MemoService.add_entry(
+        db,
+        parent_type=MemoParentType.concourse,
+        parent_id=seed_concourse_id,
+        title="Seed Entry",
+        body="seed body",
+        user_id=seed_user_id,
+    )
+    return entry.id
