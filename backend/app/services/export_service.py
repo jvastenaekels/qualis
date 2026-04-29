@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, TypedDict
 
 from ..models import Participant, Study, Statement
+from ..schemas.memos import MemoRead
 from .storage_service import storage_service
 
 if TYPE_CHECKING:
@@ -292,10 +293,38 @@ class ExportService:
         return zip_buffer.getvalue()
 
     @staticmethod
+    def render_memo_md(memo: MemoRead, user_emails: dict[int, str]) -> str:
+        """Render a memo to Markdown for inclusion in the research package.
+
+        `user_emails` maps user_id → email; entries missing from the map
+        (or with last_edited_by == None) produce a 'system' attribution.
+        Returns an empty string when there are no entries.
+        """
+        if not memo.entries:
+            return ""
+
+        lines: list[str] = []
+        lines.append(f"# Memo for {memo.parent_type} #{memo.parent_id}\n")
+
+        for e in memo.entries:
+            lines.append(f"## {e.title}\n")
+            if e.body:
+                lines.append(e.body + "\n")
+            lines.append("")
+
+        last = max(memo.entries, key=lambda e: e.updated_at)
+        editor_email = user_emails.get(last.last_edited_by or -1, "system")
+        lines.append(
+            f"\n---\nLast updated {last.updated_at:%Y-%m-%d} by {editor_email}.\n"
+        )
+        return "\n".join(lines)
+
+    @staticmethod
     def generate_research_package(
         study: Study,
         participants: list[Participant],
         full_dump: "StudyDump | None" = None,
+        memo_md: str | None = None,
     ) -> bytes:
         """Generates a ZIP containing the complete research data package."""
         zip_buffer = io.BytesIO()
@@ -341,6 +370,10 @@ class ExportService:
             zip_file.writestr(
                 "r_kit/analysis.R", ExportService._generate_r_script(study)
             )
+
+            # 7. Memo (only when the study has at least one memo entry)
+            if memo_md:
+                zip_file.writestr("memo/memo.md", memo_md)
 
         return zip_buffer.getvalue()
 

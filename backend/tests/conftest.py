@@ -336,6 +336,12 @@ async def seed_user_id(test_user: User) -> int:
 
 
 @pytest_asyncio.fixture
+async def seed_study_id(seed_study: Study) -> int:
+    """Return the int PK of the seeded study (convenience alias)."""
+    return seed_study.id
+
+
+@pytest_asyncio.fixture
 async def seed_other_user_id(db: AsyncSession) -> int:
     """Return the int PK of a second distinct user (no project membership required for T4)."""
     hashed = get_password_hash("otherpassword")

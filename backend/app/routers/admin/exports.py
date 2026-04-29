@@ -379,8 +379,34 @@ async def get_research_package(
 
     full_dump = await StudyService.get_study_full_dump(db, study.id)
 
+    # Fetch memo and render markdown for inclusion in the package
+    from ...models import MemoParentType, User
+    from ...services.memo_service import MemoService
+
+    memo = await MemoService.get_memo(
+        db, parent_type=MemoParentType.study, parent_id=study.id
+    )
+
+    user_emails: dict[int, str] = {}
+    if memo.entries:
+        user_ids = {
+            e.last_edited_by for e in memo.entries if e.last_edited_by is not None
+        }
+        if user_ids:
+            rows = (
+                await db.execute(
+                    select(User.id, User.email).where(User.id.in_(user_ids))
+                )
+            ).all()
+            user_emails = {row.id: row.email for row in rows}
+
+    memo_md = ExportService.render_memo_md(memo, user_emails)
+
     zip_content = ExportService.generate_research_package(
-        full_study, full_study.participants, full_dump=full_dump
+        full_study,
+        full_study.participants,
+        full_dump=full_dump,
+        memo_md=memo_md if memo_md else None,
     )
 
     return StreamingResponse(
