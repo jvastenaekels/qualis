@@ -1123,8 +1123,8 @@
         },
         "breadcrumbs": {
             "admin": "Ylläpito",
-            "dashboard": "Yhteenveto",
-            "study_dashboard": "Yhteenveto",
+            "dashboard": "Hallintapaneeli",
+            "study_dashboard": "Yleisnäkymä",
             "design": "Suunnittelu",
             "participants": "Osallistujat",
             "team": "Tiimi",

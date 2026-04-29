@@ -243,7 +243,10 @@ const StudyDesignPage = () => {
                                 size="sm"
                                 variant="outline"
                                 onClick={api.save}
-                                title={t('admin.design.toolbar.save_changes', 'Save Changes')}
+                                // Use the standardised toolbar.save key (Wave E.1).
+                                // The previous "save_changes" key was orphaned —
+                                // never present in any locale file.
+                                title={t('admin.design.toolbar.save', 'Save')}
                                 disabled={
                                     api.syncStatus === 'synced' ||
                                     api.syncStatus === 'saving' ||

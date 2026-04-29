@@ -211,7 +211,13 @@ export const CommandMenu = () => {
                                 <div className="flex h-6 w-6 items-center justify-center rounded bg-indigo-100 dark:bg-indigo-900/40">
                                     <LayoutDashboard className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
                                 </div>
-                                <span>{t('admin.sidebar.dashboard')}</span>
+                                {/* Wave E follow-up: the study-scope item was renamed to
+                                    'Vue d'ensemble' / 'Overview' / 'Yleisnäkymä' in PR #53
+                                    (key admin.sidebar.overview). The Command-K palette was
+                                    missed in that pass and still showed the project-scope
+                                    "Tableau de bord" / "Dashboard" / "Hallintapaneeli" label
+                                    for the same target. */}
+                                <span>{t('admin.sidebar.overview')}</span>
                             </Command.Item>
                             <Command.Item
                                 value="design study"
