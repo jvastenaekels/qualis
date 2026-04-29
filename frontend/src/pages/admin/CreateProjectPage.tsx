@@ -21,7 +21,7 @@ import {
     FormDescription,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import ApiClient from '@/api/client';
 import { useAuthStore } from '@/store/useAuthStore';
 import type { ProjectWithRole } from '@/types/backend';
@@ -101,18 +101,13 @@ export default function CreateProjectPage() {
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-8 max-w-4xl mx-auto w-full">
-            <div className="flex flex-col gap-2 mb-2">
-                <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-600 shadow-sm">
-                        <Plus className="size-6" />
-                    </div>
-                    <h1 className="text-3xl font-black tracking-tight text-slate-900">
-                        {t('admin.project.create.title')}
-                    </h1>
+            <div className="flex items-center gap-3 mb-2">
+                <div className="p-2.5 bg-indigo-50 border border-indigo-100 rounded-xl text-indigo-600 shadow-sm">
+                    <Plus className="size-6" />
                 </div>
-                <p className="text-slate-500 font-medium pl-1">
-                    {t('admin.project.create.description')}
-                </p>
+                <h1 className="text-3xl font-black tracking-tight text-slate-900">
+                    {t('admin.project.create.title')}
+                </h1>
             </div>
 
             <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
@@ -121,9 +116,6 @@ export default function CreateProjectPage() {
                         <Briefcase className="size-5 text-indigo-500" />
                         {t('admin.project.create.card_title')}
                     </CardTitle>
-                    <CardDescription className="text-sm font-medium text-slate-500">
-                        {t('admin.project.create.card_description')}
-                    </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-8">
                     <Form {...form}>

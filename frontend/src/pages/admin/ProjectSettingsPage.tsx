@@ -40,12 +40,10 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -519,50 +517,26 @@ export default function ProjectSettingsPage() {
                         </CardHeader>
                         <CardContent className="space-y-4 pt-2">
                             <div className="space-y-3">
-                                {/* Wave D — D4: Owner role was undocumented in
-                                    the matrix even though it appears in the
-                                    members-table dropdown (audit 🟡10). */}
                                 <div className="space-y-1">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-2xs font-black text-slate-900">
-                                            {t(
-                                                'admin.projects.settings.team.permissions_matrix.owner.label',
-                                                'Owner'
-                                            )}
-                                        </span>
-                                        <Badge
-                                            variant="outline"
-                                            className="text-[8px] h-4 bg-indigo-50 border-indigo-100 text-indigo-700"
-                                        >
-                                            {t(
-                                                'admin.projects.settings.team.permissions_matrix.owner.badge',
-                                                'Full access'
-                                            )}
-                                        </Badge>
-                                    </div>
+                                    <span className="text-2xs font-black text-slate-900 block">
+                                        {t(
+                                            'admin.projects.settings.team.permissions_matrix.owner.label',
+                                            'Owner'
+                                        )}
+                                    </span>
                                     <p className="text-2xs text-slate-500 leading-tight">
                                         {t(
                                             'admin.projects.settings.team.permissions_matrix.owner.desc',
-                                            'Manages project settings, members, and all studies. Can promote or remove other members.'
+                                            'Full project, member, and study control.'
                                         )}
                                     </p>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-2xs font-black text-slate-900">
-                                            {t(
-                                                'admin.projects.settings.team.permissions_matrix.researcher.label'
-                                            )}
-                                        </span>
-                                        <Badge
-                                            variant="outline"
-                                            className="text-[8px] h-4 bg-emerald-50 border-emerald-100 text-emerald-700"
-                                        >
-                                            {t(
-                                                'admin.projects.settings.team.permissions_matrix.researcher.badge'
-                                            )}
-                                        </Badge>
-                                    </div>
+                                    <span className="text-2xs font-black text-slate-900 block">
+                                        {t(
+                                            'admin.projects.settings.team.permissions_matrix.researcher.label'
+                                        )}
+                                    </span>
                                     <p className="text-2xs text-slate-500 leading-tight">
                                         {t(
                                             'admin.projects.settings.team.permissions_matrix.researcher.desc'
@@ -570,21 +544,11 @@ export default function ProjectSettingsPage() {
                                     </p>
                                 </div>
                                 <div className="space-y-1">
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-2xs font-black text-slate-900">
-                                            {t(
-                                                'admin.projects.settings.team.permissions_matrix.viewer.label'
-                                            )}
-                                        </span>
-                                        <Badge
-                                            variant="outline"
-                                            className="text-[8px] h-4 bg-slate-50 border-slate-100 text-slate-500"
-                                        >
-                                            {t(
-                                                'admin.projects.settings.team.permissions_matrix.viewer.badge'
-                                            )}
-                                        </Badge>
-                                    </div>
+                                    <span className="text-2xs font-black text-slate-900 block">
+                                        {t(
+                                            'admin.projects.settings.team.permissions_matrix.viewer.label'
+                                        )}
+                                    </span>
                                     <p className="text-2xs text-slate-500 leading-tight">
                                         {t(
                                             'admin.projects.settings.team.permissions_matrix.viewer.desc'
@@ -684,9 +648,6 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                         <DialogTitle className="text-xl font-black text-slate-900 leading-tight">
                             {t('admin.projects.settings.team.invite_modal.title')}
                         </DialogTitle>
-                        <DialogDescription className="text-sm font-medium text-slate-500 mt-2">
-                            {t('admin.projects.settings.team.invite_modal.desc')}
-                        </DialogDescription>
                     </DialogHeader>
 
                     {!inviteUrl ? (
@@ -778,9 +739,6 @@ function InviteMemberModal({ slug, isAdmin }: { slug: string; isAdmin: boolean }
                                         )}
                                     </Button>
                                 </div>
-                                <p className="text-2xs text-emerald-600/70 italic">
-                                    {t('admin.projects.settings.team.invite_modal.copy_hint')}
-                                </p>
                             </div>
                             <Button
                                 variant="outline"

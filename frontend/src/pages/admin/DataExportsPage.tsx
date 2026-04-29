@@ -32,7 +32,7 @@ export default function DataExportsPage() {
                     title={t('admin.data.empty.contract_title', 'No submissions yet')}
                     body={t(
                         'admin.data.empty.contract_body',
-                        'This page will list participant submissions and offer CSV/JSON exports as soon as the first response arrives. Share the study link from the overview to start collecting data.'
+                        'Submissions and exports will appear here. Share the study link to start collecting.'
                     )}
                     ctaLabel={t('admin.data.empty.contract_cta', 'Open study overview')}
                     ctaTo={`/app/${projectSlug ?? ''}/studies/${studySlug ?? ''}`}

@@ -377,7 +377,7 @@ describe('AnalysisPage', () => {
 
         renderWithProviders(<AnalysisPage />);
 
-        expect(screen.getByText(/Configure parameters above/i)).toBeInTheDocument();
+        expect(screen.getByText(/Set parameters and run the analysis/i)).toBeInTheDocument();
     });
 
     it('does not show export button when no results', () => {
@@ -441,16 +441,16 @@ describe('AnalysisPage', () => {
         renderWithProviders(<AnalysisPage />);
 
         // Wave C: PCA + Factors help texts are primary-visible.
-        expect(screen.getByText(/PCA maximizes explained variance/i)).toBeInTheDocument();
+        expect(screen.getByText(/PCA maximises explained variance/i)).toBeInTheDocument();
         expect(
             screen.getByText(/Each factor represents a distinct viewpoint/i)
         ).toBeInTheDocument();
         // Rotation + Flagging help texts now live inside the collapsed
         // "Advanced settings" Accordion — not visible on initial render.
-        expect(screen.queryByText(/Varimax maximizes the separation/i)).not.toBeInTheDocument();
         expect(
-            screen.queryByText(/Auto flags participants whose loading/i)
+            screen.queryByText(/Varimax separates factors for simpler structure/i)
         ).not.toBeInTheDocument();
+        expect(screen.queryByText(/Auto: flag participants loading/i)).not.toBeInTheDocument();
     });
 
     it('shows interpretation guidance in results tabs', async () => {

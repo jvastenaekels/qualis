@@ -129,7 +129,7 @@ describe('AnalysisHistoryPanel', () => {
 
         expect(screen.getByText(/No previous analyses for this study yet/i)).toBeInTheDocument();
         expect(
-            screen.getByText(/Documenting analytical choices supports reproducibility/i)
+            screen.getByText(/Each run is logged here so you can document/i)
         ).toBeInTheDocument();
     });
 

@@ -166,22 +166,17 @@
   },
   "auth": {
     "login": {
-      "title": "Panneau d'administration",
       "email_label": "Adresse e-mail",
       "password_label": "Mot de passe",
       "submit": "Continuer",
       "forgot_password": "Oublié ?",
       "loading": "Authentification...",
-      "subtitle": "Entrez vos identifiants pour gérer vos études",
       "card_title": "Se connecter",
-      "card_description": "Accès sécurisé à votre tableau de bord de recherche",
-      "privacy": "En vous connectant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.",
-      "powered_by": "Propulsé par",
       "welcome_back": "Ravi de vous revoir !",
       "error_401": "E-mail ou mot de passe invalide",
       "error_generic": "Une erreur est survenue. Veuillez réessayer.",
       "reason_session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
-      "reason_auth_required": "Connectez-vous pour accéder au panneau d'administration."
+      "reason_auth_required": "Veuillez vous connecter pour continuer."
     },
     "register": {
       "title": "Créer un compte",
@@ -439,14 +434,14 @@
     "study_design": {
       "distribution_mode": {
         "title": "Mode de distribution",
-        "helper": "Choisissez le degré de contrainte appliqué à la grille de tri Q. Forcée : chaque colonne doit être remplie à sa capacité déclarée (le choix le plus courant ; Brown 1980 ; Watts & Stenner 2012). Libre : nombre quelconque de cartes par colonne, total = taille du jeu Q (Brown et al. 2015 considèrent que la forme de la distribution influe peu sur les résultats). Flexible : total imposé, capacités par colonne données à titre indicatif.",
+        "helper": "Choisissez le degré de contrainte appliqué à la grille de tri Q. Forcée : chaque colonne doit être remplie à sa capacité déclarée (le choix le plus courant). Libre : nombre quelconque de cartes par colonne, total = taille du jeu Q. Flexible : total imposé, capacités par colonne données à titre indicatif.",
         "forced": {
           "label": "Forcée",
-          "tooltip": "Chaque colonne doit contenir exactement sa capacité déclarée. Brown 1980 ; Watts & Stenner 2012."
+          "tooltip": "Chaque colonne doit contenir exactement sa capacité déclarée."
         },
         "free": {
           "label": "Libre",
-          "tooltip": "Total de cartes = taille du jeu Q ; nombre par colonne libre. Brown et al. 2015."
+          "tooltip": "Total de cartes = taille du jeu Q ; nombre par colonne libre."
         },
         "flexible": {
           "label": "Flexible",
@@ -500,9 +495,8 @@
       "description": "Gérez vos informations personnelles et la sécurité de votre compte.",
       "personal": {
         "title": "Informations personnelles",
-        "description": "Vos coordonnées et détails de compte.",
         "email": "Adresse e-mail",
-        "email_locked": "L'email ne peut pas être modifié directement. Contactez l'administrateur.",
+        "email_locked": "Contactez un administrateur pour modifier.",
         "name": "Nom complet",
         "save": "Enregistrer",
         "saving": "Enregistrement...",
@@ -514,9 +508,6 @@
       "security": {
         "title": "Sécurité et 2FA",
         "description": "Ajoutez une couche de sécurité supplémentaire avec TOTP.",
-        "status_active": "La sécurité du compte est active",
-        "status_inactive": "La sécurité du compte est faible",
-        "status_inactive_desc": "Activez l'authentification à deux facteurs pour protéger vos données et vos études.",
         "enabled": "Activé",
         "setup_cta": "Configurer la 2FA",
         "configure_title": "Configurer l'application d'authentification",
@@ -524,7 +515,6 @@
         "secret_copied": "Secret copié",
         "enter_code": "2. Entrez le code à 6 chiffres",
         "enable_btn": "Activer la 2FA",
-        "active_msg": "La 2FA est active",
         "disable_btn": "Désactiver la 2FA",
         "confirm_disable": "Confirmer la désactivation",
         "confirm_password_label": "Confirmez avec votre mot de passe",
@@ -537,7 +527,6 @@
       },
       "password": {
         "title": "Mot de passe",
-        "description": "Mettez à jour votre mot de passe.",
         "current": "Mot de passe actuel",
         "new": "Nouveau mot de passe",
         "change_btn": "Changer le mot de passe",
@@ -602,7 +591,6 @@
       "empty_title": "Aucun concours",
       "empty_desc": "Créez un concours pour commencer à collecter et organiser les énoncés candidats pour votre recherche en Q-méthodologie.",
       "add_item": "Ajouter un élément",
-      "add_item_desc": "Ajouter un nouvel énoncé candidat à ce concours.",
       "bulk_import": "Import en masse",
       "import_desc": "Collez les énoncés séparés par des retours à la ligne. Chaque ligne devient un élément.",
       "import_prefix": "Préfixe de code",
@@ -629,7 +617,7 @@
       "deleted": "Concours supprimé",
       "delete_error": "Échec de la suppression du concours",
       "delete_item_title": "Supprimer l'élément",
-      "delete_item_confirm": "Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.",
+      "delete_item_confirm": "Supprimer cet élément ? Action irréversible.",
       "status": {
         "proposed": "Proposé",
         "accepted": "Accepté",
@@ -647,7 +635,6 @@
       "version_label": "v{{n}}",
       "item_detail_desc": "Historique et commentaires de cet élément",
       "manage_tags": "Étiquettes",
-      "manage_tags_desc": "Créez et gérez des étiquettes pour catégoriser les éléments du concours par thème ou dimension.",
       "tag_name_placeholder": "Nom de l'étiquette",
       "tag_color": "Couleur de l'étiquette",
       "tag_created": "Étiquette créée",
@@ -692,15 +679,13 @@
         "title": "Mémo de construction",
         "summary_empty": "Optionnel · pour la transparence du processus de curation",
         "summary_filled": "{{n}} caractères · cliquez pour voir ou modifier",
-        "helper": "Optionnel. Documentez comment ce concours a été constitué : sources mobilisées, voix retenues ou écartées, rationnel d'échantillonnage. Utile pour rendre transparent le processus de curation (Sneegas 2020 ; Robbins & Krueger 2000). Laissez vide si non pertinent pour votre design.",
         "placeholder": "Documentez comment ce concours a été construit : sources, voix retenues ou écartées, rationnel de l'échantillonnage…",
         "save": "Enregistrer le mémo",
         "saved": "Mémo de construction enregistré",
         "save_error": "Échec de l'enregistrement du mémo de construction"
       },
-      "status_pills_aria": "Accepté : {{a}} ; Proposé : {{p}} ; Rejeté : {{r}}",
       "import_from_csv": "Importer CSV/TSV…",
-      "import_csv_hint": "Le fichier CSV/TSV doit avoir les en-têtes code, language, text. Les lignes dans la langue sélectionnée sont chargées dans la zone de texte ci-dessus.",
+      "import_csv_hint": "CSV/TSV : colonnes code, language, text.",
       "import_csv_no_match": "Aucune ligne ne correspond à la langue sélectionnée ({{lang}}).",
       "import_csv_skipped": "{{count}} ligne(s) ignorée(s) dans d’autres langues : {{langs}}.",
       "import_csv_more_errors": "{{count}} autres problèmes"
@@ -759,7 +744,7 @@
       "eigenvalue_error": "Impossible de charger les données d'analyse. Veuillez réessayer.",
       "scree_plot_label": "Diagramme d'éboulis montrant les valeurs propres pour {{n}} facteurs",
       "loading_eigenvalues": "Chargement des valeurs propres...",
-      "empty_state": "Configurez les paramètres ci-dessus et cliquez sur « Lancer l'analyse » pour extraire les facteurs de vos données Q-sort.",
+      "empty_state": "Configurez les paramètres et lancez l'analyse.",
       "empty": {
         "contract_title": "Pas encore assez de données Q-sort",
         "contract_body": "L'analyse factorielle Q nécessite au moins 2 participants ayant complété le tri. Les choix de configuration (extraction, facteurs, rotation, marquage) prennent leur sens une fois les données disponibles. Partagez le lien d'étude depuis la vue d'ensemble pour commencer à collecter des réponses.",
@@ -811,9 +796,9 @@
       "no_statement_scores": "Aucun score d'énoncé disponible. Assurez-vous que des participants sont marqués pour au moins un facteur.",
       "no_characteristics": "Aucune caractéristique factorielle disponible.",
       "export": "Exporter",
-      "export_loadings": "CSV — Saturations factorielles",
-      "export_scores": "CSV — Scores des énoncés",
-      "export_xlsx": "XLSX — Analyse complète",
+      "export_loadings": "Saturations factorielles (CSV)",
+      "export_scores": "Scores des énoncés (CSV)",
+      "export_xlsx": "Analyse complète (XLSX)",
       "export_error": "Échec de la génération de l'export XLSX.",
       "select_factors": "Sélectionner le nombre de facteurs",
       "loadings_help": "Les saturations factorielles montrent la corrélation entre le tri de chaque participant et chaque facteur. Les cellules surlignées dépassent le seuil de significativité indiqué ci-dessus.",
@@ -827,30 +812,22 @@
       "z_scores_description": "Scores z et positions dans le tableau factoriel par énoncé",
       "factor_statistics": "Statistiques factorielles",
       "characteristics_help": "Les valeurs propres reflètent la quantité de variance expliquée. La fiabilité composite reflète la cohérence interne entre les tris marqués. L'ET des scores factoriels reflète la précision de l'estimation composite.",
-      "help_extraction": "L'ACP maximise la variance expliquée entre les facteurs. Le centroïde produit des facteurs moins contraints mathématiquement, ce que certains chercheurs en Q préfèrent pour des raisons théoriques.",
-      "help_n_factors": "Chaque facteur représente un point de vue distinct. Plus de facteurs capturent plus de nuances mais peuvent fragmenter des vues cohérentes ; moins de facteurs donnent des regroupements plus larges.",
-      "help_rotation": "Varimax maximise la séparation entre les facteurs, produisant une structure plus simple. Sans rotation, la solution mathématique originale est préservée.",
-      "help_flagging": "Auto marque les participants dont la saturation dépasse le seuil de significativité sur exactement un facteur. Manuel permet de définir le marquage selon votre propre jugement.",
+      "help_extraction": "L'ACP maximise la variance expliquée. Le centroïde est moins contraint mathématiquement.",
+      "help_n_factors": "Chaque facteur représente un point de vue distinct.",
+      "help_rotation": "Varimax sépare les facteurs pour une structure plus simple.",
+      "help_flagging": "Auto : marque les participants saturant sur un seul facteur. Manuel : ajustement participant par participant.",
       "guide_loadings_title": "Lire les saturations factorielles",
       "guide_loadings_1": "Chaque saturation est une corrélation (-1 à +1) entre un participant et un facteur (point de vue partagé).",
       "guide_loadings_2": "Les valeurs surlignées dépassent le seuil de significativité indiqué au-dessus du tableau.",
-      "guide_loadings_3": "Un participant « marqué » définit ce facteur. Recherchez une structure claire : chaque personne sur un seul facteur.",
-      "guide_loadings_4": "Les participants non marqués ont un point de vue unique non capturé par la solution.",
       "guide_arrays_title": "Interpréter les tableaux factoriels",
       "guide_arrays_1": "Chaque tableau factoriel est le Q-sort composite représentant un point de vue partagé.",
       "guide_arrays_2": "Lisez de gauche à droite : du plus en désaccord au plus en accord. Les positions extrêmes portent le signal le plus fort pour l'interprétation.",
-      "guide_arrays_3": "Les énoncés surlignés en ambre sont distinctifs — placés de manière significativement différente par rapport aux autres facteurs.",
-      "guide_arrays_4": "Comparez les tableaux entre facteurs pour voir où les points de vue divergent et convergent.",
       "guide_statements_title": "Comprendre les scores des énoncés",
       "guide_statements_1": "Les scores z montrent à quel point chaque facteur est en accord ou en désaccord avec chaque énoncé (0 = neutre).",
       "guide_statements_2": "D = distinctif (placé de manière significativement différente entre facteurs). Les étoiles indiquent le niveau de significativité.",
-      "guide_statements_3": "C = consensus (tous les facteurs s'accordent sur le placement). Ils n'aident pas à différencier les points de vue.",
-      "guide_statements_4": "Les énoncés D révèlent ce qui rend chaque point de vue unique. Les énoncés C montrent où les points de vue convergent.",
       "guide_summary_title": "Évaluer votre solution",
       "guide_summary_1": "Les valeurs propres mesurent la variance expliquée par chaque facteur. Le critère de Kaiser (valeur propre > 1) est une heuristique courante pour décider du nombre de facteurs à retenir.",
       "guide_summary_2": "La fiabilité composite reflète la cohérence entre les tris marqués pour chaque facteur. Des valeurs plus élevées signifient que l'estimation du facteur repose sur davantage d'accord entre ses tris définissants.",
-      "guide_summary_3": "Les corrélations entre facteurs montrent le degré de chevauchement entre les points de vue. Des corrélations plus élevées signifient que les facteurs partagent davantage de terrain commun ; des corrélations plus faibles signifient qu'ils sont plus distincts.",
-      "guide_summary_4": "La variance totale expliquée indique quelle part de la variation globale dans les patterns de tri est capturée par votre solution.",
       "benchmark_above": "Au-dessus du seuil",
       "benchmark_below": "En dessous du seuil",
       "history": {
@@ -858,7 +835,7 @@
         "loading": "Chargement de l'historique…",
         "fetch_error": "Impossible de charger l'historique des analyses.",
         "empty": "Aucune analyse précédente pour cette étude — lancez-en une pour démarrer la piste d'audit.",
-        "empty_explainer": "Documenter les choix analytiques favorise la reproductibilité — exigence centrale d'une pratique Q-méthodologique rigoureuse (Watts & Stenner 2012 ; Sneegas 2020). Chaque exécution est enregistrée ici afin de documenter et réexaminer chaque décision.",
+        "empty_explainer": "Chaque exécution est enregistrée ici afin de documenter et réexaminer chaque décision.",
         "load_error": "Impossible de charger cette analyse.",
         "load_run_aria": "Charger l'analyse du {{date}}",
         "loading_run": "Chargement…",
@@ -889,7 +866,7 @@
         "no_material": "Aucun enregistrement audio ni commentaire écrit des participants définissant ce facteur.",
         "loading": "Chargement des enregistrements…",
         "error": "Impossible de charger les enregistrements audio. Veuillez réessayer.",
-        "context": "Ancrer l'interprétation des facteurs dans les mots des participants eux-mêmes — leurs justifications audio comme leurs commentaires écrits sur les cartes — est un élément central d'une pratique Q-méthodologique rigoureuse (Watts & Stenner 2012 ; Sneegas 2020).",
+        "context": "Ancrez l'interprétation des facteurs dans les mots des participants — leurs justifications audio comme leurs commentaires écrits sur les cartes.",
         "context_aria": "À propos de ce panneau",
         "audio_label": "Enregistrement : {{key}} par {{participant}}",
         "url_unavailable": "URL audio non disponible.",
@@ -911,12 +888,12 @@
         "judgmental": {
           "label": "Manuelle (jugement)",
           "short": "Manuelle",
-          "tooltip": "Pivote manuellement les paires de facteurs selon des angles choisis pour aligner les facteurs sur des positions substantiellement significatives (Brown 1980 ; Watts & Stenner 2012)."
+          "tooltip": "Pivote manuellement les paires de facteurs selon des angles choisis pour aligner les facteurs sur des positions substantiellement significatives."
         }
       },
       "manual_rotations": {
         "title": "Rotations manuelles",
-        "helper": "Spécifiez les rotations sous la forme « pivoter le facteur F de Δ° autour du facteur G ». Les rotations sont appliquées dans l'ordre. Utilisées pour aligner les facteurs sur des positions substantiellement significatives (Brown 1980 ; Watts & Stenner 2012).",
+        "helper": "Spécifiez les rotations sous la forme « pivoter le facteur F de Δ° autour du facteur G ». Les rotations sont appliquées dans l'ordre.",
         "add": "Ajouter une rotation",
         "remove_aria": "Supprimer la rotation",
         "empty": "Ajoutez au moins une rotation pour lancer l'analyse.",
@@ -927,10 +904,10 @@
       "bootstrap": {
         "toggle_label": "Lancer le bootstrap de stabilité",
         "iterations_label": "Itérations (B)",
-        "helper": "Optionnel. Le bootstrap rééchantillonne vos Q-sorts avec remise et relance l'analyse B fois pour estimer les erreurs-types des z-scores. Utile lorsque vous voulez des intervalles de confiance sur les scores factoriels (Zabala & Pascual 2016).",
+        "helper": "Optionnel. Rééchantillonne les Q-sorts B fois pour estimer des intervalles de confiance sur les scores factoriels.",
         "running": "Bootstrap en cours…",
         "se_column": "Erreur-type moyenne (z)",
-        "tooltip": "Bootstrap non paramétrique des Q-sorts (rééchantillonnés avec remise) ; l'analyse est répétée B fois pour estimer les erreurs-types et les IC à 95 % des z-scores (Zabala & Pascual 2016)."
+        "tooltip": "Bootstrap non paramétrique des Q-sorts (rééchantillonnés avec remise) ; l'analyse est répétée B fois pour estimer les IC à 95 % des z-scores."
       }
     },
     "project": {
@@ -951,9 +928,7 @@
       },
       "create": {
         "title": "Créer un projet",
-        "description": "Créez une nouvelle organisation pour gérer vos études et votre équipe.",
         "card_title": "Détails du projet",
-        "card_description": "Entrez le nom et l'identifiant URL de votre nouveau projet.",
         "name_label": "Nom du projet",
         "name_placeholder": "Mon groupe de recherche universitaire",
         "url_label": "URL du projet",
@@ -983,9 +958,7 @@
         "slug_description": "L'identifiant unique utilisé dans l'URL de l'étude. Lettres minuscules, chiffres et tirets uniquement.",
         "slug_locked": "Le slug de l'URL ne peut être modifié que lorsque l'étude est en mode brouillon."
       },
-      "guidance_title": "Comment fonctionne l'accès des participants",
-      "guidance_body": "L'URL de l'étude est l'adresse web publique de votre étude. Les liens de recrutement ajoutent des jetons uniques à cette URL pour contrôler et suivre qui peut participer. Partagez les liens directement, par e-mail, ou imprimez des codes QR pour vos supports physiques.",
-      "state_draft": "Votre étude est en mode brouillon. Configurez l'URL et préparez les liens de recrutement — les participants ne pourront pas accéder à l'étude tant qu'elle n'est pas activée.",
+      "state_draft": "Mode brouillon — les liens fonctionneront après activation.",
       "state_closed": "Cette étude est fermée. Les liens existants restent visibles mais les nouveaux participants ne peuvent pas commencer.",
       "state_archived": "Cette étude est archivée. Toutes les données de recrutement sont en lecture seule.",
       "empty_title": "Aucun lien de recrutement",
@@ -1018,7 +991,6 @@
       },
       "new_link": "Nouveau lien d'accès",
       "create_title": "Créer des liens d'accès",
-      "create_description": "Ciblez des cohortes spécifiques ou créez un accès général. Chaque type de lien a des propriétés de sécurité différentes.",
       "link_type": "Stratégie d'accès",
       "select_type": "Choisir le type de recrutement...",
       "campaign_name": "Nom du canal / de la campagne",
@@ -1029,11 +1001,9 @@
       "no_links": "Aucun lien de recrutement généré pour le moment.",
       "unnamed": "Canal sans nom",
       "revoked": "Accès révoqué",
-      "qr_title": "Partager le code d'accès",
-      "qr_desc": "Les participants peuvent scanner ce code pour accéder directement à l'étude.",
-      "copy_link": "Copier l'URL sécurisée",
-      "table_title": "Panneau de contrôle d'accès",
-      "table_description": "Canaux actifs et gestion du cycle de vie des liens.",
+      "qr_title": "Partager via QR",
+      "copy_link": "Copier l'URL",
+      "table_title": "Liens de recrutement",
       "share_title": "Partager l'étude",
       "share_desc": "Distribuez l'URL de votre étude pour inviter des participants.",
       "public_url_label": "URL publique de participation",
@@ -1337,7 +1307,6 @@
     },
     "study_overview": {
       "title": "Tableau de bord",
-      "subtitle": "",
       "back_to_overview": "Retour à la vue d'ensemble",
       "sample_size": "Nombre de participations (P-Set)",
       "valid": "validé(s)",
@@ -1346,7 +1315,6 @@
       "mobile": "mobile",
       "median_duration": "Durée médiane",
       "suspect": "Suspect",
-      "time_to_complete": "Temps de complétion",
       "recent_activity": "Activité récente",
       "latest_participants": "Dernières participations ({{count}} sur {{total}})",
       "recently_completed": "Récemment complété",
@@ -1468,7 +1436,6 @@
     },
     "design": {
       "translation_needed": "Révision requise (Copie)",
-      "translation_needed_desc": "Ce contenu a été automatiquement copié d'une autre langue. Veuillez le réviser et le localiser.",
       "reset_defaults": "Réinitialiser par défaut",
       "editing_language_banner": "Vous éditez la version {{language}}. Utilisez le sélecteur de langue dans la barre d'outils pour changer.",
       "multilang": {
@@ -1524,7 +1491,7 @@
         "editing_language": "Édition",
         "manage_langs": "Gérer les langues",
         "select_lang": "Choisir la langue",
-        "test_run_help": "Ouvre un aperçu participant. Les runs de test sont marqués is_test_run=true et n’entrent jamais dans les données publiées.",
+        "test_run_help": "Aperçu en tant que participant. Ces runs ne sont pas comptés dans vos données.",
         "more_actions": "Autres actions"
       },
       "sync": {
@@ -1541,7 +1508,7 @@
       },
       "validation": {
         "failed_title": "Configuration incomplète",
-        "failed_desc": "Votre étude ne peut pas encore être activée. Veuillez corriger les problèmes suivants :",
+        "failed_desc": "Corrigez ces problèmes pour activer :",
         "errors": {
           "no_statements": "L'étude doit contenir au moins un énoncé.",
           "no_grid": "La configuration de la grille est manquante.",
@@ -1783,12 +1750,9 @@
           "tooltip_desc": "Dans la méthode Q, une distribution forcée est généralement quasi-normale. Cela oblige le participant à faire des choix difficiles et à discriminer clairement entre les items.",
           "locked": "Conception verrouillée",
           "locked_desc": "Les changements structurels (codes des énoncés, grille) sont désactivés car l'étude a recueilli des données ou n'est plus en mode brouillon. Vous pouvez toujours modifier les textes des traductions.",
-          "locked_active": "L'étude est active",
-          "locked_active_desc": "L'étude collecte actuellement des données. Pour modifier la conception, vous devez d'abord la repasser en brouillon.",
-          "locked_paused": "L'étude est en pause",
-          "locked_paused_desc": "L'étude est actuellement en pause. La conception reste verrouillée pour protéger les données existantes.",
-          "locked_closed": "L'étude est clôturée",
-          "locked_closed_desc": "Cette étude est terminée. La conception est archivée et ne peut plus être modifiée.",
+          "locked_active": "Étude active — repassez en brouillon pour éditer",
+          "locked_paused": "Étude en pause — repassez en brouillon pour éditer",
+          "locked_closed": "Étude clôturée — la conception est archivée",
           "mismatch_title": "Capacité de grille incorrecte",
           "mismatch_desc": "Vous avez {{statements}} énoncés mais la grille n'a que {{slots}} emplacements. Veuillez ajuster les colonnes ci-dessous.",
           "unlock_hint": "Aller dans l'explorateur de données pour purger les sessions et débloquer la structure"
@@ -1924,7 +1888,7 @@
       "methodology_memo": {
         "title": "Mémo méthodologique",
         "summary": "Optionnel · pour la réplication & la préinscription",
-        "help": "Optionnel. Documentez pourquoi cette distribution, ces consignes, cette taille de Q-set. Utile pour la réplication et la préinscription (Watts & Stenner 2012 ; Sneegas 2020). Laissez vide si non pertinent.",
+        "help": "Optionnel. Documentez le rationnel de cette distribution, ces consignes, et cette taille de Q-set.",
         "label": "Mémo (toutes langues)",
         "placeholder": "Documentez le rationnel de vos choix de design…"
       },
@@ -2111,7 +2075,7 @@
         "no_participants_title": "Aucun participant pour l'instant",
         "no_participants_desc": "Partagez le lien de votre étude pour commencer à collecter des réponses.",
         "contract_title": "Aucune soumission pour le moment",
-        "contract_body": "Cette page listera les soumissions des participants et proposera les exports CSV/JSON dès la première réponse. Partagez le lien d'étude depuis la vue d'ensemble pour commencer à collecter des données.",
+        "contract_body": "Les soumissions et exports apparaîtront ici. Partagez le lien d'étude pour commencer la collecte.",
         "contract_cta": "Ouvrir la vue d'ensemble"
       },
       "pagination": {
@@ -2161,7 +2125,7 @@
         "delete_button": "Supprimer l'étude",
         "delete_confirm": "Êtes-vous sûr ? Cette action est IRRÉVERSIBLE.",
         "delete_dialog_title": "Supprimer cette étude ?",
-        "delete_dialog_intro": "Tous les tris, enregistrements audio et analyses de cette étude seront supprimés définitivement. Cette action est irréversible.",
+        "delete_dialog_intro": "Supprime définitivement tris, audio et analyses.",
         "delete_dialog_typed_label": "Saisir le slug de l'étude pour confirmer",
         "delete_dialog_action": "Supprimer définitivement"
       },
@@ -2180,13 +2144,10 @@
       "delete_error_desc": "Échec de la suppression de l'étude.",
       "storage": {
         "title": "Utilisation du stockage audio",
-        "description": "Surveillez le stockage des enregistrements audio de cette étude.",
         "used": "Stockage utilisé",
         "quota": "Quota",
         "quota_label": "Quota de stockage",
         "quota_help": "Stockage audio maximal pour cette étude (10–1000 Mo).",
-        "files_count": "Fichiers : {{count}}",
-        "percent_used": "{{percent}} % utilisé",
         "error": "Échec du chargement de l'utilisation du stockage.",
         "warning_high_usage": "L'utilisation du stockage est élevée. Envisagez d'augmenter le quota ou de supprimer d'anciens enregistrements.",
         "save_success": "Quota de stockage mis à jour",
@@ -2194,9 +2155,8 @@
       },
       "retention": {
         "title": "Conservation des données",
-        "description": "Nombre de mois pendant lesquels conserver des données identifiables avant de recommander l’anonymisation. Détermine la date seuil par défaut dans Cycle de vie des données. Laissez vide pour utiliser la valeur système (12 mois).",
         "months_label": "Conservation (mois)",
-        "help": "Les chercheurs UE doivent aligner cette valeur sur leur politique de conservation RGPD. Valeurs courantes : 6, 12, 24, 60.",
+        "help": "Valeurs courantes : 6, 12, 24, 60 mois. Laissez vide pour la valeur système (12).",
         "save_success": "Politique de conservation mise à jour",
         "save_error": "Échec de la mise à jour de la politique de conservation",
         "range_error": "La durée de conservation doit être un entier entre 1 et 240 mois."
@@ -2204,12 +2164,9 @@
     },
     "lifecycle": {
       "title": "Inventaire des données & cycle de vie",
-      "header_desc": "Contrôles de minimisation des données (RGPD art. 5)",
-      "intro": "Cette page vous offre un instantané en temps réel des données personnelles détenues pour cette étude et vous permet d'anonymiser les enregistrements anciens en masse. Utilisez-la pour respecter l'obligation de minimisation des données de l'art. 5 du RGPD une fois la collecte terminée.",
+      "header_desc": "Inventaire & anonymisation",
       "load_error": "Impossible de charger l'inventaire des données.",
       "participants_title": "Instantané des participants",
-      "participants_desc": "État actuel de tous les participants de cette étude",
-      "stat_total": "Total",
       "stat_started": "Commencé",
       "stat_completed": "Complété",
       "stat_discarded": "Rejeté",
@@ -2233,20 +2190,20 @@
       "cutoff_help": "Seuls les participants complétés soumis strictement avant cette date seront anonymisés.",
       "preview_label": "Candidats :",
       "preview_zero": "Aucun participant ne correspond à ce seuil. Essayez une date antérieure.",
-      "anonymise_button": "Anonymiser antérieurs au {{date}}",
+      "anonymise_button": "Anonymiser",
       "anonymise_success": "Anonymisation terminée",
       "anonymise_success_desc": "{{n}} participant(s) anonymisé(s), {{s}} déjà anonyme(s).",
       "anonymise_error": "Échec de l'anonymisation",
       "confirm_title": "Anonymiser les données des participants ?",
       "confirm_candidates": "{{count}} participant(s) complété(s) soumis avant le {{date}} seront anonymisés.",
-      "confirm_preserved": "Les classements des énoncés seront conservés en tant que données de recherche anonymes — ils ne seront plus liés à aucun individu.",
+      "confirm_preserved": "Les classements Q-sort sont conservés ; l'identité est supprimée.",
       "confirm_irreversible": "Cette action est immédiate et irréversible.",
       "confirm_in_progress": "Anonymisation en cours…",
       "confirm_action": "Oui, anonymiser",
       "cutoff_from_policy": "Valeur par défaut dérivée de la politique de conservation de l’étude ({{months}} mois).",
       "empty": {
         "title": "Aucune donnée participante pour le moment",
-        "body": "Cette page activera les tableaux d'inventaire et les contrôles d'anonymisation en masse (RGPD art. 5) dès la première soumission d'un participant. En attendant, partagez le lien d'étude depuis la vue d'ensemble pour commencer à collecter des réponses.",
+        "body": "Cette page s'active dès qu'un participant soumet. Partagez d'abord le lien d'étude.",
         "cta": "Ouvrir la vue d'ensemble"
       }
     },
@@ -2290,36 +2247,30 @@
             "title": "Matrice des permissions",
             "admin": {
               "label": "Admin",
-              "badge": "Accès complet",
               "desc": "Peut gérer les paramètres du projet, les membres et toutes les études."
             },
             "owner": {
               "label": "Propriétaire",
-              "badge": "Accès complet",
-              "desc": "Gère les paramètres du projet, les membres et toutes les études. Peut promouvoir ou retirer d'autres membres."
+              "desc": "Contrôle complet du projet, des membres et des études."
             },
             "researcher": {
               "label": "Chercheur",
-              "badge": "Création",
               "desc": "Peut créer et gérer toutes les études. Accès restreint aux paramètres du projet."
             },
             "viewer": {
               "label": "Observateur",
-              "badge": "Lecture seule",
               "desc": "Accès en lecture seule à toutes les études et données du projet."
             }
           },
           "coming_soon": "Bientôt disponible",
           "invite_modal": {
             "title": "Inviter un collaborateur",
-            "desc": "Envoyez une invitation sécurisée pour rejoindre votre équipe de recherche.",
             "email_label": "E-mail du collaborateur",
             "role_label": "Rôle assigné",
             "success": "Lien d'invitation généré !",
             "error": "Échec de la création de l'invitation.",
             "send": "Créer et envoyer l'invitation",
-            "copy_success": "Lien copié dans le presse-papier !",
-            "copy_hint": "Copiez ce lien et envoyez-le manuellement si l'e-mail échoue."
+            "copy_success": "Lien copié dans le presse-papier !"
           }
         }
       }
