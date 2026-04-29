@@ -846,6 +846,42 @@ def compute_parallel_analysis_n(
     return max(int(np.sum(obs_eigs > threshold)), 1)
 
 
+def compute_velicer_map_n(cor_mat: NDArray[np.float64]) -> int:
+    """Velicer (1976) Minimum Average Partial.
+
+    For each candidate k from 1 to min(n-1, 8), extract k principal
+    components, deflate the correlation matrix, then compute the average
+    squared off-diagonal of the resulting partial correlation matrix.
+    The k that minimises this average is the optimal number of factors.
+
+    Args:
+        cor_mat: Participant-correlation matrix (n x n).
+
+    Returns:
+        Optimal number of factors (>= 1).
+    """
+    n = cor_mat.shape[0]
+    if n < 2:
+        return 1
+    eigenvalues, eigenvectors = np.linalg.eigh(cor_mat)
+    idx = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[idx]
+    eigenvectors = eigenvectors[:, idx]
+
+    map_values: list[float] = []
+    for k in range(1, min(n, 9)):
+        evs_k = np.maximum(eigenvalues[:k], 0.0)
+        loadings = eigenvectors[:, :k] * np.sqrt(evs_k)
+        residual = cor_mat - loadings @ loadings.T
+        diag = np.sqrt(np.maximum(np.diag(residual), 1e-10))
+        partial = residual / np.outer(diag, diag)
+        np.fill_diagonal(partial, 0.0)
+        avg_sq = float(np.sum(partial**2) / (n * (n - 1)))
+        map_values.append(avg_sq)
+
+    return int(np.argmin(map_values)) + 1
+
+
 def _distribution_from_grid_config(
     grid_config: list[dict[str, object]],
 ) -> NDArray[np.int64]:

@@ -1284,3 +1284,35 @@ def test_compute_parallel_analysis_n_pure_noise_returns_floor_1():
     noise = rng.standard_normal(size=(20, 10))
     n = compute_parallel_analysis_n(noise, n_simulations=200, seed=42)
     assert n == 1
+
+
+# --- compute_velicer_map_n ---
+
+
+def test_compute_velicer_map_n_reference_dataset():
+    """Velicer (1976) MAP on the reference dataset.
+
+    The MAP picks the k that minimises the average squared partial
+    correlation after extracting k components. On the 8-participant
+    reference dataset, the result is bounded by [1, 7]. Lock the exact
+    value once observed for regression.
+    """
+    from app.services.analysis_service import (
+        compute_velicer_map_n,
+        correlation_matrix,
+    )
+
+    cor = correlation_matrix(REFERENCE_DATASET)
+    n = compute_velicer_map_n(cor)
+    assert 1 <= n <= 7
+    # Lock observed value: actual result on reference dataset is 5.
+    assert n == 5
+
+
+def test_compute_velicer_map_n_minimum_size():
+    """MAP must return at least 1 even on degenerate inputs."""
+    from app.services.analysis_service import compute_velicer_map_n
+
+    cor = np.eye(3)
+    n = compute_velicer_map_n(cor)
+    assert n == 1
