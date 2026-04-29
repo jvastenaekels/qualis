@@ -17,9 +17,11 @@ vi.mock('@/api/generated', () => ({
         entries: [],
     }),
     getStudyMemoApiAdminStudiesSidMemoGet: vi.fn(),
-    getTemplatesApiAdminMemoTemplatesGet: vi.fn().mockResolvedValue([
-        { title: 'Sources canvassed', description: 'Where did the items come from?' },
-    ]),
+    getTemplatesApiAdminMemoTemplatesGet: vi
+        .fn()
+        .mockResolvedValue([
+            { title: 'Sources canvassed', description: 'Where did the items come from?' },
+        ]),
     createConcourseEntryApiAdminConcoursesCidMemoEntriesPost: vi.fn().mockResolvedValue({
         id: 1,
         parent_type: 'concourse',
@@ -102,17 +104,15 @@ describe('MemoSection', () => {
                 isOwner
                 canEdit
                 members={[{ user_id: 1, display_name: 'me' }]}
-            />,
+            />
         );
-        await waitFor(() =>
-            expect(screen.getByText(/Insert from template/i)).toBeInTheDocument(),
-        );
+        await waitFor(() => expect(screen.getByText(/Insert from template/i)).toBeInTheDocument());
         await user.click(screen.getByText(/Insert from template/i));
         // Click the menu item — it appears in the Radix portal
         await user.click(await screen.findByRole('menuitem', { name: 'Sources canvassed' }));
         // After insertion the entry heading is rendered
         await waitFor(() =>
-            expect(screen.getByRole('heading', { name: 'Sources canvassed' })).toBeInTheDocument(),
+            expect(screen.getByRole('heading', { name: 'Sources canvassed' })).toBeInTheDocument()
         );
     });
 
@@ -164,11 +164,9 @@ describe('MemoSection', () => {
                 isOwner
                 canEdit
                 members={[{ user_id: 1, display_name: 'me' }]}
-            />,
+            />
         );
-        await waitFor(() =>
-            expect(screen.getByText('Sources canvassed')).toBeInTheDocument(),
-        );
+        await waitFor(() => expect(screen.getByText('Sources canvassed')).toBeInTheDocument());
 
         // Expand the thread
         await user.click(screen.getByText(/0 comments/i));
@@ -176,8 +174,6 @@ describe('MemoSection', () => {
         await user.type(textarea, 'first thought');
         await user.click(screen.getByRole('button', { name: /Post/i }));
 
-        await waitFor(() =>
-            expect(screen.getByText('first thought')).toBeInTheDocument(),
-        );
+        await waitFor(() => expect(screen.getByText('first thought')).toBeInTheDocument());
     });
 });

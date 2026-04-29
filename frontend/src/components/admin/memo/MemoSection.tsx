@@ -54,9 +54,7 @@ export function MemoSection({
     const [newEntryTitle, setNewEntryTitle] = useState('');
     const [adding, setAdding] = useState(false);
 
-    const resolvedCount = m.entries
-        .flatMap((e) => e.comments)
-        .filter((c) => c.resolved).length;
+    const resolvedCount = m.entries.flatMap((e) => e.comments).filter((c) => c.resolved).length;
 
     return (
         <div className="space-y-3">
@@ -90,9 +88,7 @@ export function MemoSection({
                             {m.templates.map((tpl) => (
                                 <DropdownMenuItem
                                     key={tpl.title}
-                                    onClick={() =>
-                                        m.addEntry({ title: tpl.title, body: '' })
-                                    }
+                                    onClick={() => m.addEntry({ title: tpl.title, body: '' })}
                                 >
                                     {tpl.title}
                                 </DropdownMenuItem>
@@ -119,10 +115,7 @@ export function MemoSection({
                     <input
                         value={newEntryTitle}
                         onChange={(e) => setNewEntryTitle(e.target.value)}
-                        placeholder={t(
-                            'admin.memo.entry_title_placeholder',
-                            'Section title…',
-                        )}
+                        placeholder={t('admin.memo.entry_title_placeholder', 'Section title…')}
                         className="w-full text-sm rounded-md border px-2 py-1 mb-2"
                     />
                     <div className="flex justify-end gap-2">
