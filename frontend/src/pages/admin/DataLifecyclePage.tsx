@@ -44,6 +44,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyStateContract } from '@/components/admin/EmptyStateContract';
+import { EmptyState } from '@/components/ui/empty-state';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -388,9 +389,11 @@ export default function DataLifecyclePage() {
                                 </tbody>
                             </table>
                         ) : (
-                            <p className="text-sm text-slate-400 italic">
-                                {t('admin.lifecycle.locale_empty', 'No locale data yet.')}
-                            </p>
+                            // Wave E.4 (E2 cleanup): migrated to <EmptyState compact>.
+                            <EmptyState
+                                title={t('admin.lifecycle.locale_empty', 'No locale data yet.')}
+                                variant="compact"
+                            />
                         )}
                     </CardContent>
                 </Card>

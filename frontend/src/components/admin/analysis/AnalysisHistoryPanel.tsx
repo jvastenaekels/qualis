@@ -21,6 +21,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { EmptyState } from '@/components/ui/empty-state';
 
 interface AnalysisHistoryPanelProps {
     slug: string;
@@ -185,20 +186,23 @@ export function AnalysisHistoryPanel({ slug, currentRunId, onLoadRun }: Analysis
                     )}
 
                     {runsQuery.isSuccess && runs.length === 0 && (
-                        <div className="py-4 text-center space-y-1">
-                            <p className="text-sm text-slate-500">
-                                {t(
-                                    'admin.analysis.history.empty',
-                                    'No previous analyses for this study yet — run one to start the audit trail.'
-                                )}
-                            </p>
-                            <p className="text-xs text-slate-400">
-                                {t(
-                                    'admin.analysis.history.empty_explainer',
-                                    'Documenting analytical choices supports reproducibility — a core requirement of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020). Each run is logged here so you can document and revisit every decision.'
-                                )}
-                            </p>
-                        </div>
+                        // Wave E.4 (E2 cleanup): migrated to <EmptyState>.
+                        // Inline variant, no icon (the panel already has the
+                        // ClipboardList in its header). The pedagogical
+                        // body (Watts & Stenner / Sneegas citations) is
+                        // preserved verbatim.
+                        <EmptyState
+                            title={t(
+                                'admin.analysis.history.empty',
+                                'No previous analyses for this study yet — run one to start the audit trail.'
+                            )}
+                            body={t(
+                                'admin.analysis.history.empty_explainer',
+                                'Documenting analytical choices supports reproducibility — a core requirement of careful Q-methodological practice (Watts & Stenner 2012; Sneegas 2020). Each run is logged here so you can document and revisit every decision.'
+                            )}
+                            variant="inline"
+                            headingLevel={3}
+                        />
                     )}
 
                     {runsQuery.isSuccess && runs.length > 0 && (

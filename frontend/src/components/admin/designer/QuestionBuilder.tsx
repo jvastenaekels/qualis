@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { EmptyState } from '@/components/ui/empty-state';
 import {
     GripVertical,
     Plus,
@@ -954,16 +955,15 @@ const QuestionBuilder = ({ type, readOnly, structureLocked }: QuestionBuilderPro
                             strategy={verticalListSortingStrategy}
                         >
                             {questions.length === 0 ? (
-                                <div className="py-16 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/30 transition-all hover:bg-slate-50/50">
-                                    <div className="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 mb-6">
-                                        <Plus className="h-8 w-8 text-slate-300" />
-                                    </div>
-                                    <p className="text-base font-bold text-slate-900 tracking-tight">
-                                        {t('admin.design.questions.empty.title')}
-                                    </p>
-                                    <p className="text-sm font-medium text-slate-500 mt-2 max-w-[280px] text-center leading-relaxed">
-                                        {t('admin.design.questions.empty.desc')}
-                                    </p>
+                                // Wave E.4 (E2 cleanup): migrated to <EmptyState>.
+                                <div className="border-2 border-dashed border-slate-200 rounded-3xl bg-slate-50/30 transition-all hover:bg-slate-50/50">
+                                    <EmptyState
+                                        icon={Plus}
+                                        title={t('admin.design.questions.empty.title')}
+                                        body={t('admin.design.questions.empty.desc')}
+                                        variant="inline"
+                                        headingLevel={3}
+                                    />
                                 </div>
                             ) : (
                                 <div className="flex flex-col">
