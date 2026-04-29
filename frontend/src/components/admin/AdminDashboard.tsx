@@ -112,7 +112,7 @@ export function AdminDashboard() {
                 <div>
                     <div className="flex items-center gap-2.5">
                         <Briefcase className="h-6 w-6 text-indigo-500" />
-                        <h1 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900">
                             {currentProject?.title}
                         </h1>
                     </div>
@@ -123,7 +123,7 @@ export function AdminDashboard() {
 
                 <Card className="border-dashed">
                     <CardContent className="pt-6">
-                        <h2 className="text-lg font-semibold mb-6">
+                        <h2 className="text-lg font-black text-slate-900 mb-6">
                             {t('admin.dashboard.onboarding_title', 'First steps')}
                         </h2>
                         <ol className="space-y-4">
@@ -195,7 +195,7 @@ export function AdminDashboard() {
                 <div>
                     <div className="flex items-center gap-2.5">
                         <Briefcase className="h-6 w-6 text-indigo-500" />
-                        <h1 className="text-2xl font-bold tracking-tight">
+                        <h1 className="text-2xl font-black tracking-tight text-slate-900">
                             {currentProject?.title}
                         </h1>
                     </div>
@@ -320,7 +320,7 @@ export function AdminDashboard() {
                 <>
                     <div className="flex items-center gap-2">
                         <FlaskConical className="h-5 w-5 text-indigo-500" />
-                        <h2 className="text-lg font-semibold">
+                        <h2 className="text-lg font-black text-slate-900">
                             {t('admin.dashboard.studies', 'Studies')}
                         </h2>
                     </div>
@@ -430,7 +430,7 @@ function SingleStudyCard({
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <FlaskConical className="h-5 w-5 text-indigo-500" />
-                    <h2 className="text-lg font-semibold">
+                    <h2 className="text-lg font-black text-slate-900">
                         {t('admin.dashboard.studies', 'Studies')}
                     </h2>
                 </div>

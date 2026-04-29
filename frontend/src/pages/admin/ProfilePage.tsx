@@ -193,7 +193,7 @@ const ProfilePage = () => {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={t('admin.profile.title', 'Profile & security')}
+                title={t('admin.profile.title', 'Profile')}
                 description={t(
                     'admin.profile.description',
                     'Manage your personal information and account security.'

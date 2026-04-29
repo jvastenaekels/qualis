@@ -100,7 +100,7 @@ const RecruitmentPage = () => {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={t('admin.recruitment.title', 'Access & Recruitment')}
+                title={t('admin.recruitment.title', 'Access')}
                 description={t(
                     'admin.recruitment.description',
                     'Configure the study URL, manage participant access, and track recruitment efficiency.'

@@ -491,7 +491,7 @@
             "admin_user": "Ylläpitäjä"
         },
         "profile": {
-            "title": "Profiili ja turvallisuus",
+            "title": "Profiili",
             "description": "Hallitse henkilökohtaisia tietojasi ja turvallisuusasetuksia.",
             "personal": {
                 "title": "Henkilökohtaiset tiedot",
@@ -939,7 +939,7 @@
             }
         },
         "recruitment": {
-            "title": "Pääsy & Rekrytointi",
+            "title": "Pääsy",
             "description": "Määritä tutkimuksen URL-osoite, hallitse osallistujien pääsyä ja seuraa rekrytoinnin tehokkuutta.",
             "study_url": {
                 "title": "Tutkimuksen URL",
@@ -1089,9 +1089,12 @@
             "design": "Suunnittelu",
             "participants": "Osallistujat",
             "team": "Tiimi",
-            "recruitment": "Rekrytointi",
+            "recruitment": "Pääsy",
             "exports": "Tiedot",
             "data": "Tiedot",
+            "lifecycle": "Tietojen elinkaari",
+            "profile": "Profiili",
+            "participant_n": "Osallistuja #{{id}}",
             "analysis": "Analyysi",
             "settings": "Asetukset",
             "concourse": "Concourse"
@@ -1857,7 +1860,7 @@
             }
         },
         "data": {
-            "title": "Analytiikka & Tiedot",
+            "title": "Tiedot",
             "description": "Tarkastele osallistujien suorituksia, laadullista palautetta ja vie tietoaineistoja.",
             "sections": {
                 "key_indicators": "Avainmittarit",
@@ -1964,6 +1967,7 @@
             },
             "detail": {
                 "participant": "Osallistuja",
+                "participant_n": "Osallistuja #{{id}}",
                 "not_found": "Osallistujaa ei löytynyt",
                 "title": "Osallistujan profiili",
                 "session": "Istunto",
@@ -2330,7 +2334,7 @@
             }
         },
         "lifecycle": {
-            "title": "Data inventory & lifecycle",
+            "title": "Tietojen elinkaari",
             "header_desc": "Inventory & anonymisation",
             "load_error": "Failed to load data inventory.",
             "participants_title": "Participants snapshot",

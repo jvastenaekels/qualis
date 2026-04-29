@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
     useGetStudyApiAdminStudiesSlugGet,
     useGetParticipantApiAdminStudiesParticipantsParticipantIdGet,
@@ -7,14 +7,6 @@ import {
 } from '@/api/generated';
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Button } from '@/components/ui/button';
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
 import { ArrowLeft, ChevronLeft, ChevronRight, User } from 'lucide-react';
 import type { DumpResponse, DumpParticipant } from '@/components/admin/dashboard/types';
 import { ParticipantDetailContent } from '@/components/admin/dashboard/ParticipantDetailContent';
@@ -254,39 +246,11 @@ export default function ParticipantDetailsPage() {
     return (
         <div className="flex flex-1 flex-col h-full overflow-hidden bg-slate-50/30">
             <div className="flex-none p-6 pb-0 space-y-3">
-                <Breadcrumb>
-                    <BreadcrumbList>
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link
-                                    to={`/app/${currentWorkspace?.slug || 'default'}/studies/${effectiveSlug}`}
-                                >
-                                    {study?.translations?.[0]?.title || study?.slug}
-                                </Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbLink asChild>
-                                <Link
-                                    to={`/app/${currentWorkspace?.slug || 'default'}/studies/${effectiveSlug}/data`}
-                                >
-                                    {t('admin.sidebar.data', 'Data')}
-                                </Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
-                        <BreadcrumbSeparator />
-                        <BreadcrumbItem>
-                            <BreadcrumbPage>
-                                {t('admin.data.detail.participant', 'Participant')} #{participantId}
-                            </BreadcrumbPage>
-                        </BreadcrumbItem>
-                    </BreadcrumbList>
-                </Breadcrumb>
-
                 <div className="flex items-center justify-between gap-4">
                     <StudyPageHeader
-                        title={t('admin.data.detail.title', 'Participant Details')}
+                        title={t('admin.data.detail.participant_n', 'Participant #{{id}}', {
+                            id: participantId,
+                        })}
                         icon={User}
                     />
 

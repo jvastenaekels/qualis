@@ -491,7 +491,7 @@
             "admin_user": "Administrateur"
         },
         "profile": {
-            "title": "Profil et sécurité",
+            "title": "Profil",
             "description": "Gérez vos informations personnelles et la sécurité de votre compte.",
             "personal": {
                 "title": "Informations personnelles",
@@ -939,7 +939,7 @@
             }
         },
         "recruitment": {
-            "title": "Accès & Recrutement",
+            "title": "Accès",
             "description": "Configurez l'URL de l'étude, gérez l'accès des participants et suivez l'efficacité du recrutement.",
             "study_url": {
                 "title": "URL de l'étude",
@@ -1089,9 +1089,12 @@
             "design": "Conception",
             "participants": "Participants",
             "team": "Équipe",
-            "recruitment": "Recrutement",
+            "recruitment": "Accès",
             "exports": "Données",
             "data": "Données",
+            "lifecycle": "Cycle de vie",
+            "profile": "Profil",
+            "participant_n": "Participant nº{{id}}",
             "analysis": "Analyse",
             "settings": "Réglages",
             "concourse": "Concours"
@@ -1895,7 +1898,7 @@
             }
         },
         "data": {
-            "title": "Explorateur de données",
+            "title": "Données",
             "description": "Suivi de la participation en temps réel, analyse de la qualité et gestion des sessions.",
             "sections": {
                 "key_indicators": "Indicateurs clés",
@@ -2002,6 +2005,7 @@
             },
             "detail": {
                 "participant": "Participant",
+                "participant_n": "Participant nº{{id}}",
                 "not_found": "Participant introuvable",
                 "title": "Profil participant",
                 "session": "Session",
@@ -2153,7 +2157,7 @@
             }
         },
         "lifecycle": {
-            "title": "Inventaire des données & cycle de vie",
+            "title": "Cycle de vie des données",
             "header_desc": "Inventaire & anonymisation",
             "load_error": "Impossible de charger l'inventaire des données.",
             "participants_title": "Instantané des participants",

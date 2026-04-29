@@ -539,7 +539,7 @@
             "admin_user": "Admin user"
         },
         "profile": {
-            "title": "Profile & security",
+            "title": "Profile",
             "description": "Manage your personal information and security settings.",
             "personal": {
                 "title": "Personal information",
@@ -987,7 +987,7 @@
             }
         },
         "recruitment": {
-            "title": "Access & Recruitment",
+            "title": "Access",
             "description": "Configure the study URL, manage participant access, and track recruitment efficiency.",
             "study_url": {
                 "title": "Study URL",
@@ -1137,9 +1137,12 @@
             "design": "Design",
             "participants": "Participants",
             "team": "Team",
-            "recruitment": "Recruit",
+            "recruitment": "Access",
             "exports": "Data",
             "data": "Data",
+            "lifecycle": "Data lifecycle",
+            "profile": "Profile",
+            "participant_n": "Participant #{{id}}",
             "analysis": "Analysis",
             "settings": "Settings",
             "concourse": "Concourse"
@@ -1905,7 +1908,7 @@
             }
         },
         "data": {
-            "title": "Data explorer",
+            "title": "Data",
             "description": "Monitor real-time participation, analyze data quality, and manage research sessions.",
             "sections": {
                 "key_indicators": "Key indicators",
@@ -2012,6 +2015,7 @@
             },
             "detail": {
                 "participant": "Participant",
+                "participant_n": "Participant #{{id}}",
                 "not_found": "Participant not found",
                 "title": "Participant profile",
                 "session": "Session",
@@ -2201,7 +2205,7 @@
             }
         },
         "lifecycle": {
-            "title": "Data inventory & lifecycle",
+            "title": "Data lifecycle",
             "header_desc": "Inventory & anonymisation",
             "load_error": "Failed to load data inventory.",
             "participants_title": "Participants snapshot",

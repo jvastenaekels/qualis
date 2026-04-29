@@ -168,7 +168,7 @@ export default function DataLifecyclePage() {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
-                    title={t('admin.lifecycle.title', 'Data inventory & lifecycle')}
+                    title={t('admin.lifecycle.title', 'Data lifecycle')}
                     description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
                     icon={ShieldCheck}
                 />
@@ -181,7 +181,7 @@ export default function DataLifecyclePage() {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
-                    title={t('admin.lifecycle.title', 'Data inventory & lifecycle')}
+                    title={t('admin.lifecycle.title', 'Data lifecycle')}
                     description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
                     icon={ShieldCheck}
                 />
@@ -205,7 +205,7 @@ export default function DataLifecyclePage() {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
-                    title={t('admin.lifecycle.title', 'Data inventory & lifecycle')}
+                    title={t('admin.lifecycle.title', 'Data lifecycle')}
                     description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
                     icon={ShieldCheck}
                 />
@@ -226,7 +226,7 @@ export default function DataLifecyclePage() {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={t('admin.lifecycle.title', 'Data inventory & lifecycle')}
+                title={t('admin.lifecycle.title', 'Data lifecycle')}
                 description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
                 icon={ShieldCheck}
             />

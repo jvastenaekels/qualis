@@ -219,7 +219,7 @@ export default function ProjectSettingsPage() {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={project.title}
+                title={t('admin.projects.settings.title', 'Project settings')}
                 description={t('admin.projects.settings.identity_desc')}
                 icon={Briefcase}
             />

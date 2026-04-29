@@ -72,7 +72,7 @@ test.describe('Participant Discard E2E Tests (Real Backend)', () => {
 
         // Click on first participant row to open detail
         await page.locator('tbody tr').first().click();
-        await expect(page.getByRole('heading', { name: /participant profile/i })).toBeVisible();
+        await expect(page.getByRole('heading', { name: /participant\s*#?\s*\d+/i })).toBeVisible();
 
         // The card's "Discard"/"Restore" button only opens an AlertDialog;
         // the actual mutation happens when the user clicks the dialog's

@@ -104,7 +104,7 @@ describe('DataLifecyclePage', () => {
         renderWithProviders(<DataLifecyclePage />);
 
         // Page header
-        expect(screen.getByText('Data inventory & lifecycle')).toBeInTheDocument();
+        expect(screen.getByText('Data lifecycle')).toBeInTheDocument();
 
         // Participant stats (Total stat removed in text-trim wave; Started/Completed/Discarded/Anonymised remain)
         expect(screen.getByText('30')).toBeInTheDocument(); // completed
@@ -141,7 +141,7 @@ describe('DataLifecyclePage', () => {
         renderWithProviders(<DataLifecyclePage />);
 
         // Header is still shown
-        expect(screen.getByText('Data inventory & lifecycle')).toBeInTheDocument();
+        expect(screen.getByText('Data lifecycle')).toBeInTheDocument();
         // Stats table should not be there
         expect(screen.queryByText('Participants snapshot')).not.toBeInTheDocument();
     });

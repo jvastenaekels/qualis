@@ -49,6 +49,8 @@ export default function AdminLayout() {
             design: t('admin.breadcrumbs.design'),
             recruitment: t('admin.breadcrumbs.recruitment'),
             data: t('admin.breadcrumbs.data', 'Data'),
+            lifecycle: t('admin.breadcrumbs.lifecycle', 'Data lifecycle'),
+            profile: t('admin.breadcrumbs.profile', 'Profile'),
             analysis: t('admin.breadcrumbs.analysis', 'Analysis'),
             exports: t('admin.breadcrumbs.exports'),
             settings: t('admin.breadcrumbs.settings'),
@@ -65,6 +67,10 @@ export default function AdminLayout() {
         const prev = segments[segments.length - 2];
         if (prev === 'concourses' && /^\d+$/.test(last)) {
             return t('admin.breadcrumbs.concourse', 'Concourse');
+        }
+        // Participant detail page: /participants/:id → show "Participant #N"
+        if (prev === 'participants' && /^\d+$/.test(last)) {
+            return t('admin.breadcrumbs.participant_n', 'Participant #{{id}}', { id: last });
         }
 
         return mapping[last] || last.charAt(0).toUpperCase() + last.slice(1);

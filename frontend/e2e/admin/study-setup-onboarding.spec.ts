@@ -89,7 +89,7 @@ test.describe('Study setup onboarding', () => {
 
         // The recruitment page shows the study URL card
         await expect(
-            page.getByRole('heading', { name: /access.*recruitment|recruitment/i }).first()
+            page.getByRole('heading', { name: /^access$/i }).first()
         ).toBeVisible({ timeout: 15_000 });
 
         // The study URL panel is present and contains the study slug in the URL

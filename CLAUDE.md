@@ -174,3 +174,26 @@ fires on the JSX shell itself. Adding a `// biome-ignore lint/complexity/noExces
 on the page component is the documented exception (precedent: AnalysisPage,
 StudyDesignPage, RecruitmentPage, ConcourseDetailPage). Only suppress on the
 shell, never inside the hook.
+
+### Admin header policy
+
+Three layers, one role each. The breadcrumb is the single source of truth for
+hierarchy; every other piece of header chrome must respect that.
+
+- **L1 Breadcrumb** (`AdminLayout.tsx`): hierarchy. Format `[Project] > [Study?] > [Section]`.
+  No local breadcrumbs in pages. Every static URL segment must have an entry in the
+  `mapping` table (no fallback to `last.charAt(0).toUpperCase()`); detail routes
+  (`…/concourses/:id`, `…/participants/:id`) get a typed special case.
+- **L2 Page header** (`StudyPageHeader`): the page's function. Two patterns:
+  - **Entity entry-point pages** → H1 = entity name. Project Dashboard = `project.title`,
+    Study Overview = `study.translations[0].title`, Participant detail = "Participant #N".
+  - **All other pages** → H1 = functional name ("Settings", "Analysis", "Data", "Access",
+    "Project settings", "Profile"). Never `project.title` / `study.title` — those are in
+    the breadcrumb already.
+- **L3 Section titles** (`CardTitle` / `<h2>`): typography is `text-lg font-black text-slate-900`.
+  L4 item titles inside cards may use `font-semibold` (precedent: AdminDashboard study cards).
+
+**Naming canon.** One label per section, propagated to three keys:
+`admin.sidebar.<s>` (may use a shorter variant if width-constrained),
+`admin.breadcrumbs.<s>`, `admin.<s>.title`. Default values in `t(key, 'fallback')` must
+match the canonical English label.

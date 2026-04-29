@@ -42,7 +42,9 @@ const StudyOverviewPage = () => {
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={t('admin.study_overview.title', 'Overview')}
+                title={
+                    study?.translations?.[0]?.title || t('admin.study_overview.title', 'Overview')
+                }
                 icon={LayoutDashboard}
                 statusBadge={
                     <Badge

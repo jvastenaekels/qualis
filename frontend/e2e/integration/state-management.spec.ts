@@ -94,8 +94,9 @@ test.describe('State Management Flow Tests', () => {
         const workspaceSlug = testDb.getWorkspaceSlug();
         await testDb.loginToAdminUI(adminPage);
         await adminPage.goto(`/app/${workspaceSlug}/studies/${study.slug}`);
-        // Wait for study page to load by checking h1 (Title is "Overview" + Badge)
-        await expect(adminPage.locator('h1')).toContainText('Overview');
+        // Wait for study page to load by checking h1 (now shows the study title per
+        // admin header policy: entity entry-point pages display the entity name).
+        await expect(adminPage.locator('h1')).toContainText('Test Study');
         await expect(adminPage).toHaveURL(
             new RegExp(`/app/${workspaceSlug}/studies/${study.slug}`)
         );
