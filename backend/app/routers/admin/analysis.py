@@ -429,15 +429,22 @@ async def preview_range(
         )
 
     dump = await _get_analysis_dump(db, study.id)
-    n_participants = len(dump["participants"])
-    max_k = min(8, max(n_participants - 1, 1))
+    try:
+        # Re-run inside compute_preview_range; we call it here to get the
+        # post-filter column count for honest k-range validation. Cheap
+        # (pure NumPy, sub-millisecond on typical data).
+        matrix, _participants, _statements = build_sort_matrix(dump)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    n_valid_participants = matrix.shape[1]
+    max_k = min(8, max(n_valid_participants - 1, 1))
     bad = [k for k in body.n_factors_range if k < 2 or k > max_k]
     if bad:
         raise HTTPException(
             status_code=400,
             detail=(
                 f"n_factors values {bad} out of range. Allowed: "
-                f"[2, {max_k}] given {n_participants} participants."
+                f"[2, {max_k}] given {n_valid_participants} valid participants."
             ),
         )
 

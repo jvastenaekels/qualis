@@ -854,6 +854,9 @@ def compute_parallel_analysis_n(
     n_statements, n_participants = dataset.shape
     rng = np.random.default_rng(seed)
     sim_eigs = np.zeros((n_simulations, n_participants))
+    # Q-method convention: dataset is (n_statements, n_participants). Random
+    # matrices preserve that shape so the simulated participant-correlation
+    # eigenvalue distribution is shape-matched to the observed one.
     for i in range(n_simulations):
         sim = rng.standard_normal(size=(n_statements, n_participants))
         sim_cor = correlation_matrix(sim)
@@ -1205,7 +1208,6 @@ def compute_preview_range(
     Returns:
         One PreviewSummary per k, in the input order.
     """
-    del flagging  # preview always uses auto flagging
     dataset, _participants, _statements = build_sort_matrix(dump)
     grid_config = dump["study"]["grid_config"]
     rows: list[PreviewSummary] = []
@@ -1236,7 +1238,7 @@ def compute_preview_range(
                 n_distinguishing=len(result["distinguishing"]),
                 n_cross_loaders=int(cross.sum()),
                 n_consensus=len(result["consensus"]),
-                min_defining_sorts=int(per_factor_flagged.min()) if k > 0 else 0,
+                min_defining_sorts=int(per_factor_flagged.min()),
                 has_empty_factor=bool((per_factor_flagged == 0).any()),
             )
         )

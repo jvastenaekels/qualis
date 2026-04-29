@@ -1214,3 +1214,28 @@ class TestPreviewRange:
             },
         )
         assert resp.status_code == 400
+        assert "out of range" in resp.json()["message"]
+
+    async def test_preview_range_rejects_unknown_extraction(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """Unknown extraction value must surface as Pydantic 422, not router 400."""
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+        resp = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/preview-range",
+            headers=headers,
+            json={
+                "n_factors_range": [2],
+                "extraction": "garbage",
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+        )
+        assert resp.status_code == 422

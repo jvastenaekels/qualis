@@ -1,7 +1,7 @@
 """Analysis schemas for Q-method factor analysis."""
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import (
     BaseModel,
@@ -285,9 +285,9 @@ class PreviewRangeRequest(BaseModel):
         max_length=8,
         description="Candidate k values, e.g. [2, 3, 4, 5, 6].",
     )
-    extraction: str = Field(default="pca")
-    rotation: str = Field(default="varimax")
-    flagging: str = Field(default="auto")
+    extraction: Literal["pca", "centroid"] = Field(default="pca")
+    rotation: Literal["varimax", "none", "judgmental"] = Field(default="varimax")
+    flagging: Literal["auto", "manual"] = Field(default="auto")
 
 
 class PreviewRangeRow(BaseModel):
