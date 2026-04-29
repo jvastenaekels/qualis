@@ -279,6 +279,36 @@ class EigenvalueResult(BaseModel):
     )
 
 
+class PreviewRangeRequest(BaseModel):
+    """Request body for POST /analysis/preview-range."""
+
+    n_factors_range: list[int] = Field(
+        min_length=1,
+        max_length=8,
+        description="Candidate k values, e.g. [2, 3, 4, 5, 6].",
+    )
+    extraction: str = Field(default="pca")
+    rotation: str = Field(default="varimax")
+    flagging: str = Field(default="auto")
+
+
+class PreviewRangeRow(BaseModel):
+    """One PreviewSummary row, mirrors the service TypedDict."""
+
+    n_factors: int
+    cumulative_variance: float
+    pct_flagged: float
+    n_distinguishing: int
+    n_cross_loaders: int
+    n_consensus: int
+    min_defining_sorts: int
+    has_empty_factor: bool
+
+
+class PreviewRangeResponse(BaseModel):
+    rows: list[PreviewRangeRow]
+
+
 # ---- AnalysisRun (persisted analysis history) ----
 
 

@@ -17,6 +17,9 @@ from .analysis import (
     ManualRotation,
     ParticipantCardComment,
     ParticipantLoading,
+    PreviewRangeRequest,
+    PreviewRangeResponse,
+    PreviewRangeRow,
     StatementClassification,
     StatementScore,
 )
@@ -130,6 +133,9 @@ __all__ = [
     "ManualRotation",
     "ParticipantCardComment",
     "ParticipantLoading",
+    "PreviewRangeRequest",
+    "PreviewRangeResponse",
+    "PreviewRangeRow",
     "StatementClassification",
     "StatementScore",
     # audio

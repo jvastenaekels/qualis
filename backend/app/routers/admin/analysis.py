@@ -37,6 +37,9 @@ from ...schemas import (
     ParticipantAudioRecording,
     ParticipantCardComment,
     ParticipantLoading,
+    PreviewRangeRequest,
+    PreviewRangeResponse,
+    PreviewRangeRow,
     StatementClassification,
     StatementScore,
 )
@@ -46,6 +49,7 @@ from ...services.analysis_service import (
     compute_bootstrap_stability,
     compute_eigenvalues,
     compute_parallel_analysis_n,
+    compute_preview_range,
     compute_velicer_map_n,
     correlation_matrix,
     run_analysis,
@@ -394,6 +398,68 @@ async def run_factor_analysis(
     )
 
     return analysis_result
+
+
+@router.post("/{slug}/analysis/preview-range")
+@limiter.limit("10/minute")
+async def preview_range(
+    request: Request,
+    body: PreviewRangeRequest,
+    study: Study = Depends(check_study_permission(StudyRole.viewer)),
+    db: AsyncSession = Depends(get_db),
+) -> PreviewRangeResponse:
+    """Compute summaries for a range of n_factors values without persisting.
+
+    Gated to PCA + varimax (or no rotation): centroid extraction (Brown 1980)
+    and judgmental rotation are path-dependent, so previewing them would
+    silently mislead. Bootstrap is excluded — it is not a retention criterion
+    and would dominate the cost budget.
+    """
+    if body.extraction != "pca":
+        raise HTTPException(
+            status_code=400,
+            detail="Preview range supports PCA extraction only "
+            "(centroid is path-dependent; commit a real run to inspect).",
+        )
+    if body.rotation not in {"varimax", "none"}:
+        raise HTTPException(
+            status_code=400,
+            detail="Preview range supports varimax rotation only "
+            "(judgmental rotation is path-dependent; commit a real run to inspect).",
+        )
+
+    dump = await _get_analysis_dump(db, study.id)
+    n_participants = len(dump["participants"])
+    max_k = min(8, max(n_participants - 1, 1))
+    bad = [k for k in body.n_factors_range if k < 2 or k > max_k]
+    if bad:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"n_factors values {bad} out of range. Allowed: "
+                f"[2, {max_k}] given {n_participants} participants."
+            ),
+        )
+
+    try:
+        rows = await asyncio.to_thread(
+            lambda: compute_preview_range(
+                dump=dump,
+                n_factors_range=sorted(body.n_factors_range),
+                extraction=body.extraction,
+                rotation=body.rotation,
+                flagging=body.flagging,
+            )
+        )
+    except (np.linalg.LinAlgError, ValueError) as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Preview range computation failed: {e}",
+        )
+
+    return PreviewRangeResponse(
+        rows=[PreviewRangeRow(**r) for r in rows]
+    )
 
 
 # ---- AnalysisRun history endpoints (audit trail) ----

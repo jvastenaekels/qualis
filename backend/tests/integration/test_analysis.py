@@ -1105,3 +1105,112 @@ class TestAnalysisRunHistory:
             headers=headers,
         )
         assert bad.status_code == 404
+
+
+@pytest.mark.asyncio
+class TestPreviewRange:
+    """Tests for POST /{slug}/analysis/preview-range."""
+
+    async def test_preview_range_pca_varimax_returns_rows(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+        resp = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/preview-range",
+            headers=headers,
+            json={
+                "n_factors_range": [2],
+                "extraction": "pca",
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+        )
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "rows" in body
+        assert len(body["rows"]) == 1
+        row = body["rows"][0]
+        assert row["n_factors"] == 2
+        assert "cumulative_variance" in row
+        assert "min_defining_sorts" in row
+        assert "has_empty_factor" in row
+
+    async def test_preview_range_rejects_centroid(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+        resp = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/preview-range",
+            headers=headers,
+            json={
+                "n_factors_range": [2],
+                "extraction": "centroid",
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+        )
+        assert resp.status_code == 400
+        assert "PCA" in resp.json()["message"]
+
+    async def test_preview_range_rejects_judgmental(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+        resp = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/preview-range",
+            headers=headers,
+            json={
+                "n_factors_range": [2],
+                "extraction": "pca",
+                "rotation": "judgmental",
+                "flagging": "auto",
+            },
+        )
+        assert resp.status_code == 400
+        assert "judgmental" in resp.json()["message"].lower()
+
+    async def test_preview_range_clamps_max_k(
+        self,
+        client: AsyncClient,
+        test_user: User,
+        seed_study: Study,
+        auth_token_factory,
+        db,
+        _make_analysis_study,
+    ):
+        """k must be <= min(8, n_participants - 1). Out-of-range → 400."""
+        study = await _make_analysis_study(db, seed_study)
+        headers = auth_token_factory(test_user)
+        # _make_analysis_study creates 3 participants → max k is 2.
+        resp = await client.post(
+            f"/api/admin/studies/{study.slug}/analysis/preview-range",
+            headers=headers,
+            json={
+                "n_factors_range": [2, 3],
+                "extraction": "pca",
+                "rotation": "varimax",
+                "flagging": "auto",
+            },
+        )
+        assert resp.status_code == 400
