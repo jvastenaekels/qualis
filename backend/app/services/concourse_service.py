@@ -18,6 +18,7 @@ from ..models import (
     ConcourseItemTranslation,
     ConcourseItemVersion,
     ConcourseTag,
+    MemoParentType,
     Statement,
     StatementTranslation,
     Study,
@@ -174,9 +175,14 @@ class ConcourseService:
 
     @staticmethod
     async def delete_concourse(db: AsyncSession, concourse_id: int) -> None:
+        from .memo_service import MemoService
+
         concourse = await db.get(Concourse, concourse_id)
         if concourse is None:
             raise NotFoundError("Concourse")
+        await MemoService.cleanup_for_parent(
+            db, parent_type=MemoParentType.concourse, parent_id=concourse.id
+        )
         await db.delete(concourse)
         await db.commit()
 

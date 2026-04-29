@@ -556,3 +556,49 @@ async def test_validate_for_activation_multiple_errors_accumulate():
 
     errors = StudyService.validate_for_activation(study)
     assert len(errors) >= 2
+
+
+# ---------------------------------------------------------------------------
+# Memo cleanup on delete
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_deleting_study_cleans_up_memo(
+    db: AsyncSession, seed_study: Study, seed_user_id: int
+) -> None:
+    """Deleting a study cascades to memo_entries (no DB-level FK)."""
+    from sqlalchemy import func, select
+
+    from app.models import MemoEntry, MemoParentType
+    from app.services.memo_service import MemoService
+
+    study_id = seed_study.id
+
+    # Seed a memo entry for the study
+    await MemoService.add_entry(
+        db,
+        parent_type=MemoParentType.study,
+        parent_id=study_id,
+        title="Research notes",
+        body="should be removed",
+        user_id=seed_user_id,
+    )
+
+    # Simulate the router-level delete path: cleanup then delete, single tx
+    await MemoService.cleanup_for_parent(
+        db, parent_type=MemoParentType.study, parent_id=study_id
+    )
+    await db.delete(seed_study)
+    await db.commit()
+
+    # Verify no orphan memo_entries remain
+    count = (
+        await db.execute(
+            select(func.count(MemoEntry.id)).where(
+                MemoEntry.parent_type == MemoParentType.study,
+                MemoEntry.parent_id == study_id,
+            )
+        )
+    ).scalar()
+    assert count == 0

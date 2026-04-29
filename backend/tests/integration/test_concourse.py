@@ -1082,3 +1082,43 @@ class TestStalenessAndSync:
             await ConcourseService.sync_statement_from_concourse(
                 db, study, statement.id
             )
+
+
+# ---------------------------------------------------------------------------
+# Memo cleanup on delete
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_deleting_concourse_cleans_up_memo(
+    db: AsyncSession, seed_concourse_id: int, seed_user_id: int
+) -> None:
+    """Deleting a concourse cascades to memo_entries (no DB-level FK)."""
+    from sqlalchemy import func, select
+
+    from app.models import MemoEntry, MemoParentType
+    from app.services.memo_service import MemoService
+
+    # Seed a memo entry for the concourse
+    await MemoService.add_entry(
+        db,
+        parent_type=MemoParentType.concourse,
+        parent_id=seed_concourse_id,
+        title="Notes",
+        body="cleaned up",
+        user_id=seed_user_id,
+    )
+
+    # Delete the concourse via the service
+    await ConcourseService.delete_concourse(db, concourse_id=seed_concourse_id)
+
+    # Verify no orphan memo_entries remain
+    count = (
+        await db.execute(
+            select(func.count(MemoEntry.id)).where(
+                MemoEntry.parent_type == MemoParentType.concourse,
+                MemoEntry.parent_id == seed_concourse_id,
+            )
+        )
+    ).scalar()
+    assert count == 0
