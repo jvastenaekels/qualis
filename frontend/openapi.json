@@ -9465,16 +9465,29 @@
           },
           "extraction": {
             "type": "string",
+            "enum": [
+              "pca",
+              "centroid"
+            ],
             "title": "Extraction",
             "default": "pca"
           },
           "rotation": {
             "type": "string",
+            "enum": [
+              "varimax",
+              "none",
+              "judgmental"
+            ],
             "title": "Rotation",
             "default": "varimax"
           },
           "flagging": {
             "type": "string",
+            "enum": [
+              "auto",
+              "manual"
+            ],
             "title": "Flagging",
             "default": "auto"
           }

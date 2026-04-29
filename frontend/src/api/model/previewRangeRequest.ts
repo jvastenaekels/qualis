@@ -4,6 +4,9 @@
  * Qualis API
  * OpenAPI spec version: 0.1.0
  */
+import type { PreviewRangeRequestExtraction } from './previewRangeRequestExtraction';
+import type { PreviewRangeRequestRotation } from './previewRangeRequestRotation';
+import type { PreviewRangeRequestFlagging } from './previewRangeRequestFlagging';
 
 /**
  * Request body for POST /analysis/preview-range.
@@ -15,7 +18,7 @@ export interface PreviewRangeRequest {
      * @maxItems 8
      */
     n_factors_range: number[];
-    extraction?: string;
-    rotation?: string;
-    flagging?: string;
+    extraction?: PreviewRangeRequestExtraction;
+    rotation?: PreviewRangeRequestRotation;
+    flagging?: PreviewRangeRequestFlagging;
 }
