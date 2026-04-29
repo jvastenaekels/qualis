@@ -165,3 +165,18 @@ async def test_get_templates_for_concourse(
     titles = [t["title"] for t in response.json()]
     assert "Sources canvassed" in titles
     assert "Voices excluded" in titles
+
+
+async def test_post_comment_rejects_non_member_mention(
+    client: AsyncClient,
+    seed_entry_id: int,
+    auth_headers_for_seed_user: dict[str, str],
+) -> None:
+    """Mentioning a user who is not a project member returns 400."""
+    response = await client.post(
+        f"/api/admin/memo-entries/{seed_entry_id}/comments",
+        json={"body": "ping non-member", "mentions": [99999]},
+        headers=auth_headers_for_seed_user,
+    )
+    assert response.status_code == 400
+    assert "not project members" in response.json()["message"]

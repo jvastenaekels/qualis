@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -16,6 +16,7 @@ from app.dependencies import (
     get_current_user,
     get_db,
 )
+from app.limiter import limiter
 from app.models import (
     Concourse,
     MemoEntry,
@@ -38,6 +39,10 @@ from app.schemas.memos import (
 )
 from app.services.memo_service import MemoService
 
+# Unlike other admin routers (mounted at /api/admin/<area>), this one
+# spans multiple roots — concourses, studies, memo-entries, memo-comments,
+# memo/templates — so it carries its own /admin prefix and registers
+# at /api in main.py.
 router = APIRouter(prefix="/admin", tags=["memos"])
 
 
@@ -46,8 +51,8 @@ router = APIRouter(prefix="/admin", tags=["memos"])
 
 async def _resolve_entry_parent(
     db: AsyncSession, entry_id: int
-) -> tuple[MemoParentType, int, int]:
-    """Return (parent_type, parent_id, project_id) for the entry's parent.
+) -> tuple[MemoEntry, int]:
+    """Return (entry, project_id) for the entry's parent.
 
     Raises 404 if the entry or its parent is missing.
     """
@@ -58,11 +63,11 @@ async def _resolve_entry_parent(
         c = await db.get(Concourse, entry.parent_id)
         if c is None:
             raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Parent missing")
-        return entry.parent_type, entry.parent_id, c.project_id
+        return entry, c.project_id
     s = await db.get(Study, entry.parent_id)
     if s is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Parent missing")
-    return entry.parent_type, entry.parent_id, s.project_id
+    return entry, s.project_id
 
 
 async def _check_member(
@@ -155,7 +160,9 @@ async def get_templates(
     response_model=MemoEntryRead,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit("60/minute")
 async def create_concourse_entry(
+    request: Request,
     cid: int,
     payload: MemoEntryCreate,
     db: AsyncSession = Depends(get_db),
@@ -182,7 +189,9 @@ async def create_concourse_entry(
     response_model=MemoEntryRead,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit("60/minute")
 async def create_study_entry(
+    request: Request,
     sid: int,
     payload: MemoEntryCreate,
     db: AsyncSession = Depends(get_db),
@@ -205,13 +214,15 @@ async def create_study_entry(
 
 
 @router.patch("/memo-entries/{eid}", response_model=MemoEntryRead)
+@limiter.limit("60/minute")
 async def update_entry(
+    request: Request,
     eid: int,
     payload: MemoEntryUpdate,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> MemoEntryRead:
-    _, _, project_id = await _resolve_entry_parent(db, eid)
+    _, project_id = await _resolve_entry_parent(db, eid)
     await _check_member(db, project_id, user, ProjectRole.researcher)
     await MemoService.update_entry(
         db,
@@ -225,12 +236,14 @@ async def update_entry(
 
 
 @router.delete("/memo-entries/{eid}", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("60/minute")
 async def delete_entry(
+    request: Request,
     eid: int,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> None:
-    _, _, project_id = await _resolve_entry_parent(db, eid)
+    _, project_id = await _resolve_entry_parent(db, eid)
     await _check_member(db, project_id, user, ProjectRole.researcher)
     await MemoService.delete_entry(db, entry_id=eid)
 
@@ -243,13 +256,15 @@ async def delete_entry(
     response_model=MemoCommentRead,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit("30/minute")
 async def post_comment(
+    request: Request,
     eid: int,
     payload: MemoCommentCreate,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> MemoCommentRead:
-    _, _, project_id = await _resolve_entry_parent(db, eid)
+    _, project_id = await _resolve_entry_parent(db, eid)
     await _check_member(db, project_id, user, ProjectRole.viewer)
     await MemoService.validate_mentions(
         db, project_id=project_id, user_ids=payload.mentions
@@ -265,14 +280,16 @@ async def post_comment(
 
 
 @router.patch("/memo-comments/{cid}", response_model=MemoCommentRead)
+@limiter.limit("60/minute")
 async def update_comment(
+    request: Request,
     cid: int,
     payload: MemoCommentUpdate,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> MemoCommentRead:
     c = await MemoService.get_comment(db, comment_id=cid)
-    _, _, project_id = await _resolve_entry_parent(db, c.entry_id)
+    _, project_id = await _resolve_entry_parent(db, c.entry_id)
     if c.user_id != user.id:
         await _check_member(db, project_id, user, ProjectRole.owner)  # moderation
     else:
@@ -285,13 +302,15 @@ async def update_comment(
     "/memo-comments/{cid}",
     response_model=MemoCommentRead,
 )
+@limiter.limit("60/minute")
 async def delete_comment(
+    request: Request,
     cid: int,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> MemoCommentRead:
     c = await MemoService.get_comment(db, comment_id=cid)
-    _, _, project_id = await _resolve_entry_parent(db, c.entry_id)
+    _, project_id = await _resolve_entry_parent(db, c.entry_id)
     if c.user_id != user.id:
         await _check_member(db, project_id, user, ProjectRole.owner)
     else:
@@ -301,15 +320,16 @@ async def delete_comment(
 
 
 @router.post("/memo-comments/{cid}/resolve", response_model=MemoCommentRead)
+@limiter.limit("60/minute")
 async def resolve_comment(
+    request: Request,
     cid: int,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> MemoCommentRead:
     c = await MemoService.get_comment(db, comment_id=cid)
-    _, _, project_id = await _resolve_entry_parent(db, c.entry_id)
-    entry = await db.get(MemoEntry, c.entry_id)
-    is_entry_author = entry is not None and entry.created_by == user.id
+    entry, project_id = await _resolve_entry_parent(db, c.entry_id)
+    is_entry_author = entry.created_by == user.id
     if not is_entry_author:
         await _check_member(db, project_id, user, ProjectRole.owner)
     else:
@@ -321,15 +341,16 @@ async def resolve_comment(
 
 
 @router.post("/memo-comments/{cid}/unresolve", response_model=MemoCommentRead)
+@limiter.limit("60/minute")
 async def unresolve_comment(
+    request: Request,
     cid: int,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> MemoCommentRead:
     c = await MemoService.get_comment(db, comment_id=cid)
-    _, _, project_id = await _resolve_entry_parent(db, c.entry_id)
-    entry = await db.get(MemoEntry, c.entry_id)
-    is_entry_author = entry is not None and entry.created_by == user.id
+    entry, project_id = await _resolve_entry_parent(db, c.entry_id)
+    is_entry_author = entry.created_by == user.id
     if not is_entry_author:
         await _check_member(db, project_id, user, ProjectRole.owner)
     else:
