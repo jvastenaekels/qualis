@@ -275,6 +275,132 @@ async def test_update_study_active_state_raises_validation_error(
 
 
 # ---------------------------------------------------------------------------
+# rough_sort_enabled toggle — locked once any participant has gone past consent
+# ---------------------------------------------------------------------------
+
+
+async def _reload_study_with_relations(db: AsyncSession, study_id: int) -> Study:
+    return (
+        await db.execute(
+            select(Study)
+            .where(Study.id == study_id)
+            .options(
+                selectinload(Study.translations),
+                selectinload(Study.statements).selectinload(Statement.translations),
+                selectinload(Study.participants),
+            )
+        )
+    ).scalar_one()
+
+
+@pytest.mark.asyncio
+async def test_rough_sort_toggle_allowed_when_no_participants(
+    db: AsyncSession, seed_study: Study
+):
+    """Flipping rough_sort_enabled is allowed when no participants exist."""
+    refreshed = await _reload_study_with_relations(db, seed_study.id)
+    assert refreshed.rough_sort_enabled is True  # default
+
+    patch = StudyUpdate(rough_sort_enabled=False)
+    updated = await StudyService.update_study(db, refreshed, patch)
+
+    assert updated.rough_sort_enabled is False
+
+
+@pytest.mark.asyncio
+async def test_rough_sort_toggle_allowed_when_only_consent_step_reached(
+    db: AsyncSession, seed_study: Study
+):
+    """Participants stuck at consent (last_step_reached=1) do not lock the toggle."""
+    p = Participant(
+        study_id=seed_study.id,
+        session_token=uuid.uuid4(),
+        language_used="en",
+        status=ParticipantStatus.started,
+        last_step_reached=1,
+        last_step_reached_at=__import__("datetime").datetime.now(),
+    )
+    db.add(p)
+    await db.commit()
+
+    refreshed = await _reload_study_with_relations(db, seed_study.id)
+    patch = StudyUpdate(rough_sort_enabled=False)
+    updated = await StudyService.update_study(db, refreshed, patch)
+    assert updated.rough_sort_enabled is False
+
+
+@pytest.mark.asyncio
+async def test_rough_sort_toggle_blocked_once_participant_started(
+    db: AsyncSession, seed_study: Study
+):
+    """Toggle is locked once any participant has last_step_reached > 1."""
+    p = Participant(
+        study_id=seed_study.id,
+        session_token=uuid.uuid4(),
+        language_used="en",
+        status=ParticipantStatus.started,
+        last_step_reached=2,  # past consent
+        last_step_reached_at=__import__("datetime").datetime.now(),
+    )
+    db.add(p)
+    await db.commit()
+
+    refreshed = await _reload_study_with_relations(db, seed_study.id)
+    patch = StudyUpdate(rough_sort_enabled=False)
+
+    with pytest.raises(ValidationError, match="rough_sort_enabled"):
+        await StudyService.update_study(db, refreshed, patch)
+
+
+@pytest.mark.asyncio
+async def test_rough_sort_toggle_lock_message_includes_count(
+    db: AsyncSession, seed_study: Study
+):
+    """Error message includes the number of started participants."""
+    for _ in range(3):
+        db.add(
+            Participant(
+                study_id=seed_study.id,
+                session_token=uuid.uuid4(),
+                language_used="en",
+                status=ParticipantStatus.started,
+                last_step_reached=2,
+                last_step_reached_at=__import__("datetime").datetime.now(),
+            )
+        )
+    await db.commit()
+
+    refreshed = await _reload_study_with_relations(db, seed_study.id)
+    patch = StudyUpdate(rough_sort_enabled=False)
+
+    with pytest.raises(ValidationError, match="3 participant"):
+        await StudyService.update_study(db, refreshed, patch)
+
+
+@pytest.mark.asyncio
+async def test_rough_sort_no_op_update_does_not_lock(
+    db: AsyncSession, seed_study: Study
+):
+    """Setting rough_sort_enabled to its current value is a no-op (no lock check)."""
+    p = Participant(
+        study_id=seed_study.id,
+        session_token=uuid.uuid4(),
+        language_used="en",
+        status=ParticipantStatus.started,
+        last_step_reached=2,
+        last_step_reached_at=__import__("datetime").datetime.now(),
+    )
+    db.add(p)
+    await db.commit()
+
+    refreshed = await _reload_study_with_relations(db, seed_study.id)
+    # Re-asserting True (same value as current) must not raise
+    patch = StudyUpdate(rough_sort_enabled=True)
+    updated = await StudyService.update_study(db, refreshed, patch)
+    assert updated.rough_sort_enabled is True
+
+
+# ---------------------------------------------------------------------------
 # F-04-002: delete_study — cascade verification (via router-level test)
 # We also test the service guard: delete is only possible via the router which
 # enforces is_superuser + archived.  We test the DB cascade directly.

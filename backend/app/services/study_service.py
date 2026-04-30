@@ -182,6 +182,23 @@ class StudyService:
                         "have already started the study."
                     )
 
+        # Rough-sort toggle lock: once any participant has gone past consent
+        # (last_step_reached > 1) the flow is materialised in their session;
+        # flipping the toggle would create inconsistent state.
+        if (
+            study_update.rough_sort_enabled is not None
+            and study_update.rough_sort_enabled != study.rough_sort_enabled
+        ):
+            count = await StudyService._count_participants_past_consent(
+                db, study.id
+            )
+            if count > 0:
+                raise ValidationError(
+                    f"Cannot change rough_sort_enabled — {count} participant(s) "
+                    "have started the survey. Archive or delete those sessions "
+                    "before changing this setting."
+                )
+
         # Draft-only updates
         if study.state != StudyState.draft:
             raise ValidationError(
@@ -315,6 +332,23 @@ class StudyService:
             )
         )
         return (result.scalar() or 0) > 0
+
+    @staticmethod
+    async def _count_participants_past_consent(
+        db: AsyncSession, study_id: int
+    ) -> int:
+        """Count participants whose ``last_step_reached`` is beyond consent.
+
+        Used to lock structural toggles (rough_sort_enabled) once a session
+        has been materialised in the participant's flow.
+        """
+        result = await db.execute(
+            select(func.count(Participant.id)).where(
+                Participant.study_id == study_id,
+                Participant.last_step_reached > 1,
+            )
+        )
+        return result.scalar() or 0
 
     @staticmethod
     async def _get_study_or_raise(db: AsyncSession, slug: str) -> Study:
