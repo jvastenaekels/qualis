@@ -86,11 +86,16 @@ test('full analysis workflow: run → results → history', async ({ page, testD
     // The button stays disabled while the analysis runs (spinner replaces icon).
     await expect(runButton).toBeDisabled({ timeout: 5_000 });
 
-    // Wait for the results card to render — the Tabs component appears once
-    // analysisMutation.isSuccess fires and setResult() is called.
-    // We wait for the "Loadings" tab-trigger (first tab) as the readiness signal.
+    // Wait for the Interpret phase to render. After Phase 4, the page lands
+    // on Focus mode by default (FactorCanvas with F1/F2/F3 chips). Switch to
+    // Overview mode so the legacy four tabs (loadings/arrays/statements/
+    // summary) become visible — that's the surface this E2E exercises.
+    const overviewToggle = page.getByRole('button', { name: /^overview$/i });
+    await expect(overviewToggle).toBeVisible({ timeout: 60_000 });
+    await overviewToggle.click();
+
     const loadingsTab = page.getByRole('tab', { name: /loadings/i });
-    await expect(loadingsTab).toBeVisible({ timeout: 60_000 });
+    await expect(loadingsTab).toBeVisible({ timeout: 10_000 });
 
     // -----------------------------------------------------------------------
     // 4. Assert Region 1 — Factor Loadings table (default "Loadings" tab)
