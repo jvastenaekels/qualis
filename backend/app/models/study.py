@@ -29,11 +29,16 @@ from .base import (
 class DistributionMode(str, enum.Enum):
     """Enum for Q-sort grid distribution enforcement.
 
-    forced — each column must hold exactly its declared capacity
+    forced — activation requires sum(capacity) == len(statements); each column
+        must hold exactly its declared capacity at submission
         (Brown 1980; Watts & Stenner 2012).
-    free — total count must equal Q-set size; per-column capacities
-        ignored at validation (Brown et al. 2015).
-    flexible — total enforced, per-column capacities are soft hints
+    free — activation requires sum(capacity) >= len(statements) (the grid must
+        fit every statement; declared capacities are an upper hint, columns
+        may absorb overflow at sort time). Total submitted count must equal
+        the Q-set size; per-column capacities are not enforced
+        (Brown et al. 2015).
+    flexible — activation requires sum(capacity) == len(statements); total is
+        enforced at submission; per-column capacities are soft hints
         (warnings only). Qualis-specific compromise.
     """
 

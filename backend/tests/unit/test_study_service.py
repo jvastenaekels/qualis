@@ -197,9 +197,28 @@ async def test_validate_distribution_free_accepts_lopsided(active_study):
 
 
 @pytest.mark.asyncio
-async def test_validate_distribution_flexible_accepts_and_warns(
-    active_study, caplog
-):
+async def test_submission_free_mode_accepts_overstacked_column(active_study):
+    """In `free` mode, a column may exceed its declared capacity at submission.
+
+    Per the model docstring, free-mode per-column capacities are ignored at
+    submission validation. Active study's grid is [-1:1, 0:2, +1:1] (4 cards
+    total). Stacking 3 cards in column 0 (declared capacity 2) and 1 in column
+    +1 (capacity 1) overstacks column 0 but keeps total = Q-set size; this
+    must pass without raising.
+    """
+    active_study.distribution_mode = DistributionMode.free
+    qsort = [
+        QSortEntryInput(statement_id=1, grid_score=0),
+        QSortEntryInput(statement_id=2, grid_score=0),
+        QSortEntryInput(statement_id=3, grid_score=0),  # 3 cards in capacity-2 column
+        QSortEntryInput(statement_id=4, grid_score=1),
+    ]
+    # Should not raise: free mode treats per-column capacity as a soft hint.
+    StudyService.validate_distribution(active_study, qsort)
+
+
+@pytest.mark.asyncio
+async def test_validate_distribution_flexible_accepts_and_warns(active_study, caplog):
     """In `flexible` mode, lopsided distribution passes but logs a warning."""
     active_study.distribution_mode = DistributionMode.flexible
     qsort = [

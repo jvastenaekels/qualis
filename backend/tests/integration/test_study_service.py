@@ -23,6 +23,7 @@ from sqlalchemy.orm import selectinload
 
 from app.exceptions import ConflictError, NotFoundError, ValidationError
 from app.models import (
+    DistributionMode,
     Participant,
     ParticipantStatus,
     Statement,
@@ -68,19 +69,27 @@ def _make_study_create(slug: str | None = None) -> StudyCreate:
         statements=[
             StatementCreate(
                 code="T1",
-                translations=[StatementTranslationCreate(language_code="en", text="T1")],
+                translations=[
+                    StatementTranslationCreate(language_code="en", text="T1")
+                ],
             ),
             StatementCreate(
                 code="T2",
-                translations=[StatementTranslationCreate(language_code="en", text="T2")],
+                translations=[
+                    StatementTranslationCreate(language_code="en", text="T2")
+                ],
             ),
             StatementCreate(
                 code="T3",
-                translations=[StatementTranslationCreate(language_code="en", text="T3")],
+                translations=[
+                    StatementTranslationCreate(language_code="en", text="T3")
+                ],
             ),
             StatementCreate(
                 code="T4",
-                translations=[StatementTranslationCreate(language_code="en", text="T4")],
+                translations=[
+                    StatementTranslationCreate(language_code="en", text="T4")
+                ],
             ),
         ],
     )
@@ -191,9 +200,7 @@ async def test_update_study_data_retention_months_round_trip(
 
 
 @pytest.mark.asyncio
-async def test_update_study_translation_sync(
-    db: AsyncSession, seed_study: Study
-):
+async def test_update_study_translation_sync(db: AsyncSession, seed_study: Study):
     """Updating translations must update the existing EN translation in-place
     (no duplicate row) and add new languages when supplied.
     """
@@ -408,9 +415,7 @@ async def test_rough_sort_no_op_update_does_not_lock(
 
 
 @pytest.mark.asyncio
-async def test_delete_study_cascades_to_statements(
-    db: AsyncSession, seed_study: Study
-):
+async def test_delete_study_cascades_to_statements(db: AsyncSession, seed_study: Study):
     """Deleting a study must cascade-delete its statements and translations."""
     study_id = seed_study.id
     statement_ids = [s.id for s in seed_study.statements]
@@ -453,14 +458,21 @@ def _make_trans_ns(**overrides) -> SimpleNamespace:
         consent_description="Full legal text here.",
         condition_of_instruction="Sort each card",
         process_steps=[
-            {"id": "step1", "title": "Step One", "description": "Do this", "icon": "check"}
+            {
+                "id": "step1",
+                "title": "Step One",
+                "description": "Do this",
+                "icon": "check",
+            }
         ],
     )
     defaults.update(overrides)
     return SimpleNamespace(**defaults)
 
 
-def _make_stmt_ns(code: str, lang: str = "en", text: str | None = None) -> SimpleNamespace:
+def _make_stmt_ns(
+    code: str, lang: str = "en", text: str | None = None
+) -> SimpleNamespace:
     """Build a SimpleNamespace mimicking a Statement with one translation."""
     st = SimpleNamespace(language_code=lang, text=text or f"Statement {code}")
     return SimpleNamespace(code=code, translations=[st])
@@ -535,6 +547,168 @@ async def test_validate_for_activation_capacity_mismatch():
     errors = StudyService.validate_for_activation(study)
     keys = [json.loads(e)["key"] for e in errors]
     assert any("capacity_mismatch" in k for k in keys)
+
+
+def _build_study_for_distribution_mode(
+    *,
+    mode: DistributionMode,
+    statement_count: int,
+    grid_capacities: list[int],
+) -> SimpleNamespace:
+    """Build a validation namespace parameterised by distribution mode and shape.
+
+    Helper for activation rule tests across forced/free/flexible. Symmetric
+    integer scores around zero are assigned to columns purely for shape; only
+    the sum of capacities and the statement_count drive the capacity rule.
+    """
+    study = _build_minimal_study_for_validation()
+    study.distribution_mode = mode
+    study.statements = [_make_stmt_ns(f"S{i + 1}") for i in range(statement_count)]
+    n = len(grid_capacities)
+    # Center scores around 0: e.g. n=3 → -1,0,1; n=5 → -2..2
+    offset = (n - 1) // 2
+    study.grid_config = [
+        {"score": i - offset, "capacity": cap} for i, cap in enumerate(grid_capacities)
+    ]
+    return study
+
+
+@pytest.mark.asyncio
+async def test_activation_forced_requires_capacity_equals_qset_size():
+    """forced: grid total must equal statement count (sum != len → reject)."""
+    # sum=8, count=12 → reject
+    study_under = _build_study_for_distribution_mode(
+        mode=DistributionMode.forced,
+        statement_count=12,
+        grid_capacities=[2, 4, 2],
+    )
+    errors = StudyService.validate_for_activation(study_under)
+    keys = [json.loads(e)["key"] for e in errors]
+    assert any("capacity_mismatch" in k for k in keys)
+
+    # sum=14, count=12 → still reject (forced is strict equality)
+    study_over = _build_study_for_distribution_mode(
+        mode=DistributionMode.forced,
+        statement_count=12,
+        grid_capacities=[4, 6, 4],
+    )
+    errors_over = StudyService.validate_for_activation(study_over)
+    keys_over = [json.loads(e)["key"] for e in errors_over]
+    assert any("capacity_mismatch" in k for k in keys_over)
+
+    # sum=12, count=12 → accept (no capacity_mismatch)
+    study_eq = _build_study_for_distribution_mode(
+        mode=DistributionMode.forced,
+        statement_count=12,
+        grid_capacities=[3, 6, 3],
+    )
+    errors_eq = StudyService.validate_for_activation(study_eq)
+    keys_eq = [json.loads(e)["key"] for e in errors_eq]
+    assert not any("capacity_mismatch" in k for k in keys_eq)
+
+
+@pytest.mark.asyncio
+async def test_activation_flexible_requires_capacity_equals_qset_size():
+    """flexible: grid total must equal statement count (same rule as forced).
+
+    Per the model docstring, flexible enforces total but treats per-column
+    capacities as soft hints during submission.
+    """
+    study_under = _build_study_for_distribution_mode(
+        mode=DistributionMode.flexible,
+        statement_count=12,
+        grid_capacities=[2, 4, 2],
+    )
+    errors = StudyService.validate_for_activation(study_under)
+    keys = [json.loads(e)["key"] for e in errors]
+    assert any("capacity_mismatch" in k for k in keys)
+
+    study_over = _build_study_for_distribution_mode(
+        mode=DistributionMode.flexible,
+        statement_count=12,
+        grid_capacities=[4, 6, 4],
+    )
+    errors_over = StudyService.validate_for_activation(study_over)
+    keys_over = [json.loads(e)["key"] for e in errors_over]
+    assert any("capacity_mismatch" in k for k in keys_over)
+
+    study_eq = _build_study_for_distribution_mode(
+        mode=DistributionMode.flexible,
+        statement_count=12,
+        grid_capacities=[3, 6, 3],
+    )
+    errors_eq = StudyService.validate_for_activation(study_eq)
+    keys_eq = [json.loads(e)["key"] for e in errors_eq]
+    assert not any("capacity_mismatch" in k for k in keys_eq)
+
+
+@pytest.mark.asyncio
+async def test_activation_free_requires_capacity_at_least_qset_size():
+    """free: grid must fit the Q-set (sum >= len). Overflow above is allowed."""
+    # sum=3, count=12 → reject (grid too small)
+    study_too_small = _build_study_for_distribution_mode(
+        mode=DistributionMode.free,
+        statement_count=12,
+        grid_capacities=[1, 1, 1],
+    )
+    errors = StudyService.validate_for_activation(study_too_small)
+    keys = [json.loads(e)["key"] for e in errors]
+    assert any("capacity_mismatch" in k for k in keys)
+
+    # sum=8, count=12 → still reject
+    study_under = _build_study_for_distribution_mode(
+        mode=DistributionMode.free,
+        statement_count=12,
+        grid_capacities=[2, 4, 2],
+    )
+    errors_under = StudyService.validate_for_activation(study_under)
+    keys_under = [json.loads(e)["key"] for e in errors_under]
+    assert any("capacity_mismatch" in k for k in keys_under)
+
+    # sum=12, count=12 → accept (equality allowed)
+    study_eq = _build_study_for_distribution_mode(
+        mode=DistributionMode.free,
+        statement_count=12,
+        grid_capacities=[3, 6, 3],
+    )
+    errors_eq = StudyService.validate_for_activation(study_eq)
+    keys_eq = [json.loads(e)["key"] for e in errors_eq]
+    assert not any("capacity_mismatch" in k for k in keys_eq)
+
+    # sum=14, count=12 → accept (overflow capacity is allowed in free mode)
+    study_over = _build_study_for_distribution_mode(
+        mode=DistributionMode.free,
+        statement_count=12,
+        grid_capacities=[4, 6, 4],
+    )
+    errors_over = StudyService.validate_for_activation(study_over)
+    keys_over = [json.loads(e)["key"] for e in errors_over]
+    assert not any("capacity_mismatch" in k for k in keys_over)
+
+
+@pytest.mark.asyncio
+async def test_activation_free_rejects_grid_too_small():
+    """free: when sum < len, the activation error includes informative params.
+
+    The grid must still fit every statement; absorbing extras above is fine,
+    but going below the Q-set size is rejected with total/count details.
+    """
+    study = _build_study_for_distribution_mode(
+        mode=DistributionMode.free,
+        statement_count=12,
+        grid_capacities=[1, 1, 1],  # sum=3
+    )
+    errors = StudyService.validate_for_activation(study)
+
+    capacity_errors = [
+        json.loads(e) for e in errors if "capacity_mismatch" in json.loads(e)["key"]
+    ]
+    assert capacity_errors, (
+        "Expected capacity_mismatch error for free-mode under-capacity"
+    )
+    payload = capacity_errors[0]
+    assert payload.get("total") == 3
+    assert payload.get("count") == 12
 
 
 @pytest.mark.asyncio
@@ -620,7 +794,12 @@ async def test_validate_for_activation_missing_statement_translation():
         consent_description="Description légale",
         condition_of_instruction="Trier",
         process_steps=[
-            {"id": "s1", "title": "Étape 1", "description": "Faire ceci", "icon": "check"}
+            {
+                "id": "s1",
+                "title": "Étape 1",
+                "description": "Faire ceci",
+                "icon": "check",
+            }
         ],
     )
     study.translations.append(fr_trans)
@@ -648,9 +827,11 @@ async def test_validate_for_activation_multiple_errors_accumulate():
     validate_for_activation must never short-circuit.
     """
     study = _build_minimal_study_for_validation()
-    study.statements = []       # → no_statements
-    study.grid_config = []      # → no_grid
-    study.translations[0].title = ""  # would trigger missing_title but no_translations check runs too
+    study.statements = []  # → no_statements
+    study.grid_config = []  # → no_grid
+    study.translations[
+        0
+    ].title = ""  # would trigger missing_title but no_translations check runs too
 
     errors = StudyService.validate_for_activation(study)
     assert len(errors) >= 2

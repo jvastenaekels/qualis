@@ -25,6 +25,7 @@ from sqlalchemy.orm import selectinload
 
 from ..exceptions import ConflictError, NotFoundError, ValidationError
 from ..models import (
+    DistributionMode,
     Participant,
     Statement,
     StatementTranslation,
@@ -603,11 +604,25 @@ class StudyService:
             total_capacity = sum(
                 int(col.get("capacity", 0)) for col in study.grid_config
             )
-            if len(study.statements) != total_capacity:
+            stmt_count = len(study.statements)
+            # Distribution-mode-aware capacity rule:
+            #   forced/flexible — total capacity must equal the Q-set size
+            #     (Brown 1980; Watts & Stenner 2012). Forced enforces per-column
+            #     too at submission; flexible relaxes per-column to a soft hint.
+            #   free — the grid must fit every statement (sum >= len). Columns
+            #     may declare extra capacity that absorbs overflow at sort time.
+            mode = getattr(study, "distribution_mode", DistributionMode.forced)
+            if mode is None:
+                mode = DistributionMode.forced
+            if mode == DistributionMode.free:
+                capacity_ok = total_capacity >= stmt_count
+            else:
+                capacity_ok = total_capacity == stmt_count
+            if not capacity_ok:
                 add_error(
                     "capacity_mismatch",
                     total=total_capacity,
-                    count=len(study.statements),
+                    count=stmt_count,
                 )
 
         # 3. Minimum Translations
