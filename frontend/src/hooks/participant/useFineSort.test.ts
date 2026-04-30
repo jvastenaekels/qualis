@@ -101,11 +101,14 @@ describe('useFineSort', () => {
 
         const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
 
-        expect(result.current.unplacedAgree).toHaveLength(1);
-        expect(result.current.unplacedAgree[0].id).toBe(1);
-        expect(result.current.unplacedDisagree).toHaveLength(1);
-        expect(result.current.unplacedDisagree[0].id).toBe(2);
-        expect(result.current.unplacedNeutral).toHaveLength(0); // card 3 is placed
+        const { unplaced } = result.current;
+        expect(unplaced.mode).toBe('rough');
+        if (unplaced.mode !== 'rough') throw new Error('expected rough mode');
+        expect(unplaced.agree).toHaveLength(1);
+        expect(unplaced.agree[0].id).toBe(1);
+        expect(unplaced.disagree).toHaveLength(1);
+        expect(unplaced.disagree[0].id).toBe(2);
+        expect(unplaced.neutral).toHaveLength(0); // card 3 is placed
     });
 
     it('isAllPlaced is false when cards remain in decks', () => {
@@ -210,5 +213,248 @@ describe('useFineSort', () => {
         useConfigStore.getState().setConfig({ ...mockConfig, distribution_mode: 'flexible' });
         const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
         expect(result.current.distributionMode).toBe('flexible');
+    });
+});
+
+// ── Deck mode (rough_sort_enabled=false) ─────────────────────────
+describe('useFineSort deck mode', () => {
+    const setup = () => {
+        vi.clearAllMocks();
+        useConfigStore.getState().setConfig({ ...mockConfig, rough_sort_enabled: false });
+        useResponseStore.getState().resetResponses();
+        useSessionStore.getState().resetSession();
+        useSessionStore.getState().setConsent(true);
+    };
+
+    beforeEach(() => {
+        setup();
+    });
+
+    it('does NOT redirect to /rough-sort when in deck mode', () => {
+        renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        const calls = mockNavigate.mock.calls;
+        const wentToRough = calls.some(
+            (args) => typeof args[0] === 'string' && args[0].includes('/rough-sort')
+        );
+        expect(wentToRough).toBe(false);
+    });
+
+    it('returns unplaced.deck listing every config statement when nothing is placed', async () => {
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        // Allow reconciliation effect to push orphans into the deck slice
+        await act(async () => {});
+
+        const { unplaced } = result.current;
+        expect(unplaced.mode).toBe('deck');
+        if (unplaced.mode !== 'deck') throw new Error('expected deck mode');
+        expect(unplaced.deck).toHaveLength(3);
+        const ids = unplaced.deck.map((s) => s.id).sort();
+        expect(ids).toEqual([1, 2, 3]);
+    });
+
+    it('after placing card 2 in the grid, unplaced.deck contains the remaining ids (1, 3) and not 2', async () => {
+        useResponseStore.getState().placeCardInGrid(2, 1, 0);
+
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        await act(async () => {});
+
+        const { unplaced } = result.current;
+        expect(unplaced.mode).toBe('deck');
+        if (unplaced.mode !== 'deck') throw new Error('expected deck mode');
+        const ids = unplaced.deck.map((s) => s.id).sort();
+        expect(ids).toEqual([1, 3]);
+        expect(ids).not.toContain(2);
+    });
+
+    it('reconciles orphan cards into the flat deck on mount (no categorizeCard to neutral)', async () => {
+        renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        await act(async () => {});
+
+        const state = useResponseStore.getState();
+        // Deck should hold every config statement
+        expect(state.deck.sort()).toEqual([1, 2, 3]);
+        // Rough piles must remain empty — no categorizeCard('neutral') call happened
+        expect(state.rough.agree).toEqual([]);
+        expect(state.rough.disagree).toEqual([]);
+        expect(state.rough.neutral).toEqual([]);
+    });
+
+    it('isAllPlaced is false when at least one card is unplaced', async () => {
+        useResponseStore.getState().placeCardInGrid(1, 2, 0);
+
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        await act(async () => {});
+
+        expect(result.current.isAllPlaced).toBe(false);
+    });
+
+    it('isAllPlaced is true when every config statement is placed in qsort', async () => {
+        useResponseStore.getState().placeCardInGrid(1, 2, 0);
+        useResponseStore.getState().placeCardInGrid(2, 0, 0);
+        useResponseStore.getState().placeCardInGrid(3, 1, 0);
+
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        await act(async () => {});
+
+        expect(result.current.isAllPlaced).toBe(true);
+    });
+
+    it('Escape key sets selectedCardId to null (parity with rough mode)', () => {
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+
+        act(() => {
+            result.current.setSelectedCardId(1);
+        });
+        expect(result.current.selectedCardId).toBe(1);
+
+        act(() => {
+            window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+        });
+        expect(result.current.selectedCardId).toBeNull();
+    });
+
+    it('handleValidate navigates to /post-sort (parity with rough mode)', () => {
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+
+        act(() => {
+            result.current.handleValidate();
+        });
+
+        expect(mockNavigate).toHaveBeenCalledWith(expect.stringContaining('/post-sort'));
+    });
+
+    it.each([
+        'forced',
+        'free',
+        'flexible',
+    ] as const)('surfaces distributionMode=%s in deck mode', (mode) => {
+        useConfigStore.getState().setConfig({
+            ...mockConfig,
+            rough_sort_enabled: false,
+            distribution_mode: mode,
+        });
+
+        const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        expect(result.current.distributionMode).toBe(mode);
+    });
+
+    it('defensively resets a stale rough slice on mount in deck mode', async () => {
+        // Simulate a stale rough slice from a prior session
+        useResponseStore.getState().categorizeCard(1, 'agree');
+        useResponseStore.getState().categorizeCard(2, 'disagree');
+        useResponseStore.getState().categorizeCard(3, 'neutral');
+
+        // Sanity check: stale state is in place before mount
+        let state = useResponseStore.getState();
+        expect(state.rough.agree).toContain(1);
+        expect(state.rough.disagree).toContain(2);
+        expect(state.rough.neutral).toContain(3);
+
+        renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
+        await act(async () => {});
+
+        state = useResponseStore.getState();
+        // Rough slice fully cleared
+        expect(state.rough.agree).toEqual([]);
+        expect(state.rough.disagree).toEqual([]);
+        expect(state.rough.neutral).toEqual([]);
+        // Statements reconciled into the deck via the regular path
+        expect(state.deck.sort()).toEqual([1, 2, 3]);
+    });
+});
+
+// ── Task 20.5.6 — Distribution-mode edge cases ──────────────────────
+//
+// These tests interrogate the hook directly so they can run in BOTH
+// modes via describe.each (rough_sort_enabled flag). The hook must
+// surface gridColumns and isAllPlaced correctly even when one column
+// has capacity 0 or the grid is non-symmetric.
+describe.each([
+    true,
+    false,
+] as const)('useFineSort distribution-mode edge cases (rough=%s)', (roughEnabled) => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        useResponseStore.getState().resetResponses();
+        useSessionStore.getState().resetSession();
+        useSessionStore.getState().setConsent(true);
+    });
+
+    it.each([
+        'forced',
+        'flexible',
+    ] as const)('surfaces a capacity-0 column in %s mode (gridColumns intact)', (mode) => {
+        const grid = [
+            { score: -1, capacity: 1 },
+            { score: 0, capacity: 0 }, // empty centre column
+            { score: 1, capacity: 1 },
+        ];
+        useConfigStore.getState().setConfig({
+            ...mockConfig,
+            rough_sort_enabled: roughEnabled,
+            grid_config: grid,
+            distribution_mode: mode,
+            statements: [
+                { id: 1, text: 'A' },
+                { id: 2, text: 'B' },
+            ],
+        });
+        if (roughEnabled) {
+            // Seed rough so the navigation guard does not redirect.
+            useResponseStore.getState().categorizeCard(1, 'agree');
+            useResponseStore.getState().categorizeCard(2, 'disagree');
+        }
+
+        const { result } = renderHook(() => useFineSort(null), {
+            wrapper: AllTheProviders,
+        });
+
+        // Hook surfaces the empty middle column verbatim.
+        expect(result.current.gridColumns).toHaveLength(3);
+        expect(result.current.gridColumns[1].capacity).toBe(0);
+        expect(result.current.distributionMode).toBe(mode);
+        // No card is placed yet so isAllPlaced must be false.
+        expect(result.current.isAllPlaced).toBe(false);
+    });
+
+    it('non-symmetric grid (asymmetric distribution) → isAllPlaced=true with 16 placements', async () => {
+        const grid = [
+            { score: -3, capacity: 1 },
+            { score: -2, capacity: 2 },
+            { score: -1, capacity: 3 },
+            { score: 0, capacity: 4 },
+            { score: 1, capacity: 3 },
+            { score: 2, capacity: 2 },
+            { score: 3, capacity: 1 },
+        ];
+        const stmts = Array.from({ length: 16 }, (_, i) => ({
+            id: i + 1,
+            code: String(i + 1),
+            text: `S${i + 1}`,
+        }));
+        useConfigStore.getState().setConfig({
+            ...mockConfig,
+            rough_sort_enabled: roughEnabled,
+            grid_config: grid,
+            statements: stmts,
+        });
+
+        // Place every card consistent with the grid layout.
+        let next = 1;
+        grid.forEach((col, colIdx) => {
+            for (let row = 0; row < col.capacity; row++) {
+                useResponseStore.getState().placeCardInGrid(next, colIdx, row);
+                next += 1;
+            }
+        });
+
+        const { result } = renderHook(() => useFineSort(null), {
+            wrapper: AllTheProviders,
+        });
+        await act(async () => {});
+
+        expect(result.current.gridColumns).toHaveLength(7);
+        expect(result.current.qsort).toHaveLength(16);
+        expect(result.current.isAllPlaced).toBe(true);
     });
 });

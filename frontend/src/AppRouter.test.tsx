@@ -7,6 +7,7 @@
 import { screen } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { RoughSortGuard } from './components/participant/RoughSortGuard';
 import StudyLayout from './layouts/StudyLayout';
 import type { StudyConfig } from './schemas/study';
 import { useConfigStore } from './store/useConfigStore';
@@ -110,5 +111,70 @@ describe('App Routing Protection', () => {
         );
 
         expect(screen.getByTestId('rough-sort-page')).toBeTruthy();
+    });
+});
+
+describe('RoughSortGuard', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        useSessionStore.getState().resetSession();
+    });
+
+    it('redirects /rough-sort to /fine-sort when study has rough_sort_enabled=false', () => {
+        useConfigStore
+            .getState()
+            .setConfig({ ...mockConfig, rough_sort_enabled: false } as StudyConfig);
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/rough-sort" element={<RoughSortGuard />} />
+                <Route
+                    path="/study/:slug/fine-sort"
+                    element={<div data-testid="fine-sort-redirect-target">Fine Sort</div>}
+                />
+            </Routes>,
+            { initialEntries: ['/study/demo-study/rough-sort'] }
+        );
+
+        expect(screen.queryByTestId('rough-sort-page')).toBeNull();
+        expect(screen.getByTestId('fine-sort-redirect-target')).toBeTruthy();
+    });
+
+    it('allows /rough-sort when study has rough_sort_enabled=true (default)', () => {
+        useConfigStore
+            .getState()
+            .setConfig({ ...mockConfig, rough_sort_enabled: true } as StudyConfig);
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/rough-sort" element={<RoughSortGuard />} />
+                <Route
+                    path="/study/:slug/fine-sort"
+                    element={<div data-testid="fine-sort-redirect-target">Fine Sort</div>}
+                />
+            </Routes>,
+            { initialEntries: ['/study/demo-study/rough-sort'] }
+        );
+
+        expect(screen.getByTestId('rough-sort-page')).toBeTruthy();
+        expect(screen.queryByTestId('fine-sort-redirect-target')).toBeNull();
+    });
+
+    it('allows /rough-sort when config is still loading (renders RoughSortPage)', () => {
+        useConfigStore.getState().resetConfig();
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/rough-sort" element={<RoughSortGuard />} />
+                <Route
+                    path="/study/:slug/fine-sort"
+                    element={<div data-testid="fine-sort-redirect-target">Fine Sort</div>}
+                />
+            </Routes>,
+            { initialEntries: ['/study/demo-study/rough-sort'] }
+        );
+
+        expect(screen.getByTestId('rough-sort-page')).toBeTruthy();
+        expect(screen.queryByTestId('fine-sort-redirect-target')).toBeNull();
     });
 });

@@ -23,6 +23,14 @@ interface Responses {
         neutral: number[];
         history: number[];
     };
+    /**
+     * Flat unsorted deck (deck mode, rough_sort_enabled=false).
+     * Holds every statement id that has not yet been placed in the qsort
+     * grid. The list is mode-specific: when rough_sort_enabled=true the
+     * orphan reconciler in useFineSort uses categorizeCard('neutral')
+     * instead, and `deck` stays empty.
+     */
+    deck: number[];
     qsort: { statementId: number; col: number; row: number }[];
     postsort: {
         card_comments: Record<number, string>;
@@ -42,6 +50,10 @@ interface ResponseActions {
     // Rough Sort
     categorizeCard: (statementId: number, category: 'agree' | 'disagree' | 'neutral') => void;
     undoRoughSort: () => void;
+
+    // Deck mode (rough_sort_enabled=false)
+    addToDeck: (statementId: number) => void;
+    removeFromDeck: (statementId: number) => void;
 
     // Fine Sort
     placeCardInGrid: (statementId: number, col: number, row: number) => void;
@@ -67,6 +79,7 @@ interface ResponseActions {
 export const initialResponses: Responses = {
     presort: {},
     rough: { agree: [], disagree: [], neutral: [], history: [] },
+    deck: [],
     qsort: [],
     postsort: {
         card_comments: {},
@@ -110,7 +123,18 @@ const _placeOrMove = (
         return;
     }
     const filtered = state.qsort.filter((p) => p.statementId !== statementId);
-    set({ qsort: [...filtered, { statementId, col, row }] });
+    // Deck-mode invariant: a placed card must not also live in the flat deck.
+    // When the card is currently in the deck, splice it out atomically with the
+    // qsort update so the two slices never disagree (rough mode: deck is always
+    // empty, so this branch is skipped and only qsort is updated).
+    if (state.deck.includes(statementId)) {
+        set({
+            qsort: [...filtered, { statementId, col, row }],
+            deck: state.deck.filter((id) => id !== statementId),
+        });
+    } else {
+        set({ qsort: [...filtered, { statementId, col, row }] });
+    }
     triggerSavingIndicator();
 };
 
@@ -174,6 +198,20 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         },
                     };
                 });
+                triggerSavingIndicator();
+            },
+
+            addToDeck: (statementId) => {
+                const { deck } = get();
+                if (deck.includes(statementId)) return;
+                set({ deck: [...deck, statementId] });
+                triggerSavingIndicator();
+            },
+
+            removeFromDeck: (statementId) => {
+                const { deck } = get();
+                if (!deck.includes(statementId)) return;
+                set({ deck: deck.filter((id) => id !== statementId) });
                 triggerSavingIndicator();
             },
 
@@ -269,6 +307,10 @@ export const useResponseStore = create<Responses & ResponseActions>()(
             version: 2,
             storage: safeLocalStorage,
             migrate: (persisted: unknown, version: number) => {
+                // v1 → v2: deck slice added; structurally compatible because
+                // `deck` defaults to [] via the `...initialResponses` spread on
+                // rehydration (any persisted v1 blob simply lacks `deck` and the
+                // default fills it in). No data transform needed.
                 if (version < 2) return persisted as Responses;
                 return persisted as Responses;
             },

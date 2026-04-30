@@ -65,6 +65,9 @@ export function projectStudyToUpdate(study: StudyRead): StudyUpdate {
         show_statement_codes: study.show_statement_codes,
         randomize_statement_order: study.randomize_statement_order,
         symmetry_lock: study.symmetry_lock,
+        // Default to true for legacy studies missing the rough_sort_enabled
+        // column — mirrors the runtime fallback in `isRoughSortEnabled`.
+        rough_sort_enabled: study.rough_sort_enabled ?? true,
         distribution_mode: study.distribution_mode,
         branding: study.branding,
 
@@ -349,6 +352,7 @@ function applyImportedSimpleFields(draft: StudyUpdate, studyData: any): void {
         'show_statement_codes',
         'randomize_statement_order',
         'symmetry_lock',
+        'rough_sort_enabled',
         'distribution_mode',
     ] as const;
     for (const key of keys) {

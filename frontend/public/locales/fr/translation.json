@@ -447,6 +447,13 @@
                     "label": "Flexible",
                     "tooltip": "Total de cartes = taille du jeu Q ; les capacités par colonne sont indicatives (avertissements seulement)."
                 }
+            },
+            "rough_sort": {
+                "section_title": "Étape de pré-tri",
+                "toggle_label": "Activer le pré-tri (3 piles d'accord/neutre/pas d'accord)",
+                "toggle_help": "Recommandé pour les Q-sets longs (>40 énoncés). Environ 38 % des études Q publiées utilisent cette étape (Dieteren et al. 2023).",
+                "lock_banner": "Verrou actif — {{count}} participant(s) ont commencé l'enquête. Archivez ou supprimez ces sessions avant de modifier ce réglage.",
+                "deck_mode_note": "Désactivé — les participants verront l'ensemble du Q-set sous forme d'un deck défilant horizontalement."
             }
         },
         "study": {

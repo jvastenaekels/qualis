@@ -83,6 +83,11 @@ describe('StudyDesignPage Feature Tests', () => {
         server.use(
             http.get('*/api/admin/studies/test-study-designer', () => {
                 return HttpResponse.json(mockStudy);
+            }),
+            // Default to no participants so the rough-sort toggle is unlocked.
+            // Individual tests can override this handler to assert the lock policy.
+            http.get('*/api/admin/studies/test-study-designer/participants', () => {
+                return HttpResponse.json({ items: [], total: 0 });
             })
         );
     });
@@ -164,6 +169,53 @@ describe('StudyDesignPage Feature Tests', () => {
         // Wait for the overlay to render (status badge appears)
         await screen.findByTestId('study-status');
         expect(screen.queryByRole('button', { name: /Draft Mode/i })).not.toBeInTheDocument();
+    });
+
+    // ── Rough-sort toggle (Phase 3 task 17) ───────────────────────
+    // The toggle lives inside the Q-sort tab; tests pre-select that tab
+    // by seeding the designer store to avoid extra clicks in Tabs UI.
+    const seedQSortTab = () => {
+        useStudyDesigner.setState({ activeStep: 'q-sort' });
+    };
+
+    it('renders the rough_sort toggle label and reflects the saved value', async () => {
+        // mockStudy has rough_sort_enabled implicitly true (defaulted by store)
+        seedQSortTab();
+        renderPage();
+
+        const toggle = await screen.findByTestId('rough-sort-toggle');
+        expect(toggle).toBeInTheDocument();
+        expect(toggle).toBeChecked();
+        expect(toggle).not.toBeDisabled();
+        // Label should render via i18n key (or its English fallback)
+        expect(screen.getByText(/Enable preliminary sort \(3-pile triage\)/i)).toBeInTheDocument();
+    });
+
+    it('disables the toggle and shows lock banner when participants have started', async () => {
+        // 3 participants past consent, 1 only on consent (should not count)
+        server.use(
+            http.get('*/api/admin/studies/test-study-designer/participants', () => {
+                return HttpResponse.json({
+                    items: [
+                        { id: 1, last_step_reached: 2 },
+                        { id: 2, last_step_reached: 3 },
+                        { id: 3, last_step_reached: 4 },
+                        { id: 4, last_step_reached: 1 },
+                    ],
+                    total: 4,
+                });
+            })
+        );
+        seedQSortTab();
+        renderPage();
+
+        const toggle = await screen.findByTestId('rough-sort-toggle');
+        await waitFor(() => {
+            expect(toggle).toBeDisabled();
+        });
+        const banner = await screen.findByTestId('rough-sort-lock-banner');
+        // Count is interpolated via i18n {{count}} → text contains "3"
+        expect(banner.textContent).toContain('3');
     });
 
     it('enables sequential navigation between steps', async () => {

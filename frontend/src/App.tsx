@@ -23,8 +23,8 @@ import PostSortPage from './pages/PostSortPage';
 import PreSortPage from './pages/PreSortPage';
 import ResetPage from './pages/ResetPage';
 import ResumePage from './pages/ResumePage';
-import RoughSortPage from './pages/RoughSortPage';
 import WelcomePage from './pages/WelcomePage';
+import { RoughSortGuard } from './components/participant/RoughSortGuard';
 import { Toaster } from 'sonner';
 import RouteErrorBoundary from './components/RouteErrorBoundary';
 
@@ -246,7 +246,7 @@ const router = createBrowserRouter([
             { path: 'welcome', element: <WelcomePage /> },
             { path: 'consent', element: <ConsentPage /> },
             { path: 'presort', element: <PreSortPage /> },
-            { path: 'rough-sort', element: <RoughSortPage /> },
+            { path: 'rough-sort', element: <RoughSortGuard /> },
             { path: 'fine-sort', element: <FineSortPage /> },
             { path: 'post-sort', element: <PostSortPage /> },
             {

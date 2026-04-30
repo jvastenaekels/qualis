@@ -495,6 +495,13 @@
                     "label": "Flexible",
                     "tooltip": "Total cards = Q-set size; per-column capacities are soft hints (warnings only)."
                 }
+            },
+            "rough_sort": {
+                "section_title": "Rough sort step",
+                "toggle_label": "Enable preliminary sort (3-pile triage)",
+                "toggle_help": "Recommended for large Q-sets (>40 statements). About 38% of published Q studies use this step (Dieteren et al. 2023).",
+                "lock_banner": "Toggle locked — {{count}} participant(s) have started the survey. Archive or delete those sessions before changing this setting.",
+                "deck_mode_note": "Disabled — participants will see the full Q-set as a horizontally-scrollable deck."
             }
         },
         "study": {

@@ -56,12 +56,12 @@ import { resetAllStores } from '../utils/sessionReset';
 import { isPresortEnabled, isRoughSortEnabled } from '../utils/studyConfig';
 
 const steps = [
-    { id: 1, labelKey: 'layout.steps.welcome' },
-    { id: 2, labelKey: 'welcome.steps.profile.title' },
-    { id: 3, labelKey: 'welcome.steps.rough.title' },
-    { id: 4, labelKey: 'welcome.steps.fine.title' },
-    { id: 5, labelKey: 'welcome.steps.post.title' },
-];
+    { id: 1, labelKey: 'layout.steps.welcome', processStepId: null },
+    { id: 2, labelKey: 'welcome.steps.profile.title', processStepId: 'profile' },
+    { id: 3, labelKey: 'welcome.steps.rough.title', processStepId: 'rough' },
+    { id: 4, labelKey: 'welcome.steps.fine.title', processStepId: 'fine' },
+    { id: 5, labelKey: 'welcome.steps.post.title', processStepId: 'post' },
+] as const;
 
 const StudyLayoutContent: React.FC = () => {
     const { t } = useTranslation();
@@ -712,12 +712,17 @@ const StudyLayoutContent: React.FC = () => {
                             const isReachable = step.id <= maxReachedStep;
 
                             // Dynamic Title Resolution
+                            // Look up the process_step entry by its `id` (e.g. 'fine', 'post')
+                            // rather than by array index — when rough_sort_enabled=false the
+                            // backend filters the rough entry out, so the remaining indices
+                            // would no longer line up with step.id - 2.
                             let stepLabel = t(step.labelKey);
-                            if (step.id > 1 && config?.process_steps) {
-                                // Map IDs: 2->0, 3->1, 4->2, 5->3
-                                const pIndex = step.id - 2;
-                                if (config.process_steps[pIndex]?.title) {
-                                    stepLabel = config.process_steps[pIndex].title;
+                            if (step.processStepId && config?.process_steps) {
+                                const processStep = config.process_steps.find(
+                                    (ps) => ps.id === step.processStepId
+                                );
+                                if (processStep?.title) {
+                                    stepLabel = processStep.title;
                                 }
                             }
 

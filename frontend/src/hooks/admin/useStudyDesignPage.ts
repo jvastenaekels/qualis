@@ -36,16 +36,21 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import type {
+    ParticipantRead,
     StudyRead,
     StudyTranslationCreate,
     StudyTranslationRead,
     StudyUpdate,
 } from '@/api/model';
-import { useGetStudyApiAdminStudiesSlugGet } from '@/api/generated';
+import {
+    useGetStudyApiAdminStudiesSlugGet,
+    useListStudyParticipantsApiAdminStudiesSlugParticipantsGet,
+} from '@/api/generated';
 import { customInstance } from '@/api/mutator';
 import { areStudiesEqual, projectStudyToUpdate, useStudyDesigner } from '@/store/useStudyDesigner';
 import { DEFAULT_STUDY_CONTENT } from '@/constants/studyDefaults';
 import { useStudyPersistence } from '@/hooks/useStudyPersistence';
+import { useRoughSortLock } from './useRoughSortLock';
 
 // ────────────────────────────────────────────────────────────────
 // Types
@@ -154,6 +159,10 @@ export interface StudyDesignPageApi {
     handleActivate: () => Promise<void>;
     handleSwitchToDraft: () => Promise<void>;
     handleTestRun: () => void;
+
+    // Rough-sort toggle lock policy (mirrors backend study_service.update_study)
+    roughSortLocked: boolean;
+    roughSortLockedCount: number;
 }
 
 // ────────────────────────────────────────────────────────────────
@@ -266,6 +275,7 @@ function buildLanguageReadiness(
 // Hook
 // ────────────────────────────────────────────────────────────────
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: orchestration hook for the Study Design page; cyclomatic complexity comes from independent useEffect/useMemo blocks (study sync, lock derivation, checklist, language readiness, action handlers) that are intentionally kept flat for legibility — rather than fragmenting into trivial sub-hooks just to placate the linter, the established pattern (precedent: useFineSort, useAnalysisPage) is to suppress at the orchestration boundary
 export function useStudyDesignPage(): StudyDesignPageApi {
     const { t } = useTranslation();
     const { projectSlug, studySlug } = useParams<{
@@ -315,6 +325,26 @@ export function useStudyDesignPage(): StudyDesignPageApi {
         query: {
             enabled: !!projectSlug,
         },
+    });
+
+    // ── Participants fetch (used only by the rough-sort lock policy) ─
+    // Backend rejects rough_sort_enabled changes once any participant
+    // has progressed past consent. We mirror that here so the toggle
+    // disables eagerly instead of failing on save.
+    const { data: participantsPage } = useListStudyParticipantsApiAdminStudiesSlugParticipantsGet(
+        effectiveSlug,
+        undefined,
+        {
+            query: {
+                enabled: !!projectSlug && !!effectiveSlug,
+            },
+        }
+    );
+    const participants: ParticipantRead[] = participantsPage?.items ?? [];
+    const studyId = study?.id ?? 0;
+    const { locked: roughSortLocked, lockedCount: roughSortLockedCount } = useRoughSortLock({
+        studyId,
+        participants,
     });
 
     // ── Initialize / sync designer state when study is (re)loaded ──
@@ -575,5 +605,7 @@ export function useStudyDesignPage(): StudyDesignPageApi {
         handleActivate,
         handleSwitchToDraft,
         handleTestRun,
+        roughSortLocked,
+        roughSortLockedCount,
     };
 }

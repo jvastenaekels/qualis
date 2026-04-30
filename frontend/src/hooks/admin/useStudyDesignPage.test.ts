@@ -26,14 +26,16 @@ vi.mock('sonner', () => ({
     toast: { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() },
 }));
 
-const { mockStudyQuery, mockUpdateMutation } = vi.hoisted(() => ({
+const { mockStudyQuery, mockUpdateMutation, mockParticipantsQuery } = vi.hoisted(() => ({
     mockStudyQuery: vi.fn(),
     mockUpdateMutation: vi.fn(),
+    mockParticipantsQuery: vi.fn(),
 }));
 
 vi.mock('@/api/generated', () => ({
     useGetStudyApiAdminStudiesSlugGet: mockStudyQuery,
     useUpdateStudyApiAdminStudiesSlugPatch: mockUpdateMutation,
+    useListStudyParticipantsApiAdminStudiesSlugParticipantsGet: mockParticipantsQuery,
 }));
 
 vi.mock('@/api/mutator', () => ({
@@ -117,6 +119,7 @@ describe('useStudyDesignPage', () => {
         });
         mockStudyQuery.mockReturnValue(makeStudyQueryResult());
         mockUpdateMutation.mockReturnValue(makeUpdateMutation());
+        mockParticipantsQuery.mockReturnValue({ data: { items: [] }, isLoading: false });
         // Reset the Zustand store between tests
         useStudyDesigner.setState({
             draft: null,

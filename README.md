@@ -64,6 +64,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 - **Survey builder** with 9 question types (text, number, select, radio, checkbox, date, email, textarea, audio), conditional visibility, reordering, and per-question validation.
 - **Markdown-formatted content** for instructions, consent forms, and condition of instruction.
 - **Import/Export configurations** to create templates, back up designs, or clone studies across projects.
+- **Optional rough-sort step.** The 3-pile triage that precedes the fine-sort grid is configurable per study: only ~38% of published Q studies use it (Dieteren et al. 2023). When disabled, participants land directly on the fine-sort grid and place items from a single horizontally-scrollable deck.
 - **Pilot mode** to run through the full participant experience without persisting any data.
 
 ### Analysis
