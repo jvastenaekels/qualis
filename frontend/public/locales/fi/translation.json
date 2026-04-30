@@ -927,6 +927,15 @@
                 "overview_mode": "Yleisnäkymä",
                 "mode_toggle": "Näkymätila"
             },
+            "compare": {
+                "pin_cta": "Kiinnitä vertailu",
+                "no_other_runs": "Ei muita vertailtavia ajoja",
+                "run_label": "Ajo #{{id}} ({{n}} tekijää)",
+                "pinned": "Verrataan ajoon #{{id}}",
+                "phi": "φ = {{phi}}",
+                "ambiguous": "epäselvä vastaavuus — tulkitse delta-arvoja varoen",
+                "unpin": "Poista kiinnitys"
+            },
             "quote_insert_format": "> {{text}}\n> — {{p}}, väittämästä {{code}}: \"{{stmt}}\""
         },
         "project": {
