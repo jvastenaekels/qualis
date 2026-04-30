@@ -20,6 +20,7 @@ import SortingAnimation from '../components/SortingAnimation';
 import { useConfigStore } from '../store/useConfigStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { resetAllStores } from '../utils/sessionReset';
+import { isPresortEnabled, isRoughSortEnabled } from '../utils/studyConfig';
 import { cn } from '@/lib/utils';
 import { DynamicIcon } from '../components/DynamicIcon';
 import { DEFAULT_STUDY_CONTENT } from '../constants/studyDefaults';
@@ -105,7 +106,17 @@ const WelcomePage: React.FC<WelcomePageProps> = ({ highlightKey }) => {
     const defaultSteps =
         DEFAULT_STUDY_CONTENT[studyLang]?.process_steps || DEFAULT_STUDY_CONTENT.en.process_steps;
     const rawSteps = config.process_steps;
-    const steps = rawSteps && rawSteps.length > 0 ? rawSteps : defaultSteps;
+    const allSteps = rawSteps && rawSteps.length > 0 ? rawSteps : defaultSteps;
+    // Drop steps the study has structurally disabled — handles legacy
+    // process_steps arrays that still include 'profile' (presort) or 'rough'
+    // entries even though the admin has flipped the corresponding flag off.
+    const presortOn = isPresortEnabled(config);
+    const roughOn = isRoughSortEnabled(config);
+    const steps = allSteps.filter((s: { id?: string }) => {
+        if (s.id === 'profile' && !presortOn) return false;
+        if (s.id === 'rough' && !roughOn) return false;
+        return true;
+    });
 
     return (
         <div className="max-w-5xl mx-auto py-6 px-4 animate-in fade-in duration-500">

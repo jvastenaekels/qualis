@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { useConfigStore } from '@/store/useConfigStore';
 import { useSessionStore } from '@/store/useSessionStore';
+import { mapPersistedStepToKey } from '@/utils/studySteps';
 
 import { useLocation } from 'react-router-dom';
 
@@ -31,17 +32,12 @@ const HelpOverlay: React.FC = () => {
         return null;
     }
 
-    // Map currentStep to ID-based keys (welcome=1, consent=ignored, presort=2, rough=3, fine=4, review/post=5)
-    // We use semantic keys in study.help.step_{id}
-    const stepIdMap: Record<number, string> = {
-        1: 'welcome',
-        2: 'presort',
-        3: 'rough',
-        4: 'fine',
-        5: 'post',
-    };
-
-    const stepKey = stepIdMap[currentStep] || 'rough';
+    // Map currentStep to a semantic step key used in study.help.step_{key}.
+    // mapPersistedStepToKey respects the study's rough_sort_enabled flag —
+    // a stale currentStep=3 on a deck-mode study falls back to 'fine'.
+    const roughEnabled = config?.rough_sort_enabled !== false;
+    const stepKey =
+        mapPersistedStepToKey(currentStep, { rough_sort_enabled: roughEnabled }) ?? 'rough';
     const customHelp = config?.step_help?.[stepKey];
 
     const what = customHelp?.what || t(`study.help.step_${stepKey}.what`);

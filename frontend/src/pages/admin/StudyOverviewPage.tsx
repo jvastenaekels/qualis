@@ -173,6 +173,7 @@ const StudyOverviewPage = () => {
                             isMultiLang={(study?.translations?.length ?? 0) > 1}
                             projectSlug={project?.slug || ''}
                             studySlug={slug}
+                            roughSortEnabled={study?.rough_sort_enabled !== false}
                         />
 
                         <div className="col-span-12 md:col-span-4 space-y-6">

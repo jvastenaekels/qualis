@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getEnabledSteps, mapPersistedStepToKey } from './studySteps';
+import { getEnabledSteps, getStepInfo, getStepLabels, mapPersistedStepToKey } from './studySteps';
 
 const baseStudy = (overrides: Partial<{ rough_sort_enabled: boolean }> = {}) =>
     ({
@@ -75,5 +75,50 @@ describe('mapPersistedStepToKey', () => {
     it('returns null for unknown step number', () => {
         expect(mapPersistedStepToKey(99, baseStudy())).toBeNull();
         expect(mapPersistedStepToKey(0, baseStudy())).toBeNull();
+    });
+});
+
+describe('getStepLabels', () => {
+    const FILTER_KEYS = new Set(['presort', 'rough', 'fine', 'post'] as const);
+
+    it('returns 4 entries when rough enabled (presort + rough + fine + post)', () => {
+        const labels = getStepLabels(baseStudy({ rough_sort_enabled: true }), FILTER_KEYS);
+        expect(Object.keys(labels).map(Number).sort()).toEqual([2, 3, 4, 5]);
+        expect(labels[3]).toEqual(['admin.data.step.rough', 'Preliminary sort']);
+    });
+
+    it('omits step 3 when rough disabled', () => {
+        const labels = getStepLabels(baseStudy({ rough_sort_enabled: false }), FILTER_KEYS);
+        expect(Object.keys(labels).map(Number).sort()).toEqual([2, 4, 5]);
+        expect(labels[3]).toBeUndefined();
+    });
+
+    it('respects the keys filter', () => {
+        const labels = getStepLabels(baseStudy(), new Set(['fine'] as const));
+        expect(Object.keys(labels)).toEqual(['4']);
+    });
+});
+
+describe('getStepInfo', () => {
+    it('returns label + progress for an enabled step (rough mode)', () => {
+        const info = getStepInfo(baseStudy({ rough_sort_enabled: true }), 4);
+        expect(info).toEqual({
+            labelKey: 'admin.data.step.fine',
+            labelDefault: 'Q-sort',
+            progress: 80,
+        });
+    });
+
+    it('progress reflects 4-step distribution when rough disabled', () => {
+        const info = getStepInfo(baseStudy({ rough_sort_enabled: false }), 4);
+        expect(info?.progress).toBe(75);
+    });
+
+    it('returns null for a structurally-disabled step', () => {
+        expect(getStepInfo(baseStudy({ rough_sort_enabled: false }), 3)).toBeNull();
+    });
+
+    it('returns null for an out-of-range step', () => {
+        expect(getStepInfo(baseStudy(), 99)).toBeNull();
     });
 });

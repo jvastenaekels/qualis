@@ -141,6 +141,7 @@ export const StudyConfigSchema = z.object({
     language: z.string().optional(),
     show_statement_codes: z.boolean().optional(),
     randomize_statement_order: z.boolean().optional().default(false),
+    rough_sort_enabled: z.boolean().optional().default(true),
     distribution_mode: z.enum(['forced', 'free', 'flexible']).optional().default('forced'),
     state: z.enum(['draft', 'active', 'paused', 'closed']).optional(),
     branding: BrandingSchema.optional(),

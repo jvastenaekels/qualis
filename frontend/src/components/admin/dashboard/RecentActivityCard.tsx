@@ -22,26 +22,12 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { parseUA } from '@/utils/uaParser';
+import { getStepInfo } from '@/utils/studySteps';
 
 const dateLocales: Record<string, Locale> = {
     en: enUS,
     fr: fr,
     fi: fi,
-};
-
-const STEP_INFO: Record<number, { labelKey: string; labelDefault: string; progress: number }> = {
-    2: { labelKey: 'admin.data.step.presort', labelDefault: 'Pre-sort survey', progress: 25 },
-    3: {
-        labelKey: 'admin.data.step.rough',
-        labelDefault: 'Preliminary sort',
-        progress: 50,
-    },
-    4: { labelKey: 'admin.data.step.fine', labelDefault: 'Q-sort', progress: 75 },
-    5: {
-        labelKey: 'admin.data.step.post',
-        labelDefault: 'Post-sort survey',
-        progress: 100,
-    },
 };
 
 const DEVICE_ICONS = {
@@ -78,10 +64,17 @@ interface ParticipantRowProps {
     participant: ParticipantRead;
     locale: Locale;
     showLanguage: boolean;
+    roughSortEnabled: boolean;
     onView: () => void;
 }
 
-function ParticipantRow({ participant, locale, showLanguage, onView }: ParticipantRowProps) {
+function ParticipantRow({
+    participant,
+    locale,
+    showLanguage,
+    roughSortEnabled,
+    onView,
+}: ParticipantRowProps) {
     const { t } = useTranslation();
     const colors = getParticipantColor(participant.session_token);
     const isCompleted = participant.status === 'completed';
@@ -92,7 +85,7 @@ function ParticipantRow({ participant, locale, showLanguage, onView }: Participa
 
     const durationSeconds = computeDurationSeconds(participant);
     const stepNum = (participant.last_step_reached as number) ?? 1;
-    const stepInfo = STEP_INFO[stepNum] ?? null;
+    const stepInfo = getStepInfo({ rough_sort_enabled: roughSortEnabled }, stepNum);
 
     return (
         <div
@@ -220,6 +213,11 @@ interface RecentActivityCardProps {
     isMultiLang: boolean;
     projectSlug: string;
     studySlug: string;
+    /**
+     * Whether the study has the rough-sort step enabled. Defaults to true
+     * for backwards-compatibility with callers that haven't passed it yet.
+     */
+    roughSortEnabled?: boolean;
 }
 
 export default function RecentActivityCard({
@@ -228,6 +226,7 @@ export default function RecentActivityCard({
     isMultiLang,
     projectSlug,
     studySlug,
+    roughSortEnabled = true,
 }: RecentActivityCardProps) {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
@@ -275,6 +274,7 @@ export default function RecentActivityCard({
                                 participant={p}
                                 locale={currentLocale}
                                 showLanguage={isMultiLang}
+                                roughSortEnabled={roughSortEnabled}
                                 onView={() =>
                                     navigate(
                                         `/app/${projectSlug}/studies/${studySlug}/participants/${p.id}`
