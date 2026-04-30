@@ -40,6 +40,11 @@ export async function captureTransition(
     const stepStr = String(step).padStart(2, '0');
     const filename = `e2e/participant/fine-sort-screenshots/${formFactor}-${mode}-${stepStr}-${label}.png`;
     try {
+        // Playwright's `animations: 'disabled'` covers CSS animations and
+        // transitions, but framer-motion's layoutId-driven animations are
+        // JS-driven and slip past it. Give them a moment to settle so cards
+        // are captured in their final placement instead of mid-flight.
+        await page.waitForTimeout(400);
         await page.screenshot({ path: filename, fullPage: false, animations: 'disabled' });
     } catch {
         // Screenshot best-effort; never fail the test on capture issues.

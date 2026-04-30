@@ -454,6 +454,104 @@ describe('Pilot Mode Logic', () => {
     });
 });
 
+describe('Breadcrumb labels (process_steps mapping)', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        useSessionStore.setState({
+            token: null,
+            hasConsented: true,
+            currentStep: 4,
+            maxReachedStep: 4,
+            language: 'en',
+            isCompleted: false,
+            // biome-ignore lint/suspicious/noExplicitAny: partial state
+        } as any);
+    });
+
+    it('Resolves step labels by process_step id (deck mode, rough disabled)', () => {
+        // Backend filters out the rough entry when rough_sort_enabled=false,
+        // so process_steps has 3 entries instead of 4. Looking up by index would
+        // make step.id=4 (fine) read process_steps[2] = post → "Why" instead of
+        // the correct "Your perspective".
+        useConfigStore.setState({
+            config: {
+                slug: 'test',
+                rough_sort_enabled: false,
+                presort_config: { enabled: true, fields: {} },
+                process_steps: [
+                    { id: 'profile', title: "Let's meet", description: '', icon: 'User' },
+                    {
+                        id: 'fine',
+                        title: 'Your perspective',
+                        description: '',
+                        icon: 'Target',
+                    },
+                    { id: 'post', title: 'Why', description: '', icon: 'MessageSquare' },
+                ],
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
+            } as any,
+            isLoading: false,
+            error: null,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/fine-sort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/fine-sort'] }
+        );
+
+        const stepper = screen.getByTestId('stepper-container');
+        // The fine-sort step (3rd visible position when rough is disabled) must
+        // resolve to "Your perspective", not "Why" (which is the post step).
+        expect(within(stepper).getByText('Your perspective')).toBeInTheDocument();
+        // "Why" should appear exactly once (for the post step), not duplicated.
+        const whyMatches = within(stepper).getAllByText('Why');
+        expect(whyMatches).toHaveLength(1);
+    });
+
+    it('Resolves step labels correctly when rough is enabled (5-step flow)', () => {
+        useConfigStore.setState({
+            config: {
+                slug: 'test',
+                rough_sort_enabled: true,
+                presort_config: { enabled: true, fields: {} },
+                process_steps: [
+                    { id: 'profile', title: "Let's meet", description: '', icon: 'User' },
+                    {
+                        id: 'rough',
+                        title: 'First impressions',
+                        description: '',
+                        icon: 'Zap',
+                    },
+                    {
+                        id: 'fine',
+                        title: 'Your perspective',
+                        description: '',
+                        icon: 'Target',
+                    },
+                    { id: 'post', title: 'Why', description: '', icon: 'MessageSquare' },
+                ],
+                // biome-ignore lint/suspicious/noExplicitAny: mock config
+            } as any,
+            isLoading: false,
+            error: null,
+        });
+
+        renderWithProviders(
+            <Routes>
+                <Route path="/study/:slug/fine-sort" element={<StudyLayout />} />
+            </Routes>,
+            { initialEntries: ['/study/test/fine-sort'] }
+        );
+
+        const stepper = screen.getByTestId('stepper-container');
+        expect(within(stepper).getByText('First impressions')).toBeInTheDocument();
+        expect(within(stepper).getByText('Your perspective')).toBeInTheDocument();
+        expect(within(stepper).getByText('Why')).toBeInTheDocument();
+    });
+});
+
 describe('Network & Password Features', () => {
     beforeEach(() => {
         useConfigStore.setState({

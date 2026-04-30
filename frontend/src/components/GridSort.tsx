@@ -1025,13 +1025,20 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                 </div>
 
                 {/* PANEL: SOURCE INVENTORY (Deck) */}
+                {/*
+                 * Sizing: when stacked vertically (<lg, !isLandscapeMobile), the
+                 * deck panel must NOT take h-full or it pushes the grid panel to
+                 * zero height (mobile and tablet portrait alike). Use h-auto in
+                 * the stacked layout and only h-full in the side-by-side
+                 * (lg+, or landscape-mobile) layout. Inner deck-area sizing
+                 * follows the same rule (see DroppableDeckArea below).
+                 */}
                 <div
                     className={cn(
                         'flex-none bg-white border-gray-200 z-40 flex flex-col transition-all duration-300 overflow-hidden',
                         isLandscapeMobile
                             ? 'w-[min(280px,40vw)] h-full border-l shadow-md pr-safe'
-                            : 'w-full lg:w-[360px] lg:border-r border-t lg:border-t-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md lg:h-full',
-                        !isLandscapeMobile && (isMobile ? 'h-auto' : 'h-full')
+                            : 'w-full h-auto lg:w-[360px] lg:h-full lg:border-r border-t lg:border-t-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] lg:shadow-md'
                     )}
                 >
                     {readOnly && sidebarContent ? (
@@ -1091,9 +1098,11 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                     'flex-col overflow-hidden relative',
                                     isLandscapeMobile
                                         ? 'flex-1 min-h-0 flex'
-                                        : isMobile
-                                          ? 'h-[100px] flex-none'
-                                          : 'flex-1 min-h-0 flex'
+                                        : // <lg stacked layout (mobile + tablet portrait):
+                                          // fixed-height horizontal strip so the grid panel
+                                          // keeps its share of the viewport.
+                                          // lg+ side-by-side: deck takes full remaining height.
+                                          'h-[100px] flex-none lg:h-auto lg:flex-1 lg:min-h-0 lg:flex'
                                 )}
                             >
                                 <div

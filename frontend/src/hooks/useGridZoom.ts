@@ -42,7 +42,14 @@ export const useGridZoom = ({
         let scale: number, x: number, y: number;
 
         if (isMobile) {
-            const widthScale = (wrapperW * 0.98) / contentW;
+            // The zoom toolbar is positioned absolute top-4 right-4, ~60px wide.
+            // Scale the grid to fit within the wrapper width MINUS the toolbar
+            // footprint so column headers (e.g. "+1" on the rightmost column)
+            // stay visible instead of being hidden under the toolbar. Portrait
+            // only — landscape-mobile uses a different sidebar layout.
+            const TOOLBAR_RESERVED_PX = isLandscapeMobile ? 0 : 64;
+            const usableW = Math.max(0, wrapperW - TOOLBAR_RESERVED_PX);
+            const widthScale = (usableW * 0.98) / contentW;
             const heightScale = (wrapperH * (isLandscapeMobile ? 0.95 : 0.9)) / contentH;
 
             if (isLandscapeMobile) {
@@ -53,8 +60,10 @@ export const useGridZoom = ({
                 scale = Math.min(widthScale, Math.max(heightScale, widthScale * 0.7));
             }
 
-            // Center Horizontally
-            x = (wrapperW - contentW * scale) / 2;
+            // Center horizontally inside the usable area (excluding the
+            // toolbar reserved column on portrait), so the rightmost grid
+            // column never extends behind the absolute toolbar overlay.
+            x = (usableW - contentW * scale) / 2;
 
             if (isLandscapeMobile) {
                 // Center vertically in landscape

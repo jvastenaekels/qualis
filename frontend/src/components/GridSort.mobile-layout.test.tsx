@@ -177,6 +177,90 @@ describe('FineSortPage Mobile Interaction (Integration)', () => {
     });
 });
 
+describe('GridSort Tablet Portrait Layout', () => {
+    const defaultProps = {
+        agreeCards: [],
+        disagreeCards: [{ id: 1, text: 'Card 1' }],
+        neutralCards: [],
+        gridColumns: [{ score: 0, capacity: 5 }],
+        renderSlotContent: () => null,
+    };
+
+    beforeEach(() => {
+        // Tablet portrait: 768 wide, taller than wide, !isMobile, !isLandscape, !lg
+        Object.defineProperty(window, 'innerWidth', {
+            writable: true,
+            configurable: true,
+            value: 768,
+        });
+        Object.defineProperty(window, 'innerHeight', {
+            writable: true,
+            configurable: true,
+            value: 1024,
+        });
+        window.dispatchEvent(new Event('resize'));
+        vi.clearAllMocks();
+    });
+
+    it('renders the placement grid container at tablet portrait (rough mode)', () => {
+        render(
+            <DndContext>
+                <GridSort {...defaultProps} />
+            </DndContext>
+        );
+
+        // Bug 2 regression: at 768x1024 the deck panel was taking h-full which
+        // squeezed the grid panel down to zero height, hiding the grid entirely.
+        // The grid-container must remain mounted and visible.
+        const gridContainer = screen.getByTestId('grid-container');
+        expect(gridContainer).toBeInTheDocument();
+    });
+
+    it('renders the placement grid container at tablet portrait (deck mode)', () => {
+        render(
+            <DndContext>
+                <GridSort
+                    {...defaultProps}
+                    agreeCards={[]}
+                    disagreeCards={[]}
+                    neutralCards={[]}
+                    deckCards={[{ id: 1, text: 'Card 1' }]}
+                />
+            </DndContext>
+        );
+
+        const gridContainer = screen.getByTestId('grid-container');
+        expect(gridContainer).toBeInTheDocument();
+    });
+
+    it('uses h-auto on the deck panel in stacked layout (not h-full)', () => {
+        const { container } = render(
+            <DndContext>
+                <GridSort
+                    {...defaultProps}
+                    agreeCards={[]}
+                    disagreeCards={[]}
+                    neutralCards={[]}
+                    deckCards={[{ id: 1, text: 'Card 1' }]}
+                />
+            </DndContext>
+        );
+
+        // The deck panel sits next to the grid panel. In stacked layout the
+        // deck must NOT take h-full at the base size — only at lg+.
+        const deckCardsContainer = screen.getByTestId('deck-cards-container');
+        // Walk up until we find the panel: the parent .flex.flex-col with
+        // bg-white and overflow-hidden — its className must contain h-auto, not
+        // a base-class h-full.
+        let panel: HTMLElement | null = deckCardsContainer.parentElement;
+        while (panel && !panel.className.includes('flex-none') && panel !== container) {
+            panel = panel.parentElement;
+        }
+        expect(panel).not.toBeNull();
+        expect(panel?.className).toContain('h-auto');
+    });
+});
+
 describe('GridSort Landscape Mobile Layout', () => {
     const defaultProps = {
         agreeCards: [],
