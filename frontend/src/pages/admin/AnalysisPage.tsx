@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import type { TFunction } from 'i18next';
 import {
     ChartColumnStacked,
-    Play,
     Loader2,
     BarChart3,
     Grid3X3,
@@ -22,7 +21,7 @@ import {
 
 import { StudyPageHeader } from '@/components/admin/layout/StudyPageHeader';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import {
     Accordion,
@@ -49,7 +48,7 @@ import {
 
 import { GuidanceCard } from '@/components/admin/GuidanceCard';
 import { EmptyStateContract } from '@/components/admin/EmptyStateContract';
-import { ScreePlot } from '@/components/admin/analysis/ScreePlot';
+import { ExplorerPanel } from '@/components/admin/analysis/ExplorerPanel';
 import { FactorLoadingsTable } from '@/components/admin/analysis/FactorLoadingsTable';
 import { FactorArraysView } from '@/components/admin/analysis/FactorArraysView';
 import { StatementsTable } from '@/components/admin/analysis/StatementsTable';
@@ -203,7 +202,6 @@ interface ExploreShellProps {
     onSelectHistoricalRun: (runId: number) => void;
 }
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from the configuration card (extraction/factors selectors, advanced accordion with rotation/flagging/bootstrap, judgmental rotations sub-panel). All logic in useExplorePhase.
 function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellProps) {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
@@ -216,90 +214,66 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                 icon={ChartColumnStacked}
             />
 
-            {/* Controls */}
-            <Card className="border-none shadow-sm bg-white rounded-2xl">
-                <CardHeader className="pb-3">
-                    <CardTitle className="text-lg font-black">
-                        {t('admin.analysis.configuration', 'Configuration')}
-                    </CardTitle>
-                    <CardDescription>
+            {/* Gate banners — kept above ExplorerPanel because they govern
+                whether the new diagnostics + preview-range surfaces should
+                even render. */}
+            {explore.isTooFewParticipants && (
+                <div
+                    className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800"
+                    role="alert"
+                >
+                    <Info className="size-4 flex-shrink-0" aria-hidden="true" />
+                    {t(
+                        'admin.analysis.too_few_participants',
+                        'Need at least 2 completed participants to run analysis.'
+                    )}
+                </div>
+            )}
+
+            {explore.isEigenvalueError && (
+                <div
+                    className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"
+                    role="alert"
+                >
+                    <AlertTriangle className="size-4 flex-shrink-0" aria-hidden="true" />
+                    <span className="flex-1">
                         {t(
-                            'admin.analysis.configuration_description',
-                            'Select extraction method, number of factors, and rotation'
+                            'admin.analysis.eigenvalue_error',
+                            'Failed to load analysis data. Please try again.'
                         )}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-5">
-                    {explore.isTooFewParticipants && (
-                        <div
-                            className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800"
-                            role="alert"
-                        >
-                            <Info className="size-4 flex-shrink-0" aria-hidden="true" />
-                            {t(
-                                'admin.analysis.too_few_participants',
-                                'Need at least 2 completed participants to run analysis.'
-                            )}
-                        </div>
-                    )}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={explore.handleRefetchEigenvalues}
+                        className="gap-1.5 shrink-0"
+                    >
+                        <RefreshCw className="size-3.5" aria-hidden="true" />
+                        {t('admin.analysis.retry', 'Retry')}
+                    </Button>
+                </div>
+            )}
 
-                    {explore.isEigenvalueError && (
-                        <div
-                            className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"
-                            role="alert"
-                        >
-                            <AlertTriangle className="size-4 flex-shrink-0" aria-hidden="true" />
-                            <span className="flex-1">
-                                {t(
-                                    'admin.analysis.eigenvalue_error',
-                                    'Failed to load analysis data. Please try again.'
-                                )}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={explore.handleRefetchEigenvalues}
-                                className="gap-1.5 shrink-0"
-                            >
-                                <RefreshCw className="size-3.5" aria-hidden="true" />
-                                {t('admin.analysis.retry', 'Retry')}
-                            </Button>
-                        </div>
-                    )}
+            {explore.eigenvaluesIsLoading && (
+                <div
+                    className="flex items-center justify-center py-8 text-slate-400"
+                    role="status"
+                    aria-live="polite"
+                >
+                    <Loader2 className="size-5 animate-spin mr-2" aria-hidden="true" />
+                    {t('admin.analysis.loading_eigenvalues', 'Loading eigenvalues...')}
+                </div>
+            )}
 
-                    {explore.eigenvaluesIsLoading && (
-                        <div
-                            className="flex items-center justify-center py-8 text-slate-400"
-                            role="status"
-                            aria-live="polite"
-                        >
-                            <Loader2 className="size-5 animate-spin mr-2" aria-hidden="true" />
-                            {t('admin.analysis.loading_eigenvalues', 'Loading eigenvalues...')}
-                        </div>
-                    )}
-
-                    {/* Scree plot + parameters: side-by-side on lg+ */}
-                    <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-start">
-                        {/* Scree plot */}
-                        {explore.hasEigenvalues &&
-                            explore.eigenvalues &&
-                            explore.suggestedNFactors !== undefined && (
-                                <ScreePlot
-                                    eigenvalues={explore.eigenvalues}
-                                    suggestedNFactors={explore.suggestedNFactors}
-                                    selectedNFactors={explore.nFactors}
-                                    onSelectNFactors={explore.setNFactors}
-                                />
-                            )}
-                        {!explore.hasEigenvalues && !explore.eigenvaluesIsLoading && <div />}
-
-                        {/* Parameters — Wave C: only Extraction + Facteurs are
-                            primary-visible. Rotation / Flagging / Bootstrap
-                            move into the "Advanced settings" Accordion below
-                            (audit REPORT.md finding 🔴3, when analysis IS
-                            possible). Reduces decision surface from 4 dropdowns
-                            + 4 rationale paragraphs to 2 dropdowns. */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 lg:w-[320px]">
+            {/* Phase 3 ExplorerPanel — primary surfaces (Diagnostics, Preview
+                range) plus the legacy form controls routed through the
+                advancedContent slot. The "Commit and interpret" CTA is owned
+                by ExplorerPanel itself. */}
+            <ExplorerPanel
+                explore={explore}
+                advancedContent={
+                    <div className="space-y-5">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
                             <div className="space-y-1.5">
                                 <Label
                                     htmlFor="extraction-select"
@@ -363,383 +337,382 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                                 </p>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Wave C — Advanced settings Accordion. Defaults open
-                        when the user previously chose non-default values
-                        (judgmental rotation, manual flagging, or bootstrap),
-                        otherwise closed so most studies start clean. */}
-                    <Accordion
-                        type="multiple"
-                        defaultValue={
-                            explore.rotation !== 'varimax' ||
-                            explore.flagging !== 'auto' ||
-                            explore.bootstrapEnabled
-                                ? ['advanced']
-                                : []
-                        }
-                    >
-                        <AccordionItem
-                            value="advanced"
-                            className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/30"
+                        {/* Wave C — inner Advanced settings Accordion. Defaults
+                            open when the user previously chose non-default
+                            values (judgmental rotation, manual flagging, or
+                            bootstrap), otherwise closed so most studies start
+                            clean. */}
+                        <Accordion
+                            type="multiple"
+                            defaultValue={
+                                explore.rotation !== 'varimax' ||
+                                explore.flagging !== 'auto' ||
+                                explore.bootstrapEnabled
+                                    ? ['advanced']
+                                    : []
+                            }
                         >
-                            <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-200">
-                                <div className="flex flex-col items-start text-left">
-                                    <span className="text-sm font-bold text-slate-700">
-                                        {t('admin.analysis.advanced.title', 'Advanced settings')}
-                                    </span>
-                                    <span className="text-xs font-medium text-slate-500 mt-0.5">
-                                        {t(
-                                            'admin.analysis.advanced.summary',
-                                            'Rotation: {{rotation}} · Flagging: {{flagging}} · Bootstrap: {{bootstrap}}',
-                                            {
-                                                rotation:
-                                                    explore.rotation === 'varimax'
-                                                        ? t('admin.analysis.varimax', 'Varimax')
-                                                        : explore.rotation === 'none'
-                                                          ? t('admin.analysis.none', 'None')
-                                                          : t(
-                                                                'admin.analysis.rotation.judgmental.short',
-                                                                'Judgmental'
-                                                            ),
-                                                flagging:
-                                                    explore.flagging === 'auto'
-                                                        ? t('admin.analysis.auto', 'Auto')
-                                                        : t('admin.analysis.manual', 'Manual'),
-                                                bootstrap: explore.bootstrapEnabled
-                                                    ? t(
-                                                          'admin.analysis.advanced.bootstrap_on',
-                                                          '{{n}} iterations',
-                                                          { n: explore.bootstrapIterations }
-                                                      )
-                                                    : t(
-                                                          'admin.analysis.advanced.bootstrap_off',
-                                                          'off'
-                                                      ),
-                                            }
-                                        )}
-                                    </span>
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="px-4 py-4 space-y-5">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
-                                        <div className="space-y-1.5">
-                                            <Label
-                                                htmlFor="rotation-select"
-                                                className="text-2xs font-black text-slate-500"
-                                            >
-                                                {t('admin.analysis.rotation_method', 'Rotation')}
-                                            </Label>
-                                            <Select
-                                                value={explore.rotation}
-                                                onValueChange={explore.setRotation}
-                                                disabled={explore.isRunning}
-                                            >
-                                                <SelectTrigger id="rotation-select">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="varimax">
-                                                        {t('admin.analysis.varimax', 'Varimax')}
-                                                    </SelectItem>
-                                                    <SelectItem value="none">
-                                                        {t('admin.analysis.none', 'None')}
-                                                    </SelectItem>
-                                                    <SelectItem value="judgmental">
-                                                        {t(
-                                                            'admin.analysis.rotation.judgmental.label',
-                                                            'Judgmental (manual)'
-                                                        )}
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <p className="text-xs text-muted-foreground leading-snug">
-                                                {t(
-                                                    'admin.analysis.help_rotation',
-                                                    'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution. Judgmental lets you specify rotation angles manually.'
-                                                )}
-                                            </p>
-                                        </div>
-
-                                        <div className="space-y-1.5">
-                                            <Label
-                                                htmlFor="flagging-select"
-                                                className="text-2xs font-black text-slate-500"
-                                            >
-                                                {t('admin.analysis.flagging_method', 'Flagging')}
-                                            </Label>
-                                            <Select
-                                                value={explore.flagging}
-                                                onValueChange={(v) => {
-                                                    explore.setFlagging(v as 'auto' | 'manual');
-                                                }}
-                                                disabled={explore.isRunning}
-                                            >
-                                                <SelectTrigger id="flagging-select">
-                                                    <SelectValue />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="auto">
-                                                        {t('admin.analysis.auto', 'Auto')}
-                                                    </SelectItem>
-                                                    <SelectItem value="manual">
-                                                        {t('admin.analysis.manual', 'Manual')}
-                                                    </SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                            <p className="text-xs text-muted-foreground leading-snug">
-                                                {t(
-                                                    'admin.analysis.help_flagging',
-                                                    'Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.'
-                                                )}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    {/* Judgmental rotations sub-panel — visible only when rotation === 'judgmental' */}
-                                    {explore.rotation === 'judgmental' && (
-                                        <div className="space-y-3 pt-2 border-t border-slate-100">
-                                            <div>
-                                                <h3 className="text-sm font-black text-slate-800">
-                                                    {t(
-                                                        'admin.analysis.manual_rotations.title',
-                                                        'Manual rotations'
-                                                    )}
-                                                </h3>
-                                                <p className="text-xs text-muted-foreground leading-snug mt-1">
-                                                    {t(
-                                                        'admin.analysis.manual_rotations.helper',
-                                                        "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order. Used to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012)."
-                                                    )}
-                                                </p>
-                                            </div>
-
-                                            {explore.manualRotations.length === 0 && (
-                                                <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
-                                                    {t(
-                                                        'admin.analysis.manual_rotations.empty',
-                                                        'Add at least one rotation to run the analysis.'
-                                                    )}
-                                                </p>
+                            <AccordionItem
+                                value="advanced"
+                                className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50/30"
+                            >
+                                <AccordionTrigger className="px-4 py-3 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-200">
+                                    <div className="flex flex-col items-start text-left">
+                                        <span className="text-sm font-bold text-slate-700">
+                                            {t(
+                                                'admin.analysis.advanced.title',
+                                                'Advanced settings'
                                             )}
-
-                                            <ul className="space-y-2">
-                                                {explore.manualRotations.map((mr, idx) => (
-                                                    <li
-                                                        key={mr.id}
-                                                        className="flex flex-wrap items-center gap-2"
-                                                    >
-                                                        <span className="text-xs text-slate-600">
-                                                            {t(
-                                                                'admin.analysis.manual_rotations.factor_a_label',
-                                                                'Rotate factor'
-                                                            )}
-                                                        </span>
-                                                        <Input
-                                                            type="number"
-                                                            min={1}
-                                                            max={explore.nFactors}
-                                                            step={1}
-                                                            value={mr.factor_a}
-                                                            onChange={(e) =>
-                                                                explore.updateManualRotation(idx, {
-                                                                    factor_a: Number(
-                                                                        e.target.value
-                                                                    ),
-                                                                })
-                                                            }
-                                                            disabled={explore.isRunning}
-                                                            className="w-16 h-8 text-sm"
-                                                            aria-label={t(
-                                                                'admin.analysis.manual_rotations.factor_a_label',
-                                                                'Rotate factor'
-                                                            )}
-                                                        />
-                                                        <span className="text-xs text-slate-600">
-                                                            {t(
-                                                                'admin.analysis.manual_rotations.angle_label',
-                                                                'by'
-                                                            )}
-                                                        </span>
-                                                        <Input
-                                                            type="number"
-                                                            min={-180}
-                                                            max={180}
-                                                            step={1}
-                                                            value={mr.angle_deg}
-                                                            onChange={(e) =>
-                                                                explore.updateManualRotation(idx, {
-                                                                    angle_deg: Number(
-                                                                        e.target.value
-                                                                    ),
-                                                                })
-                                                            }
-                                                            disabled={explore.isRunning}
-                                                            className="w-20 h-8 text-sm"
-                                                            aria-label={t(
-                                                                'admin.analysis.manual_rotations.angle_label',
-                                                                'by'
-                                                            )}
-                                                        />
-                                                        <span className="text-xs text-slate-600">
-                                                            °{' '}
-                                                            {t(
-                                                                'admin.analysis.manual_rotations.factor_b_label',
-                                                                'around factor'
-                                                            )}
-                                                        </span>
-                                                        <Input
-                                                            type="number"
-                                                            min={1}
-                                                            max={explore.nFactors}
-                                                            step={1}
-                                                            value={mr.factor_b}
-                                                            onChange={(e) =>
-                                                                explore.updateManualRotation(idx, {
-                                                                    factor_b: Number(
-                                                                        e.target.value
-                                                                    ),
-                                                                })
-                                                            }
-                                                            disabled={explore.isRunning}
-                                                            className="w-16 h-8 text-sm"
-                                                            aria-label={t(
-                                                                'admin.analysis.manual_rotations.factor_b_label',
-                                                                'around factor'
-                                                            )}
-                                                        />
-                                                        <Button
-                                                            type="button"
-                                                            variant="ghost"
-                                                            size="sm"
-                                                            onClick={() =>
-                                                                explore.removeManualRotation(idx)
-                                                            }
-                                                            disabled={explore.isRunning}
-                                                            aria-label={t(
-                                                                'admin.analysis.manual_rotations.remove_aria',
-                                                                'Remove rotation'
-                                                            )}
-                                                            className="h-8 w-8 p-0"
-                                                        >
-                                                            <X
-                                                                className="size-4"
-                                                                aria-hidden="true"
-                                                            />
-                                                        </Button>
-                                                    </li>
-                                                ))}
-                                            </ul>
-
-                                            <Button
-                                                type="button"
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={explore.addManualRotation}
-                                                disabled={explore.isRunning}
-                                                className="gap-1.5"
-                                            >
-                                                <Plus className="size-3.5" aria-hidden="true" />
-                                                {t(
-                                                    'admin.analysis.manual_rotations.add',
-                                                    'Add rotation'
-                                                )}
-                                            </Button>
-                                        </div>
-                                    )}
-
-                                    {/* Bootstrap stability toggle (Zabala & Pascual 2016) */}
-                                    <div className="space-y-3 pt-2 border-t border-slate-100">
-                                        <div className="flex items-start gap-3">
-                                            <input
-                                                id="bootstrap-toggle"
-                                                type="checkbox"
-                                                checked={explore.bootstrapEnabled}
-                                                onChange={(e) =>
-                                                    explore.setBootstrapEnabled(e.target.checked)
+                                        </span>
+                                        <span className="text-xs font-medium text-slate-500 mt-0.5">
+                                            {t(
+                                                'admin.analysis.advanced.summary',
+                                                'Rotation: {{rotation}} · Flagging: {{flagging}} · Bootstrap: {{bootstrap}}',
+                                                {
+                                                    rotation:
+                                                        explore.rotation === 'varimax'
+                                                            ? t('admin.analysis.varimax', 'Varimax')
+                                                            : explore.rotation === 'none'
+                                                              ? t('admin.analysis.none', 'None')
+                                                              : t(
+                                                                    'admin.analysis.rotation.judgmental.short',
+                                                                    'Judgmental'
+                                                                ),
+                                                    flagging:
+                                                        explore.flagging === 'auto'
+                                                            ? t('admin.analysis.auto', 'Auto')
+                                                            : t('admin.analysis.manual', 'Manual'),
+                                                    bootstrap: explore.bootstrapEnabled
+                                                        ? t(
+                                                              'admin.analysis.advanced.bootstrap_on',
+                                                              '{{n}} iterations',
+                                                              { n: explore.bootstrapIterations }
+                                                          )
+                                                        : t(
+                                                              'admin.analysis.advanced.bootstrap_off',
+                                                              'off'
+                                                          ),
                                                 }
-                                                disabled={explore.isRunning}
-                                                className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                                            />
-                                            <div className="flex-1 space-y-1.5">
+                                            )}
+                                        </span>
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="px-4 py-4 space-y-5">
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3">
+                                            <div className="space-y-1.5">
                                                 <Label
-                                                    htmlFor="bootstrap-toggle"
-                                                    className="text-sm font-black text-slate-800 cursor-pointer"
-                                                >
-                                                    {t(
-                                                        'admin.analysis.bootstrap.toggle_label',
-                                                        'Run bootstrap stability'
-                                                    )}
-                                                </Label>
-                                                <p className="text-xs text-muted-foreground leading-snug">
-                                                    {t(
-                                                        'admin.analysis.bootstrap.helper',
-                                                        'Optional. Bootstrap resamples your Q-sorts with replacement and re-runs the analysis B times to estimate standard errors on z-scores. Useful when you want confidence intervals on factor scores (Zabala & Pascual 2016).'
-                                                    )}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        {explore.bootstrapEnabled && (
-                                            <div className="flex flex-wrap items-center gap-2 pl-7">
-                                                <Label
-                                                    htmlFor="bootstrap-iterations"
+                                                    htmlFor="rotation-select"
                                                     className="text-2xs font-black text-slate-500"
                                                 >
                                                     {t(
-                                                        'admin.analysis.bootstrap.iterations_label',
-                                                        'Iterations (B)'
+                                                        'admin.analysis.rotation_method',
+                                                        'Rotation'
                                                     )}
                                                 </Label>
-                                                <Input
-                                                    id="bootstrap-iterations"
-                                                    type="number"
-                                                    min={100}
-                                                    max={5000}
-                                                    step={100}
-                                                    value={explore.bootstrapIterations}
+                                                <Select
+                                                    value={explore.rotation}
+                                                    onValueChange={explore.setRotation}
+                                                    disabled={explore.isRunning}
+                                                >
+                                                    <SelectTrigger id="rotation-select">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="varimax">
+                                                            {t('admin.analysis.varimax', 'Varimax')}
+                                                        </SelectItem>
+                                                        <SelectItem value="none">
+                                                            {t('admin.analysis.none', 'None')}
+                                                        </SelectItem>
+                                                        <SelectItem value="judgmental">
+                                                            {t(
+                                                                'admin.analysis.rotation.judgmental.label',
+                                                                'Judgmental (manual)'
+                                                            )}
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <p className="text-xs text-muted-foreground leading-snug">
+                                                    {t(
+                                                        'admin.analysis.help_rotation',
+                                                        'Varimax maximizes the separation between factors, producing simpler structure. No rotation preserves the original mathematical solution. Judgmental lets you specify rotation angles manually.'
+                                                    )}
+                                                </p>
+                                            </div>
+
+                                            <div className="space-y-1.5">
+                                                <Label
+                                                    htmlFor="flagging-select"
+                                                    className="text-2xs font-black text-slate-500"
+                                                >
+                                                    {t(
+                                                        'admin.analysis.flagging_method',
+                                                        'Flagging'
+                                                    )}
+                                                </Label>
+                                                <Select
+                                                    value={explore.flagging}
+                                                    onValueChange={(v) => {
+                                                        explore.setFlagging(v as 'auto' | 'manual');
+                                                    }}
+                                                    disabled={explore.isRunning}
+                                                >
+                                                    <SelectTrigger id="flagging-select">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="auto">
+                                                            {t('admin.analysis.auto', 'Auto')}
+                                                        </SelectItem>
+                                                        <SelectItem value="manual">
+                                                            {t('admin.analysis.manual', 'Manual')}
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <p className="text-xs text-muted-foreground leading-snug">
+                                                    {t(
+                                                        'admin.analysis.help_flagging',
+                                                        'Auto flags participants whose loading exceeds the significance threshold on exactly one factor. Manual lets you override flagging based on your own judgment.'
+                                                    )}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Judgmental rotations sub-panel — visible only when rotation === 'judgmental' */}
+                                        {explore.rotation === 'judgmental' && (
+                                            <div className="space-y-3 pt-2 border-t border-slate-100">
+                                                <div>
+                                                    <h3 className="text-sm font-black text-slate-800">
+                                                        {t(
+                                                            'admin.analysis.manual_rotations.title',
+                                                            'Manual rotations'
+                                                        )}
+                                                    </h3>
+                                                    <p className="text-xs text-muted-foreground leading-snug mt-1">
+                                                        {t(
+                                                            'admin.analysis.manual_rotations.helper',
+                                                            "Specify rotations as 'rotate factor F by Δ° around factor G'. Rotations are applied in order. Used to align factors with substantively-meaningful positions (Brown 1980; Watts & Stenner 2012)."
+                                                        )}
+                                                    </p>
+                                                </div>
+
+                                                {explore.manualRotations.length === 0 && (
+                                                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
+                                                        {t(
+                                                            'admin.analysis.manual_rotations.empty',
+                                                            'Add at least one rotation to run the analysis.'
+                                                        )}
+                                                    </p>
+                                                )}
+
+                                                <ul className="space-y-2">
+                                                    {explore.manualRotations.map((mr, idx) => (
+                                                        <li
+                                                            key={mr.id}
+                                                            className="flex flex-wrap items-center gap-2"
+                                                        >
+                                                            <span className="text-xs text-slate-600">
+                                                                {t(
+                                                                    'admin.analysis.manual_rotations.factor_a_label',
+                                                                    'Rotate factor'
+                                                                )}
+                                                            </span>
+                                                            <Input
+                                                                type="number"
+                                                                min={1}
+                                                                max={explore.nFactors}
+                                                                step={1}
+                                                                value={mr.factor_a}
+                                                                onChange={(e) =>
+                                                                    explore.updateManualRotation(
+                                                                        idx,
+                                                                        {
+                                                                            factor_a: Number(
+                                                                                e.target.value
+                                                                            ),
+                                                                        }
+                                                                    )
+                                                                }
+                                                                disabled={explore.isRunning}
+                                                                className="w-16 h-8 text-sm"
+                                                                aria-label={t(
+                                                                    'admin.analysis.manual_rotations.factor_a_label',
+                                                                    'Rotate factor'
+                                                                )}
+                                                            />
+                                                            <span className="text-xs text-slate-600">
+                                                                {t(
+                                                                    'admin.analysis.manual_rotations.angle_label',
+                                                                    'by'
+                                                                )}
+                                                            </span>
+                                                            <Input
+                                                                type="number"
+                                                                min={-180}
+                                                                max={180}
+                                                                step={1}
+                                                                value={mr.angle_deg}
+                                                                onChange={(e) =>
+                                                                    explore.updateManualRotation(
+                                                                        idx,
+                                                                        {
+                                                                            angle_deg: Number(
+                                                                                e.target.value
+                                                                            ),
+                                                                        }
+                                                                    )
+                                                                }
+                                                                disabled={explore.isRunning}
+                                                                className="w-20 h-8 text-sm"
+                                                                aria-label={t(
+                                                                    'admin.analysis.manual_rotations.angle_label',
+                                                                    'by'
+                                                                )}
+                                                            />
+                                                            <span className="text-xs text-slate-600">
+                                                                °{' '}
+                                                                {t(
+                                                                    'admin.analysis.manual_rotations.factor_b_label',
+                                                                    'around factor'
+                                                                )}
+                                                            </span>
+                                                            <Input
+                                                                type="number"
+                                                                min={1}
+                                                                max={explore.nFactors}
+                                                                step={1}
+                                                                value={mr.factor_b}
+                                                                onChange={(e) =>
+                                                                    explore.updateManualRotation(
+                                                                        idx,
+                                                                        {
+                                                                            factor_b: Number(
+                                                                                e.target.value
+                                                                            ),
+                                                                        }
+                                                                    )
+                                                                }
+                                                                disabled={explore.isRunning}
+                                                                className="w-16 h-8 text-sm"
+                                                                aria-label={t(
+                                                                    'admin.analysis.manual_rotations.factor_b_label',
+                                                                    'around factor'
+                                                                )}
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                onClick={() =>
+                                                                    explore.removeManualRotation(
+                                                                        idx
+                                                                    )
+                                                                }
+                                                                disabled={explore.isRunning}
+                                                                aria-label={t(
+                                                                    'admin.analysis.manual_rotations.remove_aria',
+                                                                    'Remove rotation'
+                                                                )}
+                                                                className="h-8 w-8 p-0"
+                                                            >
+                                                                <X
+                                                                    className="size-4"
+                                                                    aria-hidden="true"
+                                                                />
+                                                            </Button>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={explore.addManualRotation}
+                                                    disabled={explore.isRunning}
+                                                    className="gap-1.5"
+                                                >
+                                                    <Plus className="size-3.5" aria-hidden="true" />
+                                                    {t(
+                                                        'admin.analysis.manual_rotations.add',
+                                                        'Add rotation'
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        )}
+
+                                        {/* Bootstrap stability toggle (Zabala & Pascual 2016) */}
+                                        <div className="space-y-3 pt-2 border-t border-slate-100">
+                                            <div className="flex items-start gap-3">
+                                                <input
+                                                    id="bootstrap-toggle"
+                                                    type="checkbox"
+                                                    checked={explore.bootstrapEnabled}
                                                     onChange={(e) =>
-                                                        explore.setBootstrapIterations(
-                                                            Number(e.target.value)
+                                                        explore.setBootstrapEnabled(
+                                                            e.target.checked
                                                         )
                                                     }
                                                     disabled={explore.isRunning}
-                                                    className="w-24 h-8 text-sm"
+                                                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                                                 />
+                                                <div className="flex-1 space-y-1.5">
+                                                    <Label
+                                                        htmlFor="bootstrap-toggle"
+                                                        className="text-sm font-black text-slate-800 cursor-pointer"
+                                                    >
+                                                        {t(
+                                                            'admin.analysis.bootstrap.toggle_label',
+                                                            'Run bootstrap stability'
+                                                        )}
+                                                    </Label>
+                                                    <p className="text-xs text-muted-foreground leading-snug">
+                                                        {t(
+                                                            'admin.analysis.bootstrap.helper',
+                                                            'Optional. Bootstrap resamples your Q-sorts with replacement and re-runs the analysis B times to estimate standard errors on z-scores. Useful when you want confidence intervals on factor scores (Zabala & Pascual 2016).'
+                                                        )}
+                                                    </p>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
 
-                    {/* Action buttons — visually separated */}
-                    <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
-                        <Button
-                            onClick={explore.handleRunAnalysis}
-                            disabled={
-                                explore.isRunning ||
-                                !explore.hasEigenvalues ||
-                                explore.isJudgmentalWithoutRotations
-                            }
-                            className="gap-2"
-                        >
-                            {explore.isRunning ? (
-                                <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-                            ) : (
-                                <Play className="size-4" aria-hidden="true" />
-                            )}
-                            {explore.isRunning
-                                ? explore.bootstrapEnabled
-                                    ? t('admin.analysis.bootstrap.running', 'Running bootstrap…')
-                                    : t('admin.analysis.running', 'Analyzing...')
-                                : t('admin.analysis.run', 'Run Analysis')}
-                        </Button>
+                                            {explore.bootstrapEnabled && (
+                                                <div className="flex flex-wrap items-center gap-2 pl-7">
+                                                    <Label
+                                                        htmlFor="bootstrap-iterations"
+                                                        className="text-2xs font-black text-slate-500"
+                                                    >
+                                                        {t(
+                                                            'admin.analysis.bootstrap.iterations_label',
+                                                            'Iterations (B)'
+                                                        )}
+                                                    </Label>
+                                                    <Input
+                                                        id="bootstrap-iterations"
+                                                        type="number"
+                                                        min={100}
+                                                        max={5000}
+                                                        step={100}
+                                                        value={explore.bootstrapIterations}
+                                                        onChange={(e) =>
+                                                            explore.setBootstrapIterations(
+                                                                Number(e.target.value)
+                                                            )
+                                                        }
+                                                        disabled={explore.isRunning}
+                                                        className="w-24 h-8 text-sm"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
                     </div>
-                </CardContent>
-            </Card>
+                }
+            />
 
             {/* Analysis history */}
             <AnalysisHistoryPanel
@@ -749,20 +722,6 @@ function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellP
                     if (run) onSelectHistoricalRun(run.id);
                 }}
             />
-
-            {/* Empty state — explore phase always shows this when eigenvalues
-                are loaded (no result has been committed in this URL yet). */}
-            {explore.hasEigenvalues && !explore.isRunning && (
-                <div className="text-center py-12 text-slate-400">
-                    <ChartColumnStacked className="size-12 mx-auto mb-3 opacity-30" />
-                    <p className="text-sm">
-                        {t(
-                            'admin.analysis.empty_state',
-                            'Configure parameters above and click "Run Analysis" to extract factors from your Q-sort data.'
-                        )}
-                    </p>
-                </div>
-            )}
         </div>
     );
 }

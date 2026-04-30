@@ -11,7 +11,7 @@
  * manage the post-run interpretation surfaces (those live in useInterpretPhase).
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -22,8 +22,12 @@ import {
     useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost,
     listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet,
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey,
+    usePreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePost,
 } from '@/api/generated';
 import type { ManualRotation } from '@/api/model';
+import type { PreviewRangeRow } from '@/api/model/previewRangeRow';
+import type { PreviewRangeRequestExtraction } from '@/api/model/previewRangeRequestExtraction';
+import type { PreviewRangeRequestRotation } from '@/api/model/previewRangeRequestRotation';
 
 /**
  * Client-side draft of a manual rotation row. Carries a stable `id` used as the
@@ -96,10 +100,22 @@ export interface ExplorePhaseApi {
     eigenvaluesIsLoading: boolean;
     eigenvalues: number[] | undefined;
     suggestedNFactors: number | undefined;
+    /** Kaiser criterion (eigenvalues > 1). */
+    kaiserN: number | undefined;
+    /** Horn (1965) parallel-analysis count. */
+    parallelN: number | undefined;
+    /** Velicer (1976) Minimum Average Partial. */
+    mapN: number | undefined;
     handleRefetchEigenvalues: () => void;
 
     // Run state
     isRunning: boolean;
+
+    // Preview-range (PCA-only — backend rejects centroid + judgmental)
+    canPreviewRange: boolean;
+    previewRows: PreviewRangeRow[] | undefined;
+    isPreviewing: boolean;
+    handlePreviewRange: (range: number[]) => Promise<void>;
 
     // Handlers
     handleRunAnalysis: () => void;
@@ -204,6 +220,53 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
     });
 
     const isRunning = analysisMutation.isPending;
+
+    // ── Preview-range mutation (PCA-only) ─────────────────────────
+    // The backend `/preview-range` endpoint rejects centroid extraction and
+    // judgmental rotation; mirror that gate client-side so the button can be
+    // disabled with a clear reason instead of round-tripping a 400.
+    const previewMutation = usePreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePost({
+        mutation: { retry: false },
+    });
+    const [previewRows, setPreviewRows] = useState<PreviewRangeRow[] | undefined>(undefined);
+
+    const canPreviewRange = extraction === 'pca' && (rotation === 'varimax' || rotation === 'none');
+
+    // Monotonic token: every preview-range call captures the current value
+    // and only commits its result if the token still matches. The reset effect
+    // bumps the token so any in-flight resolution is silenced when the user
+    // flips extraction / rotation / flagging mid-flight (otherwise the stale
+    // rows would land under the new config).
+    const previewTokenRef = useRef(0);
+
+    const handlePreviewRange = useCallback(
+        async (range: number[]) => {
+            if (!canPreviewRange) return;
+            const token = ++previewTokenRef.current;
+            const data = await previewMutation.mutateAsync({
+                slug,
+                data: {
+                    n_factors_range: range,
+                    extraction: extraction as PreviewRangeRequestExtraction,
+                    rotation: rotation as PreviewRangeRequestRotation,
+                    flagging,
+                },
+            });
+            if (token === previewTokenRef.current) {
+                setPreviewRows(data.rows);
+            }
+            // else: a newer call (or a config flip) has invalidated this resolution.
+        },
+        [slug, extraction, rotation, flagging, canPreviewRange, previewMutation]
+    );
+
+    // Reset stale rows whenever a setting that would change the preview flips.
+    // Bumping the token cancels any pending commit even if the user doesn't
+    // trigger a new mutate.
+    useEffect(() => {
+        previewTokenRef.current += 1;
+        setPreviewRows(undefined);
+    }, [extraction, rotation, flagging]);
 
     // ── Handlers ──────────────────────────────────────────────────
     const handleRunAnalysis = useCallback(() => {
@@ -321,8 +384,15 @@ export function useExplorePhase(slug: string, onCommit: (runId: number) => void)
         eigenvaluesIsLoading: eigenvaluesQuery.isLoading,
         eigenvalues: eigenvaluesQuery.data?.eigenvalues,
         suggestedNFactors: eigenvaluesQuery.data?.suggested_n_factors,
+        kaiserN: eigenvaluesQuery.data?.kaiser_n,
+        parallelN: eigenvaluesQuery.data?.parallel_analysis_n,
+        mapN: eigenvaluesQuery.data?.velicer_map_n,
         handleRefetchEigenvalues,
         isRunning,
+        canPreviewRange,
+        previewRows,
+        isPreviewing: previewMutation.isPending,
+        handlePreviewRange,
         handleRunAnalysis,
     };
 }

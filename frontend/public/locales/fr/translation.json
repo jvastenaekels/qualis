@@ -899,6 +899,24 @@
                 "running": "Bootstrap en cours…",
                 "se_column": "Erreur-type moyenne (z)",
                 "tooltip": "Bootstrap non paramétrique des Q-sorts (rééchantillonnés avec remise) ; l'analyse est répétée B fois pour estimer les IC à 95 % des z-scores."
+            },
+            "explore": {
+                "diagnostics_title": "Diagnostics",
+                "kaiser": "Kaiser",
+                "parallel": "Analyse parallèle",
+                "map": "MAP de Velicer",
+                "advisory": "Indicateurs consultatifs — la rétention en Q-méthode dépend aussi de l'interprétabilité et de la stabilité (Watts & Stenner 2012).",
+                "preview_range_title": "Aperçu par k",
+                "preview_range_disabled": "L'aperçu n'est pris en charge qu'avec PCA + varimax. L'extraction centroid et la rotation jugementale sont path-dépendantes — lancez un run réel pour les inspecter.",
+                "select_k": "{{k}} facteurs",
+                "empty_factor": "Facteur vide — sur-factorisation",
+                "cumvar": "% var. cum.",
+                "pct_flagged": "% flaggés",
+                "n_distinguishing": "# distinguish.",
+                "n_cross_loaders": "# cross-load.",
+                "min_def_sorts": "min sorts définiss.",
+                "advanced_title": "Configuration avancée",
+                "commit_cta": "Valider et interpréter"
             }
         },
         "project": {

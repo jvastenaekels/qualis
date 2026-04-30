@@ -947,6 +947,24 @@
                 "running": "Running bootstrap…",
                 "se_column": "Mean SE (z)",
                 "tooltip": "Non-parametric bootstrap of Q-sorts (resampled with replacement); analysis is repeated B times to estimate 95% CIs on z-scores."
+            },
+            "explore": {
+                "diagnostics_title": "Diagnostics",
+                "kaiser": "Kaiser",
+                "parallel": "Parallel analysis",
+                "map": "Velicer's MAP",
+                "advisory": "Advisory only — Q-method retention also depends on interpretability and stability (Watts & Stenner 2012).",
+                "preview_range_title": "Preview range",
+                "preview_range_disabled": "Preview range supports PCA + varimax only. Centroid extraction and judgmental rotation are path-dependent — commit a real run to inspect.",
+                "select_k": "{{k}} factors",
+                "empty_factor": "Empty factor — over-factorisation",
+                "cumvar": "cumvar %",
+                "pct_flagged": "% flagged",
+                "n_distinguishing": "# distinguishing",
+                "n_cross_loaders": "# cross-loaders",
+                "min_def_sorts": "min defining sorts",
+                "advanced_title": "Advanced configuration",
+                "commit_cta": "Commit and interpret"
             }
         },
         "project": {

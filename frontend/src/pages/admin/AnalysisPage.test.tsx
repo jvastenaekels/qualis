@@ -41,6 +41,14 @@ vi.mock('@/api/generated', () => ({
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey: vi.fn(() => [
         '/api/admin/studies/test-study/analysis/runs',
     ]),
+    // Preview-range mutation lives in useExplorePhase; idle stub is enough
+    // for AnalysisPage integration tests (no test triggers the action).
+    usePreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePost: () => ({
+        mutateAsync: vi.fn().mockResolvedValue({ rows: [] }),
+        isPending: false,
+        isError: false,
+        error: null,
+    }),
     // FactorVoicesPanel renders inside the results tab and calls these hooks
     // — return idle/empty queries so the panel renders the empty state
     // without a real network call.
@@ -74,6 +82,9 @@ const ANALYSIS_PATH = '/app/test-project/studies/test-study/analysis';
 
 const mockEigenvalues: EigenvalueResult = {
     eigenvalues: [2.5, 1.2, 0.8, 0.5],
+    kaiser_n: 2,
+    parallel_analysis_n: 2,
+    velicer_map_n: 2,
     suggested_n_factors: 2,
 };
 
@@ -300,14 +311,16 @@ describe('AnalysisPage', () => {
         expect(screen.getByText(/Not enough Q-sort data yet/i)).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /open study overview/i })).toBeInTheDocument();
 
-        // Configuration chrome is NOT rendered: the "Configuration" heading
-        // and the "Run Analysis" button (the only unambiguous markers — the
-        // word "extraction" also appears in the empty-state body copy).
-        expect(screen.queryByRole('heading', { name: /^Configuration$/i })).not.toBeInTheDocument();
-        expect(screen.queryByRole('button', { name: /run analysis/i })).not.toBeInTheDocument();
+        // ExplorerPanel chrome is NOT rendered: neither the diagnostics
+        // surface nor the commit CTA appear when the empty-state contract
+        // takes over.
+        expect(screen.queryByText(/^Diagnostics$/i)).not.toBeInTheDocument();
+        expect(
+            screen.queryByRole('button', { name: /commit and interpret/i })
+        ).not.toBeInTheDocument();
     });
 
-    it('renders scree plot and controls after eigenvalues load', () => {
+    it('renders ExplorerPanel surfaces and CTA after eigenvalues load', () => {
         mockEigenvaluesHook.mockReturnValue({
             data: mockEigenvalues,
             isLoading: false,
@@ -319,14 +332,39 @@ describe('AnalysisPage', () => {
 
         renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
 
-        // Wave C: Extraction + Factors are primary-visible; Rotation + Flagging
-        // moved into the "Advanced settings" Accordion (collapsed by default
-        // when values are at their defaults: varimax/auto/no bootstrap).
-        expect(screen.getByRole('combobox', { name: /Extraction/i })).toBeInTheDocument();
-        expect(screen.getByRole('combobox', { name: /^Factors$/i })).toBeInTheDocument();
+        // Phase 3: ExplorerPanel hosts Diagnostics + Preview range as primary
+        // surfaces; the legacy form controls (Extraction, Factors, Rotation,
+        // Flagging) all live inside the outer "Advanced configuration"
+        // accordion (collapsed by default).
+        expect(screen.getByText(/Diagnostics/i)).toBeInTheDocument();
+        expect(screen.getByText(/Preview range/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /Advanced configuration/i })).toBeInTheDocument();
+        expect(screen.queryByRole('combobox', { name: /Extraction/i })).not.toBeInTheDocument();
+        expect(screen.queryByRole('combobox', { name: /^Factors$/i })).not.toBeInTheDocument();
         expect(screen.queryByRole('combobox', { name: /Rotation/i })).not.toBeInTheDocument();
         expect(screen.queryByRole('combobox', { name: /Flagging/i })).not.toBeInTheDocument();
-        expect(screen.getByRole('button', { name: /Run Analysis/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /commit and interpret/i })).toBeInTheDocument();
+    });
+
+    it('reveals Extraction/Factors when the outer "Advanced configuration" accordion is opened', async () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+
+        const user = userEvent.setup();
+        renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
+
+        // Open the outer ExplorerPanel "Advanced configuration" accordion to
+        // expose the legacy Extraction + Factors selectors.
+        await user.click(screen.getByRole('button', { name: /Advanced configuration/i }));
+
+        expect(await screen.findByRole('combobox', { name: /Extraction/i })).toBeInTheDocument();
+        expect(screen.getByRole('combobox', { name: /^Factors$/i })).toBeInTheDocument();
     });
 
     it('reveals Rotation/Flagging when "Advanced settings" Accordion is opened (Wave C)', async () => {
@@ -342,8 +380,13 @@ describe('AnalysisPage', () => {
         const user = userEvent.setup();
         renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
 
-        // The Accordion trigger is a button; clicking it expands the panel
-        const advancedTrigger = screen.getByRole('button', { name: /Advanced settings/i });
+        // First open the outer "Advanced configuration" accordion (the
+        // ExplorerPanel slot wrapper), then the inner "Advanced settings"
+        // accordion that hosts Rotation/Flagging/Bootstrap.
+        await user.click(screen.getByRole('button', { name: /Advanced configuration/i }));
+        const advancedTrigger = await screen.findByRole('button', {
+            name: /Advanced settings/i,
+        });
         await user.click(advancedTrigger);
 
         // After expanding, Rotation + Flagging dropdowns appear
@@ -353,7 +396,7 @@ describe('AnalysisPage', () => {
         expect(screen.getByLabelText(/Run bootstrap stability/i)).toBeInTheDocument();
     });
 
-    it('factor dropdown is capped at eigenvalues.length - 1', () => {
+    it('factor dropdown is capped at eigenvalues.length - 1', async () => {
         mockEigenvaluesHook.mockReturnValue({
             data: { eigenvalues: [3.0, 1.5, 0.5], suggested_n_factors: 2 },
             isLoading: false,
@@ -363,15 +406,20 @@ describe('AnalysisPage', () => {
             refetch: vi.fn(),
         });
 
+        const user = userEvent.setup();
         renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
+
+        // The Factors selector now lives inside the outer "Advanced
+        // configuration" accordion — open it first.
+        await user.click(screen.getByRole('button', { name: /Advanced configuration/i }));
 
         // With 3 eigenvalues, maxFactors = min(3-1, 10) = 2
         // The factor dropdown should show 1 and 2 but not 3
-        const factorsSelect = screen.getByRole('combobox', { name: /^Factors$/i });
+        const factorsSelect = await screen.findByRole('combobox', { name: /^Factors$/i });
         expect(factorsSelect).toBeInTheDocument();
     });
 
-    it('disables controls during analysis run', () => {
+    it('disables the Commit-and-interpret CTA during an analysis run', () => {
         mockEigenvaluesHook.mockReturnValue({
             data: mockEigenvalues,
             isLoading: false,
@@ -388,10 +436,10 @@ describe('AnalysisPage', () => {
 
         renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
 
-        expect(screen.getByText(/Analyzing/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /commit and interpret/i })).toBeDisabled();
     });
 
-    it('shows empty state when no results yet', () => {
+    it('shows the ExplorerPanel surfaces when no run is loaded yet', () => {
         mockEigenvaluesHook.mockReturnValue({
             data: mockEigenvalues,
             isLoading: false,
@@ -403,7 +451,11 @@ describe('AnalysisPage', () => {
 
         renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
 
-        expect(screen.getByText(/Set parameters and run the analysis/i)).toBeInTheDocument();
+        // The legacy "Set parameters and run the analysis." copy was removed
+        // when the configuration card was replaced by ExplorerPanel.
+        // Diagnostics + Preview range are now the always-on landing surface.
+        expect(screen.getByText(/Diagnostics/i)).toBeInTheDocument();
+        expect(screen.getByText(/Preview range/i)).toBeInTheDocument();
     });
 
     it('does not show export button in explore phase', () => {
@@ -421,7 +473,7 @@ describe('AnalysisPage', () => {
         expect(screen.queryByText(/Export/i)).not.toBeInTheDocument();
     });
 
-    it('calls mutate with correct params when Run Analysis is clicked', async () => {
+    it('calls mutate with correct params when Commit-and-interpret is clicked', async () => {
         const mockMutate = vi.fn();
         mockEigenvaluesHook.mockReturnValue({
             data: mockEigenvalues,
@@ -439,7 +491,7 @@ describe('AnalysisPage', () => {
 
         renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
 
-        await userEvent.click(screen.getByRole('button', { name: /Run Analysis/i }));
+        await userEvent.click(screen.getByRole('button', { name: /commit and interpret/i }));
 
         expect(mockMutate).toHaveBeenCalledWith(
             expect.objectContaining({
@@ -454,7 +506,7 @@ describe('AnalysisPage', () => {
         );
     });
 
-    it('shows parameter help descriptions', () => {
+    it('shows parameter help descriptions inside the "Advanced configuration" accordion', async () => {
         mockEigenvaluesHook.mockReturnValue({
             data: mockEigenvalues,
             isLoading: false,
@@ -464,15 +516,25 @@ describe('AnalysisPage', () => {
             refetch: vi.fn(),
         });
 
+        const user = userEvent.setup();
         renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
 
-        // Wave C: PCA + Factors help texts are primary-visible.
-        expect(screen.getByText(/PCA maximises explained variance/i)).toBeInTheDocument();
+        // Phase 3: every form-control help text moved inside the outer
+        // "Advanced configuration" accordion. Verify nothing leaks above the
+        // fold, then open the accordion and confirm PCA + Factors helpers are
+        // visible while Rotation/Flagging helpers stay nested in the inner
+        // "Advanced settings" accordion.
+        expect(screen.queryByText(/PCA maximises explained variance/i)).not.toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: /Advanced configuration/i }));
+
+        expect(await screen.findByText(/PCA maximises explained variance/i)).toBeInTheDocument();
         expect(
             screen.getByText(/Each factor represents a distinct viewpoint/i)
         ).toBeInTheDocument();
-        // Rotation + Flagging help texts now live inside the collapsed
-        // "Advanced settings" Accordion — not visible on initial render.
+        // Rotation + Flagging help texts still live inside the collapsed
+        // inner "Advanced settings" Accordion — not visible after only the
+        // outer accordion was opened.
         expect(
             screen.queryByText(/Varimax separates factors for simpler structure/i)
         ).not.toBeInTheDocument();
@@ -519,7 +581,9 @@ describe('AnalysisPage', () => {
         renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
 
         await waitFor(() => {
-            expect(screen.getByRole('button', { name: /run analysis/i })).toBeInTheDocument();
+            expect(
+                screen.getByRole('button', { name: /commit and interpret/i })
+            ).toBeInTheDocument();
         });
         // Interpret-phase marker is absent in explore mode.
         expect(screen.queryByTestId('interpret-phase')).not.toBeInTheDocument();
@@ -549,8 +613,10 @@ describe('AnalysisPage', () => {
         await waitFor(() => {
             expect(screen.getByTestId('interpret-phase')).toBeInTheDocument();
         });
-        // Configuration card is NOT rendered in interpret phase.
-        expect(screen.queryByRole('button', { name: /^run analysis$/i })).not.toBeInTheDocument();
+        // Explore-phase ExplorerPanel is NOT rendered in interpret phase.
+        expect(
+            screen.queryByRole('button', { name: /commit and interpret/i })
+        ).not.toBeInTheDocument();
     });
 
     it('bounces back to Explore when AnalysisHistoryPanel signals current-run deletion', async () => {
@@ -623,7 +689,7 @@ describe('AnalysisPage', () => {
         await waitFor(() => {
             expect(screen.queryByTestId('interpret-phase')).not.toBeInTheDocument();
         });
-        expect(screen.getByRole('button', { name: /run analysis/i })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /commit and interpret/i })).toBeInTheDocument();
     });
 
     it('navigates to interpret phase after a successful run', async () => {
@@ -668,7 +734,7 @@ describe('AnalysisPage', () => {
 
         renderWithProviders(<AnalysisPage />, { initialEntries: [ANALYSIS_PATH] });
 
-        await userEvent.click(screen.getByRole('button', { name: /run analysis/i }));
+        await userEvent.click(screen.getByRole('button', { name: /commit and interpret/i }));
 
         // The hook awaits the runs list, then routes — the marker appears once
         // the URL has flipped to interpret.

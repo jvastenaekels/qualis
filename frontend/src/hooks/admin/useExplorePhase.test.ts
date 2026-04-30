@@ -15,6 +15,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AllTheProviders } from '@/test-utils/test-utils';
+import type { PreviewRangeRow } from '@/api/model/previewRangeRow';
 import { useExplorePhase } from './useExplorePhase';
 
 // ── Mocks ──────────────────────────────────────────────────────────
@@ -29,11 +30,13 @@ const {
     mockAnalysisMutationHook,
     mockListAnalysisRuns,
     mockGetListAnalysisRunsQueryKey,
+    mockPreviewRangeMutation,
 } = vi.hoisted(() => ({
     mockEigenvaluesHook: vi.fn(),
     mockAnalysisMutationHook: vi.fn(),
     mockListAnalysisRuns: vi.fn(),
     mockGetListAnalysisRunsQueryKey: vi.fn(() => ['list-analysis-runs', 'test-study']),
+    mockPreviewRangeMutation: vi.fn(),
 }));
 
 vi.mock('@/api/generated', () => ({
@@ -41,6 +44,7 @@ vi.mock('@/api/generated', () => ({
     useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost: mockAnalysisMutationHook,
     listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet: mockListAnalysisRuns,
     getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey: mockGetListAnalysisRunsQueryKey,
+    usePreviewRangeApiAdminStudiesSlugAnalysisPreviewRangePost: () => mockPreviewRangeMutation(),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -95,6 +99,12 @@ describe('useExplorePhase', () => {
         mockEigenvaluesHook.mockReturnValue(makeIdleEigenvalues());
         mockAnalysisMutationHook.mockReturnValue(makeIdleMutation());
         mockListAnalysisRuns.mockResolvedValue([]);
+        mockPreviewRangeMutation.mockReturnValue({
+            mutateAsync: vi.fn().mockResolvedValue({ rows: [] }),
+            isPending: false,
+            isError: false,
+            error: null,
+        });
     });
 
     it('has correct initial form state defaults', () => {
@@ -490,6 +500,192 @@ describe('useExplorePhase', () => {
                 }),
                 expect.any(Object)
             );
+        });
+    });
+
+    describe('diagnostics + preview-range (Phase 3)', () => {
+        it('exposes kaiserN, parallelN, mapN from the eigenvalues query', async () => {
+            mockEigenvaluesHook.mockReturnValue({
+                data: {
+                    eigenvalues: [3.2, 2.1, 0.8],
+                    kaiser_n: 2,
+                    parallel_analysis_n: 2,
+                    velicer_map_n: 3,
+                    suggested_n_factors: 2,
+                },
+                isError: false,
+                isLoading: false,
+                isSuccess: true,
+                refetch: vi.fn(),
+                error: null,
+            });
+            const { result } = renderHook(() => useExplorePhase('test-slug', vi.fn()), {
+                wrapper: AllTheProviders,
+            });
+            await waitFor(() => expect(result.current.kaiserN).toBe(2));
+            expect(result.current.parallelN).toBe(2);
+            expect(result.current.mapN).toBe(3);
+        });
+
+        it('triggers preview-range and exposes rows on success', async () => {
+            mockEigenvaluesHook.mockReturnValue({
+                data: {
+                    eigenvalues: [3.2, 2.1, 0.8],
+                    kaiser_n: 2,
+                    parallel_analysis_n: 2,
+                    velicer_map_n: 2,
+                    suggested_n_factors: 2,
+                },
+                isError: false,
+                isLoading: false,
+                isSuccess: true,
+                refetch: vi.fn(),
+                error: null,
+            });
+            const mutateAsync = vi.fn().mockResolvedValue({
+                rows: [
+                    {
+                        n_factors: 2,
+                        cumulative_variance: 47,
+                        pct_flagged: 0.82,
+                        n_distinguishing: 8,
+                        n_cross_loaders: 0,
+                        n_consensus: 3,
+                        min_defining_sorts: 4,
+                        has_empty_factor: false,
+                    },
+                ],
+            });
+            mockPreviewRangeMutation.mockReturnValue({
+                mutateAsync,
+                isPending: false,
+                isError: false,
+                error: null,
+            });
+            const { result } = renderHook(() => useExplorePhase('test-slug', vi.fn()), {
+                wrapper: AllTheProviders,
+            });
+            await act(async () => {
+                await result.current.handlePreviewRange([2]);
+            });
+            expect(mutateAsync).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    slug: 'test-slug',
+                    data: expect.objectContaining({
+                        n_factors_range: [2],
+                        extraction: 'pca',
+                        rotation: 'varimax',
+                        flagging: 'auto',
+                    }),
+                })
+            );
+            expect(result.current.previewRows).toHaveLength(1);
+            expect(result.current.previewRows?.[0]?.n_factors).toBe(2);
+        });
+
+        it('disables preview-range (canPreviewRange=false) when extraction is centroid', () => {
+            const { result } = renderHook(() => useExplorePhase('test-slug', vi.fn()), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.setExtraction('centroid');
+            });
+            expect(result.current.canPreviewRange).toBe(false);
+        });
+
+        it('disables preview-range when rotation is judgmental', () => {
+            const { result } = renderHook(() => useExplorePhase('test-slug', vi.fn()), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.setRotation('judgmental');
+            });
+            expect(result.current.canPreviewRange).toBe(false);
+        });
+
+        it('canPreviewRange is true for default PCA + varimax', () => {
+            const { result } = renderHook(() => useExplorePhase('test-slug', vi.fn()), {
+                wrapper: AllTheProviders,
+            });
+            // defaults are extraction=pca, rotation=varimax
+            expect(result.current.canPreviewRange).toBe(true);
+        });
+
+        it('handlePreviewRange is a no-op when canPreviewRange is false', async () => {
+            const mutateAsync = vi.fn();
+            mockPreviewRangeMutation.mockReturnValue({
+                mutateAsync,
+                isPending: false,
+                isError: false,
+                error: null,
+            });
+            const { result } = renderHook(() => useExplorePhase('test-slug', vi.fn()), {
+                wrapper: AllTheProviders,
+            });
+            act(() => {
+                result.current.setExtraction('centroid');
+            });
+            await act(async () => {
+                await result.current.handlePreviewRange([2, 3]);
+            });
+            expect(mutateAsync).not.toHaveBeenCalled();
+        });
+
+        it('discards in-flight preview-range result when extraction changes mid-flight', async () => {
+            // Race: while mutateAsync is in flight, the user flips extraction.
+            // The reset effect clears previewRows AND bumps the snapshot token;
+            // when the stale promise resolves, the commit must be skipped.
+            let resolveMutation: ((v: { rows: PreviewRangeRow[] }) => void) | null = null;
+            const mutateAsync = vi.fn(
+                () =>
+                    new Promise<{ rows: PreviewRangeRow[] }>((resolve) => {
+                        resolveMutation = resolve;
+                    })
+            );
+            mockPreviewRangeMutation.mockReturnValue({
+                mutateAsync,
+                isPending: true,
+                isError: false,
+                error: null,
+            });
+
+            const { result } = renderHook(() => useExplorePhase('test-slug', vi.fn()), {
+                wrapper: AllTheProviders,
+            });
+
+            // Start the preview-range request (don't await — keep the promise in flight).
+            let pendingPreview: Promise<void> | undefined;
+            await act(async () => {
+                pendingPreview = result.current.handlePreviewRange([2, 3]);
+            });
+
+            // Flip extraction mid-flight: this resets previewRows and bumps the token.
+            await act(async () => {
+                result.current.setExtraction('centroid');
+            });
+
+            // Now resolve the stale mutation with rows that should NOT be committed.
+            expect(resolveMutation).not.toBeNull();
+            await act(async () => {
+                resolveMutation?.({
+                    rows: [
+                        {
+                            n_factors: 2,
+                            cumulative_variance: 47,
+                            pct_flagged: 0.8,
+                            n_distinguishing: 8,
+                            n_cross_loaders: 0,
+                            n_consensus: 3,
+                            min_defining_sorts: 4,
+                            has_empty_factor: false,
+                        },
+                    ],
+                });
+                await pendingPreview;
+            });
+
+            // The stale rows must NOT have landed: previewRows is still undefined.
+            expect(result.current.previewRows).toBeUndefined();
         });
     });
 

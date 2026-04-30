@@ -899,6 +899,24 @@
                 "aria": "Edit factor {{n}} narrative",
                 "saved": "Factor narrative saved.",
                 "error": "Failed to save the factor narrative."
+            },
+            "explore": {
+                "diagnostics_title": "Diagnostiikka",
+                "kaiser": "Kaiser",
+                "parallel": "Rinnakkaisanalyysi",
+                "map": "Velicerin MAP",
+                "advisory": "Vain ohjaava — Q-menetelmän tekijöiden säilyttäminen riippuu myös tulkittavuudesta ja vakaudesta (Watts & Stenner 2012).",
+                "preview_range_title": "Esikatselu k:lle",
+                "preview_range_disabled": "Esikatselu tukee vain PCA + varimax -yhdistelmää. Centroid-poiminta ja arvioon perustuva rotaatio ovat polkuriippuvaisia — aja oikea analyysi tarkastellaksesi.",
+                "select_k": "{{k}} tekijää",
+                "empty_factor": "Tyhjä tekijä — ylifaktoroitu",
+                "cumvar": "kum. %",
+                "pct_flagged": "% flagattu",
+                "n_distinguishing": "# erottavia",
+                "n_cross_loaders": "# ristikuormitt.",
+                "min_def_sorts": "min määr. sortit",
+                "advanced_title": "Lisäasetukset",
+                "commit_cta": "Vahvista ja tulkitse"
             }
         },
         "project": {
