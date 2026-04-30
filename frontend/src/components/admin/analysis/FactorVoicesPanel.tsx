@@ -9,6 +9,9 @@ import {
     useListCommentsForParticipantsApiAdminStudiesSlugAnalysisCommentsGet,
 } from '@/api/generated';
 
+/** |Δloading| threshold above which the chip is visually emphasised. Mirrors spec §5.5. */
+const DELTA_LOADING_HIGHLIGHT = 0.2;
+
 interface FactorVoicesPanelProps {
     slug: string;
     factorIndex: number;
@@ -21,6 +24,13 @@ interface FactorVoicesPanelProps {
      * button is rendered (legacy read-only mode).
      */
     onInsertCommentQuote?: (comment: ParticipantCardComment, participantLabel: string) => void;
+    /**
+     * Optional Δloading on the active factor per participant_db_id, sign-flip
+     * aware (provided by useInterpretPhase compare flow). When defined and a
+     * participant is in the map, render a Δ chip next to the participant
+     * label. Undefined when no compare run is pinned.
+     */
+    deltaByParticipant?: Map<number, number>;
 }
 
 function scoreBadgeClass(score: number): string {
@@ -48,6 +58,7 @@ function groupByParticipant<T extends { participant_db_id: number }>(
 
 interface ParticipantMaterialCardProps {
     label: string;
+    deltaLoading?: number;
     recordings: ParticipantAudioRecording[];
     comments: ParticipantCardComment[];
     onInsertCommentQuote?: (comment: ParticipantCardComment, participantLabel: string) => void;
@@ -55,6 +66,7 @@ interface ParticipantMaterialCardProps {
 
 function ParticipantMaterialCard({
     label,
+    deltaLoading,
     recordings,
     comments,
     onInsertCommentQuote,
@@ -62,7 +74,27 @@ function ParticipantMaterialCard({
     const { t } = useTranslation();
     return (
         <div className="bg-white rounded-lg border border-slate-200 p-3 space-y-3">
-            <p className="text-xs font-semibold text-slate-700">{label}</p>
+            <div className="flex items-center gap-2">
+                <p className="text-xs font-semibold text-slate-700">{label}</p>
+                {deltaLoading !== undefined && (
+                    <span
+                        className={
+                            Math.abs(deltaLoading) >= DELTA_LOADING_HIGHLIGHT
+                                ? 'text-2xs px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-mono'
+                                : 'text-2xs text-slate-500 font-mono'
+                        }
+                        role="img"
+                        aria-label={t(
+                            'admin.analysis.compare.delta_loading_aria',
+                            'Δloading {{delta}} vs compare run',
+                            { delta: deltaLoading.toFixed(2) }
+                        )}
+                    >
+                        Δ{deltaLoading >= 0 ? '+' : ''}
+                        {deltaLoading.toFixed(2)}
+                    </span>
+                )}
+            </div>
 
             {recordings.length > 0 && (
                 <div className="space-y-2">
@@ -151,6 +183,7 @@ export function FactorVoicesPanel({
     factorIndex,
     participants,
     onInsertCommentQuote,
+    deltaByParticipant,
 }: FactorVoicesPanelProps) {
     const { t } = useTranslation();
     const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -261,6 +294,7 @@ export function FactorVoicesPanel({
                         <ParticipantMaterialCard
                             key={p.db_id}
                             label={p.label}
+                            deltaLoading={deltaByParticipant?.get(p.db_id)}
                             recordings={recordingsByParticipant.get(p.db_id) ?? []}
                             comments={commentsByParticipant.get(p.db_id) ?? []}
                             onInsertCommentQuote={onInsertCommentQuote}

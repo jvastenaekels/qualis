@@ -857,6 +857,33 @@ describe('AnalysisPage', () => {
         expect(screen.getByRole('tab', { name: 'F1' })).toHaveAttribute('aria-selected', 'false');
     });
 
+    it('treats malformed runId / compareTo URL params as null (no NaN propagation)', async () => {
+        // Defensive guard for ?runId=invalid&compareTo=garbage. Without
+        // Number.isFinite the page would pass NaN to useInterpretPhase, which
+        // would eventually fire `/runs/NaN`. With the guard, both params fall
+        // back to null, so the interpret hook sees runId=null and the page
+        // lands on Explore (no `interpret-phase` testid).
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+
+        renderWithProviders(<AnalysisPage />, {
+            initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=invalid&compareTo=garbage`],
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByTestId('interpret-phase')).toBeNull();
+        });
+        // mockGetRunHook is called by useInterpretPhase; the runId argument
+        // must be null (not NaN). The page falls back to Explore copy.
+        expect(screen.getByRole('button', { name: /commit and interpret/i })).toBeInTheDocument();
+    });
+
     it('navigates to interpret phase after a successful run', async () => {
         mockEigenvaluesHook.mockReturnValue({
             data: mockEigenvalues,

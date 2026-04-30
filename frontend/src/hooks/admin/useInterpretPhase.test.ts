@@ -407,6 +407,211 @@ describe('useInterpretPhase', () => {
         expect(result.current.deltaByStatement).toBeNull();
     });
 
+    describe('Tucker φ matching (Phase 5)', () => {
+        it('exposes activeMatchPhi and activeMatchBIndex when both runs are loaded', () => {
+            const baseRun = makeRun({ id: 42 });
+            const compare = makeRun({ id: 7 });
+
+            mockGetAnalysisRunHook.mockImplementation((_slug: string, runId: number) => {
+                if (runId === 42) return makeLoadedRunQuery(baseRun);
+                if (runId === 7) return makeLoadedRunQuery(compare);
+                return makeIdleRunQuery();
+            });
+
+            const { result } = renderHook(() => useInterpretPhase('test-study', 42, 'f1', 7), {
+                wrapper: AllTheProviders,
+            });
+
+            // Identical fixtures → φ = 1.0 for the matched factor.
+            expect(result.current.activeMatchPhi).not.toBeNull();
+            expect(result.current.activeMatchBIndex).toBe(0);
+            expect(result.current.activeMatchPhi).toBeCloseTo(1.0, 6);
+        });
+
+        it('exposes null match fields when compareRun is missing', () => {
+            const run = makeRun();
+            mockGetAnalysisRunHook.mockImplementation((_slug: string, runId: number) =>
+                runId === 42 ? makeLoadedRunQuery(run) : makeIdleRunQuery()
+            );
+
+            const { result } = renderHook(() => useInterpretPhase('test-study', 42, 'f1', null), {
+                wrapper: AllTheProviders,
+            });
+
+            expect(result.current.activeMatchPhi).toBeNull();
+            expect(result.current.activeMatchBIndex).toBeNull();
+            expect(result.current.isAmbiguousMatch).toBe(false);
+        });
+
+        it('isAmbiguousMatch=false when |phi| >= 0.85 (identity match)', () => {
+            const baseRun = makeRun({ id: 42 });
+            const compare = makeRun({ id: 7 });
+
+            mockGetAnalysisRunHook.mockImplementation((_slug: string, runId: number) => {
+                if (runId === 42) return makeLoadedRunQuery(baseRun);
+                if (runId === 7) return makeLoadedRunQuery(compare);
+                return makeIdleRunQuery();
+            });
+
+            const { result } = renderHook(() => useInterpretPhase('test-study', 42, 'f1', 7), {
+                wrapper: AllTheProviders,
+            });
+
+            expect(result.current.isAmbiguousMatch).toBe(false);
+        });
+
+        it('isAmbiguousMatch=true when |phi| < 0.85', () => {
+            const baseRun = makeRun({ id: 42 });
+            // Construct a compare run whose factor 0 z-scores produce a low |φ|
+            // against base factor 0 ([1.5, -1.2]). Using [1.0, 1.0] gives:
+            //   φ = (1.5 - 1.2) / (sqrt(1.5²+1.2²) * sqrt(2)) ≈ 0.111
+            const compare = makeRun({
+                id: 7,
+                result: {
+                    n_participants: 3,
+                    n_statements: 2,
+                    n_factors: 2,
+                    participants: baseRun.result.participants,
+                    statement_scores: [
+                        {
+                            statement_id: 10,
+                            code: 'S10',
+                            text: 'Statement ten',
+                            z_scores: [1.0, 1.0],
+                            factor_arrays: [1, 1],
+                        },
+                        {
+                            statement_id: 11,
+                            code: 'S11',
+                            text: 'Statement eleven',
+                            z_scores: [1.0, 1.0],
+                            factor_arrays: [1, 1],
+                        },
+                    ],
+                },
+            });
+
+            mockGetAnalysisRunHook.mockImplementation((_slug: string, runId: number) => {
+                if (runId === 42) return makeLoadedRunQuery(baseRun);
+                if (runId === 7) return makeLoadedRunQuery(compare);
+                return makeIdleRunQuery();
+            });
+
+            const { result } = renderHook(() => useInterpretPhase('test-study', 42, 'f1', 7), {
+                wrapper: AllTheProviders,
+            });
+
+            expect(result.current.activeMatchPhi).not.toBeNull();
+            expect(Math.abs(result.current.activeMatchPhi ?? 0)).toBeLessThan(0.85);
+            expect(result.current.isAmbiguousMatch).toBe(true);
+        });
+
+        it('deltaByStatement uses sign-flip when matched factor has negative phi', () => {
+            const baseRun = makeRun({ id: 42 });
+            // Construct compare run where factor 0 is exactly the negation of
+            // base factor 0. Tucker φ = -1.0 → sign-flip applied → Δ ≈ 0.
+            const compare = makeRun({
+                id: 7,
+                result: {
+                    n_participants: 3,
+                    n_statements: 2,
+                    n_factors: 2,
+                    participants: baseRun.result.participants,
+                    statement_scores: [
+                        {
+                            statement_id: 10,
+                            code: 'S10',
+                            text: 'Statement ten',
+                            // negation of base [1.5, -0.3] on factor 0
+                            z_scores: [-1.5, 0.3],
+                            factor_arrays: [-3, 1],
+                        },
+                        {
+                            statement_id: 11,
+                            code: 'S11',
+                            text: 'Statement eleven',
+                            // negation of base [-1.2, 0.9] on factor 0
+                            z_scores: [1.2, -0.9],
+                            factor_arrays: [2, -2],
+                        },
+                    ],
+                },
+            });
+
+            mockGetAnalysisRunHook.mockImplementation((_slug: string, runId: number) => {
+                if (runId === 42) return makeLoadedRunQuery(baseRun);
+                if (runId === 7) return makeLoadedRunQuery(compare);
+                return makeIdleRunQuery();
+            });
+
+            const { result } = renderHook(() => useInterpretPhase('test-study', 42, 'f1', 7), {
+                wrapper: AllTheProviders,
+            });
+
+            // Match should pick bIndex=0 with φ ≈ -1.0.
+            expect(result.current.activeMatchBIndex).toBe(0);
+            expect(result.current.activeMatchPhi).toBeCloseTo(-1.0, 6);
+
+            const delta = result.current.deltaByStatement;
+            expect(delta).not.toBeNull();
+            // With sign-flip: za - (zb * -1) = za + zb = 1.5 + (-1.5) = 0.
+            expect(delta?.get(10)).toBeCloseTo(0.0, 6);
+            expect(delta?.get(11)).toBeCloseTo(0.0, 6);
+        });
+
+        it('deltaByParticipant exposes Δloading per participant_db_id', () => {
+            const baseRun = makeRun({ id: 42 });
+            // Compare: same participants by db_id, loadings differ by 0.10 on
+            // factor 0. Statement scores remain identical so the Tucker match
+            // resolves to bIndex=0 with φ=1.0 (no sign-flip).
+            const compare = makeRun({
+                id: 7,
+                result: {
+                    n_participants: 3,
+                    n_statements: 2,
+                    n_factors: 2,
+                    participants: [
+                        { db_id: 1, label: 'P1', loadings: [0.6, 0.1], flagged_factors: [1] },
+                        { db_id: 2, label: 'P2', loadings: [0.1, 0.8], flagged_factors: [2] },
+                        { db_id: 3, label: 'P3', loadings: [0.4, 0.5], flagged_factors: [1, 2] },
+                    ],
+                    statement_scores: baseRun.result.statement_scores,
+                },
+            });
+
+            mockGetAnalysisRunHook.mockImplementation((_slug: string, runId: number) => {
+                if (runId === 42) return makeLoadedRunQuery(baseRun);
+                if (runId === 7) return makeLoadedRunQuery(compare);
+                return makeIdleRunQuery();
+            });
+
+            const { result } = renderHook(() => useInterpretPhase('test-study', 42, 'f1', 7), {
+                wrapper: AllTheProviders,
+            });
+
+            const delta = result.current.deltaByParticipant;
+            expect(delta).not.toBeNull();
+            expect(delta?.size).toBe(3);
+            // base.loadings[0] - compare.loadings[0] for each participant = +0.10
+            expect(delta?.get(1)).toBeCloseTo(0.1, 6);
+            expect(delta?.get(2)).toBeCloseTo(0.1, 6);
+            expect(delta?.get(3)).toBeCloseTo(0.1, 6);
+        });
+
+        it('deltaByParticipant returns null when no compareTo', () => {
+            const run = makeRun();
+            mockGetAnalysisRunHook.mockImplementation((_slug: string, runId: number) =>
+                runId === 42 ? makeLoadedRunQuery(run) : makeIdleRunQuery()
+            );
+
+            const { result } = renderHook(() => useInterpretPhase('test-study', 42, 'f1', null), {
+                wrapper: AllTheProviders,
+            });
+
+            expect(result.current.deltaByParticipant).toBeNull();
+        });
+    });
+
     describe('showFactorNarratives localStorage', () => {
         beforeEach(() => {
             window.localStorage.clear();

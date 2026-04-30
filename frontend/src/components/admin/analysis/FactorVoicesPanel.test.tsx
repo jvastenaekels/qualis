@@ -282,6 +282,101 @@ describe('FactorVoicesPanel', () => {
         expect(screen.getByText(/My rationale/)).toBeInTheDocument();
     });
 
+    // ── Δloading display (Phase 5) ────────────────────────────────────────────
+    describe('Δloading display (Phase 5)', () => {
+        it('renders Δloading chip when deltaByParticipant is provided', async () => {
+            const participants = [makeParticipant(60, 'Kira', [1])];
+            const comments = [makeComment(60, 1, 'S1', 'Statement one prose', 3, 'Kira rationale')];
+
+            mockAudiosHook.mockReturnValue(emptyOk<ParticipantAudioRecording>());
+            mockCommentsHook.mockReturnValue(dataOk(comments));
+
+            renderWithProviders(
+                <FactorVoicesPanel
+                    slug="demo-study"
+                    factorIndex={0}
+                    participants={participants}
+                    deltaByParticipant={new Map([[60, 0.3]])}
+                />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Kira')).toBeInTheDocument();
+            });
+
+            // The chip exposes its value through aria-label so screen readers
+            // hear "Δloading 0.30 vs compare run".
+            const chip = screen.getByLabelText(/Δloading 0\.30/i);
+            expect(chip).toBeInTheDocument();
+            // Visible glyph includes the sign for non-negative values.
+            expect(chip.textContent).toMatch(/Δ\+0\.30/);
+        });
+
+        it('highlights large |Δloading| (>= 0.20) with amber styling', async () => {
+            const participants = [
+                makeParticipant(70, 'Liam', [1]),
+                makeParticipant(71, 'Mona', [1]),
+            ];
+            const comments = [
+                makeComment(70, 1, 'S1', 'Statement one prose', 3, 'Liam rationale'),
+                makeComment(71, 2, 'S2', 'Statement two prose', -2, 'Mona rationale'),
+            ];
+
+            mockAudiosHook.mockReturnValue(emptyOk<ParticipantAudioRecording>());
+            mockCommentsHook.mockReturnValue(dataOk(comments));
+
+            renderWithProviders(
+                <FactorVoicesPanel
+                    slug="demo-study"
+                    factorIndex={0}
+                    participants={participants}
+                    deltaByParticipant={
+                        new Map([
+                            [70, 0.25], // above threshold → amber
+                            [71, 0.1], // below threshold → muted slate
+                        ])
+                    }
+                />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Liam')).toBeInTheDocument();
+            });
+
+            const highChip = screen.getByLabelText(/Δloading 0\.25/i);
+            const lowChip = screen.getByLabelText(/Δloading 0\.10/i);
+
+            // High-delta chip has amber background; low-delta chip does not.
+            expect(highChip.className).toMatch(/bg-amber-50/);
+            expect(highChip.className).toMatch(/text-amber-700/);
+            expect(lowChip.className).not.toMatch(/bg-amber-50/);
+            expect(lowChip.className).toMatch(/text-slate-500/);
+        });
+
+        it('does NOT render Δloading chip when deltaByParticipant is undefined', async () => {
+            const participants = [makeParticipant(80, 'Nina', [1])];
+            const comments = [makeComment(80, 1, 'S1', 'Statement one prose', 3, 'Nina rationale')];
+
+            mockAudiosHook.mockReturnValue(emptyOk<ParticipantAudioRecording>());
+            mockCommentsHook.mockReturnValue(dataOk(comments));
+
+            renderWithProviders(
+                <FactorVoicesPanel
+                    slug="demo-study"
+                    factorIndex={0}
+                    participants={participants}
+                    // deltaByParticipant intentionally omitted (Phase 4 callsite).
+                />
+            );
+
+            await waitFor(() => {
+                expect(screen.getByText('Nina')).toBeInTheDocument();
+            });
+
+            expect(screen.queryByLabelText(/Δloading/i)).toBeNull();
+        });
+    });
+
     // ── Test 8: participant with comments but no audio is still listed ────────
     it('lists a participant who has comments but no audio', async () => {
         const participants = [makeParticipant(50, 'Iris', [1]), makeParticipant(51, 'Jamal', [1])];

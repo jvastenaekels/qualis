@@ -975,6 +975,17 @@
                 "overview_mode": "Overview",
                 "mode_toggle": "View mode"
             },
+            "compare": {
+                "pin_cta": "Pin compare",
+                "no_other_runs": "No other runs available",
+                "run_label": "Run #{{id}} ({{n}} factors)",
+                "pinned": "Comparing with run #{{id}}",
+                "phi": "φ = {{phi}}",
+                "ambiguous": "ambiguous match — interpret deltas with care",
+                "unpin": "Unpin",
+                "delta_z_aria": "Δz {{delta}} vs compare run",
+                "delta_loading_aria": "Δloading {{delta}} vs compare run"
+            },
             "quote_insert_format": "> {{text}}\n> — {{p}}, on statement {{code}}: \"{{stmt}}\""
         },
         "project": {

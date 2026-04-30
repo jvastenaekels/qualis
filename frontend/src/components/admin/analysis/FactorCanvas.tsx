@@ -10,14 +10,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FactorSelectorChips } from './FactorSelectorChips';
 import { FactorNoteEditor, type FactorNoteEditorHandle } from './FactorNoteEditor';
 import { FactorVoicesPanel } from './FactorVoicesPanel';
+import { CompareBar } from './CompareBar';
 import type { ParticipantCardComment } from '@/api/model/participantCardComment';
 import type { AnalysisResult } from '@/api/model/analysisResult';
+import type { AnalysisRunSummary } from '@/api/model';
 import type { InterpretPhaseApi } from '@/hooks/admin/useInterpretPhase';
+
+/** |Δz| threshold above which the chip is visually emphasised. Mirrors spec §5.5. */
+const DELTA_Z_HIGHLIGHT = 0.5;
 
 interface Props {
     slug: string;
     interpret: InterpretPhaseApi;
     onFocusChange: (factor: number) => void;
+    /** Available runs for the compare-pin picker (typically the run history). */
+    runs: AnalysisRunSummary[];
+    /** The pinned compare-to run id, or null when nothing is pinned. */
+    compareTo: number | null;
+    onPin: (runId: number) => void;
+    onUnpin: () => void;
 }
 
 /**
@@ -42,7 +53,15 @@ const QUOTE_TRUNCATE = 60;
  * pipeline). Statement insertion is also out of scope (z-scores are
  * already visible in StatementsTable / Statements panel).
  */
-export function FactorCanvas({ slug, interpret, onFocusChange }: Props) {
+export function FactorCanvas({
+    slug,
+    interpret,
+    onFocusChange,
+    runs,
+    compareTo,
+    onPin,
+    onUnpin,
+}: Props) {
     const { t } = useTranslation();
     const editorRef = useRef<FactorNoteEditorHandle>(null);
     const run = interpret.run;
@@ -107,6 +126,16 @@ export function FactorCanvas({ slug, interpret, onFocusChange }: Props) {
                         n: definingSorts,
                     })}
                 </div>
+                <div className="ml-auto">
+                    <CompareBar
+                        runs={runs}
+                        currentRunId={run.id}
+                        compareTo={compareTo}
+                        onPin={onPin}
+                        onUnpin={onUnpin}
+                        phi={interpret.activeMatchPhi}
+                    />
+                </div>
             </div>
 
             <Card>
@@ -117,31 +146,56 @@ export function FactorCanvas({ slug, interpret, onFocusChange }: Props) {
                 </CardHeader>
                 <CardContent>
                     <ul className="space-y-1 text-sm">
-                        {topStatements.map((s) => (
-                            <li key={s.statement_id} className="flex items-center gap-2">
-                                <span
-                                    className={
-                                        s.z >= 0
-                                            ? 'text-emerald-700 font-mono'
-                                            : 'text-rose-700 font-mono'
-                                    }
-                                >
-                                    {s.z >= 0 ? '+' : ''}
-                                    {s.z.toFixed(2)}
-                                </span>
-                                <span className="font-mono font-bold">{s.code}</span>
-                                <span className="text-slate-700 truncate flex-1">“{s.text}”</span>
-                                {s.isDistinguishing && (
+                        {topStatements.map((s) => {
+                            const delta = interpret.deltaByStatement?.get(s.statement_id);
+                            const isLargeDelta =
+                                delta !== undefined && Math.abs(delta) >= DELTA_Z_HIGHLIGHT;
+                            return (
+                                <li key={s.statement_id} className="flex items-center gap-2">
                                     <span
-                                        className="text-2xs px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200"
-                                        role="img"
-                                        aria-label="distinguishing statement"
+                                        className={
+                                            s.z >= 0
+                                                ? 'text-emerald-700 font-mono'
+                                                : 'text-rose-700 font-mono'
+                                        }
                                     >
-                                        D
+                                        {s.z >= 0 ? '+' : ''}
+                                        {s.z.toFixed(2)}
                                     </span>
-                                )}
-                            </li>
-                        ))}
+                                    {delta !== undefined && (
+                                        <span
+                                            className={
+                                                isLargeDelta
+                                                    ? 'text-2xs px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 font-mono'
+                                                    : 'text-2xs text-slate-500 font-mono'
+                                            }
+                                            role="img"
+                                            aria-label={t(
+                                                'admin.analysis.compare.delta_z_aria',
+                                                'Δz {{delta}} vs compare run',
+                                                { delta: delta.toFixed(2) }
+                                            )}
+                                        >
+                                            Δ{delta >= 0 ? '+' : ''}
+                                            {delta.toFixed(2)}
+                                        </span>
+                                    )}
+                                    <span className="font-mono font-bold">{s.code}</span>
+                                    <span className="text-slate-700 truncate flex-1">
+                                        “{s.text}”
+                                    </span>
+                                    {s.isDistinguishing && (
+                                        <span
+                                            className="text-2xs px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200"
+                                            role="img"
+                                            aria-label="distinguishing statement"
+                                        >
+                                            D
+                                        </span>
+                                    )}
+                                </li>
+                            );
+                        })}
                     </ul>
                 </CardContent>
             </Card>
@@ -151,6 +205,7 @@ export function FactorCanvas({ slug, interpret, onFocusChange }: Props) {
                 factorIndex={interpret.activeFactor - 1}
                 participants={interpret.flaggedParticipants}
                 onInsertCommentQuote={handleInsertCommentQuote}
+                deltaByParticipant={interpret.deltaByParticipant ?? undefined}
             />
 
             <Card>
