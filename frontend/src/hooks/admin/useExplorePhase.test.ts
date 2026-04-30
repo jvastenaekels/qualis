@@ -5,18 +5,17 @@
  */
 
 /**
- * Unit tests for useAnalysisPage hook.
+ * Unit tests for useExplorePhase hook.
  *
- * Covers form state defaults, state updates, mutation dispatch, and
- * historical run navigation — without rendering any JSX.
- * Integration of hook + JSX is covered by the existing AnalysisPage.test.tsx.
+ * Covers form state defaults, state updates, mutation dispatch, and the
+ * post-success onCommit handoff — without rendering any JSX.
+ * Integration of hook + JSX is covered by AnalysisPage.test.tsx.
  */
 
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AllTheProviders } from '@/test-utils/test-utils';
-import { useAnalysisPage } from './useAnalysisPage';
-import type { AnalysisResult, AnalysisRunSummary } from '@/api/model';
+import { useExplorePhase } from './useExplorePhase';
 
 // ── Mocks ──────────────────────────────────────────────────────────
 
@@ -25,22 +24,23 @@ vi.mock('sonner', () => ({
 }));
 
 // Hoisted mocks for generated API hooks
-const { mockEigenvaluesHook, mockAnalysisMutationHook } = vi.hoisted(() => ({
+const {
+    mockEigenvaluesHook,
+    mockAnalysisMutationHook,
+    mockListAnalysisRuns,
+    mockGetListAnalysisRunsQueryKey,
+} = vi.hoisted(() => ({
     mockEigenvaluesHook: vi.fn(),
     mockAnalysisMutationHook: vi.fn(),
+    mockListAnalysisRuns: vi.fn(),
+    mockGetListAnalysisRunsQueryKey: vi.fn(() => ['list-analysis-runs', 'test-study']),
 }));
 
 vi.mock('@/api/generated', () => ({
     useGetEigenvaluesApiAdminStudiesSlugAnalysisEigenvaluesGet: mockEigenvaluesHook,
     useRunFactorAnalysisApiAdminStudiesSlugAnalysisRunPost: mockAnalysisMutationHook,
-}));
-
-vi.mock('@/utils/analysisXlsxExport', () => ({
-    generateAnalysisXlsx: vi.fn().mockResolvedValue(
-        new Blob(['xlsx'], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        })
-    ),
+    listAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet: mockListAnalysisRuns,
+    getListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGetQueryKey: mockGetListAnalysisRunsQueryKey,
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -57,100 +57,6 @@ vi.mock('react-router-dom', async () => {
 const mockEigenvalueData = {
     eigenvalues: [3.0, 1.5, 0.8, 0.4],
     suggested_n_factors: 2,
-};
-
-const mockResult: AnalysisResult = {
-    n_participants: 3,
-    n_statements: 4,
-    n_factors: 2,
-    extraction: 'pca',
-    rotation: 'varimax',
-    eigenvalues: [3.0, 1.5],
-    total_variance_explained: 56.0,
-    loadings: [
-        [0.8, 0.1],
-        [0.7, 0.2],
-        [0.1, 0.9],
-    ],
-    rotated_loadings: [
-        [0.82, 0.08],
-        [0.71, 0.18],
-        [0.05, 0.91],
-    ],
-    flags: [
-        [true, false],
-        [true, false],
-        [false, true],
-    ],
-    participants: [
-        { db_id: 1, label: 'P001', loadings: [0.82, 0.08], flagged_factors: [1] },
-        { db_id: 2, label: 'P002', loadings: [0.71, 0.18], flagged_factors: [1] },
-        { db_id: 3, label: 'P003', loadings: [0.05, 0.91], flagged_factors: [2] },
-    ],
-    statement_scores: [
-        {
-            statement_id: 1,
-            code: 'S1',
-            text: 'Statement one',
-            z_scores: [1.2, -0.5],
-            factor_arrays: [1, -1],
-        },
-        {
-            statement_id: 2,
-            code: 'S2',
-            text: 'Statement two',
-            z_scores: [0.3, 0.8],
-            factor_arrays: [0, 1],
-        },
-    ],
-    distinguishing: [
-        {
-            statement_id: 1,
-            code: 'S1',
-            text: 'Statement one',
-            z_scores: [1.2, -0.5],
-            factor_arrays: [1, -1],
-            significance: { '1-2': 'p<0.05' },
-        },
-    ],
-    consensus: [],
-    factor_characteristics: [
-        {
-            factor: 1,
-            eigenvalue: 3.0,
-            variance_explained: 37.5,
-            cumulative_variance: 37.5,
-            n_flagged: 2,
-            avg_rel_coef: 0.8,
-            composite_reliability: 0.889,
-            se_factor_scores: 0.333,
-        },
-        {
-            factor: 2,
-            eigenvalue: 1.5,
-            variance_explained: 18.75,
-            cumulative_variance: 56.0,
-            n_flagged: 1,
-            avg_rel_coef: 0.8,
-            composite_reliability: 0.8,
-            se_factor_scores: 0.447,
-        },
-    ],
-    correlation_matrix: [
-        [1.0, 0.05],
-        [0.05, 1.0],
-    ],
-};
-
-const mockRun: AnalysisRunSummary = {
-    id: 42,
-    ran_at: '2026-04-20T10:00:00Z',
-    extraction_method: 'pca',
-    n_factors: 2,
-    rotation_method: 'varimax',
-    flagging_mode: 'auto',
-    ran_by_email: 'researcher@example.com',
-    notes: null,
 };
 
 // ── Setup ─────────────────────────────────────────────────────────
@@ -183,15 +89,16 @@ function makeIdleMutation() {
 
 // ── Tests ─────────────────────────────────────────────────────────
 
-describe('useAnalysisPage', () => {
+describe('useExplorePhase', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockEigenvaluesHook.mockReturnValue(makeIdleEigenvalues());
         mockAnalysisMutationHook.mockReturnValue(makeIdleMutation());
+        mockListAnalysisRuns.mockResolvedValue([]);
     });
 
     it('has correct initial form state defaults', () => {
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
+        const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
             wrapper: AllTheProviders,
         });
 
@@ -200,13 +107,10 @@ describe('useAnalysisPage', () => {
         expect(result.current.rotation).toBe('varimax');
         expect(result.current.flagging).toBe('auto');
         expect(result.current.manualFlags).toEqual({});
-        expect(result.current.result).toBeNull();
-        expect(result.current.viewingRun).toBeNull();
-        expect(result.current.isViewingHistorical).toBe(false);
     });
 
     it('setExtraction and setRotation update form state', () => {
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
+        const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
             wrapper: AllTheProviders,
         });
 
@@ -222,7 +126,7 @@ describe('useAnalysisPage', () => {
     });
 
     it('setNFactors updates nFactors', () => {
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
+        const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
             wrapper: AllTheProviders,
         });
 
@@ -233,18 +137,15 @@ describe('useAnalysisPage', () => {
     });
 
     it('setFlagging to auto clears manualFlags', () => {
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
+        const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
             wrapper: AllTheProviders,
         });
 
-        // Switch to manual first to set some flags via toggle
+        // Switch to manual first; manualFlags is empty initially.
         act(() => {
             result.current.setFlagging('manual');
         });
-        act(() => {
-            result.current.handleToggleFlag(1, 2);
-        });
-        expect(result.current.manualFlags[1]).toEqual([2]);
+        expect(result.current.flagging).toBe('manual');
 
         // Switching back to auto clears the flags
         act(() => {
@@ -254,39 +155,12 @@ describe('useAnalysisPage', () => {
         expect(result.current.flagging).toBe('auto');
     });
 
-    it('handleToggleFlag toggles a factor for a participant (one at a time)', () => {
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
-            wrapper: AllTheProviders,
-        });
-
-        // Toggle on
-        act(() => {
-            result.current.handleToggleFlag(1, 2);
-        });
-        expect(result.current.manualFlags[1]).toEqual([2]);
-
-        // Toggle off (same factor)
-        act(() => {
-            result.current.handleToggleFlag(1, 2);
-        });
-        expect(result.current.manualFlags[1]).toEqual([]);
-
-        // Toggle a different factor replaces the previous (Q-method standard: one per participant)
-        act(() => {
-            result.current.handleToggleFlag(1, 1);
-        });
-        act(() => {
-            result.current.handleToggleFlag(1, 2);
-        });
-        expect(result.current.manualFlags[1]).toEqual([2]);
-    });
-
     it('handleRunAnalysis calls mutate with current form values', () => {
         const mockMutate = vi.fn();
         mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
         mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
 
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
+        const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
             wrapper: AllTheProviders,
         });
 
@@ -314,75 +188,21 @@ describe('useAnalysisPage', () => {
         );
     });
 
-    it('handleLoadHistoricalRun sets result and viewingRun, enabling isViewingHistorical', () => {
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
-            wrapper: AllTheProviders,
-        });
-
-        act(() => {
-            result.current.handleLoadHistoricalRun(mockResult, mockRun);
-        });
-
-        expect(result.current.result).toBe(mockResult);
-        expect(result.current.viewingRun).toBe(mockRun);
-        expect(result.current.isViewingHistorical).toBe(true);
-    });
-
-    it('handleClearHistoricalView clears viewingRun without clearing result', () => {
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
-            wrapper: AllTheProviders,
-        });
-
-        act(() => {
-            result.current.handleLoadHistoricalRun(mockResult, mockRun);
-        });
-        expect(result.current.isViewingHistorical).toBe(true);
-
-        act(() => {
-            result.current.handleClearHistoricalView();
-        });
-        expect(result.current.viewingRun).toBeNull();
-        expect(result.current.isViewingHistorical).toBe(false);
-        // result is not cleared — it stays showing the historical data
-        expect(result.current.result).toBe(mockResult);
-    });
-
     it('maxFactors is capped at eigenvalues.length - 1 (max 10)', () => {
         mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
         // mockEigenvalueData has 4 eigenvalues → maxFactors = min(4-1, 10) = 3
 
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
+        const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
             wrapper: AllTheProviders,
         });
 
         expect(result.current.maxFactors).toBe(3);
     });
 
-    it('handleLoadHistoricalRun with null args clears viewingRun (deleted run case)', () => {
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
-            wrapper: AllTheProviders,
-        });
-
-        act(() => {
-            result.current.handleLoadHistoricalRun(mockResult, mockRun);
-        });
-        expect(result.current.isViewingHistorical).toBe(true);
-
-        // Simulate deletion callback: null args
-        act(() => {
-            result.current.handleLoadHistoricalRun(
-                null as unknown as AnalysisResult,
-                null as unknown as AnalysisRunSummary
-            );
-        });
-        expect(result.current.viewingRun).toBeNull();
-        expect(result.current.isViewingHistorical).toBe(false);
-    });
-
     it('exposes eigenvalue-derived data when query succeeds', () => {
         mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
 
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
+        const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
             wrapper: AllTheProviders,
         });
 
@@ -397,16 +217,70 @@ describe('useAnalysisPage', () => {
     it('isRunning reflects mutation pending state', () => {
         mockAnalysisMutationHook.mockReturnValue({ mutate: vi.fn(), isPending: true });
 
-        const { result } = renderHook(() => useAnalysisPage('test-study'), {
+        const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
             wrapper: AllTheProviders,
         });
 
         expect(result.current.isRunning).toBe(true);
     });
 
+    it('calls onCommit with the fresh runId after successful analysis', async () => {
+        // Drive mutation onSuccess synchronously: the mocked mutate immediately
+        // invokes the per-call onSuccess with a minimal AnalysisResult-shaped
+        // payload. The hook then awaits listAnalysisRuns to discover the fresh id.
+        const mockMutate = vi.fn(
+            (_vars: unknown, opts?: { onSuccess?: (data: { n_factors: number }) => void }) => {
+                opts?.onSuccess?.({ n_factors: 3 });
+            }
+        );
+        mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
+        mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
+        mockListAnalysisRuns.mockResolvedValue([
+            { id: 99, ran_at: '2026-04-29T10:00:00Z', n_factors: 3 },
+            { id: 50, ran_at: '2026-04-28T10:00:00Z', n_factors: 2 },
+        ]);
+
+        const onCommit = vi.fn();
+        const { result } = renderHook(() => useExplorePhase('test-study', onCommit), {
+            wrapper: AllTheProviders,
+        });
+
+        await waitFor(() => expect(result.current.hasEigenvalues).toBe(true));
+
+        await act(async () => {
+            result.current.handleRunAnalysis();
+        });
+
+        await waitFor(() => expect(onCommit).toHaveBeenCalledWith(99));
+        expect(mockListAnalysisRuns).toHaveBeenCalledWith('test-study');
+    });
+
+    it('does not call onCommit when listAnalysisRuns returns empty', async () => {
+        const mockMutate = vi.fn(
+            (_vars: unknown, opts?: { onSuccess?: (data: { n_factors: number }) => void }) => {
+                opts?.onSuccess?.({ n_factors: 3 });
+            }
+        );
+        mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
+        mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
+        mockListAnalysisRuns.mockResolvedValue([]);
+
+        const onCommit = vi.fn();
+        const { result } = renderHook(() => useExplorePhase('test-study', onCommit), {
+            wrapper: AllTheProviders,
+        });
+
+        await act(async () => {
+            result.current.handleRunAnalysis();
+        });
+
+        await waitFor(() => expect(mockListAnalysisRuns).toHaveBeenCalled());
+        expect(onCommit).not.toHaveBeenCalled();
+    });
+
     describe('judgmental rotation', () => {
         it('manualRotations is empty by default', () => {
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             expect(result.current.manualRotations).toEqual([]);
@@ -414,7 +288,7 @@ describe('useAnalysisPage', () => {
         });
 
         it('addManualRotation appends a row with default values', () => {
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             act(() => {
@@ -428,7 +302,7 @@ describe('useAnalysisPage', () => {
         });
 
         it('addManualRotation gives each row a unique stable id', () => {
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             act(() => {
@@ -441,7 +315,7 @@ describe('useAnalysisPage', () => {
         });
 
         it('updateManualRotation mutates only the targeted row', () => {
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             act(() => {
@@ -456,7 +330,7 @@ describe('useAnalysisPage', () => {
         });
 
         it('removeManualRotation removes the row at the given index', () => {
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             act(() => {
@@ -471,7 +345,7 @@ describe('useAnalysisPage', () => {
         });
 
         it('switching rotation away from judgmental clears manualRotations', () => {
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             act(() => {
@@ -489,7 +363,7 @@ describe('useAnalysisPage', () => {
         });
 
         it('isJudgmentalWithoutRotations is true when rotation is judgmental and list is empty', () => {
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             act(() => {
@@ -508,7 +382,7 @@ describe('useAnalysisPage', () => {
             mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
             mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
 
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
 
@@ -553,7 +427,7 @@ describe('useAnalysisPage', () => {
 
     describe('bootstrap stability (Zabala & Pascual 2016)', () => {
         it('bootstrapEnabled defaults to false and bootstrapIterations defaults to 1000', () => {
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             expect(result.current.bootstrapEnabled).toBe(false);
@@ -561,7 +435,7 @@ describe('useAnalysisPage', () => {
         });
 
         it('setBootstrapEnabled and setBootstrapIterations update state', () => {
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             act(() => {
@@ -579,7 +453,7 @@ describe('useAnalysisPage', () => {
             mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
             mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
 
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
 
@@ -599,7 +473,7 @@ describe('useAnalysisPage', () => {
             mockAnalysisMutationHook.mockReturnValue({ mutate: mockMutate, isPending: false });
             mockEigenvaluesHook.mockReturnValue(makeLoadedEigenvalues());
 
-            const { result } = renderHook(() => useAnalysisPage('test-study'), {
+            const { result } = renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
 
@@ -619,64 +493,12 @@ describe('useAnalysisPage', () => {
         });
     });
 
-    describe('showFactorNarratives toggle (localStorage-persisted)', () => {
-        const studySlug = 'narratives-toggle-study';
-        const lsKey = `qualis-analysis-show-narratives-${studySlug}`;
-
-        beforeEach(() => {
-            window.localStorage.removeItem(lsKey);
-        });
-
-        it('defaults to true when no localStorage entry exists', () => {
-            const { result } = renderHook(() => useAnalysisPage(studySlug), {
-                wrapper: AllTheProviders,
-            });
-            expect(result.current.showFactorNarratives).toBe(true);
-        });
-
-        it('initializes from localStorage when a previous preference exists', () => {
-            window.localStorage.setItem(lsKey, 'false');
-            const { result } = renderHook(() => useAnalysisPage(studySlug), {
-                wrapper: AllTheProviders,
-            });
-            expect(result.current.showFactorNarratives).toBe(false);
-        });
-
-        it('setShowFactorNarratives writes the value to localStorage', () => {
-            const { result } = renderHook(() => useAnalysisPage(studySlug), {
-                wrapper: AllTheProviders,
-            });
-
-            act(() => {
-                result.current.setShowFactorNarratives(false);
-            });
-
-            expect(result.current.showFactorNarratives).toBe(false);
-            expect(window.localStorage.getItem(lsKey)).toBe('false');
-
-            act(() => {
-                result.current.setShowFactorNarratives(true);
-            });
-
-            expect(window.localStorage.getItem(lsKey)).toBe('true');
-        });
-
-        it('uses a per-study localStorage key (does not leak across studies)', () => {
-            window.localStorage.setItem('qualis-analysis-show-narratives-other-study', 'false');
-            const { result } = renderHook(() => useAnalysisPage(studySlug), {
-                wrapper: AllTheProviders,
-            });
-            // The other-study preference must NOT bleed into this study's hook.
-            expect(result.current.showFactorNarratives).toBe(true);
-        });
-    });
-
     describe('eigenvalues query retry policy', () => {
         // The endpoint returns 400 "Need at least 2 valid participants"
         // for fresh studies. Retrying delays the user-visible amber alert
         // and emits 4 console errors — short-circuit retries on 4xx.
         function getRetryFn(): (failureCount: number, error: unknown) => boolean {
-            renderHook(() => useAnalysisPage('test-study'), {
+            renderHook(() => useExplorePhase('test-study', vi.fn()), {
                 wrapper: AllTheProviders,
             });
             const lastCall = mockEigenvaluesHook.mock.calls.at(-1);

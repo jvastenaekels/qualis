@@ -1,6 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import type { TFunction } from 'i18next';
 import {
     ChartColumnStacked,
     Play,
@@ -54,28 +56,37 @@ import { StatementsTable } from '@/components/admin/analysis/StatementsTable';
 import { FactorCharacteristicsTable } from '@/components/admin/analysis/FactorCharacteristicsTable';
 import { AnalysisHistoryPanel } from '@/components/admin/analysis/AnalysisHistoryPanel';
 import { FactorVoicesPanel } from '@/components/admin/analysis/FactorVoicesPanel';
-import { useAnalysisPage } from '@/hooks/admin/useAnalysisPage';
+import { useExplorePhase, type ExplorePhaseApi } from '@/hooks/admin/useExplorePhase';
+import { useInterpretPhase, type InterpretPhaseApi } from '@/hooks/admin/useInterpretPhase';
+import type { AnalysisResult, AnalysisRunRead, AnalysisRunSummary } from '@/api/model';
+import { downloadBlob, generateLoadingsCsv, generateScoresCsv } from '@/utils/analysisCsvExport';
+import { generateAnalysisXlsx } from '@/utils/analysisXlsxExport';
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from 4 tab panels + conditional error/loading states; all logic lives in useAnalysisPage
 export default function AnalysisPage() {
     const { studySlug, projectSlug } = useParams();
     const slug = studySlug ?? '';
     const { t } = useTranslation();
-
-    // Active results tab persisted to ?tab= so reload + share-links are stable.
     const [searchParams, setSearchParams] = useSearchParams();
-    const activeTab = searchParams.get('tab') ?? 'loadings';
-    const setActiveTab = useCallback(
-        (next: string) => {
+
+    const phase = searchParams.get('phase') ?? 'explore';
+    const runIdParam = searchParams.get('runId');
+    const runId = runIdParam ? Number(runIdParam) : null;
+    const focus = searchParams.get('focus') ?? 'f1';
+    const compareToParam = searchParams.get('compareTo');
+    const compareTo = compareToParam ? Number(compareToParam) : null;
+
+    const navigateToInterpret = useCallback(
+        (newRunId: number) => {
             setSearchParams(
                 (prev) => {
-                    const params = new URLSearchParams(prev);
-                    if (next === 'loadings') {
-                        params.delete('tab');
-                    } else {
-                        params.set('tab', next);
-                    }
-                    return params;
+                    const p = new URLSearchParams(prev);
+                    p.set('phase', 'interpret');
+                    p.set('runId', String(newRunId));
+                    p.delete('extraction');
+                    p.delete('nFactors');
+                    p.delete('rotation');
+                    p.delete('flagging');
+                    return p;
                 },
                 { replace: true }
             );
@@ -83,9 +94,37 @@ export default function AnalysisPage() {
         [setSearchParams]
     );
 
-    const api = useAnalysisPage(slug);
-    // Capture result in local const so TypeScript narrows it through JSX callback boundaries
-    const analysisResult = api.result;
+    const navigateToHistoricalRun = useCallback(
+        (id: number) => {
+            setSearchParams(
+                (prev) => {
+                    const p = new URLSearchParams(prev);
+                    p.set('phase', 'interpret');
+                    p.set('runId', String(id));
+                    return p;
+                },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
+
+    const navigateToExplore = useCallback(() => {
+        setSearchParams(
+            (prev) => {
+                const p = new URLSearchParams(prev);
+                p.delete('phase');
+                p.delete('runId');
+                p.delete('focus');
+                p.delete('compareTo');
+                return p;
+            },
+            { replace: true }
+        );
+    }, [setSearchParams]);
+
+    const explore = useExplorePhase(slug, navigateToInterpret);
+    const interpret = useInterpretPhase(slug, runId, focus, compareTo);
 
     // ── Empty-state contract: not enough participants for factor analysis ──
     // Wave A — UX progressive-disclosure audit. The configuration card walls
@@ -94,7 +133,7 @@ export default function AnalysisPage() {
     // contract instead. The history panel below preserves access to past runs
     // and its own pedagogical empty state with Watts & Stenner / Sneegas
     // citations.
-    if (api.isTooFewParticipants && !analysisResult && !api.isRunning) {
+    if (explore.isTooFewParticipants && !interpret.run && !explore.isRunning) {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
@@ -118,12 +157,54 @@ export default function AnalysisPage() {
                 <AnalysisHistoryPanel
                     slug={slug}
                     currentRunId={null}
-                    onLoadRun={api.handleLoadHistoricalRun}
+                    onLoadRun={(_result, run) => {
+                        // The legacy callback signature passes (result, run); we
+                        // only need the id to route. The panel may also call this
+                        // with `(null, null)` after deleting the active run — in
+                        // that case, do nothing (we're already in empty state).
+                        if (run) navigateToHistoricalRun(run.id);
+                    }}
                 />
             </div>
         );
     }
 
+    if (phase === 'interpret' && runId !== null) {
+        return (
+            <InterpretShell
+                slug={slug}
+                runId={runId}
+                interpret={interpret}
+                t={t}
+                onSelectHistoricalRun={navigateToHistoricalRun}
+                onBackToExplore={navigateToExplore}
+            />
+        );
+    }
+
+    return (
+        <ExploreShell
+            slug={slug}
+            explore={explore}
+            t={t}
+            onSelectHistoricalRun={navigateToHistoricalRun}
+        />
+    );
+}
+
+// ────────────────────────────────────────────────────────────────
+// ExploreShell — configuration card + history panel + empty state
+// ────────────────────────────────────────────────────────────────
+
+interface ExploreShellProps {
+    slug: string;
+    explore: ExplorePhaseApi;
+    t: TFunction;
+    onSelectHistoricalRun: (runId: number) => void;
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell complexity from the configuration card (extraction/factors selectors, advanced accordion with rotation/flagging/bootstrap, judgmental rotations sub-panel). All logic in useExplorePhase.
+function ExploreShell({ slug, explore, t, onSelectHistoricalRun }: ExploreShellProps) {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
@@ -149,7 +230,7 @@ export default function AnalysisPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-5">
-                    {api.isTooFewParticipants && (
+                    {explore.isTooFewParticipants && (
                         <div
                             className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800"
                             role="alert"
@@ -162,7 +243,7 @@ export default function AnalysisPage() {
                         </div>
                     )}
 
-                    {api.isEigenvalueError && (
+                    {explore.isEigenvalueError && (
                         <div
                             className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"
                             role="alert"
@@ -177,7 +258,7 @@ export default function AnalysisPage() {
                             <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={api.handleRefetchEigenvalues}
+                                onClick={explore.handleRefetchEigenvalues}
                                 className="gap-1.5 shrink-0"
                             >
                                 <RefreshCw className="size-3.5" aria-hidden="true" />
@@ -186,7 +267,7 @@ export default function AnalysisPage() {
                         </div>
                     )}
 
-                    {api.eigenvaluesIsLoading && (
+                    {explore.eigenvaluesIsLoading && (
                         <div
                             className="flex items-center justify-center py-8 text-slate-400"
                             role="status"
@@ -200,17 +281,17 @@ export default function AnalysisPage() {
                     {/* Scree plot + parameters: side-by-side on lg+ */}
                     <div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-6 items-start">
                         {/* Scree plot */}
-                        {api.hasEigenvalues &&
-                            api.eigenvalues &&
-                            api.suggestedNFactors !== undefined && (
+                        {explore.hasEigenvalues &&
+                            explore.eigenvalues &&
+                            explore.suggestedNFactors !== undefined && (
                                 <ScreePlot
-                                    eigenvalues={api.eigenvalues}
-                                    suggestedNFactors={api.suggestedNFactors}
-                                    selectedNFactors={api.nFactors}
-                                    onSelectNFactors={api.setNFactors}
+                                    eigenvalues={explore.eigenvalues}
+                                    suggestedNFactors={explore.suggestedNFactors}
+                                    selectedNFactors={explore.nFactors}
+                                    onSelectNFactors={explore.setNFactors}
                                 />
                             )}
-                        {!api.hasEigenvalues && !api.eigenvaluesIsLoading && <div />}
+                        {!explore.hasEigenvalues && !explore.eigenvaluesIsLoading && <div />}
 
                         {/* Parameters — Wave C: only Extraction + Facteurs are
                             primary-visible. Rotation / Flagging / Bootstrap
@@ -227,9 +308,9 @@ export default function AnalysisPage() {
                                     {t('admin.analysis.extraction_method', 'Extraction')}
                                 </Label>
                                 <Select
-                                    value={api.extraction}
-                                    onValueChange={api.setExtraction}
-                                    disabled={api.isRunning}
+                                    value={explore.extraction}
+                                    onValueChange={explore.setExtraction}
+                                    disabled={explore.isRunning}
                                 >
                                     <SelectTrigger id="extraction-select">
                                         <SelectValue />
@@ -259,15 +340,15 @@ export default function AnalysisPage() {
                                     {t('admin.analysis.n_factors', 'Factors')}
                                 </Label>
                                 <Select
-                                    value={String(api.nFactors)}
-                                    onValueChange={(v) => api.setNFactors(Number(v))}
-                                    disabled={api.isRunning}
+                                    value={String(explore.nFactors)}
+                                    onValueChange={(v) => explore.setNFactors(Number(v))}
+                                    disabled={explore.isRunning}
                                 >
                                     <SelectTrigger id="factors-select">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {Array.from({ length: api.maxFactors }, (_, i) => (
+                                        {Array.from({ length: explore.maxFactors }, (_, i) => (
                                             <SelectItem key={i + 1} value={String(i + 1)}>
                                                 {i + 1}
                                             </SelectItem>
@@ -291,9 +372,9 @@ export default function AnalysisPage() {
                     <Accordion
                         type="multiple"
                         defaultValue={
-                            api.rotation !== 'varimax' ||
-                            api.flagging !== 'auto' ||
-                            api.bootstrapEnabled
+                            explore.rotation !== 'varimax' ||
+                            explore.flagging !== 'auto' ||
+                            explore.bootstrapEnabled
                                 ? ['advanced']
                                 : []
                         }
@@ -313,23 +394,23 @@ export default function AnalysisPage() {
                                             'Rotation: {{rotation}} · Flagging: {{flagging}} · Bootstrap: {{bootstrap}}',
                                             {
                                                 rotation:
-                                                    api.rotation === 'varimax'
+                                                    explore.rotation === 'varimax'
                                                         ? t('admin.analysis.varimax', 'Varimax')
-                                                        : api.rotation === 'none'
+                                                        : explore.rotation === 'none'
                                                           ? t('admin.analysis.none', 'None')
                                                           : t(
                                                                 'admin.analysis.rotation.judgmental.short',
                                                                 'Judgmental'
                                                             ),
                                                 flagging:
-                                                    api.flagging === 'auto'
+                                                    explore.flagging === 'auto'
                                                         ? t('admin.analysis.auto', 'Auto')
                                                         : t('admin.analysis.manual', 'Manual'),
-                                                bootstrap: api.bootstrapEnabled
+                                                bootstrap: explore.bootstrapEnabled
                                                     ? t(
                                                           'admin.analysis.advanced.bootstrap_on',
                                                           '{{n}} iterations',
-                                                          { n: api.bootstrapIterations }
+                                                          { n: explore.bootstrapIterations }
                                                       )
                                                     : t(
                                                           'admin.analysis.advanced.bootstrap_off',
@@ -351,9 +432,9 @@ export default function AnalysisPage() {
                                                 {t('admin.analysis.rotation_method', 'Rotation')}
                                             </Label>
                                             <Select
-                                                value={api.rotation}
-                                                onValueChange={api.setRotation}
-                                                disabled={api.isRunning}
+                                                value={explore.rotation}
+                                                onValueChange={explore.setRotation}
+                                                disabled={explore.isRunning}
                                             >
                                                 <SelectTrigger id="rotation-select">
                                                     <SelectValue />
@@ -389,11 +470,11 @@ export default function AnalysisPage() {
                                                 {t('admin.analysis.flagging_method', 'Flagging')}
                                             </Label>
                                             <Select
-                                                value={api.flagging}
+                                                value={explore.flagging}
                                                 onValueChange={(v) => {
-                                                    api.setFlagging(v as 'auto' | 'manual');
+                                                    explore.setFlagging(v as 'auto' | 'manual');
                                                 }}
-                                                disabled={api.isRunning}
+                                                disabled={explore.isRunning}
                                             >
                                                 <SelectTrigger id="flagging-select">
                                                     <SelectValue />
@@ -417,7 +498,7 @@ export default function AnalysisPage() {
                                     </div>
 
                                     {/* Judgmental rotations sub-panel — visible only when rotation === 'judgmental' */}
-                                    {api.rotation === 'judgmental' && (
+                                    {explore.rotation === 'judgmental' && (
                                         <div className="space-y-3 pt-2 border-t border-slate-100">
                                             <div>
                                                 <h3 className="text-sm font-black text-slate-800">
@@ -434,7 +515,7 @@ export default function AnalysisPage() {
                                                 </p>
                                             </div>
 
-                                            {api.manualRotations.length === 0 && (
+                                            {explore.manualRotations.length === 0 && (
                                                 <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2">
                                                     {t(
                                                         'admin.analysis.manual_rotations.empty',
@@ -444,7 +525,7 @@ export default function AnalysisPage() {
                                             )}
 
                                             <ul className="space-y-2">
-                                                {api.manualRotations.map((mr, idx) => (
+                                                {explore.manualRotations.map((mr, idx) => (
                                                     <li
                                                         key={mr.id}
                                                         className="flex flex-wrap items-center gap-2"
@@ -458,17 +539,17 @@ export default function AnalysisPage() {
                                                         <Input
                                                             type="number"
                                                             min={1}
-                                                            max={api.nFactors}
+                                                            max={explore.nFactors}
                                                             step={1}
                                                             value={mr.factor_a}
                                                             onChange={(e) =>
-                                                                api.updateManualRotation(idx, {
+                                                                explore.updateManualRotation(idx, {
                                                                     factor_a: Number(
                                                                         e.target.value
                                                                     ),
                                                                 })
                                                             }
-                                                            disabled={api.isRunning}
+                                                            disabled={explore.isRunning}
                                                             className="w-16 h-8 text-sm"
                                                             aria-label={t(
                                                                 'admin.analysis.manual_rotations.factor_a_label',
@@ -488,13 +569,13 @@ export default function AnalysisPage() {
                                                             step={1}
                                                             value={mr.angle_deg}
                                                             onChange={(e) =>
-                                                                api.updateManualRotation(idx, {
+                                                                explore.updateManualRotation(idx, {
                                                                     angle_deg: Number(
                                                                         e.target.value
                                                                     ),
                                                                 })
                                                             }
-                                                            disabled={api.isRunning}
+                                                            disabled={explore.isRunning}
                                                             className="w-20 h-8 text-sm"
                                                             aria-label={t(
                                                                 'admin.analysis.manual_rotations.angle_label',
@@ -511,17 +592,17 @@ export default function AnalysisPage() {
                                                         <Input
                                                             type="number"
                                                             min={1}
-                                                            max={api.nFactors}
+                                                            max={explore.nFactors}
                                                             step={1}
                                                             value={mr.factor_b}
                                                             onChange={(e) =>
-                                                                api.updateManualRotation(idx, {
+                                                                explore.updateManualRotation(idx, {
                                                                     factor_b: Number(
                                                                         e.target.value
                                                                     ),
                                                                 })
                                                             }
-                                                            disabled={api.isRunning}
+                                                            disabled={explore.isRunning}
                                                             className="w-16 h-8 text-sm"
                                                             aria-label={t(
                                                                 'admin.analysis.manual_rotations.factor_b_label',
@@ -533,9 +614,9 @@ export default function AnalysisPage() {
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={() =>
-                                                                api.removeManualRotation(idx)
+                                                                explore.removeManualRotation(idx)
                                                             }
-                                                            disabled={api.isRunning}
+                                                            disabled={explore.isRunning}
                                                             aria-label={t(
                                                                 'admin.analysis.manual_rotations.remove_aria',
                                                                 'Remove rotation'
@@ -555,8 +636,8 @@ export default function AnalysisPage() {
                                                 type="button"
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={api.addManualRotation}
-                                                disabled={api.isRunning}
+                                                onClick={explore.addManualRotation}
+                                                disabled={explore.isRunning}
                                                 className="gap-1.5"
                                             >
                                                 <Plus className="size-3.5" aria-hidden="true" />
@@ -574,11 +655,11 @@ export default function AnalysisPage() {
                                             <input
                                                 id="bootstrap-toggle"
                                                 type="checkbox"
-                                                checked={api.bootstrapEnabled}
+                                                checked={explore.bootstrapEnabled}
                                                 onChange={(e) =>
-                                                    api.setBootstrapEnabled(e.target.checked)
+                                                    explore.setBootstrapEnabled(e.target.checked)
                                                 }
-                                                disabled={api.isRunning}
+                                                disabled={explore.isRunning}
                                                 className="mt-0.5 h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                                             />
                                             <div className="flex-1 space-y-1.5">
@@ -600,7 +681,7 @@ export default function AnalysisPage() {
                                             </div>
                                         </div>
 
-                                        {api.bootstrapEnabled && (
+                                        {explore.bootstrapEnabled && (
                                             <div className="flex flex-wrap items-center gap-2 pl-7">
                                                 <Label
                                                     htmlFor="bootstrap-iterations"
@@ -617,13 +698,13 @@ export default function AnalysisPage() {
                                                     min={100}
                                                     max={5000}
                                                     step={100}
-                                                    value={api.bootstrapIterations}
+                                                    value={explore.bootstrapIterations}
                                                     onChange={(e) =>
-                                                        api.setBootstrapIterations(
+                                                        explore.setBootstrapIterations(
                                                             Number(e.target.value)
                                                         )
                                                     }
-                                                    disabled={api.isRunning}
+                                                    disabled={explore.isRunning}
                                                     className="w-24 h-8 text-sm"
                                                 />
                                             </div>
@@ -634,89 +715,28 @@ export default function AnalysisPage() {
                         </AccordionItem>
                     </Accordion>
 
-                    {/* Warn before re-running when a result is already on screen */}
-                    {analysisResult && (
-                        <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 flex items-start gap-2">
-                            <AlertTriangle
-                                className="size-3.5 mt-0.5 shrink-0"
-                                aria-hidden="true"
-                            />
-                            <span>
-                                {t(
-                                    'admin.analysis.run_will_replace',
-                                    'Running again will replace the current results view. Use the history panel to compare runs.'
-                                )}
-                            </span>
-                        </p>
-                    )}
-
                     {/* Action buttons — visually separated */}
                     <div className="flex items-center gap-3 pt-1 border-t border-slate-100">
                         <Button
-                            onClick={api.handleRunAnalysis}
+                            onClick={explore.handleRunAnalysis}
                             disabled={
-                                api.isRunning ||
-                                !api.hasEigenvalues ||
-                                api.isJudgmentalWithoutRotations
+                                explore.isRunning ||
+                                !explore.hasEigenvalues ||
+                                explore.isJudgmentalWithoutRotations
                             }
                             className="gap-2"
                         >
-                            {api.isRunning ? (
+                            {explore.isRunning ? (
                                 <Loader2 className="size-4 animate-spin" aria-hidden="true" />
                             ) : (
                                 <Play className="size-4" aria-hidden="true" />
                             )}
-                            {api.isRunning
-                                ? api.bootstrapEnabled
+                            {explore.isRunning
+                                ? explore.bootstrapEnabled
                                     ? t('admin.analysis.bootstrap.running', 'Running bootstrap…')
                                     : t('admin.analysis.running', 'Analyzing...')
                                 : t('admin.analysis.run', 'Run Analysis')}
                         </Button>
-
-                        {api.result && (
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" className="gap-2">
-                                        <Download className="size-4" aria-hidden="true" />
-                                        {t('admin.analysis.export', 'Export')}
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start">
-                                    <DropdownMenuItem
-                                        onClick={() => void api.handleExport('xlsx')}
-                                        disabled={api.isExporting}
-                                    >
-                                        {api.isExporting && (
-                                            <Loader2
-                                                className="size-3.5 animate-spin mr-1.5"
-                                                aria-hidden="true"
-                                            />
-                                        )}
-                                        {t(
-                                            'admin.analysis.export_xlsx',
-                                            'XLSX — Complete Analysis'
-                                        )}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem
-                                        onClick={() => void api.handleExport('loadings')}
-                                    >
-                                        {t(
-                                            'admin.analysis.export_loadings',
-                                            'CSV — Factor Loadings'
-                                        )}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                        onClick={() => void api.handleExport('scores')}
-                                    >
-                                        {t(
-                                            'admin.analysis.export_scores',
-                                            'CSV — Statement Scores'
-                                        )}
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        )}
                     </div>
                 </CardContent>
             </Card>
@@ -724,225 +744,15 @@ export default function AnalysisPage() {
             {/* Analysis history */}
             <AnalysisHistoryPanel
                 slug={slug}
-                currentRunId={api.viewingRun?.id ?? null}
-                onLoadRun={api.handleLoadHistoricalRun}
+                currentRunId={null}
+                onLoadRun={(_result, run) => {
+                    if (run) onSelectHistoricalRun(run.id);
+                }}
             />
 
-            {/* Historical run banner */}
-            {api.viewingRun && (
-                <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
-                    <History className="size-4 flex-shrink-0" aria-hidden="true" />
-                    <span className="flex-1">
-                        {t(
-                            'admin.analysis.history.viewing_banner',
-                            'Viewing run from {{date}} — {{extraction}} · {{n}}F · {{rotation}}',
-                            {
-                                date: new Date(api.viewingRun.ran_at).toLocaleString(undefined, {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                }),
-                                extraction: api.viewingRun.extraction_method.toUpperCase(),
-                                n: api.viewingRun.n_factors,
-                                rotation: api.viewingRun.rotation_method,
-                            }
-                        )}
-                    </span>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={api.handleClearHistoricalView}
-                        className="gap-1.5 shrink-0 text-amber-700 border-amber-300 hover:bg-amber-100"
-                    >
-                        <X className="size-3.5" aria-hidden="true" />
-                        {t('admin.analysis.history.back_to_current', 'Back to current')}
-                    </Button>
-                </div>
-            )}
-
-            {/* Results */}
-            {analysisResult && (
-                <Card className="border-none shadow-sm bg-white rounded-2xl relative">
-                    {api.isRunning && (
-                        <div
-                            className="absolute inset-0 bg-white/75 z-10 flex items-center justify-center rounded-2xl"
-                            role="status"
-                            aria-live="polite"
-                        >
-                            <div className="flex items-center gap-2 text-slate-500">
-                                <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-                                <span className="text-sm">
-                                    {t('admin.analysis.reanalyzing', 'Re-analyzing...')}
-                                </span>
-                            </div>
-                        </div>
-                    )}
-                    <CardContent className="pt-5 pb-5">
-                        <Tabs value={activeTab} onValueChange={setActiveTab}>
-                            <TabsList className="mb-5 flex-wrap h-auto gap-1">
-                                <TabsTrigger value="loadings" className="gap-1.5">
-                                    <BarChart3 className="size-3.5" aria-hidden="true" />
-                                    {t('admin.analysis.tab_loadings', 'Loadings')}
-                                </TabsTrigger>
-                                <TabsTrigger value="arrays" className="gap-1.5">
-                                    <Grid3X3 className="size-3.5" aria-hidden="true" />
-                                    {t('admin.analysis.tab_factor_arrays', 'Factor Arrays')}
-                                </TabsTrigger>
-                                <TabsTrigger value="statements" className="gap-1.5">
-                                    <List className="size-3.5" aria-hidden="true" />
-                                    {t('admin.analysis.tab_statements', 'Statements')}
-                                </TabsTrigger>
-                                <TabsTrigger value="summary" className="gap-1.5">
-                                    <Info className="size-3.5" aria-hidden="true" />
-                                    {t('admin.analysis.tab_summary', 'Summary')}
-                                </TabsTrigger>
-                            </TabsList>
-
-                            <TabsContent value="loadings" className="space-y-3">
-                                <GuidanceCard
-                                    title={t(
-                                        'admin.analysis.guide_loadings_title',
-                                        'Reading Factor Loadings'
-                                    )}
-                                    type="info"
-                                    collapsible
-                                    defaultOpen={false}
-                                >
-                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_loadings_1',
-                                                'Each loading is a correlation (-1 to +1) between a participant and a factor (shared viewpoint).'
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_loadings_2',
-                                                'Highlighted values exceed the significance threshold shown above the table.'
-                                            )}
-                                        </li>
-                                    </ul>
-                                </GuidanceCard>
-                                <FactorLoadingsTable
-                                    result={analysisResult}
-                                    flaggingMode={api.flagging}
-                                    manualFlags={api.manualFlags}
-                                    onToggleFlag={api.handleToggleFlag}
-                                />
-                            </TabsContent>
-
-                            <TabsContent value="arrays" className="space-y-3">
-                                <GuidanceCard
-                                    title={t(
-                                        'admin.analysis.guide_arrays_title',
-                                        'Interpreting Factor Arrays'
-                                    )}
-                                    type="info"
-                                    collapsible
-                                    defaultOpen={false}
-                                >
-                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_arrays_1',
-                                                'Each factor array is the composite Q-sort representing one shared viewpoint.'
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_arrays_2',
-                                                'Read left-to-right as most disagreed to most agreed. Extreme positions carry the strongest signal for interpretation.'
-                                            )}
-                                        </li>
-                                    </ul>
-                                </GuidanceCard>
-                                <FactorArraysView
-                                    result={analysisResult}
-                                    currentRun={api.currentRun}
-                                    slug={slug}
-                                    showFactorNarratives={api.showFactorNarratives}
-                                    onToggleFactorNarratives={() =>
-                                        api.setShowFactorNarratives(!api.showFactorNarratives)
-                                    }
-                                />
-                            </TabsContent>
-
-                            <TabsContent value="statements" className="space-y-3">
-                                <GuidanceCard
-                                    title={t(
-                                        'admin.analysis.guide_statements_title',
-                                        'Understanding Statement Scores'
-                                    )}
-                                    type="info"
-                                    collapsible
-                                    defaultOpen={false}
-                                >
-                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_statements_1',
-                                                'Z-scores show how strongly each factor agrees or disagrees with each statement (0 = neutral).'
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_statements_2',
-                                                'D = distinguishing (placed significantly differently across factors). Stars indicate significance level.'
-                                            )}
-                                        </li>
-                                    </ul>
-                                </GuidanceCard>
-                                <StatementsTable result={analysisResult} />
-                            </TabsContent>
-
-                            <TabsContent value="summary" className="space-y-3">
-                                <GuidanceCard
-                                    title={t(
-                                        'admin.analysis.guide_summary_title',
-                                        'Evaluating Your Solution'
-                                    )}
-                                    type="info"
-                                    collapsible
-                                    defaultOpen={false}
-                                >
-                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_summary_1',
-                                                'Eigenvalues measure how much variance a factor explains. The Kaiser criterion (eigenvalue > 1) is one common heuristic for deciding how many factors to retain.'
-                                            )}
-                                        </li>
-                                        <li>
-                                            {t(
-                                                'admin.analysis.guide_summary_2',
-                                                'Composite reliability reflects how consistently the flagged sorts define each factor. Higher values mean the factor estimate is based on more agreement among its defining sorts.'
-                                            )}
-                                        </li>
-                                    </ul>
-                                </GuidanceCard>
-                                <FactorCharacteristicsTable result={analysisResult} />
-                            </TabsContent>
-                        </Tabs>
-
-                        {/* Per-factor voices panels — always rendered below all tabs */}
-                        <div className="mt-4 space-y-2">
-                            {Array.from({ length: analysisResult.n_factors }, (_, f) => (
-                                <FactorVoicesPanel
-                                    key={f}
-                                    slug={slug}
-                                    factorIndex={f}
-                                    participants={analysisResult.participants}
-                                />
-                            ))}
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
-
-            {/* Empty state */}
-            {!api.result && !api.isRunning && api.hasEigenvalues && (
+            {/* Empty state — explore phase always shows this when eigenvalues
+                are loaded (no result has been committed in this URL yet). */}
+            {explore.hasEigenvalues && !explore.isRunning && (
                 <div className="text-center py-12 text-slate-400">
                     <ChartColumnStacked className="size-12 mx-auto mb-3 opacity-30" />
                     <p className="text-sm">
@@ -953,6 +763,469 @@ export default function AnalysisPage() {
                     </p>
                 </div>
             )}
+        </div>
+    );
+}
+
+// ────────────────────────────────────────────────────────────────
+// InterpretShell — result tabs + history panel + per-factor voices
+// ────────────────────────────────────────────────────────────────
+
+interface InterpretShellProps {
+    slug: string;
+    runId: number;
+    interpret: InterpretPhaseApi;
+    t: TFunction;
+    onSelectHistoricalRun: (runId: number) => void;
+    onBackToExplore: () => void;
+}
+
+function InterpretShell({
+    slug,
+    runId,
+    interpret,
+    t,
+    onSelectHistoricalRun,
+    onBackToExplore,
+}: InterpretShellProps) {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeTab = searchParams.get('tab') ?? 'loadings';
+    const setActiveTab = useCallback(
+        (next: string) => {
+            setSearchParams(
+                (prev) => {
+                    const params = new URLSearchParams(prev);
+                    if (next === 'loadings') {
+                        params.delete('tab');
+                    } else {
+                        params.set('tab', next);
+                    }
+                    return params;
+                },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
+
+    const run = interpret.run;
+    const analysisResult = run ? (run.result as unknown as AnalysisResult) : null;
+
+    // ── Manual flag overrides (Phase 2: local state) ─────────────────
+    // The interpret hook is pure read; manual flagging is being re-thought
+    // in PR 4 with the canvas. For now, we keep a light local-state copy
+    // seeded from the run's auto-flagged participants whenever the run
+    // loads, so the
+    // FactorLoadingsTable still has somewhere to write toggles. The
+    // flagging mode is read off the persisted run.
+    const flaggingMode: 'auto' | 'manual' = run?.flagging_mode === 'manual' ? 'manual' : 'auto';
+    const [manualFlags, setManualFlags] = useState<Record<number, number[]>>({});
+    const seededRunIdRef = useRef<number | null>(null);
+    useEffect(() => {
+        if (!analysisResult || flaggingMode !== 'manual') {
+            setManualFlags({});
+            seededRunIdRef.current = null;
+            return;
+        }
+        if (seededRunIdRef.current === runId) return;
+        const flags: Record<number, number[]> = {};
+        for (const p of analysisResult.participants) {
+            if (p.flagged_factors && p.flagged_factors.length > 0) {
+                flags[p.db_id] = [...p.flagged_factors];
+            }
+        }
+        setManualFlags(flags);
+        seededRunIdRef.current = runId;
+    }, [analysisResult, flaggingMode, runId]);
+
+    const handleToggleFlag = useCallback((participantDbId: number, factorNumber: number) => {
+        setManualFlags((prev) => {
+            const current = prev[participantDbId] ?? [];
+            const has = current.includes(factorNumber);
+            const next = has ? [] : [factorNumber];
+            return { ...prev, [participantDbId]: next };
+        });
+    }, []);
+
+    // ── Export ───────────────────────────────────────────────────────
+    const [isExporting, setIsExporting] = useState(false);
+    const handleExport = useCallback(
+        async (type: 'loadings' | 'scores' | 'xlsx') => {
+            if (!analysisResult) return;
+            if (type === 'xlsx') {
+                setIsExporting(true);
+                try {
+                    const factorNotes = run?.factor_notes ?? undefined;
+                    const blob = await generateAnalysisXlsx(analysisResult, factorNotes);
+                    downloadBlob(blob, `${slug}_analysis.xlsx`);
+                } catch {
+                    toast.error(
+                        t('admin.analysis.export_error', 'Failed to generate XLSX export.')
+                    );
+                } finally {
+                    setIsExporting(false);
+                }
+                return;
+            }
+            const csv =
+                type === 'loadings'
+                    ? generateLoadingsCsv(analysisResult)
+                    : generateScoresCsv(analysisResult);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            downloadBlob(blob, `${slug}_analysis_${type}.csv`);
+        },
+        [analysisResult, run, slug, t]
+    );
+
+    // ── currentRun — passed to FactorArraysView for the per-factor
+    //   narrative editor. AnalysisRunRead is structurally a superset of
+    //   AnalysisRunSummary, so we widen via cast.
+    const currentRun = useMemo<AnalysisRunSummary | null>(() => {
+        if (!run) return null;
+        const { result: _omitted, ...summary } = run as AnalysisRunRead & {
+            result?: unknown;
+        };
+        return summary as AnalysisRunSummary;
+    }, [run]);
+
+    // ── Per-analyst, per-study UI preference for showing per-factor narratives.
+    // Owned by useInterpretPhase so the localStorage contract (default-true,
+    // per-slug key, quota/private-mode safe) is covered by hook tests.
+    const { showFactorNarratives, setShowFactorNarratives } = interpret;
+
+    // ── Loading / error gates ────────────────────────────────────────
+    if (interpret.isLoading) {
+        return (
+            <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+                <StudyPageHeader
+                    title={t('admin.analysis.title', 'Analysis')}
+                    description={t(
+                        'admin.analysis.description',
+                        'Factor analysis of Q-sort data — extract viewpoints from participant responses'
+                    )}
+                    icon={ChartColumnStacked}
+                />
+                <div
+                    className="flex items-center justify-center py-12 text-slate-400"
+                    role="status"
+                    aria-live="polite"
+                    data-testid="interpret-phase"
+                >
+                    <Loader2 className="size-5 animate-spin mr-2" aria-hidden="true" />
+                    {t('admin.analysis.loading_run', 'Loading run…')}
+                </div>
+            </div>
+        );
+    }
+
+    if (interpret.isError || !analysisResult || !run) {
+        return (
+            <div
+                className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2"
+                data-testid="interpret-phase"
+            >
+                <StudyPageHeader
+                    title={t('admin.analysis.title', 'Analysis')}
+                    description={t(
+                        'admin.analysis.description',
+                        'Factor analysis of Q-sort data — extract viewpoints from participant responses'
+                    )}
+                    icon={ChartColumnStacked}
+                />
+                <div
+                    className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800"
+                    role="alert"
+                >
+                    <AlertTriangle className="size-4 flex-shrink-0" aria-hidden="true" />
+                    <span className="flex-1">
+                        {t(
+                            'admin.analysis.eigenvalue_error',
+                            'Failed to load analysis data. Please try again.'
+                        )}
+                    </span>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onBackToExplore}
+                        className="gap-1.5 shrink-0"
+                    >
+                        <X className="size-3.5" aria-hidden="true" />
+                        {t('admin.analysis.history.back_to_current', 'Back to current')}
+                    </Button>
+                </div>
+                <AnalysisHistoryPanel
+                    slug={slug}
+                    currentRunId={null}
+                    onLoadRun={(_r, summary) => {
+                        if (summary) onSelectHistoricalRun(summary.id);
+                    }}
+                />
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
+            <StudyPageHeader
+                title={t('admin.analysis.title', 'Analysis')}
+                description={t(
+                    'admin.analysis.description',
+                    'Factor analysis of Q-sort data — extract viewpoints from participant responses'
+                )}
+                icon={ChartColumnStacked}
+            />
+
+            {/* Phase marker — used by routing tests to assert that the
+                page entered the Interpret branch. Not visually intrusive. */}
+            <div className="sr-only" data-testid="interpret-phase">
+                {t('admin.analysis.history.run_label', 'Run #{{id}}', { id: runId })}
+            </div>
+
+            {/* Export controls — interpret phase exposes the same XLSX / CSV
+                export dropdown the original page placed alongside the Run
+                button. The "Back to current" affordance lives on the run banner
+                below, mirroring legacy chrome. */}
+            <div className="flex items-center gap-3 pt-1">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="gap-2">
+                            <Download className="size-4" aria-hidden="true" />
+                            {t('admin.analysis.export', 'Export')}
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                        <DropdownMenuItem
+                            onClick={() => void handleExport('xlsx')}
+                            disabled={isExporting}
+                        >
+                            {isExporting && (
+                                <Loader2
+                                    className="size-3.5 animate-spin mr-1.5"
+                                    aria-hidden="true"
+                                />
+                            )}
+                            {t('admin.analysis.export_xlsx', 'XLSX — Complete Analysis')}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => void handleExport('loadings')}>
+                            {t('admin.analysis.export_loadings', 'CSV — Factor Loadings')}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => void handleExport('scores')}>
+                            {t('admin.analysis.export_scores', 'CSV — Statement Scores')}
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+
+            {/* Analysis history */}
+            <AnalysisHistoryPanel
+                slug={slug}
+                currentRunId={runId}
+                onLoadRun={(_result, summary) => {
+                    if (summary) {
+                        onSelectHistoricalRun(summary.id);
+                    } else {
+                        // Panel may pass `(null, null)` after deleting the
+                        // currently-displayed run — bounce back to explore.
+                        onBackToExplore();
+                    }
+                }}
+            />
+
+            {/* Run banner */}
+            <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+                <History className="size-4 flex-shrink-0" aria-hidden="true" />
+                <span className="flex-1">
+                    {t(
+                        'admin.analysis.history.viewing_banner',
+                        'Viewing run from {{date}} — {{extraction}} · {{n}}F · {{rotation}}',
+                        {
+                            date: new Date(run.ran_at).toLocaleString(undefined, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }),
+                            extraction: run.extraction_method.toUpperCase(),
+                            n: run.n_factors,
+                            rotation: run.rotation_method,
+                        }
+                    )}
+                </span>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={onBackToExplore}
+                    className="gap-1.5 shrink-0 text-amber-700 border-amber-300 hover:bg-amber-100"
+                >
+                    <X className="size-3.5" aria-hidden="true" />
+                    {t('admin.analysis.history.back_to_current', 'Back to current')}
+                </Button>
+            </div>
+
+            {/* Results */}
+            <Card className="border-none shadow-sm bg-white rounded-2xl relative">
+                <CardContent className="pt-5 pb-5">
+                    <Tabs value={activeTab} onValueChange={setActiveTab}>
+                        <TabsList className="mb-5 flex-wrap h-auto gap-1">
+                            <TabsTrigger value="loadings" className="gap-1.5">
+                                <BarChart3 className="size-3.5" aria-hidden="true" />
+                                {t('admin.analysis.tab_loadings', 'Loadings')}
+                            </TabsTrigger>
+                            <TabsTrigger value="arrays" className="gap-1.5">
+                                <Grid3X3 className="size-3.5" aria-hidden="true" />
+                                {t('admin.analysis.tab_factor_arrays', 'Factor Arrays')}
+                            </TabsTrigger>
+                            <TabsTrigger value="statements" className="gap-1.5">
+                                <List className="size-3.5" aria-hidden="true" />
+                                {t('admin.analysis.tab_statements', 'Statements')}
+                            </TabsTrigger>
+                            <TabsTrigger value="summary" className="gap-1.5">
+                                <Info className="size-3.5" aria-hidden="true" />
+                                {t('admin.analysis.tab_summary', 'Summary')}
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="loadings" className="space-y-3">
+                            <GuidanceCard
+                                title={t(
+                                    'admin.analysis.guide_loadings_title',
+                                    'Reading Factor Loadings'
+                                )}
+                                type="info"
+                                collapsible
+                                defaultOpen={false}
+                            >
+                                <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
+                                    <li>
+                                        {t(
+                                            'admin.analysis.guide_loadings_1',
+                                            'Each loading is a correlation (-1 to +1) between a participant and a factor (shared viewpoint).'
+                                        )}
+                                    </li>
+                                    <li>
+                                        {t(
+                                            'admin.analysis.guide_loadings_2',
+                                            'Highlighted values exceed the significance threshold shown above the table.'
+                                        )}
+                                    </li>
+                                </ul>
+                            </GuidanceCard>
+                            <FactorLoadingsTable
+                                result={analysisResult}
+                                flaggingMode={flaggingMode}
+                                manualFlags={manualFlags}
+                                onToggleFlag={handleToggleFlag}
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="arrays" className="space-y-3">
+                            <GuidanceCard
+                                title={t(
+                                    'admin.analysis.guide_arrays_title',
+                                    'Interpreting Factor Arrays'
+                                )}
+                                type="info"
+                                collapsible
+                                defaultOpen={false}
+                            >
+                                <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
+                                    <li>
+                                        {t(
+                                            'admin.analysis.guide_arrays_1',
+                                            'Each factor array is the composite Q-sort representing one shared viewpoint.'
+                                        )}
+                                    </li>
+                                    <li>
+                                        {t(
+                                            'admin.analysis.guide_arrays_2',
+                                            'Read left-to-right as most disagreed to most agreed. Extreme positions carry the strongest signal for interpretation.'
+                                        )}
+                                    </li>
+                                </ul>
+                            </GuidanceCard>
+                            <FactorArraysView
+                                result={analysisResult}
+                                currentRun={currentRun}
+                                slug={slug}
+                                showFactorNarratives={showFactorNarratives}
+                                onToggleFactorNarratives={() =>
+                                    setShowFactorNarratives(!showFactorNarratives)
+                                }
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="statements" className="space-y-3">
+                            <GuidanceCard
+                                title={t(
+                                    'admin.analysis.guide_statements_title',
+                                    'Understanding Statement Scores'
+                                )}
+                                type="info"
+                                collapsible
+                                defaultOpen={false}
+                            >
+                                <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
+                                    <li>
+                                        {t(
+                                            'admin.analysis.guide_statements_1',
+                                            'Z-scores show how strongly each factor agrees or disagrees with each statement (0 = neutral).'
+                                        )}
+                                    </li>
+                                    <li>
+                                        {t(
+                                            'admin.analysis.guide_statements_2',
+                                            'D = distinguishing (placed significantly differently across factors). Stars indicate significance level.'
+                                        )}
+                                    </li>
+                                </ul>
+                            </GuidanceCard>
+                            <StatementsTable result={analysisResult} />
+                        </TabsContent>
+
+                        <TabsContent value="summary" className="space-y-3">
+                            <GuidanceCard
+                                title={t(
+                                    'admin.analysis.guide_summary_title',
+                                    'Evaluating Your Solution'
+                                )}
+                                type="info"
+                                collapsible
+                                defaultOpen={false}
+                            >
+                                <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
+                                    <li>
+                                        {t(
+                                            'admin.analysis.guide_summary_1',
+                                            'Eigenvalues measure how much variance a factor explains. The Kaiser criterion (eigenvalue > 1) is one common heuristic for deciding how many factors to retain.'
+                                        )}
+                                    </li>
+                                    <li>
+                                        {t(
+                                            'admin.analysis.guide_summary_2',
+                                            'Composite reliability reflects how consistently the flagged sorts define each factor. Higher values mean the factor estimate is based on more agreement among its defining sorts.'
+                                        )}
+                                    </li>
+                                </ul>
+                            </GuidanceCard>
+                            <FactorCharacteristicsTable result={analysisResult} />
+                        </TabsContent>
+                    </Tabs>
+
+                    {/* Per-factor voices panels — always rendered below all tabs */}
+                    <div className="mt-4 space-y-2">
+                        {Array.from({ length: analysisResult.n_factors }, (_, f) => (
+                            <FactorVoicesPanel
+                                key={f}
+                                slug={slug}
+                                factorIndex={f}
+                                participants={analysisResult.participants}
+                            />
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 }
