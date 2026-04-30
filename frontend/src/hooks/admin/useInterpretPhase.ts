@@ -14,14 +14,16 @@
  * Visual state stays in the page component (factor selector chips, mode
  * toggle, compare-pin picker open state).
  *
- * Phase 2 limitation: factor matching for compareTo is by-index. Phase 5
- * upgrades it to Tucker's φ alignment with sign-flip and ambiguous-match
- * warnings. The deltaByStatement Map shape stays stable.
+ * Phase 5 (Task 27): factor matching across compareTo runs is now Tucker's
+ * congruence (φ) alignment with sign-flip awareness and ambiguous-match
+ * warnings. The consumer-facing Map shapes (deltaByStatement, the new
+ * deltaByParticipant) stay stable; the upgrade is internal.
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useGetAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet } from '@/api/generated';
 import type { AnalysisResult, AnalysisRunRead, ParticipantLoading } from '@/api/model';
+import { matchFactorsByPhi } from '@/utils/tuckerPhi';
 
 // ────────────────────────────────────────────────────────────────
 // Public API surface
@@ -37,7 +39,32 @@ export interface InterpretPhaseApi {
     setNarrativeDraft: (draft: string) => void;
     appendToNarrative: (snippet: string) => void;
     compareRun: AnalysisRunRead | null;
+    /**
+     * Δz on the active factor per statement_id. Sign-flip aware via the
+     * Tucker φ match between active and compare runs. Null when no compare
+     * run is loaded or no match could be computed.
+     */
     deltaByStatement: Map<number, number> | null;
+    /**
+     * Δloading on the active factor per participant_db_id. Sign-flip aware
+     * via the same Tucker φ match. Null when no compare run is loaded.
+     */
+    deltaByParticipant: Map<number, number> | null;
+    /**
+     * Tucker's φ of the active factor's match in the compare run. Null when
+     * no compare run is loaded or the match couldn't be computed.
+     */
+    activeMatchPhi: number | null;
+    /**
+     * 0-based factor index in the compare run that matches the active
+     * factor. Null when no match exists.
+     */
+    activeMatchBIndex: number | null;
+    /**
+     * True when a compare run is loaded AND |activeMatchPhi| < 0.85. The
+     * threshold matches CompareBar's warning trigger.
+     */
+    isAmbiguousMatch: boolean;
     /**
      * Per-analyst, per-study UI preference for showing the per-factor narrative
      * editor in the interpret view. Persisted in localStorage so the choice
@@ -158,24 +185,67 @@ export function useInterpretPhase(
         [narrativesPrefKey]
     );
 
-    // ── deltaByStatement (by-index match — Phase 2) ───────────────
-    // Phase 5 (Task 27) refines this to Tucker's φ alignment with sign-flip
-    // detection and ambiguous-match warnings. Map shape stays stable so the
-    // page component does not need to change.
-    const deltaByStatement = useMemo<Map<number, number> | null>(() => {
+    // ── Tucker φ factor matching (Phase 5) ────────────────────────
+    // Align A and B factors by maximum |φ| over the intersection of
+    // statements present in both runs. Statement-id intersection makes
+    // the matcher robust to concourses that gained/lost statements
+    // between runs (length mismatch would otherwise throw inside
+    // tuckerPhi).
+    const factorMatches = useMemo(() => {
         if (!runResult || !compareResult) return null;
+        const compareById = new Map(compareResult.statement_scores.map((s) => [s.statement_id, s]));
+        const aMatrix: number[][] = [];
+        const bMatrix: number[][] = [];
+        for (const s of runResult.statement_scores) {
+            const matching = compareById.get(s.statement_id);
+            if (!matching) continue;
+            aMatrix.push(s.z_scores);
+            bMatrix.push(matching.z_scores);
+        }
+        if (aMatrix.length === 0) return null;
+        return matchFactorsByPhi(aMatrix, bMatrix);
+    }, [runResult, compareResult]);
+
+    const activeMatch = factorMatches?.find((m) => m.aIndex === activeFactor - 1) ?? null;
+    const activeMatchPhi = activeMatch?.phi ?? null;
+    const activeMatchBIndex = activeMatch?.bIndex ?? null;
+    const isAmbiguousMatch = activeMatchPhi !== null && Math.abs(activeMatchPhi) < 0.85;
+
+    // ── deltaByStatement (Tucker-aligned, sign-flip aware) ────────
+    const deltaByStatement = useMemo<Map<number, number> | null>(() => {
+        if (!runResult || !compareResult || activeMatchBIndex === null) return null;
+        const sign = (activeMatchPhi ?? 0) < 0 ? -1 : 1;
         const factorIdx = activeFactor - 1;
         const compareById = new Map(compareResult.statement_scores.map((s) => [s.statement_id, s]));
         const out = new Map<number, number>();
         for (const s of runResult.statement_scores) {
-            const match = compareById.get(s.statement_id);
-            if (!match) continue;
+            const matching = compareById.get(s.statement_id);
+            if (!matching) continue;
             const za = s.z_scores[factorIdx] ?? 0;
-            const zb = match.z_scores[factorIdx] ?? 0;
+            const zb = (matching.z_scores[activeMatchBIndex] ?? 0) * sign;
             out.set(s.statement_id, za - zb);
         }
         return out;
-    }, [runResult, compareResult, activeFactor]);
+    }, [runResult, compareResult, activeFactor, activeMatchBIndex, activeMatchPhi]);
+
+    // ── deltaByParticipant (Tucker-aligned, sign-flip aware) ──────
+    const deltaByParticipant = useMemo<Map<number, number> | null>(() => {
+        if (!runResult || !compareResult || activeMatchBIndex === null) return null;
+        const sign = (activeMatchPhi ?? 0) < 0 ? -1 : 1;
+        const factorIdx = activeFactor - 1;
+        const compareById = new Map<number, ParticipantLoading>(
+            compareResult.participants.map((p) => [p.db_id, p])
+        );
+        const out = new Map<number, number>();
+        for (const p of runResult.participants) {
+            const matching = compareById.get(p.db_id);
+            if (!matching) continue;
+            const la = p.loadings[factorIdx] ?? 0;
+            const lb = (matching.loadings[activeMatchBIndex] ?? 0) * sign;
+            out.set(p.db_id, la - lb);
+        }
+        return out;
+    }, [runResult, compareResult, activeFactor, activeMatchBIndex, activeMatchPhi]);
 
     return {
         run,
@@ -188,6 +258,10 @@ export function useInterpretPhase(
         appendToNarrative,
         compareRun,
         deltaByStatement,
+        deltaByParticipant,
+        activeMatchPhi,
+        activeMatchBIndex,
+        isAmbiguousMatch,
         showFactorNarratives,
         setShowFactorNarratives,
     };
