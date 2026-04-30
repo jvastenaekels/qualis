@@ -78,6 +78,28 @@ export function getEnabledSteps(study: StudyShape): StepDescriptor[] {
 }
 
 /**
+ * Build a record mapping persisted step numbers to their [labelKey, labelDefault]
+ * tuple, restricted to the keys in `keys`. Used by admin views that show
+ * dropdowns / filters / per-row badges keyed off `last_step_reached`.
+ *
+ * Steps not enabled for the study are omitted. Step 1 (consent) is typically
+ * not user-facing in admin filter dropdowns, so callers pass the keys they
+ * actually want.
+ */
+export function getStepLabels(
+    study: StudyShape,
+    keys: ReadonlySet<StepKey>
+): Record<number, [string, string]> {
+    const result: Record<number, [string, string]> = {};
+    for (const desc of getEnabledSteps(study)) {
+        if (keys.has(desc.key)) {
+            result[desc.persistedNumber] = [desc.labelKey, desc.labelDefault];
+        }
+    }
+    return result;
+}
+
+/**
  * Map a persisted step number to its key, given a study config.
  *
  * If the step number is not enabled for this study (e.g. step 3 with

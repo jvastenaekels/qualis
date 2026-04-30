@@ -53,6 +53,7 @@ export interface DumpResponse {
             // biome-ignore lint/suspicious/noExplicitAny: dynamic config
         } & Record<string, any>;
         state: string;
+        rough_sort_enabled?: boolean;
     };
     participants: DumpParticipant[];
     statement_id_to_index: Record<string, number>;

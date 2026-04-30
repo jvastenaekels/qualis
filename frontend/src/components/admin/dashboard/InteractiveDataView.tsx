@@ -93,6 +93,7 @@ import {
 } from 'react-icons/fa6';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { getStepLabels } from '@/utils/studySteps';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -157,12 +158,10 @@ function getDisplayStatus(p: DumpParticipant): 'completed' | 'in_progress' | 'ab
     return 'in_progress';
 }
 
-const STEP_LABEL_KEYS: Record<number, [string, string]> = {
-    2: ['admin.data.step.presort', 'Pre-sort survey'],
-    3: ['admin.data.step.rough', 'Preliminary sort'],
-    4: ['admin.data.step.fine', 'Q-sort'],
-    5: ['admin.data.step.post', 'Post-sort survey'],
-};
+// Step labels derive at render time from the study config
+// (see `getStepLabels` — step 3 vanishes when rough_sort_enabled=false).
+// Step 1 (consent) is omitted from the filter dropdown by historical convention.
+const FILTERABLE_STEP_KEYS = new Set(['presort', 'rough', 'fine', 'post'] as const);
 const PAGE_SIZE = 25;
 const columnHelper = createColumnHelper<DumpParticipant>();
 
@@ -284,6 +283,17 @@ export default function InteractiveDataView({
             statement_id_to_index: {},
         } as DumpResponse;
     }, [rawData, effectiveParticipants, slug]);
+
+    // Step labels derived from the study config so the filter dropdown and
+    // per-row badges adapt to rough_sort_enabled (step 3 vanishes when off).
+    const stepLabels = useMemo(
+        () =>
+            getStepLabels(
+                { rough_sort_enabled: data.study.rough_sort_enabled !== false },
+                FILTERABLE_STEP_KEYS
+            ),
+        [data.study.rough_sort_enabled]
+    );
 
     const handleClearAllParticipants = useCallback(async () => {
         try {
@@ -675,7 +685,7 @@ export default function InteractiveDataView({
                                 <DropdownMenuLabel className="text-2xs text-slate-400">
                                     {t('admin.data.table.current_step', 'Current step')}
                                 </DropdownMenuLabel>
-                                {Object.entries(STEP_LABEL_KEYS).map(([step, [key, fallback]]) => (
+                                {Object.entries(stepLabels).map(([step, [key, fallback]]) => (
                                     <DropdownMenuItem
                                         key={step}
                                         onClick={() => {
@@ -716,12 +726,12 @@ export default function InteractiveDataView({
                             >
                                 {t(`admin.data.status.${displayStatus}`, displayStatus)}
                             </Badge>
-                            {currentStep != null && STEP_LABEL_KEYS[currentStep] && (
+                            {currentStep != null && stepLabels[currentStep] && (
                                 <Badge
                                     variant="outline"
                                     className="h-5 text-2xs px-2 font-semibold border-slate-200 text-slate-500"
                                 >
-                                    {t(...STEP_LABEL_KEYS[currentStep])}
+                                    {t(...stepLabels[currentStep])}
                                 </Badge>
                             )}
                         </div>
@@ -1452,8 +1462,8 @@ export default function InteractiveDataView({
                                 <Footprints className="w-3 h-3" />
                                 {stepFilter === 'completed'
                                     ? t('admin.data.status.completed', 'Completed')
-                                    : STEP_LABEL_KEYS[stepFilter]
-                                      ? t(...STEP_LABEL_KEYS[stepFilter])
+                                    : stepLabels[stepFilter]
+                                      ? t(...stepLabels[stepFilter])
                                       : stepFilter}
                                 <button
                                     type="button"
