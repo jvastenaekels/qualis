@@ -2,6 +2,10 @@
 
 These constants provide sensible defaults in English, French, and Finnish
 for consent text, methodology tips, step descriptions, etc.
+
+The :func:`build_process_steps` and :func:`build_step_help` helpers filter
+out the rough-sort entries when ``rough_sort_enabled`` is False (a study
+that skips the 3-pile triage step).
 """
 
 from ..types.wire import TranslationDefaults
@@ -211,3 +215,38 @@ DEFAULT_TRANSLATION_CONTENT: dict[str, TranslationDefaults] = {
         },
     },
 }
+
+
+def _resolve_locale(locale: str, table: dict[str, object]) -> str:
+    return locale if locale in table else "en"
+
+
+def build_process_steps(
+    *, rough_sort_enabled: bool, locale: str
+) -> list[dict[str, str]]:
+    """Return the default ``process_steps`` for ``locale``, filtering out
+    the rough-sort entry when the study has the rough step disabled.
+    """
+    key = _resolve_locale(locale, DEFAULT_PROCESS_STEPS)  # type: ignore[arg-type]
+    steps = DEFAULT_PROCESS_STEPS[key]
+    if rough_sort_enabled:
+        return [dict(s) for s in steps]
+    return [dict(s) for s in steps if s.get("id") != "rough"]
+
+
+def build_step_help(
+    *, rough_sort_enabled: bool, locale: str
+) -> dict[str, dict[str, str]]:
+    """Return the default ``step_help`` for ``locale``, dropping the
+    ``rough`` key when the study has the rough step disabled.
+    """
+    key = _resolve_locale(locale, DEFAULT_TRANSLATION_CONTENT)  # type: ignore[arg-type]
+    defaults = DEFAULT_TRANSLATION_CONTENT[key]
+    help_dict = defaults["step_help"]
+    if rough_sort_enabled:
+        return {k: {"what": v["what"], "why": v["why"]} for k, v in help_dict.items()}
+    return {
+        k: {"what": v["what"], "why": v["why"]}
+        for k, v in help_dict.items()
+        if k != "rough"
+    }

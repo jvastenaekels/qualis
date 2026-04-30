@@ -13630,6 +13630,7 @@ export const getCreateStudyApiAdminStudiesPostResponseMock = (
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    rough_sort_enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     distribution_mode: faker.helpers.arrayElement([
         faker.helpers.arrayElement(Object.values(DistributionMode)),
         undefined,
@@ -13919,6 +13920,7 @@ export const getListStudiesApiAdminStudiesGetResponseMock = (
                 undefined,
             ]),
             symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+            rough_sort_enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
             distribution_mode: faker.helpers.arrayElement([
                 faker.helpers.arrayElement(Object.values(DistributionMode)),
                 undefined,
@@ -14222,6 +14224,7 @@ export const getGetStudyApiAdminStudiesSlugGetResponseMock = (
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    rough_sort_enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     distribution_mode: faker.helpers.arrayElement([
         faker.helpers.arrayElement(Object.values(DistributionMode)),
         undefined,
@@ -14502,6 +14505,7 @@ export const getUpdateStudyApiAdminStudiesSlugPatchResponseMock = (
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    rough_sort_enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     distribution_mode: faker.helpers.arrayElement([
         faker.helpers.arrayElement(Object.values(DistributionMode)),
         undefined,
@@ -14785,6 +14789,7 @@ export const getChangeStudyStateApiAdminStudiesSlugStatePostResponseMock = (
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    rough_sort_enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     distribution_mode: faker.helpers.arrayElement([
         faker.helpers.arrayElement(Object.values(DistributionMode)),
         undefined,
@@ -15065,6 +15070,7 @@ export const getImportFromConcourseApiAdminStudiesSlugImportConcoursePostRespons
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    rough_sort_enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     distribution_mode: faker.helpers.arrayElement([
         faker.helpers.arrayElement(Object.values(DistributionMode)),
         undefined,
@@ -15371,6 +15377,7 @@ export const getSyncStatementFromConcourseApiAdminStudiesSlugSyncStatementStatem
             undefined,
         ]),
         symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+        rough_sort_enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
         distribution_mode: faker.helpers.arrayElement([
             faker.helpers.arrayElement(Object.values(DistributionMode)),
             undefined,
@@ -15660,6 +15667,7 @@ export const getSyncAllStaleStatementsApiAdminStudiesSlugSyncAllStalePostRespons
     show_statement_codes: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     randomize_statement_order: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     symmetry_lock: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
+    rough_sort_enabled: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     distribution_mode: faker.helpers.arrayElement([
         faker.helpers.arrayElement(Object.values(DistributionMode)),
         undefined,

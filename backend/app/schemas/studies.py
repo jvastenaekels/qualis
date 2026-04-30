@@ -192,6 +192,13 @@ class StudyBase(BaseModel):
     show_statement_codes: bool = False
     randomize_statement_order: bool = False
     symmetry_lock: bool = True
+    rough_sort_enabled: bool = Field(
+        default=True,
+        description=(
+            "Enable the rough-sort step (3-pile triage). When False, "
+            "participants go directly from pre-sort to fine-sort."
+        ),
+    )
     distribution_mode: DistributionMode = DistributionMode.forced
     start_date: datetime | None = None
     end_date: datetime | None = None
@@ -218,6 +225,7 @@ class StudyUpdate(BaseModel):
     show_statement_codes: bool | None = None
     randomize_statement_order: bool | None = None
     symmetry_lock: bool | None = None
+    rough_sort_enabled: bool | None = None
     distribution_mode: DistributionMode | None = None
     translations: list[StudyTranslationCreate] | None = None
     statements: list[StatementUpdate] | None = None

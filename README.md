@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/assets/qualis-logo.png" alt="Qualis" width="180" />
+</p>
+
 # Qualis
 
 **Open-source platform for Q-methodology research.**

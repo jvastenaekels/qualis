@@ -14,6 +14,7 @@ import type { StudyUpdateDefaultLanguage } from './studyUpdateDefaultLanguage';
 import type { StudyUpdateShowStatementCodes } from './studyUpdateShowStatementCodes';
 import type { StudyUpdateRandomizeStatementOrder } from './studyUpdateRandomizeStatementOrder';
 import type { StudyUpdateSymmetryLock } from './studyUpdateSymmetryLock';
+import type { StudyUpdateRoughSortEnabled } from './studyUpdateRoughSortEnabled';
 import type { StudyUpdateDistributionMode } from './studyUpdateDistributionMode';
 import type { StudyUpdateTranslations } from './studyUpdateTranslations';
 import type { StudyUpdateStatements } from './studyUpdateStatements';
@@ -37,6 +38,7 @@ export interface StudyUpdate {
     show_statement_codes?: StudyUpdateShowStatementCodes;
     randomize_statement_order?: StudyUpdateRandomizeStatementOrder;
     symmetry_lock?: StudyUpdateSymmetryLock;
+    rough_sort_enabled?: StudyUpdateRoughSortEnabled;
     distribution_mode?: StudyUpdateDistributionMode;
     translations?: StudyUpdateTranslations;
     statements?: StudyUpdateStatements;

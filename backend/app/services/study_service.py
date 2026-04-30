@@ -33,7 +33,12 @@ from ..models import (
     StudyTranslation,
 )
 from ..schemas import StudyCreate, StudyUpdate
-from .study_defaults import DEFAULT_PROCESS_STEPS, DEFAULT_TRANSLATION_CONTENT
+from .study_defaults import (
+    DEFAULT_PROCESS_STEPS,
+    DEFAULT_TRANSLATION_CONTENT,
+    build_process_steps,
+    build_step_help,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -100,6 +105,7 @@ class StudyService:
                 ),
                 show_statement_codes=study_in.show_statement_codes,
                 distribution_mode=study_in.distribution_mode,
+                rough_sort_enabled=study_in.rough_sort_enabled,
                 branding=study_in.branding.model_dump() if study_in.branding else None,
                 start_date=study_in.start_date,
                 end_date=study_in.end_date,
@@ -117,12 +123,19 @@ class StudyService:
                     lang, DEFAULT_TRANSLATION_CONTENT["en"]
                 )
                 if not t_data.get("process_steps"):
-                    t_data["process_steps"] = DEFAULT_PROCESS_STEPS.get(
-                        lang, DEFAULT_PROCESS_STEPS["en"]
+                    t_data["process_steps"] = build_process_steps(
+                        rough_sort_enabled=study_in.rough_sort_enabled,
+                        locale=lang,
                     )
                 for field, value in defaults.items():
                     if not t_data.get(field):
-                        t_data[field] = value
+                        if field == "step_help":
+                            t_data[field] = build_step_help(
+                                rough_sort_enabled=study_in.rough_sort_enabled,
+                                locale=lang,
+                            )
+                        else:
+                            t_data[field] = value
                 db.add(StudyTranslation(study_id=db_study.id, **t_data))
 
             for idx, s_in in enumerate(study_in.statements):
@@ -168,6 +181,21 @@ class StudyService:
                         "Cannot modify grid configuration because participants "
                         "have already started the study."
                     )
+
+        # Rough-sort toggle lock: once any participant has gone past consent
+        # (last_step_reached > 1) the flow is materialised in their session;
+        # flipping the toggle would create inconsistent state.
+        if (
+            study_update.rough_sort_enabled is not None
+            and study_update.rough_sort_enabled != study.rough_sort_enabled
+        ):
+            count = await StudyService._count_participants_past_consent(db, study.id)
+            if count > 0:
+                raise ValidationError(
+                    f"Cannot change rough_sort_enabled — {count} participant(s) "
+                    "have started the survey. Archive or delete those sessions "
+                    "before changing this setting."
+                )
 
         # Draft-only updates
         if study.state != StudyState.draft:
@@ -302,6 +330,21 @@ class StudyService:
             )
         )
         return (result.scalar() or 0) > 0
+
+    @staticmethod
+    async def _count_participants_past_consent(db: AsyncSession, study_id: int) -> int:
+        """Count participants whose ``last_step_reached`` is beyond consent.
+
+        Used to lock structural toggles (rough_sort_enabled) once a session
+        has been materialised in the participant's flow.
+        """
+        result = await db.execute(
+            select(func.count(Participant.id)).where(
+                Participant.study_id == study_id,
+                Participant.last_step_reached > 1,
+            )
+        )
+        return result.scalar() or 0
 
     @staticmethod
     async def _get_study_or_raise(db: AsyncSession, slug: str) -> Study:

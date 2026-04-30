@@ -110,6 +110,50 @@ class TestProgressEndpoint:
         )
         assert resp.status_code == 422
 
+    async def test_step_3_rejected_when_rough_disabled(
+        self, client: AsyncClient, db: AsyncSession, active_study: Study
+    ):
+        """A study with rough_sort_enabled=False rejects /progress targeting step 3."""
+        active_study.rough_sort_enabled = False
+        await db.commit()
+
+        token = await self._create_participant(client, active_study)
+
+        resp = await client.patch(
+            f"/api/study/{active_study.slug}/progress",
+            json={"session_token": token, "step": 3},
+        )
+        assert resp.status_code == 400
+        body = resp.json()
+        assert "step 3" in body["message"].lower()
+
+        result = await db.execute(
+            select(Participant).where(Participant.session_token == uuid.UUID(token))
+        )
+        p = result.scalar_one()
+        assert p.last_step_reached == 1  # unchanged
+
+    async def test_step_4_allowed_when_rough_disabled(
+        self, client: AsyncClient, db: AsyncSession, active_study: Study
+    ):
+        """Step 4 (fine sort) is reachable directly when rough is disabled."""
+        active_study.rough_sort_enabled = False
+        await db.commit()
+
+        token = await self._create_participant(client, active_study)
+
+        resp = await client.patch(
+            f"/api/study/{active_study.slug}/progress",
+            json={"session_token": token, "step": 4},
+        )
+        assert resp.status_code == 200
+
+        result = await db.execute(
+            select(Participant).where(Participant.session_token == uuid.UUID(token))
+        )
+        p = result.scalar_one()
+        assert p.last_step_reached == 4
+
     async def test_completion_sets_step_5(
         self, client: AsyncClient, db: AsyncSession, active_study: Study
     ):

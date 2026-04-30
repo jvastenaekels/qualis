@@ -65,6 +65,9 @@ class Study(Base):
     symmetry_lock: Mapped[bool] = mapped_column(
         Boolean, default=True
     )  # Enforce grid symmetry in designer
+    rough_sort_enabled: Mapped[bool] = mapped_column(
+        Boolean, default=True, server_default="true", nullable=False
+    )  # When False, participants skip the rough-sort (3-pile) step
     distribution_mode: Mapped[DistributionMode] = mapped_column(
         SAEnum(DistributionMode, name="distributionmode"),
         default=DistributionMode.forced,

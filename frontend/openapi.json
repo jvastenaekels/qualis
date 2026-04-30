@@ -10565,6 +10565,12 @@
             "title": "Symmetry Lock",
             "default": true
           },
+          "rough_sort_enabled": {
+            "type": "boolean",
+            "title": "Rough Sort Enabled",
+            "description": "Enable the rough-sort step (3-pile triage). When False, participants go directly from pre-sort to fine-sort.",
+            "default": true
+          },
           "distribution_mode": {
             "$ref": "#/components/schemas/DistributionMode",
             "default": "forced"
@@ -10768,6 +10774,12 @@
           "symmetry_lock": {
             "type": "boolean",
             "title": "Symmetry Lock",
+            "default": true
+          },
+          "rough_sort_enabled": {
+            "type": "boolean",
+            "title": "Rough Sort Enabled",
+            "description": "Enable the rough-sort step (3-pile triage). When False, participants go directly from pre-sort to fine-sort.",
             "default": true
           },
           "distribution_mode": {
@@ -11362,6 +11374,17 @@
               }
             ],
             "title": "Symmetry Lock"
+          },
+          "rough_sort_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rough Sort Enabled"
           },
           "distribution_mode": {
             "anyOf": [

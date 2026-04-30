@@ -322,6 +322,7 @@ export * from './studyUpdatePostsortConfigAnyOf';
 export * from './studyUpdatePresortConfig';
 export * from './studyUpdatePresortConfigAnyOf';
 export * from './studyUpdateRandomizeStatementOrder';
+export * from './studyUpdateRoughSortEnabled';
 export * from './studyUpdateShowStatementCodes';
 export * from './studyUpdateSlug';
 export * from './studyUpdateStartDate';

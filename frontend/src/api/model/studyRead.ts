@@ -38,6 +38,8 @@ export interface StudyRead {
     show_statement_codes?: boolean;
     randomize_statement_order?: boolean;
     symmetry_lock?: boolean;
+    /** Enable the rough-sort step (3-pile triage). When False, participants go directly from pre-sort to fine-sort. */
+    rough_sort_enabled?: boolean;
     distribution_mode?: DistributionMode;
     start_date?: StudyReadStartDate;
     end_date?: StudyReadEndDate;
