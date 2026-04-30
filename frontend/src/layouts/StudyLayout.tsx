@@ -53,7 +53,7 @@ import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
 import { ComponentErrorBoundary } from '../components/ComponentErrorBoundary';
 import { resetAllStores } from '../utils/sessionReset';
-import { isPresortEnabled } from '../utils/studyConfig';
+import { isPresortEnabled, isRoughSortEnabled } from '../utils/studyConfig';
 
 const steps = [
     { id: 1, labelKey: 'layout.steps.welcome' },
@@ -235,6 +235,11 @@ const StudyLayoutContent: React.FC = () => {
 
         // Skip presort if disabled
         if (stepId === 2 && !isPresortEnabled(config)) {
+            return;
+        }
+
+        // Skip rough-sort if disabled
+        if (stepId === 3 && !isRoughSortEnabled(config)) {
             return;
         }
 
@@ -512,8 +517,12 @@ const StudyLayoutContent: React.FC = () => {
     const branding = config?.branding;
     const accentColor = branding?.accent_color || '#2563eb'; // Default to blue-600
 
-    // Filter steps based on config
-    const visibleSteps = steps.filter((step) => !(step.id === 2 && !isPresortEnabled(config)));
+    // Filter steps based on config: drop presort if disabled, drop rough if disabled.
+    const visibleSteps = steps.filter((step) => {
+        if (step.id === 2 && !isPresortEnabled(config)) return false;
+        if (step.id === 3 && !isRoughSortEnabled(config)) return false;
+        return true;
+    });
 
     const currentVisibleIndex = visibleSteps.findIndex((s) => s.id === currentStep);
 
