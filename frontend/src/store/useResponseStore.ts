@@ -23,6 +23,14 @@ interface Responses {
         neutral: number[];
         history: number[];
     };
+    /**
+     * Flat unsorted deck (deck mode, rough_sort_enabled=false).
+     * Holds every statement id that has not yet been placed in the qsort
+     * grid. The list is mode-specific: when rough_sort_enabled=true the
+     * orphan reconciler in useFineSort uses categorizeCard('neutral')
+     * instead, and `deck` stays empty.
+     */
+    deck: number[];
     qsort: { statementId: number; col: number; row: number }[];
     postsort: {
         card_comments: Record<number, string>;
@@ -42,6 +50,10 @@ interface ResponseActions {
     // Rough Sort
     categorizeCard: (statementId: number, category: 'agree' | 'disagree' | 'neutral') => void;
     undoRoughSort: () => void;
+
+    // Deck mode (rough_sort_enabled=false)
+    addToDeck: (statementId: number) => void;
+    removeFromDeck: (statementId: number) => void;
 
     // Fine Sort
     placeCardInGrid: (statementId: number, col: number, row: number) => void;
@@ -67,6 +79,7 @@ interface ResponseActions {
 export const initialResponses: Responses = {
     presort: {},
     rough: { agree: [], disagree: [], neutral: [], history: [] },
+    deck: [],
     qsort: [],
     postsort: {
         card_comments: {},
@@ -174,6 +187,20 @@ export const useResponseStore = create<Responses & ResponseActions>()(
                         },
                     };
                 });
+                triggerSavingIndicator();
+            },
+
+            addToDeck: (statementId) => {
+                const { deck } = get();
+                if (deck.includes(statementId)) return;
+                set({ deck: [...deck, statementId] });
+                triggerSavingIndicator();
+            },
+
+            removeFromDeck: (statementId) => {
+                const { deck } = get();
+                if (!deck.includes(statementId)) return;
+                set({ deck: deck.filter((id) => id !== statementId) });
                 triggerSavingIndicator();
             },
 

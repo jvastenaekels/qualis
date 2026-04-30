@@ -60,6 +60,12 @@ export interface FineSortApi {
     unplacedAgree: Statement[];
     unplacedDisagree: Statement[];
     unplacedNeutral: Statement[];
+    /**
+     * Flat unplaced deck (deck mode, rough_sort_enabled=false).
+     * Empty when in rough mode — callers should branch on
+     * `config.rough_sort_enabled !== false` before reading either side.
+     */
+    unplacedDeck: Statement[];
     isAllPlaced: boolean;
     showCodes: boolean;
     distributionMode: DistributionMode;
@@ -88,6 +94,42 @@ export interface FineSortApi {
 }
 
 // ────────────────────────────────────────────────────────────────
+// Reconciliation helpers (module-scope to keep the effect simple)
+// ────────────────────────────────────────────────────────────────
+
+interface RoughSlice {
+    agree: number[];
+    disagree: number[];
+    neutral: number[];
+}
+
+const reconcileIntoRoughNeutral = (
+    statementIds: number[],
+    placedIds: Set<number>,
+    rough: RoughSlice,
+    categorize: (id: number, category: 'agree' | 'disagree' | 'neutral') => void
+): void => {
+    const roughIds = new Set([...rough.agree, ...rough.neutral, ...rough.disagree]);
+    const missingIds = statementIds.filter((id) => !placedIds.has(id) && !roughIds.has(id));
+    if (missingIds.length === 0) return;
+    console.warn('Reconciling missing cards:', missingIds);
+    for (const id of missingIds) categorize(id, 'neutral');
+};
+
+const reconcileIntoDeck = (
+    statementIds: number[],
+    placedIds: Set<number>,
+    deck: number[],
+    addToDeck: (id: number) => void
+): void => {
+    const deckIds = new Set(deck);
+    const missingIds = statementIds.filter((id) => !placedIds.has(id) && !deckIds.has(id));
+    if (missingIds.length === 0) return;
+    console.warn('Reconciling missing cards into deck:', missingIds);
+    for (const id of missingIds) addToDeck(id);
+};
+
+// ────────────────────────────────────────────────────────────────
 // Hook
 // ────────────────────────────────────────────────────────────────
 
@@ -97,6 +139,7 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
 
     // Response store
     const rough = useResponseStore((state) => state.rough);
+    const deck = useResponseStore((state) => state.deck);
     const qsort = useResponseStore((state) => state.qsort);
     const placeCardInGrid = useResponseStore((state) => state.placeCardInGrid);
     const moveCardInGrid = useResponseStore((state) => state.moveCardInGrid);
@@ -104,6 +147,11 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
     const unplaceCard = useResponseStore((state) => state.unplaceCard);
     const resetFineSort = useResponseStore((state) => state.resetFineSort);
     const categorizeCard = useResponseStore((state) => state.categorizeCard);
+    const addToDeck = useResponseStore((state) => state.addToDeck);
+
+    // Mode flag — read early so every effect / memo can branch on it.
+    // Defaults to true (rough mode) when the field is missing on older configs.
+    const roughSortEnabled = config?.rough_sort_enabled !== false;
 
     // Session store
     const setStep = useSessionStore((state) => state.setStep);
@@ -153,11 +201,32 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
 
     useEffect(() => {
         if (isCompleted) return;
+        // In deck mode there is no rough-sort URL to redirect to; the
+        // participant lands on FineSort directly from welcome / pre-sort.
+        if (!roughSortEnabled) return;
         const totalRough = rough.agree.length + rough.disagree.length + rough.neutral.length;
         if (config && totalRough === 0) {
             navigate(`/study/${slug}/rough-sort${location.search}`, { replace: true });
         }
-    }, [config, rough, navigate, slug, isCompleted, location.search]);
+    }, [config, rough, navigate, slug, isCompleted, location.search, roughSortEnabled]);
+
+    // ── Deck-mode defensive reset ─────────────────────────────────
+    // On mount in deck mode, clear any stale rough slice (e.g. carried over
+    // from a previous study session in the same browser). The reconciliation
+    // effect below will then push every config statement into the flat deck.
+    useEffect(() => {
+        if (roughSortEnabled) return;
+        if (
+            rough.agree.length > 0 ||
+            rough.disagree.length > 0 ||
+            rough.neutral.length > 0 ||
+            rough.history.length > 0
+        ) {
+            useResponseStore.setState({
+                rough: { agree: [], disagree: [], neutral: [], history: [] },
+            });
+        }
+    }, [roughSortEnabled, rough.agree, rough.disagree, rough.neutral, rough.history]);
 
     useEffect(() => {
         setHeaderAction(null);
@@ -184,36 +253,47 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
     const distributionMode: DistributionMode = (config?.distribution_mode ??
         'forced') as DistributionMode;
 
-    const { unplacedAgree, unplacedDisagree, unplacedNeutral, isAllPlaced } = useMemo(() => {
-        const placedIds = new Set(qsort.map((c) => c.statementId));
-        const statements = config?.statements || [];
+    const { unplacedAgree, unplacedDisagree, unplacedNeutral, unplacedDeck, isAllPlaced } =
+        useMemo(() => {
+            const placedIds = new Set(qsort.map((c) => c.statementId));
+            const statements = config?.statements || [];
 
-        const unplacedAgree = rough.agree
-            .filter((id) => !placedIds.has(id))
-            .map((id) => statements.find((s) => s.id === id))
-            .filter((s): s is NonNullable<typeof s> => !!s);
+            const unplacedAgree = rough.agree
+                .filter((id) => !placedIds.has(id))
+                .map((id) => statements.find((s) => s.id === id))
+                .filter((s): s is NonNullable<typeof s> => !!s);
 
-        const unplacedDisagree = rough.disagree
-            .filter((id) => !placedIds.has(id))
-            .map((id) => statements.find((s) => s.id === id))
-            .filter((s): s is NonNullable<typeof s> => !!s);
+            const unplacedDisagree = rough.disagree
+                .filter((id) => !placedIds.has(id))
+                .map((id) => statements.find((s) => s.id === id))
+                .filter((s): s is NonNullable<typeof s> => !!s);
 
-        const unplacedNeutral = rough.neutral
-            .filter((id) => !placedIds.has(id))
-            .map((id) => statements.find((s) => s.id === id))
-            .filter((s): s is NonNullable<typeof s> => !!s);
+            const unplacedNeutral = rough.neutral
+                .filter((id) => !placedIds.has(id))
+                .map((id) => statements.find((s) => s.id === id))
+                .filter((s): s is NonNullable<typeof s> => !!s);
 
-        // In forced mode the rough piles must all be empty (each card has a
-        // grid slot equal to its column capacity). In free/flexible mode any
-        // total count = stmt_count is accepted; the per-column structural
-        // constraint is relaxed.
-        const isAllPlaced =
-            unplacedAgree.length === 0 &&
-            unplacedDisagree.length === 0 &&
-            unplacedNeutral.length === 0;
+            // Deck-mode flat unplaced list: every config statement that is not in qsort.
+            // In rough mode this still computes (cheap) but downstream callers branch on
+            // rough_sort_enabled and only read it in deck mode.
+            const unplacedDeck = roughSortEnabled
+                ? []
+                : statements.filter((s) => !placedIds.has(s.id));
 
-        return { unplacedAgree, unplacedDisagree, unplacedNeutral, isAllPlaced };
-    }, [qsort, rough, config?.statements]);
+            // Mode-agnostic: every config statement is in qsort.
+            // In rough mode this is equivalent to "every rough pile is empty" by the
+            // reconciliation invariant (every id ends up either placed or in some pile).
+            const isAllPlaced =
+                statements.length > 0 && statements.every((s) => placedIds.has(s.id));
+
+            return {
+                unplacedAgree,
+                unplacedDisagree,
+                unplacedNeutral,
+                unplacedDeck,
+                isAllPlaced,
+            };
+        }, [qsort, rough, config?.statements, roughSortEnabled]);
 
     const showCodes = config?.show_statement_codes ?? false;
 
@@ -225,8 +305,9 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
             swapCardsInGrid,
             unplaceCard,
             categorizeCard,
+            addToDeck,
         }),
-        [placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard, categorizeCard]
+        [placeCardInGrid, moveCardInGrid, swapCardsInGrid, unplaceCard, categorizeCard, addToDeck]
     );
 
     // ── DnD ──────────────────────────────────────────────────────
@@ -250,19 +331,16 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
 
     // ── Reconciliation effect ─────────────────────────────────────
     useEffect(() => {
-        if (!config || !qsort || !rough) return;
+        if (!config || !qsort) return;
         const placedIds = new Set(qsort.map((p) => p.statementId));
-        const roughIds = new Set([...rough.agree, ...rough.neutral, ...rough.disagree]);
-        const missingIds = config.statements
-            .map((s) => s.id)
-            .filter((id) => !placedIds.has(id) && !roughIds.has(id));
-        if (missingIds.length > 0) {
-            console.warn('Reconciling missing cards:', missingIds);
-            for (const id of missingIds) {
-                actions.categorizeCard(id, 'neutral');
-            }
+        const statementIds = config.statements.map((s) => s.id);
+        if (roughSortEnabled) {
+            if (!rough) return;
+            reconcileIntoRoughNeutral(statementIds, placedIds, rough, actions.categorizeCard);
+        } else {
+            reconcileIntoDeck(statementIds, placedIds, deck, actions.addToDeck);
         }
-    }, [config, qsort, rough, actions]);
+    }, [config, qsort, rough, deck, actions, roughSortEnabled]);
 
     // ── Grid sanity ───────────────────────────────────────────────
     useGridSanity({
@@ -389,6 +467,7 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
         unplacedAgree,
         unplacedDisagree,
         unplacedNeutral,
+        unplacedDeck,
         isAllPlaced,
         showCodes,
         distributionMode,

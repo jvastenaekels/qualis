@@ -121,4 +121,49 @@ describe('useResponseStore', () => {
         const state = useResponseStore.getState();
         expect(state.rough.agree).toHaveLength(0);
     });
+
+    // ── Deck slice (rough_sort_enabled=false / deck mode) ─────────
+    describe('deck slice', () => {
+        it('initializes deck to an empty array', () => {
+            const state = useResponseStore.getState();
+            expect(state.deck).toEqual([]);
+        });
+
+        it('addToDeck appends a new id to deck', () => {
+            const store = useResponseStore.getState();
+            store.addToDeck(1);
+            expect(useResponseStore.getState().deck).toEqual([1]);
+        });
+
+        it('addToDeck is idempotent — repeated calls with the same id do not duplicate', () => {
+            const store = useResponseStore.getState();
+            store.addToDeck(1);
+            store.addToDeck(1);
+            store.addToDeck(2);
+            expect(useResponseStore.getState().deck).toEqual([1, 2]);
+        });
+
+        it('removeFromDeck removes the id from deck', () => {
+            const store = useResponseStore.getState();
+            store.addToDeck(1);
+            store.addToDeck(2);
+            store.removeFromDeck(1);
+            expect(useResponseStore.getState().deck).toEqual([2]);
+        });
+
+        it('removeFromDeck is a no-op when the id is missing', () => {
+            const store = useResponseStore.getState();
+            store.addToDeck(2);
+            store.removeFromDeck(999);
+            expect(useResponseStore.getState().deck).toEqual([2]);
+        });
+
+        it('resetResponses clears deck', () => {
+            const store = useResponseStore.getState();
+            store.addToDeck(1);
+            store.addToDeck(2);
+            store.resetResponses();
+            expect(useResponseStore.getState().deck).toEqual([]);
+        });
+    });
 });
