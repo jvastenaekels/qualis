@@ -55,6 +55,7 @@ import { StatementsTable } from '@/components/admin/analysis/StatementsTable';
 import { FactorCharacteristicsTable } from '@/components/admin/analysis/FactorCharacteristicsTable';
 import { AnalysisHistoryPanel } from '@/components/admin/analysis/AnalysisHistoryPanel';
 import { FactorVoicesPanel } from '@/components/admin/analysis/FactorVoicesPanel';
+import { FactorCanvas } from '@/components/admin/analysis/FactorCanvas';
 import { useExplorePhase, type ExplorePhaseApi } from '@/hooks/admin/useExplorePhase';
 import { useInterpretPhase, type InterpretPhaseApi } from '@/hooks/admin/useInterpretPhase';
 import type { AnalysisResult, AnalysisRunRead, AnalysisRunSummary } from '@/api/model';
@@ -122,6 +123,20 @@ export default function AnalysisPage() {
         );
     }, [setSearchParams]);
 
+    const setFocusFromCanvas = useCallback(
+        (factor: number) => {
+            setSearchParams(
+                (prev) => {
+                    const p = new URLSearchParams(prev);
+                    p.set('focus', `f${factor}`);
+                    return p;
+                },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
+
     const explore = useExplorePhase(slug, navigateToInterpret);
     const interpret = useInterpretPhase(slug, runId, focus, compareTo);
 
@@ -177,6 +192,7 @@ export default function AnalysisPage() {
                 t={t}
                 onSelectHistoricalRun={navigateToHistoricalRun}
                 onBackToExplore={navigateToExplore}
+                onFocusChange={setFocusFromCanvas}
             />
         );
     }
@@ -737,6 +753,7 @@ interface InterpretShellProps {
     t: TFunction;
     onSelectHistoricalRun: (runId: number) => void;
     onBackToExplore: () => void;
+    onFocusChange: (factor: number) => void;
 }
 
 function InterpretShell({
@@ -746,6 +763,7 @@ function InterpretShell({
     t,
     onSelectHistoricalRun,
     onBackToExplore,
+    onFocusChange,
 }: InterpretShellProps) {
     const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = searchParams.get('tab') ?? 'loadings';
@@ -766,6 +784,11 @@ function InterpretShell({
         },
         [setSearchParams]
     );
+
+    // ── Mode toggle: Focus (FactorCanvas) is the default; Overview keeps
+    // the legacy four-tab layout as a one-click escape hatch for
+    // cross-factor views (loadings/arrays/statements/summary).
+    const [mode, setMode] = useState<'focus' | 'overview'>('focus');
 
     const run = interpret.run;
     const analysisResult = run ? (run.result as unknown as AnalysisResult) : null;
@@ -1023,168 +1046,207 @@ function InterpretShell({
                 </Button>
             </div>
 
+            {/* Mode toggle — Focus (FactorCanvas) by default, Overview restores
+                the legacy four-tab layout. Sits above the results card. */}
+            <div className="flex justify-end">
+                <div
+                    className="inline-flex rounded-md bg-slate-100 p-1"
+                    role="group"
+                    aria-label={t('admin.analysis.interpret.mode_toggle', 'View mode')}
+                >
+                    <button
+                        type="button"
+                        onClick={() => setMode('focus')}
+                        className={
+                            mode === 'focus'
+                                ? 'px-3 py-1.5 text-xs font-medium rounded bg-white text-slate-900 shadow-sm'
+                                : 'px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900'
+                        }
+                        aria-pressed={mode === 'focus'}
+                    >
+                        {t('admin.analysis.interpret.focus_mode', 'Per-factor focus')}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setMode('overview')}
+                        className={
+                            mode === 'overview'
+                                ? 'px-3 py-1.5 text-xs font-medium rounded bg-white text-slate-900 shadow-sm'
+                                : 'px-3 py-1.5 text-xs font-medium text-slate-600 hover:text-slate-900'
+                        }
+                        aria-pressed={mode === 'overview'}
+                    >
+                        {t('admin.analysis.interpret.overview_mode', 'Overview')}
+                    </button>
+                </div>
+            </div>
+
             {/* Results */}
-            <Card className="border-none shadow-sm bg-white rounded-2xl relative">
-                <CardContent className="pt-5 pb-5">
-                    <Tabs value={activeTab} onValueChange={setActiveTab}>
-                        <TabsList className="mb-5 flex-wrap h-auto gap-1">
-                            <TabsTrigger value="loadings" className="gap-1.5">
-                                <BarChart3 className="size-3.5" aria-hidden="true" />
-                                {t('admin.analysis.tab_loadings', 'Loadings')}
-                            </TabsTrigger>
-                            <TabsTrigger value="arrays" className="gap-1.5">
-                                <Grid3X3 className="size-3.5" aria-hidden="true" />
-                                {t('admin.analysis.tab_factor_arrays', 'Factor Arrays')}
-                            </TabsTrigger>
-                            <TabsTrigger value="statements" className="gap-1.5">
-                                <List className="size-3.5" aria-hidden="true" />
-                                {t('admin.analysis.tab_statements', 'Statements')}
-                            </TabsTrigger>
-                            <TabsTrigger value="summary" className="gap-1.5">
-                                <Info className="size-3.5" aria-hidden="true" />
-                                {t('admin.analysis.tab_summary', 'Summary')}
-                            </TabsTrigger>
-                        </TabsList>
+            {mode === 'focus' ? (
+                <FactorCanvas slug={slug} interpret={interpret} onFocusChange={onFocusChange} />
+            ) : (
+                <Card className="border-none shadow-sm bg-white rounded-2xl relative">
+                    <CardContent className="pt-5 pb-5">
+                        <Tabs value={activeTab} onValueChange={setActiveTab}>
+                            <TabsList className="mb-5 flex-wrap h-auto gap-1">
+                                <TabsTrigger value="loadings" className="gap-1.5">
+                                    <BarChart3 className="size-3.5" aria-hidden="true" />
+                                    {t('admin.analysis.tab_loadings', 'Loadings')}
+                                </TabsTrigger>
+                                <TabsTrigger value="arrays" className="gap-1.5">
+                                    <Grid3X3 className="size-3.5" aria-hidden="true" />
+                                    {t('admin.analysis.tab_factor_arrays', 'Factor Arrays')}
+                                </TabsTrigger>
+                                <TabsTrigger value="statements" className="gap-1.5">
+                                    <List className="size-3.5" aria-hidden="true" />
+                                    {t('admin.analysis.tab_statements', 'Statements')}
+                                </TabsTrigger>
+                                <TabsTrigger value="summary" className="gap-1.5">
+                                    <Info className="size-3.5" aria-hidden="true" />
+                                    {t('admin.analysis.tab_summary', 'Summary')}
+                                </TabsTrigger>
+                            </TabsList>
 
-                        <TabsContent value="loadings" className="space-y-3">
-                            <GuidanceCard
-                                title={t(
-                                    'admin.analysis.guide_loadings_title',
-                                    'Reading Factor Loadings'
-                                )}
-                                type="info"
-                                collapsible
-                                defaultOpen={false}
-                            >
-                                <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
-                                    <li>
-                                        {t(
-                                            'admin.analysis.guide_loadings_1',
-                                            'Each loading is a correlation (-1 to +1) between a participant and a factor (shared viewpoint).'
-                                        )}
-                                    </li>
-                                    <li>
-                                        {t(
-                                            'admin.analysis.guide_loadings_2',
-                                            'Highlighted values exceed the significance threshold shown above the table.'
-                                        )}
-                                    </li>
-                                </ul>
-                            </GuidanceCard>
-                            <FactorLoadingsTable
-                                result={analysisResult}
-                                flaggingMode={flaggingMode}
-                                manualFlags={manualFlags}
-                                onToggleFlag={handleToggleFlag}
-                            />
-                        </TabsContent>
+                            <TabsContent value="loadings" className="space-y-3">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.analysis.guide_loadings_title',
+                                        'Reading Factor Loadings'
+                                    )}
+                                    type="info"
+                                    collapsible
+                                    defaultOpen={false}
+                                >
+                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_loadings_1',
+                                                'Each loading is a correlation (-1 to +1) between a participant and a factor (shared viewpoint).'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_loadings_2',
+                                                'Highlighted values exceed the significance threshold shown above the table.'
+                                            )}
+                                        </li>
+                                    </ul>
+                                </GuidanceCard>
+                                <FactorLoadingsTable
+                                    result={analysisResult}
+                                    flaggingMode={flaggingMode}
+                                    manualFlags={manualFlags}
+                                    onToggleFlag={handleToggleFlag}
+                                />
+                            </TabsContent>
 
-                        <TabsContent value="arrays" className="space-y-3">
-                            <GuidanceCard
-                                title={t(
-                                    'admin.analysis.guide_arrays_title',
-                                    'Interpreting Factor Arrays'
-                                )}
-                                type="info"
-                                collapsible
-                                defaultOpen={false}
-                            >
-                                <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
-                                    <li>
-                                        {t(
-                                            'admin.analysis.guide_arrays_1',
-                                            'Each factor array is the composite Q-sort representing one shared viewpoint.'
-                                        )}
-                                    </li>
-                                    <li>
-                                        {t(
-                                            'admin.analysis.guide_arrays_2',
-                                            'Read left-to-right as most disagreed to most agreed. Extreme positions carry the strongest signal for interpretation.'
-                                        )}
-                                    </li>
-                                </ul>
-                            </GuidanceCard>
-                            <FactorArraysView
-                                result={analysisResult}
-                                currentRun={currentRun}
-                                slug={slug}
-                                showFactorNarratives={showFactorNarratives}
-                                onToggleFactorNarratives={() =>
-                                    setShowFactorNarratives(!showFactorNarratives)
-                                }
-                            />
-                        </TabsContent>
+                            <TabsContent value="arrays" className="space-y-3">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.analysis.guide_arrays_title',
+                                        'Interpreting Factor Arrays'
+                                    )}
+                                    type="info"
+                                    collapsible
+                                    defaultOpen={false}
+                                >
+                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_arrays_1',
+                                                'Each factor array is the composite Q-sort representing one shared viewpoint.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_arrays_2',
+                                                'Read left-to-right as most disagreed to most agreed. Extreme positions carry the strongest signal for interpretation.'
+                                            )}
+                                        </li>
+                                    </ul>
+                                </GuidanceCard>
+                                <FactorArraysView
+                                    result={analysisResult}
+                                    currentRun={currentRun}
+                                    slug={slug}
+                                    showFactorNarratives={showFactorNarratives}
+                                    onToggleFactorNarratives={() =>
+                                        setShowFactorNarratives(!showFactorNarratives)
+                                    }
+                                />
+                            </TabsContent>
 
-                        <TabsContent value="statements" className="space-y-3">
-                            <GuidanceCard
-                                title={t(
-                                    'admin.analysis.guide_statements_title',
-                                    'Understanding Statement Scores'
-                                )}
-                                type="info"
-                                collapsible
-                                defaultOpen={false}
-                            >
-                                <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
-                                    <li>
-                                        {t(
-                                            'admin.analysis.guide_statements_1',
-                                            'Z-scores show how strongly each factor agrees or disagrees with each statement (0 = neutral).'
-                                        )}
-                                    </li>
-                                    <li>
-                                        {t(
-                                            'admin.analysis.guide_statements_2',
-                                            'D = distinguishing (placed significantly differently across factors). Stars indicate significance level.'
-                                        )}
-                                    </li>
-                                </ul>
-                            </GuidanceCard>
-                            <StatementsTable result={analysisResult} />
-                        </TabsContent>
+                            <TabsContent value="statements" className="space-y-3">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.analysis.guide_statements_title',
+                                        'Understanding Statement Scores'
+                                    )}
+                                    type="info"
+                                    collapsible
+                                    defaultOpen={false}
+                                >
+                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_statements_1',
+                                                'Z-scores show how strongly each factor agrees or disagrees with each statement (0 = neutral).'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_statements_2',
+                                                'D = distinguishing (placed significantly differently across factors). Stars indicate significance level.'
+                                            )}
+                                        </li>
+                                    </ul>
+                                </GuidanceCard>
+                                <StatementsTable result={analysisResult} />
+                            </TabsContent>
 
-                        <TabsContent value="summary" className="space-y-3">
-                            <GuidanceCard
-                                title={t(
-                                    'admin.analysis.guide_summary_title',
-                                    'Evaluating Your Solution'
-                                )}
-                                type="info"
-                                collapsible
-                                defaultOpen={false}
-                            >
-                                <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
-                                    <li>
-                                        {t(
-                                            'admin.analysis.guide_summary_1',
-                                            'Eigenvalues measure how much variance a factor explains. The Kaiser criterion (eigenvalue > 1) is one common heuristic for deciding how many factors to retain.'
-                                        )}
-                                    </li>
-                                    <li>
-                                        {t(
-                                            'admin.analysis.guide_summary_2',
-                                            'Composite reliability reflects how consistently the flagged sorts define each factor. Higher values mean the factor estimate is based on more agreement among its defining sorts.'
-                                        )}
-                                    </li>
-                                </ul>
-                            </GuidanceCard>
-                            <FactorCharacteristicsTable result={analysisResult} />
-                        </TabsContent>
-                    </Tabs>
+                            <TabsContent value="summary" className="space-y-3">
+                                <GuidanceCard
+                                    title={t(
+                                        'admin.analysis.guide_summary_title',
+                                        'Evaluating Your Solution'
+                                    )}
+                                    type="info"
+                                    collapsible
+                                    defaultOpen={false}
+                                >
+                                    <ul className="text-xs leading-relaxed space-y-1 list-disc list-inside">
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_summary_1',
+                                                'Eigenvalues measure how much variance a factor explains. The Kaiser criterion (eigenvalue > 1) is one common heuristic for deciding how many factors to retain.'
+                                            )}
+                                        </li>
+                                        <li>
+                                            {t(
+                                                'admin.analysis.guide_summary_2',
+                                                'Composite reliability reflects how consistently the flagged sorts define each factor. Higher values mean the factor estimate is based on more agreement among its defining sorts.'
+                                            )}
+                                        </li>
+                                    </ul>
+                                </GuidanceCard>
+                                <FactorCharacteristicsTable result={analysisResult} />
+                            </TabsContent>
+                        </Tabs>
 
-                    {/* Per-factor voices panels — always rendered below all tabs */}
-                    <div className="mt-4 space-y-2">
-                        {Array.from({ length: analysisResult.n_factors }, (_, f) => (
-                            <FactorVoicesPanel
-                                key={f}
-                                slug={slug}
-                                factorIndex={f}
-                                participants={analysisResult.participants}
-                            />
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+                        {/* Per-factor voices panels — always rendered below all tabs */}
+                        <div className="mt-4 space-y-2">
+                            {Array.from({ length: analysisResult.n_factors }, (_, f) => (
+                                <FactorVoicesPanel
+                                    key={f}
+                                    slug={slug}
+                                    factorIndex={f}
+                                    participants={analysisResult.participants}
+                                />
+                            ))}
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
         </div>
     );
 }

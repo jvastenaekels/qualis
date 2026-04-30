@@ -970,7 +970,10 @@
                 "def_sorts": "Defining sorts: {{n}}",
                 "statements_title": "Statements",
                 "narrative_title": "Narrative — F{{n}}",
-                "insert_comment_quote": "Insert comment as quote"
+                "insert_comment_quote": "Insert comment as quote",
+                "focus_mode": "Per-factor focus",
+                "overview_mode": "Overview",
+                "mode_toggle": "View mode"
             },
             "quote_insert_format": "> {{text}}\n> — {{p}}, on statement {{code}}: \"{{stmt}}\""
         },

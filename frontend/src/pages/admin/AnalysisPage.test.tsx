@@ -562,6 +562,10 @@ describe('AnalysisPage', () => {
             initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
         });
 
+        // Focus mode is now the default — switch to Overview to see the
+        // four-tab layout where the loadings guidance lives.
+        await userEvent.click(screen.getByRole('button', { name: /overview/i }));
+
         // The loadings tab should show its guidance card (default tab)
         expect(await screen.findByText(/Reading Factor Loadings/i)).toBeInTheDocument();
     });
@@ -690,6 +694,167 @@ describe('AnalysisPage', () => {
             expect(screen.queryByTestId('interpret-phase')).not.toBeInTheDocument();
         });
         expect(screen.getByRole('button', { name: /commit and interpret/i })).toBeInTheDocument();
+    });
+
+    // ── Focus / Overview mode toggle (Task 24) ─────────────────────
+
+    it('Interpret phase renders Focus mode by default', async () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+        mockGetRunHook.mockReturnValue({
+            data: mockRun,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+        });
+
+        renderWithProviders(<AnalysisPage />, {
+            initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+        });
+
+        // FactorCanvas renders the FactorSelectorChips (role="tab"); legacy
+        // Tabs (role="tab", names "Loadings"/"Factor Arrays"/…) are NOT
+        // mounted in Focus mode.
+        await waitFor(() => {
+            expect(screen.getByRole('tab', { name: 'F1' })).toBeInTheDocument();
+        });
+        expect(screen.queryByRole('tab', { name: /loadings/i })).not.toBeInTheDocument();
+    });
+
+    it('clicking Overview switches to the legacy four-tabs layout', async () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+        mockGetRunHook.mockReturnValue({
+            data: mockRun,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+        });
+
+        renderWithProviders(<AnalysisPage />, {
+            initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+        });
+
+        await userEvent.click(screen.getByRole('button', { name: /overview/i }));
+
+        expect(screen.getByRole('tab', { name: /loadings/i })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: /factor arrays/i })).toBeInTheDocument();
+        // FactorCanvas chips are gone in Overview mode.
+        expect(screen.queryByRole('tab', { name: 'F1' })).not.toBeInTheDocument();
+    });
+
+    it('clicking Per-factor focus switches back from Overview', async () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+        mockGetRunHook.mockReturnValue({
+            data: mockRun,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+        });
+
+        renderWithProviders(<AnalysisPage />, {
+            initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+        });
+
+        await userEvent.click(screen.getByRole('button', { name: /overview/i }));
+        expect(screen.getByRole('tab', { name: /loadings/i })).toBeInTheDocument();
+
+        await userEvent.click(screen.getByRole('button', { name: /per-factor focus/i }));
+        expect(screen.getByRole('tab', { name: 'F1' })).toBeInTheDocument();
+        expect(screen.queryByRole('tab', { name: /loadings/i })).not.toBeInTheDocument();
+    });
+
+    it('?focus=f2 URL param renders F2 as the active chip', async () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+        mockGetRunHook.mockReturnValue({
+            data: mockRun,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+        });
+
+        renderWithProviders(<AnalysisPage />, {
+            initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42&focus=f2`],
+        });
+
+        await waitFor(() => {
+            expect(screen.getByRole('tab', { name: 'F2' })).toBeInTheDocument();
+        });
+        const f2 = screen.getByRole('tab', { name: 'F2' });
+        const f1 = screen.getByRole('tab', { name: 'F1' });
+        expect(f2).toHaveAttribute('aria-selected', 'true');
+        expect(f1).toHaveAttribute('aria-selected', 'false');
+    });
+
+    it('clicking F2 chip updates the active chip aria-selected', async () => {
+        mockEigenvaluesHook.mockReturnValue({
+            data: mockEigenvalues,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+            refetch: vi.fn(),
+        });
+        mockGetRunHook.mockReturnValue({
+            data: mockRun,
+            isLoading: false,
+            isSuccess: true,
+            isError: false,
+            error: null,
+        });
+
+        renderWithProviders(<AnalysisPage />, {
+            initialEntries: [`${ANALYSIS_PATH}?phase=interpret&runId=42`],
+        });
+
+        // F1 active by default (focus omitted from URL).
+        await waitFor(() => {
+            expect(screen.getByRole('tab', { name: 'F1' })).toHaveAttribute(
+                'aria-selected',
+                'true'
+            );
+        });
+
+        // Click F2 — the URL writer (setFocusFromCanvas) updates ?focus=f2,
+        // the hook re-derives activeFactor=2, and the chip aria flips.
+        await userEvent.click(screen.getByRole('tab', { name: 'F2' }));
+        await waitFor(() => {
+            expect(screen.getByRole('tab', { name: 'F2' })).toHaveAttribute(
+                'aria-selected',
+                'true'
+            );
+        });
+        expect(screen.getByRole('tab', { name: 'F1' })).toHaveAttribute('aria-selected', 'false');
     });
 
     it('navigates to interpret phase after a successful run', async () => {

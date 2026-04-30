@@ -922,7 +922,10 @@
                 "def_sorts": "Sorts définissants : {{n}}",
                 "statements_title": "Énoncés",
                 "narrative_title": "Narration — F{{n}}",
-                "insert_comment_quote": "Insérer le commentaire comme citation"
+                "insert_comment_quote": "Insérer le commentaire comme citation",
+                "focus_mode": "Focus par facteur",
+                "overview_mode": "Vue d'ensemble",
+                "mode_toggle": "Mode d'affichage"
             },
             "quote_insert_format": "> {{text}}\n> — {{p}}, sur l'énoncé {{code}} : « {{stmt}} »"
         },
