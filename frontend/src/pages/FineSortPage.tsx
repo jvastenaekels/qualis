@@ -48,10 +48,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         config,
         gridColumns,
         qsort,
-        unplacedAgree,
-        unplacedDisagree,
-        unplacedNeutral,
-        unplacedDeck,
+        unplaced,
         isAllPlaced,
         showCodes,
         distributionMode,
@@ -102,6 +99,29 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
     const activeCardData =
         activeId !== null ? config.statements.find((s) => s.id === activeId) : undefined;
 
+    // Props shared by both GridSort branches (rough mode vs deck mode).
+    // The two branches differ only in how the unplaced cards are partitioned:
+    // rough → agree/disagree/neutral piles; deck → a single flat `deckCards`.
+    const sharedGridProps = {
+        gridColumns,
+        renderSlotContent,
+        conditionOfInstruction: config.condition_of_instruction,
+        disableHoverZoom: activeId !== null,
+        selectedCardId,
+        onCardClick: handleCardClick,
+        onSlotClick: handleSlotClick,
+        onDimensionsChange: setCardDimensions,
+        onReset: handleReset,
+        onZoomChange: setZoomLevel,
+        onInteractionUtils: setInteractionUtils,
+        isAllPlaced,
+        onValidate: handleValidate,
+        showCodes,
+        distributionMode,
+        highlightKey,
+        uiLabels: config.ui_labels,
+    };
+
     return (
         <DndContext
             sensors={sensors}
@@ -123,52 +143,20 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
                     items={config.statements.map((s) => s.id)}
                     strategy={rectSortingStrategy}
                 >
-                    {config?.rough_sort_enabled !== false ? (
+                    {unplaced.mode === 'rough' ? (
                         <GridSort
-                            agreeCards={unplacedAgree}
-                            disagreeCards={unplacedDisagree}
-                            neutralCards={unplacedNeutral}
-                            gridColumns={gridColumns}
-                            renderSlotContent={renderSlotContent}
-                            conditionOfInstruction={config.condition_of_instruction}
-                            disableHoverZoom={activeId !== null}
-                            selectedCardId={selectedCardId}
-                            onCardClick={handleCardClick}
-                            onSlotClick={handleSlotClick}
-                            onDimensionsChange={setCardDimensions}
-                            onReset={handleReset}
-                            onZoomChange={setZoomLevel}
-                            onInteractionUtils={setInteractionUtils}
-                            isAllPlaced={isAllPlaced}
-                            onValidate={handleValidate}
-                            showCodes={showCodes}
-                            distributionMode={distributionMode}
-                            highlightKey={highlightKey}
-                            uiLabels={config.ui_labels}
+                            {...sharedGridProps}
+                            agreeCards={unplaced.agree}
+                            disagreeCards={unplaced.disagree}
+                            neutralCards={unplaced.neutral}
                         />
                     ) : (
                         <GridSort
+                            {...sharedGridProps}
                             agreeCards={[]}
                             disagreeCards={[]}
                             neutralCards={[]}
-                            deckCards={unplacedDeck}
-                            gridColumns={gridColumns}
-                            renderSlotContent={renderSlotContent}
-                            conditionOfInstruction={config.condition_of_instruction}
-                            disableHoverZoom={activeId !== null}
-                            selectedCardId={selectedCardId}
-                            onCardClick={handleCardClick}
-                            onSlotClick={handleSlotClick}
-                            onDimensionsChange={setCardDimensions}
-                            onReset={handleReset}
-                            onZoomChange={setZoomLevel}
-                            onInteractionUtils={setInteractionUtils}
-                            isAllPlaced={isAllPlaced}
-                            onValidate={handleValidate}
-                            showCodes={showCodes}
-                            distributionMode={distributionMode}
-                            highlightKey={highlightKey}
-                            uiLabels={config.ui_labels}
+                            deckCards={unplaced.deck}
                         />
                     )}
                 </SortableContext>

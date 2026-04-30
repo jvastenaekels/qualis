@@ -101,11 +101,14 @@ describe('useFineSort', () => {
 
         const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
 
-        expect(result.current.unplacedAgree).toHaveLength(1);
-        expect(result.current.unplacedAgree[0].id).toBe(1);
-        expect(result.current.unplacedDisagree).toHaveLength(1);
-        expect(result.current.unplacedDisagree[0].id).toBe(2);
-        expect(result.current.unplacedNeutral).toHaveLength(0); // card 3 is placed
+        const { unplaced } = result.current;
+        expect(unplaced.mode).toBe('rough');
+        if (unplaced.mode !== 'rough') throw new Error('expected rough mode');
+        expect(unplaced.agree).toHaveLength(1);
+        expect(unplaced.agree[0].id).toBe(1);
+        expect(unplaced.disagree).toHaveLength(1);
+        expect(unplaced.disagree[0].id).toBe(2);
+        expect(unplaced.neutral).toHaveLength(0); // card 3 is placed
     });
 
     it('isAllPlaced is false when cards remain in decks', () => {
@@ -236,23 +239,29 @@ describe('useFineSort deck mode', () => {
         expect(wentToRough).toBe(false);
     });
 
-    it('returns unplacedDeck listing every config statement when nothing is placed', async () => {
+    it('returns unplaced.deck listing every config statement when nothing is placed', async () => {
         const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
         // Allow reconciliation effect to push orphans into the deck slice
         await act(async () => {});
 
-        expect(result.current.unplacedDeck).toHaveLength(3);
-        const ids = result.current.unplacedDeck.map((s) => s.id).sort();
+        const { unplaced } = result.current;
+        expect(unplaced.mode).toBe('deck');
+        if (unplaced.mode !== 'deck') throw new Error('expected deck mode');
+        expect(unplaced.deck).toHaveLength(3);
+        const ids = unplaced.deck.map((s) => s.id).sort();
         expect(ids).toEqual([1, 2, 3]);
     });
 
-    it('after placing card 2 in the grid, unplacedDeck contains the remaining ids (1, 3) and not 2', async () => {
+    it('after placing card 2 in the grid, unplaced.deck contains the remaining ids (1, 3) and not 2', async () => {
         useResponseStore.getState().placeCardInGrid(2, 1, 0);
 
         const { result } = renderHook(() => useFineSort(null), { wrapper: AllTheProviders });
         await act(async () => {});
 
-        const ids = result.current.unplacedDeck.map((s) => s.id).sort();
+        const { unplaced } = result.current;
+        expect(unplaced.mode).toBe('deck');
+        if (unplaced.mode !== 'deck') throw new Error('expected deck mode');
+        const ids = unplaced.deck.map((s) => s.id).sort();
         expect(ids).toEqual([1, 3]);
         expect(ids).not.toContain(2);
     });

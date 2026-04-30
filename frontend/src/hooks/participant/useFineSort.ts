@@ -52,20 +52,29 @@ import type { Statement, StudyConfig } from '../../schemas/study';
 
 export type DistributionMode = 'forced' | 'free' | 'flexible';
 
+/**
+ * Discriminated union describing the unplaced cards by mode.
+ *
+ * - `mode: 'rough'` → cards are partitioned into agree/disagree/neutral piles
+ *   (rough_sort_enabled !== false, the default).
+ * - `mode: 'deck'`  → a single flat list of every unplaced card
+ *   (rough_sort_enabled === false).
+ *
+ * Consumers branch on `unplaced.mode` to read the correct fields, replacing
+ * the previous flat surface (`unplacedAgree` / `unplacedDisagree` /
+ * `unplacedNeutral` / `unplacedDeck`) where the wrong-mode fields were
+ * always empty arrays.
+ */
+export type UnplacedState =
+    | { mode: 'rough'; agree: Statement[]; disagree: Statement[]; neutral: Statement[] }
+    | { mode: 'deck'; deck: Statement[] };
+
 export interface FineSortApi {
     // Config / derived data
     config: StudyConfig | null;
     gridColumns: { score: number; capacity: number }[];
     qsort: { statementId: number; col: number; row: number }[];
-    unplacedAgree: Statement[];
-    unplacedDisagree: Statement[];
-    unplacedNeutral: Statement[];
-    /**
-     * Flat unplaced deck (deck mode, rough_sort_enabled=false).
-     * Empty when in rough mode — callers should branch on
-     * `config.rough_sort_enabled !== false` before reading either side.
-     */
-    unplacedDeck: Statement[];
+    unplaced: UnplacedState;
     isAllPlaced: boolean;
     showCodes: boolean;
     distributionMode: DistributionMode;
@@ -253,47 +262,45 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
     const distributionMode: DistributionMode = (config?.distribution_mode ??
         'forced') as DistributionMode;
 
-    const { unplacedAgree, unplacedDisagree, unplacedNeutral, unplacedDeck, isAllPlaced } =
-        useMemo(() => {
-            const placedIds = new Set(qsort.map((c) => c.statementId));
-            const statements = config?.statements || [];
+    const { unplaced, isAllPlaced } = useMemo<{
+        unplaced: UnplacedState;
+        isAllPlaced: boolean;
+    }>(() => {
+        const placedIds = new Set(qsort.map((c) => c.statementId));
+        const statements = config?.statements || [];
 
-            const unplacedAgree = rough.agree
+        const resolve = (ids: number[]): Statement[] =>
+            ids
                 .filter((id) => !placedIds.has(id))
                 .map((id) => statements.find((s) => s.id === id))
                 .filter((s): s is NonNullable<typeof s> => !!s);
 
-            const unplacedDisagree = rough.disagree
-                .filter((id) => !placedIds.has(id))
-                .map((id) => statements.find((s) => s.id === id))
-                .filter((s): s is NonNullable<typeof s> => !!s);
+        // Mode-agnostic: every config statement is in qsort.
+        // In rough mode this is equivalent to "every rough pile is empty" by the
+        // reconciliation invariant (every id ends up either placed or in some pile).
+        const isAllPlaced = statements.length > 0 && statements.every((s) => placedIds.has(s.id));
 
-            const unplacedNeutral = rough.neutral
-                .filter((id) => !placedIds.has(id))
-                .map((id) => statements.find((s) => s.id === id))
-                .filter((s): s is NonNullable<typeof s> => !!s);
-
-            // Deck-mode flat unplaced list: every config statement that is not in qsort.
-            // In rough mode this still computes (cheap) but downstream callers branch on
-            // rough_sort_enabled and only read it in deck mode.
-            const unplacedDeck = roughSortEnabled
-                ? []
-                : statements.filter((s) => !placedIds.has(s.id));
-
-            // Mode-agnostic: every config statement is in qsort.
-            // In rough mode this is equivalent to "every rough pile is empty" by the
-            // reconciliation invariant (every id ends up either placed or in some pile).
-            const isAllPlaced =
-                statements.length > 0 && statements.every((s) => placedIds.has(s.id));
-
+        if (roughSortEnabled) {
             return {
-                unplacedAgree,
-                unplacedDisagree,
-                unplacedNeutral,
-                unplacedDeck,
+                unplaced: {
+                    mode: 'rough',
+                    agree: resolve(rough.agree),
+                    disagree: resolve(rough.disagree),
+                    neutral: resolve(rough.neutral),
+                },
                 isAllPlaced,
             };
-        }, [qsort, rough, config?.statements, roughSortEnabled]);
+        }
+
+        // Deck-mode flat unplaced list: every config statement that is not in qsort.
+        return {
+            unplaced: {
+                mode: 'deck',
+                deck: statements.filter((s) => !placedIds.has(s.id)),
+            },
+            isAllPlaced,
+        };
+    }, [qsort, rough, config?.statements, roughSortEnabled]);
 
     const showCodes = config?.show_statement_codes ?? false;
 
@@ -464,10 +471,7 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
         config,
         gridColumns,
         qsort,
-        unplacedAgree,
-        unplacedDisagree,
-        unplacedNeutral,
-        unplacedDeck,
+        unplaced,
         isAllPlaced,
         showCodes,
         distributionMode,
