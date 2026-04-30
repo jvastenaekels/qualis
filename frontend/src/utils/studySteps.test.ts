@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-    getEnabledSteps,
-    getStepInfo,
-    getStepLabels,
-    mapPersistedStepToKey,
-} from './studySteps';
+import { getEnabledSteps, getStepInfo, getStepLabels, mapPersistedStepToKey } from './studySteps';
 
 const baseStudy = (overrides: Partial<{ rough_sort_enabled: boolean }> = {}) =>
     ({
