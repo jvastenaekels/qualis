@@ -447,6 +447,13 @@
                     "label": "Joustava",
                     "tooltip": "Korttien kokonaismäärä = Q-joukon koko; sarakkeiden kapasiteetit ovat ohjeellisia (vain varoituksia)."
                 }
+            },
+            "rough_sort": {
+                "section_title": "Esilajitteluvaihe",
+                "toggle_label": "Ota esilajittelu käyttöön (samaa mieltä / neutraali / eri mieltä)",
+                "toggle_help": "Suositellaan suurille Q-joukoille (>40 väittämää). Noin 38 % julkaistuista Q-tutkimuksista käyttää tätä vaihetta (Dieteren et al. 2023).",
+                "lock_banner": "Lukittu — {{count}} osallistuja(a) on aloittanut kyselyn. Arkistoi tai poista nämä istunnot ennen tämän asetuksen muuttamista.",
+                "deck_mode_note": "Pois käytöstä — osallistujat näkevät koko Q-joukon vaakasuunnassa vieritettävänä pakkana."
             }
         },
         "study": {
