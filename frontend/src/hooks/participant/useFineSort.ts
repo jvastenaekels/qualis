@@ -334,6 +334,7 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
         interactionUtils,
         statements: config?.statements || [],
         actions,
+        distributionMode,
     });
 
     // ── Reconciliation effect ─────────────────────────────────────

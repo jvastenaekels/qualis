@@ -23,23 +23,46 @@ interface Actions {
     unplaceCard: (id: number) => void;
 }
 
+type DistributionMode = 'forced' | 'free' | 'flexible';
+
 interface UseGridPlacementProps {
     responses: {
         qsort: DragCard[];
     };
     gridColumns: GridColumn[];
     actions: Actions;
+    /**
+     * Distribution mode driving placement strictness. In `free` mode the
+     * per-column capacity is a soft visual hint: when every declared row is
+     * occupied, placement overflows into a synthesised row past capacity
+     * instead of swapping with an existing card. `forced` and `flexible`
+     * keep the legacy clamp-and-swap behaviour.
+     */
+    distributionMode?: DistributionMode;
 }
 
-export const useGridPlacement = ({ responses, gridColumns, actions }: UseGridPlacementProps) => {
+export const useGridPlacement = ({
+    responses,
+    gridColumns,
+    actions,
+    distributionMode = 'forced',
+}: UseGridPlacementProps) => {
     const findClosestEmptyRow = useCallback(
         (col: number, targetRow: number): number | null => {
             const capacity = gridColumns[col]?.capacity || 0;
             const cardsInCol = responses.qsort.filter((c) => c.col === col);
             const occupiedRows = new Set(cardsInCol.map((c) => c.row));
 
+            // Free mode: allow overflow rows past the declared capacity. The
+            // search horizon must extend at least one slot past the highest
+            // currently-occupied row so the next placement always lands in a
+            // synthesised empty row instead of triggering a swap.
+            const maxOccupiedRow = cardsInCol.reduce((m, c) => Math.max(m, c.row), -1);
+            const searchHorizon =
+                distributionMode === 'free' ? Math.max(capacity, maxOccupiedRow + 2) : capacity;
+
             const emptyRows: number[] = [];
-            for (let r = 0; r < capacity; r++) {
+            for (let r = 0; r < searchHorizon; r++) {
                 if (!occupiedRows.has(r)) {
                     emptyRows.push(r);
                 }
@@ -56,7 +79,7 @@ export const useGridPlacement = ({ responses, gridColumns, actions }: UseGridPla
 
             return emptyRows[0] ?? null;
         },
-        [gridColumns, responses.qsort]
+        [gridColumns, responses.qsort, distributionMode]
     );
 
     const handlePlacement = useCallback(

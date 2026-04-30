@@ -549,6 +549,15 @@ interface GridSortProps {
      * every other concern stay identical to rough mode.
      */
     deckCards?: { id: number; text: string; code?: string }[];
+    /**
+     * Committed grid-placement state (one entry per placed card). Only the
+     * `col` index is read here — used by free-mode rendering to compute how
+     * many slots a column needs (declared capacity may be exceeded). Drag
+     * preview state must NOT be folded in: the slot count derives only from
+     * settled placements to avoid reflow jitter mid-drag. Ignored unless
+     * `distributionMode === 'free'`.
+     */
+    qsort?: { col: number }[];
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -594,9 +603,35 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         sidebarContent,
         distributionMode = 'forced',
         deckCards,
+        qsort,
     }) => {
         const { t } = useTranslation();
         const isForcedDistribution = distributionMode === 'forced';
+        const isFreeDistribution = distributionMode === 'free';
+
+        // Per-column rendered slot count. Free mode is the only mode that
+        // diverges from the declared capacity — it grows the column down by
+        // one extra empty row whenever every declared row is filled, so the
+        // participant can keep adding cards. Forced/flexible always render
+        // exactly `col.capacity` slots (regression guard).
+        const slotCounts = useMemo(() => {
+            if (!isFreeDistribution) {
+                return gridColumns.map((col) => col.capacity);
+            }
+            const cardsPerCol = new Map<number, number>();
+            (qsort ?? []).forEach((c) => {
+                cardsPerCol.set(c.col, (cardsPerCol.get(c.col) ?? 0) + 1);
+            });
+            return gridColumns.map((col, idx) => {
+                const cardsInColumn = cardsPerCol.get(idx) ?? 0;
+                // When the column has reached or exceeded capacity, surface
+                // one trailing empty slot so further drops have a target.
+                if (cardsInColumn >= col.capacity) {
+                    return cardsInColumn + 1;
+                }
+                return col.capacity;
+            });
+        }, [gridColumns, qsort, isFreeDistribution]);
 
         const { isMobile, isDesktop, isLandscape, height } = useViewport();
         // Include landscape phones >= 768px (e.g., iPhone 14 Pro at 844x390)
@@ -916,92 +951,94 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                                     role="row"
                                                     tabIndex={-1}
                                                 >
-                                                    {Array.from({ length: col.capacity }).map(
-                                                        (_, rowIndex) =>
-                                                            readOnly ? (
-                                                                <div
-                                                                    key={`${colIndex}-${rowIndex}`}
-                                                                    className={cn(
-                                                                        'border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center bg-opacity-40 transition-all duration-300 shadow-sm',
-                                                                        getColumnTint(col.score),
-                                                                        selectedCardId &&
-                                                                            'ring-2 ring-[var(--brand-accent)] ring-opacity-50 bg-[color-mix(in_srgb,var(--brand-accent),transparent_95%)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--brand-accent),transparent_90%)] hover:ring-opacity-80 hover:scale-[1.02]'
-                                                                    )}
-                                                                    style={{
-                                                                        width: cardDimensions.width,
-                                                                        height: cardDimensions.height,
-                                                                    }}
-                                                                    role="button"
-                                                                    tabIndex={0}
-                                                                    aria-label={t(
-                                                                        'fine.grid.slot_label',
-                                                                        {
-                                                                            score: col.score,
-                                                                            row: rowIndex + 1,
-                                                                            defaultValue: `Score ${col.score}, row ${rowIndex + 1}`,
-                                                                        }
-                                                                    )}
-                                                                    onClick={() =>
+                                                    {Array.from({
+                                                        length:
+                                                            slotCounts[colIndex] ?? col.capacity,
+                                                    }).map((_, rowIndex) =>
+                                                        readOnly ? (
+                                                            <div
+                                                                key={`${colIndex}-${rowIndex}`}
+                                                                className={cn(
+                                                                    'border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center bg-opacity-40 transition-all duration-300 shadow-sm',
+                                                                    getColumnTint(col.score),
+                                                                    selectedCardId &&
+                                                                        'ring-2 ring-[var(--brand-accent)] ring-opacity-50 bg-[color-mix(in_srgb,var(--brand-accent),transparent_95%)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--brand-accent),transparent_90%)] hover:ring-opacity-80 hover:scale-[1.02]'
+                                                                )}
+                                                                style={{
+                                                                    width: cardDimensions.width,
+                                                                    height: cardDimensions.height,
+                                                                }}
+                                                                role="button"
+                                                                tabIndex={0}
+                                                                aria-label={t(
+                                                                    'fine.grid.slot_label',
+                                                                    {
+                                                                        score: col.score,
+                                                                        row: rowIndex + 1,
+                                                                        defaultValue: `Score ${col.score}, row ${rowIndex + 1}`,
+                                                                    }
+                                                                )}
+                                                                onClick={() =>
+                                                                    onSlotClick?.(
+                                                                        colIndex,
+                                                                        rowIndex
+                                                                    )
+                                                                }
+                                                                onKeyDown={(e) => {
+                                                                    if (
+                                                                        e.key === 'Enter' ||
+                                                                        e.key === ' '
+                                                                    ) {
                                                                         onSlotClick?.(
                                                                             colIndex,
                                                                             rowIndex
-                                                                        )
+                                                                        );
                                                                     }
-                                                                    onKeyDown={(e) => {
-                                                                        if (
-                                                                            e.key === 'Enter' ||
-                                                                            e.key === ' '
-                                                                        ) {
-                                                                            onSlotClick?.(
-                                                                                colIndex,
-                                                                                rowIndex
-                                                                            );
-                                                                        }
-                                                                    }}
-                                                                >
-                                                                    {renderSlotContent(
-                                                                        colIndex,
-                                                                        rowIndex,
-                                                                        cardDimensions
-                                                                    )}
-                                                                </div>
-                                                            ) : (
-                                                                <DroppableSlot
-                                                                    key={`${colIndex}-${rowIndex}`}
-                                                                    id={`slot_${colIndex}_${rowIndex}`}
-                                                                    role="gridcell"
-                                                                    aria-label={t(
-                                                                        'fine.grid.slot_label',
-                                                                        {
-                                                                            score: col.score,
-                                                                            row: rowIndex + 1,
-                                                                            defaultValue: `Score ${col.score}, row ${rowIndex + 1}`,
-                                                                        }
-                                                                    )}
-                                                                    onClick={() =>
-                                                                        onSlotClick?.(
-                                                                            colIndex,
-                                                                            rowIndex
-                                                                        )
+                                                                }}
+                                                            >
+                                                                {renderSlotContent(
+                                                                    colIndex,
+                                                                    rowIndex,
+                                                                    cardDimensions
+                                                                )}
+                                                            </div>
+                                                        ) : (
+                                                            <DroppableSlot
+                                                                key={`${colIndex}-${rowIndex}`}
+                                                                id={`slot_${colIndex}_${rowIndex}`}
+                                                                role="gridcell"
+                                                                aria-label={t(
+                                                                    'fine.grid.slot_label',
+                                                                    {
+                                                                        score: col.score,
+                                                                        row: rowIndex + 1,
+                                                                        defaultValue: `Score ${col.score}, row ${rowIndex + 1}`,
                                                                     }
-                                                                    style={{
-                                                                        width: cardDimensions.width,
-                                                                        height: cardDimensions.height,
-                                                                    }}
-                                                                    className={cn(
-                                                                        'border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center bg-opacity-40 transition-all duration-300 shadow-sm',
-                                                                        getColumnTint(col.score),
-                                                                        selectedCardId &&
-                                                                            'ring-2 ring-[var(--brand-accent)] ring-opacity-50 bg-[color-mix(in_srgb,var(--brand-accent),transparent_95%)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--brand-accent),transparent_90%)] hover:ring-opacity-80 hover:scale-[1.02]'
-                                                                    )}
-                                                                >
-                                                                    {renderSlotContent(
+                                                                )}
+                                                                onClick={() =>
+                                                                    onSlotClick?.(
                                                                         colIndex,
-                                                                        rowIndex,
-                                                                        cardDimensions
-                                                                    )}
-                                                                </DroppableSlot>
-                                                            )
+                                                                        rowIndex
+                                                                    )
+                                                                }
+                                                                style={{
+                                                                    width: cardDimensions.width,
+                                                                    height: cardDimensions.height,
+                                                                }}
+                                                                className={cn(
+                                                                    'border-2 border-dashed border-slate-300/80 rounded-2xl flex items-center justify-center bg-opacity-40 transition-all duration-300 shadow-sm',
+                                                                    getColumnTint(col.score),
+                                                                    selectedCardId &&
+                                                                        'ring-2 ring-[var(--brand-accent)] ring-opacity-50 bg-[color-mix(in_srgb,var(--brand-accent),transparent_95%)] cursor-pointer hover:bg-[color-mix(in_srgb,var(--brand-accent),transparent_90%)] hover:ring-opacity-80 hover:scale-[1.02]'
+                                                                )}
+                                                            >
+                                                                {renderSlotContent(
+                                                                    colIndex,
+                                                                    rowIndex,
+                                                                    cardDimensions
+                                                                )}
+                                                            </DroppableSlot>
+                                                        )
                                                     )}
                                                 </div>
                                                 <ScoreLabel

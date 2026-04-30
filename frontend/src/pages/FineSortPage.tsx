@@ -118,6 +118,7 @@ const FineSortPage: React.FC<FineSortPageProps> = ({ highlightKey }) => {
         onValidate: handleValidate,
         showCodes,
         distributionMode,
+        qsort,
         highlightKey,
         uiLabels: config.ui_labels,
     };

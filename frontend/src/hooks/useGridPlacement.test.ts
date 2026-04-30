@@ -85,4 +85,75 @@ describe('useGridPlacement', () => {
         expect(mockActions.swapCardsInGrid).toHaveBeenCalledWith(1, 2);
         expect(mockActions.unplaceCard).not.toHaveBeenCalled();
     });
+
+    // --- Free distribution mode: placement past declared capacity ---
+
+    it('finds an empty row past declared capacity in free mode (overflow placement)', () => {
+        // Column 0 has declared capacity 2 but is fully filled — in free mode
+        // the placement should overflow to row 2 (past capacity), not swap.
+        const responses = {
+            qsort: [
+                { statementId: 2, col: 0, row: 0 },
+                { statementId: 3, col: 0, row: 1 },
+            ],
+        };
+        const { result } = renderHook(() =>
+            useGridPlacement({
+                responses,
+                gridColumns,
+                actions: mockActions,
+                distributionMode: 'free',
+            })
+        );
+
+        // findClosestEmptyRow should return row 2 (past declared capacity 2)
+        const targetRow = result.current.findClosestEmptyRow(0, 0);
+        expect(targetRow).toBe(2);
+    });
+
+    it('places a card past declared capacity in free mode without swapping', () => {
+        // Column full to capacity (2) — in free mode, dropping a fresh card
+        // there should overflow into row 2, never trigger swap/unplace.
+        const responses = {
+            qsort: [
+                { statementId: 2, col: 0, row: 0 },
+                { statementId: 3, col: 0, row: 1 },
+            ],
+        };
+        const { result } = renderHook(() =>
+            useGridPlacement({
+                responses,
+                gridColumns,
+                actions: mockActions,
+                distributionMode: 'free',
+            })
+        );
+
+        result.current.handlePlacement(1, 0, 0);
+
+        // Expected: card 1 lands in (0, 2) — overflow row past capacity.
+        expect(mockActions.placeCardInGrid).toHaveBeenCalledWith(1, 0, 2);
+        expect(mockActions.swapCardsInGrid).not.toHaveBeenCalled();
+        expect(mockActions.unplaceCard).not.toHaveBeenCalled();
+    });
+
+    it('forced mode is unchanged: finds no empty row past capacity', () => {
+        const responses = {
+            qsort: [
+                { statementId: 2, col: 0, row: 0 },
+                { statementId: 3, col: 0, row: 1 },
+            ],
+        };
+        const { result } = renderHook(() =>
+            useGridPlacement({
+                responses,
+                gridColumns,
+                actions: mockActions,
+                distributionMode: 'forced',
+            })
+        );
+
+        const targetRow = result.current.findClosestEmptyRow(0, 0);
+        expect(targetRow).toBeNull();
+    });
 });

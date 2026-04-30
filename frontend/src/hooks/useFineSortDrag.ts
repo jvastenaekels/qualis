@@ -41,6 +41,11 @@ export interface UseFineSortDragProps {
     interactionUtils?: InteractionUtils | null;
     onPan?: () => void;
     statements: Statement[];
+    /**
+     * Forwarded to {@link useGridPlacement} so that free-mode placements can
+     * land in synthesised overflow rows past the declared per-column capacity.
+     */
+    distributionMode?: 'forced' | 'free' | 'flexible';
 }
 
 interface ExtendedDragEvent {
@@ -67,6 +72,7 @@ export const useFineSortDrag = ({
     interactionUtils,
     onPan,
     statements,
+    distributionMode,
 }: UseFineSortDragProps) => {
     const [activeId, setActiveId] = useState<number | null>(null);
     const setActiveCard = useUIStore((state) => state.setActiveCard);
@@ -75,6 +81,7 @@ export const useFineSortDrag = ({
         responses,
         gridColumns,
         actions,
+        distributionMode,
     });
 
     const { initInteraction, updateInteraction, cleanupInteraction } = useDragAutoInteraction({
