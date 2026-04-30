@@ -65,6 +65,12 @@ async def db_engine():
 @pytest_asyncio.fixture
 async def db(db_engine):
     """Create a fresh database session for each test."""
+    # Drop any leftover schema from previous tests (especially Alembic-driven
+    # tests like test_memo_migration that bypass this fixture and leave the
+    # studies/users/etc tables in their migration-frozen state — without
+    # the latest model columns). drop_all is a no-op when nothing exists.
+    async with db_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
     # Create tables
     async with db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
