@@ -77,6 +77,8 @@ module = [
     "app.utils.crypto",
     "app.utils.email",
     "app.utils.script_utils",
+    # Optional rough_sort phase 1 — pure state-machine helper
+    "app.utils.study_flow",
 ]
 disallow_untyped_defs = true
 disallow_any_explicit = true
