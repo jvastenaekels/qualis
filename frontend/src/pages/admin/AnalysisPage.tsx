@@ -58,6 +58,7 @@ import { FactorVoicesPanel } from '@/components/admin/analysis/FactorVoicesPanel
 import { FactorCanvas } from '@/components/admin/analysis/FactorCanvas';
 import { useExplorePhase, type ExplorePhaseApi } from '@/hooks/admin/useExplorePhase';
 import { useInterpretPhase, type InterpretPhaseApi } from '@/hooks/admin/useInterpretPhase';
+import { useListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet } from '@/api/generated';
 import type { AnalysisResult, AnalysisRunRead, AnalysisRunSummary } from '@/api/model';
 import { downloadBlob, generateLoadingsCsv, generateScoresCsv } from '@/utils/analysisCsvExport';
 import { generateAnalysisXlsx } from '@/utils/analysisXlsxExport';
@@ -137,8 +138,41 @@ export default function AnalysisPage() {
         [setSearchParams]
     );
 
+    const handlePin = useCallback(
+        (id: number) => {
+            setSearchParams(
+                (prev) => {
+                    const p = new URLSearchParams(prev);
+                    p.set('compareTo', String(id));
+                    return p;
+                },
+                { replace: true }
+            );
+        },
+        [setSearchParams]
+    );
+
+    const handleUnpin = useCallback(() => {
+        setSearchParams(
+            (prev) => {
+                const p = new URLSearchParams(prev);
+                p.delete('compareTo');
+                return p;
+            },
+            { replace: true }
+        );
+    }, [setSearchParams]);
+
     const explore = useExplorePhase(slug, navigateToInterpret);
     const interpret = useInterpretPhase(slug, runId, focus, compareTo);
+
+    // Run history for the compare-pin picker. The same query hook backs
+    // AnalysisHistoryPanel; React Query dedupes concurrent fetches so this
+    // is effectively a free read off the cache.
+    const runsQuery = useListAnalysisRunsApiAdminStudiesSlugAnalysisRunsGet(slug, {
+        query: { enabled: !!slug },
+    });
+    const runs = runsQuery.data ?? [];
 
     // ── Empty-state contract: not enough participants for factor analysis ──
     // Wave A — UX progressive-disclosure audit. The configuration card walls
@@ -193,6 +227,10 @@ export default function AnalysisPage() {
                 onSelectHistoricalRun={navigateToHistoricalRun}
                 onBackToExplore={navigateToExplore}
                 onFocusChange={setFocusFromCanvas}
+                runs={runs}
+                compareTo={compareTo}
+                onPin={handlePin}
+                onUnpin={handleUnpin}
             />
         );
     }
@@ -754,6 +792,10 @@ interface InterpretShellProps {
     onSelectHistoricalRun: (runId: number) => void;
     onBackToExplore: () => void;
     onFocusChange: (factor: number) => void;
+    runs: AnalysisRunSummary[];
+    compareTo: number | null;
+    onPin: (runId: number) => void;
+    onUnpin: () => void;
 }
 
 function InterpretShell({
@@ -764,6 +806,10 @@ function InterpretShell({
     onSelectHistoricalRun,
     onBackToExplore,
     onFocusChange,
+    runs,
+    compareTo,
+    onPin,
+    onUnpin,
 }: InterpretShellProps) {
     const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = searchParams.get('tab') ?? 'loadings';
@@ -1083,7 +1129,15 @@ function InterpretShell({
 
             {/* Results */}
             {mode === 'focus' ? (
-                <FactorCanvas slug={slug} interpret={interpret} onFocusChange={onFocusChange} />
+                <FactorCanvas
+                    slug={slug}
+                    interpret={interpret}
+                    onFocusChange={onFocusChange}
+                    runs={runs}
+                    compareTo={compareTo}
+                    onPin={onPin}
+                    onUnpin={onUnpin}
+                />
             ) : (
                 <Card className="border-none shadow-sm bg-white rounded-2xl relative">
                     <CardContent className="pt-5 pb-5">

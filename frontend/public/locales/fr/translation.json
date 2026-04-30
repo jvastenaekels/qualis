@@ -934,7 +934,9 @@
                 "pinned": "Comparaison avec le run #{{id}}",
                 "phi": "φ = {{phi}}",
                 "ambiguous": "appariement ambigu — interpréter les Δ avec précaution",
-                "unpin": "Désépingler"
+                "unpin": "Désépingler",
+                "delta_z_aria": "Δz {{delta}} vs run de comparaison",
+                "delta_loading_aria": "Δsaturation {{delta}} vs run de comparaison"
             },
             "quote_insert_format": "> {{text}}\n> — {{p}}, sur l'énoncé {{code}} : « {{stmt}} »"
         },

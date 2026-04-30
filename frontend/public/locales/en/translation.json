@@ -982,7 +982,9 @@
                 "pinned": "Comparing with run #{{id}}",
                 "phi": "φ = {{phi}}",
                 "ambiguous": "ambiguous match — interpret deltas with care",
-                "unpin": "Unpin"
+                "unpin": "Unpin",
+                "delta_z_aria": "Δz {{delta}} vs compare run",
+                "delta_loading_aria": "Δloading {{delta}} vs compare run"
             },
             "quote_insert_format": "> {{text}}\n> — {{p}}, on statement {{code}}: \"{{stmt}}\""
         },

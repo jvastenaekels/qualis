@@ -934,7 +934,9 @@
                 "pinned": "Verrataan ajoon #{{id}}",
                 "phi": "φ = {{phi}}",
                 "ambiguous": "epäselvä vastaavuus — tulkitse delta-arvoja varoen",
-                "unpin": "Poista kiinnitys"
+                "unpin": "Poista kiinnitys",
+                "delta_z_aria": "Δz {{delta}} vs vertailuajo",
+                "delta_loading_aria": "Δlataus {{delta}} vs vertailuajo"
             },
             "quote_insert_format": "> {{text}}\n> — {{p}}, väittämästä {{code}}: \"{{stmt}}\""
         },
