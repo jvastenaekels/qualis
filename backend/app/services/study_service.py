@@ -189,9 +189,7 @@ class StudyService:
             study_update.rough_sort_enabled is not None
             and study_update.rough_sort_enabled != study.rough_sort_enabled
         ):
-            count = await StudyService._count_participants_past_consent(
-                db, study.id
-            )
+            count = await StudyService._count_participants_past_consent(db, study.id)
             if count > 0:
                 raise ValidationError(
                     f"Cannot change rough_sort_enabled — {count} participant(s) "
@@ -334,9 +332,7 @@ class StudyService:
         return (result.scalar() or 0) > 0
 
     @staticmethod
-    async def _count_participants_past_consent(
-        db: AsyncSession, study_id: int
-    ) -> int:
+    async def _count_participants_past_consent(db: AsyncSession, study_id: int) -> int:
         """Count participants whose ``last_step_reached`` is beyond consent.
 
         Used to lock structural toggles (rough_sort_enabled) once a session

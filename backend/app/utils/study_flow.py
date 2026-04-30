@@ -45,6 +45,5 @@ def validate_step_transition(
     allowed = enabled_steps(rough_sort_enabled)
     if target_step not in allowed:
         raise InvalidStepTransition(
-            f"Step {target_step} is not enabled for this study "
-            f"(allowed: {allowed})"
+            f"Step {target_step} is not enabled for this study (allowed: {allowed})"
         )
