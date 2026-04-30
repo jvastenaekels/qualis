@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
     DndContext,
     closestCenter,
@@ -230,7 +230,27 @@ const ProcessStepItem = ({ id, step, onUpdate, onDelete, readOnly }: ProcessStep
     );
 };
 
-export function ProcessStepEditor({ readOnly }: { readOnly?: boolean }) {
+interface ProcessStepEditorProps {
+    readOnly?: boolean;
+    /**
+     * Override for the rough-sort feature flag. When omitted, the value is
+     * derived from the current draft (`draft.rough_sort_enabled !== false`).
+     * Mirrors {@link isRoughSortEnabled} in `utils/studyConfig.ts`.
+     */
+    roughSortEnabled?: boolean;
+    /**
+     * Override for the presort feature flag. When omitted, the value is
+     * derived from the current draft (`draft.presort_config.enabled !== false`).
+     * Mirrors {@link isPresortEnabled} in `utils/studyConfig.ts`.
+     */
+    presortEnabled?: boolean;
+}
+
+export function ProcessStepEditor({
+    readOnly,
+    roughSortEnabled: roughSortEnabledProp,
+    presortEnabled: presortEnabledProp,
+}: ProcessStepEditorProps) {
     const { t } = useTranslation();
     const {
         draft,
@@ -302,10 +322,61 @@ export function ProcessStepEditor({ readOnly }: { readOnly?: boolean }) {
         }
     }, [draft?.translations]);
 
-    if (!draft) return null;
-
-    const translation = draft.translations?.find((t) => t.language_code === activeLocale);
+    const translation = draft?.translations?.find((t) => t.language_code === activeLocale);
     const steps = translation?.process_steps || [];
+
+    // Derive feature flags from the draft when no explicit override is passed.
+    // Mirrors `isRoughSortEnabled` / `isPresortEnabled` in `utils/studyConfig.ts`
+    // and the participant-side filter in `WelcomePage.tsx`.
+    const roughSortEnabled = roughSortEnabledProp ?? draft?.rough_sort_enabled !== false;
+    const presortEnabled =
+        presortEnabledProp ??
+        (() => {
+            const cfg = draft?.presort_config as { enabled?: boolean } | null | undefined;
+            if (!cfg) return true;
+            if ('enabled' in cfg) return cfg.enabled !== false;
+            return true;
+        })();
+
+    // Detect process_steps entries that contradict the study's enabled features.
+    // The participant-side filter in WelcomePage drops these silently — we surface
+    // them here so the admin notices and can clean up their step list.
+    const inconsistentEntries = useMemo<
+        {
+            index: number;
+            id: string;
+            title: string;
+            reason: 'rough_disabled' | 'presort_disabled';
+        }[]
+    >(() => {
+        const issues: {
+            index: number;
+            id: string;
+            title: string;
+            reason: 'rough_disabled' | 'presort_disabled';
+        }[] = [];
+        steps.forEach((step, index) => {
+            if (step.id === 'rough' && !roughSortEnabled) {
+                issues.push({
+                    index,
+                    id: step.id,
+                    title: step.title || step.id,
+                    reason: 'rough_disabled',
+                });
+            }
+            if (step.id === 'profile' && !presortEnabled) {
+                issues.push({
+                    index,
+                    id: step.id,
+                    title: step.title || step.id,
+                    reason: 'presort_disabled',
+                });
+            }
+        });
+        return issues;
+    }, [steps, roughSortEnabled, presortEnabled]);
+
+    if (!draft) return null;
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -382,6 +453,51 @@ export function ProcessStepEditor({ readOnly }: { readOnly?: boolean }) {
 
     return (
         <div className="space-y-6">
+            {!readOnly && inconsistentEntries.length > 0 && (
+                <div
+                    data-testid="process-steps-inconsistent-banner"
+                    className="rounded border-l-4 border-amber-400 bg-amber-50 p-3 text-sm text-amber-900 space-y-2"
+                >
+                    <p className="font-bold">
+                        {t(
+                            'admin.design.intro.process_steps.inconsistent.banner_title',
+                            'Inconsistent process steps'
+                        )}
+                    </p>
+                    <ul className="space-y-2">
+                        {inconsistentEntries.map((entry) => (
+                            <li
+                                key={entry.id}
+                                data-testid="process-steps-inconsistent-item"
+                                className="flex items-start justify-between gap-3"
+                            >
+                                <span className="flex-1">
+                                    {entry.reason === 'rough_disabled'
+                                        ? t(
+                                              'admin.design.intro.process_steps.inconsistent.rough_disabled',
+                                              "The 'First impressions' (rough sort) step is in this list but the study has rough sort disabled. Participants will not see it."
+                                          )
+                                        : t(
+                                              'admin.design.intro.process_steps.inconsistent.presort_disabled',
+                                              "The 'Let's meet' (pre-sort survey) step is in this list but the study has the pre-sort survey disabled. Participants will not see it."
+                                          )}
+                                </span>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => deleteStep(entry.index)}
+                                    className="h-8 rounded-lg border-amber-300 bg-white px-3 text-xs font-bold text-amber-800 hover:bg-amber-100 hover:text-amber-900"
+                                >
+                                    {t(
+                                        'admin.design.intro.process_steps.inconsistent.remove_action',
+                                        'Remove'
+                                    )}
+                                </Button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
             {!readOnly && (
                 <div className="flex items-center justify-end gap-3">
                     <Button

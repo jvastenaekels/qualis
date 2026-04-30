@@ -1592,6 +1592,12 @@
                         "consent_description": "Palauta suostumuskuvaus",
                         "process_steps": "Palauta prosessin vaiheet",
                         "process_steps_confirm": "Oletko varma, että haluat palauttaa kaikki prosessivaiheet oletusarvoihin? Tämä korvaa mukautetut vaiheet."
+                    },
+                    "inconsistent": {
+                        "banner_title": "Epäjohdonmukaiset prosessivaiheet",
+                        "rough_disabled": "Vaihe 'Ensivaikutelma' (esilajittelu) on tässä luettelossa, mutta tutkimuksessa esilajittelu on poistettu käytöstä. Osallistujat eivät näe sitä.",
+                        "presort_disabled": "Vaihe 'Tutustutaan' (esilajittelukysely) on tässä luettelossa, mutta tutkimuksessa esilajittelukysely on poistettu käytöstä. Osallistujat eivät näe sitä.",
+                        "remove_action": "Poista"
                     }
                 },
                 "consent_title": "Suostumuslomake",

@@ -299,7 +299,19 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                     readOnly={readOnly}
                                 />
                             </div>
-                            <ProcessStepEditor readOnly={readOnly} />
+                            <ProcessStepEditor
+                                readOnly={readOnly}
+                                roughSortEnabled={draft.rough_sort_enabled !== false}
+                                presortEnabled={(() => {
+                                    const cfg = draft.presort_config as
+                                        | { enabled?: boolean }
+                                        | null
+                                        | undefined;
+                                    if (!cfg) return true;
+                                    if ('enabled' in cfg) return cfg.enabled !== false;
+                                    return true;
+                                })()}
+                            />
                         </CardContent>
                     </AccordionContent>
                 </AccordionItem>

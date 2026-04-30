@@ -1630,6 +1630,12 @@
                         "consent_description": "Réinitialiser la description du consentement",
                         "process_steps": "Réinitialiser les étapes",
                         "process_steps_confirm": "Êtes-vous sûr de vouloir réinitialiser toutes les étapes par défaut ? Cela remplacera vos étapes personnalisées."
+                    },
+                    "inconsistent": {
+                        "banner_title": "Étapes du processus incohérentes",
+                        "rough_disabled": "L'étape « Premières impressions » (pré-tri) est dans cette liste mais l'étude a le pré-tri désactivé. Les participants ne la verront pas.",
+                        "presort_disabled": "L'étape « Faisons connaissance » (questionnaire pré-tri) est dans cette liste mais l'étude a le questionnaire pré-tri désactivé. Les participants ne la verront pas.",
+                        "remove_action": "Supprimer"
                     }
                 },
                 "consent_title": "Formulaire de consentement",

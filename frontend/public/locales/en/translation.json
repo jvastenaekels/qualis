@@ -1640,6 +1640,12 @@
                         "consent_description": "Reset consent description",
                         "process_steps": "Reset process steps",
                         "process_steps_confirm": "Are you sure you want to reset all process steps to defaults? This will replace your custom steps."
+                    },
+                    "inconsistent": {
+                        "banner_title": "Inconsistent process steps",
+                        "rough_disabled": "The 'First impressions' (rough sort) step is in this list but the study has rough sort disabled. Participants will not see it.",
+                        "presort_disabled": "The 'Let's meet' (pre-sort survey) step is in this list but the study has the pre-sort survey disabled. Participants will not see it.",
+                        "remove_action": "Remove"
                     }
                 },
                 "consent_title": "Consent form",
