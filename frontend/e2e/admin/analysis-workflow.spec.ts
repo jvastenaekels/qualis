@@ -59,9 +59,14 @@ test('full analysis workflow: run → results → history', async ({ page, testD
     });
 
     // -----------------------------------------------------------------------
-    // 2. Set n_factors = 2 via the Select control and confirm it is enabled
-    //    Use role=combobox to avoid ambiguity with the scree plot aria-labels
+    // 2. Open the "Advanced configuration" accordion (the form controls live
+    //    inside it since Phase 3) then set n_factors = 2 via the Select.
+    //    Use role=combobox to avoid ambiguity with the scree plot aria-labels.
     // -----------------------------------------------------------------------
+    const advancedTrigger = page.getByRole('button', { name: /advanced configuration/i });
+    await expect(advancedTrigger).toBeVisible({ timeout: 10_000 });
+    await advancedTrigger.click();
+
     const factorsSelect = page.getByRole('combobox', { name: /factors/i });
     await expect(factorsSelect).toBeEnabled({ timeout: 10_000 });
     await factorsSelect.click();
