@@ -917,7 +917,14 @@
                 "min_def_sorts": "min määr. sortit",
                 "advanced_title": "Lisäasetukset",
                 "commit_cta": "Vahvista ja tulkitse"
-            }
+            },
+            "interpret": {
+                "def_sorts": "Määrittäviä lajitteluja: {{n}}",
+                "statements_title": "Väittämät",
+                "narrative_title": "Narratiivi — F{{n}}",
+                "insert_comment_quote": "Lisää kommentti lainauksena"
+            },
+            "quote_insert_format": "> {{text}}\n> — {{p}}, väittämästä {{code}}: \"{{stmt}}…\""
         },
         "project": {
             "remove_member": "Poista jäsen",

@@ -13,6 +13,14 @@ interface FactorVoicesPanelProps {
     slug: string;
     factorIndex: number;
     participants: ParticipantLoading[];
+    /**
+     * Optional callback fired when the analyst clicks the ▸+ button on a
+     * card comment. The callback receives the full comment + a participant
+     * label so the consumer (FactorCanvas) can format and insert a quote
+     * snippet into the active factor narrative. When undefined, no insert
+     * button is rendered (legacy read-only mode).
+     */
+    onInsertCommentQuote?: (comment: ParticipantCardComment, participantLabel: string) => void;
 }
 
 function scoreBadgeClass(score: number): string {
@@ -42,9 +50,15 @@ interface ParticipantMaterialCardProps {
     label: string;
     recordings: ParticipantAudioRecording[];
     comments: ParticipantCardComment[];
+    onInsertCommentQuote?: (comment: ParticipantCardComment, participantLabel: string) => void;
 }
 
-function ParticipantMaterialCard({ label, recordings, comments }: ParticipantMaterialCardProps) {
+function ParticipantMaterialCard({
+    label,
+    recordings,
+    comments,
+    onInsertCommentQuote,
+}: ParticipantMaterialCardProps) {
     const { t } = useTranslation();
     return (
         <div className="bg-white rounded-lg border border-slate-200 p-3 space-y-3">
@@ -105,6 +119,19 @@ function ParticipantMaterialCard({ label, recordings, comments }: ParticipantMat
                                     >
                                         {formatScore(c.grid_score)}
                                     </span>
+                                    {onInsertCommentQuote !== undefined && (
+                                        <button
+                                            type="button"
+                                            onClick={() => onInsertCommentQuote(c, label)}
+                                            aria-label={t(
+                                                'admin.analysis.interpret.insert_comment_quote',
+                                                'Insert comment as quote'
+                                            )}
+                                            className="ml-auto text-slate-400 hover:text-emerald-700 text-xs"
+                                        >
+                                            ▸+
+                                        </button>
+                                    )}
                                 </div>
                                 <p className="text-slate-700 leading-snug">{c.statement_text}</p>
                                 <p className="mt-1 text-slate-600 italic leading-snug">
@@ -119,7 +146,12 @@ function ParticipantMaterialCard({ label, recordings, comments }: ParticipantMat
     );
 }
 
-export function FactorVoicesPanel({ slug, factorIndex, participants }: FactorVoicesPanelProps) {
+export function FactorVoicesPanel({
+    slug,
+    factorIndex,
+    participants,
+    onInsertCommentQuote,
+}: FactorVoicesPanelProps) {
     const { t } = useTranslation();
     const [tooltipOpen, setTooltipOpen] = useState(false);
 
@@ -231,6 +263,7 @@ export function FactorVoicesPanel({ slug, factorIndex, participants }: FactorVoi
                             label={p.label}
                             recordings={recordingsByParticipant.get(p.db_id) ?? []}
                             comments={commentsByParticipant.get(p.db_id) ?? []}
+                            onInsertCommentQuote={onInsertCommentQuote}
                         />
                     ))}
                 </div>

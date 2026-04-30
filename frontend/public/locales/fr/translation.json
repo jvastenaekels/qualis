@@ -917,7 +917,14 @@
                 "min_def_sorts": "min sorts définiss.",
                 "advanced_title": "Configuration avancée",
                 "commit_cta": "Valider et interpréter"
-            }
+            },
+            "interpret": {
+                "def_sorts": "Sorts définissants : {{n}}",
+                "statements_title": "Énoncés",
+                "narrative_title": "Narration — F{{n}}",
+                "insert_comment_quote": "Insérer le commentaire comme citation"
+            },
+            "quote_insert_format": "> {{text}}\n> — {{p}}, sur l'énoncé {{code}} : « {{stmt}}… »"
         },
         "project": {
             "remove_member": "Retirer le membre",
