@@ -542,6 +542,13 @@ interface GridSortProps {
      * total card count is still validated server-side).
      */
     distributionMode?: 'forced' | 'free' | 'flexible';
+    /**
+     * Deck-mode source list (rough_sort_enabled=false). When provided, the
+     * three pile arrays are ignored, the PileTab tablist is hidden, and the
+     * deck-cards-container renders this flat list. The placement grid and
+     * every other concern stay identical to rough mode.
+     */
+    deckCards?: { id: number; text: string; code?: string }[];
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
@@ -586,6 +593,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         readOnly = false,
         sidebarContent,
         distributionMode = 'forced',
+        deckCards,
     }) => {
         const { t } = useTranslation();
         const isForcedDistribution = distributionMode === 'forced';
@@ -596,12 +604,21 @@ const GridSort: React.FC<GridSortProps> = React.memo(
         const isLandscapeMobile =
             (isMobile && isLandscape) || (isLandscape && height < 500 && !isDesktop);
 
-        // Deck Management Hook
-        const { activePile, setActivePile, activeCards } = useDeckManagement({
+        // Deck Management Hook (rough mode only — populates PileTab state)
+        const {
+            activePile,
+            setActivePile,
+            activeCards: pileActiveCards,
+        } = useDeckManagement({
             agreeCards,
             disagreeCards,
             neutralCards,
         });
+        // Deck mode (rough_sort_enabled=false) collapses the three piles into
+        // one flat list. The PileTab tablist is hidden and the deck-cards
+        // container renders `deckCards` directly.
+        const isDeckMode = deckCards !== undefined;
+        const activeCards = isDeckMode ? deckCards : pileActiveCards;
 
         const [autoFitEnabled, setAutoFitEnabled] = useState(true);
 
@@ -1029,45 +1046,47 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 </div>
                             )}
 
-                            {/* Category selector (Piles) */}
-                            <div
-                                className={cn(
-                                    'flex-none lg:p-4 lg:pb-2',
-                                    isLandscapeMobile ? 'p-2 pb-1' : 'p-2 pb-1 sm:p-3 sm:pb-1.5'
-                                )}
-                            >
+                            {/* Category selector (Piles) — rough mode only */}
+                            {!isDeckMode && (
                                 <div
                                     className={cn(
-                                        'flex w-full lg:grid lg:grid-cols-3',
-                                        isLandscapeMobile ? 'gap-1' : 'gap-2'
+                                        'flex-none lg:p-4 lg:pb-2',
+                                        isLandscapeMobile ? 'p-2 pb-1' : 'p-2 pb-1 sm:p-3 sm:pb-1.5'
                                     )}
-                                    role="tablist"
                                 >
-                                    {(['disagree', 'neutral', 'agree'] as const).map((pile) => (
-                                        <PileTab
-                                            key={pile}
-                                            pile={pile}
-                                            isActive={activePile === pile}
-                                            count={
-                                                pile === 'disagree'
-                                                    ? disagreeCards.length
-                                                    : pile === 'agree'
-                                                      ? agreeCards.length
-                                                      : neutralCards.length
-                                            }
-                                            label={t(`common.${pile}`)}
-                                            cardsLabel={t('common.cards')}
-                                            compact={isLandscapeMobile}
-                                            onClick={() => {
-                                                setActivePile(pile);
-                                            }}
-                                        />
-                                    ))}
+                                    <div
+                                        className={cn(
+                                            'flex w-full lg:grid lg:grid-cols-3',
+                                            isLandscapeMobile ? 'gap-1' : 'gap-2'
+                                        )}
+                                        role="tablist"
+                                    >
+                                        {(['disagree', 'neutral', 'agree'] as const).map((pile) => (
+                                            <PileTab
+                                                key={pile}
+                                                pile={pile}
+                                                isActive={activePile === pile}
+                                                count={
+                                                    pile === 'disagree'
+                                                        ? disagreeCards.length
+                                                        : pile === 'agree'
+                                                          ? agreeCards.length
+                                                          : neutralCards.length
+                                                }
+                                                label={t(`common.${pile}`)}
+                                                cardsLabel={t('common.cards')}
+                                                compact={isLandscapeMobile}
+                                                onClick={() => {
+                                                    setActivePile(pile);
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             <DroppableDeckArea
-                                id={`deck-area-${activePile}`}
+                                id={isDeckMode ? 'deck-area-flat' : `deck-area-${activePile}`}
                                 className={cn(
                                     'flex-col overflow-hidden relative',
                                     isLandscapeMobile
@@ -1078,7 +1097,7 @@ const GridSort: React.FC<GridSortProps> = React.memo(
                                 )}
                             >
                                 <div
-                                    key={activePile}
+                                    key={isDeckMode ? 'deck-flat' : activePile}
                                     className={cn(
                                         'flex-1 min-h-0 custom-scrollbar',
                                         isLandscapeMobile

@@ -144,3 +144,83 @@ describe('FineSortPage Integration', () => {
         expect(screen.queryAllByRole('button', { name: /fine.actions.validate/i }).length).toBe(0);
     });
 });
+
+const deckConfig: StudyConfig = {
+    ...mockConfig,
+    rough_sort_enabled: false,
+};
+
+describe('FineSortPage Integration — deck mode', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('shows "Finish Sorting" when grid is full in deck mode', () => {
+        setupStoreMocks({
+            useConfigStore: { config: deckConfig, isLoading: false },
+            useSessionStore: {
+                hasConsented: true,
+                currentStep: 4,
+                isCompleted: false,
+                language: 'en',
+                setStep: vi.fn(),
+            },
+            useResponseStore: {
+                rough: { agree: [], disagree: [], neutral: [], history: [] },
+                deck: [],
+                qsort: [
+                    { statementId: 1, col: 0, row: 0 },
+                    { statementId: 2, col: 0, row: 1 },
+                ],
+            },
+            useUIStore: {
+                hoveredCard: null,
+                setHoveredCard: vi.fn(),
+                setSelectedCard: vi.fn(),
+                setActiveCard: vi.fn(),
+            },
+        });
+
+        renderWithProviders(<FineSortPage />, {
+            initialEntries: ['/study/demo/sort/fine'],
+        });
+
+        const btns = screen.getAllByRole('button', {
+            name: /fine.actions.validate/i,
+        });
+        expect(btns.length).toBeGreaterThan(0);
+        for (const btn of btns) {
+            expect((btn as HTMLButtonElement).disabled).toBe(false);
+        }
+    });
+
+    it('hides "Finish Sorting" when grid is NOT full in deck mode', () => {
+        setupStoreMocks({
+            useConfigStore: { config: deckConfig, isLoading: false },
+            useSessionStore: {
+                currentStep: 4,
+                hasConsented: true,
+                isSaving: false,
+                language: 'en',
+                setStep: vi.fn(),
+            },
+            useResponseStore: {
+                rough: { agree: [], disagree: [], neutral: [], history: [] },
+                deck: [1, 2],
+                qsort: [],
+            },
+            useUIStore: {
+                hoveredCard: null,
+                setHoveredCard: vi.fn(),
+                setSelectedCard: vi.fn(),
+                setActiveCard: vi.fn(),
+            },
+        });
+
+        renderWithProviders(<FineSortPage />, {
+            initialEntries: ['/study/demo/sort/fine'],
+        });
+
+        expect(screen.queryAllByRole('button', { name: /fine.actions.validate/i }).length).toBe(0);
+    });
+});
