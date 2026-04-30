@@ -558,6 +558,7 @@ class StudyService:
             "default_language": study.default_language,
             "show_statement_codes": study.show_statement_codes,
             "randomize_statement_order": study.randomize_statement_order,
+            "rough_sort_enabled": study.rough_sort_enabled,
             "distribution_mode": study.distribution_mode.value
             if hasattr(study.distribution_mode, "value")
             else study.distribution_mode,

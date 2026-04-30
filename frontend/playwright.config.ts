@@ -86,6 +86,11 @@ export default defineConfig({
             testMatch: /study\/mobile-ux\.spec\.ts/,
             use: { ...devices['Pixel 5'] },
         },
+        {
+            name: 'Participant E2E',
+            testMatch: /participant\/.*\.spec\.ts/,
+            use: { ...devices['Desktop Chrome'] },
+        },
     ],
 
     /* Run both frontend and backend servers before starting tests */
