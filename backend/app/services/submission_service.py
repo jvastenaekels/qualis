@@ -19,6 +19,7 @@ from ..models import (
     Participant,
     ParticipantStatus,
     QSortEntry,
+    RecruitmentLink,
     Study,
     StudyState,
 )
@@ -253,6 +254,244 @@ class SubmissionService:
             )
 
     @staticmethod
+    def _validate_study_state(study: Study) -> None:
+        """Validate the study can accept submissions.
+
+        Checks:
+        - statements collection is loaded on the ORM object,
+        - study state is `active`,
+        - if `end_date` is set, the study has not ended (DB state stays
+          `active` even past `end_date`, so this guard is necessary).
+        """
+        if not hasattr(study, "statements") or study.statements is None:
+            raise ValidationError("Study configuration error: Statements not loaded.")
+
+        if study.state != StudyState.active:
+            raise ValidationError(
+                f"Study is not active (state: {study.state.value}). Submissions are not allowed."
+            )
+
+        if study.end_date:
+            now = datetime.now(timezone.utc)
+            end_dt = study.end_date
+            if end_dt.tzinfo is None:
+                closed = now.replace(tzinfo=None) > end_dt
+            else:
+                closed = now > end_dt
+            if closed:
+                raise ValidationError(
+                    "Study has ended. Submissions are no longer accepted."
+                )
+
+    @staticmethod
+    def _validate_qsort_payload(study: Study, data: SubmissionInput) -> None:
+        """Validate the Q-sort payload submitted by a participant.
+
+        Checks:
+        - qsort is not None,
+        - every statement_id belongs to this study,
+        - the distribution matches grid_config when status == completed.
+        """
+        if data.qsort is None:
+            raise ValidationError("Submission error: Q-sort data is missing.")
+
+        valid_statement_ids = {s.id for s in study.statements}
+        if not valid_statement_ids:
+            raise ValidationError("Study configuration error: No statements defined.")
+
+        for entry in data.qsort:
+            if entry.statement_id not in valid_statement_ids:
+                raise ValidationError(
+                    f"Statement ID {entry.statement_id} does not belong to study '{data.study_slug}'"
+                )
+
+        if data.status == ParticipantStatus.completed:
+            SubmissionService.validate_distribution(study, data.qsort)
+
+    @staticmethod
+    async def _find_or_create_participant(
+        db: AsyncSession,
+        data: SubmissionInput,
+        study: Study,
+        link: RecruitmentLink | None,
+        *,
+        presort_answers: dict[str, Any],
+        postsort_answers: dict[str, Any],
+        confirmation_code: str,
+        hashed_ip: str,
+        user_agent: str | None,
+    ) -> tuple[Participant, bool]:
+        """Lookup the participant row by session_token; create it if missing.
+
+        On creation, increments the recruitment link usage atomically.
+        Handles the race where a concurrent request inserted the same
+        session_token by rolling back, re-fetching, and returning the
+        existing row. The boolean flag marks whether *this* call did the
+        creation (used downstream to skip the existing-row update path).
+        """
+        participant_stmt = (
+            select(Participant)
+            .where(Participant.session_token == data.session_token)
+            .with_for_update()
+        )
+        participant_result = await db.execute(participant_stmt)
+        participant = participant_result.scalar_one_or_none()
+
+        if participant and participant.study_id != study.id:
+            raise ValidationError("Session token does not belong to this study.")
+
+        if participant is not None:
+            return participant, False
+
+        try:
+            participant = Participant(
+                study_id=study.id,
+                session_token=data.session_token,
+                language_used=data.language_used,
+                random_seed=str(
+                    StudyService._generate_session_seed(str(data.session_token))
+                )
+                if study.randomize_statement_order
+                else None,
+                presort_answers=presort_answers,
+                postsort_answers=postsort_answers,
+                status=data.status,
+                confirmation_code=confirmation_code,
+                ip_address=hashed_ip,
+                user_agent=user_agent,
+                submitted_at=datetime.now(timezone.utc)
+                if data.status == ParticipantStatus.completed
+                else None,
+                last_step_reached=5
+                if data.status == ParticipantStatus.completed
+                else 1,
+                last_step_reached_at=datetime.now(timezone.utc),
+            )
+            db.add(participant)
+            await db.flush()
+
+            if link and data.link_token:
+                participant.presort_answers = {
+                    **participant.presort_answers,
+                    "_recruitment_token": data.link_token,
+                }
+                if not await RecruitmentService.increment_usage(db, link.id):
+                    raise ForbiddenError("Invalid, expired, or full recruitment link")
+
+            return participant, True
+        except IntegrityError:
+            # Race: another request inserted the same session_token.
+            # Rollback the failed insert and fetch the existing row.
+            await db.rollback()
+            participant_result = await db.execute(participant_stmt)
+            participant = participant_result.scalar_one_or_none()
+            if not participant:
+                raise ConcurrencyError(
+                    "Concurrency error: Could not resolve participant."
+                )
+            return participant, False
+        except (NotFoundError, ValidationError, ForbiddenError, ConcurrencyError):
+            raise
+        except Exception as e:
+            await db.rollback()
+            raise ConcurrencyError(
+                f"Database error while creating participant: {str(e)}"
+            )
+
+    @staticmethod
+    async def _update_existing_participant(
+        db: AsyncSession,
+        participant: Participant,
+        is_newly_created: bool,
+        data: SubmissionInput,
+        *,
+        presort_answers: dict[str, Any],
+        postsort_answers: dict[str, Any],
+        confirmation_code: str,
+        hashed_ip: str,
+        user_agent: str | None,
+    ) -> dict[str, Any] | None:
+        """Update an existing participant's submission and clear old Q-sort.
+
+        Returns:
+            None — caller should continue inserting the new Q-sort.
+            dict — already-submitted short-circuit (caller returns it as-is).
+        """
+        # Skip when this participant was just inserted in the current request.
+        if is_newly_created or participant in db.new:
+            return None
+
+        if participant.status == ParticipantStatus.completed:
+            return {
+                "confirmation_code": participant.confirmation_code
+                or str(participant.session_token)[:8].upper(),
+                "id": participant.id,
+                "already_submitted": True,
+            }
+
+        if participant.is_expired:
+            raise ValidationError("Session has expired. Please start a new session.")
+
+        participant.language_used = data.language_used
+        participant.presort_answers = presort_answers
+        participant.postsort_answers = postsort_answers
+        if data.status:
+            participant.status = data.status
+        participant.confirmation_code = confirmation_code
+        participant.ip_address = hashed_ip
+        participant.user_agent = user_agent
+        if data.status == ParticipantStatus.completed:
+            participant.submitted_at = datetime.now(timezone.utc)
+            participant.last_step_reached = 5
+            participant.last_step_reached_at = participant.submitted_at
+            participant.draft_responses = None
+
+        await db.flush()
+
+        # Replace Q-Sort entries — the new ones are inserted by
+        # _persist_qsort_entries below.
+        await db.execute(
+            delete(QSortEntry).where(QSortEntry.participant_id == participant.id)
+        )
+        await db.flush()
+        return None
+
+    @staticmethod
+    async def _persist_qsort_entries(
+        db: AsyncSession,
+        participant: Participant,
+        data: SubmissionInput,
+    ) -> None:
+        """Insert the new Q-sort entries for the participant.
+
+        Assumes any pre-existing entries have already been deleted by the
+        update path. Raises `ConcurrencyError` on database failure (the
+        outer transaction is rolled back).
+        """
+        if participant.id is None:
+            raise ConcurrencyError(
+                "Database error: Participant ID is missing after save."
+            )
+
+        try:
+            new_entries = [
+                QSortEntry(
+                    participant_id=participant.id,
+                    statement_id=entry.statement_id,
+                    grid_score=entry.grid_score,
+                    card_comment=entry.card_comment,
+                )
+                for entry in data.qsort
+            ]
+            db.add_all(new_entries)
+            await db.flush()
+        except Exception as e:
+            await db.rollback()
+            raise ConcurrencyError(
+                f"Database error while saving Q-sort entries: {str(e)}"
+            )
+
+    @staticmethod
     async def process_submission(
         db: AsyncSession,
         data: SubmissionInput,
@@ -269,29 +508,8 @@ class SubmissionService:
         if not study:
             raise NotFoundError("Study")
 
-        # Edge case: Ensure study has statements loaded
-        if not hasattr(study, "statements") or study.statements is None:
-            raise ValidationError("Study configuration error: Statements not loaded.")
-
-        # 2.5 Validation: Study State
-        if study.state != StudyState.active:
-            raise ValidationError(
-                f"Study is not active (state: {study.state.value}). Submissions are not allowed."
-            )
-
-        # 2.5b Validation: Date-based closure (DB state stays 'active' past end_date)
-        if study.state == StudyState.active:
-            now = datetime.now(timezone.utc)
-            if study.end_date:
-                end_dt = study.end_date
-                if end_dt.tzinfo is None:
-                    closed = now.replace(tzinfo=None) > end_dt
-                else:
-                    closed = now > end_dt
-                if closed:
-                    raise ValidationError(
-                        "Study has ended. Submissions are no longer accepted."
-                    )
+        # 2.5 Validate study acceptance state (statements loaded, active, not ended)
+        SubmissionService._validate_study_state(study)
 
         # 2.6 Validation: Recruitment Link
         link = None
@@ -302,26 +520,8 @@ class SubmissionService:
             if not link:
                 raise ForbiddenError("Invalid, expired, or full recruitment link")
 
-        # Edge case: Ensure qsort is not None
-        if data.qsort is None:
-            raise ValidationError("Submission error: Q-sort data is missing.")
-
-        # 3. Validation: Statement Ownership
-        valid_statement_ids = {s.id for s in study.statements}
-
-        # Edge case: Handle empty valid_statement_ids
-        if not valid_statement_ids:
-            raise ValidationError("Study configuration error: No statements defined.")
-
-        for entry in data.qsort:
-            if entry.statement_id not in valid_statement_ids:
-                raise ValidationError(
-                    f"Statement ID {entry.statement_id} does not belong to study '{data.study_slug}'"
-                )
-
-        # 4. Validation: Distribution (only for completed)
-        if data.status == ParticipantStatus.completed:
-            SubmissionService.validate_distribution(study, data.qsort)
+        # 3-4. Validate Q-sort payload (presence, statement ownership, distribution)
+        SubmissionService._validate_qsort_payload(study, data)
 
         # Edge case: Ensure presort_answers and postsort_answers are dicts, not None
         presort_answers = (
@@ -331,79 +531,21 @@ class SubmissionService:
             data.postsort_answers if data.postsort_answers is not None else {}
         )
 
-        # 5. Find or Create Participant
-        participant_stmt = (
-            select(Participant)
-            .where(Participant.session_token == data.session_token)
-            .with_for_update()
+        # 5. Find or create the participant row (handles race-condition retry).
+        (
+            participant,
+            is_newly_created,
+        ) = await SubmissionService._find_or_create_participant(
+            db,
+            data,
+            study,
+            link,
+            presort_answers=presort_answers,
+            postsort_answers=postsort_answers,
+            confirmation_code=confirmation_code,
+            hashed_ip=hashed_ip,
+            user_agent=user_agent,
         )
-        participant_result = await db.execute(participant_stmt)
-        participant = participant_result.scalar_one_or_none()
-        is_newly_created = False
-
-        # Validate token belongs to this study
-        if participant and participant.study_id != study.id:
-            raise ValidationError("Session token does not belong to this study.")
-
-        if not participant:
-            try:
-                participant = Participant(
-                    study_id=study.id,
-                    session_token=data.session_token,
-                    language_used=data.language_used,
-                    random_seed=str(
-                        StudyService._generate_session_seed(str(data.session_token))
-                    )
-                    if study.randomize_statement_order
-                    else None,
-                    presort_answers=presort_answers,
-                    postsort_answers=postsort_answers,
-                    status=data.status,
-                    confirmation_code=confirmation_code,
-                    ip_address=hashed_ip,
-                    user_agent=user_agent,
-                    submitted_at=datetime.now(timezone.utc)
-                    if data.status == ParticipantStatus.completed
-                    else None,
-                    last_step_reached=5
-                    if data.status == ParticipantStatus.completed
-                    else 1,
-                    last_step_reached_at=datetime.now(timezone.utc),
-                )
-                db.add(participant)
-                await db.flush()
-                is_newly_created = True
-
-                # Increment link usage if link was used
-                if link and data.link_token:
-                    participant.presort_answers = {
-                        **participant.presort_answers,
-                        "_recruitment_token": data.link_token,
-                    }
-                    # Atomically check capacity and increment usage
-                    if not await RecruitmentService.increment_usage(db, link.id):
-                        raise ForbiddenError(
-                            "Invalid, expired, or full recruitment link"
-                        )
-            except IntegrityError:
-                # Race condition: Participant was created by another request in the meantime.
-                # Rollback the failed insert and fetch the existing participant.
-                await db.rollback()
-                participant_result = await db.execute(participant_stmt)
-                participant = participant_result.scalar_one_or_none()
-                if not participant:
-                    # Should not happen if IntegrityError was due to session_token
-                    raise ConcurrencyError(
-                        "Concurrency error: Could not resolve participant."
-                    )
-            except (NotFoundError, ValidationError, ForbiddenError, ConcurrencyError):
-                raise
-            except Exception as e:
-                # Edge case: Catch any unexpected database errors
-                await db.rollback()
-                raise ConcurrencyError(
-                    f"Database error while creating participant: {str(e)}"
-                )
 
         # 6. Validation: Consent must be recorded for completed submissions
         if (
@@ -415,71 +557,25 @@ class SubmissionService:
                 "Cannot complete submission: consent has not been recorded."
             )
 
-        # If we fell through (either from 'else' or after catching exception), participant exists.
-        # Ensure we don't treat a newly created participant as an existing one we need to skip/update.
-        if participant and participant not in db.new and not is_newly_created:
-            # Update existing participant
-            if participant.status == ParticipantStatus.completed:
-                return {
-                    "confirmation_code": participant.confirmation_code
-                    or str(participant.session_token)[:8].upper(),
-                    "id": participant.id,
-                    "already_submitted": True,
-                }
+        # If the participant already existed (or we re-fetched after a race),
+        # update its fields and replace the old Q-sort entries. The helper
+        # returns the already-submitted short-circuit dict if the row is
+        # already in completed state.
+        shortcut = await SubmissionService._update_existing_participant(
+            db,
+            participant,
+            is_newly_created,
+            data,
+            presort_answers=presort_answers,
+            postsort_answers=postsort_answers,
+            confirmation_code=confirmation_code,
+            hashed_ip=hashed_ip,
+            user_agent=user_agent,
+        )
+        if shortcut is not None:
+            return shortcut
 
-            # Reject expired sessions
-            if participant.is_expired:
-                raise ValidationError(
-                    "Session has expired. Please start a new session."
-                )
-
-            participant.language_used = data.language_used
-            participant.presort_answers = presort_answers
-            participant.postsort_answers = postsort_answers
-            if data.status:
-                participant.status = data.status
-            participant.confirmation_code = confirmation_code
-            participant.ip_address = hashed_ip
-            participant.user_agent = user_agent
-            if data.status == ParticipantStatus.completed:
-                participant.submitted_at = datetime.now(timezone.utc)
-                participant.last_step_reached = 5
-                participant.last_step_reached_at = participant.submitted_at
-                participant.draft_responses = None
-
-            await db.flush()
-
-            # Replace Q-Sort entries
-            await db.execute(
-                delete(QSortEntry).where(QSortEntry.participant_id == participant.id)
-            )
-            await db.flush()
-
-        # Edge case: Ensure participant.id exists before creating QSortEntry
-        if not participant or participant.id is None:
-            raise ConcurrencyError(
-                "Database error: Participant ID is missing after save."
-            )
-
-        # 6. Save Q-Sort Entries
-        try:
-            new_entries = [
-                QSortEntry(
-                    participant_id=participant.id,
-                    statement_id=entry.statement_id,
-                    grid_score=entry.grid_score,
-                    card_comment=entry.card_comment,
-                )
-                for entry in data.qsort
-            ]
-            db.add_all(new_entries)
-            await db.flush()
-            # await db.commit() -> Handled by router
-        except Exception as e:
-            # Edge case: Handle commit failures
-            await db.rollback()
-            raise ConcurrencyError(
-                f"Database error while saving Q-sort entries: {str(e)}"
-            )
+        # 6. Save Q-Sort entries (db.commit() is handled by the router).
+        await SubmissionService._persist_qsort_entries(db, participant, data)
 
         return {"confirmation_code": confirmation_code, "id": participant.id}
