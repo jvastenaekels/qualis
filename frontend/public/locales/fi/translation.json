@@ -2476,9 +2476,10 @@
                 "title": "Suostumuslomake",
                 "description": "Mitä osallistujat näkevät ennen tutkimukseen siirtymistä. Muokkaus: Suunnittelu.",
                 "no_text": "Suostumustekstiä ei ole vielä asetettu.",
+                "no_title": "(ei otsikkoa)",
+                "no_body": "(tyhjä)",
                 "edit_in_design": "Muokkaa Suunnittelussa",
-                "show_all_languages": "Näytä kaikki kielet",
-                "hide_all_languages": "Piilota muut kielet"
+                "view": "Näytä"
             }
         }
     },

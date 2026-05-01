@@ -2347,9 +2347,10 @@
                 "title": "Consent form",
                 "description": "What participants see before they enter the study. Edited in Study design.",
                 "no_text": "No consent text set yet.",
+                "no_title": "(no title)",
+                "no_body": "(empty)",
                 "edit_in_design": "Edit in Study design",
-                "show_all_languages": "Show all languages",
-                "hide_all_languages": "Hide other languages"
+                "view": "View"
             }
         },
         "projects": {

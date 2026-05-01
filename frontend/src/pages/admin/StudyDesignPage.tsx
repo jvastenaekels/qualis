@@ -683,21 +683,21 @@ const StudyDesignPage = () => {
 
                             <TabsContent value="q-sort" className="mt-0 outline-none space-y-6">
                                 {api.isStructureLocked && (
-                                    <div className="p-6 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-4 shadow-sm mb-6 animate-in fade-in duration-500 translate-y-0 text-amber-900 font-bold">
+                                    <div className="p-4 sm:p-6 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3 sm:gap-4 shadow-sm mb-6 animate-in fade-in duration-500 translate-y-0 text-amber-900 font-bold">
                                         <div className="bg-white p-2 rounded-xl border border-amber-100 shadow-sm shrink-0">
                                             <Lock className="h-5 w-5 text-amber-600" />
                                         </div>
-                                        <div className="flex-1 space-y-1">
+                                        <div className="flex-1 min-w-0 space-y-1">
                                             <h4 className="text-base font-black tracking-tight">
                                                 {t('admin.design.qsort.grid.locked')}
                                             </h4>
-                                            <p className="text-sm font-medium opacity-70 leading-relaxed">
+                                            <p className="text-sm font-medium opacity-70 leading-relaxed break-words">
                                                 {t('admin.design.qsort.grid.locked_desc')}
                                             </p>
                                             {api.original?.state === 'draft' && (
                                                 <Button
                                                     variant="link"
-                                                    className="h-auto p-0 text-amber-700 underline font-bold text-xs mt-2 hover:text-amber-900"
+                                                    className="h-auto p-0 text-amber-700 underline font-bold text-xs mt-2 hover:text-amber-900 whitespace-normal text-left break-words inline"
                                                     onClick={() =>
                                                         api.navigate(
                                                             `/app/${api.projectSlug}/studies/${api.effectiveSlug}/data`

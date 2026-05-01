@@ -20,9 +20,8 @@ import {
     AlertTriangle,
     Clock,
     FileSignature,
-    ChevronDown,
-    ChevronUp,
     PencilLine,
+    Eye,
 } from 'lucide-react';
 
 import {
@@ -46,9 +45,18 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyStateContract } from '@/components/admin/EmptyStateContract';
 import { EmptyState } from '@/components/ui/empty-state';
+import { SafeMarkdown } from '@/components/SafeMarkdown';
 import { useAdminContext } from '@/hooks/useAdminContext';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -81,21 +89,6 @@ function formatDate(iso: string | null | undefined): string {
     });
 }
 
-// Strip the most common markdown tokens for a single-line preview.
-// Full rendering happens in StudyDesignPage; this is just for the overview card.
-function plainPreview(md: string | null | undefined, max = 160): string {
-    if (!md) return '';
-    const stripped = md
-        .replace(/```[\s\S]*?```/g, ' ')
-        .replace(/`[^`]*`/g, ' ')
-        .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
-        .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
-        .replace(/[*_>#~]+/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-    return stripped.length > max ? `${stripped.slice(0, max).trimEnd()}…` : stripped;
-}
-
 // ─── loading skeleton ──────────────────────────────────────────────────────────
 
 function InventorySkeleton() {
@@ -113,11 +106,8 @@ function InventorySkeleton() {
 function ConsentSummaryCard({ designHref }: { designHref: string }) {
     const { t } = useTranslation();
     const { study } = useAdminContext();
-    const [showAll, setShowAll] = useState(false);
 
     const translations = study?.translations ?? [];
-    const primary = translations[0];
-    const others = translations.slice(1);
 
     const hasConsent = useMemo(
         () => translations.some((tr) => tr.consent_title || tr.consent_description),
@@ -127,10 +117,10 @@ function ConsentSummaryCard({ designHref }: { designHref: string }) {
     return (
         <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
             <CardHeader className="border-b border-slate-50 pb-4">
-                <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 mb-1">
-                        <FileSignature className="h-5 w-5 text-indigo-500" />
-                        <CardTitle className="text-lg font-black text-slate-900">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                        <FileSignature className="h-5 w-5 text-indigo-500 shrink-0" />
+                        <CardTitle className="text-lg font-black text-slate-900 truncate">
                             {t('admin.privacy.consent.title', 'Consent form')}
                         </CardTitle>
                     </div>
@@ -138,7 +128,7 @@ function ConsentSummaryCard({ designHref }: { designHref: string }) {
                         asChild
                         variant="ghost"
                         size="sm"
-                        className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold"
+                        className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold self-start sm:self-auto shrink-0"
                     >
                         <Link to={`${designHref}#consent`}>
                             <PencilLine className="size-4 mr-2" />
@@ -153,65 +143,27 @@ function ConsentSummaryCard({ designHref }: { designHref: string }) {
                     )}
                 </CardDescription>
             </CardHeader>
-            <CardContent className="p-6 space-y-4">
+            <CardContent className="p-6 space-y-2">
                 {!hasConsent ? (
                     <p className="text-sm text-slate-500 italic">
                         {t('admin.privacy.consent.no_text', 'No consent text set yet.')}
                     </p>
                 ) : (
-                    <>
-                        {primary && (
-                            <ConsentLocaleBlock
-                                language_code={primary.language_code}
-                                consent_title={primary.consent_title}
-                                consent_description={primary.consent_description}
-                            />
-                        )}
-                        {others.length > 0 && (
-                            <>
-                                {showAll &&
-                                    others.map((tr) => (
-                                        <ConsentLocaleBlock
-                                            key={tr.language_code}
-                                            language_code={tr.language_code}
-                                            consent_title={tr.consent_title}
-                                            consent_description={tr.consent_description}
-                                        />
-                                    ))}
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAll((v) => !v)}
-                                    className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
-                                >
-                                    {showAll ? (
-                                        <>
-                                            <ChevronUp className="size-3" />
-                                            {t(
-                                                'admin.privacy.consent.hide_all_languages',
-                                                'Hide other languages'
-                                            )}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ChevronDown className="size-3" />
-                                            {t(
-                                                'admin.privacy.consent.show_all_languages',
-                                                'Show all languages'
-                                            )}{' '}
-                                            ({others.length})
-                                        </>
-                                    )}
-                                </button>
-                            </>
-                        )}
-                    </>
+                    translations.map((tr) => (
+                        <ConsentLocaleRow
+                            key={tr.language_code}
+                            language_code={tr.language_code}
+                            consent_title={tr.consent_title}
+                            consent_description={tr.consent_description}
+                        />
+                    ))
                 )}
             </CardContent>
         </Card>
     );
 }
 
-function ConsentLocaleBlock({
+function ConsentLocaleRow({
     language_code,
     consent_title,
     consent_description,
@@ -220,22 +172,54 @@ function ConsentLocaleBlock({
     consent_title?: string | null;
     consent_description?: string | null;
 }) {
+    const { t } = useTranslation();
+    const hasBody = !!consent_description;
     return (
-        <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-                <span className="text-2xs font-black text-slate-500 uppercase tracking-wide">
+        <div className="flex items-center justify-between gap-3 py-1.5 border-b border-slate-50 last:border-0">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+                <span className="text-2xs font-black text-slate-500 uppercase tracking-wide shrink-0">
                     {language_code}
                 </span>
-                {consent_title && (
-                    <span className="text-sm font-bold text-slate-900">{consent_title}</span>
+                {consent_title ? (
+                    <span className="text-sm font-bold text-slate-900 truncate">
+                        {consent_title}
+                    </span>
+                ) : (
+                    <span className="text-sm text-slate-400 italic truncate">
+                        {t('admin.privacy.consent.no_title', '(no title)')}
+                    </span>
                 )}
             </div>
-            {consent_description ? (
-                <p className="text-sm text-slate-600 leading-relaxed">
-                    {plainPreview(consent_description)}
-                </p>
+            {hasBody ? (
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            className="rounded-xl shrink-0 h-8 px-3 text-xs font-bold"
+                        >
+                            <Eye className="size-3.5 mr-1.5" />
+                            {t('admin.privacy.consent.view', 'View')}
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle className="text-xl font-black text-slate-900">
+                                {consent_title || t('admin.privacy.consent.title', 'Consent form')}
+                            </DialogTitle>
+                            <DialogDescription className="text-xs font-bold text-slate-500 uppercase tracking-wide">
+                                {language_code}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="prose prose-slate prose-sm max-w-none text-slate-800 leading-relaxed">
+                            <SafeMarkdown>{consent_description}</SafeMarkdown>
+                        </div>
+                    </DialogContent>
+                </Dialog>
             ) : (
-                <p className="text-sm text-slate-400 italic">—</p>
+                <span className="text-xs text-slate-400 italic shrink-0">
+                    {t('admin.privacy.consent.no_body', '(empty)')}
+                </span>
             )}
         </div>
     );

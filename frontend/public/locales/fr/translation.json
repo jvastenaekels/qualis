@@ -2262,9 +2262,10 @@
                 "title": "Formulaire de consentement",
                 "description": "Ce que les participants voient avant d'entrer dans l'étude. Modifié dans Conception.",
                 "no_text": "Aucun texte de consentement défini.",
+                "no_title": "(sans titre)",
+                "no_body": "(vide)",
                 "edit_in_design": "Modifier dans Conception",
-                "show_all_languages": "Voir toutes les langues",
-                "hide_all_languages": "Masquer les autres langues"
+                "view": "Voir"
             }
         },
         "projects": {
