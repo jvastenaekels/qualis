@@ -536,7 +536,6 @@
             "rough_sort": {
                 "section_title": "Rough sort step",
                 "toggle_label": "Enable preliminary sort (3-pile triage)",
-                "toggle_help": "Recommended for large Q-sets (>40 statements). About 38% of published Q studies use this step (Dieteren et al. 2023).",
                 "lock_banner": "Toggle locked. {{count}} participant(s) have started the survey; archive or delete those sessions before changing this setting.",
                 "deck_mode_note": "Disabled. Participants see the full Q-set as a horizontally-scrollable deck."
             }
@@ -1947,7 +1946,8 @@
                 },
                 "help": {
                     "title": "Step guidance (what/why)",
-                    "desc": "Customize the context-sensitive help available to participants at each step via the '?' overlay."
+                    "desc": "Customize the context-sensitive help available to participants at each step via the '?' overlay.",
+                    "step_disabled": "(step disabled)"
                 }
             },
             "theme": {

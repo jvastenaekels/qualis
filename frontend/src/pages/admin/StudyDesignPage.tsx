@@ -802,12 +802,6 @@ const StudyDesignPage = () => {
                                             )}
                                         </span>
                                     </label>
-                                    <p className="text-xs text-slate-600">
-                                        {t(
-                                            'admin.study_design.rough_sort.toggle_help',
-                                            'Recommended for large Q-sets (>40 statements). About 38% of published Q studies use this step (Dieteren et al. 2023).'
-                                        )}
-                                    </p>
                                     {(draft.rough_sort_enabled ?? true) === false && (
                                         <p className="text-xs italic text-slate-500">
                                             {t(

@@ -41,75 +41,81 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     {t('admin.design.condition.title')}
                 </div>
 
-                <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
-                    <CardHeader className="pb-4">
-                        <CardTitle className="text-base font-black text-slate-900 tracking-tight">
-                            {t('admin.design.condition.pre_title', 'Preliminary Sort Instruction')}
-                        </CardTitle>
-                        <CardDescription className="text-sm font-medium text-slate-500 italic">
-                            {t(
-                                'admin.design.condition.pre_desc',
-                                'Instruction given to participants during the initial rough sort.'
-                            )}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="grid gap-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <Label
-                                        htmlFor="pre_instruction"
-                                        className="text-2xs font-black text-slate-500"
-                                    >
-                                        {t(
-                                            'admin.design.condition.pre_field_label',
-                                            'Instruction Text'
-                                        )}
-                                    </Label>
-                                    <MultiLangFieldIcon
-                                        activeLocale={activeLocale}
-                                        translations={
-                                            draft.translations?.reduce(
-                                                (acc, tr) => {
-                                                    if (tr.pre_instruction)
-                                                        acc[tr.language_code] = tr.pre_instruction;
-                                                    return acc;
-                                                },
-                                                {} as Record<string, string>
-                                            ) || {}
-                                        }
-                                    />
-                                </div>
-                                {!readOnly && (
-                                    <button
-                                        type="button"
-                                        onClick={resetPreInstruction}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-2xs
+                {(draft.rough_sort_enabled ?? true) && (
+                    <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+                        <CardHeader className="pb-4">
+                            <CardTitle className="text-base font-black text-slate-900 tracking-tight">
+                                {t(
+                                    'admin.design.condition.pre_title',
+                                    'Preliminary Sort Instruction'
+                                )}
+                            </CardTitle>
+                            <CardDescription className="text-sm font-medium text-slate-500 italic">
+                                {t(
+                                    'admin.design.condition.pre_desc',
+                                    'Instruction given to participants during the initial rough sort.'
+                                )}
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="grid gap-3">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Label
+                                            htmlFor="pre_instruction"
+                                            className="text-2xs font-black text-slate-500"
+                                        >
+                                            {t(
+                                                'admin.design.condition.pre_field_label',
+                                                'Instruction Text'
+                                            )}
+                                        </Label>
+                                        <MultiLangFieldIcon
+                                            activeLocale={activeLocale}
+                                            translations={
+                                                draft.translations?.reduce(
+                                                    (acc, tr) => {
+                                                        if (tr.pre_instruction)
+                                                            acc[tr.language_code] =
+                                                                tr.pre_instruction;
+                                                        return acc;
+                                                    },
+                                                    {} as Record<string, string>
+                                                ) || {}
+                                            }
+                                        />
+                                    </div>
+                                    {!readOnly && (
+                                        <button
+                                            type="button"
+                                            onClick={resetPreInstruction}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-2xs
                                                  font-black text-slate-500
                                                  hover:bg-slate-100 hover:text-indigo-600 transition-colors
                                                  shadow-sm border bg-white"
-                                    >
-                                        <RotateCcw className="size-3" />
-                                        {t('common.reset_to_default')}
-                                    </button>
-                                )}
+                                        >
+                                            <RotateCcw className="size-3" />
+                                            {t('common.reset_to_default')}
+                                        </button>
+                                    )}
+                                </div>
+                                <Input
+                                    id="pre_instruction"
+                                    value={translation?.pre_instruction || ''}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                        handleChange('pre_instruction', e.target.value)
+                                    }
+                                    placeholder={t(
+                                        'admin.design.condition.pre_placeholder',
+                                        'e.g. Based on your personal point of view...'
+                                    )}
+                                    className="font-bold text-lg h-12 rounded-xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-indigo-500/20 transition-all px-4"
+                                    disabled={readOnly}
+                                />
                             </div>
-                            <Input
-                                id="pre_instruction"
-                                value={translation?.pre_instruction || ''}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                    handleChange('pre_instruction', e.target.value)
-                                }
-                                placeholder={t(
-                                    'admin.design.condition.pre_placeholder',
-                                    'e.g. Based on your personal point of view...'
-                                )}
-                                className="font-bold text-lg h-12 rounded-xl border-slate-200 bg-slate-50/30 focus:bg-white focus:ring-indigo-500/20 transition-all px-4"
-                                disabled={readOnly}
-                            />
-                        </div>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                )}
 
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardHeader className="pb-4">

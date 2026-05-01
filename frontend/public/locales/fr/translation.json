@@ -449,9 +449,8 @@
                 }
             },
             "rough_sort": {
-                "section_title": "Étape de pré-tri",
-                "toggle_label": "Activer le pré-tri (3 piles d'accord/neutre/pas d'accord)",
-                "toggle_help": "Recommandé pour les Q-sets longs (>40 énoncés). Environ 38 % des études Q publiées utilisent cette étape (Dieteren et al. 2023).",
+                "section_title": "Étape de tri préliminaire",
+                "toggle_label": "Activer le tri préliminaire (3 piles d'accord/neutre/pas d'accord)",
                 "lock_banner": "Verrou actif. {{count}} participant(s) ont commencé l'enquête ; archivez ou supprimez ces sessions avant de modifier ce réglage.",
                 "deck_mode_note": "Désactivé. Les participants verront l'ensemble du Q-set sous forme d'un deck défilant horizontalement."
             }
@@ -1864,10 +1863,10 @@
                 }
             },
             "interface": {
-                "title": "Interface & Guidage",
+                "title": "Interface et guidage",
                 "desc": "Personnalisez l'expérience des participants en personnalisant les libellés et le guidage méthodologique.",
                 "nav": {
-                    "title": "Navigation & Actions principales",
+                    "title": "Navigation et actions principales",
                     "start": "Bouton d'entrée (ex: Commencer)",
                     "next": "Bouton de progression (ex: Suivant)",
                     "submit": "Soumission finale (ex: Envoyer)",
@@ -1899,7 +1898,8 @@
                 },
                 "help": {
                     "title": "Guidage par étape (Quoi/Pourquoi)",
-                    "desc": "Personnalisez l'aide contextuelle accessible aux participants à chaque étape via la bulle '?'."
+                    "desc": "Personnalisez l'aide contextuelle accessible aux participants à chaque étape via la bulle '?'.",
+                    "step_disabled": "(étape désactivée)"
                 }
             },
             "theme": {

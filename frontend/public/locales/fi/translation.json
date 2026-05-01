@@ -451,7 +451,6 @@
             "rough_sort": {
                 "section_title": "Esilajitteluvaihe",
                 "toggle_label": "Ota esilajittelu käyttöön (samaa mieltä / neutraali / eri mieltä)",
-                "toggle_help": "Suositellaan suurille Q-joukoille (>40 väittämää). Noin 38 % julkaistuista Q-tutkimuksista käyttää tätä vaihetta (Dieteren et al. 2023).",
                 "lock_banner": "Lukittu. {{count}} osallistuja(a) on aloittanut kyselyn; arkistoi tai poista nämä istunnot ennen tämän asetuksen muuttamista.",
                 "deck_mode_note": "Pois käytöstä. Osallistujat näkevät koko Q-joukon vaakasuunnassa vieritettävänä pakkana."
             }
@@ -1861,7 +1860,8 @@
                 },
                 "help": {
                     "title": "Vaiheittainen ohjaus (Mitä/Miksi)",
-                    "desc": "Mukauta osallistujien saatavilla olevaa kontekstisidonnaista apua kussakin vaiheessa '?' -kuvakkeen kautta."
+                    "desc": "Mukauta osallistujien saatavilla olevaa kontekstisidonnaista apua kussakin vaiheessa '?' -kuvakkeen kautta.",
+                    "step_disabled": "(vaihe poistettu käytöstä)"
                 }
             },
             "theme": {

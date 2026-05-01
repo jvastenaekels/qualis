@@ -77,6 +77,22 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
         { id: 'post', labelKey: 'study.steps.post' },
     ];
 
+    // Mirrors `isPresortEnabled` / `isRoughSortEnabled` in `utils/studyConfig.ts`
+    // and the gating in ProcessStepEditor. `fine` and `post` are always present
+    // (Q-sort is mandatory; post-sort has only sub-toggles, no master switch).
+    const presortCfg = draft.presort_config as { enabled?: boolean } | null | undefined;
+    const presortEnabled = !presortCfg
+        ? true
+        : 'enabled' in presortCfg
+          ? presortCfg.enabled !== false
+          : true;
+    const roughEnabled = draft.rough_sort_enabled !== false;
+    const isStepEnabled = (id: string): boolean => {
+        if (id === 'presort') return presortEnabled;
+        if (id === 'rough') return roughEnabled;
+        return true;
+    };
+
     const updateLabel = (key: string, value: string) => {
         updateTranslation(activeLocale, (t) => {
             if (!t.ui_labels) t.ui_labels = {};
@@ -402,22 +418,37 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                 <CardContent className="space-y-10">
                     {visibleSteps.map((step, index) => {
                         const stepHelp = translation?.step_help?.[step.id.toString()] ?? {};
+                        const stepEnabled = isStepEnabled(step.id);
 
                         return (
-                            <div key={step.id} className="space-y-6">
+                            <div
+                                key={step.id}
+                                className={`space-y-6 transition-opacity ${
+                                    stepEnabled ? '' : 'opacity-50'
+                                }`}
+                                aria-disabled={!stepEnabled || undefined}
+                            >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-2 py-1.5 px-3 bg-indigo-50/50 border border-indigo-100 rounded-xl w-fit">
                                         <span className="text-2xs font-black text-indigo-900">
                                             {t('common.step', 'Step')} {index + 1}:{' '}
                                             {t(step.labelKey)}
                                         </span>
+                                        {!stepEnabled && (
+                                            <span className="text-2xs font-bold text-slate-500 italic">
+                                                {t(
+                                                    'admin.design.interface.help.step_disabled',
+                                                    '(étape désactivée)'
+                                                )}
+                                            </span>
+                                        )}
                                     </div>
                                     {translation?.step_help?.[step.id.toString()] && (
                                         <Button
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => resetStepHelp(step.id.toString())}
-                                            disabled={readOnly}
+                                            disabled={readOnly || !stepEnabled}
                                             className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold h-8 text-xs"
                                         >
                                             <RotateCcw className="size-3.5 mr-2" />
@@ -450,7 +481,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                                 placeholder={tPlaceHolder(
                                                     `study.help.step_${step.id}.${field}`
                                                 )}
-                                                disabled={readOnly}
+                                                disabled={readOnly || !stepEnabled}
                                                 className="font-medium text-sm h-11 rounded-xl bg-slate-50/30"
                                             />
                                         </div>
