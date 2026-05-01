@@ -21,6 +21,7 @@ import {
 import { toast } from 'sonner';
 
 import { evaluateVisibilityCondition } from '@/utils/visibilityEvaluator';
+import { buildQuestionnaireSchema } from '@/utils/buildQuestionnaireSchema';
 import { getLocalizedText } from '@/utils/localization';
 
 interface Step2Props {
@@ -199,117 +200,8 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
         mode: 'onChange',
         resolver: async (data, context, options) => {
             if (!questions) return zodResolver(z.object({}))(data, context, options);
-
-            const shape: Record<string, z.ZodTypeAny> = {};
-            Object.entries(questions).forEach(([key, field]) => {
-                const isVisible = evaluateVisibilityCondition(
-                    field.visibility_condition,
-                    data,
-                    questions
-                );
-                if (!isVisible) {
-                    shape[key] = z.any().optional();
-                    return;
-                }
-
-                const isTextual = ['text', 'textarea', 'email', 'text_audio'].includes(field.type);
-                const errorMsg = isTextual
-                    ? t('post.extreme.min_chars')
-                    : t('presort.error_required');
-
-                if (field.required) {
-                    // text_audio: text is always optional (audio is intrinsic to the type)
-                    // Custom validation in handleFinalSubmit checks text OR audio
-                    if (field.type === 'text_audio') {
-                        shape[key] = z.preprocess(
-                            (val) => (val === '' || val === null || val === undefined ? null : val),
-                            z.string().optional().nullable()
-                        );
-                    } else if (field.type === 'checkbox') {
-                        shape[key] = z.array(z.string()).min(1, t('presort.error_required'));
-                    } else if (field.type === 'number') {
-                        let numSchema = z.number({
-                            required_error: t('presort.error_required'),
-                            invalid_type_error: t('presort.error_required'),
-                        });
-                        if (field.min !== undefined) {
-                            numSchema = numSchema.min(
-                                field.min,
-                                t('common.errors.min', { min: field.min })
-                            );
-                        }
-                        if (field.max !== undefined) {
-                            numSchema = numSchema.max(
-                                field.max,
-                                t('common.errors.max', { max: field.max })
-                            );
-                        }
-                        shape[key] = z.preprocess((val) => {
-                            if (val === '' || val === null || val === undefined) return undefined;
-                            const num = Number(val);
-                            return Number.isNaN(num) ? val : num;
-                        }, numSchema);
-                    } else {
-                        // Text-based required fields
-                        let s = z.string().min(1, errorMsg);
-                        if (field.type === 'email') {
-                            s = s.email(t('common.errors.email'));
-                        }
-                        if (field.minLength) {
-                            s = s.min(
-                                field.minLength,
-                                t('common.errors.min_length', { count: field.minLength })
-                            );
-                        }
-                        if (field.maxLength) {
-                            s = s.max(
-                                field.maxLength,
-                                t('common.errors.max_length', { count: field.maxLength })
-                            );
-                        }
-
-                        shape[key] = z.preprocess(
-                            (val) => (val === null || val === undefined ? '' : val),
-                            s
-                        );
-                    }
-                } else {
-                    // Optional fields
-                    if (field.type === 'checkbox') {
-                        shape[key] = z.array(z.string()).optional().nullable();
-                    } else if (field.type === 'number') {
-                        shape[key] = z.preprocess((val) => {
-                            if (val === '' || val === null || val === undefined) return null;
-                            const num = Number(val);
-                            return Number.isNaN(num) ? val : num;
-                        }, z.number().optional().nullable());
-                    } else {
-                        let s = z.string();
-                        if (field.type === 'email') {
-                            s = s.email(t('common.errors.email'));
-                        }
-                        if (field.minLength) {
-                            s = s.min(
-                                field.minLength,
-                                t('common.errors.min_length', { count: field.minLength })
-                            );
-                        }
-                        if (field.maxLength) {
-                            s = s.max(
-                                field.maxLength,
-                                t('common.errors.max_length', { count: field.maxLength })
-                            );
-                        }
-
-                        shape[key] = z.preprocess(
-                            (val) => (val === '' || val === null || val === undefined ? null : val),
-                            s.optional().nullable()
-                        );
-                    }
-                }
-            });
-
-            return zodResolver(z.object(shape))(data, context, options);
+            const schema = buildQuestionnaireSchema(questions, data, t);
+            return zodResolver(schema)(data, context, options);
         },
         defaultValues: postsort.questions_answers,
     });
