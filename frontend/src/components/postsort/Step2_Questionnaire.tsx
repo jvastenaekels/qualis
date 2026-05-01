@@ -183,7 +183,7 @@ export const Step2_Questionnaire: React.FC<Step2Props> = ({ onBack, onSubmit, is
                 deleteAudioRecordingStore(questionKey);
             } catch (error) {
                 console.error('Audio deletion failed:', error);
-                toast.error(t('audio.delete_failed', 'Delete failed'));
+                toast.error(t('audio.delete_failed', 'Could not delete the recording. Try again.'));
             }
         },
         [getAudioRecording, isPilotMode, deleteAudioRecordingStore, token, t]

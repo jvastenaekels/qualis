@@ -85,14 +85,22 @@ export function MemoSection({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            {m.templates.map((tpl) => (
-                                <DropdownMenuItem
-                                    key={tpl.title}
-                                    onClick={() => m.addEntry({ title: tpl.title, body: '' })}
-                                >
-                                    {tpl.title}
-                                </DropdownMenuItem>
-                            ))}
+                            {m.templates.map((tpl) => {
+                                const localizedTitle = t(
+                                    `admin.memo.templates.${tpl.id}.title`,
+                                    tpl.title
+                                );
+                                return (
+                                    <DropdownMenuItem
+                                        key={tpl.id}
+                                        onClick={() =>
+                                            m.addEntry({ title: localizedTitle, body: '' })
+                                        }
+                                    >
+                                        {localizedTitle}
+                                    </DropdownMenuItem>
+                                );
+                            })}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 )}

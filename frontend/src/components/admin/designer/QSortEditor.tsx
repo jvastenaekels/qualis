@@ -352,7 +352,12 @@ const QSortEditor = ({
                     );
                 },
                 onError: () => {
-                    toast.error(t('admin.concourse_sync.error', 'Sync failed'));
+                    toast.error(
+                        t(
+                            'admin.concourse_sync.error',
+                            'Could not sync from the concourse. Try again.'
+                        )
+                    );
                 },
             }
         );

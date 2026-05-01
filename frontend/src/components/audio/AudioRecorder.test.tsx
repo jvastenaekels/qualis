@@ -399,7 +399,7 @@ describe('AudioRecorder', () => {
             expect(screen.getByRole('button', { name: 'Play' })).toBeInTheDocument();
             expect(screen.getByText('0:45')).toBeInTheDocument();
         });
-        expect(mockToast.error).toHaveBeenCalledWith('Delete failed');
+        expect(mockToast.error).toHaveBeenCalledWith('Could not delete the recording. Try again.');
     });
 
     it('shows uploading state during delete', async () => {

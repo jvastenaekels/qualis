@@ -91,8 +91,11 @@ export default function CreateProjectPage() {
             toast.success(t('admin.project.create.success'));
             navigate(`/app/${newProject.slug}/settings`);
         } catch (error: unknown) {
-            const message = parseApiErrorSync(error, t('admin.project.create.error'));
-            toast.error(t('admin.project.create.error'), {
+            const message = parseApiErrorSync(
+                error,
+                t('admin.project.create.error', 'Could not create project. Try again.')
+            );
+            toast.error(t('admin.project.create.error', 'Could not create project. Try again.'), {
                 description: message,
             });
         } finally {

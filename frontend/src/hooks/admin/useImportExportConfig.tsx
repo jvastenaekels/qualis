@@ -60,9 +60,13 @@ export function useImportConfig() {
             } catch (error: unknown) {
                 console.error('Import failed:', error);
                 const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-                toast.error(t('admin.import.error', 'Failed to import configuration'), {
-                    description: errorMsg,
-                });
+                toast.error(
+                    t(
+                        'admin.import.error',
+                        'Could not import configuration. See details below and retry.'
+                    ),
+                    { description: errorMsg }
+                );
             } finally {
                 setIsImporting(false);
             }
@@ -116,9 +120,10 @@ export function useExportConfig(studySlug: string) {
         } catch (error: unknown) {
             console.error('Export failed:', error);
             const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-            toast.error(t('admin.export.config_error', 'Failed to export configuration'), {
-                description: errorMsg,
-            });
+            toast.error(
+                t('admin.export.config_error', 'Could not export configuration. Try again.'),
+                { description: errorMsg }
+            );
         } finally {
             setIsExporting(false);
         }

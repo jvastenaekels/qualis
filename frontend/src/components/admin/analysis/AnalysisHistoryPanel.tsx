@@ -79,7 +79,12 @@ export function AnalysisHistoryPanel({ slug, currentRunId, onLoadRun }: Analysis
             const full = await getAnalysisRunApiAdminStudiesSlugAnalysisRunsRunIdGet(slug, run.id);
             onLoadRun(full.result as unknown as AnalysisResult, run);
         } catch {
-            toast.error(t('admin.analysis.history.load_error', 'Failed to load the analysis run.'));
+            toast.error(
+                t(
+                    'admin.analysis.history.load_error',
+                    'Could not load this analysis run. Refresh the page to retry.'
+                )
+            );
         } finally {
             setLoadingRunId(null);
         }
@@ -100,7 +105,12 @@ export function AnalysisHistoryPanel({ slug, currentRunId, onLoadRun }: Analysis
                     queryClient.invalidateQueries({ queryKey: listQueryKey });
                 },
                 onError: () => {
-                    toast.error(t('admin.analysis.history.notes_error', 'Failed to save notes.'));
+                    toast.error(
+                        t(
+                            'admin.analysis.history.notes_error',
+                            'Could not save notes. Check your connection and try again.'
+                        )
+                    );
                 },
             }
         );

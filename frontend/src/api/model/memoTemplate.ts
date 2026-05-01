@@ -6,6 +6,7 @@
  */
 
 export interface MemoTemplate {
+    id: string;
     title: string;
     description: string;
 }

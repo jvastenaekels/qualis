@@ -79,5 +79,6 @@ class MemoRead(BaseModel):
 
 
 class MemoTemplate(BaseModel):
+    id: str
     title: str
     description: str

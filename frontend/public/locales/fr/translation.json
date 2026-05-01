@@ -393,7 +393,7 @@
         "play": "Écouter",
         "delete": "Supprimer",
         "deleted": "Audio supprimé",
-        "delete_failed": "Échec de la suppression",
+        "delete_failed": "Impossible de supprimer l'enregistrement. Réessayez.",
         "file_size": "Taille du fichier",
         "upload_success": "Audio envoyé avec succès",
         "upload_failed": "Échec de l'envoi. Veuillez réessayer.",
@@ -403,9 +403,9 @@
         "permission_denied": "Accès au microphone refusé",
         "unsupported": "L'enregistrement audio n'est pas pris en charge par ce navigateur.",
         "permission_revoked": "Accès au microphone perdu - enregistrement arrêté",
-        "refresh_failed": "Échec du rafraîchissement de l'URL audio",
+        "refresh_failed": "Impossible de rafraîchir l'audio. Votre enregistrement reste sauvegardé.",
         "refreshing": "Rafraîchissement de l'audio...",
-        "playback_failed": "Échec de la lecture audio",
+        "playback_failed": "Impossible de lire l'audio. Rafraîchissez la page et réessayez.",
         "error": {
             "no_token": "Jeton de session manquant",
             "quota_exceeded": "Quota de stockage dépassé. Veuillez supprimer un enregistrement existant ou répondre par écrit.",
@@ -457,6 +457,7 @@
             }
         },
         "study": {
+            "activate_error": "Impossible d'activer l'étude. Vérifiez que la conception est valide et réessayez.",
             "save": {
                 "success": "Modifications enregistrées avec succès",
                 "save_success": "Enregistré avec succès",
@@ -638,7 +639,7 @@
             "add_comment": "Écrire un commentaire...",
             "send_comment": "Envoyer",
             "comment_added": "Commentaire ajouté",
-            "comment_error": "Échec de l'ajout du commentaire",
+            "comment_error": "Impossible d'ajouter le commentaire. Réessayez.",
             "version_label": "v{{n}}",
             "item_detail_desc": "Historique et commentaires de cet élément",
             "manage_tags": "Étiquettes",
@@ -703,7 +704,7 @@
             "select_all": "Tout sélectionner",
             "import_button": "Importer {{count}} énoncés",
             "success": "{{count}} énoncés importés",
-            "error": "Échec de l'import",
+            "error": "Impossible d'importer les énoncés depuis le concours. Réessayez.",
             "no_accepted": "Aucun élément accepté dans ce concours. Décochez « Acceptés uniquement » pour tout voir.",
             "no_items": "Ce concours n'a aucun élément.",
             "no_concourses": "Aucun concours dans cet espace de travail. Créez-en un d'abord."
@@ -714,7 +715,7 @@
             "source_deleted_tip": "L'élément source du concours a été supprimé.",
             "new_version": "Nouvelle version dans le concours :",
             "synced": "Énoncé mis à jour depuis le concours",
-            "error": "Échec de la synchronisation",
+            "error": "Impossible de synchroniser depuis le concours. Réessayez.",
             "stale_banner": "{{count}} énoncé(s) ont des mises à jour disponibles depuis le concours."
         },
         "analysis": {
@@ -834,7 +835,7 @@
                 "fetch_error": "Impossible de charger l'historique des analyses.",
                 "empty": "Aucune analyse précédente pour cette étude. Lancez-en une pour démarrer la piste d'audit.",
                 "empty_explainer": "Chaque exécution est enregistrée ici afin de documenter et réexaminer chaque décision.",
-                "load_error": "Impossible de charger cette analyse.",
+                "load_error": "Impossible de charger cette analyse. Rafraîchissez la page pour réessayer.",
                 "load_run_aria": "Charger l'analyse du {{date}}",
                 "loading_run": "Chargement…",
                 "current_tag": "actuelle",
@@ -846,7 +847,7 @@
                 "save_notes_aria": "Enregistrer les notes",
                 "cancel_edit_aria": "Annuler la modification",
                 "notes_saved": "Notes enregistrées.",
-                "notes_error": "Impossible d'enregistrer les notes.",
+                "notes_error": "Impossible d'enregistrer les notes. Vérifiez votre connexion et réessayez.",
                 "delete_run": "Supprimer l'analyse",
                 "delete_run_aria": "Supprimer cette analyse",
                 "delete_dialog_title": "Supprimer cette analyse ?",
@@ -1099,9 +1100,9 @@
             },
             "toasts": {
                 "created": "Liens de recrutement créés avec succès",
-                "failed": "Échec de la création des liens",
+                "failed": "Impossible de créer les liens de recrutement. Vérifiez les paramètres et réessayez.",
                 "revoked": "Lien révoqué",
-                "revoke_failed": "Échec de la révocation du lien",
+                "revoke_failed": "Impossible de révoquer ce lien. Il est peut-être déjà utilisé.",
                 "copied": "Copié dans le presse-papiers"
             }
         },
@@ -1258,10 +1259,10 @@
             "config": "Exporter la configuration",
             "exporting": "Export en cours...",
             "config_success": "Configuration exportée avec succès",
-            "config_error": "Échec de l'export de la configuration",
+            "config_error": "Impossible d'exporter la configuration. Réessayez.",
             "label": "Exporter les données",
             "success": "Export réussi",
-            "error": "Échec de l'export",
+            "error": "Échec de l'export. Réessayez.",
             "csv": "Exporter CSV",
             "json": "Exporter JSON",
             "audio": "Exporter Audio (ZIP)",
@@ -1305,11 +1306,11 @@
             "slug_help": "Doit être unique, 3-100 caractères, lettres minuscules, chiffres et traits d'union uniquement",
             "creating": "Création de l'étude à partir de la configuration...",
             "create_study": "Créer l'étude",
-            "invalid_json": "JSON invalide",
-            "validation_failed": "Échec de la validation",
+            "invalid_json": "Fichier JSON invalide",
+            "validation_failed": "Configuration invalide",
             "success": "Étude importée avec succès",
             "redirecting": "Ouverture du concepteur d'étude...",
-            "failed": "L'import a échoué",
+            "failed": "Impossible d'importer l'étude. Voir les détails ci-dessous et réessayez.",
             "validation": {
                 "errors": {
                     "missing_version": "Le champ version est manquant",
@@ -1436,7 +1437,7 @@
                     "paused": "L'étude a été mise en pause avec succès",
                     "closed": "L'étude a été fermée avec succès"
                 },
-                "error": "Échec du changement d'état de l'étude",
+                "error": "Impossible de changer l'état de l'étude. Vérifiez vos permissions et réessayez.",
                 "state_changed_active": "L'étude est maintenant active !"
             },
             "state": {
@@ -2003,7 +2004,7 @@
                 "clear_all": "Réinitialiser toutes les données",
                 "clear_all_confirm": "DANGER : Cela supprimera définitivement TOUTES les données des participants pour cette étude. Cette action est irréversible.",
                 "clear_all_success": "Toutes les données ont été effacées",
-                "clear_all_error": "Erreur lors de l'effacement des données"
+                "clear_all_error": "Impossible d'effacer les données. Vérifiez vos permissions et réessayez."
             },
             "confirm_discard": {
                 "title": "Exclure le participant ?",
@@ -2056,7 +2057,7 @@
             "toast": {
                 "discarded": "Participant écarté",
                 "restored": "Participant restauré",
-                "error": "Échec de la mise à jour du participant"
+                "error": "Impossible de mettre à jour le participant. Vérifiez votre connexion et réessayez."
             },
             "detail": {
                 "participant": "Participant",
@@ -2181,7 +2182,7 @@
             "save_button": "Enregistrer",
             "save_success": "Paramètres mis à jour",
             "save_success_desc": "Les paramètres de l'étude ont été enregistrés avec succès.",
-            "save_error": "Erreur de mise à jour",
+            "save_error": "Impossible d'enregistrer les paramètres. Vérifiez les valeurs et réessayez.",
             "save_error_desc": "Échec de la mise à jour des paramètres. Le slug est peut-être déjà utilisé.",
             "archive_success": "Étude archivée",
             "archive_success_desc": "L'étude est maintenant archivée et en lecture seule.",
@@ -2189,7 +2190,7 @@
             "archive_error_desc": "Échec de l'archivage de l'étude. Est-elle bien fermée ?",
             "delete_success": "Étude supprimée",
             "delete_success_desc": "L'étude a été définitivement supprimée.",
-            "delete_error": "Erreur de suppression",
+            "delete_error": "Impossible de supprimer l'étude. Assurez-vous que toutes les données ont été effacées au préalable.",
             "delete_error_desc": "Échec de la suppression de l'étude.",
             "storage": {
                 "title": "Utilisation du stockage audio",
@@ -2200,7 +2201,7 @@
                 "error": "Échec du chargement de l'utilisation du stockage.",
                 "warning_high_usage": "L'utilisation du stockage est élevée. Envisagez d'augmenter le quota ou de supprimer d'anciens enregistrements.",
                 "save_success": "Quota de stockage mis à jour",
-                "save_error": "Échec de la mise à jour du quota de stockage"
+                "save_error": "Impossible de mettre à jour le quota de stockage. Réessayez."
             },
             "retention": {
                 "title": "Conservation des données",
@@ -2366,11 +2367,48 @@
             "save": "Enregistrer",
             "cancel": "Annuler",
             "saved": "Enregistré",
-            "save_error": "Échec de l'enregistrement",
+            "save_error": "Impossible d'enregistrer le mémo. Réessayez.",
+            "load_error": "Impossible de charger le mémo. Rafraîchissez la page pour réessayer.",
             "mentions_for_you": "Mentions pour vous",
             "mention_user_not_found": "Utilisateur inconnu",
             "delete_entry_confirm": "Supprimer cette entrée et tous ses commentaires ?",
-            "include_discussion_in_export": "Inclure les fils de discussion du mémo"
+            "include_discussion_in_export": "Inclure les fils de discussion du mémo",
+            "templates": {
+                "concourse": {
+                    "sources_canvassed": {
+                        "title": "Sources consultées"
+                    },
+                    "voices_retained": {
+                        "title": "Voix retenues"
+                    },
+                    "voices_excluded": {
+                        "title": "Voix écartées"
+                    },
+                    "sampling_rationale": {
+                        "title": "Justification de l'échantillonnage"
+                    },
+                    "version_notes": {
+                        "title": "Notes de version"
+                    }
+                },
+                "study": {
+                    "distribution_rationale": {
+                        "title": "Justification de la distribution"
+                    },
+                    "conditions_of_instruction": {
+                        "title": "Conditions d'instruction"
+                    },
+                    "qset_size": {
+                        "title": "Taille du Q-set"
+                    },
+                    "pre_post_design": {
+                        "title": "Choix de pré/post-tri"
+                    },
+                    "limitations": {
+                        "title": "Limites"
+                    }
+                }
+            }
         },
         "participants": {
             "title": "Participants",

@@ -59,7 +59,12 @@ const StudyStatusControl: React.FC<StudyStatusControlProps> = ({
 
             onStateChange();
         } catch (error) {
-            toast.error(t('admin.study_status.notifications.error'));
+            toast.error(
+                t(
+                    'admin.study_status.notifications.error',
+                    'Could not change study state. Check your permissions and try again.'
+                )
+            );
             console.error(error);
         }
     };

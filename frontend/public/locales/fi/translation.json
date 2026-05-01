@@ -393,7 +393,7 @@
         "play": "Toista",
         "delete": "Poista",
         "deleted": "Ääni poistettu",
-        "delete_failed": "Poisto epäonnistui",
+        "delete_failed": "Tallennusta ei voitu poistaa. Yritä uudelleen.",
         "file_size": "Tiedostokoko",
         "upload_success": "Ääni lähetetty onnistuneesti",
         "upload_failed": "Lähetys epäonnistui. Yritä uudelleen.",
@@ -403,9 +403,9 @@
         "permission_denied": "Mikrofonin käyttöoikeus evätty",
         "unsupported": "Äänen tallennus ei ole tuettu tässä selaimessa.",
         "permission_revoked": "Mikrofonin käyttöoikeus menetetty - tallennus pysäytetty",
-        "refresh_failed": "Äänen URL-osoitteen päivitys epäonnistui",
+        "refresh_failed": "Ääntä ei voitu päivittää. Tallennuksesi on yhä tallennettu.",
         "refreshing": "Päivitetään ääntä...",
-        "playback_failed": "Äänen toisto epäonnistui",
+        "playback_failed": "Ääntä ei voitu toistaa. Päivitä sivu ja yritä uudelleen.",
         "error": {
             "no_token": "Istuntotunnus puuttuu",
             "quota_exceeded": "Tallennustilakiintiö ylitetty. Poista olemassa oleva tallenne tai käytä tekstiä.",
@@ -457,6 +457,7 @@
             }
         },
         "study": {
+            "activate_error": "Tutkimusta ei voitu aktivoida. Tarkista, että suunnittelu on kelvollinen, ja yritä uudelleen.",
             "save": {
                 "success": "Muutokset tallennettu onnistuneesti",
                 "save_success": "Tallennettu onnistuneesti",
@@ -638,7 +639,7 @@
             "add_comment": "Kirjoita kommentti...",
             "send_comment": "Lähetä",
             "comment_added": "Kommentti lisätty",
-            "comment_error": "Kommentin lisääminen epäonnistui",
+            "comment_error": "Kommenttia ei voitu lisätä. Yritä uudelleen.",
             "version_label": "v{{n}}",
             "item_detail_desc": "Kohteen historia ja kommentit",
             "manage_tags": "Tunnisteet",
@@ -703,7 +704,7 @@
             "select_all": "Valitse kaikki",
             "import_button": "Tuo {{count}} lausetta",
             "success": "{{count}} lausetta tuotu",
-            "error": "Tuonti epäonnistui",
+            "error": "Lauseiden tuonti lausekokoelmasta epäonnistui. Yritä uudelleen.",
             "no_accepted": "Ei hyväksyttyjä kohteita tässä lausekokoelmassa. Poista valinta \"Vain hyväksytyt\" nähdäksesi kaikki.",
             "no_items": "Tässä lausekokoelmassa ei ole kohteita.",
             "no_concourses": "Ei lausekokoelmia tässä työtilassa. Luo ensin yksi."
@@ -714,7 +715,7 @@
             "source_deleted_tip": "Lähteen lausekokoelmakohde on poistettu.",
             "new_version": "Uusi versio lausekokoelmassa:",
             "synced": "Lause päivitetty lausekokoelmasta",
-            "error": "Synkronointi epäonnistui",
+            "error": "Synkronointi lausekokoelmasta epäonnistui. Yritä uudelleen.",
             "stale_banner": "{{count}} lauseella on päivityksiä saatavilla lausekokoelmasta."
         },
         "analysis": {
@@ -859,7 +860,7 @@
                 "fetch_error": "Could not load analysis history.",
                 "empty": "No previous analyses for this study yet. Run one to start the audit trail.",
                 "empty_explainer": "Each run is logged here so you can document and revisit every decision.",
-                "load_error": "Failed to load the analysis run.",
+                "load_error": "Tätä analyysiajoa ei voitu ladata. Päivitä sivu yrittääksesi uudelleen.",
                 "load_run_aria": "Load analysis run from {{date}}",
                 "loading_run": "Loading…",
                 "current_tag": "current",
@@ -871,7 +872,7 @@
                 "save_notes_aria": "Save notes",
                 "cancel_edit_aria": "Cancel editing",
                 "notes_saved": "Notes saved.",
-                "notes_error": "Failed to save notes.",
+                "notes_error": "Muistiinpanoja ei voitu tallentaa. Tarkista yhteytesi ja yritä uudelleen.",
                 "delete_run": "Delete run",
                 "delete_run_aria": "Delete this analysis run",
                 "delete_dialog_title": "Delete analysis run?",
@@ -1099,9 +1100,9 @@
             },
             "toasts": {
                 "created": "Rekrytointilinkit luotu onnistuneesti",
-                "failed": "Linkkien luominen epäonnistui",
+                "failed": "Rekrytointilinkkejä ei voitu luoda. Tarkista syöte ja yritä uudelleen.",
                 "revoked": "Linkki peruutettu",
-                "revoke_failed": "Linkin peruuttaminen epäonnistui",
+                "revoke_failed": "Linkkiä ei voitu peruuttaa. Se saattaa olla jo käytössä.",
                 "copied": "Kopioitu leikepöydälle"
             }
         },
@@ -1258,10 +1259,10 @@
             "config": "Vie asetukset",
             "exporting": "Viedään...",
             "config_success": "Asetukset viety onnistuneesti",
-            "config_error": "Asetusten vienti epäonnistui",
+            "config_error": "Asetuksia ei voitu viedä. Yritä uudelleen.",
             "label": "Vie tiedot",
             "success": "Vienti onnistui",
-            "error": "Vienti epäonnistui",
+            "error": "Vienti epäonnistui. Yritä uudelleen.",
             "csv": "Vie CSV",
             "json": "Vie JSON",
             "audio": "Vie ääni (ZIP)",
@@ -1305,11 +1306,11 @@
             "slug_help": "Tunnisteen on oltava yksilöllinen, 3–100 merkkiä, vain pieniä kirjaimia, numeroita ja väliviivoja",
             "creating": "Luodaan tutkimusta asetuksista...",
             "create_study": "Luo tutkimus",
-            "invalid_json": "Virheellinen JSON",
-            "validation_failed": "Vahvistus epäonnistui",
+            "invalid_json": "Virheellinen JSON-tiedosto",
+            "validation_failed": "Asetukset ovat virheellisiä",
             "success": "Tutkimus tuotu onnistuneesti",
             "redirecting": "Avataan tutkimussuunnittelija...",
-            "failed": "Tuonti epäonnistui",
+            "failed": "Tutkimusta ei voitu tuoda. Katso lisätiedot alla ja yritä uudelleen.",
             "validation": {
                 "errors": {
                     "missing_version": "Versio-kenttä puuttuu",
@@ -1436,7 +1437,7 @@
                     "paused": "Tutkimus keskeytetty onnistuneesti",
                     "closed": "Tutkimus suljettu onnistuneesti"
                 },
-                "error": "Tutkimuksen tilan muuttaminen epäonnistui",
+                "error": "Tutkimuksen tilaa ei voitu muuttaa. Tarkista käyttöoikeutesi ja yritä uudelleen.",
                 "state_changed_active": "Tutkimus on nyt aktiivinen!"
             },
             "state": {
@@ -1965,7 +1966,7 @@
                 "clear_all": "Nollaa kaikki tiedot",
                 "clear_all_confirm": "VAARA: Tämä poistaa pysyvästi KAIKKI tämän tutkimuksen osallistujatiedot. Tätä ei voi peruuttaa.",
                 "clear_all_success": "Kaikki tiedot poistettu",
-                "clear_all_error": "Tietojen poistaminen epäonnistui"
+                "clear_all_error": "Tietoja ei voitu tyhjentää. Tarkista käyttöoikeutesi ja yritä uudelleen."
             },
             "confirm_discard": {
                 "title": "Hylätäänkö osallistuja?",
@@ -2018,7 +2019,7 @@
             "toast": {
                 "discarded": "Osallistuja hylätty",
                 "restored": "Osallistuja palautettu",
-                "error": "Osallistujan päivitys epäonnistui"
+                "error": "Osallistujaa ei voitu päivittää. Tarkista yhteytesi ja yritä uudelleen."
             },
             "detail": {
                 "participant": "Osallistuja",
@@ -2181,7 +2182,7 @@
             "save_button": "Tallenna",
             "save_success": "Asetukset päivitetty",
             "save_success_desc": "Tutkimuksen asetukset on tallennettu.",
-            "save_error": "Virhe asetusten päivittämisessä",
+            "save_error": "Asetuksia ei voitu tallentaa. Tarkista arvot ja yritä uudelleen.",
             "save_error_desc": "Asetusten päivitys epäonnistui. Tunniste saattaa olla jo käytössä.",
             "archive_success": "Tutkimus arkistoitu",
             "archive_success_desc": "Tutkimus on nyt arkistoitu ja vain luku -tilassa.",
@@ -2189,7 +2190,7 @@
             "archive_error_desc": "Tutkimuksen arkistointi epäonnistui. Onko se suljettu?",
             "delete_success": "Tutkimus poistettu",
             "delete_success_desc": "Tutkimus on poistettu pysyvästi.",
-            "delete_error": "Virhe tutkimuksen poistamisessa",
+            "delete_error": "Tutkimusta ei voitu poistaa. Varmista, että kaikki tiedot on tyhjennetty ensin.",
             "delete_error_desc": "Tutkimuksen poistaminen epäonnistui.",
             "storage": {
                 "title": "Äänitallenteiden tallennustila",
@@ -2200,7 +2201,7 @@
                 "error": "Tallennustilan käytön lataaminen epäonnistui.",
                 "warning_high_usage": "Tallennustilan käyttö on korkea. Harkitse kiintiön kasvattamista tai vanhojen tallenteiden poistamista.",
                 "save_success": "Tallennustilakiintiö päivitetty",
-                "save_error": "Tallennustilakiintiön päivitys epäonnistui"
+                "save_error": "Tallennustilakiintiötä ei voitu päivittää. Yritä uudelleen."
             },
             "retention": {
                 "title": "Tietojen säilytys",
@@ -2321,11 +2322,48 @@
             "save": "Tallenna",
             "cancel": "Peruuta",
             "saved": "Tallennettu",
-            "save_error": "Tallennus epäonnistui",
+            "save_error": "Muistiota ei voitu tallentaa. Yritä uudelleen.",
+            "load_error": "Muistiota ei voitu ladata. Päivitä sivu yrittääksesi uudelleen.",
             "mentions_for_you": "Maininnat sinulle",
             "mention_user_not_found": "Tuntematon käyttäjä",
             "delete_entry_confirm": "Poistetaanko tämä merkintä ja kaikki sen kommentit?",
-            "include_discussion_in_export": "Sisällytä keskusteluketjut"
+            "include_discussion_in_export": "Sisällytä keskusteluketjut",
+            "templates": {
+                "concourse": {
+                    "sources_canvassed": {
+                        "title": "Kartoitetut lähteet"
+                    },
+                    "voices_retained": {
+                        "title": "Säilytetyt äänet"
+                    },
+                    "voices_excluded": {
+                        "title": "Pois jätetyt äänet"
+                    },
+                    "sampling_rationale": {
+                        "title": "Otantaperustelu"
+                    },
+                    "version_notes": {
+                        "title": "Versiomuistiinpanot"
+                    }
+                },
+                "study": {
+                    "distribution_rationale": {
+                        "title": "Jakauman perustelu"
+                    },
+                    "conditions_of_instruction": {
+                        "title": "Ohjeen ehdot"
+                    },
+                    "qset_size": {
+                        "title": "Q-joukon koko"
+                    },
+                    "pre_post_design": {
+                        "title": "Esi-/jälkilajittelun valinnat"
+                    },
+                    "limitations": {
+                        "title": "Rajoitukset"
+                    }
+                }
+            }
         },
         "participants": {
             "title": "Osallistujat",

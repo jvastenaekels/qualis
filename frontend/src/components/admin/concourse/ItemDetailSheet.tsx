@@ -88,7 +88,10 @@ export function ItemDetailSheet({
             toast.success(t('admin.concourse.comment_added', 'Comment added'));
         } catch (err) {
             toast.error(
-                parseApiErrorSync(err, t('admin.concourse.comment_error', 'Failed to add comment'))
+                parseApiErrorSync(
+                    err,
+                    t('admin.concourse.comment_error', 'Could not add comment. Try again.')
+                )
             );
         }
     };

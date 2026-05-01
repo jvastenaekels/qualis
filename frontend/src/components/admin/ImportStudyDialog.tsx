@@ -81,7 +81,7 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
                 setNewSlug(`${originalSlug}-${timestamp}`);
             } catch (error: unknown) {
                 const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-                toast.error(t('admin.import.validation_failed', 'Validation failed'), {
+                toast.error(t('admin.import.validation_failed', 'Configuration is invalid'), {
                     description: errorMsg,
                 });
                 setStep('upload');
@@ -156,9 +156,12 @@ export function ImportStudyDialog({ open, onOpenChange, projectSlug }: ImportStu
             navigate(`/app/${projectSlug}/studies/${result.data.slug}/design`);
         } catch (error: unknown) {
             const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-            toast.error(t('admin.import.failed', 'Import failed'), {
-                description: typeof errorMsg === 'string' ? errorMsg : 'Unknown error',
-            });
+            toast.error(
+                t('admin.import.failed', 'Could not import study. See details below and retry.'),
+                {
+                    description: typeof errorMsg === 'string' ? errorMsg : 'Unknown error',
+                }
+            );
             setStep('validate');
         }
     };

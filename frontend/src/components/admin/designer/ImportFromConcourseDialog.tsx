@@ -118,7 +118,15 @@ export function ImportFromConcourseDialog({
             resetState();
             onImported();
         } catch (err) {
-            toast.error(parseApiErrorSync(err, t('admin.concourse_import.error', 'Import failed')));
+            toast.error(
+                parseApiErrorSync(
+                    err,
+                    t(
+                        'admin.concourse_import.error',
+                        'Could not import items from the concourse. Try again.'
+                    )
+                )
+            );
         }
     };
 

@@ -8667,6 +8667,10 @@
       },
       "MemoTemplate": {
         "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
           "title": {
             "type": "string",
             "title": "Title"
@@ -8678,6 +8682,7 @@
         },
         "type": "object",
         "required": [
+          "id",
           "title",
           "description"
         ],

@@ -75,7 +75,7 @@ const RegistrationPage = () => {
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
         if (password !== confirmPassword) {
-            toast.error(t('auth.register.errors.password_mismatch'));
+            toast.error(t('auth.register.errors.password_mismatch', 'Passwords do not match.'));
             return;
         }
 
@@ -88,10 +88,22 @@ const RegistrationPage = () => {
             setIsSuccess(true);
             toast.success(t('auth.register.success_title'));
         } catch (error: unknown) {
-            const message = parseApiErrorSync(error, t('auth.register.errors.generic_fail'));
-            toast.error(t('auth.register.errors.generic_fail'), {
-                description: message,
-            });
+            const message = parseApiErrorSync(
+                error,
+                t(
+                    'auth.register.errors.generic_fail',
+                    'Could not create account. Check the form and try again.'
+                )
+            );
+            toast.error(
+                t(
+                    'auth.register.errors.generic_fail',
+                    'Could not create account. Check the form and try again.'
+                ),
+                {
+                    description: message,
+                }
+            );
         }
     };
 

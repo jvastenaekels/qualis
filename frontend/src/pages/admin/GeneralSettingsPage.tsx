@@ -97,10 +97,22 @@ export default function GeneralSettingsPage() {
 
             navigate('.', { replace: true });
         } catch (error) {
-            const message = parseApiErrorSync(error, t('admin.settings.archive_error'));
-            toast.error(t('admin.settings.archive_error'), {
-                description: message,
-            });
+            const message = parseApiErrorSync(
+                error,
+                t(
+                    'admin.settings.archive_error',
+                    'Could not archive study. Make sure the study is closed first.'
+                )
+            );
+            toast.error(
+                t(
+                    'admin.settings.archive_error',
+                    'Could not archive study. Make sure the study is closed first.'
+                ),
+                {
+                    description: message,
+                }
+            );
         }
     };
     const handleDelete = async () => {
@@ -119,8 +131,20 @@ export default function GeneralSettingsPage() {
                 : `/app/${currentWorkspace?.slug}/dashboard`;
             navigate(targetHome);
         } catch (error) {
-            const message = parseApiErrorSync(error, t('admin.settings.delete_error'));
-            toast.error(t('admin.settings.delete_error'), { description: message });
+            const message = parseApiErrorSync(
+                error,
+                t(
+                    'admin.settings.delete_error',
+                    'Could not delete study. Make sure all data has been cleared first.'
+                )
+            );
+            toast.error(
+                t(
+                    'admin.settings.delete_error',
+                    'Could not delete study. Make sure all data has been cleared first.'
+                ),
+                { description: message }
+            );
         } finally {
             setDeleteOpen(false);
             setTypedSlug('');
@@ -187,11 +211,17 @@ export default function GeneralSettingsPage() {
         } catch (error) {
             const message = parseApiErrorSync(
                 error,
-                t('admin.settings.storage.save_error', 'Failed to update storage quota')
+                t('admin.settings.storage.save_error', 'Could not update storage quota. Try again.')
             );
-            toast.error(t('admin.settings.storage.save_error', 'Failed to update storage quota'), {
-                description: message,
-            });
+            toast.error(
+                t(
+                    'admin.settings.storage.save_error',
+                    'Could not update storage quota. Try again.'
+                ),
+                {
+                    description: message,
+                }
+            );
         } finally {
             setIsSavingQuota(false);
         }

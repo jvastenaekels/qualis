@@ -30,24 +30,28 @@ _POSITION_STEP = 10
 _TEMPLATES: dict[MemoParentType, list[MemoTemplate]] = {
     MemoParentType.concourse: [
         MemoTemplate(
+            id="concourse.sources_canvassed",
             title="Sources canvassed",
             description=(
                 "Which sources were searched? Databases, archives, prior studies, "
-                "interviews. (Sneegas 2020 — concourse curation as a deliberate act.)"
+                "interviews. (Sneegas 2020, on concourse curation as a deliberate act.)"
             ),
         ),
         MemoTemplate(
+            id="concourse.voices_retained",
             title="Voices retained",
             description="Whose perspectives are represented in the final item set?",
         ),
         MemoTemplate(
+            id="concourse.voices_excluded",
             title="Voices excluded",
             description=(
                 "Whose perspectives were canvassed but not retained? Why? "
-                "(Robbins & Krueger 2000 — exclusion is a research choice.)"
+                "(Robbins & Krueger 2000, on exclusion as a research choice.)"
             ),
         ),
         MemoTemplate(
+            id="concourse.sampling_rationale",
             title="Sampling rationale",
             description=(
                 "How was the final Q-set arrived at? Saturation, theoretical "
@@ -55,12 +59,14 @@ _TEMPLATES: dict[MemoParentType, list[MemoTemplate]] = {
             ),
         ),
         MemoTemplate(
+            id="concourse.version_notes",
             title="Version notes",
             description="Substantive revisions to the concourse over time.",
         ),
     ],
     MemoParentType.study: [
         MemoTemplate(
+            id="study.distribution_rationale",
             title="Distribution rationale",
             description=(
                 "Why this distribution shape? Forced-choice symmetry, range, "
@@ -68,6 +74,7 @@ _TEMPLATES: dict[MemoParentType, list[MemoTemplate]] = {
             ),
         ),
         MemoTemplate(
+            id="study.conditions_of_instruction",
             title="Conditions of instruction",
             description=(
                 "Why this CoI? Prompt design choices, framing decisions, "
@@ -75,14 +82,17 @@ _TEMPLATES: dict[MemoParentType, list[MemoTemplate]] = {
             ),
         ),
         MemoTemplate(
+            id="study.qset_size",
             title="Q-set size",
             description="Why this number of items? Trade-offs vs participant load.",
         ),
         MemoTemplate(
+            id="study.pre_post_design",
             title="Pre/post-sort design choices",
             description="Pre-sort screening, post-sort feedback, demographics rationale.",
         ),
         MemoTemplate(
+            id="study.limitations",
             title="Limitations",
             description=(
                 "Known limits the dataset will inherit. Pre-register them here."

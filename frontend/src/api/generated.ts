@@ -17553,6 +17553,7 @@ export const getGetStudyMemoUnreadApiAdminStudiesSidMemoUnreadGetResponseMock = 
 
 export const getGetTemplatesApiAdminMemoTemplatesGetResponseMock = (): MemoTemplate[] =>
     Array.from({ length: faker.number.int({ min: 1, max: 10 }) }, (_, i) => i + 1).map(() => ({
+        id: faker.string.alpha({ length: { min: 10, max: 20 } }),
         title: faker.string.alpha({ length: { min: 10, max: 20 } }),
         description: faker.string.alpha({ length: { min: 10, max: 20 } }),
     }));

@@ -192,7 +192,12 @@ export function useStudyPersistence() {
                         return;
                     } else {
                         // Hard Conflict
-                        toast.error(t('admin.study.save.conflict'));
+                        toast.error(
+                            t(
+                                'admin.study.save.conflict',
+                                'Conflict detected. Some changes could not be merged.'
+                            )
+                        );
                         setSyncStatus('error');
                         return;
                     }
@@ -203,7 +208,7 @@ export function useStudyPersistence() {
             } else {
                 console.error('Save failed:', error);
                 setSyncStatus('error');
-                toast.error(t('admin.study.save.error'));
+                toast.error(t('admin.study.save.error', 'Failed to save changes'));
             }
         }
     }, [

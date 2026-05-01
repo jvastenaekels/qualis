@@ -486,7 +486,12 @@ export function useStudyDesignPage(): StudyDesignPageApi {
             toast.success(t('admin.study.state_changed_active') || 'Study is now active!');
             window.location.reload();
         } catch (error) {
-            toast.error(t('common.errors.unknown') || 'Failed to activate study');
+            toast.error(
+                t(
+                    'admin.study.activate_error',
+                    'Could not activate study. Verify the design is valid and try again.'
+                )
+            );
             console.error(error);
         } finally {
             setIsActivating(false);
@@ -504,7 +509,12 @@ export function useStudyDesignPage(): StudyDesignPageApi {
             });
             window.location.reload();
         } catch (error) {
-            toast.error(t('admin.study_status.error') || 'Failed to change study state');
+            toast.error(
+                t(
+                    'admin.study_status.notifications.error',
+                    'Could not change study state. Check your permissions and try again.'
+                )
+            );
             console.error(error);
         } finally {
             setIsSwitchingToDraft(false);

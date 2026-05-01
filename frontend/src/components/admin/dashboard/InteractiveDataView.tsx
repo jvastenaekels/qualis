@@ -308,7 +308,12 @@ export default function InteractiveDataView({
                 queryKey: getGetStudyDumpApiAdminStudiesSlugDumpGetQueryKey(slug),
             });
         } catch (error) {
-            toast.error(t('admin.data.actions.clear_all_error', 'Failed to clear participants'));
+            toast.error(
+                t(
+                    'admin.data.actions.clear_all_error',
+                    'Could not clear data. Check your permissions and try again.'
+                )
+            );
             console.error(error);
         }
     }, [slug, queryClient, t]);
@@ -1112,6 +1117,7 @@ export default function InteractiveDataView({
             qualityFilter,
             stepFilter,
             toggleConsent,
+            stepLabels,
         ]
     );
 

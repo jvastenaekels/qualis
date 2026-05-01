@@ -75,7 +75,7 @@ export function ParticipantDetailContent({
             toast.success(t('admin.export.success', 'Export successful'));
         } catch (err) {
             console.error(err);
-            toast.error(t('admin.export.error', 'Export failed'));
+            toast.error(t('admin.export.error', 'Export failed. Try again.'));
         } finally {
             setIsExporting(false);
         }
@@ -101,7 +101,7 @@ export function ParticipantDetailContent({
             toast.success(t('admin.export.success', 'Export successful'));
         } catch (err) {
             console.error(err);
-            toast.error(t('admin.export.error', 'Export failed'));
+            toast.error(t('admin.export.error', 'Export failed. Try again.'));
         } finally {
             setIsExporting(false);
         }
@@ -132,7 +132,7 @@ export function ParticipantDetailContent({
             toast.success(t('admin.export.success', 'Export successful'));
         } catch (err) {
             console.error(err);
-            toast.error(t('admin.export.error', 'Export failed'));
+            toast.error(t('admin.export.error', 'Export failed. Try again.'));
         } finally {
             setIsExporting(false);
         }

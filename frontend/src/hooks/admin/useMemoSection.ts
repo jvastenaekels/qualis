@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import {
     createConcourseEntryApiAdminConcoursesCidMemoEntriesPost,
@@ -61,6 +62,7 @@ export function useMemoSection({
     currentUserId,
     projectMembers,
 }: UseMemoSectionArgs) {
+    const { t } = useTranslation();
     const [memo, setMemo] = useState<MemoRead | null>(null);
     const [templates, setTemplates] = useState<MemoTemplate[]>([]);
     const [showResolved, setShowResolved] = useState(false);
@@ -83,7 +85,14 @@ export function useMemoSection({
                 if (!cancelled) setMemo(m);
             })
             .catch(() => {
-                if (!cancelled) toast.error('Memo load failed');
+                if (!cancelled) {
+                    toast.error(
+                        t(
+                            'admin.memo.load_error',
+                            'Could not load memo. Refresh the page to retry.'
+                        )
+                    );
+                }
             });
         getTemplatesApiAdminMemoTemplatesGet({ parent_type: parentType })
             .then((res) => {
@@ -93,7 +102,7 @@ export function useMemoSection({
         return () => {
             cancelled = true;
         };
-    }, [fetchMemo, parentType]);
+    }, [fetchMemo, parentType, t]);
 
     const entries: MemoEntryRead[] = useMemo(() => memo?.entries ?? [], [memo]);
 

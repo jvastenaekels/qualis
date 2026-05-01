@@ -393,7 +393,7 @@
         "play": "Play",
         "delete": "Delete",
         "deleted": "Audio deleted",
-        "delete_failed": "Delete failed",
+        "delete_failed": "Could not delete the recording. Try again.",
         "file_size": "File size",
         "upload_success": "Audio uploaded successfully",
         "upload_failed": "Upload failed. Please try again.",
@@ -403,9 +403,9 @@
         "permission_denied": "Microphone permission denied",
         "unsupported": "Audio recording is not supported in this browser.",
         "permission_revoked": "Microphone access lost - recording stopped",
-        "refresh_failed": "Failed to refresh audio URL",
+        "refresh_failed": "Could not refresh audio. Your recording is still saved.",
         "refreshing": "Refreshing audio...",
-        "playback_failed": "Failed to play audio",
+        "playback_failed": "Could not play audio. Refresh the page and try again.",
         "error": {
             "no_token": "Session token missing",
             "quota_exceeded": "Storage quota exceeded. Please delete an existing recording or use text instead.",
@@ -473,11 +473,48 @@
             "save": "Save",
             "cancel": "Cancel",
             "saved": "Saved",
-            "save_error": "Save failed",
+            "save_error": "Could not save memo. Try again.",
+            "load_error": "Could not load memo. Refresh the page to retry.",
             "mentions_for_you": "Mentions for you",
             "mention_user_not_found": "Unknown user",
             "delete_entry_confirm": "Delete this entry and all its comments?",
-            "include_discussion_in_export": "Include memo discussion threads"
+            "include_discussion_in_export": "Include memo discussion threads",
+            "templates": {
+                "concourse": {
+                    "sources_canvassed": {
+                        "title": "Sources canvassed"
+                    },
+                    "voices_retained": {
+                        "title": "Voices retained"
+                    },
+                    "voices_excluded": {
+                        "title": "Voices excluded"
+                    },
+                    "sampling_rationale": {
+                        "title": "Sampling rationale"
+                    },
+                    "version_notes": {
+                        "title": "Version notes"
+                    }
+                },
+                "study": {
+                    "distribution_rationale": {
+                        "title": "Distribution rationale"
+                    },
+                    "conditions_of_instruction": {
+                        "title": "Conditions of instruction"
+                    },
+                    "qset_size": {
+                        "title": "Q-set size"
+                    },
+                    "pre_post_design": {
+                        "title": "Pre/post-sort design choices"
+                    },
+                    "limitations": {
+                        "title": "Limitations"
+                    }
+                }
+            }
         },
         "study_design": {
             "distribution_mode": {
@@ -505,6 +542,7 @@
             }
         },
         "study": {
+            "activate_error": "Could not activate study. Verify the design is valid and try again.",
             "save": {
                 "success": "Changes saved successfully",
                 "save_success": "Saved successfully",
@@ -686,7 +724,7 @@
             "add_comment": "Write a comment...",
             "send_comment": "Send",
             "comment_added": "Comment added",
-            "comment_error": "Failed to add comment",
+            "comment_error": "Could not add comment. Try again.",
             "version_label": "v{{n}}",
             "item_detail_desc": "History and comments for this item",
             "manage_tags": "Tags",
@@ -751,7 +789,7 @@
             "select_all": "Select all",
             "import_button": "Import {{count}} statements",
             "success": "{{count}} statements imported",
-            "error": "Import failed",
+            "error": "Could not import items from the concourse. Try again.",
             "no_accepted": "No accepted items in this concourse. Uncheck \"Only accepted\" to see all.",
             "no_items": "This concourse has no items.",
             "no_concourses": "No concourses in this project. Create one first."
@@ -762,7 +800,7 @@
             "source_deleted_tip": "The source concourse item has been deleted.",
             "new_version": "New version in concourse:",
             "synced": "Statement updated from concourse",
-            "error": "Sync failed",
+            "error": "Could not sync from the concourse. Try again.",
             "stale_banner": "{{count}} statement(s) have updates available from the concourse."
         },
         "analysis": {
@@ -882,7 +920,7 @@
                 "fetch_error": "Could not load analysis history.",
                 "empty": "No previous analyses for this study yet. Run one to start the audit trail.",
                 "empty_explainer": "Each run is logged here so you can document and revisit every decision.",
-                "load_error": "Failed to load the analysis run.",
+                "load_error": "Could not load this analysis run. Refresh the page to retry.",
                 "load_run_aria": "Load analysis run from {{date}}",
                 "loading_run": "Loading…",
                 "current_tag": "current",
@@ -894,7 +932,7 @@
                 "save_notes_aria": "Save notes",
                 "cancel_edit_aria": "Cancel editing",
                 "notes_saved": "Notes saved.",
-                "notes_error": "Failed to save notes.",
+                "notes_error": "Could not save notes. Check your connection and try again.",
                 "delete_run": "Delete run",
                 "delete_run_aria": "Delete this analysis run",
                 "delete_dialog_title": "Delete analysis run?",
@@ -1147,9 +1185,9 @@
             },
             "toasts": {
                 "created": "Recruitment links created successfully",
-                "failed": "Failed to create links",
+                "failed": "Could not create recruitment links. Check the inputs and try again.",
                 "revoked": "Link revoked",
-                "revoke_failed": "Failed to revoke link",
+                "revoke_failed": "Could not revoke this link. It may already be in use.",
                 "copied": "Copied to clipboard"
             }
         },
@@ -1306,10 +1344,10 @@
             "config": "Export configuration",
             "exporting": "Exporting...",
             "config_success": "Configuration exported successfully",
-            "config_error": "Failed to export configuration",
+            "config_error": "Could not export configuration. Try again.",
             "label": "Export data",
             "success": "Export successful",
-            "error": "Export failed",
+            "error": "Export failed. Try again.",
             "csv": "Export CSV",
             "json": "Export JSON",
             "audio": "Export Audio (ZIP)",
@@ -1353,11 +1391,11 @@
             "slug_help": "Must be unique, 3-100 characters, lowercase letters, numbers, and hyphens only",
             "creating": "Creating study from configuration...",
             "create_study": "Create study",
-            "invalid_json": "Invalid JSON",
-            "validation_failed": "Validation failed",
+            "invalid_json": "Invalid JSON file",
+            "validation_failed": "Configuration is invalid",
             "success": "Study imported successfully",
             "redirecting": "Opening study designer...",
-            "failed": "Import failed",
+            "failed": "Could not import study. See details below and retry.",
             "validation": {
                 "errors": {
                     "missing_version": "Missing version field",
@@ -1489,7 +1527,7 @@
                     "paused": "Study paused successfully",
                     "closed": "Study closed successfully"
                 },
-                "error": "Failed to change study state",
+                "error": "Could not change study state. Check your permissions and try again.",
                 "state_changed_active": "Study is now active!"
             }
         },
@@ -2013,7 +2051,7 @@
                 "clear_all": "Reset all data",
                 "clear_all_confirm": "DANGER: This will permanently delete ALL participant data for this study. This cannot be undone.",
                 "clear_all_success": "All data cleared",
-                "clear_all_error": "Failed to clear data"
+                "clear_all_error": "Could not clear data. Check your permissions and try again."
             },
             "confirm_discard": {
                 "title": "Discard participant?",
@@ -2066,7 +2104,7 @@
             "toast": {
                 "discarded": "Participant discarded",
                 "restored": "Participant restored",
-                "error": "Failed to update participant"
+                "error": "Could not update participant. Check your connection and try again."
             },
             "detail": {
                 "participant": "Participant",
@@ -2229,7 +2267,7 @@
             "save_button": "Save",
             "save_success": "Settings updated",
             "save_success_desc": "Study settings have been saved.",
-            "save_error": "Error updating settings",
+            "save_error": "Could not save settings. Verify the values and try again.",
             "save_error_desc": "Failed to update settings. Slug might be taken.",
             "archive_success": "Study archived",
             "archive_success_desc": "The study is now archived and read-only.",
@@ -2237,7 +2275,7 @@
             "archive_error_desc": "Failed to archive study. Is it closed?",
             "delete_success": "Study deleted",
             "delete_success_desc": "The study has been permanently removed.",
-            "delete_error": "Error deleting study",
+            "delete_error": "Could not delete study. Make sure all data has been cleared first.",
             "delete_error_desc": "Failed to delete study.",
             "storage": {
                 "title": "Audio Storage Usage",
@@ -2248,7 +2286,7 @@
                 "error": "Failed to load storage usage.",
                 "warning_high_usage": "Storage usage is high. Consider increasing the quota or removing old recordings.",
                 "save_success": "Storage quota updated",
-                "save_error": "Failed to update storage quota"
+                "save_error": "Could not update storage quota. Try again."
             },
             "retention": {
                 "title": "Data retention",

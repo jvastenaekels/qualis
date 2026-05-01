@@ -231,7 +231,12 @@ export function useRecruitmentPage(): RecruitmentPageApi {
                 setNewLinkCount(1);
             },
             onError: () => {
-                toast.error(t('admin.recruitment.toasts.failed', 'Failed to create links'));
+                toast.error(
+                    t(
+                        'admin.recruitment.toasts.failed',
+                        'Could not create recruitment links. Check the inputs and try again.'
+                    )
+                );
             },
         },
     });
@@ -243,7 +248,12 @@ export function useRecruitmentPage(): RecruitmentPageApi {
                 revalidator.revalidate();
             },
             onError: () => {
-                toast.error(t('admin.recruitment.toasts.revoke_failed', 'Failed to revoke link'));
+                toast.error(
+                    t(
+                        'admin.recruitment.toasts.revoke_failed',
+                        'Could not revoke this link. It may already be in use.'
+                    )
+                );
             },
         },
     });
@@ -314,11 +324,20 @@ export function useRecruitmentPage(): RecruitmentPageApi {
             } catch (error) {
                 const message = parseApiErrorSync(
                     error,
-                    t('admin.settings.save_error', 'Error updating settings')
+                    t(
+                        'admin.settings.save_error',
+                        'Could not save settings. Verify the values and try again.'
+                    )
                 );
-                toast.error(t('admin.settings.save_error', 'Error updating settings'), {
-                    description: message,
-                });
+                toast.error(
+                    t(
+                        'admin.settings.save_error',
+                        'Could not save settings. Verify the values and try again.'
+                    ),
+                    {
+                        description: message,
+                    }
+                );
             }
         },
         [slug, projectSlug, currentWorkspace?.slug, navigate, queryClient, t]

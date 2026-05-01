@@ -200,7 +200,12 @@ export default function ParticipantDetailsPage() {
             );
         } catch (err) {
             console.error(err);
-            toast.error(t('admin.data.toast.error', 'Failed to update participant'));
+            toast.error(
+                t(
+                    'admin.data.toast.error',
+                    'Could not update participant. Check your connection and try again.'
+                )
+            );
         }
     };
 

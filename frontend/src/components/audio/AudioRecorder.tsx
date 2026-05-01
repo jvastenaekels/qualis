@@ -487,7 +487,12 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 await new Promise((resolve) => setTimeout(resolve, 100));
             } catch (error) {
                 console.error('Failed to refresh URL before playback:', error);
-                toast.error(t('audio.refresh_failed', 'Failed to refresh audio URL'));
+                toast.error(
+                    t(
+                        'audio.refresh_failed',
+                        'Could not refresh audio. Your recording is still saved.'
+                    )
+                );
                 return;
             }
         }
@@ -595,12 +600,22 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                         playRecording();
                     }
                 } catch {
-                    toast.error(t('audio.playback_failed', 'Failed to play audio'));
+                    toast.error(
+                        t(
+                            'audio.playback_failed',
+                            'Could not play audio. Refresh the page and try again.'
+                        )
+                    );
                     setState('stopped');
                     setAudioLevels([0, 0, 0, 0, 0]);
                 }
             } else {
-                toast.error(t('audio.playback_failed', 'Failed to play audio'));
+                toast.error(
+                    t(
+                        'audio.playback_failed',
+                        'Could not play audio. Refresh the page and try again.'
+                    )
+                );
                 setState('stopped');
                 setAudioLevels([0, 0, 0, 0, 0]);
             }
@@ -702,7 +717,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             toast.success(t('audio.deleted', 'Audio deleted'));
         } catch (error) {
             console.error('Delete failed:', error);
-            toast.error(t('audio.delete_failed', 'Delete failed'));
+            toast.error(t('audio.delete_failed', 'Could not delete the recording. Try again.'));
             // Restore previous state
             setAudioUrl(savedAudioUrl);
             setDuration(savedDuration);
