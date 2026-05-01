@@ -650,6 +650,7 @@ export default function ConcourseDetailPage() {
                                     </span>
                                 </div>
                             )}
+                            {/* biome-ignore lint/complexity/noExcessiveCognitiveComplexity: row rendering — many cooperating visual states (selection, edit mode, status, missing translation, mobile/desktop layouts, hover-only actions). Same shell-suppression precedent as the page-level biome-ignore on line 78 (CLAUDE.md). */}
                             {filteredItems.map((item) => {
                                 const activeTranslation = item.translations?.find(
                                     (tr) => tr.language_code === activeLocale
