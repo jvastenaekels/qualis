@@ -3125,8 +3125,11 @@ export function useExportStudyConfigApiAdminStudiesSlugExportConfigGet<
 }
 
 /**
- * Validate imported configuration without creating study.
-Returns validation results and warnings.
+ * Validate an imported study payload without creating the study.
+
+Each section is checked by a dedicated `_check_*` helper that returns
+its own error / warning lists; this orchestrator aggregates them and
+builds the summary.
  * @summary Validate Study Import
  */
 export const validateStudyImportApiAdminStudiesValidateImportPost = (

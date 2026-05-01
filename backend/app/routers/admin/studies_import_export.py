@@ -198,6 +198,193 @@ def _get_grid_range(grid_config: list) -> str:
         return "Invalid"
 
 
+# ---------------------------------------------------------------------------
+# Import-validation helpers
+#
+# Each `_check_*` returns (errors, warnings) lists of i18n-encoded JSON
+# strings. `validate_study_import` aggregates them and builds the summary.
+# ---------------------------------------------------------------------------
+
+
+def _format_import_error(key: str, **kwargs: Any) -> str:
+    return json.dumps({"key": f"admin.import.validation.errors.{key}", **kwargs})
+
+
+def _format_import_warning(key: str, **kwargs: Any) -> str:
+    return json.dumps({"key": f"admin.import.validation.warnings.{key}", **kwargs})
+
+
+def _check_import_version(config: dict[str, Any]) -> list[str]:
+    version = config.get("version")
+    if not version:
+        return [_format_import_error("missing_version")]
+    if version != "1.0":
+        return [_format_import_error("unsupported_version", version=version)]
+    return []
+
+
+def _check_required_fields(study_data: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    for field in ("translations", "statements", "grid_config"):
+        if field not in study_data:
+            errors.append(_format_import_error("missing_field", field=field))
+    return errors
+
+
+def _check_import_translations(
+    translations: list[dict[str, Any]],
+) -> tuple[list[str], list[str]]:
+    errors: list[str] = []
+    warnings: list[str] = []
+
+    if not translations:
+        errors.append(_format_import_error("no_translations"))
+        return errors, warnings
+
+    consent_missing = False
+    for i, trans in enumerate(translations):
+        for field in ("language_code", "title"):
+            if field not in trans or not trans[field]:
+                errors.append(
+                    _format_import_error(
+                        "missing_translation_field", index=i + 1, field=field
+                    )
+                )
+
+        if not trans.get("consent_title") or not trans.get("consent_description"):
+            consent_missing = True
+
+        lang_code = trans.get("language_code", "")
+        if lang_code and not re.match(r"^[a-z]{2}(-[A-Z]{2})?$", lang_code):
+            errors.append(_format_import_error("invalid_lang_code", lang=lang_code))
+
+    if consent_missing:
+        warnings.append(_format_import_warning("missing_consent_draft"))
+    return errors, warnings
+
+
+def _check_import_statements(
+    statements: list[dict[str, Any]],
+) -> list[str]:
+    errors: list[str] = []
+    if not statements:
+        errors.append(_format_import_error("no_statements"))
+
+    codes = [s.get("code") for s in statements if isinstance(s, dict) and s.get("code")]
+    duplicates = [code for code in codes if codes.count(code) > 1]
+    if duplicates:
+        errors.append(
+            _format_import_error(
+                "duplicate_codes",
+                codes=", ".join(set(str(c) for c in duplicates if c)),
+            )
+        )
+
+    for i, stmt in enumerate(statements):
+        if "translations" not in stmt or not stmt["translations"]:
+            errors.append(
+                _format_import_error("missing_stmt_translations", index=i + 1)
+            )
+    return errors
+
+
+def _check_import_grid(
+    grid_config: Any, statement_count: int
+) -> tuple[list[str], list[str]]:
+    errors: list[str] = []
+    warnings: list[str] = []
+    if not grid_config:
+        return errors, warnings
+    if not isinstance(grid_config, list):
+        errors.append(_format_import_error("invalid_grid_config"))
+        return errors, warnings
+
+    try:
+        grid_capacity = sum(
+            int(col.get("capacity", 0)) for col in grid_config if isinstance(col, dict)
+        )
+        if statement_count != grid_capacity:
+            warnings.append(
+                _format_import_warning(
+                    "grid_capacity_mismatch",
+                    count=statement_count,
+                    capacity=grid_capacity,
+                )
+            )
+    except (KeyError, TypeError, ValueError) as e:
+        errors.append(_format_import_error("invalid_grid_structure", error=str(e)))
+    return errors, warnings
+
+
+def _check_import_branding(branding: Any) -> list[str]:
+    """Return warnings about external (http://) resources in the branding
+    payload. Note: the partner-logo warning is intentionally a plain
+    descriptive string for backwards compat, while the main logo is a
+    keyed JSON warning.
+    """
+    warnings: list[str] = []
+    if not isinstance(branding, dict):
+        return warnings
+
+    logo_url = branding.get("logo_url")
+    if logo_url and logo_url.startswith("http"):
+        warnings.append(_format_import_warning("external_logo"))
+
+    partners = branding.get("partners") or []
+    for partner in partners:
+        partner_logo = partner.get("logo_url") if isinstance(partner, dict) else None
+        if (
+            isinstance(partner, dict)
+            and partner_logo
+            and partner_logo.startswith("http")
+        ):
+            warnings.append(
+                f"Partner '{partner.get('name', 'Unknown')}' logo references external resource"
+            )
+    return warnings
+
+
+def _check_import_recruitment_links(study_data: dict[str, Any]) -> list[str]:
+    errors: list[str] = []
+    recruitment_links = study_data.get("recruitment_links", [])
+    if recruitment_links and not isinstance(recruitment_links, list):
+        return [_format_import_error("invalid_recruitment_links")]
+    if recruitment_links:
+        for i, link in enumerate(recruitment_links):
+            if not isinstance(link, dict) or not link.get("name"):
+                errors.append(
+                    _format_import_error(
+                        "invalid_recruitment_link_structure", index=i + 1
+                    )
+                )
+    return errors
+
+
+def _build_validation_summary(
+    study_data: dict[str, Any],
+    translations: list[dict[str, Any]],
+    statements: list[dict[str, Any]],
+    grid_config: Any,
+) -> tuple[ValidationSummary | None, list[str]]:
+    """Build the ValidationSummary that surfaces in the admin UI before the
+    import runs. Returns (summary, extra_errors) — any exception during
+    construction is reported back as a plain-string error so the caller
+    can treat it like the validation errors that came before."""
+    try:
+        summary_trans = translations[0] if translations else {}
+        summary = ValidationSummary(
+            title=summary_trans.get("title", "Unknown"),
+            languages=[t.get("language_code", "??") for t in translations],
+            statement_count=len(statements),
+            grid_range=_get_grid_range(grid_config),
+            has_presort=bool(study_data.get("presort_config")),
+            has_postsort=bool(study_data.get("postsort_config")),
+        )
+        return summary, []
+    except Exception as e:
+        return None, [f"Error building summary: {str(e)}"]
+
+
 @router.post("/validate-import", response_model=ValidationResult)
 @limiter.limit("30/minute")
 async def validate_study_import(
@@ -207,159 +394,58 @@ async def validate_study_import(
     project_ctx: tuple[Project, ProjectMember] = Depends(get_current_project),
     db: AsyncSession = Depends(get_db),
 ) -> "ValidationResult":
+    """Validate an imported study payload without creating the study.
+
+    Each section is checked by a dedicated `_check_*` helper that returns
+    its own error / warning lists; this orchestrator aggregates them and
+    builds the summary.
     """
-    Validate imported configuration without creating study.
-    Returns validation results and warnings.
-    """
-    warnings = []
-    errors = []
+    errors: list[str] = []
+    warnings: list[str] = []
 
-    def add_error(key: str, **kwargs: Any) -> None:
-        errors.append(
-            json.dumps({"key": f"admin.import.validation.errors.{key}", **kwargs})
-        )
+    errors.extend(_check_import_version(config))
 
-    def add_warning(key: str, **kwargs: Any) -> None:
-        warnings.append(
-            json.dumps({"key": f"admin.import.validation.warnings.{key}", **kwargs})
-        )
+    study_data_raw = config.get("study") or {}
+    if not isinstance(study_data_raw, dict):
+        errors.append(_format_import_error("invalid_structure"))
+        study_data: dict[str, Any] = {}
+    else:
+        study_data = study_data_raw
 
-    # Check version
-    version = config.get("version")
-    if not version:
-        add_error("missing_version")
-    elif version != "1.0":
-        add_error("unsupported_version", version=version)
+    errors.extend(_check_required_fields(study_data))
 
-    study_data = config.get("study") or {}
-    if not isinstance(study_data, dict):
-        add_error("invalid_structure")
-        study_data = {}
+    translations_raw = study_data.get("translations") or []
+    if not isinstance(translations_raw, list):
+        errors.append(_format_import_error("invalid_translations"))
+        translations: list[dict[str, Any]] = []
+    else:
+        translations = translations_raw
+    t_errors, t_warnings = _check_import_translations(translations)
+    errors.extend(t_errors)
+    warnings.extend(t_warnings)
 
-    # Validate required fields
-    required = ["translations", "statements", "grid_config"]
-    for field in required:
-        if field not in study_data:
-            add_error("missing_field", field=field)
+    statements_raw = study_data.get("statements") or []
+    if not isinstance(statements_raw, list):
+        errors.append(_format_import_error("invalid_statements"))
+        statements: list[dict[str, Any]] = []
+    else:
+        statements = statements_raw
+    errors.extend(_check_import_statements(statements))
 
-    # Check translations
-    translations = study_data.get("translations") or []
-    if not isinstance(translations, list):
-        add_error("invalid_translations")
-        translations = []
-
-    if not translations:
-        add_error("no_translations")
-
-    consent_missing = False
-    for i, trans in enumerate(translations):
-        required_trans = [
-            "language_code",
-            "title",
-        ]
-        for field in required_trans:
-            if field not in trans or not trans[field]:
-                add_error("missing_translation_field", index=i + 1, field=field)
-
-        # Check for missing consent fields (warning only for drafts)
-        if not trans.get("consent_title") or not trans.get("consent_description"):
-            consent_missing = True
-
-        # Validate language code
-        lang_code = trans.get("language_code", "")
-        if lang_code and not re.match(r"^[a-z]{2}(-[A-Z]{2})?$", lang_code):
-            add_error("invalid_lang_code", lang=lang_code)
-
-    if consent_missing:
-        add_warning("missing_consent_draft")
-
-    # Check statements
-    statements = study_data.get("statements") or []
-    if not isinstance(statements, list):
-        add_error("invalid_statements")
-        statements = []
-
-    if not statements:
-        add_error("no_statements")
-
-    # Check for duplicate codes
-    codes = [s.get("code") for s in statements if isinstance(s, dict) and s.get("code")]
-    duplicates = [code for code in codes if codes.count(code) > 1]
-    if duplicates:
-        add_error(
-            "duplicate_codes", codes=", ".join(set(str(c) for c in duplicates if c))
-        )
-
-    # Check statement translations
-    for i, stmt in enumerate(statements):
-        if "translations" not in stmt or not stmt["translations"]:
-            add_error("missing_stmt_translations", index=i + 1)
-
-    # Check statements vs grid capacity
     grid_config = study_data.get("grid_config", [])
-    if grid_config:
-        if not isinstance(grid_config, list):
-            add_error("invalid_grid_config")
-        else:
-            try:
-                grid_capacity = sum(
-                    int(col.get("capacity", 0))
-                    for col in grid_config
-                    if isinstance(col, dict)
-                )
-                statement_count = len(statements)
-                if statement_count != grid_capacity:
-                    add_warning(
-                        "grid_capacity_mismatch",
-                        count=statement_count,
-                        capacity=grid_capacity,
-                    )
-            except (KeyError, TypeError, ValueError) as e:
-                add_error("invalid_grid_structure", error=str(e))
+    g_errors, g_warnings = _check_import_grid(grid_config, len(statements))
+    errors.extend(g_errors)
+    warnings.extend(g_warnings)
 
-    # Check for external resources
-    branding = study_data.get("branding") or {}
-    if isinstance(branding, dict):
-        logo_url = branding.get("logo_url")
-        if logo_url and logo_url.startswith("http"):
-            add_warning("external_logo")
+    warnings.extend(_check_import_branding(study_data.get("branding") or {}))
+    errors.extend(_check_import_recruitment_links(study_data))
 
-        partners = branding.get("partners") or []
-        for partner in partners:
-            partner_logo = partner.get("logo_url")
-            if (
-                isinstance(partner, dict)
-                and partner_logo
-                and partner_logo.startswith("http")
-            ):
-                warnings.append(
-                    f"Partner '{partner.get('name', 'Unknown')}' logo references external resource"
-                )
-
-    # Check recruitment links
-    recruitment_links = study_data.get("recruitment_links", [])
-    if recruitment_links and not isinstance(recruitment_links, list):
-        add_error("invalid_recruitment_links")
-    elif recruitment_links:
-        for i, link in enumerate(recruitment_links):
-            if not isinstance(link, dict) or not link.get("name"):
-                add_error("invalid_recruitment_link_structure", index=i + 1)
-
-    # Summary
-    summary = None
+    summary: ValidationSummary | None = None
     if not errors:
-        try:
-            summary_trans = translations[0] if translations else {}
-            summary = ValidationSummary(
-                title=summary_trans.get("title", "Unknown"),
-                languages=[t.get("language_code", "??") for t in translations],
-                statement_count=len(statements),
-                grid_range=_get_grid_range(grid_config),
-                has_presort=bool(study_data.get("presort_config")),
-                has_postsort=bool(study_data.get("postsort_config")),
-            )
-        except Exception as e:
-            errors.append(f"Error building summary: {str(e)}")
+        summary, extra_errors = _build_validation_summary(
+            study_data, translations, statements, grid_config
+        )
+        errors.extend(extra_errors)
 
     return ValidationResult(
         valid=len(errors) == 0, errors=errors, warnings=warnings, summary=summary

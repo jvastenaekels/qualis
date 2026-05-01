@@ -1391,7 +1391,7 @@
           "admin-studies"
         ],
         "summary": "Validate Study Import",
-        "description": "Validate imported configuration without creating study.\nReturns validation results and warnings.",
+        "description": "Validate an imported study payload without creating the study.\n\nEach section is checked by a dedicated `_check_*` helper that returns\nits own error / warning lists; this orchestrator aggregates them and\nbuilds the summary.",
         "operationId": "validate_study_import_api_admin_studies_validate_import_post",
         "security": [
           {
