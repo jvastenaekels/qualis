@@ -1,9 +1,4 @@
 import { useStudyDesigner } from '@/store/useStudyDesigner';
-import { useAuthStore } from '@/store/useAuthStore';
-import { usePermission } from '@/hooks/usePermission';
-import { useAdminContext } from '@/hooks/useAdminContext';
-import { MemoSection } from '@/components/admin/memo/MemoSection';
-import { useMemoUnreadBadge } from '@/hooks/admin/useMemoUnreadBadge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -13,7 +8,7 @@ import {
     AccordionTrigger,
     AccordionContent,
 } from '@/components/ui/accordion';
-import { Hand, Clipboard, ShieldCheck, Settings2, RotateCcw, BookOpen } from 'lucide-react';
+import { Hand, Clipboard, ShieldCheck, Settings2, RotateCcw } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import type React from 'react';
 import MarkdownEditor from './MarkdownEditor';
@@ -32,18 +27,10 @@ import {
 import { SUPPORTED_LANGUAGES, type Language } from '@/constants/languages';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: declarative shell with many accordion sections; hook calls for memo context (useAuthStore, usePermission, useAdminContext) add scope without meaningful branching
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: declarative shell with multiple accordion sections
 const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
     const { t } = useTranslation();
-    const { draft, original, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
-    const { user: currentUser } = useAuthStore();
-    const { role: projectRole } = usePermission();
-    const { project } = useAdminContext();
-    const memoUnreadCount = useMemoUnreadBadge('study', original?.id ?? 0, currentUser?.id ?? 0);
-    const projectMembers = (project?.members ?? []).map((m) => ({
-        user_id: m.user_id,
-        display_name: m.user.full_name ?? m.user.email,
-    }));
+    const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
 
     // Deep-link from the Data privacy page (`/design#consent`): expand the
     // consent accordion on first paint and scroll to it once the draft has
@@ -436,55 +423,6 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                                 readOnly={readOnly}
                             />
                         </CardContent>
-                    </AccordionContent>
-                </AccordionItem>
-
-                {/* Methodology memo — language-neutral free text. Mirrors the
-                    per-concourse Mémo de construction; surfaces the rationale
-                    behind distribution / conditions of instruction / Q-set
-                    size for replication and pre-registration documentation. */}
-                <AccordionItem
-                    value="memo"
-                    className="border-none rounded-2xl bg-slate-50/50 shadow-sm overflow-hidden"
-                >
-                    <AccordionTrigger className="px-5 py-4 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-200/60">
-                        <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight flex-1">
-                            <div className="bg-indigo-50 p-2 rounded-xl border border-indigo-100 shadow-sm">
-                                <BookOpen className="h-5 w-5 text-indigo-600" />
-                            </div>
-                            <div className="flex flex-col items-start">
-                                <span className="flex items-center gap-2">
-                                    {t('admin.memo.title_study', 'Methodology memo')}
-                                    {memoUnreadCount > 0 && (
-                                        <span className="rounded-full bg-amber-100 text-amber-800 text-xs px-2 py-0.5 font-medium">
-                                            {memoUnreadCount}
-                                        </span>
-                                    )}
-                                </span>
-                                <span className="text-xs font-medium text-slate-500 mt-0.5">
-                                    {t(
-                                        'admin.memo.summary_empty_study',
-                                        'Optional · for replication & pre-registration'
-                                    )}
-                                </span>
-                            </div>
-                        </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                        <div className="px-5 pb-5">
-                            {original && currentUser && (
-                                <MemoSection
-                                    parentType="study"
-                                    parentId={original.id}
-                                    currentUserId={currentUser.id}
-                                    isOwner={projectRole === 'owner'}
-                                    canEdit={
-                                        projectRole === 'owner' || projectRole === 'researcher'
-                                    }
-                                    members={projectMembers}
-                                />
-                            )}
-                        </div>
                     </AccordionContent>
                 </AccordionItem>
             </Accordion>

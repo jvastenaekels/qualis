@@ -42,27 +42,27 @@ describe('IntroductionEditor — Wave B progressive disclosure', () => {
         // Présentation section content visible (Title input pre-filled with mock title)
         expect(screen.getByDisplayValue('Test Study')).toBeInTheDocument();
 
-        // Closed-by-default sections: their interior content should NOT be visible.
-        // Consent title input ('Informed consent' value) is gated by the consent accordion
+        // Closed-by-default consent section: the consent_title input value
+        // ('Informed consent') is gated by the accordion and should not be in the DOM.
         expect(screen.queryByDisplayValue('Informed consent')).not.toBeInTheDocument();
-        // Methodology memo accordion trigger exists but is closed
-        const memoTrigger = screen.getByRole('button', {
-            name: /Methodology memo|Mémo méthodologique/i,
-        });
-        expect(memoTrigger).toHaveAttribute('data-state', 'closed');
     });
 
     it('expands a collapsed section when its trigger is clicked (B1)', async () => {
         const user = userEvent.setup();
         renderEditor();
 
-        // Click the Methodology memo accordion trigger
-        const memoTrigger = screen.getByRole('button', {
-            name: /Methodology memo|Mémo méthodologique/i,
+        // The consent accordion trigger exists and starts closed.
+        // Label is the i18n section title (admin.design.intro.consent_title),
+        // not the per-translation consent_title field on the draft.
+        const consentTrigger = screen.getByRole('button', {
+            name: /Consent form|Formulaire de consentement/i,
         });
-        await user.click(memoTrigger);
+        expect(consentTrigger).toHaveAttribute('data-state', 'closed');
 
-        // Trigger is now open (accordion expanded)
-        expect(memoTrigger).toHaveAttribute('data-state', 'open');
+        await user.click(consentTrigger);
+        expect(consentTrigger).toHaveAttribute('data-state', 'open');
+
+        // Once open, the gated consent_title input becomes visible.
+        expect(screen.getByDisplayValue('Informed consent')).toBeInTheDocument();
     });
 });

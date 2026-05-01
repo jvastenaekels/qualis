@@ -21,6 +21,7 @@ import {
     MoreHorizontal,
     Upload,
     Download,
+    NotebookPen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +31,18 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
+import { MemoSection } from '@/components/admin/memo/MemoSection';
+import { useMemoUnreadBadge } from '@/hooks/admin/useMemoUnreadBadge';
+import { useAuthStore } from '@/store/useAuthStore';
+import { usePermission } from '@/hooks/usePermission';
+import { useAdminContext } from '@/hooks/useAdminContext';
 import { DesignerSkeleton } from '@/components/admin/DashboardSkeleton';
 import IntroductionEditor from '@/components/admin/designer/IntroductionEditor';
 import QuestionBuilder from '@/components/admin/designer/QuestionBuilder';
@@ -61,8 +74,18 @@ import { useStudyDesigner } from '@/store/useStudyDesigner';
 const StudyDesignPage = () => {
     const { t, i18n } = useTranslation();
     const [activateDialogOpen, setActivateDialogOpen] = useState(false);
+    const [memoOpen, setMemoOpen] = useState(false);
     const api = useStudyDesignPage();
     const updateDraft = useStudyDesigner((s) => s.updateDraft);
+    const original = useStudyDesigner((s) => s.original);
+    const { user: currentUser } = useAuthStore();
+    const { role: projectRole } = usePermission();
+    const { project } = useAdminContext();
+    const memoUnreadCount = useMemoUnreadBadge('study', original?.id ?? 0, currentUser?.id ?? 0);
+    const projectMembers = (project?.members ?? []).map((m) => ({
+        user_id: m.user_id,
+        display_name: m.user.full_name ?? m.user.email,
+    }));
     // Wave B — Import/Export config moved to a `⋯` overflow menu next to Save.
     // The icon-only buttons in the toolbar were ambiguous; a labelled dropdown
     // restores discoverability without re-promoting them to primary actions.
@@ -235,6 +258,22 @@ const StudyDesignPage = () => {
                                     {t('admin.design.toolbar.test_run')}
                                 </span>
                             </Button>
+
+                            <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-9 w-9 rounded-lg relative bg-white border-slate-200 hover:border-indigo-300 hover:text-indigo-600 transition-all shadow-sm"
+                                onClick={() => setMemoOpen(true)}
+                                aria-label={t('admin.memo.title_study', 'Methodology memo')}
+                                title={t('admin.memo.title_study', 'Methodology memo')}
+                            >
+                                <NotebookPen className="h-4 w-4" />
+                                {memoUnreadCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 rounded-full bg-amber-100 text-amber-800 text-[10px] leading-none px-1.5 py-0.5 font-medium border border-white">
+                                        {memoUnreadCount}
+                                    </span>
+                                )}
+                            </Button>
                         </div>
 
                         <div className="h-6 w-px bg-slate-200 hidden lg:block" />
@@ -330,6 +369,33 @@ const StudyDesignPage = () => {
 
             <LanguageManagerModal isOpen={api.isLangModalOpen} onClose={api.closeLangModal} />
             <UnsavedChangesDialog blocker={api.blocker} />
+
+            <Sheet open={memoOpen} onOpenChange={setMemoOpen}>
+                <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+                    <SheetHeader>
+                        <SheetTitle>{t('admin.memo.title_study', 'Methodology memo')}</SheetTitle>
+                        <SheetDescription>
+                            {t(
+                                'admin.memo.summary_empty_study',
+                                'Optional · for replication & pre-registration'
+                            )}
+                        </SheetDescription>
+                    </SheetHeader>
+                    <div className="mt-4">
+                        {original && currentUser && (
+                            <MemoSection
+                                parentType="study"
+                                parentId={original.id}
+                                currentUserId={currentUser.id}
+                                isOwner={projectRole === 'owner'}
+                                canEdit={projectRole === 'owner' || projectRole === 'researcher'}
+                                members={projectMembers}
+                            />
+                        )}
+                    </div>
+                </SheetContent>
+            </Sheet>
+
             <ActivateStudyDialog
                 open={activateDialogOpen}
                 onOpenChange={setActivateDialogOpen}
