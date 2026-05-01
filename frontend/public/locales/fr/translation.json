@@ -557,7 +557,7 @@
             "recruit": "Accès",
             "data": "Données",
             "analysis": "Analyse",
-            "lifecycle": "Cycle de vie des données",
+            "privacy": "Confidentialité",
             "team": "Équipe",
             "settings": "Réglages",
             "documentation": "Documentation",
@@ -1141,7 +1141,7 @@
             "recruitment": "Accès",
             "exports": "Données",
             "data": "Données",
-            "lifecycle": "Cycle de vie",
+            "privacy": "Confidentialité",
             "profile": "Profil",
             "participant_n": "Participant nº{{id}}",
             "analysis": "Analyse",
@@ -2214,9 +2214,9 @@
                 "range_error": "La durée de conservation doit être un entier entre 1 et 240 mois."
             }
         },
-        "lifecycle": {
-            "title": "Cycle de vie des données",
-            "header_desc": "Inventaire & anonymisation",
+        "privacy": {
+            "title": "Confidentialité des données",
+            "header_desc": "Consentement, inventaire & anonymisation",
             "load_error": "Impossible de charger l'inventaire des données.",
             "participants_title": "Instantané des participants",
             "stat_started": "Commencé",
@@ -2257,6 +2257,14 @@
                 "title": "Aucune donnée participante pour le moment",
                 "body": "Cette page s'active dès qu'un participant soumet. Partagez d'abord le lien d'étude.",
                 "cta": "Ouvrir la vue d'ensemble"
+            },
+            "consent": {
+                "title": "Formulaire de consentement",
+                "description": "Ce que les participants voient avant d'entrer dans l'étude. Modifié dans Conception.",
+                "no_text": "Aucun texte de consentement défini.",
+                "edit_in_design": "Modifier dans Conception",
+                "show_all_languages": "Voir toutes les langues",
+                "hide_all_languages": "Masquer les autres langues"
             }
         },
         "projects": {

@@ -49,7 +49,7 @@ export default function AdminLayout() {
             design: t('admin.breadcrumbs.design'),
             recruitment: t('admin.breadcrumbs.recruitment'),
             data: t('admin.breadcrumbs.data', 'Data'),
-            lifecycle: t('admin.breadcrumbs.lifecycle', 'Data lifecycle'),
+            privacy: t('admin.breadcrumbs.privacy', 'Data privacy'),
             profile: t('admin.breadcrumbs.profile', 'Profile'),
             analysis: t('admin.breadcrumbs.analysis', 'Analysis'),
             exports: t('admin.breadcrumbs.exports'),

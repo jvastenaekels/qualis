@@ -44,7 +44,7 @@ const RecruitmentPage = lazy(() => import('./pages/admin/RecruitmentPage'));
 const AnalysisPage = lazy(() => import('./pages/admin/AnalysisPage'));
 
 const DataExportsPage = lazy(() => import('./pages/admin/DataExportsPage'));
-const DataLifecyclePage = lazy(() => import('./pages/admin/DataLifecyclePage'));
+const DataPrivacyPage = lazy(() => import('./pages/admin/DataPrivacyPage'));
 const GeneralSettingsPage = lazy(() => import('./pages/admin/GeneralSettingsPage'));
 const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetailsPage'));
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
@@ -177,8 +177,8 @@ const router = createBrowserRouter([
                                         HydrateFallback: DesignerSkeleton,
                                     },
                                     {
-                                        path: 'lifecycle',
-                                        element: <DataLifecyclePage />,
+                                        path: 'privacy',
+                                        element: <DataPrivacyPage />,
                                         HydrateFallback: DesignerSkeleton,
                                     },
                                     {

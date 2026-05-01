@@ -251,8 +251,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       show: can('study:view_data'),
                   },
                   {
-                      title: t('admin.sidebar.lifecycle', 'Data lifecycle'),
-                      url: `/app/${projectSlug}/studies/${params.studySlug}/lifecycle`,
+                      title: t('admin.sidebar.privacy', 'Data privacy'),
+                      url: `/app/${projectSlug}/studies/${params.studySlug}/privacy`,
                       icon: ShieldCheck,
                       show: can('study:edit_settings'),
                   },

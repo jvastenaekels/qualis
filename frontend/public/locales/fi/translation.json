@@ -574,7 +574,7 @@
             "study_tools": "Tutkimustyökalut",
             "concourses": "Lausekokoelmat",
             "concourse": "Lausekokoelma",
-            "lifecycle": "Data lifecycle"
+            "privacy": "Tietosuoja"
         },
         "concourse": {
             "title": "Lausekokoelma",
@@ -1141,7 +1141,7 @@
             "recruitment": "Pääsy",
             "exports": "Tiedot",
             "data": "Tiedot",
-            "lifecycle": "Tietojen elinkaari",
+            "privacy": "Tietosuoja",
             "profile": "Profiili",
             "participant_n": "Osallistuja #{{id}}",
             "analysis": "Analyysi",
@@ -2428,9 +2428,9 @@
                 "presort": "Esilajittelu"
             }
         },
-        "lifecycle": {
-            "title": "Tietojen elinkaari",
-            "header_desc": "Inventory & anonymisation",
+        "privacy": {
+            "title": "Tietosuoja",
+            "header_desc": "Suostumus, inventaario & anonymisointi",
             "load_error": "Failed to load data inventory.",
             "participants_title": "Participants snapshot",
             "stat_started": "Started",
@@ -2471,6 +2471,14 @@
                 "title": "Ei vielä osallistujadataa",
                 "body": "Sivu aktivoituu, kun osallistujat lähettävät vastauksensa. Jaa ensin tutkimuslinkki.",
                 "cta": "Avaa tutkimuksen yleisnäkymä"
+            },
+            "consent": {
+                "title": "Suostumuslomake",
+                "description": "Mitä osallistujat näkevät ennen tutkimukseen siirtymistä. Muokkaus: Suunnittelu.",
+                "no_text": "Suostumustekstiä ei ole vielä asetettu.",
+                "edit_in_design": "Muokkaa Suunnittelussa",
+                "show_all_languages": "Näytä kaikki kielet",
+                "hide_all_languages": "Piilota muut kielet"
             }
         }
     },

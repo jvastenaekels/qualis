@@ -4,8 +4,8 @@
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
-import { useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -19,6 +19,10 @@ import {
     Loader2,
     AlertTriangle,
     Clock,
+    FileSignature,
+    ChevronDown,
+    ChevronUp,
+    PencilLine,
 } from 'lucide-react';
 
 import {
@@ -45,6 +49,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyStateContract } from '@/components/admin/EmptyStateContract';
 import { EmptyState } from '@/components/ui/empty-state';
+import { useAdminContext } from '@/hooks/useAdminContext';
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -76,6 +81,21 @@ function formatDate(iso: string | null | undefined): string {
     });
 }
 
+// Strip the most common markdown tokens for a single-line preview.
+// Full rendering happens in StudyDesignPage; this is just for the overview card.
+function plainPreview(md: string | null | undefined, max = 160): string {
+    if (!md) return '';
+    const stripped = md
+        .replace(/```[\s\S]*?```/g, ' ')
+        .replace(/`[^`]*`/g, ' ')
+        .replace(/!\[[^\]]*]\([^)]*\)/g, ' ')
+        .replace(/\[([^\]]+)]\([^)]*\)/g, '$1')
+        .replace(/[*_>#~]+/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    return stripped.length > max ? `${stripped.slice(0, max).trimEnd()}…` : stripped;
+}
+
 // ─── loading skeleton ──────────────────────────────────────────────────────────
 
 function InventorySkeleton() {
@@ -88,9 +108,142 @@ function InventorySkeleton() {
     );
 }
 
+// ─── consent summary card ────────────────────────────────────────────────────
+
+function ConsentSummaryCard({ designHref }: { designHref: string }) {
+    const { t } = useTranslation();
+    const { study } = useAdminContext();
+    const [showAll, setShowAll] = useState(false);
+
+    const translations = study?.translations ?? [];
+    const primary = translations[0];
+    const others = translations.slice(1);
+
+    const hasConsent = useMemo(
+        () => translations.some((tr) => tr.consent_title || tr.consent_description),
+        [translations]
+    );
+
+    return (
+        <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+            <CardHeader className="border-b border-slate-50 pb-4">
+                <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 mb-1">
+                        <FileSignature className="h-5 w-5 text-indigo-500" />
+                        <CardTitle className="text-lg font-black text-slate-900">
+                            {t('admin.privacy.consent.title', 'Consent form')}
+                        </CardTitle>
+                    </div>
+                    <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
+                        className="text-slate-500 hover:text-indigo-600 rounded-xl font-bold"
+                    >
+                        <Link to={`${designHref}#consent`}>
+                            <PencilLine className="size-4 mr-2" />
+                            {t('admin.privacy.consent.edit_in_design', 'Edit in Study design')}
+                        </Link>
+                    </Button>
+                </div>
+                <CardDescription className="text-sm font-medium text-slate-500">
+                    {t(
+                        'admin.privacy.consent.description',
+                        'What participants see before they enter the study. Edited in Study design.'
+                    )}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="p-6 space-y-4">
+                {!hasConsent ? (
+                    <p className="text-sm text-slate-500 italic">
+                        {t('admin.privacy.consent.no_text', 'No consent text set yet.')}
+                    </p>
+                ) : (
+                    <>
+                        {primary && (
+                            <ConsentLocaleBlock
+                                language_code={primary.language_code}
+                                consent_title={primary.consent_title}
+                                consent_description={primary.consent_description}
+                            />
+                        )}
+                        {others.length > 0 && (
+                            <>
+                                {showAll &&
+                                    others.map((tr) => (
+                                        <ConsentLocaleBlock
+                                            key={tr.language_code}
+                                            language_code={tr.language_code}
+                                            consent_title={tr.consent_title}
+                                            consent_description={tr.consent_description}
+                                        />
+                                    ))}
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAll((v) => !v)}
+                                    className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+                                >
+                                    {showAll ? (
+                                        <>
+                                            <ChevronUp className="size-3" />
+                                            {t(
+                                                'admin.privacy.consent.hide_all_languages',
+                                                'Hide other languages'
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ChevronDown className="size-3" />
+                                            {t(
+                                                'admin.privacy.consent.show_all_languages',
+                                                'Show all languages'
+                                            )}{' '}
+                                            ({others.length})
+                                        </>
+                                    )}
+                                </button>
+                            </>
+                        )}
+                    </>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
+function ConsentLocaleBlock({
+    language_code,
+    consent_title,
+    consent_description,
+}: {
+    language_code: string;
+    consent_title?: string | null;
+    consent_description?: string | null;
+}) {
+    return (
+        <div className="space-y-1.5">
+            <div className="flex items-center gap-2">
+                <span className="text-2xs font-black text-slate-500 uppercase tracking-wide">
+                    {language_code}
+                </span>
+                {consent_title && (
+                    <span className="text-sm font-bold text-slate-900">{consent_title}</span>
+                )}
+            </div>
+            {consent_description ? (
+                <p className="text-sm text-slate-600 leading-relaxed">
+                    {plainPreview(consent_description)}
+                </p>
+            ) : (
+                <p className="text-sm text-slate-400 italic">—</p>
+            )}
+        </div>
+    );
+}
+
 // ─── page ──────────────────────────────────────────────────────────────────────
 
-export default function DataLifecyclePage() {
+export default function DataPrivacyPage() {
     const { t } = useTranslation();
     const { studySlug, projectSlug } = useParams<{ studySlug: string; projectSlug: string }>();
     const effectiveSlug = studySlug ?? projectSlug ?? '';
@@ -103,6 +256,8 @@ export default function DataLifecyclePage() {
     // the policy-derived default while the input is untouched, so subsequent
     // inventory refetches don't clobber the researcher's pick.
     const userTouchedCutoffRef = useRef(false);
+
+    const designHref = `/app/${projectSlug ?? ''}/studies/${studySlug ?? ''}/design`;
 
     // ── data fetch ──────────────────────────────────────────────────────────
     const {
@@ -125,9 +280,9 @@ export default function DataLifecyclePage() {
         mutation: {
             onSuccess: (result: BulkAnonymiseResult) => {
                 setConfirmOpen(false);
-                toast.success(t('admin.lifecycle.anonymise_success', 'Anonymisation complete'), {
+                toast.success(t('admin.privacy.anonymise_success', 'Anonymisation complete'), {
                     description: t(
-                        'admin.lifecycle.anonymise_success_desc',
+                        'admin.privacy.anonymise_success_desc',
                         '{{n}} participant(s) anonymised, {{s}} already anonymous.',
                         {
                             n: result.anonymised,
@@ -143,7 +298,7 @@ export default function DataLifecyclePage() {
                 });
             },
             onError: () => {
-                toast.error(t('admin.lifecycle.anonymise_error', 'Anonymisation failed'));
+                toast.error(t('admin.privacy.anonymise_error', 'Anonymisation failed'));
             },
         },
     });
@@ -168,8 +323,11 @@ export default function DataLifecyclePage() {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
-                    title={t('admin.lifecycle.title', 'Data lifecycle')}
-                    description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
+                    title={t('admin.privacy.title', 'Data privacy')}
+                    description={t(
+                        'admin.privacy.header_desc',
+                        'Consent, inventory & anonymisation'
+                    )}
                     icon={ShieldCheck}
                 />
                 <InventorySkeleton />
@@ -181,14 +339,17 @@ export default function DataLifecyclePage() {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
-                    title={t('admin.lifecycle.title', 'Data lifecycle')}
-                    description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
+                    title={t('admin.privacy.title', 'Data privacy')}
+                    description={t(
+                        'admin.privacy.header_desc',
+                        'Consent, inventory & anonymisation'
+                    )}
                     icon={ShieldCheck}
                 />
                 <Alert className="bg-red-50 border-red-200 max-w-4xl">
                     <AlertTriangle className="h-4 w-4 text-red-600" />
                     <AlertDescription className="text-red-800">
-                        {t('admin.lifecycle.load_error', 'Failed to load data inventory.')}
+                        {t('admin.privacy.load_error', 'Failed to load data inventory.')}
                     </AlertDescription>
                 </Alert>
             </div>
@@ -198,27 +359,33 @@ export default function DataLifecyclePage() {
     const { participants, audio, timeline, locales } = inventory;
 
     // ── Empty-state contract: no participant data yet ─────────────────────
-    // Wave A — UX progressive-disclosure audit. The Lifecycle page surfaces
-    // GDPR Art. 5 controls that only have meaning once data exists. Until then,
-    // render an honest contract pointing the user to the share-link surface.
+    // The inventory dashboards only have meaning once data exists. The consent
+    // summary, however, is design-time and should remain visible — researchers
+    // tune the consent text *before* collecting data.
     if (participants.total === 0) {
         return (
             <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
                 <StudyPageHeader
-                    title={t('admin.lifecycle.title', 'Data lifecycle')}
-                    description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
+                    title={t('admin.privacy.title', 'Data privacy')}
+                    description={t(
+                        'admin.privacy.header_desc',
+                        'Consent, inventory & anonymisation'
+                    )}
                     icon={ShieldCheck}
                 />
-                <EmptyStateContract
-                    icon={Users}
-                    title={t('admin.lifecycle.empty.title', 'No participant data yet')}
-                    body={t(
-                        'admin.lifecycle.empty.body',
-                        'This page will activate the inventory dashboards and bulk-anonymisation controls (GDPR Art. 5) as soon as the first participant submits a Q-sort. Until then, share the study link from the overview to start collecting responses.'
-                    )}
-                    ctaLabel={t('admin.lifecycle.empty.cta', 'Open study overview')}
-                    ctaTo={`/app/${projectSlug ?? ''}/studies/${studySlug ?? ''}`}
-                />
+                <div className="space-y-6 max-w-4xl">
+                    <ConsentSummaryCard designHref={designHref} />
+                    <EmptyStateContract
+                        icon={Users}
+                        title={t('admin.privacy.empty.title', 'No participant data yet')}
+                        body={t(
+                            'admin.privacy.empty.body',
+                            'This page activates once participants submit. Share the study link first.'
+                        )}
+                        ctaLabel={t('admin.privacy.empty.cta', 'Open study overview')}
+                        ctaTo={`/app/${projectSlug ?? ''}/studies/${studySlug ?? ''}`}
+                    />
+                </div>
             </div>
         );
     }
@@ -226,38 +393,41 @@ export default function DataLifecyclePage() {
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
-                title={t('admin.lifecycle.title', 'Data lifecycle')}
-                description={t('admin.lifecycle.header_desc', 'Inventory & anonymisation')}
+                title={t('admin.privacy.title', 'Data privacy')}
+                description={t('admin.privacy.header_desc', 'Consent, inventory & anonymisation')}
                 icon={ShieldCheck}
             />
 
             <div className="space-y-6 max-w-4xl">
+                {/* ── Section 0: Consent summary ──────────────────────────── */}
+                <ConsentSummaryCard designHref={designHref} />
+
                 {/* ── Section 1: Participants ─────────────────────────────── */}
                 <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                     <CardHeader className="border-b border-slate-50 pb-4">
                         <div className="flex items-center gap-2 mb-1">
                             <Users className="h-5 w-5 text-indigo-500" />
                             <CardTitle className="text-lg font-black text-slate-900">
-                                {t('admin.lifecycle.participants_title', 'Participants snapshot')}
+                                {t('admin.privacy.participants_title', 'Participants snapshot')}
                             </CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent className="p-6">
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                             <Stat
-                                label={t('admin.lifecycle.stat_started', 'Started')}
+                                label={t('admin.privacy.stat_started', 'Started')}
                                 value={participants.started}
                             />
                             <Stat
-                                label={t('admin.lifecycle.stat_completed', 'Completed')}
+                                label={t('admin.privacy.stat_completed', 'Completed')}
                                 value={participants.completed}
                             />
                             <Stat
-                                label={t('admin.lifecycle.stat_discarded', 'Discarded')}
+                                label={t('admin.privacy.stat_discarded', 'Discarded')}
                                 value={participants.discarded}
                             />
                             <Stat
-                                label={t('admin.lifecycle.stat_anonymised', 'Anonymised')}
+                                label={t('admin.privacy.stat_anonymised', 'Anonymised')}
                                 value={participants.anonymised}
                                 highlight
                             />
@@ -265,14 +435,12 @@ export default function DataLifecyclePage() {
 
                         {/* Aged-data alerts — only render when there is actual
                             risk to flag. Yellow alert bars for "0 records older
-                            than X" train the user to ignore the channel; D9
-                            from the progressive-disclosure audit (REPORT.md
-                            finding H3). */}
+                            than X" train the user to ignore the channel. */}
                         <div className="mt-5 space-y-2">
                             {timeline.completed_older_than_1y > 0 && (
                                 <OlderThanHint
                                     label={t(
-                                        'admin.lifecycle.older_1y',
+                                        'admin.privacy.older_1y',
                                         'Older than 1 year (not anonymised)'
                                     )}
                                     count={timeline.completed_older_than_1y}
@@ -281,7 +449,7 @@ export default function DataLifecyclePage() {
                             {timeline.completed_older_than_2y > 0 && (
                                 <OlderThanHint
                                     label={t(
-                                        'admin.lifecycle.older_2y',
+                                        'admin.privacy.older_2y',
                                         'Older than 2 years (not anonymised)'
                                     )}
                                     count={timeline.completed_older_than_2y}
@@ -291,27 +459,27 @@ export default function DataLifecyclePage() {
                     </CardContent>
                 </Card>
 
-                {/* ── Section 2: Audio storage ─ D8: render only when audio
+                {/* ── Section 2: Audio storage ─ render only when audio
                     was actually collected; otherwise the panel is permanent
-                    "0 / 0.00 MB" noise (audit REPORT.md finding H8). */}
+                    "0 / 0.00 MB" noise. */}
                 {audio.count > 0 && (
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader className="border-b border-slate-50 pb-4">
                             <div className="flex items-center gap-2 mb-1">
                                 <Mic2 className="h-5 w-5 text-violet-500" />
                                 <CardTitle className="text-lg font-black text-slate-900">
-                                    {t('admin.lifecycle.audio_title', 'Audio storage')}
+                                    {t('admin.privacy.audio_title', 'Audio storage')}
                                 </CardTitle>
                             </div>
                         </CardHeader>
                         <CardContent className="p-6">
                             <div className="grid grid-cols-2 gap-4">
                                 <Stat
-                                    label={t('admin.lifecycle.audio_count', 'Recordings')}
+                                    label={t('admin.privacy.audio_count', 'Recordings')}
                                     value={audio.count}
                                 />
                                 <Stat
-                                    label={t('admin.lifecycle.audio_mb', 'Total size')}
+                                    label={t('admin.privacy.audio_mb', 'Total size')}
                                     value={`${audio.total_mb.toFixed(2)} MB`}
                                 />
                             </div>
@@ -325,7 +493,7 @@ export default function DataLifecyclePage() {
                         <div className="flex items-center gap-2 mb-1">
                             <Globe className="h-5 w-5 text-emerald-500" />
                             <CardTitle className="text-lg font-black text-slate-900">
-                                {t('admin.lifecycle.locale_title', 'Locale breakdown')}
+                                {t('admin.privacy.locale_title', 'Locale breakdown')}
                             </CardTitle>
                         </div>
                     </CardHeader>
@@ -335,10 +503,10 @@ export default function DataLifecyclePage() {
                                 <thead>
                                     <tr className="text-left text-slate-500 font-semibold border-b border-slate-100">
                                         <th className="pb-2 font-semibold">
-                                            {t('admin.lifecycle.locale_col', 'Language')}
+                                            {t('admin.privacy.locale_col', 'Language')}
                                         </th>
                                         <th className="pb-2 font-semibold text-right">
-                                            {t('admin.lifecycle.locale_count_col', 'Participants')}
+                                            {t('admin.privacy.locale_count_col', 'Participants')}
                                         </th>
                                     </tr>
                                 </thead>
@@ -359,9 +527,8 @@ export default function DataLifecyclePage() {
                                 </tbody>
                             </table>
                         ) : (
-                            // Wave E.4 (E2 cleanup): migrated to <EmptyState compact>.
                             <EmptyState
-                                title={t('admin.lifecycle.locale_empty', 'No locale data yet.')}
+                                title={t('admin.privacy.locale_empty', 'No locale data yet.')}
                                 variant="compact"
                             />
                         )}
@@ -374,22 +541,22 @@ export default function DataLifecyclePage() {
                         <div className="flex items-center gap-2 mb-1">
                             <CalendarDays className="h-5 w-5 text-sky-500" />
                             <CardTitle className="text-lg font-black text-slate-900">
-                                {t('admin.lifecycle.timeline_title', 'Timeline')}
+                                {t('admin.privacy.timeline_title', 'Timeline')}
                             </CardTitle>
                         </div>
                     </CardHeader>
                     <CardContent className="p-6">
                         <dl className="space-y-3 text-sm">
                             <TimelineRow
-                                label={t('admin.lifecycle.tl_first', 'First submission')}
+                                label={t('admin.privacy.tl_first', 'First submission')}
                                 value={formatDate(timeline.first_submission_at)}
                             />
                             <TimelineRow
-                                label={t('admin.lifecycle.tl_last', 'Last submission')}
+                                label={t('admin.privacy.tl_last', 'Last submission')}
                                 value={formatDate(timeline.last_submission_at)}
                             />
                             <TimelineRow
-                                label={t('admin.lifecycle.tl_anon', 'Last anonymisation')}
+                                label={t('admin.privacy.tl_anon', 'Last anonymisation')}
                                 value={formatDate(timeline.last_anonymisation_at)}
                             />
                         </dl>
@@ -402,12 +569,12 @@ export default function DataLifecyclePage() {
                         <div className="flex items-center gap-2 mb-1">
                             <ShieldAlert className="h-5 w-5 text-amber-500" />
                             <CardTitle className="text-lg font-black text-slate-900">
-                                {t('admin.lifecycle.bulk_title', 'Bulk anonymisation')}
+                                {t('admin.privacy.bulk_title', 'Bulk anonymisation')}
                             </CardTitle>
                         </div>
                         <CardDescription className="text-sm font-medium text-slate-500">
                             {t(
-                                'admin.lifecycle.bulk_desc',
+                                'admin.privacy.bulk_desc',
                                 'Remove personal data from completed participants submitted before a cutoff date. Q-sort rankings are preserved.'
                             )}
                         </CardDescription>
@@ -420,7 +587,7 @@ export default function DataLifecyclePage() {
                                 className="text-xs font-black text-slate-500 flex items-center gap-1.5"
                             >
                                 <Clock className="w-3 h-3" />
-                                {t('admin.lifecycle.cutoff_label', 'Cutoff date')}
+                                {t('admin.privacy.cutoff_label', 'Cutoff date')}
                             </label>
                             <input
                                 id="cutoff-date"
@@ -435,14 +602,14 @@ export default function DataLifecyclePage() {
                             />
                             <p className="text-xs text-slate-400">
                                 {t(
-                                    'admin.lifecycle.cutoff_help',
+                                    'admin.privacy.cutoff_help',
                                     'Only completed participants submitted strictly before this date will be anonymised.'
                                 )}
                             </p>
                             {inventory?.data_retention_months && !userTouchedCutoffRef.current && (
                                 <p className="text-xs text-indigo-600">
                                     {t(
-                                        'admin.lifecycle.cutoff_from_policy',
+                                        'admin.privacy.cutoff_from_policy',
                                         'Default derived from study retention policy ({{months}} months).',
                                         { months: inventory.data_retention_months }
                                     )}
@@ -453,7 +620,7 @@ export default function DataLifecyclePage() {
                         {/* Preview / candidate count */}
                         <div className="bg-slate-50 rounded-xl p-4 text-sm">
                             <span className="font-semibold text-slate-700">
-                                {t('admin.lifecycle.preview_label', 'Candidates:')}
+                                {t('admin.privacy.preview_label', 'Candidates:')}
                             </span>{' '}
                             <span className="font-bold text-slate-900">
                                 {isPreviewFetching ? '…' : candidateCount}
@@ -461,7 +628,7 @@ export default function DataLifecyclePage() {
                             {!isPreviewFetching && candidateCount === 0 && (
                                 <p className="text-xs text-slate-400 mt-1">
                                     {t(
-                                        'admin.lifecycle.preview_zero',
+                                        'admin.privacy.preview_zero',
                                         'No participants qualify for this cutoff. Try an earlier date.'
                                     )}
                                 </p>
@@ -479,7 +646,7 @@ export default function DataLifecyclePage() {
                             ) : (
                                 <ShieldAlert className="w-4 h-4 mr-2" />
                             )}
-                            {t('admin.lifecycle.anonymise_button', 'Anonymise')}
+                            {t('admin.privacy.anonymise_button', 'Anonymise')}
                         </Button>
                     </CardContent>
                 </Card>
@@ -490,25 +657,25 @@ export default function DataLifecyclePage() {
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            {t('admin.lifecycle.confirm_title', 'Anonymise participant data?')}
+                            {t('admin.privacy.confirm_title', 'Anonymise participant data?')}
                         </AlertDialogTitle>
                         <AlertDialogDescription className="space-y-2 text-left">
                             <span className="block">
                                 {t(
-                                    'admin.lifecycle.confirm_candidates',
+                                    'admin.privacy.confirm_candidates',
                                     '{{count}} completed participant(s) submitted before {{date}} will be anonymised.',
                                     { count: candidateCount, date: cutoffDate }
                                 )}
                             </span>
                             <span className="block">
                                 {t(
-                                    'admin.lifecycle.confirm_preserved',
-                                    'Q-sort statement rankings will be preserved as anonymous research data. They will no longer link to any individual.'
+                                    'admin.privacy.confirm_preserved',
+                                    'Q-sort rankings are kept; identity is removed.'
                                 )}
                             </span>
                             <span className="block font-medium text-slate-700">
                                 {t(
-                                    'admin.lifecycle.confirm_irreversible',
+                                    'admin.privacy.confirm_irreversible',
                                     'This action is immediate and cannot be undone.'
                                 )}
                             </span>
@@ -531,8 +698,8 @@ export default function DataLifecyclePage() {
                             className="bg-amber-500 hover:bg-amber-600"
                         >
                             {anonymiseMutation.isPending
-                                ? t('admin.lifecycle.confirm_in_progress', 'Anonymising…')
-                                : t('admin.lifecycle.confirm_action', 'Yes, anonymise')}
+                                ? t('admin.privacy.confirm_in_progress', 'Anonymising…')
+                                : t('admin.privacy.confirm_action', 'Yes, anonymise')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

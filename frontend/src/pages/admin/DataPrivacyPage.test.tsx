@@ -7,7 +7,7 @@
 import { renderWithProviders, screen, waitFor } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import DataLifecyclePage from './DataLifecyclePage';
+import DataPrivacyPage from './DataPrivacyPage';
 import type { DataInventory } from '@/api/model';
 
 // Mock sonner
@@ -52,6 +52,16 @@ vi.mock('@tanstack/react-query', async () => {
     };
 });
 
+// Mock useAdminContext: provides the study (with translations) consumed by
+// ConsentSummaryCard. Default returns a study with no consent text — tests
+// that need consent content can override via the imported mock.
+vi.mock('@/hooks/useAdminContext', () => ({
+    useAdminContext: () => ({
+        project: undefined,
+        study: { translations: [] },
+    }),
+}));
+
 const mockInventory: DataInventory = {
     study_slug: 'test-study',
     generated_at: new Date().toISOString(),
@@ -77,7 +87,7 @@ const mockInventory: DataInventory = {
     locales: { en: 25, fr: 15, fi: 10 },
 };
 
-describe('DataLifecyclePage', () => {
+describe('DataPrivacyPage', () => {
     beforeEach(() => {
         mockInventoryHook.mockReset();
         mockAnonymiseMutation.mockReset();
@@ -101,10 +111,13 @@ describe('DataLifecyclePage', () => {
             isPending: false,
         });
 
-        renderWithProviders(<DataLifecyclePage />);
+        renderWithProviders(<DataPrivacyPage />);
 
         // Page header
-        expect(screen.getByText('Data lifecycle')).toBeInTheDocument();
+        expect(screen.getByText('Data privacy')).toBeInTheDocument();
+
+        // Consent summary card is always present at the top
+        expect(screen.getByText('Consent form')).toBeInTheDocument();
 
         // Participant stats (Total stat removed in text-trim wave; Started/Completed/Discarded/Anonymised remain)
         expect(screen.getByText('30')).toBeInTheDocument(); // completed
@@ -138,10 +151,10 @@ describe('DataLifecyclePage', () => {
             isPending: false,
         });
 
-        renderWithProviders(<DataLifecyclePage />);
+        renderWithProviders(<DataPrivacyPage />);
 
         // Header is still shown
-        expect(screen.getByText('Data lifecycle')).toBeInTheDocument();
+        expect(screen.getByText('Data privacy')).toBeInTheDocument();
         // Stats table should not be there
         expect(screen.queryByText('Participants snapshot')).not.toBeInTheDocument();
     });
@@ -157,7 +170,7 @@ describe('DataLifecyclePage', () => {
             isPending: false,
         });
 
-        renderWithProviders(<DataLifecyclePage />);
+        renderWithProviders(<DataPrivacyPage />);
 
         expect(screen.getByText(/failed to load data inventory/i)).toBeInTheDocument();
     });
@@ -182,7 +195,7 @@ describe('DataLifecyclePage', () => {
         });
 
         const user = userEvent.setup();
-        renderWithProviders(<DataLifecyclePage />);
+        renderWithProviders(<DataPrivacyPage />);
 
         // The anonymise button should be enabled (18 candidates for 1-year cutoff default)
         const anonymiseBtn = screen.getByRole('button', {
@@ -246,11 +259,15 @@ describe('DataLifecyclePage', () => {
             isPending: false,
         });
 
-        renderWithProviders(<DataLifecyclePage />);
+        renderWithProviders(<DataPrivacyPage />);
 
         // Empty-state contract is shown
         expect(screen.getByText(/No participant data yet/i)).toBeInTheDocument();
         expect(screen.getByRole('link', { name: /open study overview/i })).toBeInTheDocument();
+
+        // Consent summary card is still shown — it's design-time content,
+        // visible even before the first participant submits.
+        expect(screen.getByText('Consent form')).toBeInTheDocument();
 
         // Inventory chrome is NOT shown
         expect(screen.queryByText('Participants snapshot')).not.toBeInTheDocument();

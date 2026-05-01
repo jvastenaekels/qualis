@@ -14,6 +14,7 @@ import {
     AccordionContent,
 } from '@/components/ui/accordion';
 import { Hand, Clipboard, ShieldCheck, Settings2, RotateCcw, BookOpen } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import type React from 'react';
 import MarkdownEditor from './MarkdownEditor';
 import { ProcessStepEditor } from './ProcessStepEditor';
@@ -43,6 +44,23 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
         user_id: m.user_id,
         display_name: m.user.full_name ?? m.user.email,
     }));
+
+    // Deep-link from the Data privacy page (`/design#consent`): expand the
+    // consent accordion on first paint and scroll to it once the draft has
+    // hydrated. Read window.location.hash directly — useLocation() would also
+    // work but breaks tests that pass-through MemoryRouter without a real
+    // Router context, and the scroll only needs to fire once at mount.
+    const isHashConsent = typeof window !== 'undefined' && window.location.hash === '#consent';
+    const initialAccordionValueRef = useRef<string[]>(
+        isHashConsent ? ['presentation', 'consent'] : ['presentation']
+    );
+
+    useEffect(() => {
+        if (!isHashConsent || !draft) return;
+        const el = document.getElementById('consent');
+        if (!el) return;
+        requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    }, [isHashConsent, draft]);
 
     if (!draft) return null;
 
@@ -133,7 +151,11 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                 in an Accordion with only "Présentation" expanded by default.
                 Reduces above-fold cognitive load on first contact with the
                 Design page (audit REPORT.md finding 🔴1). */}
-            <Accordion type="multiple" defaultValue={['presentation']} className="space-y-6">
+            <Accordion
+                type="multiple"
+                defaultValue={initialAccordionValueRef.current}
+                className="space-y-6"
+            >
                 {/* Welcome / Présentation Section — open by default */}
                 <AccordionItem
                     value="presentation"
@@ -316,10 +338,13 @@ const IntroductionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     </AccordionContent>
                 </AccordionItem>
 
-                {/* Consent Section (Mandatory) — collapsed by default */}
+                {/* Consent Section (Mandatory) — collapsed by default.
+                    id="consent" is the deep-link target for the Data privacy
+                    page's "Edit in Study design" button. */}
                 <AccordionItem
+                    id="consent"
                     value="consent"
-                    className="border-none rounded-2xl bg-slate-50/50 shadow-sm overflow-hidden"
+                    className="border-none rounded-2xl bg-slate-50/50 shadow-sm overflow-hidden scroll-mt-20"
                 >
                     <AccordionTrigger className="px-5 py-4 hover:no-underline data-[state=open]:border-b data-[state=open]:border-slate-200/60">
                         <div className="flex items-center gap-3 text-slate-900 font-bold text-xl tracking-tight flex-1">

@@ -642,7 +642,7 @@
             "recruit": "Access",
             "data": "Data",
             "analysis": "Analysis",
-            "lifecycle": "Data lifecycle",
+            "privacy": "Data privacy",
             "team": "Team",
             "settings": "Study settings",
             "project_settings": "Project settings",
@@ -1226,7 +1226,7 @@
             "recruitment": "Access",
             "exports": "Data",
             "data": "Data",
-            "lifecycle": "Data lifecycle",
+            "privacy": "Data privacy",
             "profile": "Profile",
             "participant_n": "Participant #{{id}}",
             "analysis": "Analysis",
@@ -2299,9 +2299,9 @@
                 "range_error": "Retention must be an integer between 1 and 240 months."
             }
         },
-        "lifecycle": {
-            "title": "Data lifecycle",
-            "header_desc": "Inventory & anonymisation",
+        "privacy": {
+            "title": "Data privacy",
+            "header_desc": "Consent, inventory & anonymisation",
             "load_error": "Failed to load data inventory.",
             "participants_title": "Participants snapshot",
             "stat_started": "Started",
@@ -2342,6 +2342,14 @@
                 "title": "No participant data yet",
                 "body": "This page activates once participants submit. Share the study link first.",
                 "cta": "Open study overview"
+            },
+            "consent": {
+                "title": "Consent form",
+                "description": "What participants see before they enter the study. Edited in Study design.",
+                "no_text": "No consent text set yet.",
+                "edit_in_design": "Edit in Study design",
+                "show_all_languages": "Show all languages",
+                "hide_all_languages": "Hide other languages"
             }
         },
         "projects": {
