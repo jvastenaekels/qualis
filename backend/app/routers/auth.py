@@ -100,7 +100,8 @@ async def login_for_access_token(
         subject=user.email, expires_delta=access_token_expires
     )
 
-    return Token(access_token=access_token, token_type="bearer")
+    # token_type "bearer" is the OAuth2 literal, not a credential.
+    return Token(access_token=access_token, token_type="bearer")  # nosec B106
 
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)

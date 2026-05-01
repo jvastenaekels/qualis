@@ -12,6 +12,16 @@ We patch the latest tagged release. Older releases are best-effort.
 
 Dependencies surface CVEs that we have evaluated and chose not to fix because the affected code paths are not reachable in Qualis's usage.
 
+### Bandit suppressions
+
+`bandit -ll` (run by `make check`) flags a small number of patterns where the static heuristic does not match the actual semantics. Each suppression is annotated inline with `# nosec <test-id>` and the rationale lives next to the code:
+
+- `app/routers/auth.py:103` — `# nosec B106`. The string `"bearer"` is the OAuth2 token-type literal returned to the client, not a credential.
+- `app/services/study_service.py` (~line 503) — `# nosec B311`. `random.Random` is used to produce a deterministic per-session statement-shuffle for Q-methodology reproducibility; it is not security-sensitive. The seed is derived from the session token.
+- `app/services/study_service.py` (~line 542) — `# nosec B105`. The dict key `requires_password` is a payload field name; the value is the literal `False`. Bandit pattern-matches the key and flags the entry. The suppression is hoisted to a single-line local assignment to keep the AST attribution scoped.
+
+Last reviewed: 2026-05-01.
+
 ### `xlsx` (SheetJS Community Edition)
 
 [GHSA-4r6h-8v6p-xvw6](https://github.com/advisories/GHSA-4r6h-8v6p-xvw6) (prototype pollution) and [GHSA-5pgg-2g8v-p4x9](https://github.com/advisories/GHSA-5pgg-2g8v-p4x9) (ReDoS) require **attacker-controlled XLSX inputs to be parsed**. Qualis only **writes** XLSX files for export (`frontend/src/utils/analysisXlsxExport.ts`); it never parses untrusted XLSX. The test suite parses XLSX but only data it just wrote.

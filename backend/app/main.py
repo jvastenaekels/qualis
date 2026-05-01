@@ -47,6 +47,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Sentinel value for unset secrets in dev — production startup checks compare
+# against this constant to detect missing env vars. Not a credential.
+_INSECURE_DEFAULT_SENTINEL = "CHANGEME-insecure-dev-only"
+
 # Sentry — initialised here (before app construction) so the SDK captures
 # import-time and startup errors. No-op when SENTRY_DSN is not configured.
 if settings.SENTRY_DSN:
@@ -87,12 +91,12 @@ async def lifespan(app: FastAPI):
 
     # Production Readiness Checks
     if settings.ENVIRONMENT != "development":
-        if settings.SECRET_KEY == "CHANGEME-insecure-dev-only":
+        if settings.SECRET_KEY == _INSECURE_DEFAULT_SENTINEL:
             logger.critical(
                 "SECRET_KEY is using the insecure default! Set a strong random SECRET_KEY in environment variables."
             )
 
-        if settings.IP_HASH_SALT == "CHANGEME-insecure-dev-only":
+        if settings.IP_HASH_SALT == _INSECURE_DEFAULT_SENTINEL:
             logger.critical(
                 "IP_HASH_SALT is using the insecure default! Set a unique IP_HASH_SALT in environment variables."
             )

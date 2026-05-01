@@ -498,7 +498,9 @@ class StudyService:
         if study.randomize_statement_order and session_token:
             import random
 
-            local_random = random.Random(
+            # Deterministic per-session shuffle for Q-methodology
+            # reproducibility, not a security-sensitive RNG.
+            local_random = random.Random(  # nosec B311
                 StudyService._generate_session_seed(str(session_token))
             )
             local_random.shuffle(statements_data)
@@ -529,6 +531,11 @@ class StudyService:
                 effective_state = StudyState.paused.value
             elif study.end_date and is_now_after(study.end_date):
                 effective_state = StudyState.closed.value
+
+        # Bound to a local to keep the bandit suppression on a single line and
+        # avoid AST propagation to the dict literal below. The field name
+        # contains "password" but the value is the literal False.
+        requires_password = False  # nosec B105
 
         return {
             "slug": study.slug,
@@ -569,7 +576,7 @@ class StudyService:
             "state": effective_state,
             "step_help": (getattr(translation, "step_help", {}) or {})
             or lang_defaults.get("step_help", {}),
-            "requires_password": False,
+            "requires_password": requires_password,
             "start_date": study.start_date,
             "end_date": study.end_date,
             "branding": study.branding
