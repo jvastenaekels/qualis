@@ -1,3 +1,4 @@
+import { isPresortEnabled, isRoughSortEnabled } from '@/utils/studyConfig';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -77,19 +78,11 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
         { id: 'post', labelKey: 'study.steps.post' },
     ];
 
-    // Mirrors `isPresortEnabled` / `isRoughSortEnabled` in `utils/studyConfig.ts`
-    // and the gating in ProcessStepEditor. `fine` and `post` are always present
-    // (Q-sort is mandatory; post-sort has only sub-toggles, no master switch).
-    const presortCfg = draft.presort_config as { enabled?: boolean } | null | undefined;
-    const presortEnabled = !presortCfg
-        ? true
-        : 'enabled' in presortCfg
-          ? presortCfg.enabled !== false
-          : true;
-    const roughEnabled = draft.rough_sort_enabled !== false;
+    // `fine` and `post` are always present (Q-sort is mandatory; post-sort
+    // has only sub-toggles, no master switch).
     const isStepEnabled = (id: string): boolean => {
-        if (id === 'presort') return presortEnabled;
-        if (id === 'rough') return roughEnabled;
+        if (id === 'presort') return isPresortEnabled(draft);
+        if (id === 'rough') return isRoughSortEnabled(draft);
         return true;
     };
 
@@ -438,7 +431,7 @@ const InterfaceEditor = ({ readOnly = false }: { readOnly?: boolean }) => {
                                             <span className="text-2xs font-bold text-slate-500 italic">
                                                 {t(
                                                     'admin.design.interface.help.step_disabled',
-                                                    '(étape désactivée)'
+                                                    '(step disabled)'
                                                 )}
                                             </span>
                                         )}

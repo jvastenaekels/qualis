@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { isRoughSortEnabled } from '@/utils/studyConfig';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { StudyTranslationCreate } from '@/api/model';
@@ -787,7 +788,7 @@ const StudyDesignPage = () => {
                                         <input
                                             type="checkbox"
                                             data-testid="rough-sort-toggle"
-                                            checked={draft.rough_sort_enabled ?? true}
+                                            checked={isRoughSortEnabled(draft)}
                                             disabled={api.roughSortLocked || api.isFullyReadOnly}
                                             onChange={(e) =>
                                                 updateDraft((d) => {
@@ -802,7 +803,7 @@ const StudyDesignPage = () => {
                                             )}
                                         </span>
                                     </label>
-                                    {(draft.rough_sort_enabled ?? true) === false && (
+                                    {!isRoughSortEnabled(draft) && (
                                         <p className="text-xs italic text-slate-500">
                                             {t(
                                                 'admin.study_design.rough_sort.deck_mode_note',

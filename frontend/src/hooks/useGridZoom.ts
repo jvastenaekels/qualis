@@ -50,6 +50,9 @@ export const useGridZoom = ({
             // content readable when it does overlap. Landscape mobile already
             // used the full wrapper width (no toolbar in the same corner);
             // desktop has its own branch below.
+            // 2% breathing room — empirical margin so the grid doesn't kiss
+            // the wrapper edge; the toolbar's backdrop-blur tolerates the
+            // occasional overlap that the old 64–72px reservation prevented.
             const widthScale = (wrapperW * 0.98) / contentW;
             const heightScale = (wrapperH * (isLandscapeMobile ? 0.95 : 0.9)) / contentH;
 

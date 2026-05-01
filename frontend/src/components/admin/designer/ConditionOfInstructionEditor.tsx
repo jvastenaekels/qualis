@@ -1,4 +1,5 @@
 import type { StudyTranslationRead as StudyTranslation } from '@/api/model/studyTranslationRead';
+import { isRoughSortEnabled } from '@/utils/studyConfig';
 import { useTranslation } from 'react-i18next';
 import { useStudyDesigner } from '@/store/useStudyDesigner';
 import { Label } from '@/components/ui/label';
@@ -41,7 +42,7 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     {t('admin.design.condition.title')}
                 </div>
 
-                {(draft.rough_sort_enabled ?? true) && (
+                {isRoughSortEnabled(draft) && (
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
                         <CardHeader className="pb-4">
                             <CardTitle className="text-base font-black text-slate-900 tracking-tight">
