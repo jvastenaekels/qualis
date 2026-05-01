@@ -147,6 +147,26 @@ describe('GridSort free-mode overflow rows', () => {
         expect(countSlotsInColumn(1)).toBe(6);
     });
 
+    it('keeps overflow rows visible when cards live at high rows but cardsInColumn < capacity', () => {
+        // Realistic scenario: column 1 (cap 3) once held 6 cards (rows 0-5),
+        // then 4 were moved out leaving 2 cards at rows 4 and 5. The slot
+        // count must accommodate the surviving max row, not just the head
+        // count — otherwise the cards become invisible / unreachable.
+        const qsort = [
+            { statementId: 1, col: 1, row: 4 },
+            { statementId: 2, col: 1, row: 5 },
+        ];
+        render(
+            <DndContext>
+                <GridSort {...baseProps} distributionMode="free" qsort={qsort} />
+            </DndContext>
+        );
+
+        // maxRow is 5 → slots must reach at least row 6 (an empty trailing
+        // slot below the highest card) → 7 slots total (rows 0..6).
+        expect(countSlotsInColumn(1)).toBe(7);
+    });
+
     it('renders col.capacity slots in flexible mode (unchanged from forced)', () => {
         // Flexible is a soft warning at submission, not a UI overflow.
         const qsort = [

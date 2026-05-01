@@ -248,3 +248,72 @@ export async function placeNCardsInColumn(
 
     return placed;
 }
+
+/**
+ * Count cards currently placed in a specific column.
+ */
+async function countCardsInColumn(page: Page, columnIndex: number): Promise<number> {
+    return page.locator(`[id^="slot_${columnIndex}_"] [data-testid^="card-"]`).count();
+}
+
+/**
+ * Move a single already-placed card from sourceCol to destCol.
+ * Click the card to select it, then click an empty slot in destCol.
+ * Returns true if a card was moved.
+ */
+async function moveOnceBetweenColumns(
+    page: Page,
+    sourceCol: number,
+    destCol: number
+): Promise<boolean> {
+    const sourceCard = page.locator(`[id^="slot_${sourceCol}_"] [data-testid^="card-"]`).first();
+    if ((await sourceCard.count()) === 0) return false;
+
+    const beforeSource = await countCardsInColumn(page, sourceCol);
+    const beforeDest = await countCardsInColumn(page, destCol);
+
+    await sourceCard.scrollIntoViewIfNeeded().catch(() => {});
+    await sourceCard.evaluate((node: HTMLElement) => node.click());
+
+    // Find the first empty slot in the destination column. In free mode the
+    // GridSort renders an extra trailing slot when capacity is exhausted, so
+    // there is always at least one empty target available.
+    const destSlot = page
+        .locator(`[id^="slot_${destCol}_"]:not(:has([data-testid^="card-"]))`)
+        .first();
+    if ((await destSlot.count()) === 0) return false;
+    await destSlot.scrollIntoViewIfNeeded().catch(() => {});
+    await destSlot.evaluate((node: HTMLElement) => node.click());
+
+    // Wait for the move to settle: source decreases, dest increases.
+    await expect
+        .poll(async () => countCardsInColumn(page, sourceCol), { timeout: 5000 })
+        .toBeLessThan(beforeSource);
+    await expect
+        .poll(async () => countCardsInColumn(page, destCol), { timeout: 5000 })
+        .toBeGreaterThan(beforeDest);
+    return true;
+}
+
+/**
+ * Move N already-placed cards from sourceCol to destCol. Returns the number
+ * actually moved (capped by available cards in sourceCol).
+ *
+ * Used by free-mode tests to redistribute cards between columns to demonstrate
+ * overflow rendering: stack many cards in a low-capacity column to force
+ * GridSort to render extra trailing slots past the declared capacity.
+ */
+export async function moveNCardsBetweenColumns(
+    page: Page,
+    n: number,
+    sourceCol: number,
+    destCol: number
+): Promise<number> {
+    let moved = 0;
+    for (let i = 0; i < n; i++) {
+        const ok = await moveOnceBetweenColumns(page, sourceCol, destCol);
+        if (!ok) break;
+        moved++;
+    }
+    return moved;
+}

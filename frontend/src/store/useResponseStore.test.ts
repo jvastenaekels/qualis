@@ -83,6 +83,23 @@ describe('useResponseStore', () => {
         expect(state.qsort[0].statementId).toBe(1);
     });
 
+    it('should allow placement past capacity in free mode (overflow rows)', () => {
+        // Switch to free mode for this scenario.
+        useConfigStore.setState((s) => ({
+            config: s.config ? { ...s.config, distribution_mode: 'free' } : s.config,
+        }));
+
+        const store = useResponseStore.getState();
+        // Column 0 has capacity 1 — in free mode, two cards may stack.
+        store.placeCardInGrid(1, 0, 0);
+        store.placeCardInGrid(2, 0, 1);
+
+        const state = useResponseStore.getState();
+        expect(state.qsort).toHaveLength(2);
+        const col0Cards = state.qsort.filter((c) => c.col === 0);
+        expect(col0Cards).toHaveLength(2);
+    });
+
     it('should move card within grid', () => {
         const store = useResponseStore.getState();
         store.placeCardInGrid(1, 0, 0);

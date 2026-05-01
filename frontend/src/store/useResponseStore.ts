@@ -118,7 +118,14 @@ const _placeOrMove = (
     if (!colConfig) return;
     const state = get();
     const cardsInCol = state.qsort.filter((c) => c.col === col && c.statementId !== statementId);
-    if (cardsInCol.length >= colConfig.capacity) {
+    // Per-column capacity is a hard cap only in `forced` mode. In `free` and
+    // `flexible` mode the visual grid grows past capacity (free-mode overflow
+    // rows render in GridSort; submission validation only checks the total
+    // card count). Returning early here would block every overflow placement,
+    // even when the caller already resolved an empty row past the declared
+    // capacity (see useGridPlacement.findClosestEmptyRow).
+    const isForced = (config.distribution_mode ?? 'forced') === 'forced';
+    if (isForced && cardsInCol.length >= colConfig.capacity) {
         if (warnOnFull) console.warn(`Column ${col} is full.`);
         return;
     }

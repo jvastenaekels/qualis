@@ -86,4 +86,87 @@ describe('useGridSanity', () => {
         expect(mockUnplaceCard).toHaveBeenCalledWith(1);
         expect(mockCategorizeCard).toHaveBeenCalledWith(1, 'neutral');
     });
+
+    it('keeps overflow rows in free mode (row past capacity is allowed)', () => {
+        const unplaceCard = vi.fn();
+        const categorizeCard = vi.fn();
+        const qsort = [
+            { statementId: 1, col: 0, row: 0 },
+            { statementId: 2, col: 0, row: 1 },
+            { statementId: 3, col: 0, row: 2 }, // overflow: capacity is 2
+        ];
+
+        renderHook(() =>
+            useGridSanity({
+                qsort,
+                gridColumns,
+                unplaceCard,
+                categorizeCard,
+                distributionMode: 'free',
+            })
+        );
+
+        expect(unplaceCard).not.toHaveBeenCalled();
+        expect(categorizeCard).not.toHaveBeenCalled();
+    });
+
+    it('still removes negative-row cards in free mode (genuine bounds error)', () => {
+        const unplaceCard = vi.fn();
+        const categorizeCard = vi.fn();
+        const qsort = [{ statementId: 1, col: 0, row: -1 }];
+
+        renderHook(() =>
+            useGridSanity({
+                qsort,
+                gridColumns,
+                unplaceCard,
+                categorizeCard,
+                distributionMode: 'free',
+            })
+        );
+
+        expect(unplaceCard).toHaveBeenCalledWith(1);
+        expect(categorizeCard).toHaveBeenCalledWith(1, 'neutral');
+    });
+
+    it('still removes invalid-col cards in free mode', () => {
+        const unplaceCard = vi.fn();
+        const categorizeCard = vi.fn();
+        const qsort = [{ statementId: 1, col: 99, row: 0 }];
+
+        renderHook(() =>
+            useGridSanity({
+                qsort,
+                gridColumns,
+                unplaceCard,
+                categorizeCard,
+                distributionMode: 'free',
+            })
+        );
+
+        expect(unplaceCard).toHaveBeenCalledWith(1);
+        expect(categorizeCard).toHaveBeenCalledWith(1, 'neutral');
+    });
+
+    it('still flags overlap in free mode', () => {
+        const unplaceCard = vi.fn();
+        const categorizeCard = vi.fn();
+        const qsort = [
+            { statementId: 1, col: 0, row: 5 }, // overflow row
+            { statementId: 2, col: 0, row: 5 }, // overlap on overflow row
+        ];
+
+        renderHook(() =>
+            useGridSanity({
+                qsort,
+                gridColumns,
+                unplaceCard,
+                categorizeCard,
+                distributionMode: 'free',
+            })
+        );
+
+        expect(unplaceCard).toHaveBeenCalledWith(2);
+        expect(unplaceCard).not.toHaveBeenCalledWith(1);
+    });
 });

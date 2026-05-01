@@ -356,6 +356,7 @@ export function useFineSort(interactionUtils: InteractionUtils | null): FineSort
         gridColumns,
         unplaceCard: actions.unplaceCard,
         categorizeCard: actions.categorizeCard,
+        distributionMode,
     });
 
     // ── Keyboard handler ──────────────────────────────────────────

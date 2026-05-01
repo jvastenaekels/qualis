@@ -618,16 +618,30 @@ const GridSort: React.FC<GridSortProps> = React.memo(
             if (!isFreeDistribution) {
                 return gridColumns.map((col) => col.capacity);
             }
+            // Track per-column card count AND the highest occupied row. The
+            // max-row component is necessary because cards can sit at row
+            // indices past `capacity` (overflow rows). After moves out of an
+            // overflowed column the card count may drop below capacity while
+            // the surviving cards still live at high row indices — we must
+            // keep rendering enough slots to host them.
             const cardsPerCol = new Map<number, number>();
+            const maxRowPerCol = new Map<number, number>();
             (qsort ?? []).forEach((c) => {
                 cardsPerCol.set(c.col, (cardsPerCol.get(c.col) ?? 0) + 1);
+                const prev = maxRowPerCol.get(c.col);
+                if (prev === undefined || c.row > prev) {
+                    maxRowPerCol.set(c.col, c.row);
+                }
             });
             return gridColumns.map((col, idx) => {
                 const cardsInColumn = cardsPerCol.get(idx) ?? 0;
-                // When the column has reached or exceeded capacity, surface
-                // one trailing empty slot so further drops have a target.
-                if (cardsInColumn >= col.capacity) {
-                    return cardsInColumn + 1;
+                const maxRow = maxRowPerCol.get(idx) ?? -1;
+                // When the column hosts (or has hosted) cards past capacity,
+                // surface one trailing empty slot below the highest occupied
+                // row so further drops always have a target. Otherwise stay
+                // at the declared capacity.
+                if (cardsInColumn >= col.capacity || maxRow >= col.capacity) {
+                    return Math.max(cardsInColumn + 1, maxRow + 2);
                 }
                 return col.capacity;
             });
