@@ -557,7 +557,7 @@ interface GridSortProps {
      * settled placements to avoid reflow jitter mid-drag. Ignored unless
      * `distributionMode === 'free'`.
      */
-    qsort?: { col: number }[];
+    qsort?: { col: number; row: number }[];
 }
 
 type PileType = 'disagree' | 'neutral' | 'agree';
