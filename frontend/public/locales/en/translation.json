@@ -1228,7 +1228,7 @@
             "data": "Data",
             "privacy": "Data privacy",
             "profile": "Profile",
-            "participant_n": "Participant #{{id}}",
+            "participant_n": "Participant {{code}}",
             "analysis": "Analysis",
             "settings": "Settings",
             "concourse": "Concourse"
@@ -2110,7 +2110,7 @@
             },
             "detail": {
                 "participant": "Participant",
-                "participant_n": "Participant #{{id}}",
+                "participant_n": "Participant {{code}}",
                 "not_found": "Participant not found",
                 "title": "Participant profile",
                 "session": "Session",

@@ -14,6 +14,7 @@ import { useAdminStore } from '@/store/useAdminStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useAdminContext } from '@/hooks/useAdminContext';
+import { useGetParticipantApiAdminStudiesParticipantsParticipantIdGet } from '@/api/generated';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,17 @@ export default function AdminLayout() {
     const { currentProject } = useAuthStore();
     const { project: adminProject, study: adminStudy } = useAdminContext();
     const { t } = useTranslation();
+
+    // Resolve the participant code (session_token[:8]) for the breadcrumb
+    // when on /participants/:participantId. The fetch is gated to that route
+    // and shares the React Query cache with ParticipantDetailsPage, so the
+    // page render and the breadcrumb dedupe to a single network call.
+    const participantMatch = location.pathname.match(/\/participants\/(\d+)(?:\/|$)/);
+    const participantIdNum = participantMatch ? Number(participantMatch[1]) : 0;
+    const { data: breadcrumbParticipant } =
+        useGetParticipantApiAdminStudiesParticipantsParticipantIdGet(participantIdNum, {
+            query: { enabled: participantIdNum > 0 },
+        });
 
     useEffect(() => {
         const match = location.pathname.match(/\/app\/[^/]+\/studies\/([^/]+)/);
@@ -68,9 +80,14 @@ export default function AdminLayout() {
         if (prev === 'concourses' && /^\d+$/.test(last)) {
             return t('admin.breadcrumbs.concourse', 'Concourse');
         }
-        // Participant detail page: /participants/:id → show "Participant #N"
+        // Participant detail page: /participants/:id → show "Participant <CODE>"
+        // where <CODE> is the first 8 chars of session_token. While the fetch
+        // is in flight we fall back to the URL id so the breadcrumb is never
+        // empty.
         if (prev === 'participants' && /^\d+$/.test(last)) {
-            return t('admin.breadcrumbs.participant_n', 'Participant #{{id}}', { id: last });
+            const code =
+                breadcrumbParticipant?.session_token?.substring(0, 8).toUpperCase() ?? last;
+            return t('admin.breadcrumbs.participant_n', 'Participant {{code}}', { code });
         }
 
         return mapping[last] || last.charAt(0).toUpperCase() + last.slice(1);

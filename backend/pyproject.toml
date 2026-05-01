@@ -1,6 +1,6 @@
 [project]
 name = "qualis-backend"
-version = "0.4.0"
+version = "0.5.0"
 description = "Backend for Qualis"
 readme = "README.md"
 requires-python = ">=3.13"

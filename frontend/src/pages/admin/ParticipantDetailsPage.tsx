@@ -254,8 +254,8 @@ export default function ParticipantDetailsPage() {
             <div className="flex-none p-6 pb-0 space-y-3">
                 <div className="flex items-center justify-between gap-4">
                     <StudyPageHeader
-                        title={t('admin.data.detail.participant_n', 'Participant #{{id}}', {
-                            id: participantId,
+                        title={t('admin.data.detail.participant_n', 'Participant {{code}}', {
+                            code: participant.session_token.substring(0, 8).toUpperCase(),
                         })}
                         icon={User}
                     />

@@ -1143,7 +1143,7 @@
             "data": "Tiedot",
             "privacy": "Tietosuoja",
             "profile": "Profiili",
-            "participant_n": "Osallistuja #{{id}}",
+            "participant_n": "Osallistuja {{code}}",
             "analysis": "Analyysi",
             "settings": "Asetukset",
             "concourse": "Concourse"
@@ -2025,7 +2025,7 @@
             },
             "detail": {
                 "participant": "Osallistuja",
-                "participant_n": "Osallistuja #{{id}}",
+                "participant_n": "Osallistuja {{code}}",
                 "not_found": "Osallistujaa ei löytynyt",
                 "title": "Osallistujan profiili",
                 "session": "Istunto",
