@@ -37,17 +37,19 @@ import {
     useLoaderData,
 } from 'react-router-dom';
 import { ApiError } from '../api/client';
-import { BASE_URL, customInstance } from '../api/mutator';
 import { STEP_ROUTES } from '../constants/stepRoutes';
 import { LayoutProvider } from '../contexts/LayoutContext';
 import { useLayoutState } from '../hooks/useLayout';
 import { useStudyConfig } from '../hooks/useStudyConfig';
+import { useDraftAutoSave } from '../hooks/study/useDraftAutoSave';
+import { useMenuClickOutside } from '../hooks/study/useMenuClickOutside';
+import { useProgressReporter } from '../hooks/study/useProgressReporter';
+import { useStudyLocaleSync } from '../hooks/study/useStudyLocaleSync';
 import i18n from '../i18n';
 import ErrorPage from '../pages/ErrorPage';
 import type { StudyStatusType } from '../pages/StudyStatusPage';
 import StudyStatusPage from '../pages/StudyStatusPage';
 import { useConfigStore } from '../store/useConfigStore';
-import { useResponseStore } from '../store/useResponseStore';
 import { useSessionStore } from '../store/useSessionStore';
 import { StudyAccessGate } from '../components/study/StudyAccessGate';
 import HelpOverlay from '../components/study/HelpOverlay';
@@ -63,6 +65,14 @@ const steps = [
     { id: 5, labelKey: 'welcome.steps.post.title', processStepId: 'post' },
 ] as const;
 
+// Hook-driven layout: side effects (progress reporting, draft auto-save,
+// locale sync, click-outside) live in dedicated hooks under
+// `frontend/src/hooks/study/`. The residual cognitive complexity is in the
+// JSX shell — early-return waterfall (config loading / errors / status / gate /
+// stale-session) plus the desktop stepper render. This matches the
+// documented exception in CLAUDE.md (precedent: AnalysisPage,
+// StudyDesignPage, RecruitmentPage, ConcourseDetailPage).
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell of a hook-driven layout
 const StudyLayoutContent: React.FC = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
@@ -82,136 +92,9 @@ const StudyLayoutContent: React.FC = () => {
     const sessionLanguage = useSessionStore((state) => state.language);
     const isPilotMode = useSessionStore((state) => state.isPilotMode);
 
-    // Fire-and-forget progress tracking: report step advances to backend
-    const lastReportedStepRef = useRef(0);
-    useEffect(() => {
-        const unsub = useSessionStore.subscribe((state, prevState) => {
-            const step = state.maxReachedStep;
-            if (
-                step > prevState.maxReachedStep &&
-                step > lastReportedStepRef.current &&
-                !state.isPilotMode &&
-                state.token &&
-                slug
-            ) {
-                lastReportedStepRef.current = step;
-                customInstance({
-                    url: `/api/study/${slug}/progress`,
-                    method: 'PATCH',
-                    data: { session_token: state.token, step },
-                }).catch(() => {
-                    // Silent failure — participant experience is unaffected
-                });
-            }
-        });
-        return unsub;
-    }, [slug]);
-
-    // Debounced draft auto-save to backend
-    const draftSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const [draftSaveStatus, setDraftSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>(
-        'idle'
-    );
-    const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    /** Returns the session token when draft-saving is allowed, or null to skip. */
-    const getDraftSaveToken = useCallback(() => {
-        const session = useSessionStore.getState();
-        if (
-            !session.token ||
-            session.isPilotMode ||
-            session.isCompleted ||
-            session.isSubmitting ||
-            !slug
-        )
-            return null;
-        return session.token;
-    }, [slug]);
-
-    useEffect(() => {
-        const unsub = useResponseStore.subscribe(() => {
-            const token = getDraftSaveToken();
-            if (!token) return;
-
-            if (draftSaveTimerRef.current) clearTimeout(draftSaveTimerRef.current);
-            draftSaveTimerRef.current = setTimeout(() => {
-                const freshToken = getDraftSaveToken();
-                if (!freshToken) return;
-                const { presort, rough, qsort, postsort } = useResponseStore.getState();
-                setDraftSaveStatus('saving');
-                customInstance({
-                    url: `/api/study/${slug}/save-draft`,
-                    method: 'PUT',
-                    data: {
-                        session_token: freshToken,
-                        draft_responses: { presort, rough, qsort, postsort },
-                    },
-                })
-                    .then(() => {
-                        setDraftSaveStatus('saved');
-                        if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
-                        saveStatusTimerRef.current = setTimeout(
-                            () => setDraftSaveStatus('idle'),
-                            3000
-                        );
-                    })
-                    .catch(() => {
-                        setDraftSaveStatus('error');
-                        if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
-                        saveStatusTimerRef.current = setTimeout(
-                            () => setDraftSaveStatus('idle'),
-                            5000
-                        );
-                    });
-            }, 5000);
-        });
-
-        // Helper: build draft save payload
-        const buildDraftPayload = () => {
-            const token = getDraftSaveToken();
-            if (!token) return null;
-            const { presort, rough, qsort, postsort } = useResponseStore.getState();
-            return {
-                url: `${BASE_URL}/api/study/${slug}/save-draft`,
-                body: JSON.stringify({
-                    session_token: token,
-                    draft_responses: { presort, rough, qsort, postsort },
-                }),
-            };
-        };
-
-        // Flush draft on page unload
-        const handleBeforeUnload = () => {
-            if (draftSaveTimerRef.current) clearTimeout(draftSaveTimerRef.current);
-            const payload = buildDraftPayload();
-            if (!payload) return;
-            fetch(payload.url, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: payload.body,
-                keepalive: true,
-            }).catch(() => {});
-        };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-
-        return () => {
-            unsub();
-            window.removeEventListener('beforeunload', handleBeforeUnload);
-            if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
-            // Flush (not discard) any pending draft save on unmount
-            if (draftSaveTimerRef.current) {
-                clearTimeout(draftSaveTimerRef.current);
-                const payload = buildDraftPayload();
-                if (payload) {
-                    customInstance({
-                        url: `/api/study/${slug}/save-draft`,
-                        method: 'PUT',
-                        data: JSON.parse(payload.body),
-                    }).catch(() => {});
-                }
-            }
-        };
-    }, [slug, getDraftSaveToken]);
+    // Fire-and-forget step-progress reporting + debounced draft auto-save.
+    useProgressReporter(slug);
+    const { draftSaveStatus } = useDraftAutoSave(slug);
 
     const location = useLocation();
     const { headerAction } = useLayoutState();
@@ -219,13 +102,23 @@ const StudyLayoutContent: React.FC = () => {
     const [isStepMenuOpen, setIsStepMenuOpen] = useState(false);
     const [isResumeMenuOpen, setIsResumeMenuOpen] = useState(false);
     const [linkCopied, setLinkCopied] = useState(false);
-    const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const langMenuRef = useRef<HTMLDivElement>(null);
     const stepMenuRef = useRef<HTMLDivElement>(null);
     const resumeMenuRef = useRef<HTMLDivElement>(null);
     const resumeButtonRef = useRef<HTMLButtonElement>(null);
     const resumeInputRef = useRef<HTMLInputElement>(null);
     const resumeCode = useSessionStore((state) => state.resumeCode);
+
+    const { copyTimeoutRef } = useMenuClickOutside({
+        langMenuRef,
+        stepMenuRef,
+        resumeMenuRef,
+        resumeButtonRef,
+        setIsLangMenuOpen,
+        setIsStepMenuOpen,
+        setIsResumeMenuOpen,
+        setLinkCopied,
+    });
 
     // Network Status
     const { isOnline } = useNetworkStatus();
@@ -262,35 +155,8 @@ const StudyLayoutContent: React.FC = () => {
         }
     }, [slug, isCompleted, studySlug]);
 
-    // Close menu when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
-                setIsLangMenuOpen(false);
-            }
-            if (stepMenuRef.current && !stepMenuRef.current.contains(event.target as Node)) {
-                setIsStepMenuOpen(false);
-            }
-            if (resumeMenuRef.current && !resumeMenuRef.current.contains(event.target as Node)) {
-                if (copyTimeoutRef.current) {
-                    clearTimeout(copyTimeoutRef.current);
-                    copyTimeoutRef.current = null;
-                }
-                setIsResumeMenuOpen(false);
-                setLinkCopied(false);
-                resumeButtonRef.current?.focus();
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            if (copyTimeoutRef.current) {
-                clearTimeout(copyTimeoutRef.current);
-                copyTimeoutRef.current = null;
-            }
-        };
-    }, []);
-
+    // copyTimeoutRef and resumeButtonRef are stable refs; setters are stable too.
+    // biome-ignore lint/correctness/useExhaustiveDependencies: stable refs/setters
     const closeResumeMenu = useCallback(() => {
         setIsResumeMenuOpen(false);
         setLinkCopied(false);
@@ -301,69 +167,15 @@ const StudyLayoutContent: React.FC = () => {
         resumeButtonRef.current?.focus();
     }, []);
 
-    // URL Language Override (e.g. ?lang=fr)
-    useEffect(() => {
-        const urlLang = new URLSearchParams(location.search).get('lang');
-        const availableLangs = config?.available_languages || ['en'];
-
-        if (urlLang && availableLangs.includes(urlLang) && urlLang !== sessionLanguage) {
-            // Apply language immediately
-            i18n.changeLanguage(urlLang);
-            useSessionStore.getState().setLanguage(urlLang);
-        }
-    }, [location.search, config?.available_languages, sessionLanguage]);
-
-    // Sync i18n and HTML lang with Store
-    useEffect(() => {
-        if (sessionLanguage) {
-            if (sessionLanguage !== i18n.language) {
-                i18n.changeLanguage(sessionLanguage);
-            }
-            document.documentElement.lang = sessionLanguage;
-        }
-    }, [sessionLanguage]);
-
-    // Browser Tab Title Management
-    useEffect(() => {
-        if (config?.title) {
-            document.title = `${config.title} | ${t('layout.title', 'Qualis')}`;
-        } else {
-            document.title = t('layout.title', 'Qualis');
-        }
-    }, [config?.title, t]);
-
-    // Welcome-back toast for returning same-browser users (skipped when
-    // arriving via ResumePage, which shows its own "restored" toast).
-    // Only fires when maxReachedStep was already > 1 at mount (persisted from
-    // a previous visit), not when the user first progresses past step 1.
-    // Waits for i18n language to match sessionLanguage so the toast is localized.
-    const mountMaxStep = useRef(maxReachedStep);
-    const hasShownWelcomeBack = useRef(false);
-    const langReady = !sessionLanguage || i18n.language === sessionLanguage;
-    useEffect(() => {
-        if (
-            !hasShownWelcomeBack.current &&
-            langReady &&
-            mountMaxStep.current > 1 &&
-            hasConsented &&
-            !isCompleted &&
-            !isPilotMode &&
-            maxReachedStep > 1
-        ) {
-            hasShownWelcomeBack.current = true;
-            try {
-                if (sessionStorage.getItem('qualis-resumed-via-link') === '1') {
-                    sessionStorage.removeItem('qualis-resumed-via-link');
-                    return; // ResumePage already showed a toast
-                }
-            } catch {
-                // Ignore storage errors
-            }
-            toast.success(
-                t('resume.welcome_back', 'Welcome back! Your progress has been restored.')
-            );
-        }
-    }, [hasConsented, isCompleted, isPilotMode, langReady, maxReachedStep, t]);
+    // URL ?lang= override + i18n + <html lang> + browser title + welcome-back toast.
+    useStudyLocaleSync({
+        config,
+        sessionLanguage,
+        hasConsented,
+        isCompleted,
+        isPilotMode,
+        maxReachedStep,
+    });
 
     const changeLanguage = (lng: string) => {
         // Sync store (this will trigger config refetch)
@@ -701,6 +513,7 @@ const StudyLayoutContent: React.FC = () => {
                         data-testid="stepper-container"
                         className="flex items-center gap-1 lg:gap-2 min-w-0"
                     >
+                        {/* biome-ignore lint/complexity/noExcessiveCognitiveComplexity: stepper item rendering — many visual states (current/completed/upcoming/reachable/clickable) interact in JSX */}
                         {visibleSteps.map((step, index) => {
                             const status =
                                 currentStep === step.id
