@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -48,6 +49,8 @@ from app.services.memo_service import MemoService
 # memo/templates — so it carries its own /admin prefix and registers
 # at /api in main.py.
 router = APIRouter(prefix="/admin", tags=["memos"])
+
+logger = logging.getLogger(__name__)
 
 
 # ---------- helpers ---------------------------------------------------------
@@ -483,5 +486,12 @@ async def _dispatch_mention_emails(
                 mentioner_name=mentioner.email,
             )
         except Exception:
-            # Logged inside the helper; don't let one bad address kill the batch.
-            pass
+            # Don't let one bad address kill the batch — but record a stack so a
+            # bug (e.g. malformed template) doesn't hide behind the helper's
+            # log.error. logger.exception preserves the traceback.
+            logger.exception(
+                "Memo mention email failed (recipient=%s, parent_type=%s, parent_id=%s)",
+                u.email,
+                parent_type.value,
+                parent_id,
+            )

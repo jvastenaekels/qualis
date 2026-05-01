@@ -1231,22 +1231,32 @@ class TestBootstrapStability:
 
     def test_pathological_iterations_handled(self):
         """A degenerate dataset (all-zero columns) should not raise; n_converged
-        records how many iterations produced a usable factor solution."""
+        records how many iterations produced a usable factor solution.
+
+        The expected divide-by-zero warnings from numpy are scoped via
+        ``np.errstate`` inside ``compute_bootstrap_stability``; we promote any
+        leaking RuntimeWarning to an error here so a future numpy warning
+        outside that scope surfaces as a test failure rather than CI noise.
+        """
+        import warnings
+
         dataset = np.zeros((6, 4), dtype=np.float64)
         # Make one column slightly varying so build_sort_matrix-equivalent
         # filtering would normally exclude it; here we feed the matrix
         # directly to the bootstrap, so iterations may fail at the
         # correlation step and be skipped gracefully.
         dataset[0, 0] = 1.0
-        res = compute_bootstrap_stability(
-            dataset,
-            50,
-            n_factors=2,
-            extraction="pca",
-            rotation="varimax",
-            manual_rotations=None,
-            grid_config=None,
-        )
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", RuntimeWarning)
+            res = compute_bootstrap_stability(
+                dataset,
+                50,
+                n_factors=2,
+                extraction="pca",
+                rotation="varimax",
+                manual_rotations=None,
+                grid_config=None,
+            )
         assert res["n_iterations"] == 50
         # Many or all iterations may fail; the call must not raise.
         assert 0 <= res["n_converged"] <= 50

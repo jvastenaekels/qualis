@@ -1120,16 +1120,22 @@ def compute_bootstrap_stability(
         cols = rng.integers(0, n_participants, size=n_participants)
         boot = dataset[:, cols]
         try:
-            res = run_analysis(
-                boot,
-                n_factors=n_factors,
-                extraction=extraction,
-                rotation=rotation,
-                flagging="auto",
-                manual_flags_matrix=None,
-                manual_rotations=manual_rotations,
-                grid_config=grid_config,
-            )
+            # Pathological resamples (e.g. all-zero columns from a degenerate
+            # dataset) trigger 0/0 inside np.corrcoef. Those iterations are
+            # filtered out below by the LinAlgError/ValueError catch; scope the
+            # divide-by-zero RuntimeWarning here so a future *unexpected* numpy
+            # warning elsewhere stays visible in the test output.
+            with np.errstate(divide="ignore", invalid="ignore"):
+                res = run_analysis(
+                    boot,
+                    n_factors=n_factors,
+                    extraction=extraction,
+                    rotation=rotation,
+                    flagging="auto",
+                    manual_flags_matrix=None,
+                    manual_rotations=manual_rotations,
+                    grid_config=grid_config,
+                )
         except (ValueError, np.linalg.LinAlgError):
             # Skip iterations whose resample is too degenerate to factor —
             # tracked via n_converged so the caller can flag a low-quality

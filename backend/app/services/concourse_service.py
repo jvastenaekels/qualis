@@ -711,7 +711,10 @@ class ConcourseService:
         stale: list[StaleStatementEntry] = []
         for s in linked_statements:
             source_id = s.source_concourse_item_id
-            assert source_id is not None  # guaranteed by query filter
+            if source_id is None:
+                # SQL filter guarantees non-null at query time; defensive skip if
+                # session state diverges (and survives -O which strips asserts).
+                continue
             item = items_by_id.get(source_id)
             if item is None:
                 # Source was deleted

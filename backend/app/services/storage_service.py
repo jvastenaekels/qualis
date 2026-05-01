@@ -85,8 +85,10 @@ class StorageService:
             ),
         )
         # settings.S3_BUCKET_NAME is str | None; the all() guard above guarantees
-        # it is non-None at this point (raises ValueError otherwise).
-        assert settings.S3_BUCKET_NAME is not None
+        # it is non-None at this point. Use an explicit raise (not assert) so the
+        # narrow holds even if Python is run with -O.
+        if settings.S3_BUCKET_NAME is None:
+            raise RuntimeError("S3_BUCKET_NAME unset after S3 configuration validation")
         self.bucket_name: str = settings.S3_BUCKET_NAME
 
     async def upload_audio(
