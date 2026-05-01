@@ -107,7 +107,7 @@ test.describe('Admin Flow (Real Backend)', () => {
 
         // Go to Data tab to see results.
         // Sidebar link click was unreliable (multiple links match /data/i,
-        // including "Data lifecycle"); navigate directly via URL.
+        // including "Data privacy"); navigate directly via URL.
         const projectSlug = testDb.getWorkspaceSlug();
         await page.goto(`/app/${projectSlug}/studies/${slug}/data`);
 

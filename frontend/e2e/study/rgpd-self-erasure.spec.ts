@@ -8,7 +8,7 @@
  *   - Clicks "Request my data deletion"
  *   - Confirms in the AlertDialog
  *   - Sees the success toast and the "personal data has been removed" notice
- *   - Admin opens the data-inventory lifecycle page and sees anonymised = 1
+ *   - Admin opens the data-inventory privacy page and sees anonymised = 1
  *
  * Strategy: We seed a completed participant via the API, capturing the
  * session_token. We then inject the correct Zustand-persist state into
@@ -28,7 +28,7 @@ test.setTimeout(120_000);
 
 test.describe
     .serial('GDPR Art. 17 self-erasure', () => {
-        test('participant can erase their own data; admin lifecycle page reflects anonymised=1', async ({
+        test('participant can erase their own data; admin privacy page reflects anonymised=1', async ({
             page,
             testDb,
             authToken,
@@ -151,7 +151,7 @@ test.describe
             await expect(deleteButton).not.toBeVisible({ timeout: 5_000 });
 
             // ------------------------------------------------------------------ //
-            // 8. Admin: verify anonymised count = 1 on the lifecycle page          //
+            // 8. Admin: verify anonymised count = 1 on the privacy page            //
             // ------------------------------------------------------------------ //
             // Open a fresh page (shares the browser context but starts with a clean
             // navigation) so the admin session doesn't collide with the participant.
@@ -160,8 +160,8 @@ test.describe
             // Inject admin session into the new page
             await testDb.loginToAdminUI(adminPage);
 
-            await adminPage.goto(`/app/${workspaceSlug}/studies/${studySlug}/lifecycle`);
-            await expect(adminPage).toHaveURL(/lifecycle/, { timeout: 15_000 });
+            await adminPage.goto(`/app/${workspaceSlug}/studies/${studySlug}/privacy`);
+            await expect(adminPage).toHaveURL(/privacy/, { timeout: 15_000 });
 
             // Wait for the data inventory to load — "Participants snapshot" card
             await expect(adminPage.getByText(/participants snapshot/i)).toBeVisible({
