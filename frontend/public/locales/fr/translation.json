@@ -1025,7 +1025,9 @@
                 "clear_date": "Effacer la date",
                 "save_button": "Enregistrer les règles d'accès",
                 "save_success": "Règles d'accès mises à jour",
-                "save_error": "Échec de la mise à jour des règles d'accès"
+                "save_error": "Échec de la mise à jour des règles d'accès",
+                "non_draft_notice": "Hors brouillon, seule la fenêtre de collecte est modifiable. Repassez l'étude en brouillon pour modifier les autres règles d'accès.",
+                "archived_notice": "Cette étude est archivée. Les règles d'accès sont en lecture seule."
             },
             "new_link": "Nouveau lien d'accès",
             "create_title": "Créer des liens d'accès",

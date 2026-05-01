@@ -271,14 +271,49 @@ async def test_update_study_grid_config_blocked_when_participants_exist(
 
 
 @pytest.mark.asyncio
-async def test_update_study_active_state_raises_validation_error(
+async def test_update_study_active_state_rejects_non_window_fields(
     db: AsyncSession, active_study: Study
 ):
-    """update_study on a non-draft study must raise ValidationError."""
+    """Active studies reject changes to fields outside the window whitelist."""
     patch = StudyUpdate(show_statement_codes=True)
 
     with pytest.raises(ValidationError, match="Cannot update study in"):
         await StudyService.update_study(db, active_study, patch)
+
+
+@pytest.mark.asyncio
+async def test_update_study_active_state_allows_collection_window(
+    db: AsyncSession, active_study: Study
+):
+    """start_date / end_date may be tweaked while the study is active."""
+    from datetime import datetime, timezone
+
+    new_start = datetime(2026, 6, 1, tzinfo=timezone.utc)
+    new_end = datetime(2026, 6, 30, tzinfo=timezone.utc)
+    patch = StudyUpdate(start_date=new_start, end_date=new_end)
+
+    updated = await StudyService.update_study(db, active_study, patch)
+
+    assert updated.start_date == new_start
+    assert updated.end_date == new_end
+    assert updated.state == StudyState.active
+
+
+@pytest.mark.asyncio
+async def test_update_study_archived_blocks_collection_window(
+    db: AsyncSession, seed_study: Study
+):
+    """Archived studies are read-only — even the window whitelist is denied."""
+    from datetime import datetime, timezone
+
+    seed_study.state = StudyState.archived
+    await db.commit()
+    await db.refresh(seed_study)
+
+    patch = StudyUpdate(start_date=datetime(2026, 6, 1, tzinfo=timezone.utc))
+
+    with pytest.raises(ValidationError, match="Cannot update study in archived"):
+        await StudyService.update_study(db, seed_study, patch)
 
 
 # ---------------------------------------------------------------------------

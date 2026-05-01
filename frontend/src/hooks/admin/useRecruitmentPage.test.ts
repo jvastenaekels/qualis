@@ -370,6 +370,32 @@ describe('useRecruitmentPage', () => {
         expect(cast.end_date).toBeNull();
     });
 
+    it('onAccessRulesSubmit omits access_password when the study is not in draft', async () => {
+        mockUseLoaderData.mockReturnValue({
+            links: mockLinks,
+            study: { ...mockStudy, state: 'active' } as StudyRead,
+            slug: 'demo-study',
+        });
+
+        const { result } = renderHook(() => useRecruitmentPage(), {
+            wrapper: AllTheProviders,
+        });
+
+        await act(async () => {
+            await result.current.onAccessRulesSubmit({
+                passwordEnabled: true,
+                accessPassword: 'still-secret',
+                startDate: '2026-05-01T10:00',
+                endDate: '',
+            });
+        });
+
+        const cast = mockUpdateStudy.mock.calls[0][1] as Record<string, unknown>;
+        expect('access_password' in cast).toBe(false);
+        expect(typeof cast.start_date).toBe('string');
+        expect(cast.end_date).toBeNull();
+    });
+
     it('exposes slugForm + accessForm with default values aligned to the loader study', () => {
         const studyWithRules = {
             ...mockStudy,

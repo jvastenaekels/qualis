@@ -329,6 +329,28 @@ const RecruitmentPage = () => {
                         onSubmit={accessForm.handleSubmit(onAccessRulesSubmit)}
                         className="space-y-6"
                     >
+                        {isSlugLocked && !isArchived && (
+                            <div className="flex items-start gap-2 p-3 rounded-xl bg-amber-50 border border-amber-100 text-xs text-amber-700">
+                                <Info className="size-4 shrink-0 mt-0.5" />
+                                <p>
+                                    {t(
+                                        'admin.recruitment.access_rules.non_draft_notice',
+                                        'Outside draft, only the collection window can be edited. Switch the study back to draft to change other access rules.'
+                                    )}
+                                </p>
+                            </div>
+                        )}
+                        {isArchived && (
+                            <div className="flex items-start gap-2 p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs text-slate-600">
+                                <Info className="size-4 shrink-0 mt-0.5" />
+                                <p>
+                                    {t(
+                                        'admin.recruitment.access_rules.archived_notice',
+                                        'This study is archived. Access rules are read-only.'
+                                    )}
+                                </p>
+                            </div>
+                        )}
                         {/* Password Protection */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-100">

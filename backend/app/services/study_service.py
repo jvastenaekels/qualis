@@ -198,12 +198,24 @@ class StudyService:
                     "before changing this setting."
                 )
 
-        # Draft-only updates
+        # Field-level state guard.
+        # Archived is fully read-only. In other non-draft states (active /
+        # paused / closed) only the collection-window dates may be tweaked —
+        # extending or contracting the window is a legitimate operational
+        # need that does not require a state round-trip back to draft.
         if study.state != StudyState.draft:
-            raise ValidationError(
-                f"Cannot update study in {study.state.value} state. "
-                "Switch it back to draft first."
-            )
+            update_data = study_update.model_dump(exclude_unset=True)
+            attempted = set(update_data) - {"last_updated_at"}
+            if study.state == StudyState.archived:
+                allowed: set[str] = set()
+            else:
+                allowed = {"start_date", "end_date"}
+            disallowed = attempted - allowed
+            if disallowed:
+                raise ValidationError(
+                    f"Cannot update study in {study.state.value} state. "
+                    "Switch it back to draft first."
+                )
 
         # Optimistic locking
         if study_update.last_updated_at and study.updated_at:

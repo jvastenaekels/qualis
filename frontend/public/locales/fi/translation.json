@@ -1025,7 +1025,9 @@
                 "clear_date": "Tyhjennä päivämäärä",
                 "save_button": "Tallenna pääsysäännöt",
                 "save_success": "Pääsysäännöt päivitetty",
-                "save_error": "Pääsysääntöjen päivitys epäonnistui"
+                "save_error": "Pääsysääntöjen päivitys epäonnistui",
+                "non_draft_notice": "Luonnostilan ulkopuolella vain keruuikkunaa voi muokata. Palauta tutkimus luonnostilaan muiden pääsysääntöjen muuttamiseksi.",
+                "archived_notice": "Tämä tutkimus on arkistoitu. Pääsysäännöt ovat vain luettavissa."
             },
             "new_link": "Uusi pääsulinkki",
             "create_title": "Luo pääsulinkejä",

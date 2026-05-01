@@ -349,10 +349,16 @@ export function useRecruitmentPage(): RecruitmentPageApi {
             try {
                 const update: Record<string, unknown> = {};
 
-                if (!data.passwordEnabled) {
-                    update.access_password = null;
-                } else if (data.accessPassword) {
-                    update.access_password = data.accessPassword;
+                // Password edits are only valid in draft state; outside draft
+                // the backend whitelist accepts only start_date / end_date so
+                // we omit the field entirely instead of sending a no-op null
+                // that would trigger a 422.
+                if (!isSlugLocked) {
+                    if (!data.passwordEnabled) {
+                        update.access_password = null;
+                    } else if (data.accessPassword) {
+                        update.access_password = data.accessPassword;
+                    }
                 }
 
                 update.start_date = data.startDate ? new Date(data.startDate).toISOString() : null;
@@ -379,7 +385,7 @@ export function useRecruitmentPage(): RecruitmentPageApi {
                 );
             }
         },
-        [slug, queryClient, revalidator, t]
+        [slug, isSlugLocked, queryClient, revalidator, t]
     );
 
     return {
