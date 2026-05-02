@@ -189,6 +189,25 @@
             "two_factor_invalid": "Code invalide. Réessayez.",
             "lost_2fa_link": "Vous avez perdu l'accès à votre 2FA ?"
         },
+        "twofa": {
+            "recovery": {
+                "title": "Vous avez perdu l'accès à votre authentification à deux facteurs ?",
+                "body": "Saisissez l'adresse e-mail de votre compte. Si la double authentification est activée, nous vous enverrons un lien pour la désactiver.",
+                "submit": "Envoyer le lien de désactivation",
+                "success": "Si l'adresse e-mail existe et que la 2FA est activée, un lien de désactivation est en route."
+            },
+            "disable": {
+                "title": "Désactiver l'authentification à deux facteurs",
+                "warning": "En cliquant sur le bouton ci-dessous, vous supprimez définitivement le second facteur de ce compte. Vous pourrez vous connecter avec uniquement votre mot de passe jusqu'à ce que vous réactiviez la 2FA.",
+                "warning_attacker": "Si vous n'êtes PAS à l'origine de cette demande, fermez cette page et changez immédiatement votre mot de passe.",
+                "confirm_button": "Oui, désactiver l'authentification à deux facteurs",
+                "loading": "Désactivation…",
+                "success": "L'authentification à deux facteurs est désormais désactivée. Vous pouvez vous connecter.",
+                "error_consumed": "Ce lien a déjà été utilisé.",
+                "error_expired": "Ce lien a expiré ou est invalide.",
+                "missing_token": "Aucun jeton dans l'URL."
+            }
+        },
         "password_reset": {
             "request_title": "Réinitialiser votre mot de passe",
             "request_body": "Entrez votre adresse e-mail et nous vous enverrons un lien de réinitialisation.",

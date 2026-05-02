@@ -515,6 +515,90 @@
         }
       }
     },
+    "/api/2fa/disable/request": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Twofa Disable Request",
+        "description": "Self-serve 2FA disable \u2014 request the link.\n\nAnti-enum: returns 200 regardless of whether the user exists or has\n2FA enabled. A bcrypt call equalises latency on the no-op path so the\nresponse time doesn't leak account state.",
+        "operationId": "twofa_disable_request_api_2fa_disable_request_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/2fa/disable/confirm": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Twofa Disable Confirm",
+        "description": "Self-serve 2FA disable \u2014 confirm via single-use JWT.\n\nSingle-use enforced via the consumed_email_tokens table (jti PK).\nThe mark_jti_consumed call is atomic \u2014 concurrent attempts on the\nsame token: exactly one inserts, the other hits a PK collision and\nwe map it to 409.\n\nThe jti is consumed BEFORE the user lookup so that an attacker who\nsomehow obtained a token cannot probe for valid email addresses by\nreplaying it; whether or not the user exists, the token is burned.",
+        "operationId": "twofa_disable_confirm_api_2fa_disable_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailTokenSubmit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/studies": {
       "post": {
         "tags": [

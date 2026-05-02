@@ -189,6 +189,25 @@
             "two_factor_invalid": "Virheellinen koodi. Yritä uudelleen.",
             "lost_2fa_link": "Onko 2FA-pääsysi kadonnut?"
         },
+        "twofa": {
+            "recovery": {
+                "title": "Onko kaksivaiheisen tunnistautumisen pääsysi kadonnut?",
+                "body": "Syötä tilisi sähköpostiosoite. Jos kaksivaiheinen tunnistautuminen on käytössä tällä tilillä, lähetämme sinulle linkin sen poistamiseksi käytöstä.",
+                "submit": "Lähetä poistolinkki",
+                "success": "Jos sähköpostiosoite on olemassa ja sillä on 2FA, poistolinkki on matkalla."
+            },
+            "disable": {
+                "title": "Poista kaksivaiheinen tunnistautuminen käytöstä",
+                "warning": "Alla olevan painikkeen napsauttaminen poistaa toisen tunnistustekijän pysyvästi tältä tililtä. Voit kirjautua sisään pelkällä salasanalla, kunnes otat 2FA:n uudelleen käyttöön.",
+                "warning_attacker": "Jos et tehnyt tätä pyyntöä, sulje tämä sivu ja vaihda salasanasi välittömästi.",
+                "confirm_button": "Kyllä, poista kaksivaiheinen tunnistautuminen käytöstä",
+                "loading": "Poistetaan käytöstä…",
+                "success": "Kaksivaiheinen tunnistautuminen on nyt poistettu käytöstä. Voit kirjautua sisään.",
+                "error_consumed": "Tämä linkki on jo käytetty.",
+                "error_expired": "Tämä linkki on vanhentunut tai virheellinen.",
+                "missing_token": "URL-osoitteessa ei ole tunnusta."
+            }
+        },
         "password_reset": {
             "request_title": "Nollaa salasanasi",
             "request_body": "Syötä sähköpostiosoitteesi ja lähetämme sinulle nollauslinkin.",

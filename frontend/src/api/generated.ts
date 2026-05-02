@@ -1298,6 +1298,189 @@ export const usePasswordResetConfirmApiPasswordResetConfirmPost = <
 };
 
 /**
+ * Self-serve 2FA disable — request the link.
+
+Anti-enum: returns 200 regardless of whether the user exists or has
+2FA enabled. A bcrypt call equalises latency on the no-op path so the
+response time doesn't leak account state.
+ * @summary Twofa Disable Request
+ */
+export const twofaDisableRequestApi2faDisableRequestPost = (
+    emailRequest: EmailRequest,
+    signal?: AbortSignal
+) => {
+    return customInstance<AckResponse>({
+        url: `/api/2fa/disable/request`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: emailRequest,
+        signal,
+    });
+};
+
+export const getTwofaDisableRequestApi2faDisableRequestPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof twofaDisableRequestApi2faDisableRequestPost>>,
+        TError,
+        { data: EmailRequest },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof twofaDisableRequestApi2faDisableRequestPost>>,
+    TError,
+    { data: EmailRequest },
+    TContext
+> => {
+    const mutationKey = ['twofaDisableRequestApi2faDisableRequestPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof twofaDisableRequestApi2faDisableRequestPost>>,
+        { data: EmailRequest }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return twofaDisableRequestApi2faDisableRequestPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type TwofaDisableRequestApi2faDisableRequestPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof twofaDisableRequestApi2faDisableRequestPost>>
+>;
+export type TwofaDisableRequestApi2faDisableRequestPostMutationBody = EmailRequest;
+export type TwofaDisableRequestApi2faDisableRequestPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Twofa Disable Request
+ */
+export const useTwofaDisableRequestApi2faDisableRequestPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof twofaDisableRequestApi2faDisableRequestPost>>,
+            TError,
+            { data: EmailRequest },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof twofaDisableRequestApi2faDisableRequestPost>>,
+    TError,
+    { data: EmailRequest },
+    TContext
+> => {
+    const mutationOptions = getTwofaDisableRequestApi2faDisableRequestPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Self-serve 2FA disable — confirm via single-use JWT.
+
+Single-use enforced via the consumed_email_tokens table (jti PK).
+The mark_jti_consumed call is atomic — concurrent attempts on the
+same token: exactly one inserts, the other hits a PK collision and
+we map it to 409.
+
+The jti is consumed BEFORE the user lookup so that an attacker who
+somehow obtained a token cannot probe for valid email addresses by
+replaying it; whether or not the user exists, the token is burned.
+ * @summary Twofa Disable Confirm
+ */
+export const twofaDisableConfirmApi2faDisableConfirmPost = (
+    emailTokenSubmit: EmailTokenSubmit,
+    signal?: AbortSignal
+) => {
+    return customInstance<AckResponse>({
+        url: `/api/2fa/disable/confirm`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: emailTokenSubmit,
+        signal,
+    });
+};
+
+export const getTwofaDisableConfirmApi2faDisableConfirmPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof twofaDisableConfirmApi2faDisableConfirmPost>>,
+        TError,
+        { data: EmailTokenSubmit },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof twofaDisableConfirmApi2faDisableConfirmPost>>,
+    TError,
+    { data: EmailTokenSubmit },
+    TContext
+> => {
+    const mutationKey = ['twofaDisableConfirmApi2faDisableConfirmPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof twofaDisableConfirmApi2faDisableConfirmPost>>,
+        { data: EmailTokenSubmit }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return twofaDisableConfirmApi2faDisableConfirmPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type TwofaDisableConfirmApi2faDisableConfirmPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof twofaDisableConfirmApi2faDisableConfirmPost>>
+>;
+export type TwofaDisableConfirmApi2faDisableConfirmPostMutationBody = EmailTokenSubmit;
+export type TwofaDisableConfirmApi2faDisableConfirmPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Twofa Disable Confirm
+ */
+export const useTwofaDisableConfirmApi2faDisableConfirmPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof twofaDisableConfirmApi2faDisableConfirmPost>>,
+            TError,
+            { data: EmailTokenSubmit },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof twofaDisableConfirmApi2faDisableConfirmPost>>,
+    TError,
+    { data: EmailTokenSubmit },
+    TContext
+> => {
+    const mutationOptions = getTwofaDisableConfirmApi2faDisableConfirmPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
  * Create a new study in the active project.
 
 Requires Owner or Researcher project role.
@@ -14003,6 +14186,28 @@ export const getPasswordResetConfirmApiPasswordResetConfirmPostResponseMock = (
     ...overrideResponse,
 });
 
+export const getTwofaDisableRequestApi2faDisableRequestPostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getTwofaDisableConfirmApi2faDisableConfirmPostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
 export const getCreateStudyApiAdminStudiesPostResponseMock = (
     overrideResponse: Partial<StudyRead> = {}
 ): StudyRead => ({
@@ -18728,6 +18933,58 @@ export const getPasswordResetConfirmApiPasswordResetConfirmPostMockHandler = (
     );
 };
 
+export const getTwofaDisableRequestApi2faDisableRequestPostMockHandler = (
+    overrideResponse?:
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/2fa/disable/request',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getTwofaDisableRequestApi2faDisableRequestPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getTwofaDisableConfirmApi2faDisableConfirmPostMockHandler = (
+    overrideResponse?:
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/2fa/disable/confirm',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getTwofaDisableConfirmApi2faDisableConfirmPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
 export const getCreateStudyApiAdminStudiesPostMockHandler = (
     overrideResponse?:
         | StudyRead
@@ -21224,6 +21481,8 @@ export const getQualisAPIMock = () => [
     getResendVerificationApiEmailVerifyResendPostMockHandler(),
     getPasswordResetRequestApiPasswordResetRequestPostMockHandler(),
     getPasswordResetConfirmApiPasswordResetConfirmPostMockHandler(),
+    getTwofaDisableRequestApi2faDisableRequestPostMockHandler(),
+    getTwofaDisableConfirmApi2faDisableConfirmPostMockHandler(),
     getCreateStudyApiAdminStudiesPostMockHandler(),
     getListStudiesApiAdminStudiesGetMockHandler(),
     getGetStudyApiAdminStudiesSlugGetMockHandler(),
