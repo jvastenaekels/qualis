@@ -93,6 +93,11 @@ async def create_project(
             detail="Project with this slug already exists",
         )
 
+    # Quota gate: enforce MAX_PROJECTS_AS_OWNER (T5)
+    from app.services.quotas import assert_can_create_owned_project
+
+    await assert_can_create_owned_project(db, current_user)
+
     try:
         # Create Project
         project = Project(
@@ -425,6 +430,8 @@ async def create_invitation(
     invitation_in: ProjectInvitationCreate,
     background_tasks: BackgroundTasks,
     project: Project = Depends(check_project_permission(ProjectRole.owner)),
+    current_user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
 ) -> InvitationLink:
     """
     Invite a user to the project.
@@ -434,6 +441,11 @@ async def create_invitation(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="OWNER_ROLE_IMMUTABLE",
         )
+
+    # Quota gate: enforce MAX_MEMBERS_PER_PROJECT (T5)
+    from app.services.quotas import assert_can_add_member
+
+    await assert_can_add_member(db, project.id, current_user)
 
     token = create_invitation_token(
         email=invitation_in.email,
