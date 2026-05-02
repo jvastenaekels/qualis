@@ -17,7 +17,10 @@ The dashboard is scoped to a single study at a time. The active study is selecte
 | Recruitment | `/admin/studies/{slug}/recruitment` | Access links, conversion funnel |
 | Data | `/admin/studies/{slug}/data` | Participant table, charts, individual sessions, exports |
 | Analysis | `/admin/studies/{slug}/analysis` | Factor analysis runs, scree plot, results tabs |
+| Members | `/admin/projects/{slug}/members` | Project-level: invitations, roles, removal |
 | Profile | `/admin/profile` | Account settings, 2FA |
+
+A **Memos** drawer is available on every study and concourse page via a toolbar icon (see [Memos](#memos)).
 
 ---
 
@@ -166,6 +169,14 @@ Eigenvalues with a Kaiser reference line at `λ = 1`. Source: `GET /api/admin/st
 | Rotation | Varimax / None | Varimax uses Kaiser normalization. |
 | Flagging | Auto / Manual | Auto-flag threshold: significance at `1.96 / sqrt(n_statements)`, plus dominance (highest loading on a single factor). |
 
+### Explorer panel
+
+Diagnostic block surfaced at the top of the Analysis page. Source: `POST /api/admin/studies/{slug}/analysis/preview-range`.
+
+- **Eigenvalue / variance preview** for a configurable factor-count range (typically 1–10), so you can scan how variance breaks down without committing to a full run per candidate.
+- **Cumulative variance** and **scree-line context** alongside the Kaiser λ = 1 reference.
+- **Recommended factor count** based on the Kaiser criterion, with a manual override that drives the next run.
+
 ### Results tabs
 
 | Tab | Content |
@@ -175,9 +186,65 @@ Eigenvalues with a Kaiser reference line at `λ = 1`. Source: `GET /api/admin/st
 | Statements | Z-scores, factor positions, distinguishing/consensus classifications at p < 0.05, 0.01, 0.001 (Standard Error of Differences). |
 | Characteristics | Eigenvalues, variance explained, composite reliability (Spearman-Brown), factor correlation matrix. |
 
+### Compare
+
+When two analysis runs exist, the Compare bar aligns them via Tucker φ congruence (computed client-side; see `frontend/src/utils/tuckerPhi.ts`).
+
+- **φ matrix**: pairwise congruence between factors of the two runs.
+- **Aligned arrays**: factors of the second run reordered + sign-flipped to maximise congruence with the first.
+- **Delta columns**: per-statement difference between aligned arrays.
+
+Used to verify that minor changes (different N, different rotation, different flagging) produce equivalent factor structures. Threshold rule of thumb: φ ≥ 0.95 = identical, 0.90 ≤ φ < 0.95 = equivalent, φ < 0.90 = the perturbation mattered.
+
+### Factor canvas
+
+A focus-mode view for one factor at a time. The factor array sits on the left; a **voices panel** on the right pulls participant material for the highest-loading flagged participants — post-sort comments, audio playback, distinguishing statements at the column extremes — that you can pin onto the canvas to anchor interpretive claims in specific participant voices. Per-factor researcher notes save back to the run.
+
 Each run is persisted to the audit trail (`AnalysisRun`); past runs are accessible from the history panel and can be reloaded or deleted. Notes on a run are editable; results are immutable.
 
 Discarded participants are excluded automatically. Minimum: 2 non-discarded participants.
+
+---
+
+## Memos
+
+A drawer of structured notes attached to a parent (study or concourse). Surfaced on all admin pages of that parent via a toolbar icon. Source: `GET /api/admin/{studies|concourses}/{id}/memo` and related endpoints.
+
+### Entries
+
+A memo is a list of titled entries, each with a markdown body (up to 10 000 chars). Entries are reorderable and may be added or deleted by any project member with edit rights. The drawer remembers position and read state per user.
+
+### Threaded comments
+
+Each entry has a comment thread. Comments support `@user` mentions stored as a `mentions: int[]` array on the comment; mentioned users see an unread badge on the toolbar icon until they open the drawer. Comments can be marked **resolved** (resolution is reversible) or soft-deleted.
+
+### Templates
+
+The **Methodology memo** template surfaces as a dedicated entry on the Study Designer toolbar — a one-click way to log design decisions next to the controls that produced them. Source: `GET /api/admin/memo/templates`.
+
+### Export
+
+Memos are included in the Research Package export. See [Data Export](../guides/data-export.md).
+
+---
+
+## Members
+
+Project-scoped page (path: `/admin/projects/{slug}/members`). Lists project members with their role and supports invitations and removals. Source: `GET /api/admin/projects/{slug}/members`.
+
+### Member table
+
+| Column | Notes |
+| ------ | ----- |
+| Member | Name + email; current user marked. |
+| Role | `Owner` / `Editor` / `Viewer` (see [API roles](api.md#roles)). Editable inline by Owners via a select. |
+| Actions | Remove member (Owners only; cannot self-remove). |
+
+### Invitations
+
+The **Invite member** dialog accepts an email and role. If SMTP is configured, an email is sent; otherwise a shareable invitation link is shown in a confirmation dialog. Pending invitations are listed alongside the member table.
+
+This page replaces the previous embedded members list inside Project Settings.
 
 ---
 
