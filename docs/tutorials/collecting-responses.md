@@ -92,7 +92,7 @@ This is the single best way to spot rough edges in instructions, statement wordi
 
 1. Click **Overview** in the left sidebar.
 
-The page shows: study status, the recruitment funnel (sent → started → submitted), completion rate, and recent submissions. The funnel counts come from recruitment-link usage (sent), participant session starts (started), and final submissions (submitted) — gaps between stages are usually where dropout happens.
+The page shows: study status, the recruitment funnel (sent → started → submitted), completion rate, and recent submissions. The funnel counts come from link usage, session starts, and final submissions; gaps between stages are usually where dropout happens.
 
 ---
 
@@ -141,4 +141,4 @@ You now know how to create public, individual, and limited recruitment links; sh
 
 ## Next Steps
 
-Once you have collected enough responses (typically 15-40+ for Q methodology), continue to **[Analyzing Results — Foundations](analyzing-results-foundations.md)**.
+Once you have collected enough responses (typically 15-40+ for Q methodology), continue to **[Analyzing Results](analyzing-results.md)**.
