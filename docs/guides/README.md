@@ -21,8 +21,10 @@ For the page-by-page catalog of the admin UI, see [`../reference/admin-dashboard
 
 ## For Contributors
 
+Contributor docs have moved to [`../contributing/`](../contributing/). Highlights:
+
 | Guide | Description |
 |-------|-------------|
-| [Development Setup](contributing/development.md) | Clone, install, run locally, and daily workflow tools |
-| [Testing](contributing/testing.md) | Test stack, writing tests, CI pipeline |
-| [Style Guide](contributing/style-guide.md) | Documentation style conventions |
+| [Development Workflow](../contributing/development.md) | First-time setup (clone, install, DB, dev servers) plus daily Make targets, API client sync, and releases |
+| [Testing](../contributing/testing.md) | Test stack, writing tests, CI pipeline |
+| [Style Guide](../contributing/style-guide.md) | Documentation style conventions |
