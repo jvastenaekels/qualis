@@ -7,6 +7,10 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+# Captured when ENVIRONMENT="test" so that the /api/test/debug/last-email
+# endpoint can return it to E2E tests without a real SMTP server.
+_last_test_email: dict[str, str] | None = None
+
 
 def _send_or_log(*, email_to: str, subject: str, html_content: str, label: str) -> None:
     """Send via SMTP, or log a structured MOCK EMAIL block when SMTP is unset.
@@ -22,6 +26,14 @@ def _send_or_log(*, email_to: str, subject: str, html_content: str, label: str) 
             f"\n--- MOCK EMAIL [{label}] ---\nTo: {email_to}\nSubject: {subject}\n"
             f"Body:\n{html_content}\n----------------------------\n"
         )
+        if settings.ENVIRONMENT == "test":
+            global _last_test_email
+            _last_test_email = {
+                "to": email_to,
+                "subject": subject,
+                "body": html_content,
+                "label": label,
+            }
         return
 
     message = MIMEMultipart()

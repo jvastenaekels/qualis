@@ -271,3 +271,19 @@ else:
     async def test_health() -> dict[str, str]:
         """Simple health check for test router"""
         return {"status": "ok", "environment": settings.ENVIRONMENT}
+
+    @router.get("/debug/last-email")
+    async def get_last_email() -> dict[str, str]:
+        """Return the most recent email captured by the SMTP-fallback logger.
+
+        Test-environment-only (gated by settings.ENVIRONMENT == 'test').
+        Returns 404 in development so the endpoint cannot be accidentally
+        relied upon outside a dedicated test database.
+        """
+        if settings.ENVIRONMENT != "test":
+            raise HTTPException(status_code=404)
+        from app.utils import email as email_module
+
+        if email_module._last_test_email is None:
+            return {"to": "", "subject": "", "body": "", "label": ""}
+        return email_module._last_test_email
