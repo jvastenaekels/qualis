@@ -194,11 +194,11 @@ When two analysis runs exist, the Compare bar aligns them via Tucker φ congruen
 - **Aligned arrays**: factors of the second run reordered + sign-flipped to maximise congruence with the first.
 - **Delta columns**: per-statement difference between aligned arrays.
 
-Used to verify that minor changes (different N, different rotation, different flagging) produce equivalent factor structures. Threshold rule of thumb: φ ≥ 0.95 = identical, 0.90 ≤ φ < 0.95 = equivalent, φ < 0.90 = the perturbation mattered.
+Use it to check that two runs produce the same factor structure after a perturbation: a different N, a switch in rotation, or a manual flag override. Threshold rule of thumb: φ ≥ 0.95 = identical, 0.90 ≤ φ < 0.95 = equivalent, φ < 0.90 = the perturbation mattered.
 
 ### Factor canvas
 
-A focus-mode view for one factor at a time. The factor array sits on the left; a **voices panel** on the right pulls participant material for the highest-loading flagged participants — post-sort comments, audio playback, distinguishing statements at the column extremes — that you can pin onto the canvas to anchor interpretive claims in specific participant voices. Per-factor researcher notes save back to the run.
+A focus-mode view for one factor at a time. The factor array sits on the left; a **voices panel** on the right pulls participant material for the highest-loading flagged participants — post-sort comments, audio playback, distinguishing statements at the column extremes — that you can pin onto the canvas to ground each interpretive claim in specific participant voices. Per-factor researcher notes save back to the run.
 
 Each run is persisted to the audit trail (`AnalysisRun`); past runs are accessible from the history panel and can be reloaded or deleted. Notes on a run are editable; results are immutable.
 
@@ -208,7 +208,7 @@ Discarded participants are excluded automatically. Minimum: 2 non-discarded part
 
 ## Memos
 
-A drawer of structured notes attached to a parent (study or concourse). Surfaced on all admin pages of that parent via a toolbar icon. Source: `GET /api/admin/{studies|concourses}/{id}/memo` and related endpoints.
+A drawer of structured notes attached to a parent (study or concourse), available on every admin page of that parent via a toolbar icon. Source: `GET /api/admin/{studies|concourses}/{id}/memo` and related endpoints.
 
 ### Entries
 
@@ -220,7 +220,7 @@ Each entry has a comment thread. Comments support `@user` mentions stored as a `
 
 ### Templates
 
-The **Methodology memo** template surfaces as a dedicated entry on the Study Designer toolbar — a one-click way to log design decisions next to the controls that produced them. Source: `GET /api/admin/memo/templates`.
+The **Methodology memo** template appears as a dedicated entry on the Study Designer toolbar, so you can log design decisions next to the controls that produced them. Source: `GET /api/admin/memo/templates`.
 
 ### Export
 
