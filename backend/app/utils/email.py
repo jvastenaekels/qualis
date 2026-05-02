@@ -8,6 +8,40 @@ from app.core.config import settings
 logger = logging.getLogger(__name__)
 
 
+def _send_or_log(*, email_to: str, subject: str, html_content: str, label: str) -> None:
+    """Send via SMTP, or log a structured MOCK EMAIL block when SMTP is unset.
+
+    `label` is a short tag identifying the email type for log filtering
+    (e.g., 'invitation', 'memo-mention', 'email-verification').
+    """
+    if not settings.SMTP_HOST or not settings.SMTP_USER or not settings.SMTP_PASSWORD:
+        logger.warning("SMTP settings missing. Logging email content instead:")
+        logger.warning(f"To: {email_to}")
+        logger.warning(f"Subject: {subject}")
+        logger.info(
+            f"\n--- MOCK EMAIL [{label}] ---\nTo: {email_to}\nSubject: {subject}\n"
+            f"Body:\n{html_content}\n----------------------------\n"
+        )
+        return
+
+    message = MIMEMultipart()
+    message["From"] = f"{settings.EMAILS_FROM_NAME} <{settings.EMAILS_FROM_EMAIL}>"
+    message["To"] = email_to
+    message["Subject"] = subject
+    message.attach(MIMEText(html_content, "html"))
+
+    try:
+        with smtplib.SMTP(settings.SMTP_HOST, int(settings.SMTP_PORT or 0)) as server:
+            if settings.SMTP_TLS:
+                server.starttls()
+            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+            server.send_message(message)
+        logger.info(f"Email sent to {email_to} [{label}]")
+    except Exception as e:
+        logger.error(f"Failed to send {label} email to {email_to}: {str(e)}")
+        raise
+
+
 def send_invitation_email(
     email_to: str, context_name: str, invite_url: str, context_type: str = "study"
 ) -> None:
@@ -36,33 +70,12 @@ def send_invitation_email(
     </html>
     """
 
-    if not settings.SMTP_HOST or not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        logger.warning("SMTP settings missing. Logging email content instead:")
-        logger.warning(f"To: {email_to}")
-        logger.warning(f"Subject: {subject}")
-        logger.warning(f"Content: {invite_url}")
-        logger.info(
-            f"\n--- MOCK EMAIL ---\nTo: {email_to}\nSubject: {subject}\nLink: {invite_url}\n------------------\n"
-        )
-        return
-
-    # Create message
-    message = MIMEMultipart()
-    message["From"] = f"{settings.EMAILS_FROM_NAME} <{settings.EMAILS_FROM_EMAIL}>"
-    message["To"] = email_to
-    message["Subject"] = subject
-    message.attach(MIMEText(html_content, "html"))
-
-    try:
-        with smtplib.SMTP(settings.SMTP_HOST, int(settings.SMTP_PORT or 0)) as server:
-            if settings.SMTP_TLS:
-                server.starttls()
-            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-            server.send_message(message)
-        logger.info(f"Invitation email sent to {email_to}")
-    except Exception as e:
-        logger.error(f"Failed to send invitation email to {email_to}: {str(e)}")
-        raise
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="invitation",
+    )
 
 
 def send_memo_mention_email(
@@ -95,31 +108,125 @@ def send_memo_mention_email(
     </html>
     """
 
-    if not settings.SMTP_HOST or not settings.SMTP_USER or not settings.SMTP_PASSWORD:
-        logger.warning("SMTP settings missing. Logging memo-mention email instead:")
-        logger.warning(f"To: {email_to}")
-        logger.warning(f"Subject: {subject}")
-        logger.warning(f"Link: {link_url}")
-        logger.info(
-            f"\n--- MOCK MEMO MENTION EMAIL ---\n"
-            f"To: {email_to}\nSubject: {subject}\nLink: {link_url}\n"
-            f"-------------------------------\n"
-        )
-        return
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="memo-mention",
+    )
 
-    message = MIMEMultipart()
-    message["From"] = f"{settings.EMAILS_FROM_NAME} <{settings.EMAILS_FROM_EMAIL}>"
-    message["To"] = email_to
-    message["Subject"] = subject
-    message.attach(MIMEText(html_content, "html"))
 
-    try:
-        with smtplib.SMTP(settings.SMTP_HOST, int(settings.SMTP_PORT or 0)) as server:
-            if settings.SMTP_TLS:
-                server.starttls()
-            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-            server.send_message(message)
-        logger.info(f"Memo-mention email sent to {email_to}")
-    except Exception as e:
-        logger.error(f"Failed to send memo-mention email to {email_to}: {str(e)}")
-        raise
+def send_email_verification(email_to: str, verify_url: str) -> None:
+    subject = "Verify your Qualis account"
+    html_content = f"""
+    <html>
+        <body>
+            <h2>Welcome to Qualis</h2>
+            <p>Click the link below to activate your account:</p>
+            <p><a href="{verify_url}">{verify_url}</a></p>
+            <p>This link expires in 24 hours.</p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="email-verification",
+    )
+
+
+def send_password_reset(email_to: str, reset_url: str) -> None:
+    subject = "Reset your Qualis password"
+    html_content = f"""
+    <html>
+        <body>
+            <h2>Password reset</h2>
+            <p>Someone (hopefully you) requested a password reset for your Qualis account.</p>
+            <p><a href="{reset_url}">{reset_url}</a></p>
+            <p>This link expires in 1 hour. If you did not request this, you can safely ignore this email.</p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="password-reset",
+    )
+
+
+def send_twofa_disable_link(email_to: str, disable_url: str) -> None:
+    subject = "Disable two-factor authentication on Qualis"
+    html_content = f"""
+    <html>
+        <body>
+            <h2>Disable 2FA</h2>
+            <p>Someone (hopefully you) requested to disable two-factor authentication on your Qualis account.</p>
+            <p>Open the link below and click "Confirm" to proceed:</p>
+            <p><a href="{disable_url}">{disable_url}</a></p>
+            <p>This link expires in 15 minutes and can only be used once.</p>
+            <p>If you did not request this, change your Qualis password immediately and contact an administrator.</p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="2fa-disable-link",
+    )
+
+
+def send_twofa_disabled_notification(
+    email_to: str, *, when: str, ip_hint: str | None
+) -> None:
+    subject = "Two-factor authentication was disabled on your Qualis account"
+    ip_line = f"<p>Origin IP: {ip_hint}</p>" if ip_hint else ""
+    html_content = f"""
+    <html>
+        <body>
+            <h2>2FA disabled</h2>
+            <p>Two-factor authentication on your Qualis account was disabled at {when}.</p>
+            {ip_line}
+            <p>If this was not you, change your password immediately and contact an administrator.</p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="2fa-disabled-notification",
+    )
+
+
+def send_twofa_login_otp(email_to: str, code: str) -> None:
+    subject = "Your Qualis login code"
+    html_content = f"""
+    <html>
+        <body>
+            <h2>Login code</h2>
+            <p>Your Qualis login verification code:</p>
+            <p style="font-size:28px;letter-spacing:4px;font-weight:bold">{code}</p>
+            <p>This code expires in 5 minutes.</p>
+            <p>If you did not just try to log in, change your password immediately.</p>
+            <br>
+            <p>L'équipe Qualis</p>
+        </body>
+    </html>
+    """
+    _send_or_log(
+        email_to=email_to,
+        subject=subject,
+        html_content=html_content,
+        label="2fa-login-otp",
+    )
