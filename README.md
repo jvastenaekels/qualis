@@ -30,22 +30,22 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 
 ## Comparison with existing tools
 
-| Capability | FlashQ / HTMLQ | PQMethod | Ken-Q (online) | KADE (Banasick 2019) | qmethod (R, Zabala 2014) | Qualis |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| Browser-based data collection | Yes | No | Yes | No | No | **Yes** |
-| Documented mobile & tablet support | — | No | — | No | N/A | **Yes** |
-| Built-in factor analysis | No | Yes | Yes | Yes | Yes | **Yes** |
-| Documented forced-distribution enforcement | — | N/A | N/A | N/A | N/A | **Yes** |
-| Multi-language studies | No | No | No | No | N/A | **Yes** |
-| Audio post-sort responses | No | No | No | No | No | **Yes** |
-| Collaborative interpretation (memos, voices, focus) | No | No | No | No | No | **Yes** |
-| Recruitment tracking & funnels | No | No | No | No | No | **Yes** |
-| Team collaboration (roles) | No | No | No | No | No | **Yes** |
-| Export to PQMethod / R / Ken-Q | N/A | N/A | N/A | Yes | N/A | **Yes** |
-| Self-hosted | Yes | Desktop | No | Desktop | Yes (local R) | **Yes** |
-| Open source | Yes | No | No | Yes | Yes | **Yes** |
+| Capability | HTMLQ | Quince (Banasick) | PQMethod | Ken-Q Analysis | KADE (Banasick 2019) | qmethod (R, Zabala 2014) | Qualis |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| Browser-based data collection | Yes | Yes | No | No | No | No | **Yes** |
+| Documented mobile & tablet support | Tablet | Yes | No | — | No | N/A | **Yes** |
+| Built-in factor analysis | No | No | Yes | Yes | Yes | Yes | **Yes** |
+| Multi-language studies | No | No | No | No | No | N/A | **Yes** |
+| Audio post-sort responses | No | No | No | No | No | No | **Yes** |
+| Shared memos | No | No | No | No | No | No | **Yes** |
+| Reusable concourse with versioning and item-level discussion | No | No | No | No | No | No | **Yes** |
+| Recruitment tracking & funnels | No | No | No | No | No | No | **Yes** |
+| Team collaboration (roles) | No | No | No | No | No | No | **Yes** |
+| Interop with PQMethod / R / Ken-Q formats | CSV out | KADE / PQMethod | Native | Imports PQMethod | Imports CSV/PQMethod | Yes (import & export) | **Yes** |
+| Self-hosted | Yes | Frontend only | Desktop | Yes (static site) | Desktop | Yes (local R) | **Yes** |
+| Open source | Yes (MIT) | Yes (GPL-3) | Yes (GPL) | Yes (GPL-3) | Yes (GPL-3) | Yes (GPL-2/3) | **Yes (AGPL-3)** |
 
-*"N/A" indicates the capability does not apply to the tool category (e.g., R packages have no participant-facing UI, so "mobile support" is not applicable). "—" indicates we did not find documented support for the capability in the tool's published materials at the time of writing; corrections welcome via PR.*
+*"N/A" indicates the capability does not apply to the tool category (e.g., R packages have no participant-facing UI, so "mobile support" is not applicable). "—" indicates we did not find documented support for the capability in the tool's published materials at the time of writing; corrections welcome via PR. "Ken-Q Analysis" refers specifically to the in-browser analysis app at `shawnbanasick.github.io/ken-q-analysis/`; data collection in the Banasick toolchain is handled by separate tools (Q-Sort Touch, **Quince**, EasyHTMLQ).*
 
 ---
 
@@ -65,8 +65,18 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 - **Survey builder** with 9 question types (text, number, select, radio, checkbox, date, email, textarea, audio), conditional visibility, reordering, and per-question validation.
 - **Markdown-formatted content** for instructions, consent forms, and condition of instruction.
 - **Import/Export configurations** to create templates, back up designs, or clone studies across projects.
-- **Optional rough-sort step.** The 3-pile triage that precedes the fine-sort grid is configurable per study: only ~38% of published Q studies use it (Dieteren et al. 2023). When disabled, participants land directly on the fine-sort grid and place items from a single horizontally-scrollable deck.
+- **Optional rough-sort step.** The 3-pile triage that precedes the fine-sort grid is configurable per study, since not every protocol uses it.
 - **Pilot mode** to run through the full participant experience without persisting any data.
+
+### Concourse
+
+A reusable pool of candidate statements that lives at the project level, not the study level. Researchers can curate the concourse over time, draw on it across multiple studies, and keep the curatorial trail attached to the data.
+
+- **Project-scoped statement pool** with status workflow (proposed, kept, dropped) so the team can see what was considered and what was excluded.
+- **Per-item provenance**: source citation, multilingual translations, free-form tags, and an editable code.
+- **Version history** on each statement so revisions are traceable.
+- **Item-level comments** for team discussion of curatorial choices, alongside concourse-level memos that travel with exports for replication and pre-registration packages.
+- **Q-set sampling** into a study with one click; the link back to the concourse is preserved.
 
 ### Analysis
 
@@ -82,7 +92,6 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 - **Recruitment links** (public, single-use, or capacity-limited) with QR code generation and funnel tracking (started vs. completed).
 - **Monitoring dashboard** with submission timelines, device breakdowns, and completion rates.
 - **Session review** with grid reconstruction, survey responses, and audio playback.
-- **Pilot mode** to walk the full participant flow end-to-end without persisting anything to the database.
 - **Discard with reason** to flag problematic responses while preserving the audit trail.
 
 ### Export and interoperability
@@ -226,7 +235,7 @@ If you use Qualis in your research, please refer to the machine-readable metadat
 - **Julien Vastenaekels** (Université de Reims Champagne-Ardenne): software architecture, implementation, documentation, maintenance, methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology.
 - **Clémence Dedinger** (Université de Reims Champagne-Ardenne): methodological design, user-side testing, conceptual feedback on the platform's positioning for critical Q-methodology. No direct code contribution.
 
-**Methodological grounding:** Qualis's design draws on the critical Q-methodology literature, in particular Stainton Rogers (1997), Stenner (2011), Watts & Stenner (2012), and Sneegas (2020).
+**Methodological inspiration:** Qualis aims to be useful across Q-methodology traditions — from classical Brown-school analysis to more interpretive and critical orientations. The platform's design is informed in particular by readings of Stephenson (1953), Brown (1980), McKeown & Thomas (1988/2013), Watts & Stenner (2012), and, on the reflexive and participant-voice side, Stainton Rogers (1997), Stenner (2011), and Sneegas (2020). These works are inspirations rather than endorsements; the responsibility for any given design choice rests with Qualis.
 
 **Open-source dependencies:** Qualis builds on FastAPI, React, SQLAlchemy, Pydantic, dnd-kit, react-i18next, Vite, Biome, Ruff, Playwright, and many other libraries. See `backend/pyproject.toml` and `frontend/package.json` for the full list.
 

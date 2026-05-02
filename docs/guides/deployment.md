@@ -8,12 +8,12 @@ For the canonical list of environment variables (with types and defaults), see [
 
 ## Supported platforms
 
-| Platform | Difficulty | Cost | Status |
-| -------- | ---------- | ---- | ------ |
-| **Scalingo** | Easy | ~7 EUR/mo | Documented below; primary supported target. |
-| **Docker (self-host)** | Medium | Variable | `docker-compose.yml` in repo root; see [Docker](#docker). |
-| **Render** | Easy | Free tier | Generic Python + Postgres app; same env vars as Scalingo. |
-| **Heroku** | Medium | $7+/mo | Generic Python buildpack; same env vars and `Procfile` apply. |
+| Platform | Difficulty | Status |
+| -------- | ---------- | ------ |
+| **Scalingo** | Easy | Documented below; primary supported target. |
+| **Docker (self-host)** | Medium | `docker-compose.yml` in repo root; see [Docker](#docker). |
+| **Render** | Easy | Generic Python + Postgres app; same env vars as Scalingo. |
+| **Heroku** | Medium | Generic Python buildpack; same env vars and `Procfile` apply. |
 
 The Scalingo path is the one used in production by the maintainer; the others are known to work with the standard Python buildpack but are not documented step-by-step.
 
