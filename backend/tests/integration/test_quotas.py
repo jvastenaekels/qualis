@@ -292,3 +292,66 @@ async def test_invitation_accept_blocked_at_member_limit(
     assert response.status_code == 409
     body = response.json()
     assert body.get("message") == "MEMBER_LIMIT_REACHED" or body.get("code") == "MEMBER_LIMIT_REACHED"
+
+
+# ---------- Response-shape exposure ----------
+
+@pytest.mark.asyncio
+async def test_get_project_returns_member_quota(
+    owner_authed_client: AsyncClient,
+    seeded_project: Project,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(settings, "MAX_MEMBERS_PER_PROJECT", 5)
+    response = await owner_authed_client.get(
+        f"/api/admin/projects/{seeded_project.slug}"
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert "member_quota" in body
+    assert body["member_quota"]["limit"] == 5
+    assert body["member_quota"]["count"] >= 1
+
+
+@pytest.mark.asyncio
+async def test_auth_me_returns_owned_project_quota(
+    owner_authed_client: AsyncClient,
+    seeded_project: Project,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(settings, "MAX_PROJECTS_AS_OWNER", 3)
+    response = await owner_authed_client.get("/api/me")
+    assert response.status_code == 200
+    body = response.json()
+    assert "owned_project_quota" in body
+    assert body["owned_project_quota"]["limit"] == 3
+    assert body["owned_project_quota"]["count"] == 1
+
+
+@pytest.mark.asyncio
+async def test_unlimited_quota_serializes_as_null(
+    owner_authed_client: AsyncClient,
+    seeded_project: Project,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(settings, "MAX_MEMBERS_PER_PROJECT", 0)
+    response = await owner_authed_client.get(
+        f"/api/admin/projects/{seeded_project.slug}"
+    )
+    body = response.json()
+    assert body["member_quota"]["limit"] is None
+
+
+@pytest.mark.asyncio
+async def test_list_projects_returns_member_quota(
+    owner_authed_client: AsyncClient,
+    seeded_project: Project,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(settings, "MAX_MEMBERS_PER_PROJECT", 5)
+    response = await owner_authed_client.get("/api/admin/projects")
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["items"]) >= 1
+    assert "member_quota" in body["items"][0]
+    assert body["items"][0]["member_quota"]["limit"] == 5

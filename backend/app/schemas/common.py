@@ -23,3 +23,14 @@ class PaginatedResponse(BaseModel, Generic[T]):
     total: int
     limit: int
     offset: int
+
+
+class QuotaInfo(BaseModel):
+    """Shared quota envelope used in member and owned-project counters.
+
+    `limit` is `None` when the quota is unlimited (operator opted out via
+    `0`-sentinel setting, or the requesting user is a superuser).
+    """
+
+    count: int
+    limit: int | None

@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.models import ProjectRole
 
-from .common import validate_non_empty_string
+from .common import QuotaInfo, validate_non_empty_string
 from .users import UserRead
 
 
@@ -34,6 +34,7 @@ class ProjectRead(ProjectBrief):
     """Schema for reading a project with members."""
 
     members: list[ProjectMemberRead] = []
+    member_quota: QuotaInfo
 
 
 class ProjectWithRole(ProjectRead):
