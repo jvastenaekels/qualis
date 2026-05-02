@@ -269,8 +269,26 @@ class TestProfile:
 @pytest.mark.asyncio
 class TestRegistrationEmailVerification:
     async def test_register_without_invitation_creates_inactive_account(
-        self, client: AsyncClient, db: AsyncSession, caplog
+        self, client: AsyncClient, db: AsyncSession, caplog, monkeypatch
     ):
+        # The verification gate is conditional on SMTP being configured.
+        # Force SMTP-configured so this test exercises the gated path; stub
+        # the actual sender to avoid hitting smtp.example.com.
+        import logging
+        from app.core.config import settings
+        from app.routers import auth as auth_router
+
+        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(settings, "SMTP_USER", "user")
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pass")
+
+        sender_log = logging.getLogger("app.utils.email")
+
+        def _fake_send(email_to: str, verify_url: str) -> None:
+            sender_log.info(f"MOCK email-verification to {email_to}: {verify_url}")
+
+        monkeypatch.setattr(auth_router, "send_email_verification", _fake_send)
+
         with caplog.at_level("INFO", logger="app.utils.email"):
             response = await client.post(
                 "/api/register",
@@ -287,7 +305,7 @@ class TestRegistrationEmailVerification:
         user = result.scalar_one()
         assert user.is_active is False
         assert user.email_verified_at is None
-        # Email content was logged because dev SMTP is unset
+        # The (stubbed) sender was invoked for the verification email
         assert any("email-verification" in r.message for r in caplog.records)
 
     async def test_register_with_invitation_skips_verification(
@@ -444,9 +462,18 @@ class TestEmailVerify:
 @pytest.mark.asyncio
 class TestLoginVerificationGuard:
     async def test_unverified_user_login_returns_403(
-        self, client: AsyncClient, db: AsyncSession
+        self, client: AsyncClient, db: AsyncSession, monkeypatch
     ):
+        # Force SMTP-configured state so the verification gate is active.
+        # Without this, the gate short-circuits when SMTP is unset (the
+        # SMTP-fallback hotfix) and the test would see 200 instead of 403.
+        from app.core.config import settings
         from app.utils.security import get_password_hash
+
+        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(settings, "SMTP_USER", "user")
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pass")
+
         u = User(
             email="unverified@example.com",
             hashed_password=get_password_hash("pass123"),
@@ -497,13 +524,21 @@ class TestLoginVerificationGuard:
         assert r.status_code == 200
 
     async def test_password_check_runs_before_verification_check(
-        self, client: AsyncClient, db: AsyncSession
+        self, client: AsyncClient, db: AsyncSession, monkeypatch
     ):
         # An attacker submitting wrong password against an unverified account
         # must get 401 (Incorrect credentials), NOT 403 (email_not_verified) —
         # otherwise the response code itself becomes an oracle revealing
         # whether an unverified account exists for that email.
+        # SMTP must be monkeypatched truthy so the gate is active and the
+        # 401-vs-403 ordering is observable.
+        from app.core.config import settings
         from app.utils.security import get_password_hash
+
+        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(settings, "SMTP_USER", "user")
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pass")
+
         u = User(
             email="enum-probe@example.com",
             hashed_password=get_password_hash("realpass"),
@@ -518,3 +553,91 @@ class TestLoginVerificationGuard:
             data={"username": "enum-probe@example.com", "password": "WRONGpass"},
         )
         assert r.status_code == 401  # not 403 — password check runs first
+
+
+@pytest.mark.asyncio
+class TestSMTPUnconfiguredFallback:
+    """When SMTP is not configured, the app must still function:
+    login is not blocked on missing verification, and registration
+    creates immediately-active accounts.
+    """
+
+    async def test_register_without_smtp_creates_active_verified_account(
+        self, client: AsyncClient, db: AsyncSession, monkeypatch
+    ):
+        # Force SMTP-unconfigured state regardless of test env
+        from app.core.config import settings
+        monkeypatch.setattr(settings, "SMTP_HOST", None)
+        monkeypatch.setattr(settings, "SMTP_USER", None)
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", None)
+
+        r = await client.post(
+            "/api/register",
+            json={"email": "smtpoff@example.com", "password": "securepass123"},
+        )
+        assert r.status_code == 201
+        body = r.json()
+        # No verification flag — the app behaves as if verification is off
+        assert body["requires_email_verification"] is False
+
+        result = await db.execute(select(User).where(User.email == "smtpoff@example.com"))
+        user = result.scalar_one()
+        assert user.is_active is True
+        assert user.email_verified_at is not None
+
+    async def test_login_without_smtp_does_not_block_unverified(
+        self, client: AsyncClient, db: AsyncSession, monkeypatch
+    ):
+        from app.core.config import settings
+        from app.utils.security import get_password_hash
+
+        # Pre-existing unverified account (e.g., created when SMTP was on, now off)
+        u = User(
+            email="unverified-smtpoff@example.com",
+            hashed_password=get_password_hash("pass123"),
+            is_active=True,
+            email_verified_at=None,
+        )
+        db.add(u)
+        await db.commit()
+
+        # Turn SMTP off
+        monkeypatch.setattr(settings, "SMTP_HOST", None)
+        monkeypatch.setattr(settings, "SMTP_USER", None)
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", None)
+
+        r = await client.post(
+            "/api/token",
+            data={"username": "unverified-smtpoff@example.com", "password": "pass123"},
+        )
+        # Without SMTP, the gate must not fire
+        assert r.status_code == 200
+
+    async def test_login_with_smtp_configured_still_blocks_unverified(
+        self, client: AsyncClient, db: AsyncSession, monkeypatch
+    ):
+        # Conversely: when SMTP IS configured AND EMAIL_VERIFICATION_REQUIRED=True,
+        # the gate fires (the behavior we shipped in T10).
+        from app.core.config import settings
+        from app.utils.security import get_password_hash
+
+        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(settings, "SMTP_USER", "user")
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pass")
+        monkeypatch.setattr(settings, "EMAIL_VERIFICATION_REQUIRED", True)
+
+        u = User(
+            email="unverified-smtpon@example.com",
+            hashed_password=get_password_hash("pass123"),
+            is_active=True,
+            email_verified_at=None,
+        )
+        db.add(u)
+        await db.commit()
+
+        r = await client.post(
+            "/api/token",
+            data={"username": "unverified-smtpon@example.com", "password": "pass123"},
+        )
+        assert r.status_code == 403
+        assert "email_not_verified" in r.json()["message"]

@@ -90,8 +90,11 @@ async def login_for_access_token(
     # 2.6 Email verification gate (added by T10 of auth-email-flows).
     # Must run AFTER password check so wrong-password against an unverified
     # account returns 401, not 403 (preventing account enumeration via the
-    # response code).
-    if settings.EMAIL_VERIFICATION_REQUIRED and user.email_verified_at is None:
+    # response code). The gate is conditional on `email_verification_active`
+    # — i.e. only fires when EMAIL_VERIFICATION_REQUIRED=True AND SMTP is
+    # configured. Otherwise an SMTP-unconfigured deployment would lock out
+    # every user (no way to deliver the verification link).
+    if settings.email_verification_active and user.email_verified_at is None:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="email_not_verified",
@@ -134,9 +137,14 @@ async def register_user(
 
     - Invited path (valid invitation_token matching the email): is_active=True,
       email_verified_at=NOW(), requires_email_verification=False.
-    - Self-signup path (no invitation token): is_active=False,
+    - Self-signup path (no invitation token), when verification is active
+      (EMAIL_VERIFICATION_REQUIRED=True AND SMTP is configured): is_active=False,
       email_verified_at=NULL, verification email sent,
       requires_email_verification=True.
+    - Self-signup path with verification inactive (operator disabled it OR
+      SMTP not configured): is_active=True, email_verified_at=NOW(),
+      requires_email_verification=False — never lock users out of a deployment
+      that cannot deliver verification mail.
     """
     # 1. Check if user already exists
     query = select(User).where(User.email == user_in.email)
@@ -164,8 +172,14 @@ async def register_user(
                 detail=f"Invalid invitation token: {str(e)}",
             )
 
-    # Invited users are immediately active + verified; self-signup must verify.
+    # Invited users are immediately active + verified. Self-signup needs the
+    # verification step ONLY when verification is active (operator opted in
+    # via EMAIL_VERIFICATION_REQUIRED AND SMTP is configured to actually
+    # deliver the link). Otherwise create active+verified to avoid producing
+    # locked-out accounts on SMTP-unconfigured deployments.
     invited = invitation_payload is not None
+    verification_active = settings.email_verification_active
+    needs_verification_step = (not invited) and verification_active
     now = datetime.now(tz=timezone.utc)
 
     try:
@@ -174,8 +188,8 @@ async def register_user(
             email=user_in.email,
             full_name=user_in.full_name,
             hashed_password=get_password_hash(user_in.password),
-            is_active=invited,
-            email_verified_at=now if invited else None,
+            is_active=not needs_verification_step,
+            email_verified_at=None if needs_verification_step else now,
             password_changed_at=now,
         )
         db.add(new_user)
@@ -218,8 +232,8 @@ async def register_user(
         )
     await db.refresh(new_user)
 
-    # 5. Send verification email for self-signup path
-    if not invited:
+    # 5. Send verification email for self-signup path (only when active)
+    if needs_verification_step:
         token = create_email_token(
             email=new_user.email,
             purpose="email_verify",
@@ -230,7 +244,7 @@ async def register_user(
 
     return UserCreateResponse(
         user=UserRead.model_validate(new_user),
-        requires_email_verification=not invited,
+        requires_email_verification=needs_verification_step,
     )
 
 

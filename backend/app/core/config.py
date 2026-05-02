@@ -126,5 +126,24 @@ class Settings(BaseSettings):
         """Helper to get the email from name, falling back to project name."""
         return self.EMAILS_FROM_NAME or self.PROJECT_NAME
 
+    @property
+    def is_smtp_configured(self) -> bool:
+        """True iff all three SMTP credentials are populated.
+
+        When False, the email subsystem falls back to logging the email
+        body to stdout (see app.utils.email._send_or_log). The auth-email
+        verification gate uses this to avoid locking users out of an
+        unconfigured deployment.
+        """
+        return bool(self.SMTP_HOST and self.SMTP_USER and self.SMTP_PASSWORD)
+
+    @property
+    def email_verification_active(self) -> bool:
+        """The verification gate only fires when both:
+        - the operator opted in (EMAIL_VERIFICATION_REQUIRED=True), and
+        - SMTP is configured (otherwise users could never receive the link).
+        """
+        return self.EMAIL_VERIFICATION_REQUIRED and self.is_smtp_configured
+
 
 settings = Settings()
