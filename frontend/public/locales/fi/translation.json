@@ -449,7 +449,6 @@
                 }
             },
             "rough_sort": {
-                "section_title": "Esilajitteluvaihe",
                 "toggle_label": "Ota esilajittelu käyttöön (samaa mieltä / neutraali / eri mieltä)",
                 "lock_banner": "Lukittu. {{count}} osallistuja(a) on aloittanut kyselyn; arkistoi tai poista nämä istunnot ennen tämän asetuksen muuttamista.",
                 "deck_mode_note": "Pois käytöstä. Osallistujat näkevät koko Q-joukon vaakasuunnassa vieritettävänä pakkana."

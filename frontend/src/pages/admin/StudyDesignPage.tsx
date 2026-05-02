@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { isRoughSortEnabled } from '@/utils/studyConfig';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import type { StudyTranslationCreate } from '@/api/model';
@@ -77,7 +76,6 @@ const StudyDesignPage = () => {
     const [activateDialogOpen, setActivateDialogOpen] = useState(false);
     const [memoOpen, setMemoOpen] = useState(false);
     const api = useStudyDesignPage();
-    const updateDraft = useStudyDesigner((s) => s.updateDraft);
     const original = useStudyDesigner((s) => s.original);
     const { user: currentUser } = useAuthStore();
     const { role: projectRole } = usePermission();
@@ -679,7 +677,11 @@ const StudyDesignPage = () => {
                             </TabsContent>
 
                             <TabsContent value="condition" className="mt-0 outline-none space-y-6">
-                                <ConditionOfInstructionEditor readOnly={api.isFullyReadOnly} />
+                                <ConditionOfInstructionEditor
+                                    readOnly={api.isFullyReadOnly}
+                                    roughSortLocked={api.roughSortLocked}
+                                    roughSortLockedCount={api.roughSortLockedCount}
+                                />
                             </TabsContent>
 
                             <TabsContent value="q-sort" className="mt-0 outline-none space-y-6">
@@ -751,67 +753,6 @@ const StudyDesignPage = () => {
                                     readOnly={api.isFullyReadOnly}
                                     structureLocked={api.isStructureLocked}
                                 />
-                                {/*
-                                 * Rough-sort toggle. Sibling of the
-                                 * methodology toggles in QSortEditor's
-                                 * Research Settings card (symmetry_lock,
-                                 * randomize_statement_order). Lock policy
-                                 * mirrors backend study_service.update_study:
-                                 * once any participant has progressed past
-                                 * consent (last_step_reached > 1) the toggle
-                                 * is frozen.
-                                 */}
-                                <section
-                                    className="space-y-2 mt-8"
-                                    data-testid="rough-sort-section"
-                                >
-                                    <h3 className="text-lg font-black text-slate-900">
-                                        {t(
-                                            'admin.study_design.rough_sort.section_title',
-                                            'Rough sort step'
-                                        )}
-                                    </h3>
-                                    {api.roughSortLocked && (
-                                        <div
-                                            data-testid="rough-sort-lock-banner"
-                                            className="rounded border-l-4 border-amber-400 bg-amber-50 p-2 text-sm text-amber-900"
-                                        >
-                                            {t('admin.study_design.rough_sort.lock_banner', {
-                                                count: api.roughSortLockedCount,
-                                                defaultValue:
-                                                    'Toggle locked. {{count}} participant(s) have started the survey; ' +
-                                                    'archive or delete those sessions before changing this setting.',
-                                            })}
-                                        </div>
-                                    )}
-                                    <label className="flex items-center gap-2">
-                                        <input
-                                            type="checkbox"
-                                            data-testid="rough-sort-toggle"
-                                            checked={isRoughSortEnabled(draft)}
-                                            disabled={api.roughSortLocked || api.isFullyReadOnly}
-                                            onChange={(e) =>
-                                                updateDraft((d) => {
-                                                    d.rough_sort_enabled = e.target.checked;
-                                                })
-                                            }
-                                        />
-                                        <span>
-                                            {t(
-                                                'admin.study_design.rough_sort.toggle_label',
-                                                'Enable preliminary sort (3-pile triage)'
-                                            )}
-                                        </span>
-                                    </label>
-                                    {!isRoughSortEnabled(draft) && (
-                                        <p className="text-xs italic text-slate-500">
-                                            {t(
-                                                'admin.study_design.rough_sort.deck_mode_note',
-                                                'Disabled. Participants see the full Q-set as a horizontally-scrollable deck.'
-                                            )}
-                                        </p>
-                                    )}
-                                </section>
                             </TabsContent>
 
                             <TabsContent value="post-sort" className="mt-0 outline-none">

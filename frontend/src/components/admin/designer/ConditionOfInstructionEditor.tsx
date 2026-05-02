@@ -10,7 +10,23 @@ import type React from 'react';
 import { createResetToDefaultHandler } from '@/utils/studyResetHelpers';
 import { MultiLangFieldIcon } from './MultiLangFieldIcon';
 
-const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
+interface ConditionOfInstructionEditorProps {
+    readOnly?: boolean;
+    /**
+     * Backend lock state for `rough_sort_enabled`. The toggle now lives
+     * inside this editor (was previously in the Q-sort tab); the page
+     * passes through the values it derives from the participant list via
+     * {@link useRoughSortLock}.
+     */
+    roughSortLocked?: boolean;
+    roughSortLockedCount?: number;
+}
+
+const ConditionOfInstructionEditor = ({
+    readOnly,
+    roughSortLocked = false,
+    roughSortLockedCount = 0,
+}: ConditionOfInstructionEditorProps) => {
     const { t } = useTranslation();
     const { draft, activeLocale, updateTranslation, updateDraft } = useStudyDesigner();
 
@@ -41,6 +57,65 @@ const ConditionOfInstructionEditor = ({ readOnly }: { readOnly?: boolean }) => {
                     </div>
                     {t('admin.design.condition.title')}
                 </div>
+
+                {/*
+                 * Rough-sort toggle. Moved here from the Q-sort tab so the
+                 * admin can decide whether to ask for a preliminary sort and
+                 * write the matching consigne in the same place. The
+                 * Preliminary Sort Instruction card below is gated on
+                 * `isRoughSortEnabled(draft)` so it disappears when the
+                 * toggle is off. Lock policy mirrors backend
+                 * study_service.update_study: once any participant has
+                 * progressed past consent (last_step_reached > 1) the toggle
+                 * is frozen.
+                 */}
+                <Card
+                    className="border-none shadow-sm bg-white rounded-2xl overflow-hidden"
+                    data-testid="rough-sort-section"
+                >
+                    <CardContent className="pt-6 space-y-3">
+                        {roughSortLocked && (
+                            <div
+                                data-testid="rough-sort-lock-banner"
+                                className="rounded border-l-4 border-amber-400 bg-amber-50 p-2 text-sm text-amber-900"
+                            >
+                                {t('admin.study_design.rough_sort.lock_banner', {
+                                    count: roughSortLockedCount,
+                                    defaultValue:
+                                        'Toggle locked. {{count}} participant(s) have started the survey; ' +
+                                        'archive or delete those sessions before changing this setting.',
+                                })}
+                            </div>
+                        )}
+                        <label className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                data-testid="rough-sort-toggle"
+                                checked={isRoughSortEnabled(draft)}
+                                disabled={roughSortLocked || readOnly}
+                                onChange={(e) =>
+                                    updateDraft((d) => {
+                                        d.rough_sort_enabled = e.target.checked;
+                                    })
+                                }
+                            />
+                            <span className="text-sm font-bold text-slate-900">
+                                {t(
+                                    'admin.study_design.rough_sort.toggle_label',
+                                    'Enable preliminary sort (3-pile triage)'
+                                )}
+                            </span>
+                        </label>
+                        {!isRoughSortEnabled(draft) && (
+                            <p className="text-xs italic text-slate-500">
+                                {t(
+                                    'admin.study_design.rough_sort.deck_mode_note',
+                                    'Disabled. Participants see the full Q-set as a horizontally-scrollable deck.'
+                                )}
+                            </p>
+                        )}
+                    </CardContent>
+                </Card>
 
                 {isRoughSortEnabled(draft) && (
                     <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">

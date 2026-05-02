@@ -172,15 +172,17 @@ describe('StudyDesignPage Feature Tests', () => {
     });
 
     // ── Rough-sort toggle (Phase 3 task 17) ───────────────────────
-    // The toggle lives inside the Q-sort tab; tests pre-select that tab
-    // by seeding the designer store to avoid extra clicks in Tabs UI.
-    const seedQSortTab = () => {
-        useStudyDesigner.setState({ activeStep: 'q-sort' });
+    // The toggle was moved into the Consignes (condition) tab so the
+    // admin can pair the on/off switch with the matching pre-sort
+    // instruction text. Tests pre-select that tab by seeding the
+    // designer store to avoid extra clicks in Tabs UI.
+    const seedConditionTab = () => {
+        useStudyDesigner.setState({ activeStep: 'condition' });
     };
 
     it('renders the rough_sort toggle label and reflects the saved value', async () => {
         // mockStudy has rough_sort_enabled implicitly true (defaulted by store)
-        seedQSortTab();
+        seedConditionTab();
         renderPage();
 
         const toggle = await screen.findByTestId('rough-sort-toggle');
@@ -206,7 +208,7 @@ describe('StudyDesignPage Feature Tests', () => {
                 });
             })
         );
-        seedQSortTab();
+        seedConditionTab();
         renderPage();
 
         const toggle = await screen.findByTestId('rough-sort-toggle');

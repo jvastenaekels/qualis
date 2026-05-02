@@ -534,7 +534,6 @@
                 }
             },
             "rough_sort": {
-                "section_title": "Rough sort step",
                 "toggle_label": "Enable preliminary sort (3-pile triage)",
                 "lock_banner": "Toggle locked. {{count}} participant(s) have started the survey; archive or delete those sessions before changing this setting.",
                 "deck_mode_note": "Disabled. Participants see the full Q-set as a horizontally-scrollable deck."

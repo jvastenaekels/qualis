@@ -449,7 +449,6 @@
                 }
             },
             "rough_sort": {
-                "section_title": "Étape de tri préliminaire",
                 "toggle_label": "Activer le tri préliminaire (3 piles d'accord/neutre/pas d'accord)",
                 "lock_banner": "Verrou actif. {{count}} participant(s) ont commencé l'enquête ; archivez ou supprimez ces sessions avant de modifier ce réglage.",
                 "deck_mode_note": "Désactivé. Les participants verront l'ensemble du Q-set sous forme d'un deck défilant horizontalement."
