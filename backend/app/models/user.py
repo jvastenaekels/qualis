@@ -14,6 +14,7 @@ from .base import (
     func,
     mapped_column,
     relationship,
+    timezone,
 )
 
 
@@ -39,7 +40,10 @@ class User(Base):
     )
     totp_channel: Mapped[str | None] = mapped_column(String, nullable=True)
     password_changed_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, server_default=func.now()
+        DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+        server_default=func.now(),
     )
 
     # Relationships

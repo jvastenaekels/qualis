@@ -122,7 +122,7 @@ Inside a strict module: every function declares its return type, no implicit `An
 - Generate: `make migration-new` (auto-generates from model changes)
 - **Always review generated migrations** — auto-generation against a blank or out-of-sync DB will include unrelated tables. The migration must only contain the intended schema change.
 - Migrations run automatically on deploy via `Procfile` release phase (`python scripts/migrate.py`)
-- Migration chain (19 migrations as of 2026-05-02, head `cb8732294475`):
+- Migration chain (20 migrations as of 2026-05-02, head `fd88287d3f9b`):
   `initial_schema` → `rename_randomize_statements_to_randomize_statement_order`
   → `remove_consent_buttons` → `add_pre_instruction`
   → `add_is_test_run_to_participants` → `add_audio_recordings_table`
@@ -133,7 +133,7 @@ Inside a strict module: every function declares its return type, no implicit `An
   → `add_item_versions_and_comments` → `rename_workspace_to_project`
   → `add_analysis_runs_table` → `add_anonymised_at_to_participants`
   → `rename_workspace_indexes_to_project_add_is_discarded_index`
-  → `add_auth_email_flows`
+  → `add_auth_email_flows` → `fix_password_changed_at_default`
 - Run `alembic history` (in `backend/`) for the canonical chain — this list will drift if not updated when new migrations are added.
 - PostgreSQL DDL is transactional: a failed migration rolls back entirely, leaving `alembic_version` unchanged
 
