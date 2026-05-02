@@ -169,6 +169,7 @@
             "email_label": "Adresse e-mail",
             "password_label": "Mot de passe",
             "submit": "Continuer",
+            "cta": "Se connecter",
             "forgot_password": "Oublié ?",
             "loading": "Authentification...",
             "card_title": "Se connecter",
@@ -177,6 +178,21 @@
             "error_generic": "Une erreur est survenue. Veuillez réessayer.",
             "reason_session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
             "reason_auth_required": "Veuillez vous connecter pour continuer."
+        },
+        "email": {
+            "verification_sent": {
+                "title": "Vérifiez votre adresse e-mail",
+                "body": "Nous avons envoyé un lien de vérification à {{email}}. Cliquez sur le lien pour activer votre compte.",
+                "resend": "Renvoyer l'e-mail",
+                "cooldown": "Renvoi disponible dans {{seconds}}s",
+                "error": "Impossible de renvoyer. Réessayez plus tard."
+            },
+            "verify": {
+                "verifying": "Vérification de votre adresse e-mail…",
+                "success": "Adresse e-mail vérifiée. Vous pouvez maintenant vous connecter.",
+                "expired": "Ce lien a expiré ou est invalide.",
+                "resend_link": "Demander un nouvel e-mail de vérification"
+            }
         },
         "register": {
             "title": "Créer un compte",

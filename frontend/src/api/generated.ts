@@ -40,6 +40,8 @@ import type {
     CreateRecruitmentLinksApiAdminRecruitmentSlugLinksPostParams,
     DeleteAudioRecordingApiAudioRecordingIdDeleteParams,
     DraftSaveInput,
+    EmailRequest,
+    EmailTokenSubmit,
     GetAudioUrlApiAudioRecordingIdUrlGetParams,
     GetConcourseMemoUnreadApiAdminConcoursesCidMemoUnreadGetParams,
     GetResearchPackageApiAdminStudiesSlugExportPackageGetParams,
@@ -155,6 +157,7 @@ import type {
     TOTPEnableResponse,
     TOTPSetup,
     Token,
+    UserCreateResponse,
     UserRead,
     ValidationResult,
     VerifyInvitationApiAdminInvitationsVerifyGet200,
@@ -473,10 +476,21 @@ export const useLoginForAccessTokenApiTokenPost = <
 
 /**
  * Register a new user, optionally via an invitation token.
+
+- Invited path (valid invitation_token matching the email): is_active=True,
+  email_verified_at=NOW(), requires_email_verification=False.
+- Self-signup path (no invitation token), when verification is active
+  (EMAIL_VERIFICATION_REQUIRED=True AND SMTP is configured): is_active=False,
+  email_verified_at=NULL, verification email sent,
+  requires_email_verification=True.
+- Self-signup path with verification inactive (operator disabled it OR
+  SMTP not configured): is_active=True, email_verified_at=NOW(),
+  requires_email_verification=False — never lock users out of a deployment
+  that cannot deliver verification mail.
  * @summary Register User
  */
 export const registerUserApiRegisterPost = (userCreate: UserCreate, signal?: AbortSignal) => {
-    return customInstance<UserRead>({
+    return customInstance<UserCreateResponse>({
         url: `/api/register`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -907,6 +921,180 @@ export const useDisableTotpApiMe2faDisablePost = <TError = HTTPValidationError, 
     TContext
 > => {
     const mutationOptions = getDisableTotpApiMe2faDisablePostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Consume an email-verification JWT and activate the user account.
+
+Idempotent: re-verifying an already-verified account returns 200 silently.
+Anti-enum: a valid JWT whose email matches no user also returns 200.
+ * @summary Verify Email
+ */
+export const verifyEmailApiEmailVerifyPost = (
+    emailTokenSubmit: EmailTokenSubmit,
+    signal?: AbortSignal
+) => {
+    return customInstance<AckResponse>({
+        url: `/api/email/verify`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: emailTokenSubmit,
+        signal,
+    });
+};
+
+export const getVerifyEmailApiEmailVerifyPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof verifyEmailApiEmailVerifyPost>>,
+        TError,
+        { data: EmailTokenSubmit },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof verifyEmailApiEmailVerifyPost>>,
+    TError,
+    { data: EmailTokenSubmit },
+    TContext
+> => {
+    const mutationKey = ['verifyEmailApiEmailVerifyPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof verifyEmailApiEmailVerifyPost>>,
+        { data: EmailTokenSubmit }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return verifyEmailApiEmailVerifyPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type VerifyEmailApiEmailVerifyPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof verifyEmailApiEmailVerifyPost>>
+>;
+export type VerifyEmailApiEmailVerifyPostMutationBody = EmailTokenSubmit;
+export type VerifyEmailApiEmailVerifyPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Verify Email
+ */
+export const useVerifyEmailApiEmailVerifyPost = <TError = HTTPValidationError, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof verifyEmailApiEmailVerifyPost>>,
+            TError,
+            { data: EmailTokenSubmit },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof verifyEmailApiEmailVerifyPost>>,
+    TError,
+    { data: EmailTokenSubmit },
+    TContext
+> => {
+    const mutationOptions = getVerifyEmailApiEmailVerifyPostMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Resend a verification email to an unverified account.
+
+Always returns 200 (anti-enum). If the user exists and is unverified,
+a fresh token is emailed. Otherwise, a fake bcrypt call equalises latency
+so callers cannot distinguish the two code paths by timing.
+ * @summary Resend Verification
+ */
+export const resendVerificationApiEmailVerifyResendPost = (
+    emailRequest: EmailRequest,
+    signal?: AbortSignal
+) => {
+    return customInstance<AckResponse>({
+        url: `/api/email/verify/resend`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        data: emailRequest,
+        signal,
+    });
+};
+
+export const getResendVerificationApiEmailVerifyResendPostMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof resendVerificationApiEmailVerifyResendPost>>,
+        TError,
+        { data: EmailRequest },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof resendVerificationApiEmailVerifyResendPost>>,
+    TError,
+    { data: EmailRequest },
+    TContext
+> => {
+    const mutationKey = ['resendVerificationApiEmailVerifyResendPost'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof resendVerificationApiEmailVerifyResendPost>>,
+        { data: EmailRequest }
+    > = (props) => {
+        const { data } = props ?? {};
+
+        return resendVerificationApiEmailVerifyResendPost(data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type ResendVerificationApiEmailVerifyResendPostMutationResult = NonNullable<
+    Awaited<ReturnType<typeof resendVerificationApiEmailVerifyResendPost>>
+>;
+export type ResendVerificationApiEmailVerifyResendPostMutationBody = EmailRequest;
+export type ResendVerificationApiEmailVerifyResendPostMutationError = HTTPValidationError;
+
+/**
+ * @summary Resend Verification
+ */
+export const useResendVerificationApiEmailVerifyResendPost = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof resendVerificationApiEmailVerifyResendPost>>,
+            TError,
+            { data: EmailRequest },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof resendVerificationApiEmailVerifyResendPost>>,
+    TError,
+    { data: EmailRequest },
+    TContext
+> => {
+    const mutationOptions = getResendVerificationApiEmailVerifyResendPostMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -13506,17 +13694,23 @@ export const getLoginForAccessTokenApiTokenPostResponseMock = (
 });
 
 export const getRegisterUserApiRegisterPostResponseMock = (
-    overrideResponse: Partial<UserRead> = {}
-): UserRead => ({
-    email: faker.string.alpha({ length: { min: 10, max: 20 } }),
-    full_name: faker.helpers.arrayElement([
-        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 100 } }), null]),
-        undefined,
-    ]),
-    id: faker.number.int({ min: undefined, max: undefined }),
-    is_active: faker.datatype.boolean(),
-    is_superuser: faker.datatype.boolean(),
-    is_totp_enabled: faker.datatype.boolean(),
+    overrideResponse: Partial<UserCreateResponse> = {}
+): UserCreateResponse => ({
+    user: {
+        email: faker.string.alpha({ length: { min: 10, max: 20 } }),
+        full_name: faker.helpers.arrayElement([
+            faker.helpers.arrayElement([
+                faker.string.alpha({ length: { min: 10, max: 100 } }),
+                null,
+            ]),
+            undefined,
+        ]),
+        id: faker.number.int({ min: undefined, max: undefined }),
+        is_active: faker.datatype.boolean(),
+        is_superuser: faker.datatype.boolean(),
+        is_totp_enabled: faker.datatype.boolean(),
+    },
+    requires_email_verification: faker.datatype.boolean(),
     ...overrideResponse,
 });
 
@@ -13553,6 +13747,28 @@ export const getEnableTotpApiMe2faEnablePostResponseMock = (
 });
 
 export const getDisableTotpApiMe2faDisablePostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getVerifyEmailApiEmailVerifyPostResponseMock = (
+    overrideResponse: Partial<AckResponse> = {}
+): AckResponse => ({
+    status: faker.string.alpha({ length: { min: 10, max: 20 } }),
+    details: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    ...overrideResponse,
+});
+
+export const getResendVerificationApiEmailVerifyResendPostResponseMock = (
     overrideResponse: Partial<AckResponse> = {}
 ): AckResponse => ({
     status: faker.string.alpha({ length: { min: 10, max: 20 } }),
@@ -18058,8 +18274,10 @@ export const getLoginForAccessTokenApiTokenPostMockHandler = (
 
 export const getRegisterUserApiRegisterPostMockHandler = (
     overrideResponse?:
-        | UserRead
-        | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Promise<UserRead> | UserRead),
+        | UserCreateResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<UserCreateResponse> | UserCreateResponse),
     options?: RequestHandlerOptions
 ) => {
     return http.post(
@@ -18174,6 +18392,58 @@ export const getDisableTotpApiMe2faDisablePostMockHandler = (
                             ? await overrideResponse(info)
                             : overrideResponse
                         : getDisableTotpApiMe2faDisablePostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getVerifyEmailApiEmailVerifyPostMockHandler = (
+    overrideResponse?:
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/email/verify',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getVerifyEmailApiEmailVerifyPostResponseMock()
+                ),
+                { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+        },
+        options
+    );
+};
+
+export const getResendVerificationApiEmailVerifyResendPostMockHandler = (
+    overrideResponse?:
+        | AckResponse
+        | ((
+              info: Parameters<Parameters<typeof http.post>[1]>[0]
+          ) => Promise<AckResponse> | AckResponse),
+    options?: RequestHandlerOptions
+) => {
+    return http.post(
+        '*/api/email/verify/resend',
+        async (info) => {
+            return new HttpResponse(
+                JSON.stringify(
+                    overrideResponse !== undefined
+                        ? typeof overrideResponse === 'function'
+                            ? await overrideResponse(info)
+                            : overrideResponse
+                        : getResendVerificationApiEmailVerifyResendPostResponseMock()
                 ),
                 { status: 200, headers: { 'Content-Type': 'application/json' } }
             );
@@ -20674,6 +20944,8 @@ export const getQualisAPIMock = () => [
     getSetupTotpApiMe2faSetupGetMockHandler(),
     getEnableTotpApiMe2faEnablePostMockHandler(),
     getDisableTotpApiMe2faDisablePostMockHandler(),
+    getVerifyEmailApiEmailVerifyPostMockHandler(),
+    getResendVerificationApiEmailVerifyResendPostMockHandler(),
     getCreateStudyApiAdminStudiesPostMockHandler(),
     getListStudiesApiAdminStudiesGetMockHandler(),
     getGetStudyApiAdminStudiesSlugGetMockHandler(),

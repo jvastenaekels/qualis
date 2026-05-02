@@ -27,6 +27,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { parseApiErrorSync } from '@/lib/error-utils';
 import { customInstance } from '@/api/mutator';
+import { registerUserApiRegisterPost } from '@/api/generated';
 
 const RegistrationPage = () => {
     const { t } = useTranslation();
@@ -58,12 +59,8 @@ const RegistrationPage = () => {
 
     // Manual Mutation for Registration
     const registerMutation = useMutation({
-        mutationFn: (data: Record<string, unknown>) =>
-            customInstance<unknown>({
-                url: `/api/register`,
-                method: 'POST',
-                data,
-            }),
+        mutationFn: (data: { email: string; password: string; invitation_token?: string }) =>
+            registerUserApiRegisterPost(data),
     });
 
     useEffect(() => {
@@ -80,11 +77,15 @@ const RegistrationPage = () => {
         }
 
         try {
-            await registerMutation.mutateAsync({
+            const result = await registerMutation.mutateAsync({
                 email,
                 password,
                 invitation_token: token || undefined,
             });
+            if (result.requires_email_verification) {
+                navigate('/verify-email-sent', { state: { email } });
+                return;
+            }
             setIsSuccess(true);
             toast.success(t('auth.register.success_title'));
         } catch (error: unknown) {

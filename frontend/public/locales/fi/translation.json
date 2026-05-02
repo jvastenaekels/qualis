@@ -169,6 +169,7 @@
             "email_label": "Sähköpostiosoite",
             "password_label": "Salasana",
             "submit": "Jatka",
+            "cta": "Kirjaudu sisään",
             "forgot_password": "Unohditko?",
             "loading": "Tunnistaudutaan...",
             "card_title": "Kirjaudu sisään",
@@ -177,6 +178,21 @@
             "error_generic": "Jotain meni vikaan. Yritä uudelleen.",
             "reason_session_expired": "Istuntosi on vanhentunut. Kirjaudu sisään uudelleen.",
             "reason_auth_required": "Kirjaudu sisään jatkaaksesi."
+        },
+        "email": {
+            "verification_sent": {
+                "title": "Vahvista sähköpostiosoitteesi",
+                "body": "Lähetimme vahvistuslinkin osoitteeseen {{email}}. Klikkaa linkkiä aktivoidaksesi tilisi.",
+                "resend": "Lähetä sähköposti uudelleen",
+                "cooldown": "Uudelleenlähetys saatavilla {{seconds}}s kuluttua",
+                "error": "Uudelleenlähetys epäonnistui. Yritä myöhemmin uudelleen."
+            },
+            "verify": {
+                "verifying": "Vahvistetaan sähköpostiosoitettasi…",
+                "success": "Sähköposti vahvistettu. Voit nyt kirjautua sisään.",
+                "expired": "Tämä linkki on vanhentunut tai virheellinen.",
+                "resend_link": "Pyydä uusi vahvistussähköposti"
+            }
         },
         "register": {
             "title": "Luo tili",

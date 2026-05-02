@@ -31,6 +31,8 @@ import RouteErrorBoundary from './components/RouteErrorBoundary';
 // Lazy load heavy interactive components
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));
 const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
+const EmailVerifyPage = lazy(() => import('./pages/EmailVerifyPage'));
+const EmailVerificationSentPage = lazy(() => import('./pages/EmailVerificationSentPage'));
 import LoginPage from './pages/LoginPage';
 
 // Admin imports
@@ -83,6 +85,14 @@ const router = createBrowserRouter([
     {
         path: '/register',
         element: <RegistrationPage />,
+    },
+    {
+        path: '/verify-email',
+        element: <EmailVerifyPage />,
+    },
+    {
+        path: '/verify-email-sent',
+        element: <EmailVerificationSentPage />,
     },
     {
         path: '/hub',

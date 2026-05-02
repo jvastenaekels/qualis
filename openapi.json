@@ -143,7 +143,7 @@
           "auth"
         ],
         "summary": "Register User",
-        "description": "Register a new user, optionally via an invitation token.",
+        "description": "Register a new user, optionally via an invitation token.\n\n- Invited path (valid invitation_token matching the email): is_active=True,\n  email_verified_at=NOW(), requires_email_verification=False.\n- Self-signup path (no invitation token), when verification is active\n  (EMAIL_VERIFICATION_REQUIRED=True AND SMTP is configured): is_active=False,\n  email_verified_at=NULL, verification email sent,\n  requires_email_verification=True.\n- Self-signup path with verification inactive (operator disabled it OR\n  SMTP not configured): is_active=True, email_verified_at=NOW(),\n  requires_email_verification=False \u2014 never lock users out of a deployment\n  that cannot deliver verification mail.",
         "operationId": "register_user_api_register_post",
         "requestBody": {
           "content": {
@@ -161,7 +161,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserRead"
+                  "$ref": "#/components/schemas/UserCreateResponse"
                 }
               }
             }
@@ -345,6 +345,90 @@
             "OAuth2PasswordBearer": []
           }
         ]
+      }
+    },
+    "/api/email/verify": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Verify Email",
+        "description": "Consume an email-verification JWT and activate the user account.\n\nIdempotent: re-verifying an already-verified account returns 200 silently.\nAnti-enum: a valid JWT whose email matches no user also returns 200.",
+        "operationId": "verify_email_api_email_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailTokenSubmit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/email/verify/resend": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Resend Verification",
+        "description": "Resend a verification email to an unverified account.\n\nAlways returns 200 (anti-enum). If the user exists and is unverified,\na fresh token is emailed. Otherwise, a fake bcrypt call equalises latency\nso callers cannot distinguish the two code paths by timing.",
+        "operationId": "resend_verification_api_email_verify_resend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/admin/studies": {
@@ -8131,6 +8215,35 @@
         "title": "EigenvalueResult",
         "description": "Eigenvalues for the scree plot plus three retention indicators.\n\nAll three indicators are advisory \u2014 Watts & Stenner (2012) emphasise\nthat factor retention in Q-methodology also depends on interpretability\nand stability, not just statistical thresholds."
       },
+      "EmailRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "EmailRequest",
+        "description": "Schema for submitting an email address (resend flows)."
+      },
+      "EmailTokenSubmit": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "EmailTokenSubmit",
+        "description": "Schema for submitting an email-link JWT (verify, password-reset, etc.)."
+      },
       "FactorCharacteristic": {
         "properties": {
           "factor": {
@@ -11824,6 +11937,24 @@
         ],
         "title": "UserCreate",
         "description": "Schema for creating a new user."
+      },
+      "UserCreateResponse": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserRead"
+          },
+          "requires_email_verification": {
+            "type": "boolean",
+            "title": "Requires Email Verification"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "requires_email_verification"
+        ],
+        "title": "UserCreateResponse",
+        "description": "Response from POST /api/register: the user + a verification flag."
       },
       "UserRead": {
         "properties": {
