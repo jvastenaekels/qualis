@@ -58,7 +58,7 @@ class TestRegistration:
         )
         assert response.status_code == 201
         data = response.json()
-        assert data["email"] == "newuser@example.com"
+        assert data["user"]["email"] == "newuser@example.com"
 
         # Verify in DB
         result = await db.execute(
@@ -264,6 +264,60 @@ class TestProfile:
         }
         response = await client.post("/api/me/password", json=payload, headers=headers)
         assert response.status_code == 400
+
+
+@pytest.mark.asyncio
+class TestRegistrationEmailVerification:
+    async def test_register_without_invitation_creates_inactive_account(
+        self, client: AsyncClient, db: AsyncSession, caplog
+    ):
+        with caplog.at_level("INFO", logger="app.utils.email"):
+            response = await client.post(
+                "/api/register",
+                json={"email": "newverify@example.com", "password": "securepass123"},
+            )
+        assert response.status_code == 201
+        body = response.json()
+        assert body["requires_email_verification"] is True
+        assert body["user"]["email"] == "newverify@example.com"
+
+        result = await db.execute(
+            select(User).where(User.email == "newverify@example.com")
+        )
+        user = result.scalar_one()
+        assert user.is_active is False
+        assert user.email_verified_at is None
+        # Email content was logged because dev SMTP is unset
+        assert any("email-verification" in r.message for r in caplog.records)
+
+    async def test_register_with_invitation_skips_verification(
+        self, client: AsyncClient, db: AsyncSession, test_project
+    ):
+        # Create an invitation token mirroring the existing test_register_with_valid_invitation pattern
+        token = create_invitation_token(
+            email="invite-skip@example.com",
+            project_id=test_project.id,
+            role=ProjectRole.researcher.value,
+        )
+
+        response = await client.post(
+            "/api/register",
+            json={
+                "email": "invite-skip@example.com",
+                "password": "securepass123",
+                "invitation_token": token,
+            },
+        )
+        assert response.status_code == 201
+        body = response.json()
+        assert body["requires_email_verification"] is False
+
+        result = await db.execute(
+            select(User).where(User.email == "invite-skip@example.com")
+        )
+        user = result.scalar_one()
+        assert user.is_active is True
+        assert user.email_verified_at is not None
 
 
 @pytest.mark.skipif(

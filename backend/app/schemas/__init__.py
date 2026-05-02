@@ -86,6 +86,7 @@ from .users import (
     PasswordConfirm,
     UserBase,
     UserCreate,
+    UserCreateResponse,
     UserRead,
     UserUpdate,
 )
@@ -219,6 +220,7 @@ __all__ = [
     "PasswordConfirm",
     "UserBase",
     "UserCreate",
+    "UserCreateResponse",
     "UserRead",
     "UserUpdate",
     # projects

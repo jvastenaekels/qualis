@@ -1,6 +1,6 @@
 """Authentication routes."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 import logging
 
@@ -16,6 +16,7 @@ from app.dependencies import get_current_user
 from app.models import User
 from app.utils.security import (
     create_access_token,
+    create_email_token,
     verify_password,
     get_password_hash,
     decode_invitation_token,
@@ -23,10 +24,12 @@ from app.utils.security import (
     get_totp_uri,
     verify_totp_token,
 )
+from app.utils.email import send_email_verification
 from app.schemas import (
     Token,
     UserRead,
     UserCreate,
+    UserCreateResponse,
     UserUpdate,
     PasswordChange,
     PasswordConfirm,
@@ -104,15 +107,23 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")  # nosec B106
 
 
-@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register", response_model=UserCreateResponse, status_code=status.HTTP_201_CREATED
+)
 @limiter.limit("5/minute")
 async def register_user(
     request: Request,
     user_in: UserCreate,
     db: AsyncSession = Depends(get_db),
-) -> User:
+) -> UserCreateResponse:
     """
     Register a new user, optionally via an invitation token.
+
+    - Invited path (valid invitation_token matching the email): is_active=True,
+      email_verified_at=NOW(), requires_email_verification=False.
+    - Self-signup path (no invitation token): is_active=False,
+      email_verified_at=NULL, verification email sent,
+      requires_email_verification=True.
     """
     # 1. Check if user already exists
     query = select(User).where(User.email == user_in.email)
@@ -140,13 +151,19 @@ async def register_user(
                 detail=f"Invalid invitation token: {str(e)}",
             )
 
+    # Invited users are immediately active + verified; self-signup must verify.
+    invited = invitation_payload is not None
+    now = datetime.now(tz=timezone.utc)
+
     try:
         # 3. Create User
         new_user = User(
             email=user_in.email,
             full_name=user_in.full_name,
             hashed_password=get_password_hash(user_in.password),
-            is_active=True,
+            is_active=invited,
+            email_verified_at=now if invited else None,
+            password_changed_at=now,
         )
         db.add(new_user)
         # Flush to get ID, but be ready to rollback
@@ -187,7 +204,21 @@ async def register_user(
             detail="An unexpected error occurred while registering the user",
         )
     await db.refresh(new_user)
-    return new_user
+
+    # 5. Send verification email for self-signup path
+    if not invited:
+        token = create_email_token(
+            email=new_user.email,
+            purpose="email_verify",
+            expires_delta=timedelta(hours=24),
+        )
+        verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+        send_email_verification(email_to=new_user.email, verify_url=verify_url)
+
+    return UserCreateResponse(
+        user=UserRead.model_validate(new_user),
+        requires_email_verification=not invited,
+    )
 
 
 @router.patch("/me", response_model=UserRead)
