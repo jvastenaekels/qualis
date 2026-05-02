@@ -1,73 +1,12 @@
 import { renderWithProviders, screen, waitFor } from '@/test-utils/test-utils';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import ProjectSettingsPage from './ProjectSettingsPage';
+import ProjectMembersPage from './ProjectMembersPage';
 import { useAuthStore } from '@/store/useAuthStore';
 
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 
-// react-hook-form v7.68.0 + React 19 + happy-dom triggers a useLayoutEffect
-// infinite loop when real useForm / FormProvider / Controller are used.
-// Stub the form layer to DOM-only stubs so the test can render.
-vi.mock('@/components/ui/form', () => ({
-    Form: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    FormControl: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    FormDescription: ({ children }: { children: React.ReactNode }) => <p>{children}</p>,
-    FormField: ({
-        render,
-    }: {
-        render: (p: {
-            field: {
-                value: string;
-                onChange: () => void;
-                onBlur: () => void;
-                ref: () => void;
-                name: string;
-            };
-        }) => React.ReactNode;
-    }) => (
-        <div>
-            {render({
-                field: {
-                    value: '',
-                    onChange: vi.fn(),
-                    onBlur: vi.fn(),
-                    ref: vi.fn(),
-                    name: 'field',
-                },
-            })}
-        </div>
-    ),
-    FormItem: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    // biome-ignore lint/a11y/noLabelWithoutControl: test stub only
-    FormLabel: ({ children }: { children: React.ReactNode }) => <label>{children}</label>,
-    FormMessage: () => null,
-}));
-
-vi.mock('react-hook-form', () => ({
-    useForm: vi.fn(() => ({
-        register: vi.fn(() => ({
-            name: 'f',
-            ref: vi.fn(),
-            onChange: vi.fn(),
-            onBlur: vi.fn(),
-        })),
-        handleSubmit: vi.fn(() => vi.fn()),
-        reset: vi.fn(),
-        control: {},
-        formState: { errors: {}, isSubmitting: false },
-    })),
-    Controller: ({
-        render,
-    }: {
-        render: (p: { field: { value: string; onChange: () => void } }) => React.ReactNode;
-    }) => <div>{render({ field: { value: '', onChange: vi.fn() } })}</div>,
-    FormProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
-
-vi.mock('@hookform/resolvers/zod', () => ({ zodResolver: vi.fn(() => vi.fn()) }));
-
-// Radix Select triggers the same compose-refs loop — stub it too
+// Radix Select triggers a compose-refs loop in React 19 + happy-dom — stub it.
 vi.mock('@/components/ui/select', () => ({
     Select: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     SelectTrigger: ({ children }: { children: React.ReactNode }) => (
@@ -114,10 +53,6 @@ vi.mock('@/api/generated', () => ({
         mutateAsync: removeMember,
         isPending: false,
     }),
-    useUpdateProjectApiAdminProjectsSlugPatch: () => ({
-        mutateAsync: vi.fn(),
-        isPending: false,
-    }),
     useUpdateProjectMemberApiAdminProjectsSlugMembersUserIdPatch: () => ({
         mutateAsync: vi.fn(),
         isPending: false,
@@ -126,7 +61,6 @@ vi.mock('@/api/generated', () => ({
         mutateAsync: vi.fn(),
         isPending: false,
     }),
-    getListProjectsApiAdminProjectsGetQueryKey: () => ['projects'],
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -138,7 +72,7 @@ vi.mock('react-router-dom', async () => {
     };
 });
 
-describe('ProjectSettingsPage remove-member dialog', () => {
+describe('ProjectMembersPage remove-member dialog', () => {
     beforeEach(() => {
         removeMember.mockReset().mockResolvedValue({});
         useAuthStore.setState({
@@ -149,7 +83,7 @@ describe('ProjectSettingsPage remove-member dialog', () => {
 
     it('opens an AlertDialog showing the member name and confirms removal', async () => {
         const user = userEvent.setup();
-        renderWithProviders(<ProjectSettingsPage />);
+        renderWithProviders(<ProjectMembersPage />);
 
         const removeBtn = await screen.findByRole('button', { name: /remove ada lovelace/i });
         await user.click(removeBtn);

@@ -573,7 +573,8 @@
             "study_tools": "Tutkimustyökalut",
             "concourses": "Lausekokoelmat",
             "concourse": "Lausekokoelma",
-            "privacy": "Tietosuoja"
+            "privacy": "Tietosuoja",
+            "members": "Tiimin jäsenet"
         },
         "concourse": {
             "title": "Lausekokoelma",
@@ -1145,7 +1146,8 @@
             "participant_n": "Osallistuja {{code}}",
             "analysis": "Analyysi",
             "settings": "Asetukset",
-            "concourse": "Concourse"
+            "concourse": "Concourse",
+            "members": "Tiimin jäsenet"
         },
         "command_menu": {
             "title": "Globaali komentovalikko",
@@ -2218,7 +2220,7 @@
             "title": "Projektit",
             "settings": {
                 "title": "Projektin asetukset",
-                "identity_desc": "Hallitse projektin identiteettiä ja tiimin käyttöoikeuksia.",
+                "identity_desc": "Hallitse projektin identiteettiä.",
                 "general": {
                     "title": "Yleiset asetukset",
                     "desc": "Projektisi identiteetti ja ensisijainen tunnistus.",
@@ -2281,6 +2283,10 @@
                     }
                 }
             }
+        },
+        "members": {
+            "title": "Tiimin jäsenet",
+            "description": "Hallinnoi projektin käyttöoikeuksia ja jäsenten rooleja."
         },
         "hub": {
             "title": "Tutkijaportaali",

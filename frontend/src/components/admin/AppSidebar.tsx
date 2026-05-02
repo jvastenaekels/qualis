@@ -14,6 +14,7 @@ import {
     Download,
     Settings2,
     ShieldCheck,
+    Users,
 } from 'lucide-react';
 import { ProjectSwitcher } from './ProjectSwitcher';
 import { FocusModeHeader } from './FocusModeHeader';
@@ -206,6 +207,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   title: t('admin.sidebar.concourse', 'Concourse'),
                   url: `/app/${projectSlug}/concourses`,
                   icon: Library,
+                  show: true,
+              },
+              {
+                  title: t('admin.sidebar.members', 'Team members'),
+                  url: `/app/${projectSlug}/members`,
+                  icon: Users,
                   show: true,
               },
               {

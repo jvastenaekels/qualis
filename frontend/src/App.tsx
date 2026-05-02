@@ -49,6 +49,7 @@ const GeneralSettingsPage = lazy(() => import('./pages/admin/GeneralSettingsPage
 const ParticipantDetailsPage = lazy(() => import('./pages/admin/ParticipantDetailsPage'));
 const ProfilePage = lazy(() => import('./pages/admin/ProfilePage'));
 const ProjectSettingsPage = lazy(() => import('./pages/admin/ProjectSettingsPage'));
+const ProjectMembersPage = lazy(() => import('./pages/admin/ProjectMembersPage'));
 const ConcourseListPage = lazy(() => import('./pages/admin/ConcourseListPage'));
 const ConcourseDetailPage = lazy(() => import('./pages/admin/ConcourseDetailPage'));
 const CreateProjectPage = lazy(() => import('./pages/admin/CreateProjectPage'));
@@ -128,6 +129,12 @@ const router = createBrowserRouter([
                             {
                                 path: 'settings',
                                 element: <ProjectSettingsPage />,
+                                loader: projectSettingsPageLoader,
+                                HydrateFallback: DesignerSkeleton,
+                            },
+                            {
+                                path: 'members',
+                                element: <ProjectMembersPage />,
                                 loader: projectSettingsPageLoader,
                                 HydrateFallback: DesignerSkeleton,
                             },

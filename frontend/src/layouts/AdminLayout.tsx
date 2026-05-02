@@ -68,6 +68,7 @@ export default function AdminLayout() {
             settings: t('admin.breadcrumbs.settings'),
             participants: t('admin.breadcrumbs.participants'),
             concourses: t('admin.breadcrumbs.concourse', 'Concourse'),
+            members: t('admin.breadcrumbs.members', 'Team members'),
         };
 
         // Special cases

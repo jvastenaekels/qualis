@@ -658,7 +658,8 @@
             "study": "Study",
             "select_project": "Select project",
             "concourses": "Concourses",
-            "concourse": "Concourse"
+            "concourse": "Concourse",
+            "members": "Team members"
         },
         "concourse": {
             "title": "Concourse",
@@ -1230,7 +1231,8 @@
             "participant_n": "Participant {{code}}",
             "analysis": "Analysis",
             "settings": "Settings",
-            "concourse": "Concourse"
+            "concourse": "Concourse",
+            "members": "Team members"
         },
         "command_menu": {
             "title": "Global command menu",
@@ -2357,7 +2359,7 @@
             "title": "Projects",
             "settings": {
                 "title": "Project settings",
-                "identity_desc": "Manage project identity and team access control.",
+                "identity_desc": "Manage project identity.",
                 "general": {
                     "title": "General settings",
                     "desc": "Identity and primary identification of your project.",
@@ -2420,6 +2422,10 @@
                     }
                 }
             }
+        },
+        "members": {
+            "title": "Team members",
+            "description": "Manage who can access this project and what they can do."
         },
         "participants": {
             "title": "Participants",

@@ -573,7 +573,8 @@
             "project_settings": "Réglages du projet",
             "study_tools": "Outils d'étude",
             "concourses": "Concours",
-            "concourse": "Concours"
+            "concourse": "Concours",
+            "members": "Membres de l'équipe"
         },
         "concourse": {
             "title": "Concours",
@@ -1145,7 +1146,8 @@
             "participant_n": "Participant {{code}}",
             "analysis": "Analyse",
             "settings": "Réglages",
-            "concourse": "Concours"
+            "concourse": "Concours",
+            "members": "Membres de l'équipe"
         },
         "command_menu": {
             "title": "Menu de commandes global",
@@ -2272,7 +2274,7 @@
             "title": "Projets",
             "settings": {
                 "title": "Paramètres du projet",
-                "identity_desc": "Gérez l'identité du projet et le contrôle d'accès de l'équipe.",
+                "identity_desc": "Gérez l'identité du projet.",
                 "general": {
                     "title": "Paramètres généraux",
                     "desc": "Identité et identification primaire de votre projet.",
@@ -2336,6 +2338,10 @@
                 }
             }
         },
+        "members": {
+            "title": "Membres de l'équipe",
+            "description": "Gérez l'accès au projet et les rôles de chaque membre."
+        },
         "hub": {
             "title": "Portail Chercheur",
             "welcome": "Bon retour, ",
@@ -2372,7 +2378,7 @@
             "edit": "Modifier",
             "delete": "Supprimer",
             "deleted_body": "[commentaire supprimé]",
-            "resolve": "Résoudre",
+            "resolve": "Marquer comme résolu",
             "unresolve": "Rouvrir",
             "resolved_label": "[résolu]",
             "save": "Enregistrer",
