@@ -73,6 +73,10 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY_ID: str | None = None
     S3_SECRET_ACCESS_KEY: str | None = None
 
+    # 2FA — Email OTP channel
+    TWOFA_EMAIL_OTP_EXPIRE_MINUTES: int = 5
+    TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS: int = 30
+
     # Audio Recording Limits
     AUDIO_MAX_FILE_SIZE_MB: int = 10
     AUDIO_MAX_DURATION_SECONDS: int = 300  # 5 minutes
