@@ -10,7 +10,8 @@ Each tutorial is hands-on: you will follow along and build something real as you
 |----------|-------------|------|
 | [Your First Study](your-first-study.md) | Create a project, design a complete Q-methodology study with statements and a forced-distribution grid, and publish it for participants. | ~30 min |
 | [Collecting Responses](collecting-responses.md) | Set up recruitment links, share your study with participants, and monitor live responses from the researcher dashboard. | ~15 min |
-| [Analyzing Results](analyzing-results.md) | Use the built-in factor analysis tools (PCA, centroid extraction, varimax rotation), interpret factor loadings and arrays, and export your data for PQMethod, R, or KADE. | ~20 min |
+| [Analyzing Results — Foundations](analyzing-results-foundations.md) | Run a factor analysis with classical defaults (PCA, varimax, auto-flagging), read loadings and arrays, and export for PQMethod, R, or KADE. | ~20 min |
+| [Analyzing Results — Refinement](analyzing-results-refinement.md) | Choose the factor count deliberately (Explorer + preview range), validate stability (Compare / Tucker φ), build the narrative (factor canvas + voices), trace decisions (memos). | ~30 min |
 
 ## For Developers
 

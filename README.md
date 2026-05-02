@@ -181,7 +181,7 @@ Organized using the [Diataxis framework](https://diataxis.fr/). See the [full in
 
 | | |
 | :--- | :--- |
-| **[Tutorials](docs/tutorials/)** | [Your First Study](docs/tutorials/your-first-study.md) &middot; [Collecting Responses](docs/tutorials/collecting-responses.md) &middot; [Analyzing Results](docs/tutorials/analyzing-results.md) &middot; [Development Workflow](docs/contributing/development.md) |
+| **[Tutorials](docs/tutorials/)** | [Your First Study](docs/tutorials/your-first-study.md) &middot; [Collecting Responses](docs/tutorials/collecting-responses.md) &middot; [Analyzing — Foundations](docs/tutorials/analyzing-results-foundations.md) &middot; [Analyzing — Refinement](docs/tutorials/analyzing-results-refinement.md) &middot; [Development Workflow](docs/contributing/development.md) |
 | **[Guides](docs/guides/)** | [Conducting Studies](docs/guides/conducting-studies.md) &middot; [Data Export](docs/guides/data-export.md) &middot; [Deployment](docs/guides/deployment.md) &middot; [S3 Audio Setup](docs/guides/s3-setup.md) |
 | **[Reference](docs/reference/)** | [API](docs/reference/api.md) &middot; [Configuration](docs/reference/configuration.md) &middot; [Admin Dashboard](docs/reference/admin-dashboard.md) &middot; [Components](docs/reference/components.md) |
 | **[Explanation](docs/explanation/)** | [Architecture](docs/explanation/architecture.md) &middot; [Q-Methodology](docs/explanation/q-methodology.md) &middot; [Mobile UX Decisions](docs/explanation/design-decisions/mobile-ux.md) |

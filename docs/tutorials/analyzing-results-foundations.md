@@ -1,6 +1,8 @@
-# Analyzing Results
+# Analyzing Results — Foundations
 
-In this tutorial, you will run a factor analysis on the study you built in the previous tutorials and see what each results tab shows. The goal is to learn the workflow — *which buttons, in what order, expecting what on screen* — not to do an in-depth methodological interpretation.
+In this tutorial you will run a factor analysis on the study you built in the previous tutorials and see what each results tab shows. This is the baseline workflow that produces a publishable factor solution — defaults that work, the four basic results tabs, exports.
+
+Once you are comfortable with the baseline, [Analyzing Results — Refinement](analyzing-results-refinement.md) covers the iterative tools (Explorer panel, Compare, factor canvas, memos) that you reach for when defaults are not enough.
 
 For the *why* behind extraction methods, rotation, distinguishing statements, and reliability, see [`../explanation/q-methodology.md`](../explanation/q-methodology.md).
 
@@ -8,9 +10,9 @@ This tutorial continues from [Collecting Responses](collecting-responses.md).
 
 **What you will learn:**
 
-- How to run a factor analysis with sensible defaults
+- How to run a factor analysis with the classical Brown-school defaults
 - What each of the four results tabs shows
-- How to spot when a result is too thin to interpret (too few participants)
+- How to spot when a result is too thin to interpret
 - Where to find exports
 
 **Time required:** ~20 minutes
@@ -105,8 +107,13 @@ Each analysis you ran is also persisted to the **history panel** at the top of t
 
 ## What you built
 
-You ran a complete factor analysis end-to-end and saw what each tab surfaces. With a real study (40+ participants is typical for Q-methodology), the same workflow will produce interpretable factors — and the same exports plug into PQMethod, Ken-Q, KADE, and the R `qmethod` package.
+You ran a complete factor analysis end-to-end and saw what each tab surfaces. With a real study (40+ participants is typical for Q-methodology), the same workflow will produce interpretable factors, and the same exports plug into PQMethod, Ken-Q, KADE, and the R `qmethod` package.
 
 ## Next steps
 
-You have now finished the researcher workflow. For developer-oriented content, see the [Development Workflow guide](../contributing/development.md).
+Two paths forward:
+
+- **For most workflows** the baseline is enough — export, write up, ship. The export formats are covered in [Data Export](../guides/data-export.md).
+- **When you need more**, continue to [Analyzing Results — Refinement](analyzing-results-refinement.md): choosing the factor count deliberately (Explorer panel + preview range), validating stability against an alternate solution (Compare / Tucker φ), building the interpretive narrative for each factor (factor canvas + quote picker), tracing collaborative interpretation (memos + @-mentions).
+
+For developer-oriented content, see the [Development Workflow guide](../contributing/development.md).

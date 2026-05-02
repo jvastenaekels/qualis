@@ -141,4 +141,4 @@ You now know how to create public, individual, and limited recruitment links; sh
 
 ## Next Steps
 
-Once you have collected enough responses (typically 15-40+ for Q methodology), continue to **[Analyzing Results](analyzing-results.md)**.
+Once you have collected enough responses (typically 15-40+ for Q methodology), continue to **[Analyzing Results — Foundations](analyzing-results-foundations.md)**.

@@ -89,6 +89,14 @@ The **Q-grid** is a forced quasi-normal distribution where participants place st
           2   3   4   5   4   3   2   = 23 places
 ```
 
+### Forced, free, and flexible distributions
+
+The grid above is a *forced* distribution — every column must hold its declared capacity at submission. This is the Brown-school default and the one most published Q studies use, because the trade-offs participants commit to are what makes Q-sorts directly comparable across people.
+
+A *free* distribution drops the per-column constraint. Participants must still place every statement, but columns can absorb overflow. The slot counts are an upper hint rather than a rule. Critical-Q practitioners sometimes prefer this on the grounds that the forced shape imposes a structure on subjectivity rather than measuring it (Watts & Stenner 2012, ch. 4; Brown et al. 2015).
+
+Qualis also offers a *flexible* mode that keeps the total enforced but treats per-column capacities as soft hints with a designer warning — a compromise between forced and free.
+
 ---
 
 ## Qualis study phases
