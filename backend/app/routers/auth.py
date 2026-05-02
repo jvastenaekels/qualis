@@ -135,16 +135,19 @@ async def register_user(
     """
     Register a new user, optionally via an invitation token.
 
-    - Invited path (valid invitation_token matching the email): is_active=True,
-      email_verified_at=NOW(), requires_email_verification=False.
-    - Self-signup path (no invitation token), when verification is active
-      (EMAIL_VERIFICATION_REQUIRED=True AND SMTP is configured): is_active=False,
-      email_verified_at=NULL, verification email sent,
-      requires_email_verification=True.
-    - Self-signup path with verification inactive (operator disabled it OR
-      SMTP not configured): is_active=True, email_verified_at=NOW(),
-      requires_email_verification=False — never lock users out of a deployment
-      that cannot deliver verification mail.
+    The verification gate depends only on whether verification is active
+    (EMAIL_VERIFICATION_REQUIRED=True AND SMTP configured). Invitation
+    tokens grant project membership but never bypass the gate
+    (spec amendment 2026-05-02).
+
+    - Verification active (any path): is_active=False, email_verified_at=NULL,
+      verification email sent, requires_email_verification=True. If an
+      invitation token was provided, the project membership is still created
+      so access applies as soon as verification completes.
+    - Verification inactive (operator disabled it OR SMTP not configured):
+      is_active=True, email_verified_at=NOW(), requires_email_verification=False.
+      Membership (if any) is applied in the same transaction. This SMTP-fallback
+      rule keeps the app usable on deployments that cannot deliver mail.
     """
     # 1. Check if user already exists
     query = select(User).where(User.email == user_in.email)
@@ -172,14 +175,16 @@ async def register_user(
                 detail=f"Invalid invitation token: {str(e)}",
             )
 
-    # Invited users are immediately active + verified. Self-signup needs the
-    # verification step ONLY when verification is active (operator opted in
-    # via EMAIL_VERIFICATION_REQUIRED AND SMTP is configured to actually
-    # deliver the link). Otherwise create active+verified to avoid producing
-    # locked-out accounts on SMTP-unconfigured deployments.
-    invited = invitation_payload is not None
+    # The verification gate depends ONLY on whether verification is active
+    # (operator opted in via EMAIL_VERIFICATION_REQUIRED AND SMTP is configured
+    # to actually deliver the link). When SMTP is unconfigured we degrade to
+    # active+verified to avoid producing locked-out accounts.
+    # Invitation acceptance is independent: the membership block below runs
+    # whenever there is a valid invitation, regardless of verification state.
+    # The invited user's project access is queued and applies as soon as
+    # verification completes. See spec amendment 2026-05-02.
     verification_active = settings.email_verification_active
-    needs_verification_step = (not invited) and verification_active
+    needs_verification_step = verification_active
     now = datetime.now(tz=timezone.utc)
 
     try:

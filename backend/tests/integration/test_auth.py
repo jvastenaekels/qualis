@@ -308,12 +308,28 @@ class TestRegistrationEmailVerification:
         # The (stubbed) sender was invoked for the verification email
         assert any("email-verification" in r.message for r in caplog.records)
 
-    async def test_register_with_invitation_skips_verification(
-        self, client: AsyncClient, db: AsyncSession, test_project
+    async def test_register_with_invitation_still_requires_verification_when_smtp_active(
+        self, client: AsyncClient, db: AsyncSession, test_project, monkeypatch, caplog
     ):
-        # Create an invitation token mirroring the existing test_register_with_valid_invitation pattern
+        """Invitation grants project membership but does NOT skip the email-verification gate.
+        Spec: docs/superpowers/specs/2026-05-02-auth-email-flows-design.md (amendment)."""
+        from app.core.config import settings
+        from app.routers import auth as auth_router
+
+        # Force SMTP-active for this test
+        monkeypatch.setattr(settings, "SMTP_HOST", "smtp.example.com")
+        monkeypatch.setattr(settings, "SMTP_USER", "user")
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", "pass")
+        # Stub the email send so we don't hit a real SMTP server
+        sent: list[tuple[str, str]] = []
+        monkeypatch.setattr(
+            auth_router,
+            "send_email_verification",
+            lambda email_to, verify_url: sent.append((email_to, verify_url)),
+        )
+
         token = create_invitation_token(
-            email="invite-skip@example.com",
+            email="invite-needs-verify@example.com",
             project_id=test_project.id,
             role=ProjectRole.researcher.value,
         )
@@ -321,7 +337,60 @@ class TestRegistrationEmailVerification:
         response = await client.post(
             "/api/register",
             json={
-                "email": "invite-skip@example.com",
+                "email": "invite-needs-verify@example.com",
+                "password": "securepass123",
+                "invitation_token": token,
+            },
+        )
+        assert response.status_code == 201
+        body = response.json()
+        assert body["requires_email_verification"] is True
+
+        # The user is created inactive + unverified
+        result = await db.execute(
+            select(User).where(User.email == "invite-needs-verify@example.com")
+        )
+        user = result.scalar_one()
+        assert user.is_active is False
+        assert user.email_verified_at is None
+
+        # The membership is STILL created — invitation acceptance is independent of verification
+        member_result = await db.execute(
+            select(ProjectMember).where(
+                ProjectMember.user_id == user.id,
+                ProjectMember.project_id == test_project.id,
+            )
+        )
+        member = member_result.scalar_one()
+        assert member.role == ProjectRole.researcher
+
+        # Verification email was emitted
+        assert len(sent) == 1
+        assert sent[0][0] == "invite-needs-verify@example.com"
+        assert "verify-email" in sent[0][1]
+
+    async def test_register_with_invitation_skips_verification_when_smtp_unconfigured(
+        self, client: AsyncClient, db: AsyncSession, test_project, monkeypatch
+    ):
+        """SMTP-fallback rule: when SMTP isn't configured, invited users get
+        active+verified accounts in one shot (no verification mail could be sent)."""
+        from app.core.config import settings
+
+        # Force SMTP-unconfigured
+        monkeypatch.setattr(settings, "SMTP_HOST", None)
+        monkeypatch.setattr(settings, "SMTP_USER", None)
+        monkeypatch.setattr(settings, "SMTP_PASSWORD", None)
+
+        token = create_invitation_token(
+            email="invite-fallback@example.com",
+            project_id=test_project.id,
+            role=ProjectRole.researcher.value,
+        )
+
+        response = await client.post(
+            "/api/register",
+            json={
+                "email": "invite-fallback@example.com",
                 "password": "securepass123",
                 "invitation_token": token,
             },
@@ -331,11 +400,20 @@ class TestRegistrationEmailVerification:
         assert body["requires_email_verification"] is False
 
         result = await db.execute(
-            select(User).where(User.email == "invite-skip@example.com")
+            select(User).where(User.email == "invite-fallback@example.com")
         )
         user = result.scalar_one()
         assert user.is_active is True
         assert user.email_verified_at is not None
+
+        # Membership applied
+        member_result = await db.execute(
+            select(ProjectMember).where(
+                ProjectMember.user_id == user.id,
+                ProjectMember.project_id == test_project.id,
+            )
+        )
+        assert member_result.scalar_one().role == ProjectRole.researcher
 
 
 @pytest.mark.skipif(
