@@ -56,7 +56,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 - **Clean, readable layout.** A simple interface that lets participants focus on the sorting task.
 - **Works on any device.** Smartphone, tablet, or desktop. Participants open a link and start sorting. No apps or plugins required.
 - **Mobile-first drag-and-drop.** Touch-optimised sorting with auto-pan, dwell-zoom, and edge scrolling, so participants without desktop access are not excluded.
-- **Multi-language support.** Translate statements, instructions, consent forms, and UI labels. Participants see the study in their preferred language.
+- **Intercultural studies.** Translate statements, instructions, consent forms, and UI labels into multiple languages; participants see the study in their preferred language. Lowers the barrier to cross-cultural and multi-site Q research.
 
 
 ### Study design
