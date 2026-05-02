@@ -132,6 +132,11 @@ export default function ProjectMembersPage() {
     const userInProject = members?.find((m: any) => m.user_id === currentUser?.id);
     const isOwner = userInProject?.role === 'owner';
 
+    const memberQuotaFull =
+        project?.member_quota !== undefined &&
+        project.member_quota.limit !== null &&
+        project.member_quota.count >= (project.member_quota.limit ?? Infinity);
+
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
             <StudyPageHeader
@@ -154,6 +159,16 @@ export default function ProjectMembersPage() {
                             <CardDescription className="text-sm font-medium text-slate-500">
                                 {t('admin.projects.settings.team.desc')}
                             </CardDescription>
+                            {project?.member_quota !== undefined &&
+                                project.member_quota.limit !== null && (
+                                    <p className="text-sm text-slate-600 mb-2">
+                                        {t('admin.projects.members.quota', {
+                                            count: project.member_quota.count,
+                                            limit: project.member_quota.limit,
+                                            defaultValue: '{{count}}/{{limit}} seats used',
+                                        })}
+                                    </p>
+                                )}
                         </CardHeader>
                         <CardContent className="p-0">
                             <Table>
@@ -242,12 +257,6 @@ export default function ProjectMembersPage() {
                                                     </SelectTrigger>
                                                     <SelectContent className="rounded-xl border-white/20 glass shadow-2xl">
                                                         <SelectItem
-                                                            value="owner"
-                                                            className="text-xs font-bold py-2 rounded-lg m-1"
-                                                        >
-                                                            Owner
-                                                        </SelectItem>
-                                                        <SelectItem
                                                             value="member"
                                                             className="text-xs font-bold py-2 rounded-lg m-1"
                                                         >
@@ -260,7 +269,10 @@ export default function ProjectMembersPage() {
                                                             value="viewer"
                                                             className="text-xs font-bold py-2 rounded-lg m-1"
                                                         >
-                                                            Viewer
+                                                            {t(
+                                                                'admin.project.roles.viewer',
+                                                                'Viewer'
+                                                            )}
                                                         </SelectItem>
                                                     </SelectContent>
                                                 </Select>
@@ -325,7 +337,11 @@ export default function ProjectMembersPage() {
                             <p className="text-xs font-medium text-indigo-900/70 leading-relaxed">
                                 {t('admin.projects.settings.team.growth_desc')}
                             </p>
-                            <InviteMemberModal slug={slug} isOwner={isOwner} />
+                            <InviteMemberModal
+                                slug={slug}
+                                isOwner={isOwner}
+                                memberQuotaFull={memberQuotaFull}
+                            />
                         </CardContent>
                     </Card>
 
@@ -419,7 +435,15 @@ export default function ProjectMembersPage() {
     );
 }
 
-function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }) {
+function InviteMemberModal({
+    slug,
+    isOwner,
+    memberQuotaFull,
+}: {
+    slug: string;
+    isOwner: boolean;
+    memberQuotaFull: boolean;
+}) {
     const { t } = useTranslation();
     const [email, setEmail] = useState('');
     const [role, setRole] = useState<ProjectRole>('member');
@@ -459,7 +483,15 @@ function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }
             <DialogTrigger asChild>
                 <Button
                     className="w-full h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold shadow-lg shadow-indigo-500/20 border-none"
-                    disabled={!isOwner}
+                    disabled={!isOwner || memberQuotaFull}
+                    title={
+                        memberQuotaFull
+                            ? t(
+                                  'admin.projects.members.quota_full_tooltip',
+                                  'Member limit reached. Increase MAX_MEMBERS_PER_PROJECT or remove a member.'
+                              )
+                            : undefined
+                    }
                 >
                     <UserPlus className="size-4 mr-2" />
                     {t('admin.projects.settings.team.invite_button')}
@@ -519,7 +551,15 @@ function InviteMemberModal({ slug, isOwner }: { slug: string; isOwner: boolean }
                                 <Button
                                     type="submit"
                                     className="w-full h-11 rounded-xl bg-slate-900 font-bold"
-                                    disabled={inviteMutation.isPending}
+                                    disabled={inviteMutation.isPending || memberQuotaFull}
+                                    title={
+                                        memberQuotaFull
+                                            ? t(
+                                                  'admin.projects.members.quota_full_tooltip',
+                                                  'Member limit reached. Increase MAX_MEMBERS_PER_PROJECT or remove a member.'
+                                              )
+                                            : undefined
+                                    }
                                 >
                                     {inviteMutation.isPending ? (
                                         <Loader2 className="size-4 animate-spin mr-2" />
