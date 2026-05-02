@@ -101,7 +101,8 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 - **IP address hashing.** Participant IPs are SHA-256 hashed with a configurable salt before storage. Plaintext IPs are never persisted.
 - **Consent audit trail.** Each participant's consent is recorded with a hash of the consent version they agreed to.
 - **Security headers** (HSTS, CSP, X-Frame-Options) and bcrypt password hashing.
-- **Two-factor authentication** (TOTP) for researcher accounts.
+- **Two-factor authentication** — TOTP (authenticator app) or email-OTP as a fallback channel; self-serve recovery flow to disable 2FA when the authenticator is lost.
+- **Email-driven account flows** — sign-up email verification and password reset via time-limited tokens; graceful degradation when SMTP is not configured (dev-friendly).
 - **Role-based access control.** Project-level roles (Owner, Researcher, Viewer) control who can edit, export, or manage team members.
 
 ### Collaboration

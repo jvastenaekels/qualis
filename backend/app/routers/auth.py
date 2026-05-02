@@ -1,6 +1,6 @@
 """Authentication routes."""
 
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 import logging
 
@@ -16,6 +16,8 @@ from app.dependencies import get_current_user
 from app.models import User
 from app.utils.security import (
     create_access_token,
+    create_email_token,
+    decode_email_token,
     verify_password,
     get_password_hash,
     decode_invitation_token,
@@ -23,18 +25,35 @@ from app.utils.security import (
     get_totp_uri,
     verify_totp_token,
 )
+from app.utils.email import (
+    send_email_verification,
+    send_password_reset,
+    send_twofa_disable_link,
+    send_twofa_disabled_notification,
+    send_twofa_login_otp,
+)
+from app.services.email_otp_service import (
+    OTPRateLimitError,
+    invalidate_active_otps,
+    issue_otp,
+    verify_otp,
+)
+from app.services.email_token_consume_service import mark_jti_consumed
+from app.utils.audit import log_admin_action
 from app.schemas import (
     Token,
     UserRead,
     UserCreate,
+    UserCreateResponse,
     UserUpdate,
     PasswordChange,
     PasswordConfirm,
     TOTPSetup,
-    TOTPVerify,
+    TwoFAEnableRequest,
 )
+from app.schemas.auth import EmailRequest, EmailTokenSubmit, PasswordResetConfirm
 from app.schemas.responses import AckResponse, TOTPEnableResponse
-from app.limiter import limiter
+from app.limiter import limiter, email_hash_key_func_sync, _get_real_ip
 from fastapi import Request
 
 router = APIRouter()
@@ -81,18 +100,67 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # 2.5 Check 2FA
-    if user.is_totp_enabled:
-        if not x_totp_token:
-            return Token(requires_2fa=True)
+    # 2.6 Email verification gate (added by T10 of auth-email-flows).
+    # Must run AFTER password check so wrong-password against an unverified
+    # account returns 401, not 403 (preventing account enumeration via the
+    # response code). The gate is conditional on `email_verification_active`
+    # — i.e. only fires when EMAIL_VERIFICATION_REQUIRED=True AND SMTP is
+    # configured. Otherwise an SMTP-unconfigured deployment would lock out
+    # every user (no way to deliver the verification link).
+    if settings.email_verification_active and user.email_verified_at is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="email_not_verified",
+        )
 
-        if not user.totp_secret or not verify_totp_token(
-            user.totp_secret, x_totp_token
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid 2FA token",
-            )
+    # 2.5 Check 2FA — branches on user.totp_channel.
+    # Legacy users predating T15 have totp_channel=NULL; treat as 'app'.
+    if user.is_totp_enabled:
+        channel = user.totp_channel or "app"
+
+        if channel == "email":
+            if not x_totp_token:
+                try:
+                    code = await issue_otp(db, user)
+                except OTPRateLimitError as e:
+                    await db.rollback()
+                    raise HTTPException(status_code=429, detail=str(e))
+                await db.commit()
+                send_twofa_login_otp(user.email, code)
+                return Token(requires_2fa=True, channel="email")
+
+            ok = await verify_otp(db, user, x_totp_token)
+            await db.commit()
+            if not ok:
+                log_admin_action(
+                    actor_user_id=user.id,
+                    action="twofa_login_failed",
+                    resource="user",
+                    resource_id=user.id,
+                    channel="email",
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="invalid_2fa",
+                )
+        else:  # app channel
+            if not x_totp_token:
+                return Token(requires_2fa=True, channel="app")
+
+            if not user.totp_secret or not verify_totp_token(
+                user.totp_secret, x_totp_token
+            ):
+                log_admin_action(
+                    actor_user_id=user.id,
+                    action="twofa_login_failed",
+                    resource="user",
+                    resource_id=user.id,
+                    channel="app",
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="invalid_2fa",
+                )
 
     # 3. Create Token
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -104,15 +172,31 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")  # nosec B106
 
 
-@router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register", response_model=UserCreateResponse, status_code=status.HTTP_201_CREATED
+)
 @limiter.limit("5/minute")
 async def register_user(
     request: Request,
     user_in: UserCreate,
     db: AsyncSession = Depends(get_db),
-) -> User:
+) -> UserCreateResponse:
     """
     Register a new user, optionally via an invitation token.
+
+    The verification gate depends only on whether verification is active
+    (EMAIL_VERIFICATION_REQUIRED=True AND SMTP configured). Invitation
+    tokens grant project membership but never bypass the gate
+    (spec amendment 2026-05-02).
+
+    - Verification active (any path): is_active=False, email_verified_at=NULL,
+      verification email sent, requires_email_verification=True. If an
+      invitation token was provided, the project membership is still created
+      so access applies as soon as verification completes.
+    - Verification inactive (operator disabled it OR SMTP not configured):
+      is_active=True, email_verified_at=NOW(), requires_email_verification=False.
+      Membership (if any) is applied in the same transaction. This SMTP-fallback
+      rule keeps the app usable on deployments that cannot deliver mail.
     """
     # 1. Check if user already exists
     query = select(User).where(User.email == user_in.email)
@@ -140,13 +224,27 @@ async def register_user(
                 detail=f"Invalid invitation token: {str(e)}",
             )
 
+    # The verification gate depends ONLY on whether verification is active
+    # (operator opted in via EMAIL_VERIFICATION_REQUIRED AND SMTP is configured
+    # to actually deliver the link). When SMTP is unconfigured we degrade to
+    # active+verified to avoid producing locked-out accounts.
+    # Invitation acceptance is independent: the membership block below runs
+    # whenever there is a valid invitation, regardless of verification state.
+    # The invited user's project access is queued and applies as soon as
+    # verification completes. See spec amendment 2026-05-02.
+    verification_active = settings.email_verification_active
+    needs_verification_step = verification_active
+    now = datetime.now(tz=timezone.utc)
+
     try:
         # 3. Create User
         new_user = User(
             email=user_in.email,
             full_name=user_in.full_name,
             hashed_password=get_password_hash(user_in.password),
-            is_active=True,
+            is_active=not needs_verification_step,
+            email_verified_at=None if needs_verification_step else now,
+            password_changed_at=now,
         )
         db.add(new_user)
         # Flush to get ID, but be ready to rollback
@@ -187,7 +285,21 @@ async def register_user(
             detail="An unexpected error occurred while registering the user",
         )
     await db.refresh(new_user)
-    return new_user
+
+    # 5. Send verification email for self-signup path (only when active)
+    if needs_verification_step:
+        token = create_email_token(
+            email=new_user.email,
+            purpose="email_verify",
+            expires_delta=timedelta(hours=24),
+        )
+        verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+        send_email_verification(email_to=new_user.email, verify_url=verify_url)
+
+    return UserCreateResponse(
+        user=UserRead.model_validate(new_user),
+        requires_email_verification=needs_verification_step,
+    )
 
 
 @router.patch("/me", response_model=UserRead)
@@ -295,19 +407,43 @@ async def setup_totp(
 
 @router.post("/me/2fa/enable", response_model=TOTPEnableResponse)
 async def enable_totp(
-    verify_data: TOTPVerify,
+    payload: TwoFAEnableRequest,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
 ) -> TOTPEnableResponse:
-    """Enable 2FA after verifying a token."""
-    if not current_user.totp_secret:
-        raise HTTPException(status_code=400, detail="TOTP not set up")
+    """Enable 2FA on the chosen channel ('app' or 'email').
 
-    if verify_totp_token(current_user.totp_secret, verify_data.token):
+    For channel='app': caller must have already called /me/2fa/setup to seed
+    the TOTP secret and must provide a valid TOTP token in payload.token.
+
+    For channel='email': no token required; the user is enrolled directly.
+    The email-OTP flow exercises itself at first login (T15 deliberately
+    accepts the simpler one-step enrollment over a two-step "issue OTP /
+    confirm channel works" path — see plan trade-off note).
+    """
+    if payload.channel == "app":
+        if not current_user.totp_secret:
+            raise HTTPException(status_code=400, detail="TOTP not set up")
+        if not payload.token:
+            raise HTTPException(
+                status_code=400, detail="TOTP token required for app channel"
+            )
+        if not verify_totp_token(current_user.totp_secret, payload.token):
+            raise HTTPException(status_code=400, detail="Invalid token")
         try:
             current_user.is_totp_enabled = True
+            current_user.totp_channel = "app"
             await db.commit()
+            log_admin_action(
+                actor_user_id=current_user.id,
+                action="twofa_enable",
+                resource="user",
+                resource_id=current_user.id,
+                channel="app",
+            )
             return TOTPEnableResponse(status="enabled")
+        except HTTPException:
+            raise
         except Exception as e:
             await db.rollback()
             logger.error(f"Unexpected error during TOTP enable: {e}", exc_info=True)
@@ -316,7 +452,29 @@ async def enable_totp(
                 detail="An unexpected error occurred while enabling 2FA",
             )
 
-    raise HTTPException(status_code=400, detail="Invalid token")
+    # channel == "email"
+    try:
+        current_user.is_totp_enabled = True
+        current_user.totp_channel = "email"
+        # Discard any leftover TOTP secret from a previous /me/2fa/setup call:
+        # one channel at a time per user (spec rule).
+        current_user.totp_secret = None
+        await db.commit()
+        log_admin_action(
+            actor_user_id=current_user.id,
+            action="twofa_enable",
+            resource="user",
+            resource_id=current_user.id,
+            channel="email",
+        )
+        return TOTPEnableResponse(status="enabled")
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during email-2FA enable: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while enabling 2FA",
+        )
 
 
 @router.post("/me/2fa/disable", response_model=AckResponse)
@@ -334,6 +492,7 @@ async def disable_totp(
     try:
         current_user.is_totp_enabled = False
         current_user.totp_secret = None
+        current_user.totp_channel = None  # T15
         await db.commit()
     except Exception as e:
         await db.rollback()
@@ -343,3 +502,239 @@ async def disable_totp(
             detail="An unexpected error occurred while disabling 2FA",
         )
     return AckResponse(status="disabled")
+
+
+@router.post("/email/verify", response_model=AckResponse)
+async def verify_email(
+    payload: EmailTokenSubmit, db: AsyncSession = Depends(get_db)
+) -> AckResponse:
+    """Consume an email-verification JWT and activate the user account.
+
+    Idempotent: re-verifying an already-verified account returns 200 silently.
+    Anti-enum: a valid JWT whose email matches no user also returns 200.
+    """
+    try:
+        claims = decode_email_token(payload.token, expected_purpose="email_verify")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    result = await db.execute(select(User).where(User.email == claims["sub"]))
+    user = result.scalar_one_or_none()
+    if user is None:
+        # Anti-enum: respond 200, do nothing
+        return AckResponse(status="ok")
+
+    if user.email_verified_at is None:
+        user.email_verified_at = datetime.now(timezone.utc)
+        user.is_active = True
+        await db.commit()
+        log_admin_action(
+            actor_user_id=user.id,
+            action="email_verify",
+            resource="user",
+            resource_id=user.id,
+        )
+    return AckResponse(status="ok")
+
+
+@router.post("/email/verify/resend", response_model=AckResponse)
+@limiter.limit("3/hour", key_func=_get_real_ip)
+@limiter.limit("3/hour", key_func=email_hash_key_func_sync)
+async def resend_verification(
+    request: Request,
+    payload: EmailRequest,
+    db: AsyncSession = Depends(get_db),
+) -> AckResponse:
+    """Resend a verification email to an unverified account.
+
+    Always returns 200 (anti-enum). If the user exists and is unverified,
+    a fresh token is emailed. Otherwise, a fake bcrypt call equalises latency
+    so callers cannot distinguish the two code paths by timing.
+    """
+    result = await db.execute(select(User).where(User.email == payload.email))
+    user = result.scalar_one_or_none()
+
+    if user is not None and user.email_verified_at is None:
+        token = create_email_token(
+            email=user.email,
+            purpose="email_verify",
+            expires_delta=timedelta(hours=settings.EMAIL_VERIFY_TOKEN_EXPIRE_HOURS),
+        )
+        verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
+        send_email_verification(user.email, verify_url)
+    else:
+        # Constant-time padding to equalize latency vs the real bcrypt path
+        get_password_hash("anti-enum-padding")
+
+    return AckResponse(status="ok")
+
+
+@router.post("/password/reset/request", response_model=AckResponse)
+@limiter.limit("3/hour", key_func=_get_real_ip)
+@limiter.limit("3/hour", key_func=email_hash_key_func_sync)
+async def password_reset_request(
+    request: Request,
+    payload: EmailRequest,
+    db: AsyncSession = Depends(get_db),
+) -> AckResponse:
+    """Request a password-reset email.
+
+    Always returns 200 (anti-enum). If a user exists with the submitted
+    email, a fresh JWT carrying a `pwa` (password_changed_at epoch) claim
+    is emailed; otherwise a fake bcrypt call equalises latency. The
+    `pwa` claim is the replay-defense token: confirm-time compares it
+    to the user's current password_changed_at, so a token issued before
+    the password was last rotated is rejected.
+    """
+    result = await db.execute(select(User).where(User.email == payload.email))
+    user = result.scalar_one_or_none()
+
+    # Constant-time: run one bcrypt on BOTH paths so the unknown path
+    # (anti-enum padding) and the known path (where no real bcrypt is
+    # needed — JWT signing is cheap) take comparable time. Without this
+    # equalisation, an attacker could distinguish the two by timing the
+    # response (known is much faster than unknown).
+    get_password_hash("anti-enum-padding")
+
+    if user is not None:
+        token = create_email_token(
+            email=user.email,
+            purpose="password_reset",
+            expires_delta=timedelta(hours=settings.PASSWORD_RESET_TOKEN_EXPIRE_HOURS),
+            password_changed_at=user.password_changed_at,
+        )
+        url = f"{settings.FRONTEND_URL}/reset-password?token={token}"
+        send_password_reset(user.email, url)
+
+    return AckResponse(status="ok")
+
+
+@router.post("/password/reset/confirm", response_model=AckResponse)
+async def password_reset_confirm(
+    payload: PasswordResetConfirm, db: AsyncSession = Depends(get_db)
+) -> AckResponse:
+    """Consume a password-reset JWT, rotate the password, kill in-flight OTPs.
+
+    Returns 400 (not 200 anti-enum) on token/user/pwa failure: the token
+    itself is the secret, and an attacker cannot guess valid ones, so a
+    specific status here does not enable enumeration.
+    """
+    try:
+        claims = decode_email_token(payload.token, expected_purpose="password_reset")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    result = await db.execute(select(User).where(User.email == claims["sub"]))
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=400, detail="invalid_token")
+
+    pwa_in_token = claims.get("pwa")
+    pwa_now = int(user.password_changed_at.timestamp() * 1_000_000)
+    if pwa_in_token != pwa_now:
+        # Token was issued before the current password — already consumed
+        raise HTTPException(status_code=400, detail="token_already_consumed")
+
+    user.hashed_password = get_password_hash(payload.new_password)
+    user.password_changed_at = datetime.now(timezone.utc)
+    await invalidate_active_otps(db, user)
+    await db.commit()
+
+    log_admin_action(
+        actor_user_id=user.id,
+        action="password_reset_confirm",
+        resource="user",
+        resource_id=user.id,
+    )
+    return AckResponse(status="ok")
+
+
+@router.post("/2fa/disable/request", response_model=AckResponse)
+@limiter.limit("3/hour", key_func=_get_real_ip)
+@limiter.limit("3/hour", key_func=email_hash_key_func_sync)
+async def twofa_disable_request(
+    request: Request,
+    payload: EmailRequest,
+    db: AsyncSession = Depends(get_db),
+) -> AckResponse:
+    """Self-serve 2FA disable — request the link.
+
+    Anti-enum: returns 200 regardless of whether the user exists or has
+    2FA enabled. A bcrypt call equalises latency on the no-op path so the
+    response time doesn't leak account state.
+    """
+    result = await db.execute(select(User).where(User.email == payload.email))
+    user = result.scalar_one_or_none()
+
+    if user is not None and user.is_totp_enabled:
+        token = create_email_token(
+            email=user.email,
+            purpose="twofa_disable",
+            expires_delta=timedelta(
+                minutes=settings.TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES
+            ),
+        )
+        url = f"{settings.FRONTEND_URL}/2fa/disable?token={token}"
+        send_twofa_disable_link(user.email, url)
+    else:
+        # Constant-time padding: bcrypt of a fixed dummy
+        get_password_hash("anti-enum-padding")
+
+    return AckResponse(status="ok")
+
+
+@router.post("/2fa/disable/confirm", response_model=AckResponse)
+async def twofa_disable_confirm(
+    request: Request,
+    payload: EmailTokenSubmit,
+    db: AsyncSession = Depends(get_db),
+) -> AckResponse:
+    """Self-serve 2FA disable — confirm via single-use JWT.
+
+    Single-use enforced via the consumed_email_tokens table (jti PK).
+    The mark_jti_consumed call is atomic — concurrent attempts on the
+    same token: exactly one inserts, the other hits a PK collision and
+    we map it to 409.
+
+    The jti is consumed BEFORE the user lookup so that an attacker who
+    somehow obtained a token cannot probe for valid email addresses by
+    replaying it; whether or not the user exists, the token is burned.
+    """
+    try:
+        claims = decode_email_token(payload.token, expected_purpose="twofa_disable")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    jti = claims["jti"]
+
+    # Atomic: consume first, then act. PK collision = already consumed.
+    try:
+        await mark_jti_consumed(db, jti, purpose="twofa_disable")
+    except IntegrityError:
+        await db.rollback()
+        raise HTTPException(status_code=409, detail="token_already_consumed")
+
+    # User lookup happens AFTER consume so the jti is burned regardless.
+    result = await db.execute(select(User).where(User.email == claims["sub"]))
+    user = result.scalar_one_or_none()
+    if user is None:
+        # Persist the consumed jti even for unknown users (anti-enum).
+        await db.commit()
+        return AckResponse(status="ok")
+
+    user.is_totp_enabled = False
+    user.totp_secret = None
+    user.totp_channel = None
+    await db.commit()
+
+    when = datetime.now(timezone.utc).isoformat()
+    ip = request.client.host if request.client else None
+    send_twofa_disabled_notification(user.email, when=when, ip_hint=ip)
+
+    log_admin_action(
+        actor_user_id=user.id,
+        action="twofa_disable_confirm",
+        resource="user",
+        resource_id=user.id,
+    )
+    return AckResponse(status="ok")

@@ -62,6 +62,7 @@ export function makePasswordSchema(t: Translator) {
 type ProfileFormValues = z.infer<ReturnType<typeof makeProfileSchema>>;
 type PasswordFormValues = z.infer<ReturnType<typeof makePasswordSchema>>;
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: JSX shell — three Card sections (profile, 2FA setup with channel selector + QR/email branches, password); per CLAUDE.md "JSX shell complexity" guidance.
 const ProfilePage = () => {
     const { user, refetch: refetchUser } = useAuth();
     const { t } = useTranslation();
@@ -70,13 +71,16 @@ const ProfilePage = () => {
 
     // 2FA State
     const [is2FASetupMode, setIs2FASetupMode] = useState(false);
+    const [channelChoice, setChannelChoice] = useState<'app' | 'email'>('app');
     const [totpToken, setTotpToken] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showDisableConfirm, setShowDisableConfirm] = useState(false);
 
     const { data: totpSetup, isLoading: isSetupLoading } = useSetupTotpApiMe2faSetupGet({
         query: {
-            enabled: is2FASetupMode && !user?.is_totp_enabled,
+            // Only fetch the TOTP setup payload when the user is actively
+            // configuring app-based 2FA — email channel doesn't need a QR code.
+            enabled: is2FASetupMode && !user?.is_totp_enabled && channelChoice === 'app',
         },
     });
 
@@ -336,91 +340,193 @@ const ProfilePage = () => {
                                     </Button>
                                 </header>
 
-                                <div className="grid md:grid-cols-2 gap-8 items-center">
-                                    <div className="space-y-4">
-                                        <p className="text-sm text-slate-600 leading-relaxed">
-                                            {t(
-                                                'admin.profile.security.scan_desc',
-                                                '1. Scan this QR code with an authenticator app.'
-                                            )}
-                                        </p>
-                                        <div className="p-3 bg-slate-50 rounded-lg border font-mono text-xs flex items-center justify-between select-all group">
-                                            {isSetupLoading ? 'Generating...' : totpSetup?.secret}
-                                            <button
-                                                type="button"
-                                                className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-200 rounded"
-                                                onClick={() => {
-                                                    navigator.clipboard.writeText(
-                                                        totpSetup?.secret || ''
-                                                    );
-                                                    toast.success(
-                                                        t(
-                                                            'admin.profile.security.secret_copied',
-                                                            'Secret copied'
-                                                        )
-                                                    );
-                                                }}
-                                            >
-                                                <Copy size={14} className="text-slate-500" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center p-4 bg-white border-2 border-dashed rounded-2xl">
-                                        {isSetupLoading ? (
-                                            <div className="h-40 w-40 flex items-center justify-center animate-pulse bg-slate-100 rounded-lg">
-                                                <AlertCircle className="text-slate-300" size={48} />
-                                            </div>
-                                        ) : (
-                                            <QRCodeSVG
-                                                value={totpSetup?.qr_code_uri || ''}
-                                                size={160}
-                                            />
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-3 pt-4 border-t">
-                                    <Label
-                                        htmlFor="2fa-token"
-                                        className="text-sm font-bold text-slate-700"
-                                    >
+                                <fieldset className="space-y-3">
+                                    <legend className="text-sm font-bold text-slate-900 mb-2">
                                         {t(
-                                            'admin.profile.security.enter_code',
-                                            '2. Enter the 6-digit code'
+                                            'admin.profile.security.channel_select_label',
+                                            'How should we deliver your 2FA codes?'
                                         )}
-                                    </Label>
-                                    <div className="flex gap-3">
-                                        <Input
-                                            id="2fa-token"
-                                            placeholder="000000"
-                                            className="h-12 text-center text-2xl tracking-[0.5em] font-bold max-w-[200px]"
-                                            maxLength={6}
-                                            value={totpToken}
-                                            onChange={(e) => setTotpToken(e.target.value)}
+                                    </legend>
+                                    <label
+                                        className={cn(
+                                            'flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors',
+                                            channelChoice === 'app'
+                                                ? 'border-indigo-300 bg-indigo-50/40'
+                                                : 'border-slate-200'
+                                        )}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="2fa-channel"
+                                            value="app"
+                                            checked={channelChoice === 'app'}
+                                            onChange={() => setChannelChoice('app')}
+                                            className="mt-1"
                                         />
+                                        <div>
+                                            <div className="font-bold text-slate-900">
+                                                {t(
+                                                    'admin.profile.security.channel_app',
+                                                    'Authenticator app (recommended)'
+                                                )}
+                                            </div>
+                                        </div>
+                                    </label>
+                                    <label
+                                        className={cn(
+                                            'flex items-start gap-3 p-3 border rounded-xl cursor-pointer hover:bg-slate-50 transition-colors',
+                                            channelChoice === 'email'
+                                                ? 'border-indigo-300 bg-indigo-50/40'
+                                                : 'border-slate-200'
+                                        )}
+                                    >
+                                        <input
+                                            type="radio"
+                                            name="2fa-channel"
+                                            value="email"
+                                            checked={channelChoice === 'email'}
+                                            onChange={() => setChannelChoice('email')}
+                                            className="mt-1"
+                                        />
+                                        <div>
+                                            <div className="font-bold text-slate-900">
+                                                {t('admin.profile.security.channel_email', 'Email')}
+                                            </div>
+                                            <div className="text-sm text-slate-500">
+                                                {t(
+                                                    'admin.profile.security.channel_email_desc',
+                                                    "We'll email you a 6-digit code each time you log in. Useful if you can't install an authenticator app."
+                                                )}
+                                            </div>
+                                        </div>
+                                    </label>
+                                </fieldset>
+
+                                {channelChoice === 'email' && (
+                                    <div className="pt-4 border-t flex justify-end">
                                         <Button
                                             className="h-12 px-8 bg-indigo-600 hover:bg-indigo-700 font-bold"
-                                            disabled={
-                                                totpToken.length !== 6 || enableMutation.isPending
-                                            }
+                                            disabled={enableMutation.isPending}
                                             onClick={() =>
                                                 enableMutation.mutate({
-                                                    data: { token: totpToken },
+                                                    data: { channel: 'email' },
                                                 })
                                             }
                                         >
                                             {enableMutation.isPending
                                                 ? t(
-                                                      'admin.profile.security.verifying',
-                                                      'Verifying...'
+                                                      'admin.profile.security.enable_email_pending',
+                                                      'Enabling…'
                                                   )
                                                 : t(
-                                                      'admin.profile.security.enable_btn',
-                                                      'Enable 2FA'
+                                                      'admin.profile.security.enable_email_btn',
+                                                      'Enable email-based 2FA'
                                                   )}
                                         </Button>
                                     </div>
-                                </div>
+                                )}
+
+                                {channelChoice === 'app' && (
+                                    <>
+                                        <div className="grid md:grid-cols-2 gap-8 items-center">
+                                            <div className="space-y-4">
+                                                <p className="text-sm text-slate-600 leading-relaxed">
+                                                    {t(
+                                                        'admin.profile.security.scan_desc',
+                                                        '1. Scan this QR code with an authenticator app.'
+                                                    )}
+                                                </p>
+                                                <div className="p-3 bg-slate-50 rounded-lg border font-mono text-xs flex items-center justify-between select-all group">
+                                                    {isSetupLoading
+                                                        ? 'Generating...'
+                                                        : totpSetup?.secret}
+                                                    <button
+                                                        type="button"
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-slate-200 rounded"
+                                                        onClick={() => {
+                                                            navigator.clipboard.writeText(
+                                                                totpSetup?.secret || ''
+                                                            );
+                                                            toast.success(
+                                                                t(
+                                                                    'admin.profile.security.secret_copied',
+                                                                    'Secret copied'
+                                                                )
+                                                            );
+                                                        }}
+                                                    >
+                                                        <Copy
+                                                            size={14}
+                                                            className="text-slate-500"
+                                                        />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col items-center justify-center p-4 bg-white border-2 border-dashed rounded-2xl">
+                                                {isSetupLoading ? (
+                                                    <div className="h-40 w-40 flex items-center justify-center animate-pulse bg-slate-100 rounded-lg">
+                                                        <AlertCircle
+                                                            className="text-slate-300"
+                                                            size={48}
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <QRCodeSVG
+                                                        value={totpSetup?.qr_code_uri || ''}
+                                                        size={160}
+                                                    />
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-3 pt-4 border-t">
+                                            <Label
+                                                htmlFor="2fa-token"
+                                                className="text-sm font-bold text-slate-700"
+                                            >
+                                                {t(
+                                                    'admin.profile.security.enter_code',
+                                                    '2. Enter the 6-digit code'
+                                                )}
+                                            </Label>
+                                            <div className="flex gap-3">
+                                                <Input
+                                                    id="2fa-token"
+                                                    placeholder="000000"
+                                                    className="h-12 text-center text-2xl tracking-[0.5em] font-bold max-w-[200px]"
+                                                    maxLength={6}
+                                                    value={totpToken}
+                                                    onChange={(e) => setTotpToken(e.target.value)}
+                                                />
+                                                <Button
+                                                    className="h-12 px-8 bg-indigo-600 hover:bg-indigo-700 font-bold"
+                                                    disabled={
+                                                        totpToken.length !== 6 ||
+                                                        enableMutation.isPending
+                                                    }
+                                                    onClick={() =>
+                                                        enableMutation.mutate({
+                                                            data: {
+                                                                channel: 'app',
+                                                                token: totpToken,
+                                                            },
+                                                        })
+                                                    }
+                                                >
+                                                    {enableMutation.isPending
+                                                        ? t(
+                                                              'admin.profile.security.verifying',
+                                                              'Verifying...'
+                                                          )
+                                                        : t(
+                                                              'admin.profile.security.enable_btn',
+                                                              'Enable 2FA'
+                                                          )}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         )}
 

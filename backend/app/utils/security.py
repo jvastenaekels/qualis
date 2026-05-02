@@ -1,13 +1,31 @@
 """Security utilities."""
 
+import secrets
 from datetime import datetime, timedelta, timezone
-from typing import Any
+from typing import Any, Literal, TypedDict, cast
 
 import bcrypt
 import jwt
 import pyotp
+from typing_extensions import Required
 
 from app.core.config import settings
+
+EmailTokenPurpose = Literal["email_verify", "password_reset", "twofa_disable"]
+
+EMAIL_TOKEN_ISSUER = "qualis"
+EMAIL_TOKEN_AUDIENCE = "auth-email"
+
+
+class EmailTokenPayload(TypedDict, total=False):
+    sub: Required[str]
+    purpose: Required[EmailTokenPurpose]
+    iss: Required[str]
+    aud: Required[str]
+    exp: Required[int]
+    iat: Required[int]
+    jti: Required[str]
+    pwa: int  # password_reset only
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -83,6 +101,64 @@ def decode_invitation_token(token: str) -> dict[str, Any]:  # type: ignore[expli
     if payload.get("type") != "invitation":
         raise jwt.InvalidTokenError("Not an invitation token")
     return payload
+
+
+def create_email_token(
+    email: str,
+    purpose: EmailTokenPurpose,
+    expires_delta: timedelta,
+    password_changed_at: datetime | None = None,
+) -> str:
+    """Issue a signed JWT for one of the link-based auth-email flows.
+
+    For purpose='password_reset', password_changed_at is REQUIRED — its
+    epoch-second value is encoded as `pwa` claim and re-validated at
+    consume time as replay defense (a rotated password kills the token).
+    """
+    if purpose == "password_reset" and password_changed_at is None:
+        raise ValueError(
+            "password_reset token requires password_changed_at for replay defense"
+        )
+
+    now = datetime.now(tz=timezone.utc)
+    payload: dict[str, Any] = {  # type: ignore[explicit-any]
+        "sub": email,
+        "purpose": purpose,
+        "iss": EMAIL_TOKEN_ISSUER,
+        "aud": EMAIL_TOKEN_AUDIENCE,
+        "iat": int(now.timestamp()),
+        "exp": int((now + expires_delta).timestamp()),
+        "jti": secrets.token_urlsafe(16),
+    }
+    if password_changed_at is not None:
+        payload["pwa"] = int(password_changed_at.timestamp() * 1_000_000)
+
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def decode_email_token(
+    token: str, expected_purpose: EmailTokenPurpose
+) -> EmailTokenPayload:
+    """Decode + validate an auth-email JWT. Raises ValueError on any failure."""
+    try:
+        raw = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+            audience=EMAIL_TOKEN_AUDIENCE,
+            issuer=EMAIL_TOKEN_ISSUER,
+        )
+    except jwt.ExpiredSignatureError as e:
+        raise ValueError("token expired") from e
+    except jwt.InvalidTokenError as e:
+        raise ValueError(f"token invalid: {e}") from e
+
+    if raw.get("purpose") != expected_purpose:
+        raise ValueError(
+            f"purpose mismatch: expected {expected_purpose}, got {raw.get('purpose')!r}"
+        )
+
+    return cast(EmailTokenPayload, raw)
 
 
 def generate_totp_secret() -> str:

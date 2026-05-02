@@ -29,7 +29,16 @@ from .audio import (
     AudioUploadResponse,
     ParticipantAudioRecording,
 )
-from .auth import TOTPSetup, TOTPVerify, Token, TokenData
+from .auth import (
+    EmailRequest,
+    EmailTokenSubmit,
+    PasswordResetConfirm,
+    TOTPSetup,
+    TOTPVerify,
+    Token,
+    TokenData,
+    TwoFAEnableRequest,
+)
 from .common import PaginatedResponse
 from .participants import (
     ConsentInput,
@@ -86,6 +95,7 @@ from .users import (
     PasswordConfirm,
     UserBase,
     UserCreate,
+    UserCreateResponse,
     UserRead,
     UserUpdate,
 )
@@ -144,10 +154,14 @@ __all__ = [
     "AudioUploadResponse",
     "ParticipantAudioRecording",
     # auth
+    "EmailRequest",
+    "EmailTokenSubmit",
+    "PasswordResetConfirm",
     "TOTPSetup",
     "TOTPVerify",
     "Token",
     "TokenData",
+    "TwoFAEnableRequest",
     # common
     "PaginatedResponse",
     # participants
@@ -219,6 +233,7 @@ __all__ = [
     "PasswordConfirm",
     "UserBase",
     "UserCreate",
+    "UserCreateResponse",
     "UserRead",
     "UserUpdate",
     # projects

@@ -31,6 +31,12 @@ import RouteErrorBoundary from './components/RouteErrorBoundary';
 // Lazy load heavy interactive components
 const FineSortPage = lazy(() => import('./pages/FineSortPage'));
 const RegistrationPage = lazy(() => import('./pages/RegistrationPage'));
+const EmailVerifyPage = lazy(() => import('./pages/EmailVerifyPage'));
+const EmailVerificationSentPage = lazy(() => import('./pages/EmailVerificationSentPage'));
+const PasswordResetRequestPage = lazy(() => import('./pages/PasswordResetRequestPage'));
+const PasswordResetConfirmPage = lazy(() => import('./pages/PasswordResetConfirmPage'));
+const TwoFactorRecoveryPage = lazy(() => import('./pages/TwoFactorRecoveryPage'));
+const TwoFactorDisablePage = lazy(() => import('./pages/TwoFactorDisablePage'));
 import LoginPage from './pages/LoginPage';
 
 // Admin imports
@@ -83,6 +89,30 @@ const router = createBrowserRouter([
     {
         path: '/register',
         element: <RegistrationPage />,
+    },
+    {
+        path: '/verify-email',
+        element: <EmailVerifyPage />,
+    },
+    {
+        path: '/verify-email-sent',
+        element: <EmailVerificationSentPage />,
+    },
+    {
+        path: '/forgot-password',
+        element: <PasswordResetRequestPage />,
+    },
+    {
+        path: '/reset-password',
+        element: <PasswordResetConfirmPage />,
+    },
+    {
+        path: '/2fa/recover',
+        element: <TwoFactorRecoveryPage />,
+    },
+    {
+        path: '/2fa/disable',
+        element: <TwoFactorDisablePage />,
     },
     {
         path: '/hub',

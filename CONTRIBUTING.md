@@ -73,6 +73,19 @@ There is no separate CLA. Your `git commit --author` line is the record of your 
 
 ---
 
+## Email flows in dev (SMTP unset)
+
+When `SMTP_HOST` is empty, all `app.utils.email` send_* functions log a `MOCK EMAIL` block to the `app.utils.email` logger instead of sending. To use the email-driven auth flows locally:
+
+- Sign up → fetch the verification URL from the backend logs (search `email-verification`), open it.
+- Forgot password → fetch the reset URL (`password-reset`).
+- 2FA email-OTP → the 6-digit code appears in the `2fa-login-otp` log line.
+- Lost 2FA → the disable URL appears in the `2fa-disable-link` log line.
+
+The verification gate is **automatically disabled** when SMTP is not configured (`settings.email_verification_active = EMAIL_VERIFICATION_REQUIRED AND is_smtp_configured`). This means a fresh dev environment without SMTP just works — sign-ups create immediately-active accounts, login is not blocked. Set `EMAIL_VERIFICATION_REQUIRED=False` explicitly only if you want to test the unverified-account UX with SMTP configured.
+
+---
+
 ## Acknowledgments
 
 See [README ## Acknowledgments](README.md#acknowledgments) for current contributor credits and the project's methodological grounding.

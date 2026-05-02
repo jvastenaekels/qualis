@@ -169,6 +169,7 @@
             "email_label": "Adresse e-mail",
             "password_label": "Mot de passe",
             "submit": "Continuer",
+            "cta": "Se connecter",
             "forgot_password": "Oublié ?",
             "loading": "Authentification...",
             "card_title": "Se connecter",
@@ -176,7 +177,66 @@
             "error_401": "E-mail ou mot de passe invalide",
             "error_generic": "Une erreur est survenue. Veuillez réessayer.",
             "reason_session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
-            "reason_auth_required": "Veuillez vous connecter pour continuer."
+            "reason_auth_required": "Veuillez vous connecter pour continuer.",
+            "forgot_password_link": "Mot de passe oublié ?",
+            "reset_success_banner": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+            "two_factor_title": "Authentification à deux facteurs",
+            "two_factor_app_prompt": "Saisissez le code à 6 chiffres de votre application d'authentification.",
+            "two_factor_email_prompt": "Nous avons envoyé un code à 6 chiffres à votre adresse e-mail. Saisissez-le ci-dessous.",
+            "two_factor_submit": "Vérifier",
+            "two_factor_resend": "Renvoyer le code",
+            "two_factor_resend_cooldown": "Renvoi disponible dans {{seconds}} s",
+            "two_factor_invalid": "Code invalide. Réessayez.",
+            "lost_2fa_link": "Vous avez perdu l'accès à votre 2FA ?"
+        },
+        "twofa": {
+            "recovery": {
+                "title": "Vous avez perdu l'accès à votre authentification à deux facteurs ?",
+                "body": "Saisissez l'adresse e-mail de votre compte. Si la double authentification est activée, nous vous enverrons un lien pour la désactiver.",
+                "submit": "Envoyer le lien de désactivation",
+                "success": "Si l'adresse e-mail existe et que la 2FA est activée, un lien de désactivation est en route."
+            },
+            "disable": {
+                "title": "Désactiver l'authentification à deux facteurs",
+                "warning": "En cliquant sur le bouton ci-dessous, vous supprimez définitivement le second facteur de ce compte. Vous pourrez vous connecter avec uniquement votre mot de passe jusqu'à ce que vous réactiviez la 2FA.",
+                "warning_attacker": "Si vous n'êtes PAS à l'origine de cette demande, fermez cette page et changez immédiatement votre mot de passe.",
+                "confirm_button": "Oui, désactiver l'authentification à deux facteurs",
+                "loading": "Désactivation…",
+                "success": "L'authentification à deux facteurs est désormais désactivée. Vous pouvez vous connecter.",
+                "error_consumed": "Ce lien a déjà été utilisé.",
+                "error_expired": "Ce lien a expiré ou est invalide.",
+                "missing_token": "Aucun jeton dans l'URL."
+            }
+        },
+        "password_reset": {
+            "request_title": "Réinitialiser votre mot de passe",
+            "request_body": "Entrez votre adresse e-mail et nous vous enverrons un lien de réinitialisation.",
+            "request_submit": "Envoyer le lien de réinitialisation",
+            "request_success": "Si l'adresse e-mail existe, un lien de réinitialisation est en route.",
+            "confirm_title": "Choisissez un nouveau mot de passe",
+            "confirm_submit": "Réinitialiser le mot de passe",
+            "success_redirect": "Mot de passe mis à jour. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+            "link_expired": "Ce lien a expiré ou a déjà été utilisé.",
+            "too_short": "Le mot de passe doit comporter au moins 8 caractères.",
+            "mismatch": "Les mots de passe ne correspondent pas.",
+            "missing_token": "Aucun jeton de réinitialisation dans l'URL.",
+            "new_password_placeholder": "Nouveau mot de passe",
+            "confirm_placeholder": "Confirmer le mot de passe"
+        },
+        "email": {
+            "verification_sent": {
+                "title": "Vérifiez votre adresse e-mail",
+                "body": "Nous avons envoyé un lien de vérification à {{email}}. Cliquez sur le lien pour activer votre compte.",
+                "resend": "Renvoyer l'e-mail",
+                "cooldown": "Renvoi disponible dans {{seconds}}s",
+                "error": "Impossible de renvoyer. Réessayez plus tard."
+            },
+            "verify": {
+                "verifying": "Vérification de votre adresse e-mail…",
+                "success": "Adresse e-mail vérifiée. Vous pouvez maintenant vous connecter.",
+                "expired": "Ce lien a expiré ou est invalide.",
+                "resend_link": "Demander un nouvel e-mail de vérification"
+            }
         },
         "register": {
             "title": "Créer un compte",
@@ -529,7 +589,13 @@
                 "enabled_success": "Authentification à deux facteurs activée",
                 "disabled_success": "Authentification à deux facteurs désactivée",
                 "invalid_token": "Code de vérification invalide",
-                "disable_error": "Impossible de désactiver le 2FA"
+                "disable_error": "Impossible de désactiver le 2FA",
+                "channel_select_label": "Comment souhaitez-vous recevoir vos codes 2FA ?",
+                "channel_app": "Application d'authentification (recommandé)",
+                "channel_email": "E-mail",
+                "channel_email_desc": "Nous vous enverrons un code à 6 chiffres par e-mail à chaque connexion. Utile si vous ne pouvez pas installer une application d'authentification.",
+                "enable_email_btn": "Activer la 2FA par e-mail",
+                "enable_email_pending": "Activation…"
             },
             "password": {
                 "title": "Mot de passe",

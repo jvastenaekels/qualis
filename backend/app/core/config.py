@@ -73,6 +73,16 @@ class Settings(BaseSettings):
     S3_ACCESS_KEY_ID: str | None = None
     S3_SECRET_ACCESS_KEY: str | None = None
 
+    # 2FA — Email OTP channel
+    TWOFA_EMAIL_OTP_EXPIRE_MINUTES: int = 5
+    TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS: int = 30
+
+    # Email verification & password-reset token lifetimes
+    EMAIL_VERIFICATION_REQUIRED: bool = True
+    EMAIL_VERIFY_TOKEN_EXPIRE_HOURS: int = 24
+    PASSWORD_RESET_TOKEN_EXPIRE_HOURS: int = 1
+    TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES: int = 15
+
     # Audio Recording Limits
     AUDIO_MAX_FILE_SIZE_MB: int = 10
     AUDIO_MAX_DURATION_SECONDS: int = 300  # 5 minutes
@@ -115,6 +125,25 @@ class Settings(BaseSettings):
     def effective_emails_from_name(self) -> str:
         """Helper to get the email from name, falling back to project name."""
         return self.EMAILS_FROM_NAME or self.PROJECT_NAME
+
+    @property
+    def is_smtp_configured(self) -> bool:
+        """True iff all three SMTP credentials are populated.
+
+        When False, the email subsystem falls back to logging the email
+        body to stdout (see app.utils.email._send_or_log). The auth-email
+        verification gate uses this to avoid locking users out of an
+        unconfigured deployment.
+        """
+        return bool(self.SMTP_HOST and self.SMTP_USER and self.SMTP_PASSWORD)
+
+    @property
+    def email_verification_active(self) -> bool:
+        """The verification gate only fires when both:
+        - the operator opted in (EMAIL_VERIFICATION_REQUIRED=True), and
+        - SMTP is configured (otherwise users could never receive the link).
+        """
+        return self.EMAIL_VERIFICATION_REQUIRED and self.is_smtp_configured
 
 
 settings = Settings()

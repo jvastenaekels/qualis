@@ -143,7 +143,7 @@
           "auth"
         ],
         "summary": "Register User",
-        "description": "Register a new user, optionally via an invitation token.",
+        "description": "Register a new user, optionally via an invitation token.\n\nThe verification gate depends only on whether verification is active\n(EMAIL_VERIFICATION_REQUIRED=True AND SMTP configured). Invitation\ntokens grant project membership but never bypass the gate\n(spec amendment 2026-05-02).\n\n- Verification active (any path): is_active=False, email_verified_at=NULL,\n  verification email sent, requires_email_verification=True. If an\n  invitation token was provided, the project membership is still created\n  so access applies as soon as verification completes.\n- Verification inactive (operator disabled it OR SMTP not configured):\n  is_active=True, email_verified_at=NOW(), requires_email_verification=False.\n  Membership (if any) is applied in the same transaction. This SMTP-fallback\n  rule keeps the app usable on deployments that cannot deliver mail.",
         "operationId": "register_user_api_register_post",
         "requestBody": {
           "content": {
@@ -161,7 +161,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserRead"
+                  "$ref": "#/components/schemas/UserCreateResponse"
                 }
               }
             }
@@ -259,13 +259,13 @@
           "auth"
         ],
         "summary": "Enable Totp",
-        "description": "Enable 2FA after verifying a token.",
+        "description": "Enable 2FA on the chosen channel ('app' or 'email').\n\nFor channel='app': caller must have already called /me/2fa/setup to seed\nthe TOTP secret and must provide a valid TOTP token in payload.token.\n\nFor channel='email': no token required; the user is enrolled directly.\nThe email-OTP flow exercises itself at first login (T15 deliberately\naccepts the simpler one-step enrollment over a two-step \"issue OTP /\nconfirm channel works\" path \u2014 see plan trade-off note).",
         "operationId": "enable_totp_api_me_2fa_enable_post",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TOTPVerify"
+                "$ref": "#/components/schemas/TwoFAEnableRequest"
               }
             }
           },
@@ -345,6 +345,258 @@
             "OAuth2PasswordBearer": []
           }
         ]
+      }
+    },
+    "/api/email/verify": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Verify Email",
+        "description": "Consume an email-verification JWT and activate the user account.\n\nIdempotent: re-verifying an already-verified account returns 200 silently.\nAnti-enum: a valid JWT whose email matches no user also returns 200.",
+        "operationId": "verify_email_api_email_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailTokenSubmit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/email/verify/resend": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Resend Verification",
+        "description": "Resend a verification email to an unverified account.\n\nAlways returns 200 (anti-enum). If the user exists and is unverified,\na fresh token is emailed. Otherwise, a fake bcrypt call equalises latency\nso callers cannot distinguish the two code paths by timing.",
+        "operationId": "resend_verification_api_email_verify_resend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/password/reset/request": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Password Reset Request",
+        "description": "Request a password-reset email.\n\nAlways returns 200 (anti-enum). If a user exists with the submitted\nemail, a fresh JWT carrying a `pwa` (password_changed_at epoch) claim\nis emailed; otherwise a fake bcrypt call equalises latency. The\n`pwa` claim is the replay-defense token: confirm-time compares it\nto the user's current password_changed_at, so a token issued before\nthe password was last rotated is rejected.",
+        "operationId": "password_reset_request_api_password_reset_request_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/password/reset/confirm": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Password Reset Confirm",
+        "description": "Consume a password-reset JWT, rotate the password, kill in-flight OTPs.\n\nReturns 400 (not 200 anti-enum) on token/user/pwa failure: the token\nitself is the secret, and an attacker cannot guess valid ones, so a\nspecific status here does not enable enumeration.",
+        "operationId": "password_reset_confirm_api_password_reset_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordResetConfirm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/2fa/disable/request": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Twofa Disable Request",
+        "description": "Self-serve 2FA disable \u2014 request the link.\n\nAnti-enum: returns 200 regardless of whether the user exists or has\n2FA enabled. A bcrypt call equalises latency on the no-op path so the\nresponse time doesn't leak account state.",
+        "operationId": "twofa_disable_request_api_2fa_disable_request_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/2fa/disable/confirm": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Twofa Disable Confirm",
+        "description": "Self-serve 2FA disable \u2014 confirm via single-use JWT.\n\nSingle-use enforced via the consumed_email_tokens table (jti PK).\nThe mark_jti_consumed call is atomic \u2014 concurrent attempts on the\nsame token: exactly one inserts, the other hits a PK collision and\nwe map it to 409.\n\nThe jti is consumed BEFORE the user lookup so that an attacker who\nsomehow obtained a token cannot probe for valid email addresses by\nreplaying it; whether or not the user exists, the token is burned.",
+        "operationId": "twofa_disable_confirm_api_2fa_disable_confirm_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailTokenSubmit"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/admin/studies": {
@@ -8131,6 +8383,35 @@
         "title": "EigenvalueResult",
         "description": "Eigenvalues for the scree plot plus three retention indicators.\n\nAll three indicators are advisory \u2014 Watts & Stenner (2012) emphasise\nthat factor retention in Q-methodology also depends on interpretability\nand stability, not just statistical thresholds."
       },
+      "EmailRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "EmailRequest",
+        "description": "Schema for submitting an email address (resend flows)."
+      },
+      "EmailTokenSubmit": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "title": "EmailTokenSubmit",
+        "description": "Schema for submitting an email-link JWT (verify, password-reset, etc.)."
+      },
       "FactorCharacteristic": {
         "properties": {
           "factor": {
@@ -9455,6 +9736,26 @@
         ],
         "title": "PasswordConfirm",
         "description": "Schema for confirming identity with current password."
+      },
+      "PasswordResetConfirm": {
+        "properties": {
+          "token": {
+            "type": "string",
+            "title": "Token"
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 8,
+            "title": "New Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "token",
+          "new_password"
+        ],
+        "title": "PasswordResetConfirm",
+        "description": "Schema for confirming a password reset via email-link JWT."
       },
       "PreviewRangeRequest": {
         "properties": {
@@ -11654,20 +11955,6 @@
         "title": "TOTPSetup",
         "description": "Schema for TOTP setup response."
       },
-      "TOTPVerify": {
-        "properties": {
-          "token": {
-            "type": "string",
-            "title": "Token"
-          }
-        },
-        "type": "object",
-        "required": [
-          "token"
-        ],
-        "title": "TOTPVerify",
-        "description": "Schema for TOTP verification."
-      },
       "TimelineSnapshot": {
         "properties": {
           "first_submission_at": {
@@ -11766,11 +12053,55 @@
               }
             ],
             "title": "Temp Token"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "app",
+                  "email"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channel"
           }
         },
         "type": "object",
         "title": "Token",
-        "description": "Schema for returning an access token or 2FA requirement."
+        "description": "Schema for returning an access token or 2FA requirement.\n\nThe optional `channel` field is populated when `requires_2fa=True`\nso the frontend knows whether to render the authenticator-app\nprompt ('app') or the email-OTP prompt ('email'). It stays None\non a successful access-token response."
+      },
+      "TwoFAEnableRequest": {
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "app",
+              "email"
+            ],
+            "title": "Channel"
+          },
+          "token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "channel"
+        ],
+        "title": "TwoFAEnableRequest",
+        "description": "Body of POST /me/2fa/enable.\n\nThe `token` field is required only for channel='app' (the existing\nTOTP flow). channel='email' enrolls the user without a TOTP token;\nthe email-OTP delivery is exercised at first login."
       },
       "UserCreate": {
         "properties": {
@@ -11824,6 +12155,24 @@
         ],
         "title": "UserCreate",
         "description": "Schema for creating a new user."
+      },
+      "UserCreateResponse": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserRead"
+          },
+          "requires_email_verification": {
+            "type": "boolean",
+            "title": "Requires Email Verification"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "requires_email_verification"
+        ],
+        "title": "UserCreateResponse",
+        "description": "Response from POST /api/register: the user + a verification flag."
       },
       "UserRead": {
         "properties": {

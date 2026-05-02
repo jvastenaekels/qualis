@@ -54,6 +54,18 @@ The `models/__init__.py` and `schemas/__init__.py` re-export every public name, 
 
 Most modules in `app/` are under `mypy --strict` via `[[tool.mypy.overrides]]` in `backend/pyproject.toml`. New utility/leaf modules should opt into the same bar by adding themselves to the overrides list. See the "Strict-typed Python modules" section in [`CLAUDE.md`](../../CLAUDE.md) for the canonical list and the conventions for using `# type: ignore[explicit-any]` at JSON boundaries.
 
+## 3.1 JWT families and claim isolation
+
+Qualis uses three JWT families, all signed with `SECRET_KEY` but isolated by a strict `purpose` claim:
+
+| Family | `purpose` claim | Usage |
+| ------ | --------------- | ----- |
+| **Access** | `access` | Standard bearer token issued at login; carries `sub` (user id) and role. |
+| **Invitation** | `invitation` | Single-use project-invitation link; carries `email` + `project_id`. |
+| **Email-flow** | `email-verification` / `password-reset` / `2fa-disable` | Time-limited tokens for auth email flows; each carries a `jti` that is consumed once. |
+
+`app.utils.security.decode_token(token, expected_purpose=...)` enforces the purpose check before returning claims. Passing a token from one family to an endpoint that expects another raises `InvalidTokenError`, so a stolen password-reset link cannot be replayed as an access token even though both are signed with the same key. The 2FA-disable JTI is additionally stored in the `consumed_email_tokens` table to prevent replay of the same link twice.
+
 ## 4. Best Practices
 
 ### 4.1 Async/Sync

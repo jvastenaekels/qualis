@@ -4,7 +4,17 @@
 
 """User model."""
 
-from .base import Base, Boolean, Mapped, String, mapped_column, relationship
+from .base import (
+    Base,
+    Boolean,
+    DateTime,
+    Mapped,
+    String,
+    datetime,
+    func,
+    mapped_column,
+    relationship,
+)
 
 
 class User(Base):
@@ -22,6 +32,15 @@ class User(Base):
     # 2FA / TOTP
     totp_secret: Mapped[str | None] = mapped_column(String, nullable=True)
     is_totp_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # Email verification + password audit
+    email_verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    totp_channel: Mapped[str | None] = mapped_column(String, nullable=True)
+    password_changed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
 
     # Relationships
     memberships: Mapped[list["ProjectMember"]] = relationship(  # type: ignore[name-defined]  # noqa: F821

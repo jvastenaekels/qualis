@@ -97,9 +97,12 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.services.study_service` — services round batch 2: 8 backward-compat *args/**kwargs proxy methods kept as Any → Any (deliberate; narrowing requires duplicating each proxy with the underlying signature)
 - `app.routers.admin.memos` — phase 5 memo subsystem
 - `app.schemas.memos` — phase 5 memo subsystem (Pydantic BaseModel)
+- `app.services.email_token_consume_service` — v0.6.0 auth email flows: single-use JTI denylist (no Any at ORM boundary)
+- `app.services.email_otp_service` — v0.6.0 auth email flows: 2FA email OTP issue/verify (no Any)
+- `app.middleware.log_scrub` — v0.6.0 auth email flows: regex scrubber + logging.Filter (pure stdlib, no Any)
 
-Total: 62 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem).
-Previous milestone: 49 (after wave 4 batches 1-2). Added 10 across wave 4 batch 3 (9 routers) + services round (submission_service, study_service).
+Total: 65 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows.
+Previous milestone: 62 (after phase 5 memo subsystem). Added 3 across v0.6.0 (email_token_consume_service, email_otp_service, log_scrub).
 Wave 4 highlights (cumulative): every router under strict; build_sort_matrix cleanup eliminates last dict[str,Any] in analysis pipeline; security.py cast()s removed (bcrypt/jwt stubs now fully typed); analysis router promoted to full strict.
 Next bar (out of scope for v0.2): graduate the relaxed-tier StudyService proxies to typed pass-throughs (would require duplicating SubmissionService / StudyDataService signatures); promote remaining schemas/models to full strict by introducing TypedDict wire shapes for the open-ended JSON columns.
 
@@ -119,7 +122,7 @@ Inside a strict module: every function declares its return type, no implicit `An
 - Generate: `make migration-new` (auto-generates from model changes)
 - **Always review generated migrations** — auto-generation against a blank or out-of-sync DB will include unrelated tables. The migration must only contain the intended schema change.
 - Migrations run automatically on deploy via `Procfile` release phase (`python scripts/migrate.py`)
-- Migration chain (18 migrations as of 2026-04-25, head `62538cba702e`):
+- Migration chain (19 migrations as of 2026-05-02, head `cb8732294475`):
   `initial_schema` → `rename_randomize_statements_to_randomize_statement_order`
   → `remove_consent_buttons` → `add_pre_instruction`
   → `add_is_test_run_to_participants` → `add_audio_recordings_table`
@@ -130,6 +133,7 @@ Inside a strict module: every function declares its return type, no implicit `An
   → `add_item_versions_and_comments` → `rename_workspace_to_project`
   → `add_analysis_runs_table` → `add_anonymised_at_to_participants`
   → `rename_workspace_indexes_to_project_add_is_discarded_index`
+  → `add_auth_email_flows`
 - Run `alembic history` (in `backend/`) for the canonical chain — this list will drift if not updated when new migrations are added.
 - PostgreSQL DDL is transactional: a failed migration rolls back entirely, leaving `alembic_version` unchanged
 

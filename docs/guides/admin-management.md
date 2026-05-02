@@ -17,6 +17,14 @@ Researchers are strongly encouraged to enable Two-Factor Authentication (TOTP).
 
 Once enabled, login takes the password first, then the TOTP code. To disable, you must re-enter the current password.
 
+**2FA login channels.** After entering the password, the user can choose to receive the 2FA code via their authenticator app (TOTP) or by email (a 6-digit one-time code valid for 10 minutes, subject to a 30-second resend cooldown). The email channel requires SMTP to be configured; see [`deployment.md`](deployment.md#email-transport-auth-flows).
+
+**Lost authenticator (self-serve recovery).** If a user loses access to their authenticator app, they can initiate a 2FA disable flow from the login screen. A time-limited link (15 minutes by default) is sent to their registered email address. Opening the link disables 2FA on the account without admin involvement. Admins cannot manually bypass 2FA or verify accounts through the admin UI — the flows are entirely email-driven.
+
+## Email verification
+
+When `EMAIL_VERIFICATION_REQUIRED` is enabled and SMTP is configured, new accounts must verify their email address before logging in. A verification link is sent on sign-up and can be resent from the login screen. Admins cannot manually verify a user's email — the flow is email-driven. In environments without SMTP, verification is automatically skipped (accounts are immediately active).
+
 ---
 
 ## Manage study teams

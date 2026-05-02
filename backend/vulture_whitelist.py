@@ -351,3 +351,24 @@ n_consensus
 min_defining_sorts
 has_empty_factor
 preview_range
+
+# --- auth-email-flows (verification, password reset, 2FA email-OTP, 2FA disable) ---
+# FastAPI route endpoints registered via @router.post; slowapi key_func referenced
+# from decorator kwargs; TypedDict keys consumed at the JWT wire boundary; service
+# helpers consumed by the cleanup-cron / future call sites vulture cannot follow.
+email_hash_key_func
+verify_email
+resend_verification
+password_reset_request
+password_reset_confirm
+twofa_disable_request
+twofa_disable_confirm
+get_last_email
+requires_email_verification
+is_jti_consumed
+cleanup_consumed
+iss
+aud
+exp
+iat
+pwa

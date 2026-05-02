@@ -169,6 +169,7 @@
             "email_label": "Email address",
             "password_label": "Password",
             "submit": "Continue",
+            "cta": "Sign in",
             "forgot_password": "Forgot?",
             "loading": "Authenticating...",
             "card_title": "Sign in",
@@ -176,7 +177,66 @@
             "error_401": "Invalid email or password",
             "error_generic": "Something went wrong. Please try again.",
             "reason_session_expired": "Your session has expired. Please sign in again.",
-            "reason_auth_required": "Please sign in to continue."
+            "reason_auth_required": "Please sign in to continue.",
+            "forgot_password_link": "Forgot password?",
+            "reset_success_banner": "Password updated. You can now sign in with your new password.",
+            "two_factor_title": "Two-factor authentication",
+            "two_factor_app_prompt": "Enter the 6-digit code from your authenticator app.",
+            "two_factor_email_prompt": "We sent a 6-digit code to your email. Enter it below.",
+            "two_factor_submit": "Verify",
+            "two_factor_resend": "Resend code",
+            "two_factor_resend_cooldown": "Resend available in {{seconds}}s",
+            "two_factor_invalid": "Invalid code. Try again.",
+            "lost_2fa_link": "Lost access to your 2FA?"
+        },
+        "twofa": {
+            "recovery": {
+                "title": "Lost access to your two-factor authentication?",
+                "body": "Enter your account email. If two-factor is enabled on this account, we'll send you a link to disable it.",
+                "submit": "Send disable link",
+                "success": "If the email exists and has 2FA, a disable link is on its way."
+            },
+            "disable": {
+                "title": "Disable two-factor authentication",
+                "warning": "Clicking the button below will permanently remove the second factor from this account. You'll be able to sign in with just your password until you re-enable 2FA.",
+                "warning_attacker": "If you did NOT request this, close this page and change your password immediately.",
+                "confirm_button": "Yes, disable two-factor authentication",
+                "loading": "Disabling…",
+                "success": "Two-factor authentication is now disabled. You may sign in.",
+                "error_consumed": "This link has already been used.",
+                "error_expired": "This link has expired or is invalid.",
+                "missing_token": "No token in the URL."
+            }
+        },
+        "password_reset": {
+            "request_title": "Reset your password",
+            "request_body": "Enter your email and we'll send a reset link.",
+            "request_submit": "Send reset link",
+            "request_success": "If the email exists, a reset link is on its way.",
+            "confirm_title": "Choose a new password",
+            "confirm_submit": "Reset password",
+            "success_redirect": "Password updated. You can now sign in with your new password.",
+            "link_expired": "This link has expired or has already been used.",
+            "too_short": "Password must be at least 8 characters.",
+            "mismatch": "Passwords do not match.",
+            "missing_token": "No reset token in the URL.",
+            "new_password_placeholder": "New password",
+            "confirm_placeholder": "Confirm password"
+        },
+        "email": {
+            "verification_sent": {
+                "title": "Verify your email",
+                "body": "We sent a verification link to {{email}}. Click the link to activate your account.",
+                "resend": "Resend the email",
+                "cooldown": "Resend available in {{seconds}}s",
+                "error": "Could not resend. Try again later."
+            },
+            "verify": {
+                "verifying": "Verifying your email…",
+                "success": "Email verified. You can now sign in.",
+                "expired": "This link has expired or is invalid.",
+                "resend_link": "Request a new verification email"
+            }
         },
         "register": {
             "title": "Create account",
@@ -614,7 +674,13 @@
                 "disabled_success": "Two-factor authentication disabled",
                 "secret_copied": "Secret copied",
                 "invalid_token": "Invalid verification code",
-                "disable_error": "Failed to disable 2FA"
+                "disable_error": "Failed to disable 2FA",
+                "channel_select_label": "How should we deliver your 2FA codes?",
+                "channel_app": "Authenticator app (recommended)",
+                "channel_email": "Email",
+                "channel_email_desc": "We'll email you a 6-digit code each time you log in. Useful if you can't install an authenticator app.",
+                "enable_email_btn": "Enable email-based 2FA",
+                "enable_email_pending": "Enabling…"
             },
             "password": {
                 "title": "Password management",

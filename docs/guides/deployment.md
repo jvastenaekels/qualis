@@ -193,3 +193,31 @@ On startup the backend checks for required tables (`projects`, `users`, `studies
 ### SMTP fallback
 
 When `SMTP_HOST` is unset, invitation emails are logged to stdout instead of being sent. The invitation URL appears in the application logs and in the dashboard.
+
+---
+
+## Email transport (auth flows)
+
+Email-driven auth flows (sign-up verification, password reset, 2FA email-OTP, 2FA self-serve disable) degrade gracefully when SMTP is not configured — sign-ups create immediately-active accounts and none of the email-gate checks block login. Configure the following variables when enabling email auth in production:
+
+| Variable | Default | Notes |
+| -------- | ------- | ----- |
+| `SMTP_HOST` | — | Required to send any email. Unset = mock-log mode. |
+| `SMTP_PORT` | `587` | Standard submission port with STARTTLS. |
+| `SMTP_USER` | — | SMTP credentials username. |
+| `SMTP_PASSWORD` | — | SMTP credentials password. |
+| `SMTP_FROM` | — | Sender address shown to recipients. |
+| `EMAIL_VERIFICATION_REQUIRED` | `true` | Enforce email verification on sign-up when SMTP is active. Set to `false` only to test the unverified-account UX with SMTP configured. |
+| `EMAIL_VERIFY_TOKEN_EXPIRE_HOURS` | `48` | Validity window for the sign-up verification link. |
+| `PASSWORD_RESET_TOKEN_EXPIRE_HOURS` | `1` | Validity window for the password-reset link. |
+| `TWOFA_DISABLE_TOKEN_EXPIRE_MINUTES` | `15` | Validity window for the 2FA self-serve disable link. |
+| `TWOFA_EMAIL_OTP_EXPIRE_MINUTES` | `10` | Validity window for each 2FA email-OTP code. |
+| `TWOFA_EMAIL_OTP_RESEND_COOLDOWN_SECONDS` | `30` | Minimum interval between OTP resend requests per user. |
+
+**Cron cleanup:** consumed email tokens (2FA-disable JTIs) accumulate in the `consumed_email_tokens` table. Once SMTP is active, schedule a daily cron to prune stale rows:
+
+```bash
+PYTHONPATH=backend uv --project backend run python backend/scripts/cleanup_consumed_email_tokens.py
+```
+
+This deletes rows older than 7 days and is safe to run while the app is live.

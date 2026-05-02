@@ -6,6 +6,7 @@
 """Pytest configuration and fixtures."""
 
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -113,7 +114,11 @@ async def client(db):
 async def test_user(db: AsyncSession):
     """Create a test user for auth tests."""
     hashed = get_password_hash(TEST_PASSWORD)
-    user = User(email=TEST_EMAIL, hashed_password=hashed)
+    user = User(
+        email=TEST_EMAIL,
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),  # T10: gate-aware fixture
+    )
     db.add(user)
     await db.commit()
     await db.refresh(user)
@@ -220,7 +225,11 @@ async def user_factory(db: AsyncSession):
 
         email = email or f"user_{uuid.uuid4()}@example.com"
         hashed = get_password_hash(password)
-        user = User(email=email, hashed_password=hashed)
+        user = User(
+            email=email,
+            hashed_password=hashed,
+            email_verified_at=datetime.now(timezone.utc),  # T10: gate-aware default
+        )
         db.add(user)
         await db.commit()
         await db.refresh(user)
@@ -351,7 +360,11 @@ async def seed_study_id(seed_study: Study) -> int:
 async def seed_other_user_id(db: AsyncSession) -> int:
     """Return the int PK of a second distinct user (no project membership required for T4)."""
     hashed = get_password_hash("otherpassword")
-    user = User(email="other@example.com", hashed_password=hashed)
+    user = User(
+        email="other@example.com",
+        hashed_password=hashed,
+        email_verified_at=datetime.now(timezone.utc),  # T10: gate-aware default
+    )
     db.add(user)
     await db.commit()
     await db.refresh(user)
@@ -423,7 +436,11 @@ async def auth_headers_for_viewer(
     from app.utils.security import create_access_token, get_password_hash
 
     email = f"viewer_{uuid.uuid4()}@example.com"
-    viewer = User(email=email, hashed_password=get_password_hash("viewerpassword"))
+    viewer = User(
+        email=email,
+        hashed_password=get_password_hash("viewerpassword"),
+        email_verified_at=datetime.now(timezone.utc),  # T10: gate-aware default
+    )
     db.add(viewer)
     await db.flush()
 

@@ -22,6 +22,7 @@ from app.middleware.errors import (
     sqlalchemy_exception_handler,
     validation_exception_handler,
 )
+from app.middleware.log_scrub import install_access_log_scrub
 from app.middleware.security import SecurityHeadersMiddleware
 from app.routers import audio, auth, logs, participants, submissions
 from app.routers.admin import concourses as admin_concourses
@@ -46,6 +47,9 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+# Scrub ?token= query params from uvicorn access logs before any requests land.
+install_access_log_scrub()
 
 # Sentinel value for unset secrets in dev — production startup checks compare
 # against this constant to detect missing env vars. Not a credential.

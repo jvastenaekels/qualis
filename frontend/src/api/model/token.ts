@@ -7,13 +7,20 @@
 import type { TokenAccessToken } from './tokenAccessToken';
 import type { TokenTokenType } from './tokenTokenType';
 import type { TokenTempToken } from './tokenTempToken';
+import type { TokenChannel } from './tokenChannel';
 
 /**
  * Schema for returning an access token or 2FA requirement.
+
+The optional `channel` field is populated when `requires_2fa=True`
+so the frontend knows whether to render the authenticator-app
+prompt ('app') or the email-OTP prompt ('email'). It stays None
+on a successful access-token response.
  */
 export interface Token {
     access_token?: TokenAccessToken;
     token_type?: TokenTokenType;
     requires_2fa?: boolean;
     temp_token?: TokenTempToken;
+    channel?: TokenChannel;
 }

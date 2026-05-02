@@ -48,6 +48,15 @@ class UserUpdate(BaseModel):
         return validate_non_empty_string(v)
 
 
+class UserCreateResponse(BaseModel):
+    """Response from POST /api/register: the user + a verification flag."""
+
+    user: UserRead
+    requires_email_verification: bool
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class PasswordChange(BaseModel):
     """Schema for changing password."""
 
