@@ -45,7 +45,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 | Self-hosted | Yes | Frontend only | Desktop | Yes (static site) | Desktop | Yes (local R) | **Yes** |
 | Open source | Yes (MIT) | Yes (GPL-3) | Yes (GPL) | Yes (GPL-3) | Yes (GPL-3) | Yes (GPL-2/3) | **Yes (AGPL-3)** |
 
-*"N/A" indicates the capability does not apply to the tool category (e.g., R packages have no participant-facing UI, so "mobile support" is not applicable). "—" indicates we did not find documented support for the capability in the tool's published materials at the time of writing; corrections welcome via PR. "Ken-Q Analysis" refers specifically to the in-browser analysis app at `shawnbanasick.github.io/ken-q-analysis/`; data collection in the Banasick toolchain is handled by separate tools (Q-Sort Touch, **Quince**, EasyHTMLQ).*
+*"—" indicates we did not find documented support for the capability in the tool's published materials at the time of writing; corrections welcome via PR.*
 
 ---
 
