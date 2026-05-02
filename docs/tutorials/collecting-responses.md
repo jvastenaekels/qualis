@@ -92,7 +92,7 @@ This is the single best way to spot rough edges in instructions, statement wordi
 
 1. Click **Overview** in the left sidebar.
 
-The page shows: study status, the recruitment funnel (sent → started → submitted), completion rate, and recent submissions. The funnel counts come from recruitment-link usage (sent), participant session starts (started), and final submissions (submitted) — gaps between stages are usually where dropout happens.
+The page shows: study status, the recruitment funnel (sent → started → submitted), completion rate, and recent submissions. The funnel counts come from link usage, session starts, and final submissions; gaps between stages are usually where dropout happens.
 
 ---
 
