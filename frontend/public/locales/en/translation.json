@@ -638,12 +638,12 @@
             "back_home": "Back to home",
             "beta": "Research beta",
             "logout": "Log out",
-            "profile": "Profile",
+            "account": "Account settings",
             "admin_user": "Admin user"
         },
-        "profile": {
-            "title": "Profile",
-            "description": "Manage your personal information and security settings.",
+        "account": {
+            "title": "Account settings",
+            "description": "Manage your personal information and account security.",
             "personal": {
                 "title": "Personal information",
                 "email": "Email address",
@@ -657,8 +657,10 @@
                 "name_required": "Full name is required"
             },
             "security": {
-                "title": "Security & 2FA",
-                "description": "Secure your account with two-factor authentication.",
+                "title": "Security",
+                "description": "Manage two-factor authentication and your password.",
+                "tfa_subtitle": "Two-factor authentication",
+                "password_subtitle": "Password",
                 "enabled": "Enabled",
                 "setup_cta": "Setup 2FA now",
                 "configure_title": "Configure authenticator app",
@@ -1292,7 +1294,7 @@
             "exports": "Data",
             "data": "Data",
             "privacy": "Data privacy",
-            "profile": "Profile",
+            "account": "Account settings",
             "participant_n": "Participant {{code}}",
             "analysis": "Analysis",
             "settings": "Settings",
@@ -2598,5 +2600,10 @@
         "success": "Your personal data has been removed. Your anonymous Q-sort rankings remain in the study.",
         "error": "We could not process your request. Please try again or contact the researcher.",
         "already_erased": "Your personal data has been removed for this session."
+    },
+    "footer": {
+        "powered_by": "Powered by Qualis",
+        "license": "AGPLv3",
+        "github_aria": "View source on GitHub"
     }
 }

@@ -553,12 +553,12 @@
             "back_home": "Palaa etusivulle",
             "beta": "Tutkimuksen beta-versio",
             "logout": "Kirjaudu ulos",
-            "profile": "Profiili",
+            "account": "Tilin asetukset",
             "admin_user": "Ylläpitäjä"
         },
-        "profile": {
-            "title": "Profiili",
-            "description": "Hallitse henkilökohtaisia tietojasi ja turvallisuusasetuksia.",
+        "account": {
+            "title": "Tilin asetukset",
+            "description": "Hallitse henkilökohtaisia tietojasi ja tilin turvallisuutta.",
             "personal": {
                 "title": "Henkilökohtaiset tiedot",
                 "email": "Sähköpostiosoite",
@@ -572,8 +572,10 @@
                 "name_required": "Koko nimi vaaditaan"
             },
             "security": {
-                "title": "Turvallisuus & 2FA",
-                "description": "Suojaa tilisi kaksivaiheisella todennuksella.",
+                "title": "Turvallisuus",
+                "description": "Hallitse kaksivaiheista todennusta ja salasanaasi.",
+                "tfa_subtitle": "Kaksivaiheinen todennus",
+                "password_subtitle": "Salasana",
                 "enabled": "Käytössä",
                 "setup_cta": "Ota 2FA käyttöön",
                 "configure_title": "Määritä todennussovellus",
@@ -1207,7 +1209,7 @@
             "exports": "Tiedot",
             "data": "Tiedot",
             "privacy": "Tietosuoja",
-            "profile": "Profiili",
+            "account": "Tilin asetukset",
             "participant_n": "Osallistuja {{code}}",
             "analysis": "Analyysi",
             "settings": "Asetukset",
@@ -2598,5 +2600,10 @@
         "success": "Your personal data has been removed. Your anonymous Q-sort rankings remain in the study.",
         "error": "We could not process your request. Please try again or contact the researcher.",
         "already_erased": "Your personal data has been removed for this session."
+    },
+    "footer": {
+        "powered_by": "Qualisin tarjoama",
+        "license": "AGPLv3",
+        "github_aria": "Katso lähdekoodi GitHubissa"
     }
 }

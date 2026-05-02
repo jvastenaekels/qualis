@@ -553,11 +553,11 @@
             "back_home": "Retour à l'accueil",
             "beta": "Bêta",
             "logout": "Déconnexion",
-            "profile": "Profil",
+            "account": "Paramètres du compte",
             "admin_user": "Administrateur"
         },
-        "profile": {
-            "title": "Profil",
+        "account": {
+            "title": "Paramètres du compte",
             "description": "Gérez vos informations personnelles et la sécurité de votre compte.",
             "personal": {
                 "title": "Informations personnelles",
@@ -572,8 +572,10 @@
                 "name_required": "Le nom complet est requis"
             },
             "security": {
-                "title": "Sécurité et 2FA",
-                "description": "Ajoutez une couche de sécurité supplémentaire avec TOTP.",
+                "title": "Sécurité",
+                "description": "Gérez l'authentification à deux facteurs et votre mot de passe.",
+                "tfa_subtitle": "Authentification à deux facteurs",
+                "password_subtitle": "Mot de passe",
                 "enabled": "Activé",
                 "setup_cta": "Configurer la 2FA",
                 "configure_title": "Configurer l'application d'authentification",
@@ -1207,7 +1209,7 @@
             "exports": "Données",
             "data": "Données",
             "privacy": "Confidentialité",
-            "profile": "Profil",
+            "account": "Paramètres du compte",
             "participant_n": "Participant {{code}}",
             "analysis": "Analyse",
             "settings": "Réglages",
@@ -2598,5 +2600,10 @@
         "success": "Vos données personnelles ont été supprimées. Vos classements anonymes restent dans l'étude.",
         "error": "Nous n'avons pas pu traiter votre demande. Réessayez ou contactez la chercheuse.",
         "already_erased": "Vos données personnelles ont été supprimées pour cette session."
+    },
+    "footer": {
+        "powered_by": "Propulsé par Qualis",
+        "license": "AGPLv3",
+        "github_aria": "Voir le code source sur GitHub"
     }
 }
