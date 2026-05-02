@@ -230,11 +230,11 @@ Upload a **logo**, set an **accent color**, and add **partner logos** that appea
 
 ## Step 11: Open a methodology memo
 
-Click the **Memos** button in the toolbar. A drawer opens. Add a methodology memo and write a short note — even one paragraph — capturing the design decisions you just made: why this CoI, why forced distribution, why no rough-sort, why 12 statements.
+Click the **Memos** button in the toolbar. A drawer opens. Add a methodology memo and write a short note — even one paragraph — recording the design decisions you just made: why this CoI, why forced distribution, why no rough-sort, why 12 statements.
 
-This costs you 5 minutes now and saves you hours later when a co-author asks why you chose forced over free, or when you write the methods section of the paper. Memos are included in the Research Package export, so the audit trail follows the data.
+Five minutes now, hours saved later when a co-author asks why forced over free, or when you write the methods section. Memos travel with the Research Package export, so the audit trail stays attached to the data.
 
-> **Why this matters for both schools.** Classical Brown-school papers benefit from a clear methodology memo because reviewers ask about extraction, rotation, and flagging choices. Critical-Q work goes further: the memo *is* part of the analytical artefact, documenting the reflexive choices that shape what subjectivity the study can surface.
+> **Why this matters for both schools.** Classical Brown-school papers need a clear methodology memo because reviewers ask about extraction, rotation, and flagging. In critical-Q work, the memo is itself part of the analytical artefact: the design choices it records shape which subjectivities the study can surface.
 
 ---
 

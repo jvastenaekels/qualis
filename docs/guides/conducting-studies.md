@@ -33,23 +33,23 @@ The **Analysis** page runs PCA or centroid extraction with optional varimax rota
 
 ## Choose a distribution mode
 
-The Q-sort tab exposes three distribution modes (`forced` / `free` / `flexible`). The choice is methodologically loaded:
+The Q-sort tab exposes three distribution modes (`forced` / `free` / `flexible`). The choice carries methodological weight, so it is worth reading the field reference before activating:
 
 - **Forced** is the classical Brown-school default. Per-column slot counts are enforced at activation and submission, so participants commit to specific trade-offs and Q-sorts are directly comparable.
-- **Free** lets columns absorb overflow at sort time. The slot constraint becomes an upper hint rather than a rule. Some critical-Q practitioners argue this is the only honest treatment of subjectivity (Watts & Stenner 2012, ch. 4).
+- **Free** lets columns absorb overflow at sort time. The slot constraint becomes an upper hint. Critical-Q practitioners often prefer this mode (Watts & Stenner 2012, ch. 4).
 - **Flexible** keeps the total enforced but treats per-column capacities as soft hints with a designer warning.
 
-The setting is reversible until activation. If your study is already active and you want to switch modes, you must clone it as a new draft. See [`configuration.md`](../reference/configuration.md#distribution_mode) for the formal field reference.
+The setting is reversible until activation. To switch modes on an active study, clone it as a new draft. See [`configuration.md`](../reference/configuration.md#distribution_mode) for the formal field reference.
 
 ## Use memos as a design and analysis log
 
 Memos are short markdown notes attached to a study (or a concourse) and surfaced via the toolbar drawer on every admin page of that parent. Three suggested categories:
 
-- **Methodology memos** — rationale for the CoI, the distribution mode, the rough-sort toggle, the language(s) supported. Write these *during* design, not afterwards. They protect against reviewer questions ("why forced?", "why N=12?") and against your own future self contradicting earlier choices.
-- **Analysis memos** — notes on factor decisions during the refinement workflow (number of factors retained, flagging overrides, why a particular factor was dropped or split). See [Analyzing Results — Refinement](../tutorials/analyzing-results-refinement.md) once that tutorial lands.
-- **General memos** — anything else worth tracking (recruitment observations, team coordination).
+- **Methodology memos** — rationale for the CoI, the distribution mode, the rough-sort toggle, the language(s) supported. Write these as you design, while the choices are still in front of you. They answer the reviewer questions you will get later ("why forced?", "why N=12?") and stop your future self from second-guessing what you already decided.
+- **Analysis memos** — notes on factor decisions during the refinement workflow: how many factors you retained, which manual flagging overrides you applied, why you dropped or split a particular factor. See [Analyzing Results — Refinement](../tutorials/analyzing-results-refinement.md) once that tutorial lands.
+- **General memos** — recruitment observations, team coordination, anything else worth tracking.
 
-Threaded comments under each memo support `@mentions` of project members; mentioned users see an unread badge on the toolbar icon until they open the drawer. Memos are included in the Research Package export, making the analytic trail reproducible by anyone with the archive.
+Threaded comments under each memo support `@mentions` of project members; mentioned users see an unread badge on the toolbar icon until they open the drawer. Memos are included in the Research Package export, so the analytic trail travels with the data.
 
 ## Export
 
