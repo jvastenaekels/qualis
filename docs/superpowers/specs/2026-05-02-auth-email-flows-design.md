@@ -161,7 +161,7 @@ No `EmailVerificationService` class — each flow is `encode → email` and `dec
 - Response body becomes `{user, requires_email_verification: bool}` instead of bare `User`.
 
 **`POST /auth/token`** :
-- If `EMAIL_VERIFICATION_REQUIRED=True` and `email_verified_at IS NULL` → HTTP 403 `email_not_verified` (frontend shows resend). When `EMAIL_VERIFICATION_REQUIRED=False`, the check is skipped (kill switch for environments without SMTP).
+- If `settings.email_verification_active` (= `EMAIL_VERIFICATION_REQUIRED AND is_smtp_configured`) and `email_verified_at IS NULL` → HTTP 403 `email_not_verified` (frontend shows resend). When SMTP is not configured, the gate **must not fire** — the app must keep functioning. Same goes when the operator explicitly sets `EMAIL_VERIFICATION_REQUIRED=False`. The `is_smtp_configured` automatic fallback is a hard requirement: an operator who deploys without SMTP must never end up with locked-out accounts.
 - 2FA branch keys on `user.totp_channel`:
   - `'app'` → unchanged (header `x-totp-token` checked against TOTP secret).
   - `'email'` → without header, calls `issue_otp` + sends email + returns `Token(requires_2fa=True, channel='email')`. With header, calls `verify_otp`.
@@ -246,7 +246,7 @@ Existing `FRONTEND_URL` (already present at `app/core/config.py:25`) is the base
 
 **Consequence in dev** : with `EMAIL_VERIFICATION_REQUIRED=True` and SMTP unset, signup works but the account is locked until the developer fetches the link from logs. Documented in `CONTRIBUTING.md` (to add).
 
-**Production** : a real SMTP provider must be configured (Brevo, Postmark, Resend SMTP, Mailgun…). The feature can ship without it, but `EMAIL_VERIFICATION_REQUIRED` must then be set to `False` or new accounts will be unactivatable.
+**Production** : a real SMTP provider should be configured (Brevo, Postmark, Resend SMTP, Mailgun…) so the verification gate has teeth. The app **degrades gracefully if SMTP is missing**: `settings.email_verification_active` automatically returns `False` when `SMTP_HOST/USER/PASSWORD` are not all set, so login is not blocked and self-signups create immediately-active+verified accounts. This means an operator can deploy the binary first, configure SMTP later, and never end up with locked-out users in between.
 
 ### URL token leakage hardening
 
