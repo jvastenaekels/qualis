@@ -1021,7 +1021,6 @@
             "roles": {
                 "owner": "Propriétaire",
                 "admin": "Administrateur",
-                "researcher": "Chercheur",
                 "member": "Membre",
                 "viewer": "Observateur"
             },
@@ -2383,8 +2382,8 @@
                             "label": "Propriétaire",
                             "desc": "Contrôle complet du projet, des membres et des études."
                         },
-                        "researcher": {
-                            "label": "Chercheur",
+                        "member": {
+                            "label": "Membre",
                             "desc": "Peut créer et gérer toutes les études. Accès restreint aux paramètres du projet."
                         },
                         "viewer": {
@@ -2403,6 +2402,14 @@
                         "copy_success": "Lien copié dans le presse-papier !"
                     }
                 }
+            },
+            "members": {
+                "quota": "{{count}}/{{limit}} places utilisées",
+                "quota_full_tooltip": "Limite de membres atteinte. Augmentez MAX_MEMBERS_PER_PROJECT ou retirez un membre."
+            },
+            "create": {
+                "quota": "{{count}}/{{limit}} projets possédés",
+                "quota_full_tooltip": "Vous avez atteint votre limite de projets possédés."
             }
         },
         "members": {
@@ -2605,5 +2612,10 @@
         "powered_by": "Propulsé par Qualis",
         "license": "AGPLv3",
         "github_aria": "Voir le code source sur GitHub"
+    },
+    "errors": {
+        "member_limit_reached": "Limite de membres du projet atteinte.",
+        "owner_project_limit_reached": "Vous ne pouvez pas posséder davantage de projets.",
+        "owner_role_immutable": "Le rôle Propriétaire ne peut être attribué qu'à la création du projet."
     }
 }
