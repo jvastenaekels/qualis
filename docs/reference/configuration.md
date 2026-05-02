@@ -34,7 +34,21 @@ The shape of the Q-sort table. An array of column objects.
 | `score` | integer | Column value. |
 | `capacity` | integer | Number of cards that fit in the column. |
 
-The sum of all `capacity` values must equal the number of statements.
+The relationship between `sum(capacity)` and the statement count depends on `distribution_mode` (see below).
+
+### `distribution_mode`
+
+How strictly the grid enforces per-column capacities. Default `"forced"`.
+
+| Value | Activation rule | Submission rule | Notes |
+| ----- | --------------- | --------------- | ----- |
+| `"forced"` | `sum(capacity) == len(statements)` | Each column holds exactly its declared capacity. | Classical Brown-school default (Brown 1980; Watts & Stenner 2012). |
+| `"free"` | `sum(capacity) >= len(statements)` (the grid must fit every statement) | Total submitted count must equal the Q-set size; per-column capacities are not enforced — columns may absorb overflow at sort time. | Used when the slot constraint is itself viewed as an analytical artefact (Brown et al. 2015). |
+| `"flexible"` | `sum(capacity) == len(statements)` | Total enforced; per-column capacities are soft hints (designer warnings only). | Qualis-specific compromise between forced and free. |
+
+### `rough_sort_enabled`
+
+Boolean. When true (default), participants go through a 3-pile triage (agree / neutral / disagree) before the fine-sort grid. When false, participants go directly from pre-sort to the fine-sort grid and place items from a single horizontally-scrollable deck. Only ~38% of published Q studies use rough-sorting (Dieteren et al. 2023).
 
 ### `presort_config`
 

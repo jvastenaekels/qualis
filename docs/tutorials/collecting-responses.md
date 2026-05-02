@@ -92,7 +92,7 @@ This is the single best way to spot rough edges in instructions, statement wordi
 
 1. Click **Overview** in the left sidebar.
 
-The page shows: study status, participant statistics, completion rate, and recent submissions.
+The page shows: study status, the recruitment funnel (sent → started → submitted), completion rate, and recent submissions. The funnel counts come from link usage, session starts, and final submissions; gaps between stages are usually where dropout happens.
 
 ---
 
@@ -101,7 +101,7 @@ The page shows: study status, participant statistics, completion rate, and recen
 1. Click **Data** in the left sidebar.
 
 The Data page provides:
-- **Participant Table**: Searchable, sortable table with status, duration, device type, test run flag, and discard status
+- **Participant Table**: Searchable, sortable table with status, duration, device type, and discard status
 - **Timeline Chart**: Submission trends over time
 - **Device Breakdown**: Desktop vs. mobile vs. tablet distribution
 
@@ -130,6 +130,8 @@ If you identify a response that should be excluded:
 Discarded participants are excluded from exports and analysis by default, but the data is preserved for audit. To restore, open the same menu and click **Restore**.
 
 For the full set of state transitions a study goes through (Active → Paused → Closed → Archived), see [`../reference/admin-dashboard.md#general`](../reference/admin-dashboard.md#general). For now, leave your tutorial study Active.
+
+> **Sharing access with team members.** To give a colleague access to monitor responses, invite them via the project Members page (`/admin/projects/<slug>/members`). Roles: `Viewer` (read-only), `Editor` (run analyses, manage recruitment), `Owner` (full access including member management). See [Admin Dashboard — Members](../reference/admin-dashboard.md#members).
 
 ---
 

@@ -150,6 +150,27 @@ Wired only when `ENVIRONMENT in ("development", "test")`. The router is not regi
 | DELETE | `.../runs/{run_id}` | Editor | — | Delete a persisted run |
 | GET | `.../audios` | Viewer | — | Audio recordings for flagged participants, with presigned playback URLs |
 | GET | `.../comments` | Viewer | — | Card comments from flagged participants on each factor |
+| POST | `.../preview-range` | Viewer | 10/min | Eigenvalue + variance preview for a configurable factor-count range (Explorer panel) |
+
+### Admin — memos (`/api/admin/{studies\|concourses}/{id}/memo`)
+
+Polymorphic memo subsystem attached to either a study or a concourse.
+
+| Method | Path | Min role | Rate limit | Purpose |
+| --- | --- | --- | --- | --- |
+| GET | `/api/admin/{parent}/{id}/memo` | Viewer | — | Full memo (entries with comment threads) for a study or concourse |
+| GET | `/api/admin/{parent}/{id}/memo/entries` | Viewer | — | List entries only (no comment payloads) |
+| POST | `/api/admin/{parent}/{id}/memo/entries` | Editor | 30/min | Create a new memo entry |
+| GET | `/api/admin/{parent}/{id}/memo/unread` | Viewer | — | Unread-mention count for the current user |
+| PATCH | `/api/admin/memo-entries/{eid}` | Editor | 30/min | Update entry title, body, or position |
+| DELETE | `/api/admin/memo-entries/{eid}` | Editor | 30/min | Delete an entry (cascades to comments) |
+| GET | `/api/admin/memo-entries/{eid}/comments` | Viewer | — | List comments on an entry |
+| POST | `/api/admin/memo-entries/{eid}/comments` | Editor | 60/min | Post a comment with optional `mentions: int[]` |
+| PATCH | `/api/admin/memo-comments/{cid}` | author | 30/min | Edit a comment body |
+| DELETE | `/api/admin/memo-comments/{cid}` | author | 30/min | Soft-delete a comment |
+| POST | `/api/admin/memo-comments/{cid}/resolve` | Editor | 30/min | Mark a comment as resolved |
+| POST | `/api/admin/memo-comments/{cid}/unresolve` | Editor | 30/min | Reopen a resolved comment |
+| GET | `/api/admin/memo/templates` | Viewer | — | Preconfigured templates (e.g. methodology memo) |
 
 ### Admin — lifecycle (`/api/admin/studies/{slug}`)
 

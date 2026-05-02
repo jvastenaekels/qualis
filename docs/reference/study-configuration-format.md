@@ -23,6 +23,8 @@ For runtime configuration of a study (the same fields as they appear in the data
     "show_statement_codes": true,
     "randomize_statement_order": true,
     "symmetry_lock": true,
+    "rough_sort_enabled": true,
+    "distribution_mode": "forced",
     "access_password": null,
     "grid_config": [
       { "score": -2, "capacity": 2 },
@@ -101,6 +103,8 @@ For runtime configuration of a study (the same fields as they appear in the data
 | `show_statement_codes` | boolean | If true, statement codes (`S1`, `S2`) are visible to participants. Default `false`. |
 | `randomize_statement_order` | boolean | If true, statement display order is shuffled deterministically per session. Default `false`. |
 | `symmetry_lock` | boolean | If true, the designer enforces symmetric column capacities. Default `true`. |
+| `rough_sort_enabled` | boolean | If true (default), participants go through a 3-pile triage before the fine-sort grid. See [`configuration.md`](configuration.md#rough_sort_enabled). |
+| `distribution_mode` | string | One of `"forced"` (default), `"free"`, `"flexible"`. Controls how strictly per-column capacities are enforced at activation and submission. See [`configuration.md`](configuration.md#distribution_mode). |
 | `access_password` | string \| null | Bcrypt-hashed password gating access. `null` = publicly accessible. |
 | `grid_config` | array | Pyramid columns. See below. |
 | `statements` | array | Statement objects. |
@@ -118,7 +122,10 @@ Each item in `grid_config` represents a column.
 | `score` | integer | Column value (e.g. `-3`, `0`, `+3`). |
 | `capacity` | integer | Number of cards that fit in the column. |
 
-The sum of `capacity` across all columns must equal the number of statements.
+The relationship between `sum(capacity)` and the statement count depends on `distribution_mode`:
+
+- `"forced"` and `"flexible"`: `sum(capacity) == len(statements)`.
+- `"free"`: `sum(capacity) >= len(statements)`.
 
 ### Statement object
 
