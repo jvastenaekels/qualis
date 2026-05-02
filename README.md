@@ -22,7 +22,7 @@ Q-methodology, Stephenson's (1953) approach to studying subjectivity through ran
 
 Q-methodology tools typically separate data collection from analysis, and rarely cover multi-language studies, audio post-sort responses linked to the analysis, or programmatic access to the analytical pipeline. The capability table below breaks this down feature by feature.
 
-Qualis covers the full workflow in a single self-hosted browser application: study design, mobile-first recruitment and data collection, factor analysis, and export to PQMethod, R, and Ken-Q formats. The analytical choices stay visible and editable by the researcher. The platform is targeted at groups practising critical Q-methodology and is also usable for classical workflows.
+Qualis covers the full workflow in a single self-hosted browser application: study design, mobile-first recruitment and data collection, factor analysis, and export to PQMethod, R, and Ken-Q formats. The analytical choices stay visible and editable by the researcher. Qualis respects the constraints of classical Brown-school analysis when the inquiry calls for them. When the inquiry is critical-Q, the platform extends the analytical surface through collaborative memos, audio post-sorts, and voices panels that keep participant material attached to factor interpretation.
 
 Data ownership stays with the researcher, and Qualis can run on institutional infrastructure to meet the GDPR data-residency expectations common in European Q research.
 
@@ -38,6 +38,7 @@ Data ownership stays with the researcher, and Qualis can run on institutional in
 | Documented forced-distribution enforcement | — | N/A | N/A | N/A | N/A | **Yes** |
 | Multi-language studies | No | No | No | No | N/A | **Yes** |
 | Audio post-sort responses | No | No | No | No | No | **Yes** |
+| Collaborative interpretation (memos, voices, focus) | No | No | No | No | No | **Yes** |
 | Recruitment tracking & funnels | No | No | No | No | No | **Yes** |
 | Team collaboration (roles) | No | No | No | No | No | **Yes** |
 | Export to PQMethod / R / Ken-Q | N/A | N/A | N/A | Yes | N/A | **Yes** |
