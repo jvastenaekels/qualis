@@ -405,7 +405,7 @@ const ProfilePage = () => {
                                             }
                                             onClick={() =>
                                                 enableMutation.mutate({
-                                                    data: { token: totpToken },
+                                                    data: { channel: 'app', token: totpToken },
                                                 })
                                             }
                                         >

@@ -175,11 +175,13 @@ class Test2FA:
         secret = setup_data["secret"]
         assert secret is not None
 
-        # 2. Enable 2FA
+        # 2. Enable 2FA (channel='app' since this is the authenticator-app flow)
         totp = pyotp.TOTP(secret)
         valid_token = totp.now()
         response = await client.post(
-            "/api/me/2fa/enable", json={"token": valid_token}, headers=headers
+            "/api/me/2fa/enable",
+            json={"channel": "app", "token": valid_token},
+            headers=headers,
         )
         assert response.status_code == 200
 
@@ -875,3 +877,182 @@ class TestPasswordReset:
             )
         )
         assert result.scalar_one_or_none() is None
+
+
+@pytest.mark.asyncio
+class TestTwoFAEmailOTP:
+    async def _enable_email_2fa(self, db: AsyncSession, user: User) -> None:
+        """Helper: directly flip a user to email-channel 2FA in the DB."""
+        user.is_totp_enabled = True
+        user.totp_channel = "email"
+        user.totp_secret = None
+        await db.commit()
+        await db.refresh(user)
+
+    async def test_login_email_channel_no_header_issues_otp(
+        self, client: AsyncClient, db: AsyncSession, test_user: User, caplog
+    ):
+        from tests.conftest import TEST_PASSWORD
+        await self._enable_email_2fa(db, test_user)
+
+        with caplog.at_level("INFO", logger="app.utils.email"):
+            r = await client.post(
+                "/api/token",
+                data={"username": test_user.email, "password": TEST_PASSWORD},
+            )
+        assert r.status_code == 200
+        body = r.json()
+        assert body["requires_2fa"] is True
+        assert body["channel"] == "email"
+        # Email logged
+        assert any("2fa-login-otp" in rec.message for rec in caplog.records)
+
+    async def test_login_email_channel_with_correct_otp_issues_token(
+        self, client: AsyncClient, db: AsyncSession, test_user: User, caplog
+    ):
+        from tests.conftest import TEST_PASSWORD
+        from app.services.email_otp_service import issue_otp
+        await self._enable_email_2fa(db, test_user)
+
+        # Trigger an OTP via the service (simulates the "first call" path)
+        code = await issue_otp(db, test_user)
+        await db.commit()
+
+        r = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+            headers={"x-totp-token": code},
+        )
+        assert r.status_code == 200
+        body = r.json()
+        assert "access_token" in body
+        assert body["token_type"] == "bearer"
+
+    async def test_login_email_channel_wrong_otp_returns_401(
+        self, client: AsyncClient, db: AsyncSession, test_user: User
+    ):
+        from tests.conftest import TEST_PASSWORD
+        from app.services.email_otp_service import issue_otp
+        await self._enable_email_2fa(db, test_user)
+
+        await issue_otp(db, test_user)
+        await db.commit()
+
+        r = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+            headers={"x-totp-token": "000000"},
+        )
+        assert r.status_code == 401
+
+    async def test_login_app_channel_unchanged(
+        self, client: AsyncClient, db: AsyncSession, test_user: User
+    ):
+        # Existing TOTP-app flow must still work
+        from tests.conftest import TEST_PASSWORD
+        from app.utils.security import generate_totp_secret
+        import pyotp
+
+        secret = generate_totp_secret()
+        test_user.is_totp_enabled = True
+        test_user.totp_secret = secret
+        test_user.totp_channel = "app"
+        await db.commit()
+
+        # No header → 200 with requires_2fa, channel='app'
+        r = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+        )
+        assert r.status_code == 200
+        assert r.json()["requires_2fa"] is True
+        assert r.json()["channel"] == "app"
+
+        # With header → 200 access_token
+        valid_token = pyotp.TOTP(secret).now()
+        r2 = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+            headers={"x-totp-token": valid_token},
+        )
+        assert r2.status_code == 200
+        assert "access_token" in r2.json()
+
+    async def test_enable_email_channel_does_not_require_totp_token(
+        self, client: AsyncClient, db: AsyncSession, test_user: User
+    ):
+        """The /me/2fa/enable endpoint with channel='email' enables 2FA
+        without needing a TOTP token (since the user is enrolling for email,
+        not authenticator-app)."""
+        from tests.conftest import TEST_PASSWORD
+
+        # Get an access token first
+        login = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+        )
+        access = login.json()["access_token"]
+
+        # Enable with channel='email'
+        r = await client.post(
+            "/api/me/2fa/enable",
+            headers={"Authorization": f"Bearer {access}"},
+            json={"channel": "email"},
+        )
+        assert r.status_code == 200
+
+        await db.refresh(test_user)
+        assert test_user.is_totp_enabled is True
+        assert test_user.totp_channel == "email"
+        assert test_user.totp_secret is None
+
+    async def test_enable_app_channel_still_requires_token(
+        self, client: AsyncClient, db: AsyncSession, test_user: User
+    ):
+        """The existing TOTP-app enable path still requires a valid TOTP token."""
+        from tests.conftest import TEST_PASSWORD
+        from app.utils.security import generate_totp_secret
+        import pyotp
+
+        login = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+        )
+        access = login.json()["access_token"]
+
+        # First, set up a secret (existing flow)
+        secret = generate_totp_secret()
+        test_user.totp_secret = secret
+        await db.commit()
+
+        # Then enable with channel='app' + valid token
+        valid = pyotp.TOTP(secret).now()
+        r = await client.post(
+            "/api/me/2fa/enable",
+            headers={"Authorization": f"Bearer {access}"},
+            json={"channel": "app", "token": valid},
+        )
+        assert r.status_code == 200
+
+        await db.refresh(test_user)
+        assert test_user.is_totp_enabled is True
+        assert test_user.totp_channel == "app"
+        assert test_user.totp_secret == secret  # preserved
+
+    async def test_enable_app_channel_without_token_rejected(
+        self, client: AsyncClient, db: AsyncSession, test_user: User
+    ):
+        from tests.conftest import TEST_PASSWORD
+
+        login = await client.post(
+            "/api/token",
+            data={"username": test_user.email, "password": TEST_PASSWORD},
+        )
+        access = login.json()["access_token"]
+
+        r = await client.post(
+            "/api/me/2fa/enable",
+            headers={"Authorization": f"Bearer {access}"},
+            json={"channel": "app"},  # no token
+        )
+        assert r.status_code == 400

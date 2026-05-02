@@ -25,8 +25,17 @@ from app.utils.security import (
     get_totp_uri,
     verify_totp_token,
 )
-from app.utils.email import send_email_verification, send_password_reset
-from app.services.email_otp_service import invalidate_active_otps
+from app.utils.email import (
+    send_email_verification,
+    send_password_reset,
+    send_twofa_login_otp,
+)
+from app.services.email_otp_service import (
+    OTPRateLimitError,
+    invalidate_active_otps,
+    issue_otp,
+    verify_otp,
+)
 from app.utils.audit import log_admin_action
 from app.schemas import (
     Token,
@@ -37,7 +46,7 @@ from app.schemas import (
     PasswordChange,
     PasswordConfirm,
     TOTPSetup,
-    TOTPVerify,
+    TwoFAEnableRequest,
 )
 from app.schemas.auth import EmailRequest, EmailTokenSubmit, PasswordResetConfirm
 from app.schemas.responses import AckResponse, TOTPEnableResponse
@@ -101,18 +110,54 @@ async def login_for_access_token(
             detail="email_not_verified",
         )
 
-    # 2.5 Check 2FA
+    # 2.5 Check 2FA — branches on user.totp_channel.
+    # Legacy users predating T15 have totp_channel=NULL; treat as 'app'.
     if user.is_totp_enabled:
-        if not x_totp_token:
-            return Token(requires_2fa=True)
+        channel = user.totp_channel or "app"
 
-        if not user.totp_secret or not verify_totp_token(
-            user.totp_secret, x_totp_token
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid 2FA token",
-            )
+        if channel == "email":
+            if not x_totp_token:
+                try:
+                    code = await issue_otp(db, user)
+                except OTPRateLimitError as e:
+                    await db.rollback()
+                    raise HTTPException(status_code=429, detail=str(e))
+                await db.commit()
+                send_twofa_login_otp(user.email, code)
+                return Token(requires_2fa=True, channel="email")
+
+            ok = await verify_otp(db, user, x_totp_token)
+            await db.commit()
+            if not ok:
+                log_admin_action(
+                    actor_user_id=user.id,
+                    action="twofa_login_failed",
+                    resource="user",
+                    resource_id=user.id,
+                    channel="email",
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="invalid_2fa",
+                )
+        else:  # app channel
+            if not x_totp_token:
+                return Token(requires_2fa=True, channel="app")
+
+            if not user.totp_secret or not verify_totp_token(
+                user.totp_secret, x_totp_token
+            ):
+                log_admin_action(
+                    actor_user_id=user.id,
+                    action="twofa_login_failed",
+                    resource="user",
+                    resource_id=user.id,
+                    channel="app",
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="invalid_2fa",
+                )
 
     # 3. Create Token
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -359,19 +404,43 @@ async def setup_totp(
 
 @router.post("/me/2fa/enable", response_model=TOTPEnableResponse)
 async def enable_totp(
-    verify_data: TOTPVerify,
+    payload: TwoFAEnableRequest,
     current_user: Annotated[User, Depends(get_current_user)],
     db: AsyncSession = Depends(get_db),
 ) -> TOTPEnableResponse:
-    """Enable 2FA after verifying a token."""
-    if not current_user.totp_secret:
-        raise HTTPException(status_code=400, detail="TOTP not set up")
+    """Enable 2FA on the chosen channel ('app' or 'email').
 
-    if verify_totp_token(current_user.totp_secret, verify_data.token):
+    For channel='app': caller must have already called /me/2fa/setup to seed
+    the TOTP secret and must provide a valid TOTP token in payload.token.
+
+    For channel='email': no token required; the user is enrolled directly.
+    The email-OTP flow exercises itself at first login (T15 deliberately
+    accepts the simpler one-step enrollment over a two-step "issue OTP /
+    confirm channel works" path — see plan trade-off note).
+    """
+    if payload.channel == "app":
+        if not current_user.totp_secret:
+            raise HTTPException(status_code=400, detail="TOTP not set up")
+        if not payload.token:
+            raise HTTPException(
+                status_code=400, detail="TOTP token required for app channel"
+            )
+        if not verify_totp_token(current_user.totp_secret, payload.token):
+            raise HTTPException(status_code=400, detail="Invalid token")
         try:
             current_user.is_totp_enabled = True
+            current_user.totp_channel = "app"
             await db.commit()
+            log_admin_action(
+                actor_user_id=current_user.id,
+                action="twofa_enable",
+                resource="user",
+                resource_id=current_user.id,
+                channel="app",
+            )
             return TOTPEnableResponse(status="enabled")
+        except HTTPException:
+            raise
         except Exception as e:
             await db.rollback()
             logger.error(f"Unexpected error during TOTP enable: {e}", exc_info=True)
@@ -380,7 +449,29 @@ async def enable_totp(
                 detail="An unexpected error occurred while enabling 2FA",
             )
 
-    raise HTTPException(status_code=400, detail="Invalid token")
+    # channel == "email"
+    try:
+        current_user.is_totp_enabled = True
+        current_user.totp_channel = "email"
+        # Discard any leftover TOTP secret from a previous /me/2fa/setup call:
+        # one channel at a time per user (spec rule).
+        current_user.totp_secret = None
+        await db.commit()
+        log_admin_action(
+            actor_user_id=current_user.id,
+            action="twofa_enable",
+            resource="user",
+            resource_id=current_user.id,
+            channel="email",
+        )
+        return TOTPEnableResponse(status="enabled")
+    except Exception as e:
+        await db.rollback()
+        logger.error(f"Unexpected error during email-2FA enable: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred while enabling 2FA",
+        )
 
 
 @router.post("/me/2fa/disable", response_model=AckResponse)
@@ -398,6 +489,7 @@ async def disable_totp(
     try:
         current_user.is_totp_enabled = False
         current_user.totp_secret = None
+        current_user.totp_channel = None  # T15
         await db.commit()
     except Exception as e:
         await db.rollback()

@@ -37,6 +37,7 @@ from .auth import (
     TOTPVerify,
     Token,
     TokenData,
+    TwoFAEnableRequest,
 )
 from .common import PaginatedResponse
 from .participants import (
@@ -160,6 +161,7 @@ __all__ = [
     "TOTPVerify",
     "Token",
     "TokenData",
+    "TwoFAEnableRequest",
     # common
     "PaginatedResponse",
     # participants

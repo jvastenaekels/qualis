@@ -82,7 +82,7 @@ import type {
     StudyImportRequest,
     StudyUpdate,
     SubmissionInput,
-    TOTPVerify,
+    TwoFAEnableRequest,
     UnlockStudyApiStudySlugUnlockPostParams,
     UserCreate,
     UserUpdate,
@@ -769,15 +769,26 @@ export function useSetupTotpApiMe2faSetupGet<
 }
 
 /**
- * Enable 2FA after verifying a token.
+ * Enable 2FA on the chosen channel ('app' or 'email').
+
+For channel='app': caller must have already called /me/2fa/setup to seed
+the TOTP secret and must provide a valid TOTP token in payload.token.
+
+For channel='email': no token required; the user is enrolled directly.
+The email-OTP flow exercises itself at first login (T15 deliberately
+accepts the simpler one-step enrollment over a two-step "issue OTP /
+confirm channel works" path — see plan trade-off note).
  * @summary Enable Totp
  */
-export const enableTotpApiMe2faEnablePost = (tOTPVerify: TOTPVerify, signal?: AbortSignal) => {
+export const enableTotpApiMe2faEnablePost = (
+    twoFAEnableRequest: TwoFAEnableRequest,
+    signal?: AbortSignal
+) => {
     return customInstance<TOTPEnableResponse>({
         url: `/api/me/2fa/enable`,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        data: tOTPVerify,
+        data: twoFAEnableRequest,
         signal,
     });
 };
@@ -789,13 +800,13 @@ export const getEnableTotpApiMe2faEnablePostMutationOptions = <
     mutation?: UseMutationOptions<
         Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
         TError,
-        { data: TOTPVerify },
+        { data: TwoFAEnableRequest },
         TContext
     >;
 }): UseMutationOptions<
     Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
     TError,
-    { data: TOTPVerify },
+    { data: TwoFAEnableRequest },
     TContext
 > => {
     const mutationKey = ['enableTotpApiMe2faEnablePost'];
@@ -807,7 +818,7 @@ export const getEnableTotpApiMe2faEnablePostMutationOptions = <
 
     const mutationFn: MutationFunction<
         Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
-        { data: TOTPVerify }
+        { data: TwoFAEnableRequest }
     > = (props) => {
         const { data } = props ?? {};
 
@@ -820,7 +831,7 @@ export const getEnableTotpApiMe2faEnablePostMutationOptions = <
 export type EnableTotpApiMe2faEnablePostMutationResult = NonNullable<
     Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>
 >;
-export type EnableTotpApiMe2faEnablePostMutationBody = TOTPVerify;
+export type EnableTotpApiMe2faEnablePostMutationBody = TwoFAEnableRequest;
 export type EnableTotpApiMe2faEnablePostMutationError = HTTPValidationError;
 
 /**
@@ -831,7 +842,7 @@ export const useEnableTotpApiMe2faEnablePost = <TError = HTTPValidationError, TC
         mutation?: UseMutationOptions<
             Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
             TError,
-            { data: TOTPVerify },
+            { data: TwoFAEnableRequest },
             TContext
         >;
     },
@@ -839,7 +850,7 @@ export const useEnableTotpApiMe2faEnablePost = <TError = HTTPValidationError, TC
 ): UseMutationResult<
     Awaited<ReturnType<typeof enableTotpApiMe2faEnablePost>>,
     TError,
-    { data: TOTPVerify },
+    { data: TwoFAEnableRequest },
     TContext
 > => {
     const mutationOptions = getEnableTotpApiMe2faEnablePostMutationOptions(options);
@@ -13875,6 +13886,10 @@ export const getLoginForAccessTokenApiTokenPostResponseMock = (
     requires_2fa: faker.helpers.arrayElement([faker.datatype.boolean(), undefined]),
     temp_token: faker.helpers.arrayElement([
         faker.helpers.arrayElement([faker.string.alpha({ length: { min: 10, max: 20 } }), null]),
+        undefined,
+    ]),
+    channel: faker.helpers.arrayElement([
+        faker.helpers.arrayElement([faker.helpers.arrayElement(['app', 'email'] as const), null]),
         undefined,
     ]),
     ...overrideResponse,
