@@ -33,3 +33,46 @@ export function parseApiErrorSync(error: unknown, defaultMessage: string): strin
         return error.message || defaultMessage;
     }
 }
+
+/*
+ * Maps backend stable error codes to i18n keys.
+ *
+ * Backend wire format: { code: string, message: string, details: object | null }.
+ * Different code paths put the stable error code in different fields:
+ * - HTTPException(detail="X") (e.g. OWNER_ROLE_IMMUTABLE) → code="error", message="X"
+ * - QuotaExceeded(code="X", message="...") (T5) → code="X", message="<human-readable>"
+ *
+ * resolveApiErrorKey checks `code` first, then `message`, returning either an
+ * i18n key or null. The fallback string is the server's `message` so the user
+ * sees something coherent if no key matches.
+ *
+ * Works with both raw ApiErrorPayload objects and ApiError instances
+ * (which already have `.code` and `.message` as direct properties after
+ * parseErrorBody runs in client.ts).
+ *
+ * Spec: docs/superpowers/specs/2026-05-02-project-roles-refactor-design.md §7.3.
+ */
+
+export const ERROR_KEY: Record<string, string> = {
+    MEMBER_LIMIT_REACHED: 'errors.member_limit_reached',
+    OWNER_PROJECT_LIMIT_REACHED: 'errors.owner_project_limit_reached',
+    OWNER_ROLE_IMMUTABLE: 'errors.owner_role_immutable',
+};
+
+export interface ApiErrorPayload {
+    code?: string;
+    message?: string;
+    details?: unknown;
+}
+
+export function resolveApiErrorKey(payload: ApiErrorPayload | undefined): {
+    key: string | null;
+    fallback: string;
+} {
+    const code = payload?.code ?? '';
+    const message = payload?.message ?? '';
+    const stableCode = code in ERROR_KEY ? code : message in ERROR_KEY ? message : '';
+    const key = stableCode ? (ERROR_KEY[stableCode] ?? null) : null;
+    const fallback = message || code || 'An error occurred.';
+    return { key, fallback };
+}

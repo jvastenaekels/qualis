@@ -1027,7 +1027,6 @@
             "roles": {
                 "owner": "Omistaja",
                 "admin": "Ylläpitäjä",
-                "researcher": "Tutkija",
                 "member": "Jäsen",
                 "viewer": "Tarkastelija"
             },
@@ -2329,8 +2328,8 @@
                             "label": "Omistaja",
                             "desc": "Täysi hallinta projektista, jäsenistä ja tutkimuksista."
                         },
-                        "researcher": {
-                            "label": "Tutkija",
+                        "member": {
+                            "label": "Jäsen",
                             "desc": "Voi luoda ja hallita kaikkia tutkimuksia. Rajoitettu pääsy projektin asetuksiin."
                         },
                         "viewer": {
@@ -2349,6 +2348,14 @@
                         "copy_success": "Linkki kopioitu leikepöydälle!"
                     }
                 }
+            },
+            "members": {
+                "quota": "{{count}}/{{limit}} paikkaa käytössä",
+                "quota_full_tooltip": "Jäsenraja saavutettu. Kasvata MAX_MEMBERS_PER_PROJECT-arvoa tai poista jäsen."
+            },
+            "create": {
+                "quota": "{{count}}/{{limit}} omistettua projektia",
+                "quota_full_tooltip": "Olet saavuttanut omistamiesi projektien rajan."
             }
         },
         "members": {
@@ -2605,5 +2612,10 @@
         "powered_by": "Qualisin tarjoama",
         "license": "AGPLv3",
         "github_aria": "Katso lähdekoodi GitHubissa"
+    },
+    "errors": {
+        "member_limit_reached": "Projektin jäsenraja saavutettu.",
+        "owner_project_limit_reached": "Et voi omistaa enempää projekteja.",
+        "owner_role_immutable": "Omistajarooli voidaan määrittää vain projektin luonnin yhteydessä."
     }
 }

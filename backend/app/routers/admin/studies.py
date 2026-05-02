@@ -49,7 +49,7 @@ async def create_study(
     request: Request,
     study: StudyCreate,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     db: AsyncSession = Depends(get_db),
 ) -> Study:

@@ -127,7 +127,7 @@ class TestInvitations:
         # 1. Invite
         response = await client.post(
             f"/api/admin/projects/{ws.slug}/invitations",
-            json={"email": "collab@test.com", "role": "researcher"},
+            json={"email": "collab@test.com", "role": "member"},
             headers=headers,
         )
         assert response.status_code == 200

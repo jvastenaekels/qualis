@@ -20,7 +20,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useListProjectsApiAdminProjectsGet } from '@/api/generated';
 import { useAuthStore } from '@/store/useAuthStore';
-import type { ProjectWithRole } from '@/types/backend';
+import type { ProjectWithRole } from '@/api/model/projectWithRole';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { useAdminStore } from '@/store/useAdminStore';
@@ -134,7 +134,7 @@ export function ProjectSwitcher() {
                                                         'px-1 rounded-sm text-[8px]',
                                                         project.user_role === 'owner'
                                                             ? 'bg-amber-100 text-amber-700'
-                                                            : project.user_role === 'admin'
+                                                            : project.user_role === 'member'
                                                               ? 'bg-blue-100 text-blue-700'
                                                               : 'bg-slate-100'
                                                     )}

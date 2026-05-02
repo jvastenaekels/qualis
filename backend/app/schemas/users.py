@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from .common import validate_non_empty_string
+from .common import QuotaInfo, validate_non_empty_string
 
 
 class UserBase(BaseModel):
@@ -33,6 +33,9 @@ class UserRead(UserBase):
     is_active: bool
     is_superuser: bool
     is_totp_enabled: bool
+    # Populated by /auth/me; absent (None) elsewhere — nested UserRead
+    # objects (e.g. inside ProjectMemberRead.user) don't need to carry it.
+    owned_project_quota: QuotaInfo | None = None
     model_config = ConfigDict(from_attributes=True)
 
 

@@ -232,7 +232,7 @@ async def create_concourse_entry(
     c = await db.get(Concourse, cid)
     if c is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Concourse not found")
-    await _check_member(db, c.project_id, user, ProjectRole.researcher)
+    await _check_member(db, c.project_id, user, ProjectRole.member)
     e = await MemoService.add_entry(
         db,
         parent_type=MemoParentType.concourse,
@@ -261,7 +261,7 @@ async def create_study_entry(
     s = await db.get(Study, sid)
     if s is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Study not found")
-    await _check_member(db, s.project_id, user, ProjectRole.researcher)
+    await _check_member(db, s.project_id, user, ProjectRole.member)
     e = await MemoService.add_entry(
         db,
         parent_type=MemoParentType.study,
@@ -284,7 +284,7 @@ async def update_entry(
     user: User = Depends(get_current_user),
 ) -> MemoEntryRead:
     _, project_id = await _resolve_entry_parent(db, eid)
-    await _check_member(db, project_id, user, ProjectRole.researcher)
+    await _check_member(db, project_id, user, ProjectRole.member)
     await MemoService.update_entry(
         db,
         entry_id=eid,
@@ -305,7 +305,7 @@ async def delete_entry(
     user: User = Depends(get_current_user),
 ) -> None:
     _, project_id = await _resolve_entry_parent(db, eid)
-    await _check_member(db, project_id, user, ProjectRole.researcher)
+    await _check_member(db, project_id, user, ProjectRole.member)
     await MemoService.delete_entry(db, entry_id=eid)
 
 
@@ -403,7 +403,7 @@ async def resolve_comment(
     if not is_entry_author:
         await _check_member(db, project_id, user, ProjectRole.owner)
     else:
-        await _check_member(db, project_id, user, ProjectRole.researcher)
+        await _check_member(db, project_id, user, ProjectRole.member)
     resolved = await MemoService.resolve_comment(db, comment_id=cid, user_id=user.id)
     return MemoCommentRead.model_validate(resolved, from_attributes=True)
 
@@ -422,7 +422,7 @@ async def unresolve_comment(
     if not is_entry_author:
         await _check_member(db, project_id, user, ProjectRole.owner)
     else:
-        await _check_member(db, project_id, user, ProjectRole.researcher)
+        await _check_member(db, project_id, user, ProjectRole.member)
     unresolved = await MemoService.unresolve_comment(db, comment_id=cid)
     return MemoCommentRead.model_validate(unresolved, from_attributes=True)
 

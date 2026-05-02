@@ -1,6 +1,6 @@
 /*
  * Qualis - Open-source platform for conducting Q-methodology research
- * Copyright (C) 2025 Julien Vastenekels
+ * Copyright (C) 2025 Julien Vastenaekels
  * Licensed under the GNU Affero General Public License v3.0 or later.
  */
 
@@ -19,12 +19,12 @@ type Permission =
     | 'study:launch_recruitment';
 
 /**
- * Permission matrix based on project roles
+ * Permission matrix based on project roles.
  *
  * Roles:
- * - owner: Full control over project and all studies
- * - researcher: Can create and edit studies, but cannot manage project team
- * - viewer: Read-only access
+ * - owner: full control. One per project; set at creation, immutable via API.
+ * - member: edits studies and concourses but cannot manage the team or delete the project.
+ * - viewer: read-only.
  */
 const PERMISSION_MATRIX: Record<ProjectRole, Set<Permission>> = {
     owner: new Set([
@@ -38,7 +38,7 @@ const PERMISSION_MATRIX: Record<ProjectRole, Set<Permission>> = {
         'study:view_data',
         'study:launch_recruitment',
     ]),
-    researcher: new Set([
+    member: new Set([
         'study:create',
         'study:delete',
         'study:edit_design',
@@ -49,9 +49,6 @@ const PERMISSION_MATRIX: Record<ProjectRole, Set<Permission>> = {
     viewer: new Set(['study:view_data']),
 };
 
-/**
- * Hook to check user permissions based on project role
- */
 export function usePermission() {
     const { currentProject } = useAuthStore();
 
@@ -59,21 +56,17 @@ export function usePermission() {
         if (!currentProject?.user_role) {
             return false;
         }
-
         const role = currentProject.user_role as ProjectRole;
         const rolePermissions = PERMISSION_MATRIX[role];
         return rolePermissions?.has(permission) || false;
     };
 
-    const can = (permission: Permission): boolean => hasPermission(permission);
-    const cannot = (permission: Permission): boolean => !hasPermission(permission);
-
     return {
-        can,
-        cannot,
+        can: hasPermission,
+        cannot: (permission: Permission) => !hasPermission(permission),
         role: currentProject?.user_role,
         isOwner: currentProject?.user_role === 'owner',
-        isResearcher: currentProject?.user_role === 'researcher',
+        isMember: currentProject?.user_role === 'member',
         isViewer: currentProject?.user_role === 'viewer',
     };
 }

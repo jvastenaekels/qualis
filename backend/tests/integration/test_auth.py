@@ -92,7 +92,7 @@ class TestRegistration:
         token = create_invitation_token(
             email="invited@example.com",
             project_id=project.id,
-            role="researcher",  # ProjectRole
+            role="member",  # ProjectRole
         )
 
         # Register with token
@@ -113,7 +113,7 @@ class TestRegistration:
         members = result.scalars().all()
         assert len(members) == 2  # Owner + Invited
         invited = next(m for m in members if m.user_id != owner.id)
-        assert invited.role == ProjectRole.researcher
+        assert invited.role == ProjectRole.member
 
     async def test_register_invitation_token_email_mismatch(
         self, client: AsyncClient, user_factory, project_factory
@@ -122,7 +122,7 @@ class TestRegistration:
         owner = await user_factory()
         project = await project_factory(owner=owner)
         token = create_invitation_token(
-            email="invited@example.com", project_id=project.id, role="researcher"
+            email="invited@example.com", project_id=project.id, role="member"
         )
         response = await client.post(
             "/api/register",
@@ -144,7 +144,7 @@ class TestRegistration:
         token = create_invitation_token(
             email="late@example.com",
             project_id=project.id,
-            role="researcher",
+            role="member",
             expires_delta=timedelta(minutes=-1),
         )
         response = await client.post(
@@ -333,7 +333,7 @@ class TestRegistrationEmailVerification:
         token = create_invitation_token(
             email="invite-needs-verify@example.com",
             project_id=test_project.id,
-            role=ProjectRole.researcher.value,
+            role=ProjectRole.member.value,
         )
 
         response = await client.post(
@@ -364,7 +364,7 @@ class TestRegistrationEmailVerification:
             )
         )
         member = member_result.scalar_one()
-        assert member.role == ProjectRole.researcher
+        assert member.role == ProjectRole.member
 
         # Verification email was emitted
         assert len(sent) == 1
@@ -386,7 +386,7 @@ class TestRegistrationEmailVerification:
         token = create_invitation_token(
             email="invite-fallback@example.com",
             project_id=test_project.id,
-            role=ProjectRole.researcher.value,
+            role=ProjectRole.member.value,
         )
 
         response = await client.post(
@@ -415,7 +415,7 @@ class TestRegistrationEmailVerification:
                 ProjectMember.project_id == test_project.id,
             )
         )
-        assert member_result.scalar_one().role == ProjectRole.researcher
+        assert member_result.scalar_one().role == ProjectRole.member
 
 
 @pytest.mark.skipif(

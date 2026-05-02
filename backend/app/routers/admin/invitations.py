@@ -95,6 +95,11 @@ async def accept_invitation(
     if result.scalar_one_or_none():
         return {"message": "Already a member of this project"}
 
+    # Quota gate: enforce MAX_MEMBERS_PER_PROJECT (T5)
+    from app.services.quotas import assert_can_add_member
+
+    await assert_can_add_member(db, project_id, current_user)
+
     # Add member
     member = ProjectMember(
         project_id=project_id,

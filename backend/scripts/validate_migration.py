@@ -19,7 +19,7 @@ async def validate_pre_migration():
 
     async with SessionLocal() as db:
         # Count current roles
-        for role in ["admin", "researcher", "viewer", "owner"]:
+        for role in ["admin", "researcher", "member", "viewer", "owner"]:
             try:
                 result = await db.execute(
                     text(
@@ -70,7 +70,7 @@ async def validate_post_migration():
             print("✓ No 'admin' roles found")
 
         # Count current roles
-        for role in ["owner", "researcher", "viewer"]:
+        for role in ["owner", "member", "viewer"]:
             result = await db.execute(
                 text(
                     f"SELECT COUNT(*) FROM project_members WHERE role::text = '{role}'"

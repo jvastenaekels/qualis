@@ -72,6 +72,7 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.routers.admin.users` — wave 4 batch 1: cast(PaginatedResponse[UserRead], …) aligns mypy with FastAPI serialisation
 - `app.routers.admin.analysis` — wave 4 batch 2: _get_analysis_dump returns SortDataDump; _get_statement_text typed StatementDumpRecord; typing.Any removed entirely
 - `app.services.memo_service` — phase 5 memo subsystem
+- `app.services.quotas` — quota helpers for project-roles-refactor (TypedDict QuotaState, no Any)
 
 **Strict without disallow_any_explicit** (Pydantic/SQLAlchemy stubs or load-bearing Any at JSON boundaries):
 - `app.core.config` — pydantic-settings BaseSettings stubs
@@ -101,8 +102,8 @@ The following backend modules are under `mypy --strict` (see `[[tool.mypy.overri
 - `app.services.email_otp_service` — v0.6.0 auth email flows: 2FA email OTP issue/verify (no Any)
 - `app.middleware.log_scrub` — v0.6.0 auth email flows: regex scrubber + logging.Filter (pure stdlib, no Any)
 
-Total: 65 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows.
-Previous milestone: 62 (after phase 5 memo subsystem). Added 3 across v0.6.0 (email_token_consume_service, email_otp_service, log_scrub).
+Total: 66 modules under strict overrides (Phase 3 wave 4 + services round complete); +3 from phase 5 (memo subsystem); +3 from v0.6.0 auth email flows; +1 from project-roles-refactor (quotas).
+Previous milestone: 65 (after v0.6.0 auth email flows). Added 1 in project-roles-refactor (quotas).
 Wave 4 highlights (cumulative): every router under strict; build_sort_matrix cleanup eliminates last dict[str,Any] in analysis pipeline; security.py cast()s removed (bcrypt/jwt stubs now fully typed); analysis router promoted to full strict.
 Next bar (out of scope for v0.2): graduate the relaxed-tier StudyService proxies to typed pass-throughs (would require duplicating SubmissionService / StudyDataService signatures); promote remaining schemas/models to full strict by introducing TypedDict wire shapes for the open-ended JSON columns.
 
@@ -122,7 +123,7 @@ Inside a strict module: every function declares its return type, no implicit `An
 - Generate: `make migration-new` (auto-generates from model changes)
 - **Always review generated migrations** — auto-generation against a blank or out-of-sync DB will include unrelated tables. The migration must only contain the intended schema change.
 - Migrations run automatically on deploy via `Procfile` release phase (`python scripts/migrate.py`)
-- Migration chain (20 migrations as of 2026-05-02, head `fd88287d3f9b`):
+- Migration chain (21 migrations as of 2026-05-02, head `cb2c7f6f0cfe`):
   `initial_schema` → `rename_randomize_statements_to_randomize_statement_order`
   → `remove_consent_buttons` → `add_pre_instruction`
   → `add_is_test_run_to_participants` → `add_audio_recordings_table`
@@ -134,6 +135,7 @@ Inside a strict module: every function declares its return type, no implicit `An
   → `add_analysis_runs_table` → `add_anonymised_at_to_participants`
   → `rename_workspace_indexes_to_project_add_is_discarded_index`
   → `add_auth_email_flows` → `fix_password_changed_at_default`
+  → `rename_researcher_to_member_and_owner_uniqueness`
 - Run `alembic history` (in `backend/`) for the canonical chain — this list will drift if not updated when new migrations are added.
 - PostgreSQL DDL is transactional: a failed migration rolls back entirely, leaving `alembic_version` unchanged
 

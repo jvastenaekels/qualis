@@ -61,8 +61,8 @@ class ParticipantStatus(str, Enum):
 class ProjectRole(str, Enum):
     """Enum for project roles."""
 
-    owner = "owner"  # Renamed from 'admin' for consistency with StudyRole
-    researcher = "researcher"
+    owner = "owner"
+    member = "member"  # Renamed from `researcher` (project-roles-refactor 2026-05-02).
     viewer = "viewer"
 
 

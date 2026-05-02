@@ -415,7 +415,7 @@ async def seed_entry_id(
 
 @pytest_asyncio.fixture
 def auth_headers_for_seed_user(test_user: User) -> dict[str, str]:
-    """Bearer token for the seed user (project owner — passes researcher+ checks)."""
+    """Bearer token for the seed user (project owner — passes member+ checks)."""
     from app.utils.security import create_access_token
     from datetime import timedelta
 

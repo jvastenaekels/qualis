@@ -17,15 +17,15 @@ class TestProjectRBAC:
     ):
         # 1. Setup
         admin = await user_factory(email="admin@ws.com")
-        researcher = await user_factory(email="res@ws.com")
+        member_user = await user_factory(email="res@ws.com")
         viewer = await user_factory(email="view@ws.com")
         outsider = await user_factory(email="out@ws.com")
 
         ws = await project_factory(owner=admin)
-        # researcher membership
+        # member_user membership
         db.add(
             ProjectMember(
-                project_id=ws.id, user_id=researcher.id, role=ProjectRole.researcher
+                project_id=ws.id, user_id=member_user.id, role=ProjectRole.member
             )
         )
         # viewer membership
@@ -38,7 +38,7 @@ class TestProjectRBAC:
 
         # 2. Researcher creates study (Allowed)
         headers_res = {
-            "Authorization": f"Bearer {create_access_token(researcher.email)}",
+            "Authorization": f"Bearer {create_access_token(member_user.email)}",
             "X-Project-ID": str(ws.id),
         }
         payload = {
@@ -80,7 +80,7 @@ class TestStudyRBAC:
         [
             (ProjectRole.owner, 200, 200, 403),  # Delete is Superuser only
             (
-                ProjectRole.researcher,
+                ProjectRole.member,
                 200,
                 200,
                 403,

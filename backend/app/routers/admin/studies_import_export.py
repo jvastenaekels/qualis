@@ -483,7 +483,7 @@ async def import_study_config(
     import_data: StudyImportRequest,
     current_user: User = Depends(get_current_user),
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     db: AsyncSession = Depends(get_db),
 ) -> "StudyImportResponse":

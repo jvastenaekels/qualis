@@ -387,7 +387,7 @@ const StudyDesignPage = () => {
                                 parentId={original.id}
                                 currentUserId={currentUser.id}
                                 isOwner={projectRole === 'owner'}
-                                canEdit={projectRole === 'owner' || projectRole === 'researcher'}
+                                canEdit={projectRole === 'owner' || projectRole === 'member'}
                                 members={projectMembers}
                             />
                         )}

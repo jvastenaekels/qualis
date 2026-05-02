@@ -1,6 +1,6 @@
 import { useOutletContext } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
-import type { ProjectWithRole } from '@/types/backend';
+import type { ProjectWithRole } from '@/api/model/projectWithRole';
 import type { StudyRead } from '@/api/model';
 
 interface AdminContext {

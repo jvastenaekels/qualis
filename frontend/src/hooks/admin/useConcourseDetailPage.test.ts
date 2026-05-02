@@ -90,7 +90,7 @@ vi.mock('@/hooks/usePermission', () => ({
         cannot: () => false,
         role: 'owner',
         isOwner: true,
-        isResearcher: false,
+        isMember: false,
         isViewer: false,
     }),
 }));

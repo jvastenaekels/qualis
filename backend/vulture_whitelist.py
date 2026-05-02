@@ -352,6 +352,12 @@ min_defining_sorts
 has_empty_factor
 preview_range
 
+# --- project-roles-refactor (member/owned-project quotas exposed at JSON boundary) ---
+# Pydantic response-model fields and ORM attributes consumed at the JSON wire boundary
+# (ProjectRead.member_quota, UserRead.owned_project_quota) — vulture cannot see those.
+member_quota
+owned_project_quota
+
 # --- auth-email-flows (verification, password reset, 2FA email-OTP, 2FA disable) ---
 # FastAPI route endpoints registered via @router.post; slowapi key_func referenced
 # from decorator kwargs; TypedDict keys consumed at the JWT wire boundary; service

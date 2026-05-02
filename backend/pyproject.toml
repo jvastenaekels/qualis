@@ -328,6 +328,15 @@ disallow_untyped_defs = true
 warn_return_any = true
 strict_equality = true
 
+[[tool.mypy.overrides]]
+# Project-roles refactor — quotas helper (full strict).
+# TypedDict QuotaState; counts via SQLAlchemy func.count(); no dict[str, Any].
+module = ["app.services.quotas"]
+disallow_untyped_defs = true
+disallow_any_explicit = true
+warn_return_any = true
+strict_equality = true
+
 [tool.deptry.per_rule_ignores]
 DEP002 = ["asyncpg", "aiofiles", "gunicorn", "uvicorn", "python-multipart", "alembic"]
 DEP003 = ["botocore"]  # Transitive dependency of boto3

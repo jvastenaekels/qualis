@@ -72,7 +72,7 @@ async def create_tag(
     request: Request,
     data: ConcourseTagCreate,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     db: AsyncSession = Depends(get_db),
 ) -> ConcourseTag:
@@ -86,7 +86,7 @@ async def delete_tag(
     request: Request,
     tag_id: int,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     db: AsyncSession = Depends(get_db),
 ) -> None:
@@ -106,7 +106,7 @@ async def create_concourse(
     request: Request,
     data: ConcourseCreate,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -187,7 +187,7 @@ async def update_concourse(
     concourse_id: int,
     data: ConcourseUpdate,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     db: AsyncSession = Depends(get_db),
 ) -> Concourse:
@@ -231,7 +231,7 @@ async def create_item(
     concourse_id: int,
     data: ConcourseItemCreate,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -252,7 +252,7 @@ async def bulk_create_items(
     concourse_id: int,
     data: ConcourseItemBulkCreate,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -275,7 +275,7 @@ async def import_items_from_text(
     concourse_id: int,
     data: ConcourseItemBulkImport,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -298,7 +298,7 @@ async def update_item(
     item_id: int,
     data: ConcourseItemUpdate,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
@@ -320,7 +320,7 @@ async def delete_item(
     concourse_id: int,
     item_id: int,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     db: AsyncSession = Depends(get_db),
 ) -> None:
@@ -385,7 +385,7 @@ async def create_item_comment(
     item_id: int,
     data: ConcourseItemCommentCreate,
     project_ctx: tuple[Project, ProjectMember] = Depends(
-        require_project_role(ProjectRole.researcher)
+        require_project_role(ProjectRole.member)
     ),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),

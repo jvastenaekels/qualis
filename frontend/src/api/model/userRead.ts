@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { UserReadFullName } from './userReadFullName';
+import type { UserReadOwnedProjectQuota } from './userReadOwnedProjectQuota';
 
 /**
  * Schema for reading user details.
@@ -16,4 +17,5 @@ export interface UserRead {
     is_active: boolean;
     is_superuser: boolean;
     is_totp_enabled: boolean;
+    owned_project_quota?: UserReadOwnedProjectQuota;
 }

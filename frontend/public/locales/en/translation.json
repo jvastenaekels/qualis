@@ -1112,7 +1112,6 @@
             "roles": {
                 "owner": "Owner",
                 "admin": "Administrator",
-                "researcher": "Researcher",
                 "viewer": "Viewer",
                 "member": "Member"
             },
@@ -2468,8 +2467,8 @@
                             "label": "Owner",
                             "desc": "Full project, member, and study control."
                         },
-                        "researcher": {
-                            "label": "Researcher",
+                        "member": {
+                            "label": "Member",
                             "desc": "Can create and manage all studies. Restricted from project settings."
                         },
                         "viewer": {
@@ -2488,6 +2487,14 @@
                         "copy_success": "Link copied to clipboard!"
                     }
                 }
+            },
+            "members": {
+                "quota": "{{count}}/{{limit}} seats used",
+                "quota_full_tooltip": "Member limit reached. Increase MAX_MEMBERS_PER_PROJECT or remove a member."
+            },
+            "create": {
+                "quota": "{{count}}/{{limit}} owned projects",
+                "quota_full_tooltip": "You've reached your owned-project limit."
             }
         },
         "members": {
@@ -2605,5 +2612,10 @@
         "powered_by": "Powered by Qualis",
         "license": "AGPLv3",
         "github_aria": "View source on GitHub"
+    },
+    "errors": {
+        "member_limit_reached": "Project member limit reached.",
+        "owner_project_limit_reached": "You can't own any more projects.",
+        "owner_role_immutable": "The Owner role can only be assigned at project creation."
     }
 }

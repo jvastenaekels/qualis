@@ -75,7 +75,7 @@ async def get_participant(
         .where(
             Participant.id == participant_id,
             ProjectMember.user_id == current_user.id,
-            ProjectMember.role.in_([ProjectRole.owner, ProjectRole.researcher]),
+            ProjectMember.role.in_([ProjectRole.owner, ProjectRole.member]),
         )
         .options(
             selectinload(Participant.qsort_entries),
@@ -128,7 +128,7 @@ async def discard_participant(
         .where(
             Participant.id == participant_id,
             ProjectMember.user_id == current_user.id,
-            ProjectMember.role.in_([ProjectRole.owner, ProjectRole.researcher]),
+            ProjectMember.role.in_([ProjectRole.owner, ProjectRole.member]),
         )
     )
     result = await db.execute(stmt)

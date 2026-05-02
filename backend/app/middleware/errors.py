@@ -158,6 +158,23 @@ async def service_exception_handler(request: Request, exc: Exception) -> JSONRes
     )
 
 
+async def quota_exceeded_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Map `QuotaExceeded` to HTTP 409 with the standard error envelope.
+
+    The envelope shape `{code, message, details}` matches every other 4xx
+    response (StandardError model + create_error_response helper), so the
+    frontend's error parser reads a uniform contract.
+    """
+    from app.exceptions import QuotaExceeded
+
+    exc = cast(QuotaExceeded, exc)
+    return create_error_response(
+        status_code=status.HTTP_409_CONFLICT,
+        code=exc.code,
+        message=exc.message,
+    )
+
+
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """Global handler for all unhandled exceptions."""
     # Log the full traceback

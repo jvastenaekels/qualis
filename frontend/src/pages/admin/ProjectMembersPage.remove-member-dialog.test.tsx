@@ -34,7 +34,7 @@ vi.mock('@/api/generated', () => ({
             items: [
                 {
                     user_id: 11,
-                    role: 'researcher',
+                    role: 'member',
                     joined_at: '2024-01-01T00:00:00Z',
                     user: { full_name: 'Ada Lovelace', email: 'ada@x.io' },
                 },

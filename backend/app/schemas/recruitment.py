@@ -49,7 +49,7 @@ class InvitationCreate(BaseModel):
     """Schema for creating a study/project invitation."""
 
     email: str
-    role: ProjectRole = ProjectRole.researcher
+    role: ProjectRole = ProjectRole.member
 
 
 class InvitationLink(BaseModel):

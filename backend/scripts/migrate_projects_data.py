@@ -58,7 +58,7 @@ async def migrate_projects_data():
                     uid = u_row[0]
                     # Role: 'owner' if it's the first user maybe? Or just 'admin'?
                     # Plan doesn't specify logic for existing users role default. 'admin' or 'member'.
-                    # Let's say 'admin' for safety in dev, or 'researcher' (member).
+                    # Let's say 'admin' for safety in dev, or 'member'.
                     # 'owner' implies single owner usually.
                     role = "admin"
                     await conn.execute(

@@ -90,6 +90,11 @@ class Settings(BaseSettings):
         default=["audio/webm", "video/webm", "audio/mp4", "audio/mpeg"]
     )
 
+    # Project quotas — see docs/superpowers/specs/2026-05-02-project-roles-refactor-design.md §5.
+    # 0 means "unlimited"; opt in by setting a positive integer.
+    MAX_MEMBERS_PER_PROJECT: int = Field(default=0, ge=0)
+    MAX_PROJECTS_AS_OWNER: int = Field(default=0, ge=0)
+
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def assemble_db_url(cls, v: str | None) -> str:

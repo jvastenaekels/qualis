@@ -117,7 +117,7 @@ async def get_current_project(
 
 ROLE_MAP = {
     ProjectRole.owner: StudyRole.owner,
-    ProjectRole.researcher: StudyRole.editor,
+    ProjectRole.member: StudyRole.editor,
     ProjectRole.viewer: StudyRole.viewer,
 }
 
@@ -130,7 +130,7 @@ STUDY_ROLE_HIERARCHY = {
 
 PROJECT_ROLE_HIERARCHY = {
     ProjectRole.owner: 40,
-    ProjectRole.researcher: 20,
+    ProjectRole.member: 20,
     ProjectRole.viewer: 10,
 }
 

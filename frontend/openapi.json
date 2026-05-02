@@ -11,7 +11,7 @@
           "auth"
         ],
         "summary": "Read Users Me",
-        "description": "Get current active user.",
+        "description": "Get current active user, including owner-project quota state.",
         "operationId": "read_users_me_api_me_get",
         "responses": {
           "200": {
@@ -9998,7 +9998,7 @@
           },
           "role": {
             "$ref": "#/components/schemas/ProjectRole",
-            "default": "researcher"
+            "default": "member"
           }
         },
         "type": "object",
@@ -10075,6 +10075,9 @@
             "type": "array",
             "title": "Members",
             "default": []
+          },
+          "member_quota": {
+            "$ref": "#/components/schemas/QuotaInfo"
           }
         },
         "type": "object",
@@ -10082,7 +10085,8 @@
           "id",
           "title",
           "slug",
-          "created_at"
+          "created_at",
+          "member_quota"
         ],
         "title": "ProjectRead",
         "description": "Schema for reading a project with members."
@@ -10091,7 +10095,7 @@
         "type": "string",
         "enum": [
           "owner",
-          "researcher",
+          "member",
           "viewer"
         ],
         "title": "ProjectRole",
@@ -10157,6 +10161,9 @@
             "title": "Members",
             "default": []
           },
+          "member_quota": {
+            "$ref": "#/components/schemas/QuotaInfo"
+          },
           "user_role": {
             "$ref": "#/components/schemas/ProjectRole"
           }
@@ -10167,6 +10174,7 @@
           "title",
           "slug",
           "created_at",
+          "member_quota",
           "user_role"
         ],
         "title": "ProjectWithRole",
@@ -10239,6 +10247,32 @@
         ],
         "title": "QSortEntryRead",
         "description": "Schema for reading individual statement placement."
+      },
+      "QuotaInfo": {
+        "properties": {
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "limit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "count",
+          "limit"
+        ],
+        "title": "QuotaInfo",
+        "description": "Shared quota envelope used in member and owned-project counters.\n\n`limit` is `None` when the quota is unlimited (operator opted out via\n`0`-sentinel setting, or the requesting user is a superuser)."
       },
       "RecruitmentLinkCreate": {
         "properties": {
@@ -12207,6 +12241,16 @@
           "is_totp_enabled": {
             "type": "boolean",
             "title": "Is Totp Enabled"
+          },
+          "owned_project_quota": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuotaInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "type": "object",

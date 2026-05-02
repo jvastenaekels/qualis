@@ -110,7 +110,7 @@ export default function ProjectSettingsPage() {
 
     // biome-ignore lint/suspicious/noExplicitAny: API type inference issue
     const userInProject = members?.find((m: any) => m.user_id === currentUser?.id);
-    const isAdmin = userInProject?.role === 'owner';
+    const isOwner = userInProject?.role === 'owner';
 
     return (
         <div className="flex flex-1 flex-col gap-6 p-4 sm:p-6 pt-2">
@@ -152,7 +152,7 @@ export default function ProjectSettingsPage() {
                                                         'admin.projects.settings.general.placeholder_title'
                                                     )}
                                                     className="h-11 rounded-xl bg-white/50"
-                                                    disabled={!isAdmin}
+                                                    disabled={!isOwner}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -175,7 +175,7 @@ export default function ProjectSettingsPage() {
                                                             'admin.projects.settings.general.placeholder_slug'
                                                         )}
                                                         className="h-11 rounded-xl pl-32 bg-white/50"
-                                                        disabled={!isAdmin}
+                                                        disabled={!isOwner}
                                                     />
                                                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 select-none border-r pr-3 mr-3 h-4 flex items-center">
                                                         /app/
@@ -189,7 +189,7 @@ export default function ProjectSettingsPage() {
                                         </FormItem>
                                     )}
                                 />
-                                {isAdmin && (
+                                {isOwner && (
                                     <div className="flex justify-end pt-2">
                                         <Button
                                             type="submit"

@@ -41,7 +41,7 @@ class TestJWTFamilyIsolation:
         from app.models import ProjectRole
 
         inv = create_invitation_token(
-            email=test_user.email, role=ProjectRole.researcher.value
+            email=test_user.email, role=ProjectRole.member.value
         )
         with pytest.raises(ValueError):
             decode_email_token(inv, expected_purpose="email_verify")
@@ -90,7 +90,7 @@ class TestJWTFamilyIsolation:
         from app.models import ProjectRole
 
         inv = create_invitation_token(
-            email=test_user.email, role=ProjectRole.researcher.value
+            email=test_user.email, role=ProjectRole.member.value
         )
         r = await client.post("/api/email/verify", json={"token": inv})
         assert r.status_code == 400
