@@ -382,33 +382,65 @@ Cumulative across all seven waves. Items move through:
 ## Wave 6 — Supply chain
 
 - F-01-013 (carry-over from 2026-04-25, severity=minor) — CSP `style-src 'unsafe-inline'` reduces XSS protection.
-  Scheduled for Wave 6 (browser-side hardening fits the build/deploy hygiene cluster; Wave 3 is an alternative home).
-  Source: `01-prior-findings-status.md#f-01-013`.
+  **deferred to Wave 6b** in Wave 6 (commit `<wave-doc>`). Rationale: 73 inline-style sites in
+  `frontend/src/` including ~6 framer-motion `MotionValue` props (`style={{ x, y, rotate }}`) that
+  cannot move to Tailwind classes — they're imperative animation values. Proper fix is a nonce-based
+  CSP requiring per-render nonce wiring through React (Vite plugin + ASGI middleware + React context),
+  exceeding Wave 6 budget. See `07-supply-chain.md#wave-6b-backlog` for scope.
 - F-01-002 partial-fix gap (carry-over from 2026-04-25, severity=observation) — gitleaks pre-commit hook /
-  CI check was recommended but never implemented. Immediate credential-exposure threat is mitigated
-  (`.env.example` shipped, history verified clean), but a defence-in-depth gate against future `.env`
-  commits is missing. Scheduled for Wave 6. Source: `01-prior-findings-status.md#f-01-002`.
+  CI check was recommended but never implemented.
+  **closed in commit `76763853`** via `.github/workflows/security-scans.yml` `gitleaks` job
+  (CLI install + `gitleaks detect --source . --redact`). Source: `01-prior-findings-status.md#f-01-002`.
 - F-02-006 (severity=minor) — Dockerfile missing `USER` directive (`backend/Dockerfile:16`).
-  **deferred** to Wave 6 supply-chain hardening (operational hygiene). Source: `02-scanner-pass.md#f-02-006`.
+  **closed in commit `f4c4dd65`**. Backend Dockerfile now creates `app` user (`groupadd` + `useradd`)
+  and switches via `USER app` before `CMD`; frontend `nginx:alpine` already drops to UID 101 for
+  workers (master must remain root to bind :80, documented in the Dockerfile). Source:
+  `02-scanner-pass.md#f-02-006`.
 - F-02-007 (severity=minor) — nginx forwards unvalidated `$host` header (`frontend/nginx.conf:10`).
-  **deferred** to Wave 6 (host-header injection mitigation). Source: `02-scanner-pass.md#f-02-007`.
-- NEW (severity=observation) — Add CI gate: `pip-audit` on every PR. Rationale: Wave 1 closed
-  F-02-001/002/003 via lockfile-only bumps (pygments, python-dotenv, requests are transitive deps);
-  without a CI gate a future `uv lock` could downgrade them if a transitive constraint loosens. Pairs
-  naturally with the gitleaks pre-commit gate (F-01-002 partial-fix). Source: Wave 1 review note.
-- NEW (severity=observation) — Consider promoting transitive CVE-fixed deps (pygments, python-dotenv,
-  requests) to direct entries in `backend/pyproject.toml` with a `>=<fix-version>` floor. Defence-in-depth
-  against transitive-constraint drift. Source: Wave 1 review note.
-- NEW (severity=observation) — Add a CI lint rule (semgrep / ast-grep /
-  ruff custom check) that flags new `request.url` /
+  **closed in commit `f4c4dd65`**. nginx.conf now has `if ($host !~ ^(qualis\.example\.org|localhost|
+  127\.0\.0\.1)$) { return 444; }` — operator-editable allowlist; 444 is the documented
+  host-header-probe response. Source: `02-scanner-pass.md#f-02-007`.
+- NEW (severity=observation) — Add CI gate: `pip-audit` on every PR.
+  **closed in commit `76763853`** via `security-scans.yml` `pip-audit` job (mirrors the existing
+  ci.yml backend-lint ignore list). Source: Wave 1 review note.
+- NEW (severity=observation) — Promote transitive CVE-fixed deps (pygments, python-dotenv, requests)
+  to direct entries in `backend/pyproject.toml`.
+  **closed in commit `a264d740`**. `pygments>=2.20.0`, `python-dotenv>=1.2.2`, `requests>=2.33.0`
+  added as direct deps; regression `test_supply_chain_pinning.py::test_pyproject_pins_wave1_cve_floors`.
+  Source: Wave 1 review note.
+- NEW (severity=observation) — Add a CI lint rule that flags new `request.url` /
   `request.query_string` formatting in loggers not listed in
-  `app.middleware.log_scrub._TARGET_LOGGER_NAMES`. Today the
-  scrubber covers `uvicorn.access`, `app.middleware.errors`, and
-  `app.routers.logs` (the only application loggers that emit URLs);
-  the lint rule prevents a future contributor from quietly
-  introducing a fourth URL-emitting logger that bypasses the
-  scrubber. Pairs with the F-03-013 fix. Source:
-  `03-auth-email-flows.md#f-03-013`.
+  `app.middleware.log_scrub._TARGET_LOGGER_NAMES`.
+  **closed in commit `76763853`**. `backend/scripts/lint_logger_urls.py` (pure-stdlib AST walker)
+  flags any `logger.<level>(... .url ...)` outside `middleware/errors.py` and `routers/logs.py`;
+  wired into `security-scans.yml`. 9 unit tests in `test_lint_logger_urls.py` cover f-string,
+  positional, %-format, kwarg, and `self.logger` variants. Source: `03-auth-email-flows.md#f-03-013`.
+- F-03-003 (severity=minor) — `consumed_email_tokens` cleanup script not auto-scheduled.
+  **closed in commit `b6f20c84`** (documentation). `docs/guides/deployment.md` upgraded to mark
+  cleanup as operator-side with concrete Scalingo Scheduler addon + `cron.json` snippet (daily
+  04:00 UTC). On platforms other than Scalingo, operators substitute their own scheduler. Source:
+  `03-auth-email-flows.md#f-03-003`.
+- NEW (severity=observation) — Pin third-party GHA actions by SHA.
+  **closed in commit `bb5ac9ac`**. `astral-sh/setup-uv@v5` -> `@d4b2f3b6...86` (v5.4.2),
+  `lycheeverse/lychee-action@v1.9.0` -> `@22134d37...9c`,
+  `googleapis/release-please-action@v4` -> `@5c625bfb...71`. Pinning policy commented at the
+  top of both workflow files. Regression: `test_supply_chain_pinning.py::test_third_party_actions_are_sha_pinned`.
+- NEW (severity=observation) — Dependabot config presence.
+  **closed in commit `2ba66121`**. `.github/dependabot.yml` covers pip (/backend), npm
+  (/frontend), and github-actions (/), all weekly cadence.
+
+## Wave 6b — CSP nonce-based style-src
+_Deferred from Wave 6._
+
+- F-01-013 (severity=minor) — CSP `style-src 'unsafe-inline'`. Wave 6
+  deferred this with documented rationale (see Wave 6 entry above and
+  `07-supply-chain.md#wave-6b-backlog`). Scope: per-request nonce
+  attached to every inline style site (`<style nonce="…">`,
+  `style={…}`), Vite plugin to inject the nonce build-side, ASGI
+  middleware to emit the nonce header, React context to thread the
+  nonce through component tree, e2e regression for animated UIs
+  (CardStack, SortingAnimation, framer-motion-driven UI). No fixed
+  schedule; plan a dedicated wave doc when scoped.
 
 ## Wave 7 — Deliverables
 _pending Wave 7 plan._

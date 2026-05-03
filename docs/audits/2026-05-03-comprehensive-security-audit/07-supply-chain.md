@@ -260,6 +260,10 @@ request.url …)` outside files registered for those loggers.
 
 ## Summary
 
+No new blockers/majors/minors filed in Wave 6. The wave's deliverable is
+operational hardening — closing existing carry-overs and adding CI gates
+that prevent regressions. F-07-NNN ID space remains unused.
+
 | Severity | Count |
 |----------|-------|
 | blocker | 0 |
@@ -269,23 +273,84 @@ request.url …)` outside files registered for those loggers.
 
 ## Findings
 
-_Per-task findings filed by Tasks 3-10._
+No net-new findings filed. The eight wave items below are infrastructure
+deliverables, not vulnerabilities.
+
+### Wave 6 deliverables (cross-reference)
+
+| Item | Closes | Commit |
+|------|--------|--------|
+| Inventory of CI/deploy/dep surface | — (Task 2) | `734d0077` |
+| Pin third-party GHA actions by SHA | Wave 6 plan-time observation | `bb5ac9ac` |
+| Backend Dockerfile USER + nginx host allowlist | F-02-006, F-02-007 | `f4c4dd65` |
+| Direct-pin promotion (pygments, python-dotenv, requests) | Wave 1 NEW observation | `a264d740` |
+| `security-scans.yml` (gitleaks, pip-audit, npm audit, semgrep, logger-URL lint) | F-01-002 partial fix, pip-audit gate, npm-audit gate, request.url lint | `76763853` |
+| F-03-003 cleanup script — operator cron documented | F-03-003 | `b6f20c84` |
+| Dependabot config | Wave 6 spec item | `2ba66121` |
 
 ## Carry-overs status
 
-_Filled by Task 11 with closing SHAs:_
-- F-01-002 partial-fix gap (gitleaks pre-commit/CI)
-- F-01-013 (CSP style-src 'unsafe-inline')
-- F-02-004 (pip 26.0 CVE — no fix yet)
-- F-02-006 (Dockerfile USER)
-- F-02-007 (nginx $host)
-- F-03-003 (consumed_email_tokens cleanup not scheduled)
-- pip-audit CI gate (NEW observation from Wave 1)
-- direct-pin promotion (NEW observation from Wave 1)
-- request.url-in-loggers lint (NEW observation from Wave 2)
+- **F-01-002** partial-fix gap (gitleaks CI gate) — **closed** in `76763853`
+  via `.github/workflows/security-scans.yml` `gitleaks` job (CLI install,
+  `gitleaks detect --source . --redact --verbose` on every PR + push).
+- **F-01-013** (CSP `style-src 'unsafe-inline'`) — **deferred to Wave 6b**.
+  Rationale: `grep -rn 'style=' frontend/src/ | wc -l` returns 73 inline-style
+  sites; ~6 are framer-motion `MotionValue` props (`style={{ x, y, rotate }}`
+  in `CardStack.tsx`, `SortingAnimation.tsx`) which **cannot** be refactored
+  to Tailwind classes — they're imperative animation values bound to motion
+  state. The remaining ~60 sites mix dynamic per-element layout
+  (`style={{ height: '${pct}%' }}`) and CSS-variable assignments. The proper
+  fix is a nonce-based CSP (per-request nonce attached to every `<style
+  nonce="…">` and to the header `style-src 'self' 'nonce-…'`). This requires
+  per-render nonce wiring through React (custom Vite plugin + ASGI
+  middleware emitting the nonce + every Tailwind/inline-style site
+  inheriting it), exceeding Wave 6's plan budget. **Status:** keep
+  `'unsafe-inline'` for now; CSP nonce work scheduled for Wave 6b.
+- **F-02-004** (pip 26.0 CVE-2026-3219) — **still deferred** (no upstream
+  fix as of 2026-05-03; mirrored in `pip-audit --ignore-vuln` lists).
+- **F-02-006** (Dockerfile `USER`) — **closed** in `f4c4dd65`. Backend:
+  `groupadd app && useradd app` + `chown -R app:app /app` + `USER app`
+  before `CMD`. Frontend: documented that `nginx:alpine` already drops
+  to UID 101 for workers (master must remain root to bind :80).
+- **F-02-007** (nginx `$host`) — **closed** in `f4c4dd65`. `if ($host !~
+  ^(qualis\.example\.org|localhost|127\.0\.0\.1)$) { return 444; }` —
+  operator-editable allowlist; 444 is the documented host-header probe
+  response.
+- **F-03-003** (`consumed_email_tokens` cleanup not scheduled) — **closed**
+  in `b6f20c84`. Documented Scalingo Scheduler addon + `cron.json` daily
+  04:00 UTC run; manual one-off invocation also documented; deferred to
+  the operator on platforms other than Scalingo with the same intent.
+- **pip-audit CI gate** (Wave 1 NEW observation) — **closed** in `76763853`
+  via `security-scans.yml` `pip-audit` job (mirrors the existing
+  ci.yml backend-lint ignore list).
+- **direct-pin promotion** (Wave 1 NEW observation) — **closed** in
+  `a264d740`. `backend/pyproject.toml` now lists `pygments>=2.20.0`,
+  `python-dotenv>=1.2.2`, `requests>=2.33.0` as direct deps. Regression:
+  `test_supply_chain_pinning.py::test_pyproject_pins_wave1_cve_floors`.
+- **request.url-in-loggers lint** (Wave 2 NEW observation) — **closed** in
+  `76763853`. `backend/scripts/lint_logger_urls.py` AST-walks
+  `backend/app/**/*.py`, fails on any `logger.<level>(... .url ...)` /
+  `... .query_string ...` outside `middleware/errors.py` and
+  `routers/logs.py` (the two files whose loggers are in
+  `_TARGET_LOGGER_NAMES`). Wired into `security-scans.yml`. 9 unit tests
+  in `test_lint_logger_urls.py` cover positional, f-string, %-format,
+  kwarg, and `self.logger` variants plus an end-to-end live-tree run.
 
 ## Resolved since prior
 
-_Filled by Task 11._
+Six of the nine carry-overs are closed by Wave 6 commits (see table above).
+F-01-013 is deferred to Wave 6b with documented rationale; F-02-004
+remains deferred indefinitely until an upstream pip fix lands. The Wave 6
+spec items (Dependabot config, GHA SHA pinning, dep-update bot presence)
+are also delivered.
+
+## Wave 6b backlog
+
+- **F-01-013** CSP nonce-based `style-src` — see deferral rationale above.
+  Estimated scope: Vite plugin to inject nonce into every `<style>`,
+  `<link>`, and `style={…}` site; ASGI middleware to emit the per-request
+  nonce header; React context to thread the nonce through component tree;
+  e2e regression covering animated components (CardStack, SortingAnimation,
+  framer-motion-driven UI). Plan a dedicated wave doc when scheduled.
 
 ## False positives — not filed
