@@ -16,11 +16,11 @@ load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy import select
+from sqlalchemy import select, text
 
 # Set testing environment variable BEFORE app modules are imported
 os.environ["TESTING"] = "true"
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncConnection, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import selectinload
 
 from app.database import Base, get_db
@@ -63,18 +63,44 @@ async def db_engine():
     await engine.dispose()
 
 
+_ENUM_TYPES = (
+    "studystate",
+    "participantstatus",
+    "recruitmentlinktype",
+    "concourseitemstatus",
+    "distributionmode",
+    "projectrole",
+    "memoparenttype",
+)
+
+
+async def _reset_schema(conn: AsyncConnection) -> None:
+    """Drop all tables then all custom ENUM types, then recreate.
+
+    SQLAlchemy's ``drop_all`` drops tables but silently skips PostgreSQL ENUM
+    types when those types are not referenced by any surviving table (e.g.
+    after a previous test left a dirty DB).  The stale ENUMs then make the
+    next ``create_all`` fail with ``duplicate key value violates unique
+    constraint "pg_type_typname_nsp_index"``.  We drop them explicitly with
+    ``IF EXISTS … CASCADE`` between the two DDL phases.
+    """
+    await conn.run_sync(Base.metadata.drop_all)
+    for type_name in _ENUM_TYPES:
+        await conn.execute(text(f"DROP TYPE IF EXISTS {type_name} CASCADE"))
+    await conn.run_sync(lambda sync_conn: Base.metadata.create_all(sync_conn, checkfirst=True))
+
+
 @pytest_asyncio.fixture
 async def db(db_engine):
     """Create a fresh database session for each test."""
     # Drop any leftover schema from previous tests (especially Alembic-driven
     # tests like test_memo_migration that bypass this fixture and leave the
     # studies/users/etc tables in their migration-frozen state — without
-    # the latest model columns). drop_all is a no-op when nothing exists.
+    # the latest model columns). Also explicitly drops ENUM types which
+    # ``drop_all`` skips, to avoid duplicate-type errors on the next
+    # ``create_all`` (see ``_reset_schema`` for details).
     async with db_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-    # Create tables
-    async with db_engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        await _reset_schema(conn)
 
     # Create session factory bound to this engine
     TestingSessionLocal = async_sessionmaker(
@@ -88,9 +114,12 @@ async def db(db_engine):
     async with TestingSessionLocal() as session:
         yield session
 
-    # Drop tables (optional for in-memory, but good practice)
+    # Drop tables and ENUM types — symmetric with setup so the next test
+    # starts from a truly clean slate.
     async with db_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+        for type_name in _ENUM_TYPES:
+            await conn.execute(text(f"DROP TYPE IF EXISTS {type_name} CASCADE"))
 
 
 @pytest_asyncio.fixture

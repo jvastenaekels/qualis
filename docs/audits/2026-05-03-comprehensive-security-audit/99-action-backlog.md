@@ -183,7 +183,19 @@ Cumulative across all seven waves. Items move through:
   Source: `01-prior-findings-status.md#f-01-010`, `03-auth-email-flows.md#f-01-010`.
 
 ## Wave 3 — Multi-tenant isolation
-_pending Wave 3 plan._
+
+- F-04-001 (severity=observation) — Cross-tenant IDOR harness over 89 admin routes finds 0 leakage.
+  **closed** — harness retained as CI regression guard at `backend/tests/security/wave_3/test_admin_idor_harness.py`.
+- F-04-002 (severity=observation) — Recruitment-token cross-study replay rejected by `RecruitmentService.validate_link_token`.
+  **closed** — verified in commit `eb01aa93`; regression test pins.
+- F-04-003 (severity=observation) — Audio upload ownership session-token-bound; S3 keys carry study_slug + participant_token.
+  **closed** — verified in commit `55dbe262`; regression test pins.
+- F-04-004 (severity=observation) — Resume-code lookup joins `Study.slug == slug AND resume_code == code`; cross-study returns 404.
+  **closed** — verified in commit `ea662c95`; regression test pins.
+- F-04-005 (severity=observation) — Bulk-export queries derive `study.id` from path-bound `check_study_permission`; no body/header-trusted tenant claims.
+  **closed** — verified in commit `7e9433d4`; regression test pins.
+- F-04-006 (severity=minor) — Quota check has TOCTOU race in `quotas.assert_can_add_member` and `assert_can_create_owned_project`.
+  **deferred to backlog** — `MAX_MEMBERS_PER_PROJECT` defaults to 0 (unlimited) in OSS; over-fill is recoverable post-hoc and not billing-relevant. Recommended fix when revisited: `SELECT … FOR UPDATE` on the project sentinel row, or DB-level cap constraint. Source: `04-multi-tenant-isolation.md#f-04-006`. Filed in commit `14058c16`.
 
 ## Wave 4 — Consent & anonymisation pipeline
 _pending Wave 4 plan._
@@ -238,3 +250,4 @@ Items deferred indefinitely (no target wave scheduled yet, or no upstream fix av
 - F-02-005 (xlsx Prototype Pollution/ReDoS) — accepted-risk per `SECURITY.md:25-31`; see Wave 1 entry.
 - F-02-008 (semgrep test-router false positive) — false positive, env-gated; see Wave 1 entry.
 - F-02-009 (semgrep migration-script false positive) — false positive, no untrusted input; see Wave 1 entry.
+- F-04-006 (quota TOCTOU race) — deferred until billing/licensing activates the cap; see Wave 3 entry.
