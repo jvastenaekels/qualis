@@ -335,7 +335,7 @@ implementer — preference is "do the backend half" (plan line 154).
 |----------|-------|
 | blocker | 0 |
 | major | 0 |
-| minor | 1 |
+| minor | 2 |
 | observation | 2 |
 | n/a | 1 |
 
@@ -558,6 +558,85 @@ change, no test (the absence is the contract).
 **Status:** n/a.
 
 **Source:** Wave 5 inventory §"Test-run flag (F-06-004 surface) — n/a".
+
+### F-06-005 — Audio upload abuse-resistance (duration default + sniffed-MIME persistence)
+
+**Severity:** minor
+
+**Category:** business-logic abuse / file upload.
+
+**Location:**
+`backend/app/routers/audio.py:25-53` (`validate_audio_file`),
+`backend/app/routers/audio.py:89-231` (`upload_audio`),
+`backend/app/core/config.py:108-112` (audio settings).
+
+**Vulnerability:** two minor abuse-resistance gaps in
+`POST /api/audio/upload`. Filed as one finding with two parts because
+both originated in the same handler and ship in the same fix.
+
+**F-06-005a — duration default exceeded the configured ceiling.** The
+duration check at the prior `audio.py:162` defaulted to a hard-coded
+`600` when the study's `postsort_config["audio"]` lacked the
+`max_duration_seconds` key:
+
+```python
+max_allowed = audio_config.get("max_duration_seconds", 600)
+```
+
+`settings.AUDIO_MAX_DURATION_SECONDS` defaults to **300s** in
+`backend/app/core/config.py:109`. A study deployed without an
+explicit per-study key was therefore allowed 600s recordings — twice
+the configured ceiling. The settings value is the operator-facing
+source of truth; the literal `600` was a stale leftover from before
+the setting existed.
+
+**F-06-005b — S3 `Content-Type` taken from the client multipart
+header.** `validate_audio_file` ran `magic.from_buffer(content,
+mime=True)` and rejected the upload if the sniffed MIME wasn't on
+the allowlist (`audio.py:44-50`) — that gate is correct. But the
+sniffed value was discarded after validation, and the prior handler
+re-derived the storage MIME from `file.content_type` at line 175:
+
+```python
+content_type = file.content_type or "audio/webm"
+```
+
+The bytes-vs-claim agreement is not re-checked, so the persisted S3
+`Content-Type` could differ from the bytes actually stored. The
+allowlist on the sniffed value bounds the *type* of payload an
+attacker can store (it must be one of the four allowlisted audio
+MIMEs), but a future renderer that trusts the `Content-Type` header
+to pick a decoder could be redirected by a header/body mismatch.
+
+**Remediation (single commit):**
+- `validate_audio_file` now returns the sniffed MIME (`-> str`).
+- `upload_audio` captures it as `sniffed_mime` and uses it as the
+  `content_type` argument to `storage_service.upload_audio`.
+- The duration-cap default reads `settings.AUDIO_MAX_DURATION_SECONDS`
+  instead of the hard-coded `600`.
+
+No schema migration; the per-row `mime_type` column already stored the
+sniff result (the storage_service composes it from the
+`content_type` argument), so the fix flows through without DB work.
+
+**Test:**
+`backend/tests/security/wave_5/test_audio_upload_abuse.py` —
+6 cases pin: (a) a duration above
+`settings.AUDIO_MAX_DURATION_SECONDS` is rejected when the study omits
+the per-study override; (b) a per-study override below the settings
+default still wins; (c) when client multipart `Content-Type` claims
+`audio/mp4` but the bytes sniff as `audio/webm`, `storage_service.upload_audio`
+receives `audio/webm` (the sniffed value); (d-f) static guards on the
+return type, the `sniffed_mime` use-site, and the absence of the prior
+hard-coded `600` literal.
+
+The pre-existing 14-case `backend/tests/integration/test_audio.py`
+suite continues to pass — the change is API-compatible at every public
+boundary.
+
+**Status:** closed.
+
+**Source:** Wave 5 inventory §"Audio upload (F-06-005 surface)".
 
 ## Resolved since prior
 
