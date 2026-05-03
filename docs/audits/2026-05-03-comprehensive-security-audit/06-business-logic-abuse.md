@@ -337,7 +337,7 @@ implementer — preference is "do the backend half" (plan line 154).
 | major | 0 |
 | minor | 1 |
 | observation | 2 |
-| n/a | 0 |
+| n/a | 1 |
 
 ## Findings
 
@@ -518,6 +518,46 @@ link even at capacity (capacity is the increment's job), (iv)
 **Status:** closed (observation; pinned by regression test).
 
 **Source:** Wave 5 inventory §"Recruitment capacity (F-06-003 surface)".
+
+### F-06-004 — `is_test_run` participant flag (n/a, column dropped)
+
+**Severity:** n/a (not applicable).
+
+**Category:** business-logic abuse / column-level tampering.
+
+**Location:**
+`backend/db_migrations/versions/b3a47d8e9f12_drop_participants_is_test_run.py`
+(drop migration), `backend/db_migrations/versions/a64b4724fcb8_add_is_test_run_to_participants.py`
+(original add).
+
+**Disposition:** the original Wave 5 scope item was a participant
+self-flagging vector — could a participant set `participants.is_test_run = True`
+on themselves to keep their submission out of analysis exports?
+The answer is **n/a**: the column no longer exists. Migration
+`b3a47d8e9f12` deletes legacy `is_test_run=TRUE` rows then drops
+the column. A current
+``grep -rn 'test_run\|is_test_run' backend/app/`` returns zero hits.
+The only surviving references are:
+
+- `backend/vulture_whitelist.py:99` — `clear_test_runs` whitelist
+  entry (vestigial, no live code path).
+- `frontend/src/pages/admin/StudyDesignPage.tsx:245-257` and
+  `frontend/src/hooks/admin/useStudyDesignPage.ts:560-573` — a
+  frontend-only "preview" affordance that opens
+  ``/study/{slug}?mode=test`` in a new tab and dumps draft + config
+  to ``localStorage``. **The participant flow has no
+  ``?mode=test`` branch on the server-side**, and there is no
+  `is_test_run` field anywhere on the Participant model
+  (`backend/app/models/participant.py:35-119`).
+
+There is therefore nothing for a participant to flip — the surface
+the original scope item targeted was retired by the
+`b3a47d8e9f12` drop migration before this audit ran. No code
+change, no test (the absence is the contract).
+
+**Status:** n/a.
+
+**Source:** Wave 5 inventory §"Test-run flag (F-06-004 surface) — n/a".
 
 ## Resolved since prior
 
