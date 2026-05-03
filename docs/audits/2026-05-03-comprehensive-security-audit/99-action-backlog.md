@@ -24,6 +24,26 @@ Cumulative across all seven waves. Items move through:
 
 - F-01-010 (carry-over from 2026-04-25, severity=minor) — JWT access token lifetime is 8h with no refresh / no revocation on password change.
   Scheduled for Wave 2. Source: `01-prior-findings-status.md#f-01-010`.
+- F-03-001 (severity=observation) — JTI replay race in 2FA-disable confirm.
+  **closed** in Wave 2 Task 3: false positive. Inventory + re-read confirmed the
+  read-then-insert pattern (`is_jti_consumed`) has no production callers; the live
+  gate is the PK-collision pattern in `auth.py:719-722`. Pinned by
+  `backend/tests/security/wave_2/test_jti_replay.py`. Source:
+  `03-auth-email-flows.md#f-03-001`.
+- F-03-002 (severity=observation) — Email-verify and password-reset tokens have no
+  JTI denylist (benign-by-gate). Single-use is enforced by adjacent DB state
+  (`email_verified_at IS NULL` for verify, `pwa` round-trip for reset).
+  **closed** in Wave 2 Task 3: as designed. Pinned by
+  `backend/tests/security/wave_2/test_email_verify_replay.py` and
+  `backend/tests/security/wave_2/test_password_reset_replay.py`. Source:
+  `03-auth-email-flows.md#f-03-002`.
+- F-03-003 (severity=minor) — `consumed_email_tokens` cleanup script not
+  auto-scheduled. Documented operator action in `docs/guides/deployment.md:217-223`;
+  no Procfile or scheduler entry. Volume bound is ~100 KB/year, no security
+  boundary. Cleanup contract pinned by
+  `backend/tests/security/wave_2/test_consumed_tokens_cleanup.py`. **deferred**
+  to Wave 6 supply-chain hardening (Procfile / scheduler wiring). Source:
+  `03-auth-email-flows.md#f-03-003`.
 
 ## Wave 3 — Multi-tenant isolation
 _pending Wave 3 plan._

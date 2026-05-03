@@ -306,12 +306,127 @@ Derived properties consulted from in-scope files:
 |----------|-------|
 | blocker | 0 |
 | major | 0 |
-| minor | 0 |
-| observation | 0 |
+| minor | 1 |
+| observation | 2 |
 
 ## Findings
 
-_Populated as findings are filed by Tasks 3-9._
+### F-03-001 — JTI replay race in 2FA-disable confirm (false positive)
+
+- **Severity:** observation
+- **Audience:** internal-audit
+- **Location:** `backend/app/services/email_token_consume_service.py:18-28`,
+  `backend/app/routers/auth.py:710-722`
+- **Tool:** static review
+- **Observation:** The plan-stage worry was a TOCTOU race between
+  `is_jti_consumed` (read) and `mark_jti_consumed` (write) — a pattern where
+  two concurrent confirm requests both pass the read check, then both insert,
+  both commit, and both run the side-effect. Re-reading the code confirms this
+  pattern does **not** exist in production:
+  - `is_jti_consumed` has zero production callers (kept alive only by
+    `vulture_whitelist.py:374` and the unit-test file
+    `tests/unit/test_email_token_consume_service.py:20, 25, 51-52`).
+  - The single production gate, `twofa_disable_confirm`, calls
+    `mark_jti_consumed` **first** (`auth.py:719`) and traps the
+    `IntegrityError` from the PK collision on duplicate JTI
+    (`auth.py:720-722`). The PK on `consumed_email_tokens.jti`
+    (`db_migrations/versions/cb8732294475_add_auth_email_flows.py:24-29`)
+    serialises concurrent inserts at the database layer.
+  - The user-mutating side-effects (`is_totp_enabled=False`, `totp_secret=None`,
+    notification email, audit row) all run **after** the successful insert. A
+    concurrent attempt that loses the PK race exits at line 722 before any of
+    them runs.
+- **Impact:** none. The finding is a false positive.
+- **Recommendation:** retain the PK-collision pattern. Pin it with a
+  regression test so a future refactor cannot silently re-introduce
+  `is_jti_consumed` as a guard.
+- **Effort:** done (regression test).
+- **Disposition:** false positive — PK-collision pattern handles concurrent
+  consume; closed inline.
+- **Exploit script:** none (observation severity).
+- **Regression test:** `backend/tests/security/wave_2/test_jti_replay.py`
+  (3 tests: PK collision at the service layer, sequential 200 → 409 at the
+  router layer, anti-enum jti-burn-before-user-lookup).
+
+### F-03-002 — Email-verify and password-reset tokens have no JTI denylist (benign-by-gate)
+
+- **Severity:** observation
+- **Audience:** internal-audit
+- **Location:**
+  - email-verify: `backend/app/routers/auth.py:514-544`
+  - password-reset: `backend/app/routers/auth.py:619-656`
+  - token shape: `backend/app/utils/security.py:106-136`
+- **Tool:** static review
+- **Observation:** Three of the four email-link JWTs (signup verify, password
+  reset, 2FA-disable) carry a `jti` claim, but only the 2FA-disable flow writes
+  to `consumed_email_tokens`. The other two rely on adjacent DB state for
+  single-use semantics:
+  - **Email-verify.** `verify_email` (auth.py:534) gates the side-effect on
+    `if user.email_verified_at is None`. On replay after first consume, the
+    branch is skipped, no row is mutated, no audit row is emitted, and the
+    response is a no-op `200 ok`. The token remains accepted by
+    `decode_email_token` until `exp` (24h default) but produces zero
+    observable side-effects.
+  - **Password-reset.** `password_reset_confirm` (auth.py:639-643) re-derives
+    `pwa_now = int(user.password_changed_at.timestamp() * 1_000_000)` and 400s
+    if it disagrees with the token's `pwa` claim. A successful consume sets
+    `password_changed_at = now()` (auth.py:646), so any further replay's `pwa`
+    no longer matches. Single-use enforced.
+- **Impact:** none in the post-consume window. The pre-consume window between
+  issue and first use is the standard email-channel attack model: an attacker
+  with read access to the mailbox can use the token once before the legitimate
+  owner. This is "as designed" for email-link auth flows; mitigation is the
+  short `PASSWORD_RESET_TOKEN_EXPIRE_HOURS=1` (and `Referrer-Policy: no-referrer`
+  on the consume page, out-of-scope here, flagged for Task 9).
+- **Recommendation:** no code change. Pin both invariants with regression
+  tests so a future refactor cannot silently remove the gates (e.g. by
+  switching to an unconditional UPSERT on email-verify, or by emitting an
+  audit row outside the `if` block).
+- **Effort:** done (regression tests).
+- **Disposition:** observation — gate-based single-use is correct as designed;
+  closed inline.
+- **Exploit script:** none (observation severity).
+- **Regression test:**
+  - `backend/tests/security/wave_2/test_email_verify_replay.py` (3 tests:
+    idempotent replay, anti-enum 200 for unknown user, expired token rejected).
+  - `backend/tests/security/wave_2/test_password_reset_replay.py` (3 tests:
+    post-consume replay → 400, stale-pwa rejection, tampered token → 400).
+
+### F-03-003 — `consumed_email_tokens` cleanup script not auto-scheduled
+
+- **Severity:** minor
+- **Audience:** operator
+- **Location:** `backend/scripts/cleanup_consumed_email_tokens.py`,
+  `Procfile`, `docs/guides/deployment.md:217-223`
+- **Tool:** static review
+- **Observation:** `cleanup_consumed(db, older_than=timedelta(days=7))`
+  (`email_token_consume_service.py:31-36`) is the only path that prunes the
+  denylist, and its sole caller is the `cleanup_consumed_email_tokens.py`
+  script. The repo's `Procfile` declares `postdeploy` (one-shot migration
+  runner) and `web` (gunicorn) process types only — no `worker` or
+  `scheduler` line. No Scalingo scheduler config, no cron config, no GitHub
+  Actions schedule are checked in. The cron line is documented in
+  `docs/guides/deployment.md:217-223` as an operator action.
+- **Impact:** capacity hygiene only, no security boundary. Each row is
+  ~100 bytes; at an upper bound of 1000 2FA-disable confirmations per year,
+  that is ~100 KB/year of growth. Stale rows do not affect correctness —
+  the JTI is the PK, lookups are O(log n), and the denylist's purpose
+  (prevent replay within `exp`, max 15 minutes for 2FA-disable) is unaffected
+  by retaining old rows.
+- **Recommendation:** defer infrastructure wiring to Wave 6 (supply-chain
+  hardening) where `Procfile` and operator runbook changes belong. This wave
+  ships only a regression test pinning the cleanup contract (so a future
+  refactor that flips the comparator does not silently delete the live
+  denylist).
+- **Effort:** S — one Procfile line plus a note in `deployment.md` to remove
+  the manual cron entry, in Wave 6.
+- **Disposition:** defer to Wave 6 supply-chain hardening; documentation is
+  already in place.
+- **Exploit script:** none (minor severity, no security boundary).
+- **Regression test:**
+  `backend/tests/security/wave_2/test_consumed_tokens_cleanup.py` (2 tests:
+  cleanup deletes only rows older than the cutoff; cleanup against a fresh
+  denylist is a no-op).
 
 ## F-01-010 — JWT lifetime + revocation (carry-over)
 
