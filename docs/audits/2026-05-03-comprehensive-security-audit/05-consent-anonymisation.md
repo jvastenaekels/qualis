@@ -356,7 +356,7 @@ Code references for each transition handler:
 |----------|-------|
 | blocker | 0 |
 | major | 1 |
-| minor | 4 |
+| minor | 5 |
 | observation | 4 |
 
 ## Findings
@@ -997,6 +997,69 @@ those invariants, not a separate code path.
 **Source:** Wave 4 inventory §2.3 stage 7 ("erased — there is no
 hard-delete endpoint for an individual participant"), GDPR Recital
 26.
+
+### F-05-010 — Raw client IP in `routers/logs.py` frontend-error payload
+
+**Severity:** minor
+
+**Location:** `backend/app/routers/logs.py:34-45`
+(pre-fix `client_ip = request.client.host`).
+
+**Vulnerability:** Wave 4 inventory §2.2 (Promise 1, gap 1) flagged
+two raw-IP leak paths:
+
+1. **Uvicorn access log** renders `request.client.host` raw at the
+   start of every request line. The F-03-013 token-scrubber filter
+   (`middleware/log_scrub.py`) only scrubs query parameters
+   (`token` / `otp` / `code`); it does not touch the IP, which Uvicorn
+   writes before any FastAPI handler runs. **Cannot be fixed cleanly
+   in application code** — documented as operator obligation #2 in
+   the Wave 7 GDPR memo (systemd-journald `LineMax`, fluentd /
+   rsyslog regex at the log-sink layer).
+
+2. **`routers/logs.py`** (the frontend-error report endpoint) built
+   `log_payload["ip"] = request.client.host` and passed it as
+   `extra=` to `frontend_logger`. The F-03-013 query-string regex
+   does **not** match `extra` keys (it only scans the formatted
+   message and tuple-form `record.args`), so a real production
+   self-hoster routing `frontend_error` to any structured log sink
+   (CloudWatch, ELK, Loki) got a raw IP per frontend report.
+
+This is the application-side half of the gap and is fixable.
+
+**Remediation:**
+- `routers/logs.py` now hashes the captured IP through
+  `app.utils.crypto.hash_ip` (the same SHA-256 + `IP_HASH_SALT`
+  truncation that `participants.ip_address` uses) before passing
+  it into `log_payload`. The payload key was renamed `ip` →
+  `ip_hash` to make the contract self-describing.
+- The frontend has no debugging path that needs the raw IP — only
+  correlation across reports from the same source, which the hash
+  preserves.
+- The Uvicorn access-log path is **not fixed in application code**
+  (deferred to Wave 7 operator memo as already drafted).
+
+**Test:** `backend/tests/security/wave_4/test_pii_in_logs.py`:
+- `test_routers_logs_hashes_client_ip` — fires `POST /api/logs`,
+  asserts the rendered `frontend_error` record carries
+  `ip_hash=hash_ip("127.0.0.1")` and that the raw IP and the legacy
+  `ip` key both vanish.
+- `test_routers_logs_handles_missing_client_gracefully` — pins
+  graceful behaviour when `request.client` is absent (no crash, no
+  spurious salt-only hash).
+- `test_application_loggers_do_not_emit_raw_ip_pattern` —
+  defence-in-depth source survey: any new file that captures
+  `request.client.host` AND emits a logger call referencing the
+  captured variable AND does not call `hash_ip` will fail this
+  test. Keeps a regression of the pre-fix pattern from sneaking
+  back in.
+
+**Status:** closed (application half); Uvicorn access-log raw IP
+deferred to Wave 7 operator memo (already drafted in
+§"(c) Operator obligations" item 2).
+
+**Source:** Wave 4 inventory §2.2 (Promise 1, gap 1), §"(c) Operator
+obligations" item 2.
 
 ## Resolved since prior
 
