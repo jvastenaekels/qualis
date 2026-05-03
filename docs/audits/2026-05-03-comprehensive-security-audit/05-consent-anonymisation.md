@@ -356,8 +356,8 @@ Code references for each transition handler:
 |----------|-------|
 | blocker | 0 |
 | major | 1 |
-| minor | 2 |
-| observation | 2 |
+| minor | 3 |
+| observation | 3 |
 
 ## Findings
 
@@ -626,6 +626,81 @@ obligation #5** in the Wave 7 GDPR memo (already drafted in
 
 **Source:** Wave 4 inventory §2.3 stage 6 (bullet about fail-open
 posture), §"(c) Operator obligations" item 5.
+
+### F-05-006 — Per-participant follow-up exports leak `card_comment` from anonymised rows
+
+**Severity:** minor
+
+**Location:** `backend/app/routers/admin/exports.py:175-256` (per-participant
+CSV / JSON / audio export endpoints).
+
+**Vulnerability:** every export query in `exports.py` and
+`study_data_service.py` filtered on `Participant.is_discarded.is_(False)`
+but **not** on `Participant.anonymised_at IS NULL`. After
+`StudyDataService.anonymise_participant`, the row's PII columns are
+nulled (`ip_address`, `user_agent`, `confirmation_code`,
+`resume_code`, `consent_hash`, `presort_answers={}`,
+`postsort_answers={}`, `draft_responses=NULL`) and the audio rows
+are deleted, but `qsort_entries.card_comment` is preserved as
+research data per F-05-003 (operator screening obligation).
+
+The Wave 4 inventory (§2.2 Promise 3 verdict, §2.3 stage 6) flagged
+that an anonymised participant's `card_comment` rides through bulk
+exports. For **bulk** exports (CSV / PQMethod / R-Kit / dump /
+research package) this is the documented contract: bulk exports are
+the factor-analysis input, the consent text already promises
+operator screening of qualitative comments, and excluding
+anonymised rows would lose research data the participant consented
+to contribute.
+
+For **per-participant** exports, however, the contract differs:
+those endpoints are individual-lookup channels used in support /
+follow-up contexts. After anonymisation, the row no longer
+represents an identifiable participant — presenting it as a
+follow-up target leaks the preserved `card_comment` to a follow-up
+consumer, and as a UX trap might invite an operator to treat an
+anonymised row as a contactable participant.
+
+Severity is **minor** because:
+- The leak surface is admin-only (StudyRole.editor on the study).
+- The operator who triggers anonymisation has explicitly chosen to
+  break contact with the participant, so the impact is bounded by
+  operator process discipline.
+- The bulk-export inclusion of anonymised rows (the larger surface)
+  is correct under the F-05-003 contract — the per-participant
+  endpoints are the precise locus where the gap matters.
+- The fix is defence-in-depth; it tightens the API contract without
+  changing data semantics.
+
+**Remediation:**
+- Added `Participant.anonymised_at.is_(None)` filter to:
+  - `GET /admin/studies/{slug}/participants/{participant_id}/export/csv`
+  - `GET /admin/studies/{slug}/participants/{participant_id}/export/json`
+    (added an explicit scope-check query before falling through to
+    `get_study_full_dump`, so the 404 is emitted before the dump
+    query runs).
+  - `GET /admin/studies/{slug}/participants/{participant_id}/export/audio`
+    (anonymisation already deletes the underlying audio rows; the
+    explicit filter keeps the contract uniform).
+- Bulk exports (CSV, PQMethod, R-Kit, dump, research package) and
+  the analysis-input services (`get_study_stats`,
+  `get_study_sort_data`) are **unchanged** — they continue to
+  include anonymised rows with PII zeroed (per F-05-003).
+
+**Test:** `backend/tests/security/wave_4/test_export_pii_handling.py`
+— 7 cases:
+- `TestBulkExportsIncludeAnonymisedRows` — pin that bulk CSV / PQM /
+  dump still include the anonymised row's qsort entry (with PII
+  columns blank but `card_comment` preserved per F-05-003).
+- `TestPerParticipantExportsExcludeAnonymised` — pin that the
+  per-participant CSV / JSON / audio endpoints 404 for anonymised
+  rows; non-anonymised rows still export (regression guard).
+
+**Status:** closed.
+
+**Source:** Wave 4 inventory §2.2 (Promise 3 verdict PARTIAL),
+§2.3 stage 6 (anonymised lifecycle node), §2.4 PII table row
+`qsort_entries.card_comment`.
 
 ## GDPR-memo material (load-bearing for Wave 7)
 
