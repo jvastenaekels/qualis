@@ -26,6 +26,10 @@ _pending Wave 5 plan._
 - F-01-013 (carry-over from 2026-04-25, severity=minor) — CSP `style-src 'unsafe-inline'` reduces XSS protection.
   Scheduled for Wave 6 (browser-side hardening fits the build/deploy hygiene cluster; Wave 3 is an alternative home).
   Source: `01-prior-findings-status.md#f-01-013`.
+- F-01-002 partial-fix gap (carry-over from 2026-04-25, severity=observation) — gitleaks pre-commit hook /
+  CI check was recommended but never implemented. Immediate credential-exposure threat is mitigated
+  (`.env.example` shipped, history verified clean), but a defence-in-depth gate against future `.env`
+  commits is missing. Scheduled for Wave 6. Source: `01-prior-findings-status.md#f-01-002`.
 
 ## Wave 7 — Deliverables
 _pending Wave 7 plan._
