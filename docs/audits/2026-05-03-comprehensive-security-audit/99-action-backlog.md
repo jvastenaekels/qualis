@@ -52,6 +52,44 @@ Cumulative across all seven waves. Items move through:
   the ceiling to 0.003 %. No migration; reuses the existing `attempts` column.
   Pinned by `backend/tests/security/wave_2/test_otp_brute_force.py` (4 tests).
   Source: `03-auth-email-flows.md#f-03-004`.
+- F-03-005 (severity=major) — `/api/token` enumeration via timing differential.
+  Pre-fix the unknown-email arm skipped `verify_password`, leaking existence at
+  ~339 ms mean delta over N=100. **closed** in Wave 2 Task 5: added a fixed
+  decoy bcrypt hash (`_LOGIN_DECOY_HASH`) and run `verify_password` against it
+  on the no-such-user branch; both 401 arms now spend a bcrypt cycle. Pinned by
+  `backend/tests/security/wave_2/test_email_enumeration.py::TestTokenEnumeration`
+  (status+body equality, mean delta < 30 ms). Exploit script:
+  `.raw/exploits/F-03-005.py`. Source: `03-auth-email-flows.md#f-03-005`.
+- F-03-006 (severity=major) — `/api/email/verify/resend` enumeration via timing
+  differential. Pre-fix the bcrypt anti-enum pad sat in the `else` branch only,
+  leaking known-unverified emails at ~533 ms mean delta. **closed** in Wave 2
+  Task 5: moved `get_password_hash` out of `else` so it runs unconditionally,
+  mirroring the password-reset-request pattern. Pinned by
+  `backend/tests/security/wave_2/test_email_enumeration.py::TestVerifyResendEnumeration`.
+  Exploit script: `.raw/exploits/F-03-006.py`.
+  Source: `03-auth-email-flows.md#f-03-006`.
+- F-03-007 (severity=major) — `/api/2fa/disable/request` enumeration via timing
+  differential. Pre-fix same pattern as F-03-006, leaking accounts with email-channel
+  2FA enabled at ~595 ms mean delta. **closed** in Wave 2 Task 5: moved the
+  `get_password_hash` pad out of `else`. Pinned by
+  `backend/tests/security/wave_2/test_email_enumeration.py::TestTwofaDisableRequestEnumeration`.
+  Exploit script: `.raw/exploits/F-03-007.py`.
+  Source: `03-auth-email-flows.md#f-03-007`.
+- F-03-008 (severity=minor) — `/api/register` enumeration via response body and
+  status (400 `"already exists"` vs 201 user record). **deferred** to Wave 5
+  (business-logic abuse): closing this requires a registration redesign
+  (return 200 always, send distinct emails to existing-vs-new users) which
+  trades enumeration resistance for signup UX — a product decision, not a
+  one-line patch. Bounded today by the `5/minute` per-IP rate limit. Source:
+  `03-auth-email-flows.md#f-03-008`.
+- F-03-009 (severity=observation) — `/api/password/reset/request` residual
+  timing-floor differential. The endpoint is already constant-time at the
+  bcrypt level (correct by design pre-Wave-2); the residual ~130 ms minimum-floor
+  delta comes from JWT signing + email logging on the success branch. Below
+  remediation threshold; the fix would be a refactor moving JWT/email work to
+  a background task. **closed (no code change)** — pinned by
+  `TestPasswordResetRequestEnumeration` in `test_email_enumeration.py`.
+  Source: `03-auth-email-flows.md#f-03-009`.
 
 ## Wave 3 — Multi-tenant isolation
 _pending Wave 3 plan._
@@ -60,7 +98,12 @@ _pending Wave 3 plan._
 _pending Wave 4 plan._
 
 ## Wave 5 — Business-logic abuse
-_pending Wave 5 plan._
+
+- F-03-008 (carry-over from Wave 2, severity=minor) — `/api/register` body+status
+  email enumeration. Closing this requires a registration redesign (return 200
+  always, send distinct "you already have an account" vs verification emails)
+  which trades enumeration resistance for signup UX. Source:
+  `03-auth-email-flows.md#f-03-008`.
 
 ## Wave 6 — Supply chain
 

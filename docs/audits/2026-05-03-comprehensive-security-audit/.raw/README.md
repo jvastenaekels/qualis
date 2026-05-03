@@ -23,3 +23,6 @@ is committed so the audit is auditable.
 | File | Finding | PRE-FIX assertion | POST-FIX assertion |
 |------|---------|-------------------|--------------------|
 | `exploits/F-03-004.py` | F-03-004 (OTP brute-force, Wave 2 Task 4) | 100 wrong OTP attempts run unimpeded across 20 issue/verify cycles → script exits 1 | `OTPLockoutError` raised at attempt 30 (cap kicks in) → script exits 0 |
+| `exploits/F-03-005.py` | F-03-005 (`/api/token` enum via timing, Wave 2 Task 5) | mean_known ≈ 199 ms (bcrypt), mean_unknown ≈ 3 ms (no bcrypt) → delta ≈ 196 ms ≥ 100 ms threshold → exits 1 | both arms run bcrypt against decoy hash → delta ≈ 0.10 ms < threshold → exits 0 |
+| `exploits/F-03-006.py` | F-03-006 (`/api/email/verify/resend` enum via timing, Wave 2 Task 5) | known-unverified ≈ 7 ms, unknown ≈ 540 ms (bcrypt only on else branch) → delta ≈ 533 ms → exits 1 | bcrypt unconditional → delta ≈ 1.25 ms → exits 0 |
+| `exploits/F-03-007.py` | F-03-007 (`/api/2fa/disable/request` enum via timing, Wave 2 Task 5) | known-with-2FA ≈ 5 ms, unknown ≈ 600 ms → delta ≈ 595 ms → exits 1 | bcrypt unconditional → delta ≈ 0.70 ms → exits 0 |

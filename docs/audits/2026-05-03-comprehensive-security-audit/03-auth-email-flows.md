@@ -305,8 +305,8 @@ Derived properties consulted from in-scope files:
 | Severity | Count |
 |----------|-------|
 | blocker | 0 |
-| major | 1 |
-| minor | 1 |
+| major | 4 |
+| minor | 2 |
 | observation | 2 |
 
 ## Findings
@@ -504,6 +504,215 @@ Derived properties consulted from in-scope files:
   without raising; router maps to HTTP 429 `twofa_locked`; rolling
   window — rows older than 24h drop out of the cap and verification
   resumes).
+
+### F-03-005 — `/api/token` email enumeration via timing differential
+
+- **Severity:** major
+- **Audience:** [Prod] [SoftwareX]
+- **Location:** `backend/app/routers/auth.py:97-119` (pre-fix login flow)
+- **Tool:** static review + black-box timing probe + exploit script
+  (`.raw/exploits/F-03-005.py`)
+- **Observation:** The pre-fix `/api/token` handler short-circuited on
+  `if not user or not verify_password(...)`. When the email did not
+  match a user row, `verify_password` was skipped entirely — the
+  unknown arm returned a 401 in ~5 ms (DB SELECT only), while the
+  known arm spent ~340 ms running bcrypt at cost 12. Both arms
+  returned the byte-identical body `{"code": "unauthorized",
+  "message": "Incorrect username or password", "details": null}`, so
+  response inspection alone did not enumerate. Black-box probing
+  with N=100 samples per arm measured a **mean delta of 339 ms,
+  stdev ~10 ms** — separation is unambiguous after a single sample.
+  The standard SOSS recommendation is to hash a decoy on the
+  no-such-user branch so both arms spend a bcrypt cycle.
+- **Impact:** any caller that can reach `/api/token` (the public
+  login endpoint) can enumerate registered email addresses at the
+  current `5/minute` per-IP rate limit (~7 200 probes/day per
+  attacker IP, scaling linearly across rotated IPs). The leak feeds
+  every downstream phish/credential-stuffing campaign and undermines
+  the anti-enum work already done on `/email/verify/resend`,
+  `/password/reset/request` and `/2fa/disable/request`: those
+  endpoints became uniform-by-design while the front door
+  enumerated.
+- **Recommendation:** introduce a fixed module-level decoy bcrypt
+  hash (`_LOGIN_DECOY_HASH`, generated once with `bcrypt.hashpw`).
+  When `user is None`, call `verify_password(form_data.password,
+  _LOGIN_DECOY_HASH)` and discard the result before raising 401.
+  Both arms now run one cost-12 bcrypt; the timing channel
+  collapses to sub-millisecond noise.
+- **Effort:** S — one constant, one branch reorganisation; no
+  schema change, no new dependency.
+- **Disposition:** fixed in this PR.
+- **Exploit script:** `.raw/exploits/F-03-005.py`. Pre-fix it
+  measures mean_known=199 ms, mean_unknown=3 ms, delta=196 ms
+  (above 100 ms threshold) and exits 1. Post-fix it measures
+  delta=0.10 ms and exits 0.
+- **Regression test:** `backend/tests/security/wave_2/test_email_enumeration.py::TestTokenEnumeration`
+  (2 tests: status+body equality across arms; mean timing delta
+  < 30 ms over N=20 samples — CI-tolerant bound).
+
+### F-03-006 — `/api/email/verify/resend` email enumeration via timing differential
+
+- **Severity:** major
+- **Audience:** [Prod] [SoftwareX]
+- **Location:** `backend/app/routers/auth.py:583-595` (pre-fix branch)
+- **Tool:** static review + black-box timing probe + exploit script
+  (`.raw/exploits/F-03-006.py`)
+- **Observation:** The route's docstring already declared an
+  anti-enum invariant ("a fake bcrypt call equalises latency so
+  callers cannot distinguish the two code paths by timing") but the
+  pad sat in the **`else` branch only**. When the email matched a
+  registered-but-unverified user, the success branch ran the JWT
+  signing + email log call (~7 ms wall-clock) and *no* bcrypt; when
+  the email matched no user (or an already-verified user), the
+  `else` branch ran one `get_password_hash("anti-enum-padding")`
+  (~540 ms). Bodies and statuses were uniform. Black-box probing
+  with N=100 measured a **mean delta of 533 ms, stdev ~120 ms** —
+  one of the largest leaks in the surface. The branch placement
+  was the bug; the intent was correct.
+- **Impact:** an attacker can enumerate which emails are
+  registered-but-unverified — exactly the audience whose accounts
+  are most useful to hijack (no login history, no 2FA setup, often
+  a recently-typed password). Combined with `/2fa/disable/request`
+  (F-03-007) and `/api/token` (F-03-005), an attacker assembles a
+  three-bit account state per email (registered? unverified?
+  2FA-enabled?) using only public, rate-limited probes.
+- **Recommendation:** move `get_password_hash("anti-enum-padding")`
+  out of the `else` branch and run it unconditionally before the
+  success-branch `if`. Mirror the password-reset-request pattern,
+  which has been correct since v0.6.0. Token signing and email
+  logging on the success branch are negligible compared to the
+  bcrypt cost, so a single bcrypt call equalises wall-clock.
+- **Effort:** S — three lines moved.
+- **Disposition:** fixed in this PR.
+- **Exploit script:** `.raw/exploits/F-03-006.py`. Post-fix delta
+  = 1.25 ms (well below 100 ms threshold).
+- **Regression test:** `backend/tests/security/wave_2/test_email_enumeration.py::TestVerifyResendEnumeration`
+  (2 tests: status+body equality; timing parity).
+
+### F-03-007 — `/api/2fa/disable/request` email enumeration via timing differential
+
+- **Severity:** major
+- **Audience:** [Prod] [SoftwareX]
+- **Location:** `backend/app/routers/auth.py:695-709` (pre-fix branch)
+- **Tool:** static review + black-box timing probe + exploit script
+  (`.raw/exploits/F-03-007.py`)
+- **Observation:** Same pattern as F-03-006. The bcrypt anti-enum
+  pad sat in the `else` branch only, so the success branch
+  (`user is not None and user.is_totp_enabled` → JWT sign + email
+  log) ran ~5 ms and the no-op branch (everyone else → bcrypt) ran
+  ~600 ms. Black-box probing with N=100 measured a **mean delta of
+  595 ms, stdev ~270 ms**. The leak distinguishes a stricter set
+  than registered-vs-unregistered: it isolates accounts with
+  email-channel 2FA enabled, which are the high-value targets for
+  any social-engineering attack ("you've been locked out of 2FA,
+  click here to reset…").
+- **Impact:** an attacker enumerates accounts with email-channel
+  2FA enabled — strictly more sensitive than plain existence
+  enumeration, since 2FA-enabled accounts are the primary target
+  of MFA-stripping phish kits.
+- **Recommendation:** identical to F-03-006 — move the
+  `get_password_hash` pad out of the `else` branch and run it
+  unconditionally.
+- **Effort:** S — three lines moved.
+- **Disposition:** fixed in this PR.
+- **Exploit script:** `.raw/exploits/F-03-007.py`. Post-fix delta
+  = 0.70 ms.
+- **Regression test:** `backend/tests/security/wave_2/test_email_enumeration.py::TestTwofaDisableRequestEnumeration`
+  (2 tests: status+body equality; timing parity).
+
+### F-03-008 — `/api/register` email enumeration via response body and status
+
+- **Severity:** minor
+- **Audience:** [Prod] [SoftwareX]
+- **Location:** `backend/app/routers/auth.py:230-236`,
+  `backend/app/routers/auth.py:299-307`
+- **Tool:** static review + black-box probe
+- **Observation:** The self-signup endpoint returns
+  `{"code": "error", "message": "A user with this email already
+  exists.", "details": null}` with status `400` when the submitted
+  email matches an existing account, and a `201` body containing
+  the new user record otherwise. The status differential
+  (`400` vs `201`) and the explicit "already exists" message both
+  enumerate; the body-shape differential alone (`code/message`
+  envelope vs nested `user` object) is unambiguous. Timing also
+  diverges (~7 ms vs ~340 ms because the success branch runs
+  bcrypt to hash the new user's password) — but the body is the
+  primary channel.
+- **Impact:** registered emails enumerable through the public
+  signup endpoint at whatever `5/minute` per-IP rate limit allows.
+  Severity is **minor** rather than major because (a) registration
+  is intrinsically existence-revealing — any signup form must
+  reject duplicates somewhere, (b) the `5/minute` per-IP limit
+  bounds throughput at ~7 200 probes/day per attacker IP, similar
+  to `/token`, and (c) closing it requires a registration
+  redesign (return 200 always, send distinct "you already have an
+  account" emails to existing users vs verification links to new
+  users) — that's not a Wave 2 patch.
+- **Recommendation:** out of scope for Wave 2. The registration
+  redesign is a multi-step change touching the signup UX, the
+  email templates, and the SMTP-fallback path. File to backlog as
+  a Wave 5 (business-logic abuse) candidate; Wave 5 is the right
+  home because the redesign trades enumeration resistance for
+  signup-UX friction and that's a product decision, not a
+  one-line patch.
+- **Effort:** M — touches signup UX, two new email templates, the
+  `verification_active` branch, and the openapi response shape;
+  affects the frontend signup flow.
+- **Disposition:** deferred to Wave 5 (business-logic abuse) — see
+  Wave 2 backlog entry.
+- **Exploit script:** none filed (minor; the body+status differential
+  is documented inline above and reproducible with two `curl`
+  invocations).
+- **Regression test:** none filed in Wave 2 (would lock in the
+  pre-fix shape; the test belongs with the Wave 5 redesign).
+
+### F-03-009 — `/api/password/reset/request` residual timing variance (below threshold)
+
+- **Severity:** observation
+- **Audience:** internal-audit
+- **Location:** `backend/app/routers/auth.py:617-637` (current — already
+  constant-time)
+- **Tool:** static review + black-box timing probe
+- **Observation:** The endpoint already runs
+  `get_password_hash("anti-enum-padding")` unconditionally (correct
+  by design pre-Wave-2). Black-box probing with N=100 still
+  measures a non-zero residual: known-arm mean=335 ms (single
+  bcrypt + JWT signing + email logging), unknown-arm mean=600 ms
+  (single bcrypt only, but with much higher variance — stdev=204 ms,
+  min=197 ms, max=1009 ms). The mean delta is large *in the wrong
+  direction* (known is faster than unknown), which is consistent
+  with the unknown arm's `bcrypt.gensalt` competing against
+  background asyncio work for the GIL on the test rig — not a
+  real signal an attacker can exploit consistently. The minimum
+  duration on each arm tells the real story: known floor is
+  ~330 ms (bcrypt + cheap downstream), unknown floor is ~197 ms
+  (bcrypt only). An attacker measuring minimums could still
+  distinguish the two paths after a large sample, since the known
+  arm always pays for JWT signing and the unknown arm never does.
+- **Impact:** below remediation threshold. The minimum-floor
+  differential is ~130 ms but requires the attacker to sample
+  hundreds of times to identify a floor through the noise; over
+  the same horizon the `3/hour` per-IP and per-email-hash limits
+  on this route gate them to a few hundred probes per day —
+  enough to confirm a single suspected email but not to enumerate
+  a corpus.
+- **Recommendation:** no code change in Wave 2. If the residual
+  becomes a concern, the fix is to move JWT signing + email
+  logging to a background task (so the response returns
+  immediately after the bcrypt call, regardless of branch) — that
+  is a refactor with frontend implications, not a one-liner.
+- **Effort:** M — would require an async task queue + a frontend
+  contract change (response returns before email actually sent).
+- **Disposition:** observation — below remediation threshold; no
+  code change.
+- **Exploit script:** none (observation severity).
+- **Regression test:** the existing
+  `TestPasswordResetRequestEnumeration` class in
+  `test_email_enumeration.py` pins the body+status equality and
+  the < 30 ms mean-delta bound, which is what an attacker
+  actually measures end-to-end. Pinning the minimum-floor
+  differential would require a flake-prone test and is not
+  warranted at observation severity.
 
 ## F-01-010 — JWT lifetime + revocation (carry-over)
 

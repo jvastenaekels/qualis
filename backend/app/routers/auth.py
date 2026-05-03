@@ -61,6 +61,16 @@ from fastapi import Request
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+# F-03-005: Decoy bcrypt hash used to equalise /token timing on the
+# unknown-email branch. ``verify_password`` against this hash takes the
+# same wall-clock as a real bcrypt check (cost factor 12), so the two
+# 401-arms — "no such user" and "wrong password" — become
+# indistinguishable by request latency. The hash is the bcrypt of a
+# random throwaway string and never authenticates anything (no user
+# row carries it). Generated once with ``bcrypt.hashpw(b"do-not-use-
+# this-password-it-is-a-decoy", bcrypt.gensalt())``.
+_LOGIN_DECOY_HASH = "$2b$12$OVGfAcV/ZbLQp6LJiJlMaOR324VnwW6bO.HTcA6VVP4ryk1FnXvYS"
+
 
 @router.get("/me", response_model=UserRead)
 async def read_users_me(
@@ -100,8 +110,21 @@ async def login_for_access_token(
     result = await db.execute(query)
     user = result.scalar_one_or_none()
 
-    # 2. Authenticate
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    # 2. Authenticate — branch must take comparable wall-clock on both
+    # arms, otherwise a /token caller can enumerate registered emails
+    # by request latency (F-03-005). The known arm runs bcrypt against
+    # the user's stored hash; the unknown arm runs bcrypt against a
+    # fixed decoy hash and discards the result. The cost-12 hash is
+    # the dominant ~150 ms term in either path, so the timing channel
+    # collapses.
+    if user is None:
+        verify_password(form_data.password, _LOGIN_DECOY_HASH)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -576,11 +599,21 @@ async def resend_verification(
     """Resend a verification email to an unverified account.
 
     Always returns 200 (anti-enum). If the user exists and is unverified,
-    a fresh token is emailed. Otherwise, a fake bcrypt call equalises latency
-    so callers cannot distinguish the two code paths by timing.
+    a fresh token is emailed.
+
+    Constant-time: a single ``get_password_hash`` runs unconditionally so
+    the known and unknown arms take comparable wall-clock. Pre-fix
+    (F-03-006) the bcrypt pad sat in the ``else`` branch only, so the
+    known-unverified path returned ~7 ms while the unknown path took
+    ~540 ms — a clear enumeration signal.
     """
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
+
+    # F-03-006: Constant-time padding on BOTH branches. Token signing +
+    # email logging on the success branch are negligible compared to
+    # the bcrypt cost, so a single bcrypt call equalises wall-clock.
+    get_password_hash("anti-enum-padding")
 
     if user is not None and user.email_verified_at is None:
         token = create_email_token(
@@ -590,9 +623,6 @@ async def resend_verification(
         )
         verify_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
         send_email_verification(user.email, verify_url)
-    else:
-        # Constant-time padding to equalize latency vs the real bcrypt path
-        get_password_hash("anti-enum-padding")
 
     return AckResponse(status="ok")
 
@@ -688,11 +718,21 @@ async def twofa_disable_request(
     """Self-serve 2FA disable — request the link.
 
     Anti-enum: returns 200 regardless of whether the user exists or has
-    2FA enabled. A bcrypt call equalises latency on the no-op path so the
-    response time doesn't leak account state.
+    2FA enabled.
+
+    Constant-time: a single ``get_password_hash`` runs unconditionally
+    on every call so the known and unknown arms take comparable
+    wall-clock. Pre-fix (F-03-007) the pad was only on the no-op
+    branch, so a known-with-2FA email returned ~5 ms while an unknown
+    email took ~600 ms — leaking which addresses had 2FA enabled.
     """
     result = await db.execute(select(User).where(User.email == payload.email))
     user = result.scalar_one_or_none()
+
+    # F-03-007: Constant-time padding on BOTH branches. Token signing +
+    # email logging on the success branch are negligible compared to
+    # the bcrypt cost, so a single bcrypt call equalises wall-clock.
+    get_password_hash("anti-enum-padding")
 
     if user is not None and user.is_totp_enabled:
         token = create_email_token(
@@ -704,9 +744,6 @@ async def twofa_disable_request(
         )
         url = f"{settings.FRONTEND_URL}/2fa/disable?token={token}"
         send_twofa_disable_link(user.email, url)
-    else:
-        # Constant-time padding: bcrypt of a fixed dummy
-        get_password_hash("anti-enum-padding")
 
     return AckResponse(status="ok")
 
