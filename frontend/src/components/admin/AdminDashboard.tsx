@@ -22,6 +22,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/store/useAuthStore';
+import { usePermission } from '@/hooks/usePermission';
 import { CreateStudyDialog } from '@/components/admin/CreateStudyDialog';
 import { ImportStudyDialog } from '@/components/admin/ImportStudyDialog';
 import { useTranslation } from 'react-i18next';
@@ -72,6 +73,8 @@ export function AdminDashboard() {
     const { currentProject } = useAuthStore();
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const { can } = usePermission();
+    const canCreateStudy = can('study:create'); // viewers don't see Create-study CTAs
     const {
         isLoading,
         hasStudies,
@@ -175,18 +178,26 @@ export function AdminDashboard() {
                                     'admin.dashboard.step_study_desc',
                                     'Define the sorting grid for your Q-sort.'
                                 )}
-                                action={() => setShowCreateDialog(true)}
-                                actionLabel={t('admin.dashboard.create_study', 'Create study')}
+                                action={
+                                    canCreateStudy ? () => setShowCreateDialog(true) : undefined
+                                }
+                                actionLabel={
+                                    canCreateStudy
+                                        ? t('admin.dashboard.create_study', 'Create study')
+                                        : undefined
+                                }
                             />
                         </ol>
                     </CardContent>
                 </Card>
 
-                <CreateStudyDialog
-                    open={showCreateDialog}
-                    onOpenChange={setShowCreateDialog}
-                    projectSlug={projectSlug}
-                />
+                {canCreateStudy && (
+                    <CreateStudyDialog
+                        open={showCreateDialog}
+                        onOpenChange={setShowCreateDialog}
+                        projectSlug={projectSlug}
+                    />
+                )}
             </div>
         );
     }
@@ -203,16 +214,18 @@ export function AdminDashboard() {
                         </h1>
                     </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                    <Button onClick={() => setShowCreateDialog(true)} size="sm">
-                        <Plus className="mr-2 h-3.5 w-3.5" />
-                        {t('admin.dashboard.create_study', 'Create study')}
-                    </Button>
-                    <Button onClick={() => setShowImportDialog(true)} variant="ghost" size="sm">
-                        <Upload className="mr-2 h-3.5 w-3.5" />
-                        {t('admin.dashboard.import_study', 'Import')}
-                    </Button>
-                </div>
+                {canCreateStudy && (
+                    <div className="flex items-center gap-2 shrink-0">
+                        <Button onClick={() => setShowCreateDialog(true)} size="sm">
+                            <Plus className="mr-2 h-3.5 w-3.5" />
+                            {t('admin.dashboard.create_study', 'Create study')}
+                        </Button>
+                        <Button onClick={() => setShowImportDialog(true)} variant="ghost" size="sm">
+                            <Upload className="mr-2 h-3.5 w-3.5" />
+                            {t('admin.dashboard.import_study', 'Import')}
+                        </Button>
+                    </div>
+                )}
             </div>
 
             {/* Alerts */}
@@ -267,7 +280,7 @@ export function AdminDashboard() {
                     projectSlug={projectSlug}
                     locale={currentLocale}
                     t={t}
-                    onCreateStudy={() => setShowCreateDialog(true)}
+                    onCreateStudy={canCreateStudy ? () => setShowCreateDialog(true) : undefined}
                 />
             ) : (
                 <StudyGroups
@@ -282,16 +295,20 @@ export function AdminDashboard() {
                 />
             )}
 
-            <CreateStudyDialog
-                open={showCreateDialog}
-                onOpenChange={setShowCreateDialog}
-                projectSlug={projectSlug}
-            />
-            <ImportStudyDialog
-                open={showImportDialog}
-                onOpenChange={setShowImportDialog}
-                projectSlug={projectSlug}
-            />
+            {canCreateStudy && (
+                <>
+                    <CreateStudyDialog
+                        open={showCreateDialog}
+                        onOpenChange={setShowCreateDialog}
+                        projectSlug={projectSlug}
+                    />
+                    <ImportStudyDialog
+                        open={showImportDialog}
+                        onOpenChange={setShowImportDialog}
+                        projectSlug={projectSlug}
+                    />
+                </>
+            )}
         </div>
     );
 }
@@ -412,7 +429,7 @@ function SingleStudyCard({
     // biome-ignore lint/suspicious/noExplicitAny: date-fns locale type
     locale: any;
     t: TranslateFn;
-    onCreateStudy: () => void;
+    onCreateStudy?: () => void; // omitted for viewers — Add-study CTA hides
 }) {
     const navigate = useNavigate();
     const participants = study.participant_count ?? 0;
@@ -429,15 +446,17 @@ function SingleStudyCard({
                         {t('admin.dashboard.studies', 'Studies')}
                     </h2>
                 </div>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs text-muted-foreground"
-                    onClick={onCreateStudy}
-                >
-                    <Plus className="h-3 w-3 mr-1" />
-                    {t('admin.dashboard.add_study', 'Add study')}
-                </Button>
+                {onCreateStudy && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-muted-foreground"
+                        onClick={onCreateStudy}
+                    >
+                        <Plus className="h-3 w-3 mr-1" />
+                        {t('admin.dashboard.add_study', 'Add study')}
+                    </Button>
+                )}
             </div>
 
             <Card

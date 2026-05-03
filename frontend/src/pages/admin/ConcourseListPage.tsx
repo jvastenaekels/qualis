@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAdminContext } from '@/hooks/useAdminContext';
+import { usePermission } from '@/hooks/usePermission';
 import {
     useListConcoursesApiAdminConcoursesGet,
     useCreateConcourseApiAdminConcoursesPost,
@@ -18,8 +19,15 @@ export default function ConcourseListPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { project: workspace } = useAdminContext();
+    const { can } = usePermission();
+    const canCreate = can('study:create'); // owner/member only — viewers can't auto-create
 
-    const { data, isLoading } = useListConcoursesApiAdminConcoursesGet();
+    // Gate the GET on having the project context hydrated, otherwise the
+    // request fires without an X-Project-ID header and the backend returns
+    // a spurious 403 → "Access Denied" toast on first paint.
+    const { data, isLoading } = useListConcoursesApiAdminConcoursesGet(undefined, {
+        query: { enabled: !!workspace?.slug },
+    });
     const concourses = data?.items ?? [];
 
     const createMutation = useCreateConcourseApiAdminConcoursesPost();
@@ -27,7 +35,8 @@ export default function ConcourseListPage() {
     const [error, setError] = useState<string | null>(null);
 
     const attemptCreate = useCallback(() => {
-        if (creatingRef.current || createMutation.isPending || !workspace?.slug) return;
+        if (creatingRef.current || createMutation.isPending || !workspace?.slug || !canCreate)
+            return;
         creatingRef.current = true;
         setError(null);
 
@@ -59,7 +68,7 @@ export default function ConcourseListPage() {
                     )
                 );
             });
-    }, [workspace?.slug, workspace?.title, createMutation, t, navigate]);
+    }, [workspace?.slug, workspace?.title, createMutation, t, navigate, canCreate]);
 
     useEffect(() => {
         if (isLoading || !workspace?.slug) return;
@@ -70,8 +79,10 @@ export default function ConcourseListPage() {
             return;
         }
 
-        attemptCreate();
-    }, [isLoading, concourses, workspace?.slug, navigate, attemptCreate]);
+        // Viewers cannot create — show the empty-state message instead of
+        // attempting a POST that the backend will reject with 403.
+        if (canCreate) attemptCreate();
+    }, [isLoading, concourses, workspace?.slug, navigate, attemptCreate, canCreate]);
 
     if (error) {
         return (
@@ -90,6 +101,21 @@ export default function ConcourseListPage() {
                     )}
                     {t('common.retry', 'Retry')}
                 </Button>
+            </div>
+        );
+    }
+
+    // Viewer landed on the page but no concourse exists yet and they can't
+    // create one — show a clear empty state instead of an infinite spinner.
+    if (!isLoading && concourses.length === 0 && !canCreate) {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center px-4">
+                <p className="text-sm text-slate-600">
+                    {t(
+                        'admin.concourse.viewer_empty_state',
+                        'No concourse yet. Ask the project owner or a member to create one.'
+                    )}
+                </p>
             </div>
         );
     }
