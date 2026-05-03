@@ -336,7 +336,7 @@ implementer — preference is "do the backend half" (plan line 154).
 | blocker | 0 |
 | major | 0 |
 | minor | 2 |
-| observation | 2 |
+| observation | 3 |
 | n/a | 1 |
 
 ## Findings
@@ -637,6 +637,78 @@ boundary.
 **Status:** closed.
 
 **Source:** Wave 5 inventory §"Audio upload (F-06-005 surface)".
+
+### F-06-006 — Submission idempotency and ownership-claim integrity (clean)
+
+**Severity:** observation
+
+**Category:** business-logic abuse / idempotency.
+
+**Location:**
+`backend/app/services/submission_service.py:312-400` (`_find_or_create_participant`),
+`backend/app/services/submission_service.py:402-458` (`_update_existing_participant`),
+`backend/app/models/participant.py:44` (unique constraint on `session_token`).
+
+**Observation:** `POST /api/submit` is the most security-load-bearing
+participant endpoint — it writes the Q-sort entries that become
+research data, the participant's PII, and the
+consent/recruitment-link bindings. Three abuse vectors are
+already closed:
+
+1. **Double-submit replay** — `Participant.session_token` carries
+   `unique=True` (`participant.py:44`); a double-insert raises
+   `IntegrityError` and is caught at lines 383-393 (rollback +
+   re-fetch existing row, return it without creating a duplicate
+   participant). The router commits at `submissions.py:48`.
+2. **Concurrent double-submit** — `_find_or_create_participant` runs
+   `SELECT … FOR UPDATE` on the session_token (line 333-337) inside
+   the transaction the router commits, so concurrent submissions on
+   the same token serialize at the database row level. Combined
+   with the unique constraint, no window exists where two
+   `qsort_entries` sets coexist for the same participant.
+3. **Submit-on-behalf (cross-study)** — `_find_or_create_participant`
+   checks `participant.study_id != study.id` at lines 341-342 and
+   raises `ValidationError`. A token issued for study A cannot be
+   used to submit a Q-sort to study B — the ownership claim is
+   bound at participant-row creation time and re-verified on every
+   subsequent submit.
+4. **Already-completed short-circuit** — `_update_existing_participant`
+   returns `{"already_submitted": True, …}` at lines 425-431 when
+   the participant is already in `ParticipantStatus.completed`,
+   without touching `qsort_entries`. The router surfaces the flag
+   to the client at `submissions.py:53`.
+
+**Re-submit before complete** is the one path that mutates: if a
+participant has saved a partial sort and submits again before
+completing, `_update_existing_participant` deletes the prior
+`qsort_entries` and `_persist_qsort_entries` re-inserts the new ones.
+This is correct (the participant is editing their own work-in-progress)
+and is bounded by the SELECT-FOR-UPDATE serialization above.
+
+**Doc-cite correction:** the Wave 5 plan referenced "F-04-003 pinned
+ownership for submissions" but F-04-003 is actually the **audio**
+session_token-bound ownership pin from Wave 3. The submission shape
+uses the **same session_token-only bearer model** under a different
+prior-finding ID; this finding makes that explicit so future
+auditors don't chase a wrong cite.
+
+**No code change.**
+
+**Test:**
+`backend/tests/security/wave_5/test_submission_idempotency.py` —
+6 cases: (1) completed-then-resubmit short-circuits, no extra
+qsort_entries, same confirmation_code, `already_submitted=True`;
+(2) submit-on-behalf with study A's token rejected on study B with
+"does not belong to this study"; (3) static guard on
+`Participant.session_token` unique constraint;
+(4) static guard on `with_for_update()` in
+`_find_or_create_participant`; (5) static guard on the
+`participant.study_id != study.id` check;
+(6) static guard on the `already_submitted` short-circuit.
+
+**Status:** closed (observation; pinned by regression test).
+
+**Source:** Wave 5 inventory §"Submission idempotency (F-06-006 surface)".
 
 ## Resolved since prior
 
