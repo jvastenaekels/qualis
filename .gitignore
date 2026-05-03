@@ -62,9 +62,8 @@ docs/audits/*/.raw/*
 # Claude Code scheduler state
 .claude/
 
-# Stray playwright MCP run dumps (keep ux-audit/ contents)
-.playwright-mcp/page-*.yml
-.playwright-mcp/console-*.log
+# Playwright-MCP browser session dumps — never commit (screenshots, page snapshots, console logs)
+.playwright-mcp/
 
 # Stray Playwright test-report / trace-viewer / snapshot dumps that have
 # leaked to the repo root before — pin them so they cannot be re-committed.
