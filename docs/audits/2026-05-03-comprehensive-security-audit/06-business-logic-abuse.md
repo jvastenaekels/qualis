@@ -336,7 +336,7 @@ implementer — preference is "do the backend half" (plan line 154).
 | blocker | 0 |
 | major | 0 |
 | minor | 1 |
-| observation | 1 |
+| observation | 2 |
 | n/a | 0 |
 
 ## Findings
@@ -474,6 +474,50 @@ has been added to the participant flow.
 **Status:** closed (observation; pinned by regression test).
 
 **Source:** Wave 5 inventory §"Draft-responses (F-06-002 surface)".
+
+### F-06-003 — Recruitment capacity gate uses SELECT FOR UPDATE (clean)
+
+**Severity:** observation
+
+**Category:** business-logic abuse / concurrency.
+
+**Location:**
+`backend/app/services/recruitment_service.py:84-108` (`increment_usage`),
+`backend/app/services/recruitment_service.py:126-146` (`validate_link_token`),
+`backend/app/services/submission_service.py:374-380` (only consumer).
+
+**Observation:** capacity-bound recruitment links are gated correctly
+under concurrency. `increment_usage` runs the read under
+`SELECT … FOR UPDATE` (PostgreSQL row-level lock); a concurrent
+caller blocks until the first commits, so the canonical TOCTOU
+window between "check usage_count vs capacity" and "increment
+usage_count" is closed. `validate_link_token` deliberately omits the
+capacity check (comment: "Capacity is enforced atomically in
+`increment_usage()` under a row-level lock, so we don't check it
+here (avoids TOCTOU race)") so the atomic increment is the single
+gate.
+
+The only consumer at `submission_service.py:374-380` flushes within
+the outer submission transaction, and the router commits at
+`submissions.py:48`; the lock therefore holds end-to-end across the
+participant insert and the link increment. There is no raw
+check-then-insert variant.
+
+**No code change.**
+
+**Test:**
+`backend/tests/security/wave_5/test_recruitment_capacity_race.py` —
+5 cases pin (i) the first N=capacity calls succeed and the
+(N+1)-th refuses, (ii) refusals are idempotent (usage_count does
+not advance past capacity), (iii) `validate_link_token` returns the
+link even at capacity (capacity is the increment's job), (iv)
+`increment_usage` source contains `with_for_update` (static guard),
+(v) `validate_link_token` source contains no capacity comparison
+(static guard against re-introducing the TOCTOU window).
+
+**Status:** closed (observation; pinned by regression test).
+
+**Source:** Wave 5 inventory §"Recruitment capacity (F-06-003 surface)".
 
 ## Resolved since prior
 
