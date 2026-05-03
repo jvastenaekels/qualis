@@ -6,6 +6,8 @@ from typing import Any, Literal
 from fastapi import APIRouter, Request
 from pydantic import BaseModel
 
+from app.utils.crypto import hash_ip
+
 # Configure logger specifically for frontend errors
 frontend_logger = logging.getLogger("frontend_error")
 frontend_logger.setLevel(logging.ERROR)
@@ -30,8 +32,14 @@ class LogEntry(BaseModel):
 @router.post("/logs")
 async def report_log(entry: LogEntry, request: Request) -> dict[str, str]:
     """Receives logging/error data from the frontend."""
-    # Enrich with IP if needed (caution with proxies)
-    client_ip = request.client.host if request.client else "unknown"
+    # F-05-010: never log a raw client IP. Hash with the same
+    # SHA-256 + IP_HASH_SALT used for participants.ip_address so the
+    # log line is non-identifying while still letting an investigator
+    # correlate frontend errors from the same source. The token-scrubber
+    # filter (F-03-013) only handles query strings; `extra` payloads
+    # need explicit redaction at write time.
+    raw_ip = request.client.host if request.client else None
+    client_ip_hash = hash_ip(raw_ip) if raw_ip else "unknown"
 
     log_payload = {
         "source": "frontend",
@@ -41,7 +49,7 @@ async def report_log(entry: LogEntry, request: Request) -> dict[str, str]:
         "context": entry.context,
         "url": entry.url,
         "userAgent": entry.userAgent or request.headers.get("user-agent"),
-        "ip": client_ip,
+        "ip_hash": client_ip_hash,
     }
 
     # Format meant for server logs (e.g., CloudWatch, Kibana friendly if JSONified)

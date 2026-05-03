@@ -5,7 +5,9 @@
 """S3/Cellar storage service for audio file management."""
 
 import asyncio
+import hashlib
 import logging
+import os
 import re
 from datetime import UTC, datetime
 from typing import TypedDict, cast
@@ -47,6 +49,37 @@ def _sanitise_question_key(value: str) -> str:
     if not cleaned:
         return "unknown"
     return cleaned[:_MAX_QUESTION_KEY_LEN]
+
+
+def _hashed_audio_prefix(study_slug: str, participant_token: UUID) -> str:
+    """Return an opaque hex prefix for the audio S3 key.
+
+    Pre-Wave-4 keys were ``audio/{study_slug}/{participant_token}/…``.
+    To anyone with ``s3:ListBucket`` permission the slug + token leaked
+    study existence and a per-participant identifier — and pre-
+    anonymisation, the token bound the key directly to a row. Hashing
+    the (slug + token) pair into an opaque hex prefix removes the
+    re-identification surface from key listings while keeping the
+    per-row ``s3_key`` deterministic and stable for delete/get-url
+    flows (the row stores the full key).
+
+    Reuses ``IP_HASH_SALT`` for the same operator-config reason as
+    ``hash_ip`` and ``hash_user_agent`` (one salt, one var).
+    Truncated to 32 hex chars (16 bytes) — the prefix only needs to
+    avoid collisions across the bucket; the per-key uniqueness lives
+    in the timestamp + question_key suffix.
+    """
+    salt = os.getenv("IP_HASH_SALT")
+    if not salt:
+        if os.getenv("DATABASE_URL", "").startswith("postgre"):
+            raise ValueError(
+                "IP_HASH_SALT environment variable MUST be set in production for privacy."
+            )
+        salt = "CHANGEME-insecure-dev-only"
+    digest = hashlib.sha256(
+        f"{study_slug}|{participant_token}|{salt}".encode()
+    ).hexdigest()[:32]
+    return digest
 
 
 class StorageService:
@@ -120,10 +153,17 @@ class StorageService:
         # Generate S3 key with timestamp for uniqueness.
         # question_key is sanitised before being concatenated into the path
         # — see _sanitise_question_key for the threat model.
+        # The (study, participant) prefix is a 32-char hex hash of
+        # (slug, token, salt) — see _hashed_audio_prefix. This removes
+        # study/participant metadata from S3 key listings (defence in
+        # depth against an operator-side ListBucket leak). Pre-existing
+        # rows keep their legacy key on disk; anonymisation deletes by
+        # the per-row stored s3_key, so both formats coexist safely.
         timestamp = int(datetime.now(UTC).timestamp())
         extension = self._get_extension(content_type)
         safe_question_key = _sanitise_question_key(question_key)
-        s3_key = f"audio/{study_slug}/{participant_token}/{timestamp}_{safe_question_key}{extension}"
+        prefix = _hashed_audio_prefix(study_slug, participant_token)
+        s3_key = f"audio/{prefix}/{timestamp}_{safe_question_key}{extension}"
 
         # Upload to S3 with retry for transient failures
         loop = asyncio.get_running_loop()
@@ -138,10 +178,13 @@ class StorageService:
                         Body=content,
                         ContentLength=file_size,
                         ContentType=content_type,
+                        # S3 object metadata: omit study_slug and
+                        # participant_token to mirror the hashed-key
+                        # treatment. Question key kept (sanitised) for
+                        # operator debugging — it's the form-level
+                        # context, not a participant identifier.
                         Metadata={
-                            "study": study_slug,
-                            "participant": str(participant_token),
-                            "question": question_key,
+                            "question": safe_question_key,
                         },
                     ),
                 )

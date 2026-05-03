@@ -139,6 +139,10 @@ async def discard_participant(
             status_code=404, detail="Participant not found or access denied"
         )
 
+    from app.utils.audit import log_admin_action
+
+    previous_is_discarded = participant.is_discarded
+    study_id_for_audit = participant.study_id
     try:
         participant.is_discarded = discard_data.is_discarded
         participant.discard_reason = discard_data.discard_reason
@@ -152,6 +156,17 @@ async def discard_participant(
             detail="An unexpected error occurred while updating participant status",
         )
     await db.refresh(participant)
+    # Audit-log the discard / undiscard. F-05-008: lifecycle mutations on
+    # personal data must leave a trail in `app.audit` so operators can
+    # investigate after the fact who marked which row when.
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="discard" if discard_data.is_discarded else "undiscard",
+        resource="participant",
+        resource_id=participant_id,
+        study_id=study_id_for_audit,
+        previous_is_discarded=previous_is_discarded,
+    )
     return participant
 
 
@@ -160,6 +175,7 @@ async def discard_participant(
 async def clear_all_participants(
     request: Request,
     study: Study = Depends(check_study_permission(StudyRole.editor)),
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> None:
     """Delete ALL participants for this study. Only allowed in DRAFT state."""
@@ -169,10 +185,25 @@ async def clear_all_participants(
             detail="Cannot delete all participants unless study is in DRAFT state.",
         )
     from app.services.study_data_service import StudyDataService
+    from app.utils.audit import log_admin_action
+
+    # Count before delete so the audit row is informative.
+    count_q = select(func.count(Participant.id)).where(Participant.study_id == study.id)
+    deleted_count = (await db.execute(count_q)).scalar() or 0
 
     await StudyDataService.delete_audio_files_for_study(db, study.id)
     await db.execute(delete(Participant).where(Participant.study_id == study.id))
     await db.commit()
+
+    # F-05-008: hard-delete of personal data must leave a trail.
+    log_admin_action(
+        actor_user_id=current_user.id,
+        action="clear_all_participants",
+        resource="study",
+        resource_id=study.id,
+        slug=study.slug,
+        deleted_participants=int(deleted_count),
+    )
     return None
 
 

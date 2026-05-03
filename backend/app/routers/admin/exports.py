@@ -180,15 +180,28 @@ async def export_participant_csv(
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
-    """Export single participant results as CSV."""
+    """Export single participant results as CSV.
+
+    Per-participant exports are an individual-lookup channel used for
+    follow-up / support contexts. After GDPR Art. 17 anonymisation
+    (``Participant.anonymised_at IS NOT NULL``) the row no longer
+    represents an identifiable participant — the bulk CSV / R-Kit /
+    PQMethod exports preserve the anonymous Q-sort entries as research
+    data (with PII zeroed), but the per-participant endpoints 404 to
+    avoid presenting an anonymised row as a follow-up target.
+    See F-05-006 in Wave 4.
+    """
     slug = study.slug
 
-    # Fetch participant with qsort entries and audio recordings
+    # Fetch participant with qsort entries and audio recordings.
+    # F-05-006: anonymised participants are excluded from per-participant
+    # exports (defence in depth for follow-up consumers).
     query = (
         select(Participant)
         .where(
             Participant.id == participant_id,
             Participant.study_id == study.id,
+            Participant.anonymised_at.is_(None),
         )
         .options(
             selectinload(Participant.qsort_entries),
@@ -232,8 +245,26 @@ async def export_participant_json(
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> ParticipantExportResponse:
-    """Export single participant results as JSON."""
+    """Export single participant results as JSON.
+
+    F-05-006: anonymised participants (``anonymised_at IS NOT NULL``)
+    are excluded from per-participant follow-up exports. The bulk
+    ``/dump`` endpoint still surfaces them as anonymous research
+    entries with PII zeroed.
+    """
     from ...services.study_service import StudyService
+
+    # Confirm the participant exists, belongs to this study, and is not
+    # anonymised — same scope rule as the per-participant CSV endpoint.
+    scope_res = await db.execute(
+        select(Participant.id).where(
+            Participant.id == participant_id,
+            Participant.study_id == study.id,
+            Participant.anonymised_at.is_(None),
+        )
+    )
+    if scope_res.scalar_one_or_none() is None:
+        raise HTTPException(status_code=404, detail="Participant not found")
 
     # Use the existing full dump logic but we'll filter it for the single participant
     # This ensures consistency with the data format researchers expect from the full dump.
@@ -264,13 +295,20 @@ async def export_participant_audio(
     study: Study = Depends(check_study_permission(StudyRole.editor)),
     db: AsyncSession = Depends(get_db),
 ) -> StreamingResponse:
-    """Export all audio recordings for a participant as a ZIP with metadata."""
+    """Export all audio recordings for a participant as a ZIP with metadata.
+
+    F-05-006: anonymised participants are excluded. (Anonymisation
+    deletes their audio rows + S3 objects already, so the post-filter
+    behaviour is the same — but the explicit filter keeps the API
+    contract uniform with the CSV/JSON endpoints.)
+    """
     # Fetch participant with audio recordings
     query = (
         select(Participant)
         .where(
             Participant.id == participant_id,
             Participant.study_id == study.id,
+            Participant.anonymised_at.is_(None),
         )
         .options(selectinload(Participant.audio_recordings))
     )

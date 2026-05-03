@@ -150,6 +150,7 @@ report_log
 update_progress
 save_draft
 resume_session
+withdraw_draft
 
 # submissions.py
 submit_study

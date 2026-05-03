@@ -24,7 +24,7 @@ from ..models import (
     StudyState,
 )
 from ..schemas import SubmissionInput
-from ..utils.crypto import hash_ip
+from ..utils.crypto import hash_ip, hash_user_agent
 from .recruitment_service import RecruitmentService
 from .study_service import StudyService
 
@@ -51,6 +51,7 @@ class SubmissionService:
             raise NotFoundError("Study")
 
         hashed_ip = hash_ip(ip_address or "unknown")
+        hashed_ua = hash_user_agent(user_agent)
 
         # 2. Check if participant exists
         stmt = (
@@ -76,7 +77,7 @@ class SubmissionService:
                     consented_at=datetime.now(timezone.utc),
                     consent_hash=consent_hash,
                     ip_address=hashed_ip,
-                    user_agent=user_agent,
+                    user_agent=hashed_ua,
                     status=ParticipantStatus.started,
                     last_step_reached=1,
                     last_step_reached_at=datetime.now(timezone.utc),
@@ -129,7 +130,7 @@ class SubmissionService:
             participant.consent_hash = consent_hash
             participant.language_used = language_code
             participant.ip_address = hashed_ip
-            participant.user_agent = user_agent
+            participant.user_agent = hashed_ua
             # Generate resume code if missing (e.g. pre-existing participant)
             if not participant.resume_code:
                 from ..resume_codes import generate_unique_resume_code
@@ -499,8 +500,9 @@ class SubmissionService:
         user_agent: str | None = None,
     ) -> dict[str, Any]:
         """Process and save a participant's submission."""
-        # 1. IP Hashing
+        # 1. IP + UA hashing (UA is treated like IP — see hash_user_agent docstring).
         hashed_ip = hash_ip(client_ip)
+        hashed_ua = hash_user_agent(user_agent)
         confirmation_code = str(data.session_token)[:8].upper()
 
         # 2. Get Study
@@ -544,7 +546,7 @@ class SubmissionService:
             postsort_answers=postsort_answers,
             confirmation_code=confirmation_code,
             hashed_ip=hashed_ip,
-            user_agent=user_agent,
+            user_agent=hashed_ua,
         )
 
         # 6. Validation: Consent must be recorded for completed submissions
@@ -570,7 +572,7 @@ class SubmissionService:
             postsort_answers=postsort_answers,
             confirmation_code=confirmation_code,
             hashed_ip=hashed_ip,
-            user_agent=user_agent,
+            user_agent=hashed_ua,
         )
         if shortcut is not None:
             return shortcut

@@ -149,6 +149,75 @@ async def save_draft(
     return AckResponse(status="ok")
 
 
+@router.delete("/draft", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("10/minute")
+async def withdraw_draft(
+    request: Request,
+    session_token: UUID,
+    slug: str = Path(
+        ..., title="Study Slug", description="The distinct slug of the study"
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    """Participant-initiated withdrawal of in-flight draft responses.
+
+    Honours the consent-text promise that "If you withdraw before
+    finalizing your sort, no partial data will be retained" by clearing
+    the participant's ``draft_responses`` JSON column on demand. This is
+    the lightweight counterpart to the GDPR Art. 17 self-erase route
+    (``DELETE /personal-data``): drafts are pre-submission scratch state,
+    not permanent research data, so a fast self-serve "I want to start
+    over" path is appropriate.
+
+    Authentication: the ``session_token`` query parameter is the bearer
+    of the right — only someone in possession of the original token
+    issued at consent can clear that participant's draft. Same model as
+    the resume flow.
+
+    Scope: only ``draft_responses`` is cleared. The ``last_step_reached``
+    counter is reset to 1 so the resume flow brings the participant back
+    to the start of the Q-sort (consent step is already past). All other
+    PII columns (hashed IP, UA, consent_hash, presort_answers,
+    postsort_answers) are untouched — operators who require full
+    pre-submission erasure should call the Art. 17 ``DELETE
+    /personal-data`` route instead, which is also rate-limited and
+    idempotent.
+
+    Idempotent: repeated calls return 204; a participant whose draft is
+    already empty / already submitted is a no-op (only the
+    ``draft_responses`` column is rewritten, never row-deleted).
+    """
+    result = await db.execute(
+        select(Participant)
+        .join(Study, Participant.study_id == Study.id)
+        .where(
+            Participant.session_token == session_token,
+            Study.slug == slug,
+        )
+        .with_for_update()
+    )
+    participant = result.scalar_one_or_none()
+
+    if participant is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Session not found",
+        )
+
+    # No-op if the participant already submitted: keep the row intact;
+    # the consent-text promise applies pre-submission only.
+    if participant.status == ParticipantStatus.completed:
+        return None
+
+    participant.draft_responses = None
+    # Reset progress so a subsequent resume returns the participant to
+    # the start of the Q-sort (still post-consent — consent stays).
+    participant.last_step_reached = 1
+    participant.last_step_reached_at = datetime.now(timezone.utc)
+    await db.commit()
+    return None
+
+
 @router.get("/resume/{code}", response_model=ResumeResponse)
 @limiter.limit("30/minute")
 async def resume_session(
@@ -244,6 +313,7 @@ async def participant_self_erase_personal_data(
     participants are no-ops).
     """
     from app.services.study_data_service import StudyDataService
+    from app.utils.audit import log_admin_action
 
     stmt = (
         select(Participant)
@@ -260,5 +330,22 @@ async def participant_self_erase_personal_data(
             detail="Session not found",
         )
 
+    was_already_anonymised = participant.anonymised_at is not None
+    participant_id = participant.id
+    study_id = participant.study_id
     await StudyDataService.anonymise_participant(db, participant)
+    # F-05-008: participant self-erase must also leave an audit trail.
+    # The participant is the actor; there is no admin user to attribute,
+    # so actor_user_id=None and the action carries the "self_erase" mode
+    # so an investigator can distinguish it from admin-mediated erasure.
+    log_admin_action(
+        actor_user_id=None,
+        action="erase_personal_data",
+        resource="participant",
+        resource_id=participant_id,
+        study_slug=slug,
+        study_id=study_id,
+        already_anonymised=was_already_anonymised,
+        mode="participant_self",
+    )
     return None

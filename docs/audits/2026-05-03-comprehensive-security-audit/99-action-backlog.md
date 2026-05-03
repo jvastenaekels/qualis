@@ -198,7 +198,87 @@ Cumulative across all seven waves. Items move through:
   **deferred to backlog** — `MAX_MEMBERS_PER_PROJECT` defaults to 0 (unlimited) in OSS; over-fill is recoverable post-hoc and not billing-relevant. Recommended fix when revisited: `SELECT … FOR UPDATE` on the project sentinel row, or DB-level cap constraint. Source: `04-multi-tenant-isolation.md#f-04-006`. Filed in commit `14058c16`.
 
 ## Wave 4 — Consent & anonymisation pipeline
-_pending Wave 4 plan._
+
+- F-05-001 (severity=major) — No pre-submission withdrawal mechanism; consent text
+  promised "no partial data will be retained" but `draft_responses` survived
+  abandoned sessions indefinitely.
+  **closed (backend half)** — added `DELETE /api/study/{slug}/draft?session_token=…`
+  in commit `9679e564`. Frontend "I want to start over" button and operator-side
+  abandoned-draft sweeper script deferred to Wave 4b. Source:
+  `05-consent-anonymisation.md#f-05-001`.
+- F-05-002 (severity=minor) — `user_agent` stored raw at write time, contradicting
+  the consent text's "such as IP addresses" non-exhaustive direct-identifier
+  promise.
+  **closed** — added `hash_user_agent` (SHA-256 + IP_HASH_SALT, prefixed with
+  `"mobile"`/`"desktop"` device class to preserve the per-study device
+  breakdown). Hashing now happens at the `record_consent` and `process_submission`
+  entry points; no raw UA reaches the participants table. Source:
+  `05-consent-anonymisation.md#f-05-002`.
+- F-05-003 (severity=observation) — `qsort_entries.card_comment` preserved through
+  anonymisation; participant-supplied free text may contain PII.
+  **observation; deferred** — documented as operator screening obligation per
+  the consent text; cannot be fixed programmatically (would require
+  NER/PII-redaction models out of scope for a research instrument). A Wave 4b
+  inline-redaction admin UI is filed below. Source:
+  `05-consent-anonymisation.md#f-05-003`.
+- F-05-004 (severity=minor) — Audio S3 keys leaked `study_slug` + `participant_token`
+  in the path and as object metadata.
+  **closed** — added `_hashed_audio_prefix` in storage_service; new uploads use
+  `audio/<sha256(slug|token|salt)[:32]>/<timestamp>_<question>.ext`. Stripped
+  slug + participant from the S3 Metadata block (only sanitised question kept
+  for operator debugging). Pre-existing rows retain their legacy keys; the
+  per-row `s3_key` makes both formats addressable for delete/download. Source:
+  `05-consent-anonymisation.md#f-05-004`.
+- F-05-005 (severity=observation) — Audio S3 anonymisation is fail-open; orphan
+  objects survive on S3-side outages. No bucket lifecycle policy.
+  **observation; deferred to operator + Wave 7** — fail-open is the right
+  posture for legal erasure; the bucket-side lifecycle policy must live in
+  S3/Cellar configuration and is documented as operator obligation #5 in the
+  GDPR memo. Source: `05-consent-anonymisation.md#f-05-005`.
+- F-05-006 (severity=minor) — Per-participant exports (CSV / JSON / audio) included
+  anonymised rows; `card_comment` (preserved per F-05-003) rode through to follow-up
+  consumers.
+  **closed** in commit `6a81a5f8` — added `Participant.anonymised_at IS NULL` filter
+  to all three per-participant export endpoints in `routers/admin/exports.py`. Bulk
+  exports (CSV/PQMethod/R-Kit/dump/package) intentionally unchanged: analysis exports
+  zero out PII columns but anonymised rows still contribute to factor stats. Source:
+  `05-consent-anonymisation.md#f-05-006`.
+- F-05-007 (severity=observation) — No participant-facing Article 15 self-export
+  endpoint.
+  **observation; deferred to Wave 7** — operator satisfies Art. 15 today via the
+  admin per-participant CSV/JSON endpoints; one-month response window doesn't
+  require a self-service portal. A self-serve `GET /api/study/{slug}/personal-data`
+  is documented as a Wave 7 follow-up. Source: `05-consent-anonymisation.md#f-05-007`.
+- F-05-008 (severity=minor) — Lifecycle mutations (discard / undiscard / per-participant
+  erase / clear_all_participants / participant self-erase) emitted no `log_admin_action`
+  audit row.
+  **closed** in commit `7f736f47` — added audit logging at five sites with mode
+  discriminator (`admin_mediated`, `participant_self`, `bulk_anonymise`). Source:
+  `05-consent-anonymisation.md#f-05-008`.
+- F-05-009 (severity=observation) — Anonymisation-as-Article-17 position.
+  **observation; documented** — anonymised data falls outside GDPR scope per
+  Recital 26 (no longer personal data); Qualis treats anonymisation as the legal
+  Art. 17 endpoint while preserving qsort entries as anonymous research data.
+  No code change. Source: `05-consent-anonymisation.md#f-05-009`.
+- F-05-010 (severity=minor) — Raw `request.client.host` emitted in `frontend_error`
+  logger payload via `routers/logs.py:36-45`.
+  **closed** in commit `8a4c8d6c` — IP now hashed via `hash_ip()` before logging;
+  payload key renamed `ip` → `ip_hash`. Uvicorn access-log raw IP is operator-side
+  fluentd config — documented in Wave 7 GDPR memo §(c) operator obligation #2.
+  Source: `05-consent-anonymisation.md#f-05-010`.
+
+### Wave 4b backlog (deferred)
+
+- (Wave 4b, frontend) — Add a "Withdraw / Start over" button on the resume screen
+  and the post-consent landing that calls `DELETE /api/study/{slug}/draft`.
+  Requires translation keys (`en`, `fr`, `fi`) and a confirm modal.
+- (Wave 4b, operator) — Add `backend/scripts/cleanup_abandoned_sessions.py` that
+  removes participants with `status='started' AND submitted_at IS NULL AND
+  last_step_reached_at < now() - SESSION_TTL_DAYS`. Recommended cadence: weekly cron.
+- (Wave 4b, frontend) — Inline card-comment redaction admin UI: researcher
+  reviews each comment per-participant before export, marks each as keep /
+  scrub / pseudonymise. Out of scope for the backend-only audit PR. Source:
+  F-05-003.
 
 ## Wave 5 — Business-logic abuse
 

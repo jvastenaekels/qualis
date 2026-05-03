@@ -74,9 +74,17 @@ async def test_upload_audio_happy_path_calls_put_object():
     assert call_kwargs["ContentLength"] == len(content)
     assert call_kwargs["Body"] == content
 
-    # Key structure: audio/{slug}/{token}/{timestamp}_{question}.webm
+    # Key structure: audio/{32-hex hashed prefix}/{timestamp}_{question}.webm
+    # (Wave 4 F-05-004 — slug + token hashed into the prefix so a
+    # ListBucket viewer cannot recover study or participant identity.)
     key = call_kwargs["Key"]
-    assert key.startswith(f"audio/my-study/{participant_token}/")
+    import re
+
+    assert re.match(r"^audio/[0-9a-f]{32}/", key), (
+        f"Key must start with audio/<32-hex>/: {key}"
+    )
+    assert "my-study" not in key
+    assert str(participant_token) not in key
     assert key.endswith("_post_sort_overall.webm")
 
     # Returned metadata
@@ -310,11 +318,19 @@ async def test_upload_audio_key_does_not_allow_path_traversal():
     )
 
     key = result["s3_key"]
+    import re
 
-    # Service-controlled prefix is preserved
-    assert key.startswith("audio/study/"), f"Key should start with 'audio/study/': {key}"
+    # Service-controlled prefix is preserved (post-Wave-4 layout:
+    # audio/<32-hex>/<timestamp>_<safe_question_key>.<ext>).
+    assert re.match(r"^audio/[0-9a-f]{32}/", key), (
+        f"Key must start with audio/<32-hex>/: {key}"
+    )
+    # Slug not leaked into the key (hashed into the prefix).
+    assert "study" not in key.split("/")[1], (
+        f"Slug should not appear in hashed prefix: {key}"
+    )
     # No traversal characters survived sanitisation
     assert ".." not in key
-    # The slashes from the malicious input are gone (only the 3 service-
-    # controlled separators remain: audio/<slug>/<token>/)
-    assert key.count("/") == 3, f"Unexpected slash count in key: {key}"
+    # Only the 2 service-controlled separators remain:
+    #   audio/<hashed-prefix>/<timestamp_question.ext>
+    assert key.count("/") == 2, f"Unexpected slash count in key: {key}"

@@ -88,6 +88,7 @@ import type {
     UserUpdate,
     ValidateStudyImportApiAdminStudiesValidateImportPostBody,
     VerifyInvitationApiAdminInvitationsVerifyGetParams,
+    WithdrawDraftApiStudySlugDraftDeleteParams,
 } from './model';
 
 import { faker } from '@faker-js/faker';
@@ -6667,6 +6668,15 @@ export function useGetStudyDumpApiAdminStudiesSlugDumpGet<
 
 /**
  * Export single participant results as CSV.
+
+Per-participant exports are an individual-lookup channel used for
+follow-up / support contexts. After GDPR Art. 17 anonymisation
+(``Participant.anonymised_at IS NOT NULL``) the row no longer
+represents an identifiable participant — the bulk CSV / R-Kit /
+PQMethod exports preserve the anonymous Q-sort entries as research
+data (with PII zeroed), but the per-participant endpoints 404 to
+avoid presenting an anonymised row as a follow-up target.
+See F-05-006 in Wave 4.
  * @summary Export Participant Csv
  */
 export const exportParticipantCsvApiAdminStudiesSlugParticipantsParticipantIdExportCsvGet = (
@@ -6914,6 +6924,11 @@ export function useExportParticipantCsvApiAdminStudiesSlugParticipantsParticipan
 
 /**
  * Export single participant results as JSON.
+
+F-05-006: anonymised participants (``anonymised_at IS NOT NULL``)
+are excluded from per-participant follow-up exports. The bulk
+``/dump`` endpoint still surfaces them as anonymous research
+entries with PII zeroed.
  * @summary Export Participant Json
  */
 export const exportParticipantJsonApiAdminStudiesSlugParticipantsParticipantIdExportJsonGet = (
@@ -7161,6 +7176,11 @@ export function useExportParticipantJsonApiAdminStudiesSlugParticipantsParticipa
 
 /**
  * Export all audio recordings for a participant as a ZIP with metadata.
+
+F-05-006: anonymised participants are excluded. (Anonymisation
+deletes their audio rows + S3 objects already, so the post-filter
+behaviour is the same — but the explicit filter keeps the API
+contract uniform with the CSV/JSON endpoints.)
  * @summary Export Participant Audio
  */
 export const exportParticipantAudioApiAdminStudiesSlugParticipantsParticipantIdExportAudioGet = (
@@ -13400,6 +13420,111 @@ export const useSaveDraftApiStudySlugSaveDraftPut = <
     TContext
 > => {
     const mutationOptions = getSaveDraftApiStudySlugSaveDraftPutMutationOptions(options);
+
+    return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Participant-initiated withdrawal of in-flight draft responses.
+
+Honours the consent-text promise that "If you withdraw before
+finalizing your sort, no partial data will be retained" by clearing
+the participant's ``draft_responses`` JSON column on demand. This is
+the lightweight counterpart to the GDPR Art. 17 self-erase route
+(``DELETE /personal-data``): drafts are pre-submission scratch state,
+not permanent research data, so a fast self-serve "I want to start
+over" path is appropriate.
+
+Authentication: the ``session_token`` query parameter is the bearer
+of the right — only someone in possession of the original token
+issued at consent can clear that participant's draft. Same model as
+the resume flow.
+
+Scope: only ``draft_responses`` is cleared. The ``last_step_reached``
+counter is reset to 1 so the resume flow brings the participant back
+to the start of the Q-sort (consent step is already past). All other
+PII columns (hashed IP, UA, consent_hash, presort_answers,
+postsort_answers) are untouched — operators who require full
+pre-submission erasure should call the Art. 17 ``DELETE
+/personal-data`` route instead, which is also rate-limited and
+idempotent.
+
+Idempotent: repeated calls return 204; a participant whose draft is
+already empty / already submitted is a no-op (only the
+``draft_responses`` column is rewritten, never row-deleted).
+ * @summary Withdraw Draft
+ */
+export const withdrawDraftApiStudySlugDraftDelete = (
+    slug: string,
+    params: WithdrawDraftApiStudySlugDraftDeleteParams
+) => {
+    return customInstance<void>({ url: `/api/study/${slug}/draft`, method: 'DELETE', params });
+};
+
+export const getWithdrawDraftApiStudySlugDraftDeleteMutationOptions = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(options?: {
+    mutation?: UseMutationOptions<
+        Awaited<ReturnType<typeof withdrawDraftApiStudySlugDraftDelete>>,
+        TError,
+        { slug: string; params: WithdrawDraftApiStudySlugDraftDeleteParams },
+        TContext
+    >;
+}): UseMutationOptions<
+    Awaited<ReturnType<typeof withdrawDraftApiStudySlugDraftDelete>>,
+    TError,
+    { slug: string; params: WithdrawDraftApiStudySlugDraftDeleteParams },
+    TContext
+> => {
+    const mutationKey = ['withdrawDraftApiStudySlugDraftDelete'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<
+        Awaited<ReturnType<typeof withdrawDraftApiStudySlugDraftDelete>>,
+        { slug: string; params: WithdrawDraftApiStudySlugDraftDeleteParams }
+    > = (props) => {
+        const { slug, params } = props ?? {};
+
+        return withdrawDraftApiStudySlugDraftDelete(slug, params);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type WithdrawDraftApiStudySlugDraftDeleteMutationResult = NonNullable<
+    Awaited<ReturnType<typeof withdrawDraftApiStudySlugDraftDelete>>
+>;
+
+export type WithdrawDraftApiStudySlugDraftDeleteMutationError = HTTPValidationError;
+
+/**
+ * @summary Withdraw Draft
+ */
+export const useWithdrawDraftApiStudySlugDraftDelete = <
+    TError = HTTPValidationError,
+    TContext = unknown,
+>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof withdrawDraftApiStudySlugDraftDelete>>,
+            TError,
+            { slug: string; params: WithdrawDraftApiStudySlugDraftDeleteParams },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<
+    Awaited<ReturnType<typeof withdrawDraftApiStudySlugDraftDelete>>,
+    TError,
+    { slug: string; params: WithdrawDraftApiStudySlugDraftDeleteParams },
+    TContext
+> => {
+    const mutationOptions = getWithdrawDraftApiStudySlugDraftDeleteMutationOptions(options);
 
     return useMutation(mutationOptions, queryClient);
 };
@@ -21840,6 +21965,24 @@ export const getSaveDraftApiStudySlugSaveDraftPutMockHandler = (
     );
 };
 
+export const getWithdrawDraftApiStudySlugDraftDeleteMockHandler = (
+    overrideResponse?:
+        | void
+        | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Promise<void> | void),
+    options?: RequestHandlerOptions
+) => {
+    return http.delete(
+        '*/api/study/:slug/draft',
+        async (info) => {
+            if (typeof overrideResponse === 'function') {
+                await overrideResponse(info);
+            }
+            return new HttpResponse(null, { status: 204 });
+        },
+        options
+    );
+};
+
 export const getResumeSessionApiStudySlugResumeCodeGetMockHandler = (
     overrideResponse?:
         | ResumeResponse
@@ -22119,6 +22262,7 @@ export const getQualisAPIMock = () => [
     getRecordConsentApiStudySlugConsentPostMockHandler(),
     getUpdateProgressApiStudySlugProgressPatchMockHandler(),
     getSaveDraftApiStudySlugSaveDraftPutMockHandler(),
+    getWithdrawDraftApiStudySlugDraftDeleteMockHandler(),
     getResumeSessionApiStudySlugResumeCodeGetMockHandler(),
     getParticipantSelfErasePersonalDataApiStudySlugPersonalDataDeleteMockHandler(),
     getReportLogApiLogsPostMockHandler(),

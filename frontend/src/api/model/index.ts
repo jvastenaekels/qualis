@@ -384,3 +384,4 @@ export * from './validationResultSummary';
 export * from './validationSummary';
 export * from './verifyInvitationApiAdminInvitationsVerifyGet200';
 export * from './verifyInvitationApiAdminInvitationsVerifyGetParams';
+export * from './withdrawDraftApiStudySlugDraftDeleteParams';
