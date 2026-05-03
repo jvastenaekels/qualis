@@ -702,6 +702,67 @@ Severity is **minor** because:
 §2.3 stage 6 (anonymised lifecycle node), §2.4 PII table row
 `qsort_entries.card_comment`.
 
+### F-05-007 — No participant-facing Article 15 (right of access) self-export
+
+**Severity:** observation
+
+**Location:** `backend/app/routers/participants.py` (no Article 15
+endpoint); `backend/app/routers/admin/exports.py:175-256` (admin path
+that satisfies Art. 15 today).
+
+**Concern:** GDPR Art. 15 grants the data subject a right of access
+to their personal data — typically expected to be served via a
+machine-readable self-export. Qualis ships a participant-facing
+Art. 17 erasure endpoint
+(`DELETE /api/study/{slug}/personal-data?session_token=…`) and a
+resume endpoint that returns draft state, but no participant-facing
+self-export. The grep for `session_token`, `personal-data`,
+`my-data` across `backend/app/routers/` confirms no such route
+exists in v0.6.x.
+
+**Disposition: documented as operator obligation; no Qualis-software
+change in this wave.** GDPR Art. 15 requests are served today by the
+operator (the data controller of record) joining on
+`participant.session_token` (the participant supplies their resume
+code or session token in the access request) and exporting via the
+admin per-participant CSV / JSON endpoints (`exports.py:175-256`).
+This satisfies Art. 15 procedurally — the participant submits a
+request, the operator (who is the legal data controller) responds
+within one month with a machine-readable export.
+
+A participant-facing self-export endpoint would be a UX improvement
+but is not an Art. 15 compliance gap: the right is to receive the
+data on request, not to receive it via a self-service portal. The
+lift to ship a self-export is genuinely > 30 minutes (new endpoint,
+schemas, frontend, edge cases for anonymised rows mirroring F-05-006
+contract, threading `session_token` rate-limiting, audit-log
+attribution for participant-initiated exports — all out of scope for
+Wave 4).
+
+**Remediation:**
+- Wave 7 GDPR memo (already drafted in §"(c) Operator obligations"
+  item 6) documents the operator path: "Operators should answer
+  Art. 15 requests by joining on `participant.session_token` (or
+  recruitment-link email) and exporting via the admin per-participant
+  CSV/JSON endpoints (`exports.py:175-256`)."
+- Wave 7 follow-up tracker carries the recommendation to ship a
+  participant-facing self-export gated by `session_token`, mirroring
+  the existing `/personal-data` Art. 17 route.
+
+**Test:** `backend/tests/security/wave_4/test_subject_rights.py
+::test_article_15` — pins the operator path: given a participant
+who knows their `session_token`, the admin (acting as data
+controller) can resolve that token to a `participant_id` and the
+per-participant CSV endpoint delivers their data in machine-readable
+form. Defends against accidental regressions of the operator path
+that the GDPR memo will rest on.
+
+**Status:** observation; deferred to Wave 7 (memo write-up).
+
+**Source:** Wave 4 inventory §"(c) Operator obligations" item 6;
+Wave 7 follow-up tracker bullet "Recommend a participant-facing
+Art. 15 self-export".
+
 ## GDPR-memo material (load-bearing for Wave 7)
 
 This subsection captures Wave 4's inventory in a form Wave 7's GDPR memo for
