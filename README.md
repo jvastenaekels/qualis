@@ -18,9 +18,20 @@ Design studies, collect Q-sorts, and run factor analysis from the browser. Suppo
 
 ## Statement of need
 
-Q-methodology, introduced by Stephenson (1953) as a way of studying subjectivity through rank-ordered statements, is used across the social sciences and in applied fields including health, sustainability, education, and public policy. A growing share of recent work draws on critical research traditions that foreground reflexivity, transparency of analytical choices, the situatedness of subjectivities, and the integration of participant voice into interpretation (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020). The studies this orientation invites tend to share a few practical needs: running in several languages; reaching participants across phones and computers; building and reusing the pool of candidate statements over time, with the curatorial trail kept visible; tracking how recruitment is unfolding without leaving the platform; keeping what participants say about their sort attached to the analysis; and making the analytical choices open to discussion and revision by a research team.
+Q-methodology, introduced by Stephenson (1953) as a way of studying subjectivity through rank-ordered statements, is used across the social sciences and in applied fields including health, sustainability, education, and public policy. A growing share of recent work draws on critical research traditions that foreground reflexivity, transparency of analytical choices, the situatedness of subjectivities, and the integration of participant voice into interpretation (Stainton Rogers 1997; Stenner 2011; Watts & Stenner 2012; Sneegas 2020).
 
-Qualis covers the full workflow in a single self-hosted browser application with a modern, user-friendly interface: a project-scoped concourse where candidate statements are curated, versioned, and reused across studies; visual study design with sorting grids and post-sort surveys; mobile-first recruitment and data collection with funnel monitoring; built-in factor analysis; and export to PQMethod, R, and Ken-Q formats. The choices behind each analytical step are visible and adjustable. Multiple researchers can work on the same project, with collaborative memos for analytical reflexivity, optional audio post-sorts that travel with the analysis, and a voices panel that keeps participant material adjacent to factor interpretation.
+The studies this orientation invites tend to share a few practical needs:
+
+- running in several languages;
+- reaching participants across phones and computers;
+- building and reusing the pool of candidate statements over time, with the curatorial trail kept visible;
+- tracking how recruitment is unfolding without leaving the platform;
+- keeping what participants say about their sort attached to the analysis;
+- making the analytical choices open to discussion and revision by a research team.
+
+Qualis covers the full workflow in a single self-hosted browser application with a modern, user-friendly interface: a project-scoped concourse where candidate statements are curated, versioned, and reused across studies; visual study design with sorting grids and post-sort surveys; mobile-first recruitment and data collection with funnel monitoring; built-in factor analysis; and export to PQMethod, R, and Ken-Q formats.
+
+The choices behind each analytical step are visible and adjustable. Multiple researchers can work on the same project, with collaborative memos for analytical reflexivity, optional audio post-sorts that travel with the analysis, and a voices panel that keeps participant material adjacent to factor interpretation.
 
 Data ownership stays with the researcher, and Qualis can run on institutional infrastructure to meet the GDPR data-residency expectations common in European Q research.
 
